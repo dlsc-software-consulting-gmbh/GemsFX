@@ -1,4 +1,0 @@
-.number-input-field:invalid {
-    -fx-text-fill: red;
-    -fx-border-color: red;
-}

@@ -87,7 +87,7 @@
                 <configuration>
                     <failOnError>false</failOnError>
                     <force>true</force>
-                    <windowtitle>UnitFX API</windowtitle>
+                    <windowtitle>GemsFX API</windowtitle>
                     <additionalJOption>-J-Djavafx.javadoc=true
                     </additionalJOption>
                     <docfilessubdirs>true</docfilessubdirs>
