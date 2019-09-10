@@ -1,8 +1,6 @@
 module com.dlsc.gemsfx.demo {
-
-    requires com.dlsc.gemsfx;
-
+    requires javafx.web;
     requires javafx.controls;
-
+    requires com.dlsc.gemsfx;
     exports com.dlsc.gemsfx.demo;
 }

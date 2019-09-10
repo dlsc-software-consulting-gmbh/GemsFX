@@ -1,0 +1,45 @@
+.drawer-stackpane > .drawer {
+    -fx-background-color: #e0e0e0, white;
+    -fx-background-radius: 2 2 0 0;
+    -fx-background-insets: 0, 1 1 0 1;
+    -fx-padding: 0 20 0 20;
+    -fx-spacing: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
+}
+
+.drawer-stackpane .glass-pane {
+    -fx-background-color: grey;
+}
+
+.drawer-stackpane > .drawer > .top > .header {
+    -fx-spacing: 10;
+    -fx-padding: 3 0 3 0;
+}
+
+.drawer-stackpane > .drawer > .top > .header > .title-label {
+    -fx-font-size: 21px;
+    -fx-graphic-text-gap: 20;
+}
+
+.drawer-stackpane > .drawer > .top > .header > .close-button {
+    -fx-background-insets: 0;
+    -fx-background-color: #3b424c;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-translate-y: -3;
+    -fx-padding: 2 10 5 10;
+    -fx-background-radius: 0 0 4 4;
+    -fx-cursor: hand;
+    -fx-font-size: 14;
+}
+
+.drawer-stackpane > .drawer > .top > .drag-handle {
+    -fx-padding: 2 0;
+}
+
+.drawer-stackpane > .drawer > .top > .drag-handle > .handle {
+    -fx-padding: 2 0 2 0;
+    -fx-spacing: 2;
+    -fx-pref-width: 50;
+    -fx-max-width: 50;
+}
