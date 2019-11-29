@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<keyboard name="Finish">
+    <row>
+        <keys>
+            <key chars="§" shifts="°" symbols="`" show-shift="true"/>
+            <key chars="1" shifts="!" symbols="1" show-shift="true"/>
+            <key chars="2" shifts="&quot;" symbols="2" show-shift="true"/>
+            <key chars="3" shifts="#" symbols="3" show-shift="true"/>
+            <key chars="4" shifts="€" symbols="4" show-shift="true"/>
+            <key chars="5" shifts="%" symbols="5" show-shift="true"/>
+            <key chars="6" shifts="&amp;" symbols="6" show-shift="true"/>
+            <key chars="7" shifts="/" symbols="7" show-shift="true"/>
+            <key chars="8" shifts="(" symbols="8" show-shift="true"/>
+            <key chars="9" shifts=")" symbols="9" show-shift="true"/>
+            <key chars="0" shifts="=" symbols="0" show-shift="true"/>
+            <key chars="+" shifts="?" symbols="&lt;" show-shift="true"/>
+            <key chars="´" shifts="`" symbols="&gt;" show-shift="true"/>
+            <special type="BACKSPACE" alignment="BOTTOM_RIGHT" cols="6"/>
+        </keys>
+    </row>
+    <row>
+        <keys>
+            <special type="TAB" alignment="BOTTOM_LEFT" cols="6"/>
+            <key chars="q" shifts="Q" symbols="["/>
+            <key chars="w" shifts="W" symbols="]"/>
+            <key chars="e é è" shifts="E É È" symbols="{"/>
+            <key chars="r" shifts="R" symbols="}"/>
+            <key chars="t" shifts="T" symbols="#"/>
+            <key chars="y ÿ" shifts="Y Ÿ" symbols="%"/>
+            <key chars="u ü" shifts="U Ü" symbols="^"/>
+            <key chars="i í" shifts="I Í" symbols="*"/>
+            <key chars="o ø ô ò ó õ œ ō" shifts="O Ø Ô Ò Ó Õ Œ Ō" symbols="+"/>
+            <key chars="p" shifts="P" symbols="="/>
+            <key chars="å" shifts="Å" symbols="\"/>~
+            <key chars="¨" shifts="^" symbols="|" show-shift="true"/>
+            <key chars="'" shifts="*" symbols="¥"/>
+        </keys>
+    </row>
+    <row>
+        <keys>
+            <special type="CAPS" alignment="BOTTOM_LEFT" cols="7"/>
+            <key chars="a æ à á â ã ā" shifts="A Æ À Á Â Ã Ā" symbols="-"/>
+            <key chars="s š ß ś" shifts="S Š Ś" symbols="/"/>
+            <key chars="d" shifts="D" symbols=":"/>
+            <key chars="f" shifts="F" symbols=";"/>
+            <key chars="g" shifts="G" symbols="("/>
+            <key chars="h" shifts="H" symbols=")"/>
+            <key chars="j" shifts="J" symbols="€"/>
+            <key chars="k" shifts="K" symbols="&amp;"/>
+            <key chars="l" shifts="L" symbols="@"/>
+            <key chars="ö" shifts="Ö" symbols="£"/>
+            <key chars="ä" shifts="Ä" symbols="¥"/>
+            <special type="ENTER" alignment="BOTTOM_RIGHT" cols="7"/>
+        </keys>
+    </row>
+    <row>
+        <keys>
+            <special type="SHIFT" alignment="BOTTOM_LEFT" cols="5"/>
+            <key chars="&lt;" shifts="&gt;" show-shift="true"/>
+            <key chars="z ž ź ż" shifts="Z Ž Ź Ż" symbols="%"/>
+            <key chars="x" shifts="X" symbols="..."/>
+            <key chars="c ç" shifts="C Ç" symbols="."/>
+            <key chars="v" shifts="V" symbols=","/>
+            <key chars="b" shifts="B" symbols="?"/>
+            <key chars="n ŋ ñ" shifts="N Ŋ Ñ" symbols="!"/>
+            <key chars="m" shifts="M" symbols="'"/>
+            <key chars="," shifts=";" symbols="&quot;" show-shift="true"/>
+            <key chars="." shifts=":" symbols="_" show-shift="true"/>
+            <key chars="-" shifts="_" symbols="$" show-shift="true"/>
+            <special type="SHIFT" alignment="BOTTOM_RIGHT" cols="9"/>
+        </keys>
+    </row>
+    <row>
+        <keys>
+            <special type="KEYBOARDS" alignment="BOTTOM_LEFT" cols="5"/>
+            <special type="SPECIAL_CHARACTERS" alignment="BOTTOM_LEFT" cols="5"/>
+            <special type="MICROPHONE" alignment="BOTTOM_LEFT" cols="5"/>
+            <special type="SPACE" cols="28"/>
+            <key chars="@" shifts="@" symbols="@" cols="5"/>
+            <special type="SPECIAL_CHARACTERS" alignment="BOTTOM_RIGHT" cols="5"/>
+            <special type="HIDE" alignment="BOTTOM_RIGHT" cols="5"/>
+        </keys>
+    </row>
+</keyboard>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<keyboard name="Numeric Keyboard" maxWidth="500">
+    <row>
+        <keys>
+            <key chars="7"/>
+            <key chars="8"/>
+            <key chars="9"/>
+            <special type="MINUS"/>
+        </keys>
+    </row>
+    <row>
+        <keys>
+            <key chars="4"/>
+            <key chars="5"/>
+            <key chars="6"/>
+            <special type="PLUS"/>
+        </keys>
+    </row>
+    <row>
+        <keys>
+            <key chars="1"/>
+            <key chars="2"/>
+            <key chars="3"/>
+            <special type="ENTER" rows="2"/>
+        </keys>
+    </row>
+    <row>
+        <keys>
+            <key chars="0" cols="8"/>
+            <key chars=","/>
+        </keys>
+    </row>
+</keyboard>

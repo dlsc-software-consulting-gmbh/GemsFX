@@ -1,0 +1,93 @@
+.keyboard {
+    -fx-background-color: rgb(20,20,20);
+    -fx-padding: 5;
+}
+
+.keyboard .label {
+    -fx-text-fill: white;
+}
+
+.keyboard .key {
+    -fx-background-color: grey;
+    -fx-background-insets: 0;
+}
+
+.keyboard .key:hover {
+    -fx-background-color: orange;
+}
+
+.keyboard .key:pressed {
+    -fx-background-color: derive(orange, -30%);
+}
+
+.keyboard .key .label {
+    -fx-text-fill: white;
+}
+
+.keyboard .key.dual .label {
+}
+
+.keyboard .key.special {
+    -fx-background-color: derive(grey, -30%);
+}
+
+.keyboard .key.special:disabled {
+}
+
+.keyboard .key.special .label {
+}
+
+.keyboard .key.special > .ikonli-font-icon {
+    -fx-icon-color: white;
+}
+
+.keyboard .key.special:selected {
+    -fx-background-color: white;
+}
+
+.keyboard .key.special:selected .ikonli-font-icon {
+    -fx-icon-color: black;
+}
+
+.keyboard .key.enter {
+}
+
+.keyboard .key.enter > .ikonli-font-icon {
+}
+
+.keyboard .key.space {
+    -fx-background-color: grey;
+}
+
+.keyboard .key.special.equals,
+.keyboard .key.special.plus,
+.keyboard .key.special.minus,
+.keyboard .key.special.multiply,
+.keyboard .key.special.divide {
+}
+
+.keyboard > * > .toolbar {
+}
+
+.keyboard > * > .toolbar > .ikonli-font-icon {
+    -fx-icon-color: white;
+}
+
+.keyboard .extra-keys-box {
+    -fx-background-color: gray, lightgrey;
+}
+
+.keyboard .keyboard-selector {
+}
+
+.keyboard .keyboard-selector .toggle-button {
+}
+
+.keyboard .keyboard-selector .toggle-button:selected {
+    -fx-background-color: rgb(52, 123, 246);
+    -fx-text-fill: white;
+    -fx-border-width: 0;
+}
+
+.keyboard .keyboard-selector .toggle-button.last {
+}
