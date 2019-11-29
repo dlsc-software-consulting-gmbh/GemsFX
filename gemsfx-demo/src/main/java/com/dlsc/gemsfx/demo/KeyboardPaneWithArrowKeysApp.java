@@ -6,7 +6,7 @@ import com.dlsc.gemsfx.keyboard.KeyboardView;
 
 import javax.xml.bind.JAXBException;
 
-public class KeyboardPaneDemoWithArrowKeys extends KeyboardPaneDemoApp {
+public class KeyboardPaneWithArrowKeysApp extends KeyboardPaneDemoApp {
 
     @Override
     protected KeyboardPane createKeyboardPane() {

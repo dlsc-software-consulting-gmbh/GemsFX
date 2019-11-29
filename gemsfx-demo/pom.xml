@@ -25,7 +25,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.3</version>
                 <configuration>
-                    <mainClass>com.dlsc.gemsfx.demo.DrawerDemoApp</mainClass>
+                    <mainClass>com.dlsc.gemsfx.demo.DrawerApp</mainClass>
                 </configuration>
             </plugin>
 

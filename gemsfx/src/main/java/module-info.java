@@ -1,5 +1,6 @@
 module com.dlsc.gemsfx {
     requires transitive javafx.controls;
+    requires javafx.swing;
 
     requires com.sun.xml.bind;
 
@@ -16,6 +17,8 @@ module com.dlsc.gemsfx {
 
     requires retrofit2;
     requires okhttp3;
+    requires org.apache.pdfbox;
+    requires java.desktop;
 
     exports com.dlsc.gemsfx.util;
     exports com.dlsc.gemsfx;

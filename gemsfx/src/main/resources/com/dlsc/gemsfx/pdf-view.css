@@ -1,0 +1,34 @@
+.pdf-view {
+}
+
+.pdf-view .list-cell {
+    -fx-padding: 20 20 10 10;
+    -fx-background-color: rgb(245, 245, 245) !important;
+}
+
+.pdf-view .list-cell .page-number-label,
+.pdf-view .list-cell:selected .page-number-label {
+    -fx-text-fill: grey;
+    -fx-font-size: 10px;
+}
+
+.pdf-view .list-cell:selected {
+    -fx-background-color: rgb(245, 245, 245) !important;
+}
+
+.pdf-view .list-cell .image-view-wrapper {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .1), 6, 0.2, 0, 0);;
+}
+
+.pdf-view .thumbnail-list-view {
+    -fx-pref-width: 200;
+}
+
+.pdf-view .thumbnail-list-view .list-cell .image-view-wrapper {
+    -fx-padding: 2px;
+}
+
+.pdf-view .thumbnail-list-view .list-cell:selected .image-view-wrapper {
+    -fx-background-color: -fx-selection-bar;
+    -fx-background-radius: 2px;
+}

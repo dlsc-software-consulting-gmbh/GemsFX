@@ -5,12 +5,13 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class KeyboardDemo extends Application {
+public class KeyboardDarkApp extends Application {
 
     @Override
     public void start(Stage stage) {
         KeyboardView view =  new KeyboardView();
         view.setPrefSize(1000, 340);
+        view.setDarkMode(true);
         Scene scene = new Scene(view);
         stage.setScene(scene);
         stage.sizeToScene();

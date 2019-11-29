@@ -7,7 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
-public class DrawerDemoApp extends Application {
+public class DrawerApp extends Application {
 
     @Override
     public void start(Stage stage) {

@@ -17,6 +17,7 @@ public class KeyboardPaneDemoApp extends Application {
         keyboardPane.setPrefSize(1000, 900);
         Scene scene = new Scene(keyboardPane);
         stage.setScene(scene);
+        stage.setTitle("JavaFX Keyboard Pane");
         stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
