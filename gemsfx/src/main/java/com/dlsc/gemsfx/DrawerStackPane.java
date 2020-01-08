@@ -168,6 +168,25 @@ public class DrawerStackPane extends StackPane {
         this.fadeInOut.set(animate);
     }
 
+    private final BooleanProperty autoHide = new SimpleBooleanProperty(this, "autoHide", true);
+
+    public boolean isAutoHide() {
+        return autoHide.get();
+    }
+
+    /**
+     * Makes the drawer close if the user clicks in the background (onto the glass pane).
+     *
+     * @return true if the drawer hides when user clicks on background
+     */
+    public BooleanProperty autoHideProperty() {
+        return autoHide;
+    }
+
+    public void setAutoHide(boolean autoHide) {
+        this.autoHide.set(autoHide);
+    }
+
     class GlassPane extends StackPane {
 
         public GlassPane() {
@@ -176,7 +195,11 @@ public class DrawerStackPane extends StackPane {
             setVisible(false);
             setManaged(false);
             setMouseTransparent(false);
-            setOnMouseClicked(evt -> setShowDrawer(false));
+            setOnMouseClicked(evt -> {
+                if (isAutoHide()) {
+                    setShowDrawer(false);
+                }
+            });
 
             hide.bind(showDrawer.not());
 
