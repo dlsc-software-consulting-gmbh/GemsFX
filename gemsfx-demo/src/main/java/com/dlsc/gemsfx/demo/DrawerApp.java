@@ -21,7 +21,7 @@ public class DrawerApp extends Application {
         drawerStackPane.getChildren().add(showButton);
         showButton.setOnAction(evt -> drawerStackPane.setShowDrawer(true));
         Scene scene = new Scene(drawerStackPane);
-        stage.setTitle("GemsFX Demo");
+        stage.setTitle("Drawer Demo");
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
