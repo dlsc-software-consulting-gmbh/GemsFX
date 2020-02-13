@@ -13,7 +13,7 @@ public class RTLink extends RTTextElement<RTLink> {
 
     public static RTLink create(String text, String url) {
         try {
-            return new RTLink(text).withURL(new URL(url));
+            return new RTLink().withText(text).withURL(new URL(url));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

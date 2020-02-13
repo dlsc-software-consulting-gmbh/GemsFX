@@ -7,6 +7,7 @@ import javafx.scene.control.Control;
 public class RichTextArea2 extends Control {
 
     public RichTextArea2() {
+        getStyleClass().add("rich-text-area");
     }
 
     @Override
