@@ -28,6 +28,7 @@
 }
 
 .rich-text-area .link {
+    -fx-underline: true;
 }
 
 .rich-text-area .link:hover {
@@ -42,12 +43,20 @@
 }
 
 .rich-text-area .heading {
-    -fx-padding: 20 0 10 0;
+    -fx-padding: 0 0 10 0;
     -fx-font-weight: bold;
     -fx-font-size: 1.2em;
+}
+
+.rich-text-area .paragraph {
+    -fx-padding: 0 0 10 0;
 }
 
 .rich-text-area .placeholder {
     -fx-font-style: italic;
     -fx-text-fill: gray;
+}
+
+.rich-text-area .list-block {
+    -fx-hgap: 5;
 }

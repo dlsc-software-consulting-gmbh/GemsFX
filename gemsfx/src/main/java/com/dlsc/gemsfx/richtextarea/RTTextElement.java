@@ -1,4 +1,4 @@
-package com.dlsc.gemsfx.rtf;
+package com.dlsc.gemsfx.richtextarea;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

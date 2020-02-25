@@ -1,13 +1,12 @@
-package com.dlsc.gemsfx.rtf;
+package com.dlsc.gemsfx.richtextarea;
 
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public abstract class RTElementContainer<SELF extends RTElementContainer> extends RTElement<SELF> {
 
-    private ListProperty<RTElement> elements = new SimpleListProperty<>(this, "elements", FXCollections.observableArrayList());
+    private ReadOnlyListWrapper<RTElement> elements = new ReadOnlyListWrapper<>(this, "elements", FXCollections.observableArrayList());
 
     protected RTElementContainer() {
     }
@@ -18,6 +17,6 @@ public abstract class RTElementContainer<SELF extends RTElementContainer> extend
     }
 
     public ObservableList<RTElement> getElements() {
-        return elements.get();
+        return elements.getReadOnlyProperty();
     }
 }

@@ -1,4 +1,4 @@
-package com.dlsc.gemsfx.rtf;
+package com.dlsc.gemsfx.richtextarea;
 
 public class RTHeading extends RTTextElement<RTHeading> {
 
@@ -8,7 +8,7 @@ public class RTHeading extends RTTextElement<RTHeading> {
     }
 
     public static RTHeading create(String text) {
-        return new RTHeading(text);
+        return new RTHeading().withText(text);
     }
 
     public RTHeading withLevel(int level) {

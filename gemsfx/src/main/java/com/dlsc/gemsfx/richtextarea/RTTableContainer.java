@@ -1,4 +1,4 @@
-package com.dlsc.gemsfx.rtf;
+package com.dlsc.gemsfx.richtextarea;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

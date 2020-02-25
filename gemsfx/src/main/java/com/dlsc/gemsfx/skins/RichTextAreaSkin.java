@@ -1,12 +1,27 @@
-package com.dlsc.gemsfx.rtf;
+package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.rtf.RTList.Type;
+import com.dlsc.gemsfx.richtextarea.RTDocument;
+import com.dlsc.gemsfx.richtextarea.RTElement;
+import com.dlsc.gemsfx.richtextarea.RTElementContainer;
+import com.dlsc.gemsfx.richtextarea.RTHeading;
+import com.dlsc.gemsfx.richtextarea.RTImage;
+import com.dlsc.gemsfx.richtextarea.RTLink;
+import com.dlsc.gemsfx.richtextarea.RTList;
+import com.dlsc.gemsfx.richtextarea.RTList.Type;
+import com.dlsc.gemsfx.richtextarea.RTListItem;
+import com.dlsc.gemsfx.richtextarea.RTParagraph;
+import com.dlsc.gemsfx.richtextarea.RTTable;
+import com.dlsc.gemsfx.richtextarea.RTTableBody;
+import com.dlsc.gemsfx.richtextarea.RTTableCell;
+import com.dlsc.gemsfx.richtextarea.RTTableHead;
+import com.dlsc.gemsfx.richtextarea.RTTableRow;
+import com.dlsc.gemsfx.richtextarea.RTText;
+import com.dlsc.gemsfx.richtextarea.RTTextElement;
+import com.dlsc.gemsfx.richtextarea.RichTextArea;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,6 +29,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -26,7 +42,7 @@ import javafx.util.Callback;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class RichTextArea2Skin extends SkinBase<RichTextArea2> {
+public class RichTextAreaSkin extends SkinBase<RichTextArea> {
 
     private final Label placeholder = new Label();
 
@@ -34,12 +50,10 @@ public class RichTextArea2Skin extends SkinBase<RichTextArea2> {
 
     private VBox container = new VBox();
 
-    public RichTextArea2Skin(RichTextArea2 control) {
+    public RichTextAreaSkin(RichTextArea control) {
         super(control);
 
-        control.documentProperty().addListener(it -> updateText());
-
-        placeholder.textProperty().bind(placeholderText);
+        placeholder.textProperty().bind(control.placeholderTextProperty());
 
         container.setFillWidth(true);
 
@@ -50,20 +64,9 @@ public class RichTextArea2Skin extends SkinBase<RichTextArea2> {
         placeholder.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         VBox.setVgrow(placeholder, Priority.ALWAYS);
         container.getChildren().add(placeholder);
-    }
 
-    private final StringProperty placeholderText = new SimpleStringProperty(this, "placeholderText", "No content");
-
-    public final StringProperty placeholderTextProperty() {
-        return placeholderText;
-    }
-
-    public void setPlaceholderText(String text) {
-        placeholderText.set(text);
-    }
-
-    public final String getPlaceholderText() {
-        return placeholderText.get();
+        control.documentProperty().addListener(it -> updateText());
+        updateText();
     }
 
     protected double computePrefWidth(double height) {
@@ -154,17 +157,17 @@ public class RichTextArea2Skin extends SkinBase<RichTextArea2> {
         section.getChildren().add(imageView);
     }
 
-    private final ObjectProperty<Callback<String, javafx.scene.image.Image>> imageProvider = new SimpleObjectProperty<>(this, "imageProvider");
+    private final ObjectProperty<Callback<String, Image>> imageProvider = new SimpleObjectProperty<>(this, "imageProvider");
 
-    public Callback<String, javafx.scene.image.Image> getImageProvider() {
+    public Callback<String, Image> getImageProvider() {
         return imageProvider.get();
     }
 
-    public ObjectProperty<Callback<String, javafx.scene.image.Image>> imageProviderProperty() {
+    public ObjectProperty<Callback<String, Image>> imageProviderProperty() {
         return imageProvider;
     }
 
-    public void setImageProvider(Callback<String, javafx.scene.image.Image> imageProvider) {
+    public void setImageProvider(Callback<String, Image> imageProvider) {
         this.imageProvider.set(imageProvider);
     }
 
@@ -247,28 +250,22 @@ public class RichTextArea2Skin extends SkinBase<RichTextArea2> {
         section.addChild(label);
     }
 
-    private Consumer<String> hyperlinkConsumer;
-
-    public void setHyperlinkConsumer(Consumer<String> hyperlinkConsumer) {
-        this.hyperlinkConsumer = hyperlinkConsumer;
-    }
-
     private void createLink(RTLink link, Section section) {
-        String target = link.getUrl().toExternalForm();
         javafx.scene.text.Text uiText = createText(link, section);
 
         uiText.setOnMouseClicked(evt -> {
-            if (hyperlinkConsumer != null) {
-                hyperlinkConsumer.accept(target);
+            final Consumer<String> hyperlinkHandler = getSkinnable().getHyperlinkHandler();
+            if (hyperlinkHandler != null) {
+                hyperlinkHandler.accept(link.getTarget());
             }
         });
 
         uiText.getStyleClass().add("link");
-        uiText.setUnderline(true);
     }
 
     private void createParagraph(RTParagraph paragraph, Section section) {
         Section newSection = new Section();
+        newSection.getStyleClass().add("paragraph");
 
         if (paragraph.getElements().isEmpty()) {
             newSection.getStyleClass().add("gap");
@@ -342,7 +339,8 @@ public class RichTextArea2Skin extends SkinBase<RichTextArea2> {
 
     private void createOrderedListItem(int number, RTListItem item, GridPane gridPane, int row) {
         javafx.scene.text.Text bullet = new javafx.scene.text.Text(number + ".");
-        bullet.getStyleClass().add("text");
+        bullet.getStyleClass().addAll("text", "bullet");
+        bullet.getStyleClass().addAll(item.getStyleClass());
         Section itemSection = new Section();
         gridPane.add(bullet, 0, row);
         gridPane.add(itemSection, 1, row);
@@ -355,7 +353,8 @@ public class RichTextArea2Skin extends SkinBase<RichTextArea2> {
 
     private void createBulletListItem(RTListItem item, GridPane gridPane, int row) {
         javafx.scene.text.Text bullet = new javafx.scene.text.Text("\u2022");
-        bullet.getStyleClass().add("text");
+        bullet.getStyleClass().addAll("text", "bullet");
+        bullet.getStyleClass().addAll(item.getStyleClass());
 
         Section itemSection = new Section();
 

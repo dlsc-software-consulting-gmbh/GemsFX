@@ -1,4 +1,4 @@
-package com.dlsc.gemsfx.rtf;
+package com.dlsc.gemsfx.richtextarea;
 
 public class RTTableBody extends RTTableContainer<RTTableBody> {
 
