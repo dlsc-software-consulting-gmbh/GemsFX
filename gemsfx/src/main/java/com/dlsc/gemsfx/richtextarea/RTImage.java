@@ -13,11 +13,11 @@ public class RTImage extends RTElement<RTImage> {
         return new RTImage();
     }
 
-    public Image getImage() {
+    public final Image getImage() {
         return image;
     }
 
-    public RTImage withImage(Image image) {
+    public final RTImage withImage(Image image) {
         this.image = image;
         return this;
     }

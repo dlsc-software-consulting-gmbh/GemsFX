@@ -8,12 +8,12 @@ public abstract class RTTableContainer<SELF extends RTTableContainer> extends RT
     private final ObservableList<RTTableRow> rows = FXCollections.observableArrayList();
 
 
-    public SELF withRows(RTTableRow... row) {
+    public final SELF withRows(RTTableRow... row) {
         rows.setAll(row);
         return (SELF) this;
     }
 
-    public ObservableList<RTTableRow> getRows() {
+    public final ObservableList<RTTableRow> getRows() {
         return rows;
     }
 }

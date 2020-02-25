@@ -15,30 +15,30 @@ public class RTTableCell extends RTElementContainer<RTTableCell> {
         return new RTTableCell();
     }
 
-    public RTTableCell withRowSpan(int span) {
+    public final RTTableCell withRowSpan(int span) {
         this.rowSpan = rowSpan;
         return this;
     }
 
-    public RTTableCell withColSpan(int span) {
+    public final RTTableCell withColSpan(int span) {
         this.colSpan = colSpan;
         return this;
     }
 
-    public RTTableCell withAlignment(Pos alignment) {
+    public final RTTableCell withAlignment(Pos alignment) {
         this.alignment = alignment;
         return this;
     }
 
-    public int getRowSpan() {
+    public final int getRowSpan() {
         return rowSpan;
     }
 
-    public int getColSpan() {
+    public final int getColSpan() {
         return colSpan;
     }
 
-    public Pos getAlignment() {
+    public final Pos getAlignment() {
         return alignment;
     }
 }

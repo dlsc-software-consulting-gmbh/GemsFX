@@ -25,30 +25,30 @@ public class RTList extends RTElement<RTList> {
         return new RTList().withItems(items);
     }
 
-    public RTList withItems(RTListItem... items) {
+    public final RTList withItems(RTListItem... items) {
         this.items.setAll(items);
         return this;
     }
 
-    public RTList withStart(int start) {
+    public final RTList withStart(int start) {
         this.start = start;
         return this;
     }
 
-    public RTList withType(Type type) {
+    public final RTList withType(Type type) {
         this.type = type;
         return this;
     }
 
-    public int getStart() {
+    public final int getStart() {
         return start;
     }
 
-    public Type getType() {
+    public final Type getType() {
         return type;
     }
 
-    public ObservableList<RTListItem> getItems() {
+    public final ObservableList<RTListItem> getItems() {
         return items.get();
     }
 }

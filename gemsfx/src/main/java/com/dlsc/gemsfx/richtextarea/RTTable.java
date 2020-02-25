@@ -12,21 +12,21 @@ public class RTTable extends RTElement<RTTable> {
         return new RTTable();
     }
 
-    public RTTable withHead(RTTableHead head) {
+    public final RTTable withHead(RTTableHead head) {
         this.head = head;
         return this;
     }
 
-    public RTTable withBody(RTTableBody body) {
+    public final RTTable withBody(RTTableBody body) {
         this.body = body;
         return this;
     }
 
-    public RTTableHead getHead() {
+    public final RTTableHead getHead() {
         return head;
     }
 
-    public RTTableBody getBody() {
+    public final RTTableBody getBody() {
         return body;
     }
 }

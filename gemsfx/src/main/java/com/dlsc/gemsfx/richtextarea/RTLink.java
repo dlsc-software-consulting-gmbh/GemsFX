@@ -16,22 +16,22 @@ public class RTLink extends RTTextElement<RTLink> {
         return create(text).withTarget(url);
     }
 
-    public RTLink withTarget(String url) {
+    public final RTLink withTarget(String url) {
         this.target.set(url);
         return this;
     }
 
     private final StringProperty target = new SimpleStringProperty(this, "target");
 
-    public String getTarget() {
+    public final String getTarget() {
         return target.get();
     }
 
-    public StringProperty targetProperty() {
+    public final StringProperty targetProperty() {
         return target;
     }
 
-    public void setTarget(String target) {
+    public final void setTarget(String target) {
         this.target.set(target);
     }
 }

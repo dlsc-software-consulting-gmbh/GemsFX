@@ -247,6 +247,7 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
     private void createHeading(RTHeading heading, Section section) {
         Label label = new Label(heading.getText());
         label.getStyleClass().addAll("text", "heading");
+        label.setStyle(heading.getStyle());
         section.addChild(label);
     }
 
@@ -266,6 +267,7 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
     private void createParagraph(RTParagraph paragraph, Section section) {
         Section newSection = new Section();
         newSection.getStyleClass().add("paragraph");
+        newSection.setStyle(paragraph.getStyle());
 
         if (paragraph.getElements().isEmpty()) {
             newSection.getStyleClass().add("gap");
@@ -284,6 +286,8 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
 
     private javafx.scene.text.Text createText(RTTextElement text, Section section) {
         javafx.scene.text.Text uiText = new javafx.scene.text.Text(text.getText());
+        uiText.setStyle(text.getStyle());
+
         if (text.isItalic()) {
             uiText.getStyleClass().add("italic");
         }
@@ -315,6 +319,7 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
     private void createList(RTList list, Section section) {
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("list-block");
+        gridPane.setStyle(list.getStyle());
 
         if (list.getType().equals(Type.ORDERED)) {
             gridPane.getStyleClass().add("ordered-list");

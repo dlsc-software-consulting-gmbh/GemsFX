@@ -30,53 +30,53 @@ public abstract class RTTextElement<SELF extends RTTextElement> extends RTElemen
         this.text.set(text);
     }
 
-    public SELF withText(String text) {
+    public final SELF withText(String text) {
         setText(text);
         return (SELF) this;
     }
 
-    public SELF withSubscript(boolean on) {
+    public final SELF withSubscript(boolean on) {
         this.subscript = on;
         return (SELF) this;
     }
 
-    public SELF withSuperscript(boolean on) {
+    public final SELF withSuperscript(boolean on) {
         this.superscript = on;
         return (SELF) this;
     }
 
-    public SELF withItalic(boolean on) {
+    public final SELF withItalic(boolean on) {
         this.italic = on;
         return (SELF) this;
     }
 
-    public SELF withBold(boolean on) {
+    public final SELF withBold(boolean on) {
         this.bold = on;
         return (SELF) this;
     }
 
-    public SELF withTextFill(Color color) {
+    public final SELF withTextFill(Color color) {
         this.textFill = color;
         return (SELF) this;
     }
 
-    public boolean isSubscript() {
+    public final boolean isSubscript() {
         return subscript;
     }
 
-    public boolean isSuperscript() {
+    public final boolean isSuperscript() {
         return superscript;
     }
 
-    public boolean isItalic() {
+    public final boolean isItalic() {
         return italic;
     }
 
-    public boolean isBold() {
+    public final boolean isBold() {
         return bold;
     }
 
-    public Color getTextFill() {
+    public final Color getTextFill() {
         return textFill;
     }
 }

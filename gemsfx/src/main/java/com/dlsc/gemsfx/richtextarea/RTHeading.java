@@ -11,12 +11,12 @@ public class RTHeading extends RTTextElement<RTHeading> {
         return new RTHeading().withText(text);
     }
 
-    public RTHeading withLevel(int level) {
+    public final RTHeading withLevel(int level) {
         this.level = level;
         return this;
     }
 
-    public int getLevel() {
+    public final int getLevel() {
         return level;
     }
 }

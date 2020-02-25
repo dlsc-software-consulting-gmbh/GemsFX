@@ -11,12 +11,12 @@ public abstract class RTElementContainer<SELF extends RTElementContainer> extend
     protected RTElementContainer() {
     }
 
-    public SELF withElements(RTElement... elements) {
+    public final SELF withElements(RTElement... elements) {
         this.elements.setAll(elements);
         return (SELF) this;
     }
 
-    public ObservableList<RTElement> getElements() {
+    public final ObservableList<RTElement> getElements() {
         return elements.getReadOnlyProperty();
     }
 }

@@ -14,12 +14,12 @@ public class RTTableRow extends RTElement<RTTableRow> {
         return new RTTableRow();
     }
 
-    public RTTableRow withCells(RTTableCell... cells) {
+    public final RTTableRow withCells(RTTableCell... cells) {
         this.cells.setAll(cells);
         return this;
     }
 
-    public ObservableList<RTTableCell> getCells() {
+    public final ObservableList<RTTableCell> getCells() {
         return cells;
     }
 }
