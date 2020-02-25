@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.2.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.2.0) (2020-02-25)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.0.0...1.2.0)
+
 ## [1.0.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.0.0) (2019-09-10)
 [Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.1.0...1.0.0)
 
