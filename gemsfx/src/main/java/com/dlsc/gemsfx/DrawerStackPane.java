@@ -63,7 +63,8 @@ public class DrawerStackPane extends StackPane {
         drawer = createContainer();
         drawer.getStyleClass().add("drawer");
         drawer.setVisible(false);
-        drawer.setManaged(false);
+        drawer.setMinHeight(0);
+        drawer.setPrefHeight(0);
 
         glassPane = new GlassPane();
 
@@ -193,10 +194,9 @@ public class DrawerStackPane extends StackPane {
             getStyleClass().add("glass-pane");
 
             setVisible(false);
-            setManaged(false);
             setMouseTransparent(false);
             setOnMouseClicked(evt -> {
-                if (isAutoHide()) {
+                if (isAutoHide() && evt.getButton().equals(MouseButton.PRIMARY) && !evt.isConsumed()) {
                     setShowDrawer(false);
                 }
             });
@@ -207,7 +207,6 @@ public class DrawerStackPane extends StackPane {
 
                 if (isFadeInOut()) {
                     setVisible(true);
-                    setManaged(true);
 
                     FadeTransition fadeTransition = new FadeTransition();
                     fadeTransition.setDuration(Duration.millis(200));
@@ -217,14 +216,12 @@ public class DrawerStackPane extends StackPane {
                     fadeTransition.setOnFinished(evt -> {
                         if (isHide()) {
                             setVisible(false);
-                            setManaged(false);
                         }
                     });
                     fadeTransition.play();
                 } else {
                     setOpacity(isHide() ? 0 : .5);
                     setVisible(!isHide());
-                    setManaged(!isHide());
                 }
             });
         }
