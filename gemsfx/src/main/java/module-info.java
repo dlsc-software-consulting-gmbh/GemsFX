@@ -4,7 +4,7 @@ module com.dlsc.gemsfx {
 
     requires com.sun.xml.bind;
 
-    requires org.kordamp.ikonli.core;
+    requires org.kordamp.iconli.core;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign;
 
