@@ -1,0 +1,12 @@
+.email-field {
+}
+
+.email-field .icon-wrapper {
+    -fx-padding: 5;
+}
+
+.email-field .icon-wrapper .ikonli-font-icon {
+    -fx-icon-code: "mdi-alert";
+    -fx-icon-size: 16px;
+    -fx-icon-color: red;
+}

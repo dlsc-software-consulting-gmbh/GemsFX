@@ -14,6 +14,7 @@ module com.dlsc.gemsfx {
     requires java.prefs;
 
     requires java.xml.bind;
+    requires commons.validator;
     requires org.apache.commons.lang3;
     requires org.controlsfx.controls;
 
