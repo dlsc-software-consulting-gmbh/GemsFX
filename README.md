@@ -24,6 +24,43 @@ A read-only text area that is capable of displaying nicely formatted text. The c
 
 ![RichTextArea](gemsfx/docs/rich-textarea.png)
 
+```java
+RichTextArea area = new RichTextArea();
+        area.setDocument(
+                RTDocument.create(
+                        RTHeading.create("Heading 1"),
+                        RTParagraph.create(
+                                RTText.create("This is the first paragraph. "),
+                                RTText.create("Some text comes here before the link that "),
+                                RTLink.create("points to the website ", "https://www.dlsc.com"),
+                                RTText.create("of DLSC Software & Consulting.")
+                        ),
+                        RTParagraph.create(
+                                RTText.create("Here comes the second paragraph.")
+                        ),
+                        RTParagraph.create(),
+                        RTHeading.create("Heading 2"),
+                        RTParagraph.create(
+                                RTText.create("Some text for the first paragraph after heading 2."),
+                                RTList.create(
+                                        RTListItem.create("List item 1"),
+                                        RTListItem.create("List item 2"),
+                                        RTListItem.create("List item 3",
+                                                RTList.create(
+                                                        RTListItem.create("Sub item A"),
+                                                        RTListItem.create("Sub item B"),
+                                                        RTListItem.create("Sub item C"),
+                                                        RTListItem.create("Sub item D")
+                                                )
+                                        ),
+                                        RTListItem.create("List item 4")
+                                )
+                        )
+                )
+        );```
+
+
+
 
 
 
