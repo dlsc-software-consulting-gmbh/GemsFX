@@ -2,11 +2,9 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PDFView;
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -22,7 +20,6 @@ public class PDFViewApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         PDFView view = new PDFView();
-
         Button loadButton = new Button("Load PDF ...");
         loadButton.setMaxWidth(Double.MAX_VALUE);
         loadButton.setOnAction(evt -> {
@@ -45,13 +42,10 @@ public class PDFViewApp extends Application {
         });
 
         VBox.setVgrow(view, Priority.ALWAYS);
-        VBox box = new VBox(20, view, loadButton);
+        VBox box = new VBox(view, loadButton);
         box.setFillWidth(true);
 
-        StackPane stackPane = new StackPane(box);
-        stackPane.setPadding(new Insets(20));
-
-        Scene scene = new Scene(stackPane);
+        Scene scene = new Scene(box);
         primaryStage.setTitle("PDF View");
         primaryStage.setWidth(1000);
         primaryStage.setHeight(900);

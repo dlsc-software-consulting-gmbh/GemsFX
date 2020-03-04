@@ -1,22 +1,22 @@
 .pdf-view {
 }
 
-.pdf-view .list-cell {
+.pdf-view .list-view .list-cell {
     -fx-padding: 20 20 10 10;
     -fx-background-color: rgb(245, 245, 245) !important;
 }
 
-.pdf-view .list-cell .page-number-label,
-.pdf-view .list-cell:selected .page-number-label {
+.pdf-view .list-view .list-cell .page-number-label,
+.pdf-view .list-view .list-cell:selected .page-number-label {
     -fx-text-fill: grey;
     -fx-font-size: 10px;
 }
 
-.pdf-view .list-cell:selected {
+.pdf-view .list-view .list-cell:selected {
     -fx-background-color: rgb(245, 245, 245) !important;
 }
 
-.pdf-view .list-cell .image-view-wrapper {
+.pdf-view .list-view .list-cell .image-view-wrapper {
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .1), 6, 0.2, 0, 0);;
 }
 
@@ -26,9 +26,41 @@
 
 .pdf-view .thumbnail-list-view .list-cell .image-view-wrapper {
     -fx-padding: 2px;
+    -fx-background-color: white;
 }
 
 .pdf-view .thumbnail-list-view .list-cell:selected .image-view-wrapper {
-    -fx-background-color: -fx-selection-bar;
+    -fx-background-color: -fx-selection-bar, white;
+    -fx-background-insets: 0, 2;
     -fx-background-radius: 2px;
+}
+
+.pdf-view .pdf-toolbar {
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+}
+
+.pdf-view .scroll-pane {
+}
+
+.pdf-view .scroll-pane .image-view-wrapper {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .1), 6, 0.2, 0, 0);
+}
+
+.pdf-view .page-control .left-button {
+    -fx-background-radius: 3 0 0 3, 3 0 0 3, 2 0 0 2, 1 0 0 1;
+}
+
+.pdf-view .page-control .page-field {
+    -fx-background-radius: 0;
+    -fx-pref-column-count: 4;
+}
+
+.pdf-view .page-control .page-field:invalid {
+    -fx-background-color: red;
+}
+
+.pdf-view .page-control .right-button {
+    -fx-background-radius: 0 3 3 0, 0 3 3 0, 0 2 2 0, 0 1 1 0;
 }
