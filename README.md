@@ -22,7 +22,7 @@ A stackpane with an optional node that can be shown inside a drawer. The drawer 
 
 A read-only text area that is capable of displaying nicely formatted text. The control comes with a rich model and a fluent API that will allow you to quickly compose rich text.
 
-![RichTextArea](gemsfx/docs/rich-texarea.png)
+![RichTextArea](gemsfx/docs/rich-textarea.png)
 
 
 
