@@ -1,11 +1,13 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.PDFView;
+import com.dlsc.gemsfx.PDFView.SearchResult;
 import com.dlsc.unitfx.IntegerInputField;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.IntegerProperty;
@@ -22,6 +24,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -32,6 +35,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
@@ -45,19 +49,32 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.rendering.RenderDestination;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import java.awt.BasicStroke;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class PDFViewSkin extends SkinBase<PDFView> {
 
@@ -72,6 +89,8 @@ public class PDFViewSkin extends SkinBase<PDFView> {
     private PDFRenderer renderer;
 
     private final Map<Integer, Image> imageCache = new HashMap<>();
+
+    private final Map<SearchResult, Rectangle2D> resultBounds = new HashMap<>();
 
     public PDFViewSkin(PDFView view) {
         super(view);
@@ -119,6 +138,96 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             view.setPage(-1);
             view.setPage(0);
         });
+
+        view.searchTextProperty().addListener(it -> search());
+    }
+
+    private SearchService searchService;
+
+    private void search() {
+        if (searchService == null) {
+            searchService = new SearchService();
+            searchService.setOnSucceeded(evt -> {
+                getSkinnable().getSearchResults().setAll(searchService.getValue());
+                if (!searchService.getValue().isEmpty()) {
+                    getSkinnable().setSelectedSearchResult(searchService.getValue().get(0));
+                } else {
+                    getSkinnable().setSelectedSearchResult(null);
+                }
+            });
+        }
+
+        searchService.restart();
+    }
+
+    class SearchService extends Service<List<SearchResult>> {
+
+        public SearchService() {
+        }
+
+        @Override
+        protected Task<List<SearchResult>> createTask() {
+            return new SearchTask(getSkinnable().getDocument(), getSkinnable().getSearchText());
+        }
+    }
+
+    class SearchTask extends Task<List<SearchResult>> {
+
+        private final PDDocument document;
+        private final String searchText;
+
+        public SearchTask(PDDocument document, String searchText) {
+            this.document = document;
+            this.searchText = searchText;
+        }
+
+        @Override
+        protected List<SearchResult> call() throws Exception {
+            Thread.sleep(300);
+
+            if (isCancelled()) {
+                return Collections.emptyList();
+            }
+
+            List<SearchResult> results = new ArrayList<>();
+
+            PDFTextStripper stripper = new PDFTextStripper() {
+
+                private int pageNumber = -1;
+
+                @Override
+                protected void startPage(PDPage page) {
+                    pageNumber++;
+                }
+
+                @Override
+                protected void writeString(String text, List<TextPosition> textPositions) {
+                    if (StringUtils.containsIgnoreCase(text, searchText)) {
+                        SearchResult result = new SearchResult(pageNumber, text, searchText, textPositions);
+                        results.add(result);
+                    }
+                }
+            };
+
+            Writer writer = new Writer() {
+
+                @Override
+                public void write(char[] cbuf, int off, int len) {
+                }
+
+                @Override
+                public void flush() {
+                }
+
+                @Override
+                public void close() {
+                }
+            };
+
+            stripper.writeText(document, writer);
+
+            return results;
+        }
     }
 
     private final DoubleProperty requestedVValue = new SimpleDoubleProperty(-1);
@@ -178,6 +287,36 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         final Label zoomLabel = new Label("Zoom");
         zoomLabel.disableProperty().bind(view.showAllProperty());
 
+        // search
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search ...");
+        searchField.textProperty().bindBidirectional(view.searchTextProperty());
+
+        final BooleanBinding searchResultsAvailable = Bindings.isNotEmpty(view.getSearchResults());
+
+        final Label searchLabel = new Label();
+        searchLabel.visibleProperty().bind(searchResultsAvailable);
+        searchLabel.managedProperty().bind(searchResultsAvailable);
+        searchLabel.textProperty().bind(Bindings.createObjectBinding(() -> view.getSearchResults().size() + " search results", view.getSearchResults()));
+
+        final Button previousResultButton = new Button();
+        previousResultButton.visibleProperty().bind(searchResultsAvailable);
+        previousResultButton.managedProperty().bind(searchResultsAvailable);
+        previousResultButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT));
+        previousResultButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        previousResultButton.setOnAction(evt -> showPreviousSearchResult());
+        previousResultButton.disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSearchResults().indexOf(view.getSelectedSearchResult()) <= 0,
+                view.selectedSearchResultProperty(), view.getSearchResults()));
+
+        final Button nextResultButton = new Button();
+        nextResultButton.visibleProperty().bind(searchResultsAvailable);
+        nextResultButton.managedProperty().bind(searchResultsAvailable);
+        nextResultButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT));
+        nextResultButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        nextResultButton.setOnAction(evt -> showNextSearchResult());
+        nextResultButton.disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSearchResults().indexOf(view.getSelectedSearchResult()) >= view.getSearchResults().size() - 1,
+                view.selectedSearchResultProperty(), view.getSearchResults()));
+
         // toolbar
         return new ToolBar(
                 showAll,
@@ -188,7 +327,29 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 pageControl,
                 new Separator(Orientation.VERTICAL),
                 rotateLeft,
-                rotateRight);
+                rotateRight,
+                new Separator(Orientation.VERTICAL),
+                searchField,
+                searchLabel,
+                previousResultButton,
+                nextResultButton
+        );
+    }
+
+    public final void showNextSearchResult() {
+        final PDFView view = getSkinnable();
+        int index = view.getSearchResults().indexOf(view.getSelectedSearchResult());
+        if (index < view.getSearchResults().size() - 1) {
+            view.setSelectedSearchResult(view.getSearchResults().get(index + 1));
+        }
+    }
+
+    public final void showPreviousSearchResult() {
+        final PDFView view = getSkinnable();
+        int index = view.getSearchResults().indexOf(view.getSelectedSearchResult());
+        if (index < view.getSearchResults().size() - 1) {
+            view.setSelectedSearchResult(view.getSearchResults().get(index + 1));
+        }
     }
 
     private void updateMaximumValue(IntegerInputField pageField) {
@@ -246,6 +407,8 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
         public MainAreaScrollPane() {
 
+            getSkinnable().getSearchResults().addListener((Observable it) -> mainAreaRenderService.restart());
+
             mainAreaRenderService.setOnSucceeded(evt -> {
                 double vValue = requestedVValue.get();
                 if (vValue != -1) {
@@ -300,13 +463,10 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             });
 
             setFitToWidth(true);
-
             setFitToHeight(true);
-
             setPannable(true);
 
             pane = new
-
                     Pane() {
                         @Override
                         protected void layoutChildren() {
@@ -316,147 +476,96 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
             ;
 
-            wrapper = new
-
-                    StackPane();
-            wrapper.getStyleClass().
-
-                    add("image-view-wrapper");
+            wrapper = new StackPane();
+            wrapper.getStyleClass().add("image-view-wrapper");
             wrapper.setMaxWidth(Region.USE_PREF_SIZE);
             wrapper.setMaxHeight(Region.USE_PREF_SIZE);
-            wrapper.rotateProperty().
+            wrapper.rotateProperty().bind(getSkinnable().pageRotationProperty());
 
-                    bind(getSkinnable().
+            group = new Group(wrapper);
+            pane.getChildren().add(group);
 
-                            pageRotationProperty());
+            viewportBoundsProperty().addListener(it -> {
+                final Bounds bounds = getViewportBounds();
 
-            group = new
+                pane.setPrefWidth(Region.USE_COMPUTED_SIZE);
+                pane.setMinWidth(Region.USE_COMPUTED_SIZE);
 
-                    Group(wrapper);
-            pane.getChildren().
+                pane.setPrefHeight(Region.USE_COMPUTED_SIZE);
+                pane.setMinHeight(Region.USE_COMPUTED_SIZE);
 
-                    add(group);
+                if (isPortrait()) {
 
-            viewportBoundsProperty().
+                    final double prefWidth = bounds.getWidth() * getSkinnable().getZoomFactor() - 5;
+                    pane.setPrefWidth(prefWidth);
+                    pane.setMinWidth(prefWidth);
 
-                    addListener(it ->
-
-                    {
-                        final Bounds bounds = getViewportBounds();
-
-                        pane.setPrefWidth(Region.USE_COMPUTED_SIZE);
-                        pane.setMinWidth(Region.USE_COMPUTED_SIZE);
-
-                        pane.setPrefHeight(Region.USE_COMPUTED_SIZE);
-                        pane.setMinHeight(Region.USE_COMPUTED_SIZE);
-
-                        if (isPortrait()) {
-
-                            final double prefWidth = bounds.getWidth() * getSkinnable().getZoomFactor() - 5;
-                            pane.setPrefWidth(prefWidth);
-                            pane.setMinWidth(prefWidth);
-
-                            if (getSkinnable().isShowAll()) {
-                                pane.setPrefHeight(bounds.getHeight() - 5);
-                            } else {
-                                Image image = getImage();
-                                if (image != null) {
-                                    double scale = bounds.getWidth() / image.getWidth();
-                                    double scaledImageHeight = image.getHeight() * scale;
-                                    final double prefHeight = scaledImageHeight * getSkinnable().getZoomFactor();
-                                    pane.setPrefHeight(prefHeight);
-                                    pane.setMinHeight(prefHeight);
-                                }
-                            }
-
-                        } else {
-
-                            /*
-                             * Image has been rotated.
-                             */
-
-                            final double prefHeight = bounds.getHeight() * getSkinnable().getZoomFactor() - 5;
+                    if (getSkinnable().isShowAll()) {
+                        pane.setPrefHeight(bounds.getHeight() - 5);
+                    } else {
+                        Image image = getImage();
+                        if (image != null) {
+                            double scale = bounds.getWidth() / image.getWidth();
+                            double scaledImageHeight = image.getHeight() * scale;
+                            final double prefHeight = scaledImageHeight * getSkinnable().getZoomFactor();
                             pane.setPrefHeight(prefHeight);
                             pane.setMinHeight(prefHeight);
-
-                            if (getSkinnable().isShowAll()) {
-                                pane.setPrefWidth(bounds.getWidth() - 5);
-                            } else {
-                                Image image = getImage();
-                                if (image != null) {
-                                    double scale = bounds.getHeight() / image.getWidth();
-                                    double scaledImageHeight = image.getHeight() * scale;
-                                    final double prefWidth = scaledImageHeight * getSkinnable().getZoomFactor();
-                                    pane.setPrefWidth(prefWidth);
-                                    pane.setMinWidth(prefWidth);
-                                }
-                            }
-
                         }
-                    });
+                    }
+
+                } else {
+
+                    /*
+                     * Image has been rotated.
+                     */
+
+                    final double prefHeight = bounds.getHeight() * getSkinnable().getZoomFactor() - 5;
+                    pane.setPrefHeight(prefHeight);
+                    pane.setMinHeight(prefHeight);
+
+                    if (getSkinnable().isShowAll()) {
+                        pane.setPrefWidth(bounds.getWidth() - 5);
+                    } else {
+                        Image image = getImage();
+                        if (image != null) {
+                            double scale = bounds.getHeight() / image.getWidth();
+                            double scaledImageHeight = image.getHeight() * scale;
+                            final double prefWidth = scaledImageHeight * getSkinnable().getZoomFactor();
+                            pane.setPrefWidth(prefWidth);
+                            pane.setMinWidth(prefWidth);
+                        }
+                    }
+
+                }
+            });
 
             setContent(pane);
 
             mainAreaRenderService.setExecutor(EXECUTOR);
-            mainAreaRenderService.scaleProperty().
+            mainAreaRenderService.scaleProperty().bind(getSkinnable().pageScaleProperty().multiply(getSkinnable().zoomFactorProperty()));
+            mainAreaRenderService.pageProperty().bind(getSkinnable().pageProperty());
+            mainAreaRenderService.valueProperty().addListener(it -> {
+                Image image = mainAreaRenderService.getValue();
+                if (image != null) {
+                    setImage(image);
+                }
+            });
 
-                    bind(getSkinnable().
+            getSkinnable().showAllProperty().addListener(it -> {
+                updateScrollbarPolicies();
+                layoutImage();
+                requestLayout();
+            });
 
-                            pageScaleProperty().
+            getSkinnable().pageRotationProperty().addListener(it -> {
+                updateScrollbarPolicies();
+                layoutImage();
+            });
 
-                            multiply(getSkinnable().
-
-                                    zoomFactorProperty()));
-            mainAreaRenderService.pageProperty().
-
-                    bind(getSkinnable().
-
-                            pageProperty());
-
-            mainAreaRenderService.valueProperty().
-
-                    addListener(it ->
-
-                    {
-                        Image image = mainAreaRenderService.getValue();
-                        if (image != null) {
-                            setImage(image);
-                        }
-                    });
-
-            getSkinnable().
-
-                    showAllProperty().
-
-                    addListener(it ->
-
-                    {
-                        updateScrollbarPolicies();
-                        layoutImage();
-                        requestLayout();
-                    });
-
-            getSkinnable().
-
-                    pageRotationProperty().
-
-                    addListener(it ->
-
-                    {
-                        updateScrollbarPolicies();
-                        layoutImage();
-                    });
-
-            getSkinnable().
-
-                    zoomFactorProperty().
-
-                    addListener(it ->
-
-                    {
-                        updateScrollbarPolicies();
-                        requestLayout();
-                    });
+            getSkinnable().zoomFactorProperty().addListener(it -> {
+                updateScrollbarPolicies();
+                requestLayout();
+            });
 
             updateScrollbarPolicies();
 
@@ -612,10 +721,52 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             return null;
         }
 
-        private Image renderPDFPage(int page, float scale) throws IOException {
-            BufferedImage bufferedImage = renderer.renderImage(page, scale, ImageType.ARGB, RenderDestination.VIEW);
+        private Image renderPDFPage(int pageNumber, float scale) throws IOException {
+            BufferedImage bufferedImage = renderer.renderImage(pageNumber, scale, ImageType.ARGB, RenderDestination.VIEW);
+
+            // only highlight search results in the main view (for performance reasons)
+            if (!thumbnail) {
+                highlightSearchResults(pageNumber, scale, bufferedImage);
+            }
+
             Image image = SwingFXUtils.toFXImage(bufferedImage, null);
             return image;
+        }
+
+        private void highlightSearchResults(int pageNumber, float scale, BufferedImage bufferedImage) {
+            final List<SearchResult> searchResults = getSkinnable().getSearchResults().stream().filter(result -> result.getPageNumber() == pageNumber).collect(Collectors.toList());
+
+            if (!searchResults.isEmpty()) {
+                final PDDocument document = getSkinnable().getDocument();
+                final PDPage page = document.getPage(pageNumber);
+                final PDRectangle mediaBox = page.getMediaBox();
+
+                final Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
+
+
+                final Color searchResultColor = getSkinnable().getSearchResultColor();
+
+                graphics.setStroke(new BasicStroke(8));
+                graphics.setColor(new java.awt.Color((int) (255 * searchResultColor.getRed()), (int) (255 * searchResultColor.getGreen()), (int) (255 * searchResultColor.getBlue())));
+
+                searchResults.forEach(result -> {
+                    final String searchText = result.getSearchText();
+                    final List<TextPosition> textPositions = result.getTextPositions();
+                    final int startIndex = result.getText().toLowerCase().indexOf(searchText.toLowerCase());
+
+                    Rectangle2D bounds = new Rectangle2D(-1,-1,-1,-1);
+
+                    for (int i = startIndex; i < startIndex + searchText.length(); i++) {
+                        TextPosition position = textPositions.get(i);
+
+                        final float x1 = position.getXDirAdj() * scale;
+                        final float x2 = x1 + position.getWidth() * scale;
+                        final float y = position.getYDirAdj() * scale + 8;
+
+                        graphics.drawLine((int) x1, (int) y, (int) x2, (int) y);
+                    }
+                });
+            }
         }
     }
 

@@ -5,19 +5,29 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.paint.Color;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.TextPosition;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -48,6 +58,13 @@ public class PDFView extends Control {
         showAllProperty().addListener(it -> {
             if (isShowAll()) {
                 setZoomFactor(1);
+            }
+        });
+
+        selectedSearchResultProperty().addListener(it -> {
+            final SearchResult result = getSelectedSearchResult();
+            if (result != null) {
+                setPage(result.getPageNumber());
             }
         });
     }
@@ -212,23 +229,6 @@ public class PDFView extends Control {
     }
 
     /**
-     * A list of supported display modes.
-     */
-    public enum DisplayMode {
-        /**
-         * A display mode where the user will always be presented with the content of
-         * an entire page.
-         */
-        FIT_ALL,
-
-        /**
-         * A display mode where the user will always see the current page utilizing the entire
-         * available width.
-         */
-        FIT_WIDTH
-    }
-
-    /**
      * A flag that controls whether we always want to show the entire page. If "true" then the page
      * will be constantly resized to fit the viewport of the scroll pane in which it is showing. In
      * this mode zooming is not possible.
@@ -315,6 +315,103 @@ public class PDFView extends Control {
 
     public final void setDocument(PDDocument document) {
         this.document.set(document);
+    }
+
+    /**
+     * A text used for searching inside the document. Results will be highlighted.
+     */
+    private final StringProperty searchText = new SimpleStringProperty(this, "searchText");
+
+    public final String getSearchText() {
+        return searchText.get();
+    }
+
+    public final StringProperty searchTextProperty() {
+        return searchText;
+    }
+
+    public final void setSearchText(String searchText) {
+        this.searchText.set(searchText);
+    }
+
+    private final ListProperty<SearchResult> searchResults = new SimpleListProperty<>(this, "searchResults", FXCollections.observableArrayList());
+
+    public final ObservableList<SearchResult> getSearchResults() {
+        return searchResults.get();
+    }
+
+    public final ListProperty<SearchResult> searchResultsProperty() {
+        return searchResults;
+    }
+
+    public final void setSearchResults(ObservableList<SearchResult> searchResults) {
+        this.searchResults.set(searchResults);
+    }
+
+    private final ObjectProperty<SearchResult> selectedSearchResult = new SimpleObjectProperty<>(this, "selectedSearchResult");
+
+    public final SearchResult getSelectedSearchResult() {
+        return selectedSearchResult.get();
+    }
+
+    public final ObjectProperty<SearchResult> selectedSearchResultProperty() {
+        return selectedSearchResult;
+    }
+
+    public final void setSelectedSearchResult(SearchResult selectedSearchResult) {
+        this.selectedSearchResult.set(selectedSearchResult);
+    }
+
+    private final ObjectProperty<Color> searchResultColor = new SimpleObjectProperty<>(this, "searchResultColor", Color.RED);
+
+    public final Color getSearchResultColor() {
+        return searchResultColor.get();
+    }
+
+    public final ObjectProperty<Color> searchResultColorProperty() {
+        return searchResultColor;
+    }
+
+    public final void setSearchResultColor(Color searchResultColor) {
+        this.searchResultColor.set(searchResultColor);
+    }
+
+    public static class SearchResult {
+
+        private final int pageNumber;
+        private String text;
+        private String searchText;
+        private final List<TextPosition> textPositions;
+
+        public SearchResult(int pageNumber, String text, String searchText, List<TextPosition> textPositions) {
+            this.pageNumber = pageNumber;
+            this.text = text;
+            this.searchText = searchText;
+            this.textPositions = textPositions;
+        }
+
+        public String getSearchText() {
+            return searchText;
+        }
+
+        public int getPageNumber() {
+            return pageNumber;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public List<TextPosition> getTextPositions() {
+            return textPositions;
+        }
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this)
+                    .append("text", text)
+                    .toString();
+        }
     }
 
     /**

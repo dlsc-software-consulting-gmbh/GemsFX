@@ -41,6 +41,12 @@ public class PDFViewApp extends Application {
             }
         });
 
+        try {
+            view.load(new File(System.getProperty("user.home"), "tesla.pdf"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         VBox.setVgrow(view, Priority.ALWAYS);
         VBox box = new VBox(view, loadButton);
         box.setFillWidth(true);
