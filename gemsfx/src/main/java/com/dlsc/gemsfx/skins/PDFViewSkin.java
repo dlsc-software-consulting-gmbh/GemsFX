@@ -46,6 +46,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -62,6 +63,7 @@ import org.apache.pdfbox.text.TextPosition;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -86,6 +88,8 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
     private ListView<Integer> thumbnailListView = new ListView<>();
 
+    private ListView<PageSearchResult> searchResultListView = new ListView<>();
+
     private PDFRenderer renderer;
 
     private final Map<Integer, Image> imageCache = new HashMap<>();
@@ -95,20 +99,55 @@ public class PDFViewSkin extends SkinBase<PDFView> {
     public PDFViewSkin(PDFView view) {
         super(view);
 
+        view.getSearchResults().addListener((Observable it) -> {
+            final ObservableList<SearchResult> searchResults = view.getSearchResults();
+            final Map<Integer, PageSearchResult> itemMap = new HashMap<>();
+
+            searchResults.forEach(result -> {
+                final PageSearchResult pageSearchResult = itemMap.computeIfAbsent(result.getPageNumber(),
+                        key -> new PageSearchResult(result.getPageNumber(), result.getSearchText()));
+                pageSearchResult.getItems().add(result);
+            });
+
+            List<PageSearchResult> list = new ArrayList<>(itemMap.values());
+            Collections.sort(list);
+            pageSearchResults.setAll(list);
+        });
+        
+        searchResultListView.getStyleClass().add("search-result-list-view");
+        searchResultListView.visibleProperty().bind(Bindings.isNotEmpty(pageSearchResults));
+        searchResultListView.managedProperty().bind(Bindings.isNotEmpty(pageSearchResults));
+        searchResultListView.setPlaceholder(null);
+        searchResultListView.setCellFactory(listView -> new SearchResultListCell());
+        searchResultListView.setItems(pageSearchResults);
+        searchResultListView.getSelectionModel().selectedItemProperty().addListener(it -> {
+            final PageSearchResult result = searchResultListView.getSelectionModel().getSelectedItem();
+            if (result != null) {
+                view.setSelectedSearchResult(result.getItems().get(0));
+            }
+        });
+
+        view.selectedSearchResultProperty().addListener(it -> {
+            final SearchResult result = view.getSelectedSearchResult();
+            if (result != null) {
+                pageSearchResults.stream()
+                        .filter(r -> r.getPageNumber() == result.getPageNumber()).findFirst()
+                        .ifPresent(r -> searchResultListView.getSelectionModel().select(r));
+            }
+        });
+
         thumbnailListView.getStyleClass().add("thumbnail-list-view");
-        thumbnailListView.visibleProperty().bind(view.showThumbnailsProperty());
-        thumbnailListView.managedProperty().bind(view.showThumbnailsProperty());
         thumbnailListView.setPlaceholder(null);
+        thumbnailListView.setCellFactory(listView -> new PdfPageListCell());
+        thumbnailListView.setItems(pdfFilePages);
+        thumbnailListView.prefWidthProperty().bind(view.thumbnailSizeProperty().multiply(1.25));
+        thumbnailListView.requestFocus();
         thumbnailListView.getSelectionModel().selectedItemProperty().addListener(it -> {
             final Integer selectedItem = thumbnailListView.getSelectionModel().getSelectedItem();
             if (selectedItem != null) {
                 view.setPage(selectedItem);
             }
         });
-        thumbnailListView.setCellFactory(listView -> new PdfPageListCell());
-        thumbnailListView.setItems(pdfFilePages);
-        thumbnailListView.prefWidthProperty().bind(view.thumbnailSizeProperty().multiply(1.25));
-        thumbnailListView.requestFocus();
 
         view.pageProperty().addListener(it -> thumbnailListView.getSelectionModel().select(view.getPage()));
 
@@ -125,9 +164,13 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
         MainAreaScrollPane mainArea = new MainAreaScrollPane();
 
+        StackPane leftSide = new StackPane(thumbnailListView, searchResultListView);
+        leftSide.visibleProperty().bind(view.showThumbnailsProperty());
+        leftSide.managedProperty().bind(view.showThumbnailsProperty());
+
         borderPane = new BorderPane();
         borderPane.setTop(toolBar);
-        borderPane.setLeft(thumbnailListView);
+        borderPane.setLeft(leftSide);
         borderPane.setCenter(mainArea);
         borderPane.setFocusTraversable(false);
 
@@ -404,8 +447,13 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         private Pane pane;
         private Group group;
         private RenderService mainAreaRenderService = new RenderService(false);
+        private Region bouncer = new Region();
 
         public MainAreaScrollPane() {
+
+            bouncer.setStyle("-fx-background-color: orange; -fx-border-color: red;");
+            bouncer.setManaged(false);
+            getSkinnable().selectedSearchResultProperty().addListener(it -> boundsSearchResult());
 
             getSkinnable().getSearchResults().addListener((Observable it) -> mainAreaRenderService.restart());
 
@@ -415,6 +463,8 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                     setVvalue(vValue);
                     requestedVValue.set(-1);
                 }
+
+                boundsSearchResult();
             });
 
             addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
@@ -483,7 +533,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             wrapper.rotateProperty().bind(getSkinnable().pageRotationProperty());
 
             group = new Group(wrapper);
-            pane.getChildren().add(group);
+            pane.getChildren().addAll(group, bouncer);
 
             viewportBoundsProperty().addListener(it -> {
                 final Bounds bounds = getViewportBounds();
@@ -570,6 +620,20 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             updateScrollbarPolicies();
 
             layoutImage();
+        }
+
+        private void boundsSearchResult() {
+            final SearchResult result = getSkinnable().getSelectedSearchResult();
+            if (result != null) {
+                final Rectangle2D bounds = resultBounds.get(result);
+                if (bounds != null) {
+                    System.out.println(bounds);
+                    bouncer.setLayoutX(bounds.getMinX());
+                    bouncer.setLayoutY(bounds.getMinY());
+                    bouncer.setPrefWidth(bounds.getWidth());
+                    bouncer.setPrefHeight(bounds.getHeight());
+                }
+            }
         }
 
         private final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
@@ -739,10 +803,9 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             if (!searchResults.isEmpty()) {
                 final PDDocument document = getSkinnable().getDocument();
                 final PDPage page = document.getPage(pageNumber);
-                final PDRectangle mediaBox = page.getMediaBox();
 
                 final Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
-
+                graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
 
                 final Color searchResultColor = getSkinnable().getSearchResultColor();
 
@@ -754,17 +817,28 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                     final List<TextPosition> textPositions = result.getTextPositions();
                     final int startIndex = result.getText().toLowerCase().indexOf(searchText.toLowerCase());
 
-                    Rectangle2D bounds = new Rectangle2D(-1,-1,-1,-1);
+                    float x1 = Float.MAX_VALUE;
+                    float x2 = 0;
+                    float y1 = Float.MAX_VALUE;
+                    float y2 = 0;
 
                     for (int i = startIndex; i < startIndex + searchText.length(); i++) {
                         TextPosition position = textPositions.get(i);
 
-                        final float x1 = position.getXDirAdj() * scale;
-                        final float x2 = x1 + position.getWidth() * scale;
-                        final float y = position.getYDirAdj() * scale + 8;
-
-                        graphics.drawLine((int) x1, (int) y, (int) x2, (int) y);
+                        x1 = Math.min(x1, position.getXDirAdj() * scale);
+                        x2 = Math.max(x2, (position.getXDirAdj() + position.getWidth()) * scale);
+                        y1 = Math.min(y1, (position.getYDirAdj() - position.getHeight()) * scale);
+                        y2 = Math.max(y2, position.getYDirAdj() * scale);
                     }
+
+                    x1 -= 10;
+                    x2 += 10;
+                    y1 -= 10;
+                    y2 += 10;
+
+                    graphics.fillRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
+
+                    resultBounds.put(result, new Rectangle2D(x1, x2, y1, y2));
                 });
             }
         }
@@ -777,6 +851,60 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             renderer = new PDFRenderer(document);
             for (int i = 0; i < document.getNumberOfPages(); i++) {
                 pdfFilePages.add(i);
+            }
+        }
+    }
+
+    class SearchResultListCell extends ListCell<PageSearchResult> {
+
+        private Label pageLabel = new Label();
+        private Label matchesLabel = new Label();
+        private Label summaryLabel = new Label();
+
+        public SearchResultListCell() {
+            pageLabel.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(pageLabel, Priority.ALWAYS);
+
+            HBox header = new HBox(pageLabel, matchesLabel);
+            header.setFillHeight(true);
+            header.setAlignment(Pos.TOP_LEFT);
+
+            VBox.setVgrow(summaryLabel, Priority.ALWAYS);
+            VBox box = new VBox(5, header, summaryLabel);
+            box.setFillWidth(true);
+
+            pageLabel.getStyleClass().add("page-label");
+            matchesLabel.getStyleClass().add("matches-label");
+            summaryLabel.getStyleClass().add("summary-label");
+            summaryLabel.setWrapText(true);
+
+            setGraphic(box);
+            setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+            setPrefWidth(0);
+        }
+
+        @Override
+        protected void updateItem(PageSearchResult item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (item != null && !empty) {
+
+                pageLabel.setText("Page " + item.getPageNumber());
+                int matchCount = item.getItems().size();
+                if (matchCount == 1) {
+                    matchesLabel.setText(matchCount + " match");
+                } else {
+                    matchesLabel.setText(matchCount + " matches");
+                }
+
+                final String text = item.getItems().stream().map(resultItem -> resultItem.getText()).collect(Collectors.joining("... "));
+                summaryLabel.setText(text.substring(0, Math.min(70, text.length())));
+
+            } else {
+
+                setText("");
+
             }
         }
     }
@@ -846,4 +974,34 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         }
     }
 
+    private final ObservableList<PageSearchResult> pageSearchResults = FXCollections.observableArrayList();
+
+    public static class PageSearchResult implements Comparable<PageSearchResult> {
+
+        private final int pageNumber;
+        private final String searchText;
+        private final List<SearchResult> items = new ArrayList<>();
+
+        public PageSearchResult(int pageNumber, String searchText) {
+            this.pageNumber = pageNumber;
+            this.searchText = searchText;
+        }
+
+        public String getSearchText() {
+            return searchText;
+        }
+
+        public int getPageNumber() {
+            return pageNumber;
+        }
+
+        public List<SearchResult> getItems() {
+            return items;
+        }
+
+        @Override
+        public int compareTo(PageSearchResult o) {
+            return getPageNumber() - o.getPageNumber();
+        }
+    }
 }

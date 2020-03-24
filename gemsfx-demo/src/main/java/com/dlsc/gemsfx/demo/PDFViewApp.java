@@ -20,6 +20,7 @@ public class PDFViewApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         PDFView view = new PDFView();
+        view.setShowAll(true);
         Button loadButton = new Button("Load PDF ...");
         loadButton.setMaxWidth(Double.MAX_VALUE);
         loadButton.setOnAction(evt -> {
