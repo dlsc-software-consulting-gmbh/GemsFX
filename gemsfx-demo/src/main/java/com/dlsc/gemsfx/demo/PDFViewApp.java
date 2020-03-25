@@ -51,11 +51,11 @@ public class PDFViewApp extends Application {
         MenuBar menuBar = new MenuBar(fileMenu);
         menuBar.setUseSystemMenuBar(false);
 
-//        try {
-//            view.load(new File(System.getProperty("user.home"), "tesla.pdf"));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            view.load(new File(System.getProperty("user.home"), "tesla.pdf"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         VBox.setVgrow(view, Priority.ALWAYS);
         VBox box = new VBox(menuBar, view);

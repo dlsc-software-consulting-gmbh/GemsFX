@@ -28,6 +28,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -38,6 +39,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -133,7 +135,38 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             if (result != null) {
                 pageSearchResults.stream()
                         .filter(r -> r.getPageNumber() == result.getPageNumber()).findFirst()
-                        .ifPresent(r -> searchResultListView.getSelectionModel().select(r));
+                        .ifPresent(r -> {
+                            searchResultListView.getSelectionModel().select(r);
+
+                            /*
+                             * We want to make sure that the selected result will be visible within the list view,
+                             * but we do not want to scroll every time the selected search result changes. We really
+                             * only want to perform a scrolling if the newly selected search result is not within the
+                             * currently visible rows of the list view.
+                             */
+                            final VirtualFlow virtualFlow = (VirtualFlow) searchResultListView.lookup("VirtualFlow");
+                            if (virtualFlow != null) {
+
+                                final IndexedCell firstVisibleCell = virtualFlow.getFirstVisibleCell();
+                                final IndexedCell lastVisibleCell = virtualFlow.getLastVisibleCell();
+
+                                if (firstVisibleCell != null && lastVisibleCell != null) {
+
+                                    /*
+                                     * Adding 1 to start and subtracting 1 from the end as the calculations of the
+                                     * currently visible cells doesn't seem to work perfectly. Also, if only a fraction
+                                     * of a cell is visible then it requires scrolling, too.
+                                     */
+                                    final int start = Math.max(0, firstVisibleCell.getIndex() + 1);
+                                    final int end = Math.max(1, lastVisibleCell.getIndex() - 1);
+                                    final int index = searchResultListView.getItems().indexOf(r);
+
+                                    if (index < start || index > end) {
+                                        searchResultListView.scrollTo(r);
+                                    }
+                                }
+                            }
+                        });
             }
         });
 
@@ -150,7 +183,20 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             }
         });
 
-        view.pageProperty().addListener(it -> thumbnailListView.getSelectionModel().select(view.getPage()));
+        view.pageProperty().addListener(it -> {
+            thumbnailListView.getSelectionModel().select(view.getPage());
+
+            if (!pageSearchResults.isEmpty()) {
+                /*
+                 * We have page search results and the current page changes. Let's make sure we select a
+                 * matching page result, if one exits.
+                 */
+                pageSearchResults.stream()
+                        .filter(result -> result.getPageNumber() == view.getPage())
+                        .findFirst()
+                        .ifPresent(result -> searchResultListView.getSelectionModel().select(result));
+            }
+        });
 
         pdfFilePages.addListener((Observable it) -> {
             if (!pdfFilePages.isEmpty()) {
@@ -166,7 +212,13 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         toolBar.visibleProperty().bind(view.showToolBarProperty());
         toolBar.managedProperty().bind(view.showToolBarProperty());
 
+        final HBox searchNavigator = createSearchNavigator();
+
         MainAreaScrollPane mainArea = new MainAreaScrollPane();
+        VBox.setVgrow(mainArea, Priority.ALWAYS);
+
+        VBox rightSide = new VBox(searchNavigator, mainArea);
+        rightSide.setFillWidth(true);
 
         StackPane leftSide = new StackPane(thumbnailListView, searchResultListView);
         leftSide.visibleProperty().bind(view.showThumbnailsProperty());
@@ -175,7 +227,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         borderPane = new BorderPane();
         borderPane.setTop(toolBar);
         borderPane.setLeft(leftSide);
-        borderPane.setCenter(mainArea);
+        borderPane.setCenter(rightSide);
         borderPane.setFocusTraversable(false);
 
         getChildren().add(borderPane);
@@ -230,9 +282,13 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
         @Override
         protected List<SearchResult> call() throws Exception {
+            if (StringUtils.isBlank(searchText)) {
+                return Collections.emptyList();
+            }
+
             Thread.sleep(300);
 
-            if (isCancelled() || StringUtils.isBlank(searchText)) {
+            if (isCancelled()) {
                 return Collections.emptyList();
             }
 
@@ -285,7 +341,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         // show all
         ToggleButton showAll = new ToggleButton();
         showAll.setGraphic(new FontIcon(MaterialDesign.MDI_FULLSCREEN));
-        showAll.getStyleClass().addAll("toolbar-button", "show-all-button");
+        showAll.getStyleClass().addAll("tool-bar-button", "show-all-button");
         showAll.setTooltip(new Tooltip("Show all / whole page"));
         showAll.selectedProperty().bindBidirectional(pdfView.showAllProperty());
 
@@ -294,14 +350,14 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         goLeft.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT));
         goLeft.setTooltip(new Tooltip("Show previous page"));
         goLeft.setOnAction(evt -> view.gotoPreviousPage());
-        goLeft.getStyleClass().addAll("toolbar-button", "previous-page-button");
+        goLeft.getStyleClass().addAll("tool-bar-button", "previous-page-button");
         goLeft.disableProperty().bind(Bindings.createBooleanBinding(() -> view.getPage() <= 0, view.pageProperty(), view.documentProperty()));
 
         Button goRight = new Button();
         goRight.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT));
         goRight.setTooltip(new Tooltip("Show next page"));
         goRight.setOnAction(evt -> view.gotoNextPage());
-        goRight.getStyleClass().addAll("toolbar-button", "next-page-button");
+        goRight.getStyleClass().addAll("tool-bar-button", "next-page-button");
         goRight.disableProperty().bind(Bindings.createBooleanBinding(() -> view.getDocument() == null || view.getDocument().getNumberOfPages() <= view.getPage() + 1, view.pageProperty(), view.documentProperty()));
 
         IntegerInputField pageField = new IntegerInputField();
@@ -327,13 +383,13 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
         // rotate buttons
         Button rotateLeft = new Button();
-        rotateLeft.getStyleClass().addAll("toolbar-button", "rotate-left");
+        rotateLeft.getStyleClass().addAll("tool-bar-button", "rotate-left");
         rotateLeft.setTooltip(new Tooltip("Rotate page left"));
         rotateLeft.setGraphic(new FontIcon(MaterialDesign.MDI_ROTATE_LEFT));
         rotateLeft.setOnAction(evt -> view.rotateLeft());
 
         Button rotateRight = new Button();
-        rotateRight.getStyleClass().addAll("toolbar-button", "rotate-right");
+        rotateRight.getStyleClass().addAll("tool-bar-button", "rotate-right");
         rotateRight.setTooltip(new Tooltip("Rotate page right"));
         rotateRight.setGraphic(new FontIcon(MaterialDesign.MDI_ROTATE_RIGHT));
         rotateRight.setOnAction(evt -> view.rotateRight());
@@ -367,38 +423,6 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         searchField.setPromptText("Search ...");
         searchField.textProperty().bindBidirectional(view.searchTextProperty());
 
-        final BooleanBinding searchResultsAvailable = Bindings.isNotEmpty(view.getSearchResults());
-
-        final Label searchLabel = new Label();
-        searchLabel.visibleProperty().bind(searchResultsAvailable);
-        searchLabel.managedProperty().bind(searchResultsAvailable);
-        searchLabel.textProperty().bind(Bindings.createObjectBinding(() -> view.getSearchResults().size() + " search results", view.getSearchResults()));
-
-        final Button previousResultButton = new Button();
-        previousResultButton.getStyleClass().addAll("toolbar-button", "previous-search-result");
-        previousResultButton.setTooltip(new Tooltip("Go to previous search result"));
-        previousResultButton.visibleProperty().bind(searchResultsAvailable);
-        previousResultButton.managedProperty().bind(searchResultsAvailable);
-        previousResultButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT));
-        previousResultButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        previousResultButton.setOnAction(evt -> showPreviousSearchResult());
-        previousResultButton.disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSearchResults().indexOf(view.getSelectedSearchResult()) <= 0,
-                view.selectedSearchResultProperty(), view.getSearchResults()));
-
-        final Button nextResultButton = new Button();
-        nextResultButton.getStyleClass().addAll("toolbar-button", "next-search-result");
-        nextResultButton.setTooltip(new Tooltip("Go to next search result"));
-        nextResultButton.visibleProperty().bind(searchResultsAvailable);
-        nextResultButton.managedProperty().bind(searchResultsAvailable);
-        nextResultButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT));
-        nextResultButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        nextResultButton.setOnAction(evt -> showNextSearchResult());
-        nextResultButton.disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSearchResults().indexOf(view.getSelectedSearchResult()) >= view.getSearchResults().size() - 1,
-                view.selectedSearchResultProperty(), view.getSearchResults()));
-
-        HBox searchBox = new HBox(previousResultButton, nextResultButton, searchLabel, searchField);
-        searchBox.getStyleClass().add("search-box");
-
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
@@ -414,8 +438,47 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 rotateLeft,
                 rotateRight,
                 spacer,
-                searchBox
+                searchField
         );
+    }
+
+    private HBox createSearchNavigator() {
+        final PDFView view = getSkinnable();
+
+        final Label searchLabel = new Label();
+        searchLabel.textProperty().bind(Bindings.createObjectBinding(() -> "Found " + view.getSearchResults().size() + " occurrences on " + pageSearchResults.size() + " pages", view.getSearchResults(), pageSearchResults));
+        searchLabel.getStyleClass().add("search-result-label");
+
+        final Button previousResultButton = new Button();
+        previousResultButton.getStyleClass().addAll("search-bar-button", "previous-search-result");
+        previousResultButton.setTooltip(new Tooltip("Go to previous search result"));
+        previousResultButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT));
+        previousResultButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        previousResultButton.setOnAction(evt -> showPreviousSearchResult());
+        previousResultButton.setMaxHeight(Double.MAX_VALUE);
+
+        final Button nextResultButton = new Button();
+        nextResultButton.getStyleClass().addAll("search-bar-button", "next-search-result");
+        nextResultButton.setTooltip(new Tooltip("Go to next search result"));
+        nextResultButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT));
+        nextResultButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        nextResultButton.setOnAction(evt -> showNextSearchResult());
+        nextResultButton.setMaxHeight(Double.MAX_VALUE);
+
+        final Button doneButton = new Button("Done");
+        doneButton.setOnAction(evt -> view.setSearchText(null));
+        doneButton.getStyleClass().addAll("search-bar-button");
+
+        final BooleanBinding searchResultsAvailable = Bindings.isNotEmpty(view.getSearchResults());
+
+        HBox buttonBox = new HBox(previousResultButton, nextResultButton);
+
+        HBox searchBox = new HBox(searchLabel, buttonBox, doneButton);
+        searchBox.getStyleClass().add("search-navigator");
+        searchBox.visibleProperty().bind(searchResultsAvailable);
+        searchBox.managedProperty().bind(searchResultsAvailable);
+
+        return searchBox;
     }
 
     public final void showNextSearchResult() {
@@ -423,14 +486,18 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         int index = view.getSearchResults().indexOf(view.getSelectedSearchResult());
         if (index < view.getSearchResults().size() - 1) {
             view.setSelectedSearchResult(view.getSearchResults().get(index + 1));
+        } else {
+            view.setSelectedSearchResult(view.getSearchResults().get(0));
         }
     }
 
     public final void showPreviousSearchResult() {
         final PDFView view = getSkinnable();
         int index = view.getSearchResults().indexOf(view.getSelectedSearchResult());
-        if (index < view.getSearchResults().size() - 1) {
-            view.setSelectedSearchResult(view.getSearchResults().get(index + 1));
+        if (index > 0) {
+            view.setSelectedSearchResult(view.getSearchResults().get(index - 1));
+        } else {
+            view.setSelectedSearchResult(view.getSearchResults().get(view.getSearchResults().size() - 1));
         }
     }
 

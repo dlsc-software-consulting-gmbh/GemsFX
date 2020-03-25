@@ -10,7 +10,7 @@
 }
 
 .pdf-view .search-result-list-view .list-cell .page-label {
-    -fx-font-style: bold;
+    -fx-font-weight: bold;
 }
 
 .pdf-view .search-result-list-view .list-cell .matches-label {
@@ -77,9 +77,40 @@
     -fx-icon-color: black;
 }
 
-.pdf-view .tool-bar .search-box {
+.pdf-view .search-navigator {
+    -fx-background-color: aliceblue;
+    -fx-padding: 5px 10px;
+    -fx-fill-height: true;
     -fx-spacing: 10px;
     -fx-alignment: center-right;
+}
+
+.pdf-view .search-navigator .search-bar-button {
+    -fx-padding: 2 5;
+    -fx-background-radius: 3, 3;
+    -fx-background-color: black, aliceblue;
+    -fx-background-insets: 0, 1 1 1 1;
+}
+
+.pdf-view .search-navigator .search-bar-button:hover {
+    -fx-background-color: rgba(0, 0, 0, .5), derive(aliceblue, -10%);
+}
+
+.pdf-view .search-navigator .search-bar-button:pressed {
+    -fx-background-color: rgba(0, 0, 0, .5), derive(aliceblue, -5%);
+}
+
+.pdf-view .search-navigator .search-bar-button:disabled {
+    -fx-opacity: 1;
+}
+
+.pdf-view .search-navigator .previous-search-result {
+    -fx-background-radius: 3 0 0 3, 3 0 0 3;
+}
+
+.pdf-view .search-navigator .next-search-result {
+    -fx-background-radius: 0 3 3 0, 0 3 3 0;
+    -fx-background-insets: 0, 1 1 1 0;
 }
 
 .pdf-view .scroll-pane {
@@ -90,7 +121,7 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .1), 6, 0.2, 0, 0);
 }
 
-.pdf-view .tool-bar .toolbar-button .ikonli-font-icon {
+.pdf-view .tool-bar .tool-bar-button .ikonli-font-icon {
     -fx-icon-size: 18px;
     -fx-icon-color: black;
 }
