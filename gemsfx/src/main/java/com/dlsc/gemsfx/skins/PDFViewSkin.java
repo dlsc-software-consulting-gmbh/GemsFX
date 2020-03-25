@@ -37,6 +37,7 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -282,23 +283,29 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         final PDFView view = getSkinnable();
 
         // show all
-        ToggleButton showAll = new ToggleButton("Show All");
+        ToggleButton showAll = new ToggleButton();
+        showAll.setGraphic(new FontIcon(MaterialDesign.MDI_FULLSCREEN));
+        showAll.getStyleClass().addAll("toolbar-button", "show-all-button");
+        showAll.setTooltip(new Tooltip("Show all / whole page"));
         showAll.selectedProperty().bindBidirectional(pdfView.showAllProperty());
 
         // paging
         Button goLeft = new Button();
         goLeft.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT));
+        goLeft.setTooltip(new Tooltip("Show previous page"));
         goLeft.setOnAction(evt -> view.gotoPreviousPage());
         goLeft.getStyleClass().addAll("toolbar-button", "previous-page-button");
         goLeft.disableProperty().bind(Bindings.createBooleanBinding(() -> view.getPage() <= 0, view.pageProperty(), view.documentProperty()));
 
         Button goRight = new Button();
         goRight.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT));
+        goRight.setTooltip(new Tooltip("Show next page"));
         goRight.setOnAction(evt -> view.gotoNextPage());
         goRight.getStyleClass().addAll("toolbar-button", "next-page-button");
         goRight.disableProperty().bind(Bindings.createBooleanBinding(() -> view.getDocument() == null || view.getDocument().getNumberOfPages() <= view.getPage() + 1, view.pageProperty(), view.documentProperty()));
 
         IntegerInputField pageField = new IntegerInputField();
+        pageField.setTooltip(new Tooltip("Current page number"));
         pageField.getStyleClass().add("page-field");
         pageField.setAllowNegatives(false);
         pageField.setMinimumValue(1);
@@ -321,11 +328,13 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         // rotate buttons
         Button rotateLeft = new Button();
         rotateLeft.getStyleClass().addAll("toolbar-button", "rotate-left");
+        rotateLeft.setTooltip(new Tooltip("Rotate page left"));
         rotateLeft.setGraphic(new FontIcon(MaterialDesign.MDI_ROTATE_LEFT));
         rotateLeft.setOnAction(evt -> view.rotateLeft());
 
         Button rotateRight = new Button();
         rotateRight.getStyleClass().addAll("toolbar-button", "rotate-right");
+        rotateRight.setTooltip(new Tooltip("Rotate page right"));
         rotateRight.setGraphic(new FontIcon(MaterialDesign.MDI_ROTATE_RIGHT));
         rotateRight.setOnAction(evt -> view.rotateRight());
 
@@ -343,8 +352,10 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         final FontIcon searchClearIcon = new FontIcon(MaterialDesign.MDI_CLOSE_CIRCLE);
         searchClearIcon.visibleProperty().bind(view.searchTextProperty().isNotEmpty());
         searchClearIcon.setOnMouseClicked(evt -> view.setSearchText(null));
+        Tooltip.install(searchClearIcon, new Tooltip("Clear search text"));
 
         CustomTextField searchField = new CustomTextField();
+        searchField.setText("Search text");
         searchField.getStyleClass().add("search-field");
         searchField.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
             if (evt.getCode() == KeyCode.ESCAPE) {
@@ -364,6 +375,8 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         searchLabel.textProperty().bind(Bindings.createObjectBinding(() -> view.getSearchResults().size() + " search results", view.getSearchResults()));
 
         final Button previousResultButton = new Button();
+        previousResultButton.getStyleClass().addAll("toolbar-button", "previous-search-result");
+        previousResultButton.setTooltip(new Tooltip("Go to previous search result"));
         previousResultButton.visibleProperty().bind(searchResultsAvailable);
         previousResultButton.managedProperty().bind(searchResultsAvailable);
         previousResultButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT));
@@ -373,6 +386,8 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 view.selectedSearchResultProperty(), view.getSearchResults()));
 
         final Button nextResultButton = new Button();
+        nextResultButton.getStyleClass().addAll("toolbar-button", "next-search-result");
+        nextResultButton.setTooltip(new Tooltip("Go to next search result"));
         nextResultButton.visibleProperty().bind(searchResultsAvailable);
         nextResultButton.managedProperty().bind(searchResultsAvailable);
         nextResultButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT));
@@ -380,6 +395,12 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         nextResultButton.setOnAction(evt -> showNextSearchResult());
         nextResultButton.disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSearchResults().indexOf(view.getSelectedSearchResult()) >= view.getSearchResults().size() - 1,
                 view.selectedSearchResultProperty(), view.getSearchResults()));
+
+        HBox searchBox = new HBox(previousResultButton, nextResultButton, searchLabel, searchField);
+        searchBox.getStyleClass().add("search-box");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // toolbar
         return new ToolBar(
@@ -392,11 +413,8 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 new Separator(Orientation.VERTICAL),
                 rotateLeft,
                 rotateRight,
-                new Separator(Orientation.VERTICAL),
-                searchField,
-                searchLabel,
-                previousResultButton,
-                nextResultButton
+                spacer,
+                searchBox
         );
     }
 

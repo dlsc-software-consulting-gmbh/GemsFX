@@ -77,6 +77,11 @@
     -fx-icon-color: black;
 }
 
+.pdf-view .tool-bar .search-box {
+    -fx-spacing: 10px;
+    -fx-alignment: center-right;
+}
+
 .pdf-view .scroll-pane {
 }
 
@@ -87,7 +92,7 @@
 
 .pdf-view .tool-bar .toolbar-button .ikonli-font-icon {
     -fx-icon-size: 18px;
-    -fx-icon-color: grey;
+    -fx-icon-color: black;
 }
 
 .pdf-view .page-control .previous-page-button {

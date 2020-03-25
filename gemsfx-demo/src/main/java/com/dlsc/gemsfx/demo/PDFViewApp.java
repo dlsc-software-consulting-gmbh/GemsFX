@@ -3,7 +3,10 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.PDFView;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -20,10 +23,10 @@ public class PDFViewApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         PDFView view = new PDFView();
-        view.setShowAll(true);
-        Button loadButton = new Button("Load PDF ...");
-        loadButton.setMaxWidth(Double.MAX_VALUE);
-        loadButton.setOnAction(evt -> {
+
+        MenuItem loadItem = new MenuItem("Load PDF ...");
+        loadItem.setAccelerator(KeyCombination.valueOf("SHORTCUT+o"));
+        loadItem.setOnAction(evt -> {
             if (chooser == null) {
                 chooser = new FileChooser();
                 chooser.setTitle("Load PDF File");
@@ -32,7 +35,7 @@ public class PDFViewApp extends Application {
                 chooser.setSelectedExtensionFilter(filter);
             }
 
-            final File file = chooser.showOpenDialog(loadButton.getScene().getWindow());
+            final File file = chooser.showOpenDialog(view.getScene().getWindow());
             if (file != null) {
                 try {
                     view.load(file);
@@ -42,14 +45,20 @@ public class PDFViewApp extends Application {
             }
         });
 
-        try {
-            view.load(new File(System.getProperty("user.home"), "tesla.pdf"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Menu fileMenu = new Menu("File");
+        fileMenu.getItems().add(loadItem);
+
+        MenuBar menuBar = new MenuBar(fileMenu);
+        menuBar.setUseSystemMenuBar(false);
+
+//        try {
+//            view.load(new File(System.getProperty("user.home"), "tesla.pdf"));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         VBox.setVgrow(view, Priority.ALWAYS);
-        VBox box = new VBox(view, loadButton);
+        VBox box = new VBox(menuBar, view);
         box.setFillWidth(true);
 
         Scene scene = new Scene(box);

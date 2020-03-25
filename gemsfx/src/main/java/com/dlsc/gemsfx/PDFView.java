@@ -272,7 +272,7 @@ public class PDFView extends Control {
      * will be constantly resized to fit the viewport of the scroll pane in which it is showing. In
      * this mode zooming is not possible.
      */
-    private final BooleanProperty showAll = new SimpleBooleanProperty(this, "fitSize");
+    private final BooleanProperty showAll = new SimpleBooleanProperty(this, "showAll", false);
 
     public final boolean isShowAll() {
         return showAll.get();
