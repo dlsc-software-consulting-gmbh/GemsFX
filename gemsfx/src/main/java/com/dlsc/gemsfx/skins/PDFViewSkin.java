@@ -35,7 +35,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
@@ -60,6 +59,7 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.rendering.RenderDestination;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
+import org.controlsfx.control.textfield.CustomTextField;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -115,8 +115,8 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         });
         
         searchResultListView.getStyleClass().add("search-result-list-view");
-        searchResultListView.visibleProperty().bind(Bindings.isNotEmpty(pageSearchResults));
-        searchResultListView.managedProperty().bind(Bindings.isNotEmpty(pageSearchResults));
+        searchResultListView.visibleProperty().bind(Bindings.isNotEmpty(pageSearchResults).and(view.showSearchResultsProperty()));
+        searchResultListView.managedProperty().bind(Bindings.isNotEmpty(pageSearchResults).and(view.showSearchResultsProperty()));
         searchResultListView.setPlaceholder(null);
         searchResultListView.setCellFactory(listView -> new SearchResultListCell());
         searchResultListView.setItems(pageSearchResults);
@@ -161,6 +161,9 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         updatePagesList();
 
         final ToolBar toolBar = createToolBar(view);
+        toolBar.getStylesheets().add(PDFView.class.getResource("pdf-view.css").toExternalForm());
+        toolBar.visibleProperty().bind(view.showToolBarProperty());
+        toolBar.managedProperty().bind(view.showToolBarProperty());
 
         MainAreaScrollPane mainArea = new MainAreaScrollPane();
 
@@ -228,7 +231,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         protected List<SearchResult> call() throws Exception {
             Thread.sleep(300);
 
-            if (isCancelled()) {
+            if (isCancelled() || StringUtils.isBlank(searchText)) {
                 return Collections.emptyList();
             }
 
@@ -283,14 +286,16 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         showAll.selectedProperty().bindBidirectional(pdfView.showAllProperty());
 
         // paging
-        Button goLeft = new Button("<");
+        Button goLeft = new Button();
+        goLeft.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT));
         goLeft.setOnAction(evt -> view.gotoPreviousPage());
-        goLeft.getStyleClass().add("left-button");
+        goLeft.getStyleClass().addAll("toolbar-button", "previous-page-button");
         goLeft.disableProperty().bind(Bindings.createBooleanBinding(() -> view.getPage() <= 0, view.pageProperty(), view.documentProperty()));
 
-        Button goRight = new Button(">");
+        Button goRight = new Button();
+        goRight.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT));
         goRight.setOnAction(evt -> view.gotoNextPage());
-        goRight.getStyleClass().add("right-button");
+        goRight.getStyleClass().addAll("toolbar-button", "next-page-button");
         goRight.disableProperty().bind(Bindings.createBooleanBinding(() -> view.getDocument() == null || view.getDocument().getNumberOfPages() <= view.getPage() + 1, view.pageProperty(), view.documentProperty()));
 
         IntegerInputField pageField = new IntegerInputField();
@@ -314,10 +319,14 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         pageControl.getStyleClass().add("page-control");
 
         // rotate buttons
-        Button rotateLeft = new Button("Rotate Left");
+        Button rotateLeft = new Button();
+        rotateLeft.getStyleClass().addAll("toolbar-button", "rotate-left");
+        rotateLeft.setGraphic(new FontIcon(MaterialDesign.MDI_ROTATE_LEFT));
         rotateLeft.setOnAction(evt -> view.rotateLeft());
 
-        Button rotateRight = new Button("Rotate Right");
+        Button rotateRight = new Button();
+        rotateRight.getStyleClass().addAll("toolbar-button", "rotate-right");
+        rotateRight.setGraphic(new FontIcon(MaterialDesign.MDI_ROTATE_RIGHT));
         rotateRight.setOnAction(evt -> view.rotateRight());
 
         // zoom slider
@@ -330,8 +339,20 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         final Label zoomLabel = new Label("Zoom");
         zoomLabel.disableProperty().bind(view.showAllProperty());
 
-        // search
-        TextField searchField = new TextField();
+        // search icon / field
+        final FontIcon searchClearIcon = new FontIcon(MaterialDesign.MDI_CLOSE_CIRCLE);
+        searchClearIcon.visibleProperty().bind(view.searchTextProperty().isNotEmpty());
+        searchClearIcon.setOnMouseClicked(evt -> view.setSearchText(null));
+
+        CustomTextField searchField = new CustomTextField();
+        searchField.getStyleClass().add("search-field");
+        searchField.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+            if (evt.getCode() == KeyCode.ESCAPE) {
+                searchField.setText("");
+            }
+        });
+
+        searchField.setRight(searchClearIcon);
         searchField.setPromptText("Search ...");
         searchField.textProperty().bindBidirectional(view.searchTextProperty());
 
@@ -857,9 +878,11 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
     class SearchResultListCell extends ListCell<PageSearchResult> {
 
-        private Label pageLabel = new Label();
-        private Label matchesLabel = new Label();
-        private Label summaryLabel = new Label();
+        private final Label pageLabel = new Label();
+        private final Label matchesLabel = new Label();
+        private final Label summaryLabel = new Label();
+        private final ImageView imageView = new ImageView();
+        private final RenderService renderService = new RenderService(true);
 
         public SearchResultListCell() {
             pageLabel.setMaxWidth(Double.MAX_VALUE);
@@ -873,13 +896,44 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             VBox box = new VBox(5, header, summaryLabel);
             box.setFillWidth(true);
 
+            imageView.setPreserveRatio(true);
+
+            StackPane stackPane = new StackPane(imageView);
+            stackPane.getStyleClass().add("image-view-wrapper");
+            stackPane.setMaxWidth(Region.USE_PREF_SIZE);
+            stackPane.visibleProperty().bind(imageView.imageProperty().isNotNull());
+
             pageLabel.getStyleClass().add("page-label");
             matchesLabel.getStyleClass().add("matches-label");
             summaryLabel.getStyleClass().add("summary-label");
             summaryLabel.setWrapText(true);
 
-            setGraphic(box);
+            HBox.setHgrow(box, Priority.ALWAYS);
+            HBox finalBox = new HBox(10, stackPane, box);
+            finalBox.setFillHeight(false);
+            finalBox.setAlignment(Pos.TOP_LEFT);
+
+            finalBox.visibleProperty().bind(itemProperty().isNotNull());
+
+            setGraphic(finalBox);
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+            renderService.scaleProperty().bind(PDFViewSkin.this.getSkinnable().thumbnailPageScaleProperty());
+            renderService.valueProperty().addListener(it -> imageView.setImage(renderService.getValue()));
+
+            itemProperty().addListener(it -> {
+                final PageSearchResult item = getItem();
+                if (item != null) {
+                    final Image image = imageCache.get(item.getPageNumber());
+                    if (getSkinnable().isCacheThumbnails() && image != null) {
+                        imageView.setImage(image);
+                    } else {
+                        renderService.setPage(item.getPageNumber());
+                    }
+                } else {
+                    imageView.setImage(null);
+                }
+            });
 
             setPrefWidth(0);
         }
@@ -890,7 +944,8 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
             if (item != null && !empty) {
 
-                pageLabel.setText("Page " + item.getPageNumber());
+                pageLabel.setText("Page " + (item.getPageNumber() + 1));
+
                 int matchCount = item.getItems().size();
                 if (matchCount == 1) {
                     matchesLabel.setText(matchCount + " match");
@@ -899,21 +954,27 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 }
 
                 final String text = item.getItems().stream().map(resultItem -> resultItem.getText()).collect(Collectors.joining("... "));
-                summaryLabel.setText(text.substring(0, Math.min(70, text.length())));
+                summaryLabel.setText(text.substring(0, Math.min(120, text.length())));
 
-            } else {
+                final PDDocument document = getSkinnable().getDocument();
+                final PDPage page = document.getPage(item.getPageNumber());
+                final PDRectangle cropBox = page.getCropBox();
 
-                setText("");
-
+                if (cropBox.getHeight() < cropBox.getWidth()) {
+                    imageView.fitWidthProperty().bind(getSkinnable().thumbnailSizeProperty().divide(3));
+                    imageView.fitHeightProperty().unbind();
+                } else {
+                    imageView.fitWidthProperty().unbind();
+                    imageView.fitHeightProperty().bind(getSkinnable().thumbnailSizeProperty().divide(3));
+                }
             }
         }
     }
 
     class PdfPageListCell extends ListCell<Integer> {
 
-        private ImageView imageView = new ImageView();
-        private Label pageNumberLabel = new Label();
-
+        private final ImageView imageView = new ImageView();
+        private final Label pageNumberLabel = new Label();
         private final RenderService renderService = new RenderService(true);
 
         public PdfPageListCell() {

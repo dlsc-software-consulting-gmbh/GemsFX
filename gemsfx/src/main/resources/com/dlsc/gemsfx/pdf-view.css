@@ -1,6 +1,10 @@
 .pdf-view {
 }
 
+.pdf-view .search-result-list-view {
+    -fx-pref-width: 300;
+}
+
 .pdf-view .search-result-list-view .list-cell {
     -fx-padding: 10;
 }
@@ -17,6 +21,12 @@
 .pdf-view .search-result-list-view:focused .list-cell:focused .matches-label,
 .pdf-view .search-result-list-view:focused .list-cell:selected .matches-label {
     -fx-text-fill: white;
+}
+
+.pdf-view .search-result-list-view .list-cell .image-view-wrapper {
+    -fx-padding: 2px;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .1), 6, 0.2, 0, 0);;
 }
 
 .pdf-view .search-result-list-view .list-cell .summary-label {
@@ -38,10 +48,6 @@
     -fx-background-color: rgb(245, 245, 245) !important;
 }
 
-.pdf-view .thumbnail-list-view .list-cell .image-view-wrapper {
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .1), 6, 0.2, 0, 0);;
-}
-
 .pdf-view .thumbnail-list-view {
     -fx-pref-width: 200;
 }
@@ -49,6 +55,7 @@
 .pdf-view .thumbnail-list-view .list-cell .image-view-wrapper {
     -fx-padding: 2px;
     -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .1), 6, 0.2, 0, 0);;
 }
 
 .pdf-view .thumbnail-list-view .list-cell:selected .image-view-wrapper {
@@ -57,9 +64,17 @@
     -fx-background-radius: 2px;
 }
 
-.pdf-view .pdf-toolbar {
-    -fx-padding: 10px;
-    -fx-spacing: 10px;
+.pdf-view .tool-bar .search-field .ikonli-font-icon {
+    -fx-icon-color: gray;
+    -fx-icon-size: 16px;
+}
+
+.pdf-view .tool-bar .search-field .ikonli-font-icon:hover {
+    -fx-icon-color: black;
+}
+
+.pdf-view .tool-bar .search-field .ikonli-font-icon:pressed {
+    -fx-icon-color: black;
 }
 
 .pdf-view .scroll-pane {
@@ -70,8 +85,17 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .1), 6, 0.2, 0, 0);
 }
 
-.pdf-view .page-control .left-button {
+.pdf-view .tool-bar .toolbar-button .ikonli-font-icon {
+    -fx-icon-size: 18px;
+    -fx-icon-color: grey;
+}
+
+.pdf-view .page-control .previous-page-button {
     -fx-background-radius: 3 0 0 3, 3 0 0 3, 2 0 0 2, 1 0 0 1;
+}
+
+.pdf-view .page-control .next-page-button {
+    -fx-background-radius: 0 3 3 0, 0 3 3 0, 0 2 2 0, 0 1 1 0;
 }
 
 .pdf-view .page-control .page-field {
@@ -81,8 +105,4 @@
 
 .pdf-view .page-control .page-field:invalid {
     -fx-background-color: red;
-}
-
-.pdf-view .page-control .right-button {
-    -fx-background-radius: 0 3 3 0, 0 3 3 0, 0 2 2 0, 0 1 1 0;
 }

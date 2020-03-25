@@ -67,6 +67,8 @@ public class PDFView extends Control {
                 setPage(result.getPageNumber());
             }
         });
+
+        documentProperty().addListener(it -> setSearchText(null));
     }
 
     @Override
@@ -95,6 +97,43 @@ public class PDFView extends Control {
 
     public final void setShowThumbnails(boolean showThumbnails) {
         this.showThumbnails.set(showThumbnails);
+    }
+
+
+    /**
+     * A flag used to control whether the view will include a toolbar with zoom, search, rotation
+     * controls.
+     */
+    private final BooleanProperty showToolBar = new SimpleBooleanProperty(this, "showToolBar", true);
+
+    public final boolean isShowToolBar() {
+        return showToolBar.get();
+    }
+
+    public final BooleanProperty showToolBarProperty() {
+        return showToolBar;
+    }
+
+    public final void setShowToolBar(boolean showToolBar) {
+        this.showToolBar.set(showToolBar);
+    }
+
+    /**
+     * A flag used to control whether the view will display aggregated search results
+     * on the left-hand side.
+     */
+    private final BooleanProperty showSearchResults = new SimpleBooleanProperty(this, "showSearchResults", true);
+
+    public final boolean isShowSearchResults() {
+        return showSearchResults.get();
+    }
+
+    public final BooleanProperty showSearchResultsProperty() {
+        return showSearchResults;
+    }
+
+    public final void setShowSearchResults(boolean showSearchResults) {
+        this.showSearchResults.set(showSearchResults);
     }
 
     /**
