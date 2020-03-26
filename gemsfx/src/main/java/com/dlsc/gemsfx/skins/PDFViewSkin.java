@@ -375,6 +375,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         pageField.getStyleClass().add("page-field");
         pageField.setAllowNegatives(false);
         pageField.setMinimumValue(1);
+        pageField.setMaxHeight(Double.MAX_VALUE);
         pageField.setAlignment(Pos.CENTER);
         pageField.setValue(view.getPage() + 1);
         view.pageProperty().addListener(it -> pageField.setValue(view.getPage() + 1));
@@ -388,6 +389,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         view.documentProperty().addListener(it -> updateMaximumValue(pageField));
 
         HBox pageControl = new HBox(goLeft, pageField, goRight);
+        pageControl.setFillHeight(true);
         pageControl.disableProperty().bind(view.documentProperty().isNull());
         pageControl.getStyleClass().add("page-control");
 

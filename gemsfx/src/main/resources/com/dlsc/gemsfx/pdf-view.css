@@ -85,11 +85,16 @@
     -fx-alignment: center-right;
 }
 
+.pdf-view .search-navigator .search-result-label {
+    -fx-text-fill: black;
+}
+
 .pdf-view .search-navigator .search-bar-button {
     -fx-padding: 2 5;
-    -fx-background-radius: 3, 3;
-    -fx-background-color: black, aliceblue;
+    -fx-background-radius: 2, 2;
+    -fx-background-color: gray, -fx-base;
     -fx-background-insets: 0, 1 1 1 1;
+    -fx-text-fill: black;
 }
 
 .pdf-view .search-navigator .search-bar-button:hover {
@@ -102,6 +107,10 @@
 
 .pdf-view .search-navigator .search-bar-button:disabled {
     -fx-opacity: 1;
+}
+
+.pdf-view .search-navigator .search-bar-button .ikonli-font-icon {
+    -fx-icon-color: red;
 }
 
 .pdf-view .search-navigator .previous-search-result {

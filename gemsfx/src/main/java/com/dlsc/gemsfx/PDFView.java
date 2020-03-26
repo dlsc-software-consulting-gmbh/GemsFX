@@ -68,7 +68,17 @@ public class PDFView extends Control {
             }
         });
 
-        documentProperty().addListener(it -> setSearchText(null));
+        documentProperty().addListener((obs, oldDoc, newDoc) -> {
+            if (oldDoc != null) {
+                try {
+                    oldDoc.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            setSearchText(null);
+        });
     }
 
     @Override
