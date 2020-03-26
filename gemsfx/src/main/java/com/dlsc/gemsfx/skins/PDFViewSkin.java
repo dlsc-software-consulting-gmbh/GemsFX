@@ -29,6 +29,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.IndexedCell;
@@ -142,35 +143,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                         .filter(r -> r.getPageNumber() == result.getPageNumber()).findFirst()
                         .ifPresent(r -> {
                             searchResultListView.getSelectionModel().select(r);
-
-                            /*
-                             * We want to make sure that the selected result will be visible within the list view,
-                             * but we do not want to scroll every time the selected search result changes. We really
-                             * only want to perform a scrolling if the newly selected search result is not within the
-                             * currently visible rows of the list view.
-                             */
-                            final VirtualFlow virtualFlow = (VirtualFlow) searchResultListView.lookup("VirtualFlow");
-                            if (virtualFlow != null) {
-
-                                final IndexedCell firstVisibleCell = virtualFlow.getFirstVisibleCell();
-                                final IndexedCell lastVisibleCell = virtualFlow.getLastVisibleCell();
-
-                                if (firstVisibleCell != null && lastVisibleCell != null) {
-
-                                    /*
-                                     * Adding 1 to start and subtracting 1 from the end as the calculations of the
-                                     * currently visible cells doesn't seem to work perfectly. Also, if only a fraction
-                                     * of a cell is visible then it requires scrolling, too.
-                                     */
-                                    final int start = Math.max(0, firstVisibleCell.getIndex() + 1);
-                                    final int end = Math.max(1, lastVisibleCell.getIndex() - 1);
-                                    final int index = searchResultListView.getItems().indexOf(r);
-
-                                    if (index < start || index > end) {
-                                        searchResultListView.scrollTo(r);
-                                    }
-                                }
-                            }
+                            maybeScrollTo(searchResultListView, r);
                         });
             }
         });
@@ -190,6 +163,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
         view.pageProperty().addListener(it -> {
             thumbnailListView.getSelectionModel().select(view.getPage());
+            maybeScrollTo(thumbnailListView, view.getPage());
 
             if (!pageSearchResults.isEmpty()) {
                 /*
@@ -244,6 +218,37 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         });
 
         view.searchTextProperty().addListener(it -> search());
+    }
+
+    private <T> void maybeScrollTo(ListView<T> listView, T item) {
+        /*
+         * We want to make sure that the selected result will be visible within the list view,
+         * but we do not want to scroll every time the selected search result changes. We really
+         * only want to perform a scrolling if the newly selected search result is not within the
+         * currently visible rows of the list view.
+         */
+        final VirtualFlow virtualFlow = (VirtualFlow) listView.lookup("VirtualFlow");
+        if (virtualFlow != null) {
+
+            final IndexedCell firstVisibleCell = virtualFlow.getFirstVisibleCell();
+            final IndexedCell lastVisibleCell = virtualFlow.getLastVisibleCell();
+
+            if (firstVisibleCell != null && lastVisibleCell != null) {
+
+                /*
+                 * Adding 1 to start and subtracting 1 from the end as the calculations of the
+                 * currently visible cells doesn't seem to work perfectly. Also, if only a fraction
+                 * of a cell is visible then it requires scrolling, too.
+                 */
+                final int start = Math.max(0, firstVisibleCell.getIndex() + 1);
+                final int end = Math.max(1, lastVisibleCell.getIndex() - 1);
+                final int index = listView.getItems().indexOf(item);
+
+                if (index < start || index > end) {
+                    listView.scrollTo(item);
+                }
+            }
+        }
     }
 
     private SearchService searchService;
@@ -570,7 +575,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             bouncer.fillProperty().bind(pdfView.searchResultColorProperty());
             bouncer.visibleProperty().bind(pdfView.selectedSearchResultProperty().isNotNull());
 
-            pdfView.selectedSearchResultProperty().addListener(it -> boundsSearchResult());
+            pdfView.selectedSearchResultProperty().addListener(it -> bounceSearchResult());
             pdfView.getSearchResults().addListener((Observable it) -> mainAreaRenderService.restart());
 
             mainAreaRenderService.setOnSucceeded(evt -> {
@@ -579,8 +584,6 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                     setVvalue(vValue);
                     requestedVValue.set(-1);
                 }
-
-                boundsSearchResult();
             });
 
             addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
@@ -614,7 +617,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 boolean success;
 
                 if (evt.getDeltaY() > 0) {
-                    success = pdfView.getPage() > 1;
+                    success = pdfView.getPage() > 0;
                     pagerService.setUp(true);
                 } else {
                     success = pdfView.getPage() < pdfView.getDocument().getNumberOfPages() - 1;
@@ -656,6 +659,28 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                             bouncer.setHeight(bounds.getHeight() * scale);
                         }
                     }
+
+                    Platform.runLater(() -> ensureVisible(bouncer));
+                }
+
+                private void ensureVisible(Node node) {
+                    final Bounds viewport = getViewportBounds();
+
+                    final double contentHeight = getContent().localToScene(getContent().getBoundsInLocal()).getHeight();
+                    final double nodeMinY = node.localToScene(node.getBoundsInLocal()).getMinY();
+                    final double nodeMaxY = node.localToScene(node.getBoundsInLocal()).getMaxY();
+
+                    final double vValueCurrent = getVvalue();
+
+                    double vValueDelta = 0;
+
+                    if (nodeMaxY < Math.abs(viewport.getMinY())) {
+                        vValueDelta = (nodeMinY - viewport.getHeight()) / contentHeight;
+                    } else if (nodeMinY > viewport.getHeight() + viewport.getMinY()) {
+                        vValueDelta = (nodeMinY + viewport.getHeight()) / contentHeight;
+                    }
+
+                    setVvalue(vValueCurrent + vValueDelta);
                 }
             };
 
@@ -759,19 +784,22 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
         private ParallelTransition parallel;
 
-        private void boundsSearchResult() {
+        private void bounceSearchResult() {
             if (parallel != null) {
                 parallel.stop();
             }
 
-            if (getSkinnable().getSelectedSearchResult() == null) {
+            final SearchResult selectedSearchResult = getSkinnable().getSelectedSearchResult();
+
+            if (selectedSearchResult == null) {
                 return;
             }
 
             final int SCALE_FACTOR = 3;
+            final int DURATION = 150;
 
             ScaleTransition scaleUp = new ScaleTransition();
-            scaleUp.setDuration(Duration.millis(200));
+            scaleUp.setDuration(Duration.millis(DURATION));
             scaleUp.setFromX(1);
             scaleUp.setFromY(1);
             scaleUp.setToX(SCALE_FACTOR);
@@ -779,7 +807,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             scaleUp.setNode(bouncer);
 
             FadeTransition fadeIn = new FadeTransition();
-            fadeIn.setDuration(Duration.millis(200));
+            fadeIn.setDuration(Duration.millis(DURATION));
             fadeIn.setFromValue(0);
             fadeIn.setToValue(0.7);
             fadeIn.setNode(bouncer);
@@ -787,7 +815,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             parallel = new ParallelTransition(scaleUp, fadeIn);
             parallel.setOnFinished(evt -> {
                 ScaleTransition scaleDown = new ScaleTransition();
-                scaleDown.setDuration(Duration.millis(200));
+                scaleDown.setDuration(Duration.millis(DURATION));
                 scaleDown.setFromX(SCALE_FACTOR);
                 scaleDown.setFromY(SCALE_FACTOR);
                 scaleDown.setToX(1);
@@ -795,7 +823,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 scaleDown.setNode(bouncer);
 
                 FadeTransition fadeOut = new FadeTransition();
-                fadeOut.setDuration(Duration.millis(200));
+                fadeOut.setDuration(Duration.millis(DURATION));
                 fadeOut.setFromValue(0.7);
                 fadeOut.setToValue(0);
                 fadeOut.setNode(bouncer);
