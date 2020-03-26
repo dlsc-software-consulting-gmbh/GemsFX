@@ -3,6 +3,9 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.PDFView;
 import com.dlsc.gemsfx.PDFView.SearchResult;
 import com.dlsc.unitfx.IntegerInputField;
+import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -53,6 +56,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -116,7 +121,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             Collections.sort(list);
             pageSearchResults.setAll(list);
         });
-        
+
         searchResultListView.getStyleClass().add("search-result-list-view");
         searchResultListView.visibleProperty().bind(Bindings.isNotEmpty(pageSearchResults).and(view.showSearchResultsProperty()));
         searchResultListView.managedProperty().bind(Bindings.isNotEmpty(pageSearchResults).and(view.showSearchResultsProperty()));
@@ -553,15 +558,20 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         private Pane pane;
         private Group group;
         private RenderService mainAreaRenderService = new RenderService(false);
-        private Region bouncer = new Region();
+        private Rectangle bouncer = new Rectangle();
+        private ImageView imageView;
 
         public MainAreaScrollPane() {
 
-            bouncer.setStyle("-fx-background-color: orange; -fx-border-color: red;");
-            bouncer.setManaged(false);
-            getSkinnable().selectedSearchResultProperty().addListener(it -> boundsSearchResult());
+            final PDFView pdfView = getSkinnable();
 
-            getSkinnable().getSearchResults().addListener((Observable it) -> mainAreaRenderService.restart());
+            bouncer.getStyleClass().add("bouncer");
+            bouncer.setManaged(false);
+            bouncer.fillProperty().bind(pdfView.searchResultColorProperty());
+            bouncer.visibleProperty().bind(pdfView.selectedSearchResultProperty().isNotNull());
+
+            pdfView.selectedSearchResultProperty().addListener(it -> boundsSearchResult());
+            pdfView.getSearchResults().addListener((Observable it) -> mainAreaRenderService.restart());
 
             mainAreaRenderService.setOnSucceeded(evt -> {
                 double vValue = requestedVValue.get();
@@ -579,18 +589,18 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                     case LEFT:
                     case PAGE_UP:
                     case HOME:
-                        if (getVvalue() == 0 || getSkinnable().isShowAll() || evt.getCode() == KeyCode.LEFT) {
+                        if (getVvalue() == 0 || pdfView.isShowAll() || evt.getCode() == KeyCode.LEFT) {
                             requestedVValue.set(1);
-                            getSkinnable().gotoPreviousPage();
+                            pdfView.gotoPreviousPage();
                         }
                         break;
                     case DOWN:
                     case RIGHT:
                     case PAGE_DOWN:
                     case END:
-                        if (getVvalue() == 1 || getSkinnable().isShowAll() || evt.getCode() == KeyCode.RIGHT) {
+                        if (getVvalue() == 1 || pdfView.isShowAll() || evt.getCode() == KeyCode.RIGHT) {
                             requestedVValue.set(0);
-                            getSkinnable().gotoNextPage();
+                            pdfView.gotoNextPage();
                         }
                         break;
                 }
@@ -604,10 +614,10 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 boolean success;
 
                 if (evt.getDeltaY() > 0) {
-                    success = getSkinnable().getPage() > 1;
+                    success = pdfView.getPage() > 1;
                     pagerService.setUp(true);
                 } else {
-                    success = getSkinnable().getPage() < getSkinnable().getDocument().getNumberOfPages() - 1;
+                    success = pdfView.getPage() < pdfView.getDocument().getNumberOfPages() - 1;
                     pagerService.setUp(false);
                 }
 
@@ -628,18 +638,36 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                         protected void layoutChildren() {
                             wrapper.resizeRelocate((getWidth() - wrapper.prefWidth(-1)) / 2, (getHeight() - wrapper.prefHeight(-1)) / 2, wrapper.prefWidth(-1), wrapper.prefHeight(-1));
                         }
+                    };
+
+            wrapper = new StackPane() {
+                @Override
+                protected void layoutChildren() {
+                    super.layoutChildren();
+
+                    final SearchResult result = pdfView.getSelectedSearchResult();
+                    if (result != null) {
+                        final Rectangle2D bounds = resultBounds.get(result);
+                        if (bounds != null) {
+                            double scale = getWidth() / imageView.getImage().getWidth();
+                            bouncer.setLayoutX(bounds.getMinX() * scale);
+                            bouncer.setLayoutY(bounds.getMinY() * scale);
+                            bouncer.setWidth(bounds.getWidth() * scale);
+                            bouncer.setHeight(bounds.getHeight() * scale);
+                        }
                     }
+                }
+            };
 
-            ;
+            pdfView.selectedSearchResultProperty().addListener(it -> wrapper.requestLayout());
 
-            wrapper = new StackPane();
             wrapper.getStyleClass().add("image-view-wrapper");
             wrapper.setMaxWidth(Region.USE_PREF_SIZE);
             wrapper.setMaxHeight(Region.USE_PREF_SIZE);
-            wrapper.rotateProperty().bind(getSkinnable().pageRotationProperty());
+            wrapper.rotateProperty().bind(pdfView.pageRotationProperty());
 
             group = new Group(wrapper);
-            pane.getChildren().addAll(group, bouncer);
+            pane.getChildren().addAll(group);
 
             viewportBoundsProperty().addListener(it -> {
                 final Bounds bounds = getViewportBounds();
@@ -652,18 +680,18 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
                 if (isPortrait()) {
 
-                    final double prefWidth = bounds.getWidth() * getSkinnable().getZoomFactor() - 5;
+                    final double prefWidth = bounds.getWidth() * pdfView.getZoomFactor() - 5;
                     pane.setPrefWidth(prefWidth);
                     pane.setMinWidth(prefWidth);
 
-                    if (getSkinnable().isShowAll()) {
+                    if (pdfView.isShowAll()) {
                         pane.setPrefHeight(bounds.getHeight() - 5);
                     } else {
                         Image image = getImage();
                         if (image != null) {
                             double scale = bounds.getWidth() / image.getWidth();
                             double scaledImageHeight = image.getHeight() * scale;
-                            final double prefHeight = scaledImageHeight * getSkinnable().getZoomFactor();
+                            final double prefHeight = scaledImageHeight * pdfView.getZoomFactor();
                             pane.setPrefHeight(prefHeight);
                             pane.setMinHeight(prefHeight);
                         }
@@ -675,18 +703,18 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                      * Image has been rotated.
                      */
 
-                    final double prefHeight = bounds.getHeight() * getSkinnable().getZoomFactor() - 5;
+                    final double prefHeight = bounds.getHeight() * pdfView.getZoomFactor() - 5;
                     pane.setPrefHeight(prefHeight);
                     pane.setMinHeight(prefHeight);
 
-                    if (getSkinnable().isShowAll()) {
+                    if (pdfView.isShowAll()) {
                         pane.setPrefWidth(bounds.getWidth() - 5);
                     } else {
                         Image image = getImage();
                         if (image != null) {
                             double scale = bounds.getHeight() / image.getWidth();
                             double scaledImageHeight = image.getHeight() * scale;
-                            final double prefWidth = scaledImageHeight * getSkinnable().getZoomFactor();
+                            final double prefWidth = scaledImageHeight * pdfView.getZoomFactor();
                             pane.setPrefWidth(prefWidth);
                             pane.setMinWidth(prefWidth);
                         }
@@ -698,27 +726,28 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             setContent(pane);
 
             mainAreaRenderService.setExecutor(EXECUTOR);
-            mainAreaRenderService.scaleProperty().bind(getSkinnable().pageScaleProperty().multiply(getSkinnable().zoomFactorProperty()));
-            mainAreaRenderService.pageProperty().bind(getSkinnable().pageProperty());
+            mainAreaRenderService.scaleProperty().bind(pdfView.pageScaleProperty().multiply(pdfView.zoomFactorProperty()));
+            mainAreaRenderService.pageProperty().bind(pdfView.pageProperty());
             mainAreaRenderService.valueProperty().addListener(it -> {
                 Image image = mainAreaRenderService.getValue();
                 if (image != null) {
                     setImage(image);
                 }
+                wrapper.requestLayout(); // bouncer needs layout now
             });
 
-            getSkinnable().showAllProperty().addListener(it -> {
+            pdfView.showAllProperty().addListener(it -> {
                 updateScrollbarPolicies();
                 layoutImage();
                 requestLayout();
             });
 
-            getSkinnable().pageRotationProperty().addListener(it -> {
+            pdfView.pageRotationProperty().addListener(it -> {
                 updateScrollbarPolicies();
                 layoutImage();
             });
 
-            getSkinnable().zoomFactorProperty().addListener(it -> {
+            pdfView.zoomFactorProperty().addListener(it -> {
                 updateScrollbarPolicies();
                 requestLayout();
             });
@@ -728,18 +757,54 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             layoutImage();
         }
 
+        private ParallelTransition parallel;
+
         private void boundsSearchResult() {
-            final SearchResult result = getSkinnable().getSelectedSearchResult();
-            if (result != null) {
-                final Rectangle2D bounds = resultBounds.get(result);
-                if (bounds != null) {
-                    System.out.println(bounds);
-                    bouncer.setLayoutX(bounds.getMinX());
-                    bouncer.setLayoutY(bounds.getMinY());
-                    bouncer.setPrefWidth(bounds.getWidth());
-                    bouncer.setPrefHeight(bounds.getHeight());
-                }
+            if (parallel != null) {
+                parallel.stop();
             }
+
+            if (getSkinnable().getSelectedSearchResult() == null) {
+                return;
+            }
+
+            final int SCALE_FACTOR = 3;
+
+            ScaleTransition scaleUp = new ScaleTransition();
+            scaleUp.setDuration(Duration.millis(200));
+            scaleUp.setFromX(1);
+            scaleUp.setFromY(1);
+            scaleUp.setToX(SCALE_FACTOR);
+            scaleUp.setToY(SCALE_FACTOR);
+            scaleUp.setNode(bouncer);
+
+            FadeTransition fadeIn = new FadeTransition();
+            fadeIn.setDuration(Duration.millis(200));
+            fadeIn.setFromValue(0);
+            fadeIn.setToValue(0.7);
+            fadeIn.setNode(bouncer);
+
+            parallel = new ParallelTransition(scaleUp, fadeIn);
+            parallel.setOnFinished(evt -> {
+                ScaleTransition scaleDown = new ScaleTransition();
+                scaleDown.setDuration(Duration.millis(200));
+                scaleDown.setFromX(SCALE_FACTOR);
+                scaleDown.setFromY(SCALE_FACTOR);
+                scaleDown.setToX(1);
+                scaleDown.setToY(1);
+                scaleDown.setNode(bouncer);
+
+                FadeTransition fadeOut = new FadeTransition();
+                fadeOut.setDuration(Duration.millis(200));
+                fadeOut.setFromValue(0.7);
+                fadeOut.setToValue(0);
+                fadeOut.setNode(bouncer);
+
+                ParallelTransition parallel2 = new ParallelTransition(scaleDown, fadeOut);
+                parallel2.play();
+            });
+
+            parallel.play();
         }
 
         private final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
@@ -753,10 +818,10 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         }
 
         protected void layoutImage() {
-            ImageView imageView = new ImageView();
+            imageView = new ImageView();
             imageView.imageProperty().bind(image);
             imageView.setPreserveRatio(true);
-            wrapper.getChildren().setAll(imageView);
+            wrapper.getChildren().setAll(imageView, bouncer);
 
             requestLayout();
 
@@ -944,7 +1009,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
                     graphics.fillRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
 
-                    resultBounds.put(result, new Rectangle2D(x1, x2, y1, y2));
+                    resultBounds.put(result, new Rectangle2D(x1, y1, x2 - x1, y2 - y1));
                 });
             }
         }

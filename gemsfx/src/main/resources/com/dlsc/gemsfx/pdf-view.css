@@ -142,3 +142,6 @@
 .pdf-view .page-control .page-field:invalid {
     -fx-background-color: red;
 }
+
+.pdf-view .bouncer {
+}
