@@ -1,5 +1,7 @@
 # GemsFX
 
+*At least **JDK 11** is required.*
+
 ## Keyboard / KeyboardPane
 
 An on-screen keyboard, especially useful for touch applications (mobile, tablet).
