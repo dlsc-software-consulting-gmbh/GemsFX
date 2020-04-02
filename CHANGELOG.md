@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.5.1](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.5.1) (2020-04-02)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.5.0...1.5.1)
+
+**Closed issues:**
+
+- Java 11 compatibility [\#2](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/2)
+- new features ? [\#1](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/1)
+
+**Merged pull requests:**
+
+- Java 11 compatibility [\#3](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/3) ([PrimosK](https://github.com/PrimosK))
+
 ## [1.5.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.5.0) (2020-03-26)
 [Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.4.0...1.5.0)
 
