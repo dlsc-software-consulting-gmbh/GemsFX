@@ -90,7 +90,11 @@ import java.util.stream.Collectors;
 public class PDFViewSkin extends SkinBase<PDFView> {
 
     // Access to PDF document must be single threaded (see Apache PdfBox website FAQs)
-    private final Executor EXECUTOR = Executors.newSingleThreadExecutor();
+    private final Executor EXECUTOR = Executors.newSingleThreadExecutor(r -> {
+        Thread thread = new Thread(r, PDFView.class.getSimpleName() + " Thread");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     private final ObservableList<Integer> pdfFilePages = FXCollections.observableArrayList();
     private final BorderPane borderPane;
