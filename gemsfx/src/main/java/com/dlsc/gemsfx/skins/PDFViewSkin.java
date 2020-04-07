@@ -1002,9 +1002,6 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             final List<SearchResult> searchResults = getSkinnable().getSearchResults().stream().filter(result -> result.getPageNumber() == pageNumber).collect(Collectors.toList());
 
             if (!searchResults.isEmpty()) {
-                final PDDocument document = getSkinnable().getDocument();
-                final PDPage page = document.getPage(pageNumber);
-
                 final Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
                 graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
 
@@ -1015,16 +1012,17 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
                 searchResults.forEach(result -> {
                     final String searchText = result.getSearchText();
+                    final String snippetText = result.getText();
                     final List<TextPosition> textPositions = result.getTextPositions();
-                    final int startIndex = result.getText().toLowerCase().indexOf(searchText.toLowerCase());
+                    final int textPositionStartIndex = calculateTextPositionStartIndex(searchText, snippetText, textPositions);
 
                     float x1 = Float.MAX_VALUE;
                     float x2 = 0;
                     float y1 = Float.MAX_VALUE;
                     float y2 = 0;
 
-                    for (int i = startIndex; i < startIndex + searchText.length(); i++) {
-                        TextPosition position = textPositions.get(i);
+                    for (int textPositionIndex = textPositionStartIndex; textPositionIndex < textPositionStartIndex + searchText.length(); textPositionIndex++) {
+                        TextPosition position = textPositions.get(textPositionIndex);
 
                         x1 = Math.min(x1, position.getXDirAdj() * scale);
                         x2 = Math.max(x2, (position.getXDirAdj() + position.getWidth()) * scale);
@@ -1042,6 +1040,29 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                     resultBounds.put(result, new Rectangle2D(x1, y1, x2 - x1, y2 - y1));
                 });
             }
+        }
+
+        /**
+         * Note that number of textPositions might not be equal to the length of the snippetText.
+         * so we need to account for that.
+         *
+         * See: org.apache.pdfbox.text.PDFTextStripper.WordWithTextPositions
+         */
+        private int calculateTextPositionStartIndex(String searchText, String snippetText, List<TextPosition> textPositions) {
+
+            final int snippetTextStartIndex = snippetText.toLowerCase().indexOf(searchText.toLowerCase());
+
+            int startIndexDecreaseDelta = 0;
+
+            // If any TextPosition (up to the snippetTextStartIndex) contains more then one character, we have to account for that.
+            for (int i=0; i < snippetTextStartIndex; i++) {
+                int numberOfCharactersInTextPosition = textPositions.get(i).getUnicode().length();
+                if (numberOfCharactersInTextPosition > 1) {
+                    startIndexDecreaseDelta = startIndexDecreaseDelta + (numberOfCharactersInTextPosition - 1);
+                }
+            }
+
+            return snippetTextStartIndex - startIndexDecreaseDelta;
         }
     }
 
