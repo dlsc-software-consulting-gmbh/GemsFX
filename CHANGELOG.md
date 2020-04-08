@@ -1,5 +1,22 @@
 # Change Log
 
+## [Unreleased](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/HEAD)
+
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.5.2...HEAD)
+
+**Closed issues:**
+
+- Highlights misalignment [\#6](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/6)
+- JavaFX application containing PDFView node wont exit [\#4](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/4)
+
+## [1.5.2](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.5.2) (2020-04-07)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.5.1...1.5.2)
+
+**Merged pull requests:**
+
+- Highlights misalignment fix [\#7](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/7) ([PrimosK](https://github.com/PrimosK))
+- Fixes the issue of JavaFX application not exiting properly [\#5](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/5) ([PrimosK](https://github.com/PrimosK))
+
 ## [1.5.1](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.5.1) (2020-04-02)
 [Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.5.0...1.5.1)
 
