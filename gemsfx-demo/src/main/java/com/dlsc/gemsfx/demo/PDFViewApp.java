@@ -14,7 +14,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.IOException;
 
 public class PDFViewApp extends Application {
 
@@ -37,11 +36,7 @@ public class PDFViewApp extends Application {
 
             final File file = chooser.showOpenDialog(view.getScene().getWindow());
             if (file != null) {
-                try {
-                    view.load(file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                view.load(file);
             }
         });
 
