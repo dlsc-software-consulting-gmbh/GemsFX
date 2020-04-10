@@ -1074,7 +1074,11 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                     matchesLabel.setText(matchCount + " matches");
                 }
 
-                final String text = item.getItems().stream().map(resultItem -> resultItem.getTextSnippet()).collect(Collectors.joining("... "));
+                final String text = item.getItems().stream()
+                        .filter(searchResult -> searchResult.getTextSnippet() != null)
+                        .map(PDFView.SearchResult::getTextSnippet)
+                        .collect(Collectors.joining("... "));
+
                 summaryLabel.setText(text.substring(0, Math.min(120, text.length())));
 
                 PDFView.Document document = getSkinnable().getDocument();
