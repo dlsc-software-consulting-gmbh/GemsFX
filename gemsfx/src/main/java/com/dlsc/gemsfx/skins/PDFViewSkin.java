@@ -203,6 +203,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         getChildren().add(borderPane);
 
         view.documentProperty().addListener(it -> {
+            mainArea.setImage(null);
             imageCache.clear();
             view.setPage(-1);
             view.setPage(0);
