@@ -274,6 +274,17 @@ public class PDFView extends Control {
     }
 
     /**
+     * Convenience method to show the last page.
+     *
+     * @return true if the operation actually did cause a page change
+     */
+    public final boolean gotoLastPage() {
+        int currentPage = getPage();
+        setPage(getDocument().getNumberOfPages() - 1);
+        return currentPage != getPage();
+    }
+
+    /**
      * A flag that controls whether we always want to show the entire page. If "true" then the page
      * will be constantly resized to fit the viewport of the scroll pane in which it is showing. In
      * this mode zooming is not possible.
