@@ -337,11 +337,15 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         pageField.setTooltip(new Tooltip("Current page number"));
         pageField.getStyleClass().add("page-field");
         pageField.setAllowNegatives(false);
-        pageField.setMinimumValue(1);
         pageField.setMaxHeight(Double.MAX_VALUE);
         pageField.setAlignment(Pos.CENTER);
-        pageField.setValue(view.getPage() + 1);
-        view.pageProperty().addListener(it -> pageField.setValue(view.getPage() + 1));
+        pageField.setMinimumValue(0);
+        pageField.setValue(0);
+        view.pageProperty().addListener(it -> {
+                    pageField.setMinimumValue(1);
+                    pageField.setValue(view.getPage() + 1);
+                }
+        );
         pageField.valueProperty().addListener(it -> {
             final Integer value = pageField.getValue();
             if (value != null) {
@@ -351,7 +355,16 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         updateMaximumValue(pageField);
         view.documentProperty().addListener(it -> updateMaximumValue(pageField));
 
-        HBox pageControl = new HBox(goLeft, pageField, goRight);
+        Button totalPages = new Button();
+        totalPages.setTooltip(new Tooltip("Total number of pages"));
+        totalPages.getStyleClass().add("page-number-button");
+        totalPages.setMaxHeight(Double.MAX_VALUE);
+        totalPages.setAlignment(Pos.CENTER);
+        totalPages.setOnAction(event -> view.gotoLastPage());
+        updateTotalPagesNumber(totalPages);
+        view.documentProperty().addListener(it -> updateTotalPagesNumber(totalPages));
+
+        HBox pageControl = new HBox(goLeft, pageField, totalPages, goRight);
         pageControl.setFillHeight(true);
         pageControl.disableProperty().bind(view.documentProperty().isNull());
         pageControl.getStyleClass().add("page-control");
@@ -482,6 +495,15 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         PDFView.Document document = getSkinnable().getDocument();
         if (document != null) {
             pageField.setMaximumValue(document.getNumberOfPages());
+        }
+    }
+
+    private void updateTotalPagesNumber(Button totalPagesButton) {
+        PDFView.Document document = getSkinnable().getDocument();
+        if (document != null) {
+            totalPagesButton.setText("/ " + document.getNumberOfPages());
+        } else {
+            totalPagesButton.setText("/ " + 0);
         }
     }
 

@@ -139,6 +139,10 @@
     -fx-background-radius: 3 0 0 3, 3 0 0 3, 2 0 0 2, 1 0 0 1;
 }
 
+.pdf-view .page-control .page-number-button {
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0;
+}
+
 .pdf-view .page-control .next-page-button {
     -fx-background-radius: 0 3 3 0, 0 3 3 0, 0 2 2 0, 0 1 1 0;
 }
