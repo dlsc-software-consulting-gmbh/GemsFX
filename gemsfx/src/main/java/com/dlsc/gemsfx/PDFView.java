@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.PDFView.Document.DocumentProcessingException;
 import com.dlsc.gemsfx.skins.PDFViewSkin;
+import com.dlsc.gemsfx.util.PdfBoxDocument;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.FloatProperty;
@@ -17,15 +19,13 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.TextPosition;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
@@ -70,11 +70,7 @@ public class PDFView extends Control {
 
         documentProperty().addListener((obs, oldDoc, newDoc) -> {
             if (oldDoc != null) {
-                try {
-                    oldDoc.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                oldDoc.close();
             }
 
             setSearchText(null);
@@ -352,17 +348,17 @@ public class PDFView extends Control {
     /**
      * The currently loaded and displayed PDF document.
      */
-    private final ObjectProperty<PDDocument> document = new SimpleObjectProperty<>(this, "document");
+    private final ObjectProperty<Document> document = new SimpleObjectProperty<>(this, "document");
 
-    public final ObjectProperty<PDDocument> documentProperty() {
+    public final ObjectProperty<Document> documentProperty() {
         return document;
     }
 
-    public final PDDocument getDocument() {
+    public final Document getDocument() {
         return document.get();
     }
 
-    public final void setDocument(PDDocument document) {
+    public final void setDocument(Document document) {
         this.document.set(document);
     }
 
@@ -425,89 +421,129 @@ public class PDFView extends Control {
         this.searchResultColor.set(searchResultColor);
     }
 
-    public static class SearchResult {
-
-        private final int pageNumber;
-        private String text;
-        private String searchText;
-        private final List<TextPosition> textPositions;
-
-        public SearchResult(int pageNumber, String text, String searchText, List<TextPosition> textPositions) {
-            this.pageNumber = pageNumber;
-            this.text = text;
-            this.searchText = searchText;
-            this.textPositions = textPositions;
-        }
-
-        public String getSearchText() {
-            return searchText;
-        }
-
-        public int getPageNumber() {
-            return pageNumber;
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public List<TextPosition> getTextPositions() {
-            return textPositions;
-        }
-
-        @Override
-        public String toString() {
-            return new ToStringBuilder(this)
-                    .append("text", text)
-                    .toString();
-        }
-    }
-
     /**
      * Loads the given PDF file.
      *
      * @param file a file containing a PDF document
-     * @throws IOException in case of problems while loading the file
+     *
+     * @throws DocumentProcessingException if there is error reading/parsing of a document.
      */
-    public final void load(File file) throws IOException {
+    public final void load(File file) {
         Objects.requireNonNull(file, "file can not be null");
-        load(() -> {
-            try {
-                return PDDocument.load(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        });
+        load(() -> new PdfBoxDocument(file));
     }
 
     /**
      * Loads the given PDF file.
      *
      * @param stream a stream returning a PDF document
-     * @throws IOException in case of problems while loading the file
+     *
+     * @throws DocumentProcessingException if there is error reading/parsing of a document.
      */
     public final void load(InputStream stream) {
         Objects.requireNonNull(stream, "stream can not be null");
-        load(() -> {
-            try {
-                return PDDocument.load(stream);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        });
+        load(() -> new PdfBoxDocument(stream));
     }
 
     /**
      * Sets the document retrieved from the given supplier.
      *
-     * @param supplier
+     * @param supplier Document supplier.
+     *
+     * @throws DocumentProcessingException if there is error reading/parsing of a document.
      */
-    public final void load(Supplier<PDDocument> supplier) {
+    public final void load(Supplier<Document> supplier) {
         Objects.requireNonNull(supplier, "supplier can not be null");
         setDocument(supplier.get());
+    }
+
+    public interface Document {
+
+        BufferedImage renderPage(int pageNumber, float scale);
+
+        int getNumberOfPages();
+
+        boolean isLandscape(int pageNumber);
+
+        void close();
+
+        class DocumentProcessingException extends RuntimeException {
+            public DocumentProcessingException(Throwable cause) {
+                super(cause);
+            }
+        }
+
+    }
+
+    public interface SearchableDocument extends Document {
+
+        List<PDFView.SearchResult> getSearchResults(String searchText);
+
+    }
+
+    /**
+     * Represent a single match in the document.
+     */
+    public static class SearchResult implements Comparable<SearchResult> {
+
+        private final String searchText;
+        private final String textSnippet;
+        private final int pageNumber;
+        private final Rectangle2D marker;
+
+        public SearchResult(String searchText, String textSnippet, int pageNumber, Rectangle2D marker) {
+            this.searchText = searchText;
+            this.textSnippet = textSnippet;
+            this.pageNumber = pageNumber;
+            this.marker = marker;
+        }
+
+        public Rectangle2D getMarker() {
+            return marker;
+        }
+
+        public Rectangle2D getScaledMarker(double scale) {
+            return new Rectangle2D(marker.getMinX() * scale, marker.getMinY() * scale, marker.getWidth() * scale, marker.getHeight() * scale);
+        }
+
+        public String getSearchText() {
+            return searchText;
+        }
+
+        public String getTextSnippet() {
+            return textSnippet;
+        }
+
+        public int getPageNumber() {
+            return pageNumber;
+        }
+
+
+
+        @Override
+        public int compareTo(SearchResult other) {
+            int result = Integer.compare(this.pageNumber, other.pageNumber);
+
+            if (result == 0) {
+                result = Double.compare(this.getMarker().getMinY(), other.getMarker().getMinY());
+            }
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            SearchResult that = (SearchResult) o;
+            return pageNumber == that.pageNumber && Objects.equals(searchText, that.searchText) && Objects
+                    .equals(textSnippet, that.textSnippet) && Objects.equals(marker, that.marker);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(searchText, textSnippet, pageNumber, marker);
+        }
     }
 }
