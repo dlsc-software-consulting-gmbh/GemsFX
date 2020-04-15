@@ -2,6 +2,8 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PDFView;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -21,7 +23,7 @@ public class PDFViewApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        PDFView view = new PDFView();
+        PDFView pdfView = new PDFView();
 
         MenuItem loadItem = new MenuItem("Load PDF ...");
         loadItem.setAccelerator(KeyCombination.valueOf("SHORTCUT+o"));
@@ -34,20 +36,27 @@ public class PDFViewApp extends Application {
                 chooser.setSelectedExtensionFilter(filter);
             }
 
-            final File file = chooser.showOpenDialog(view.getScene().getWindow());
+            final File file = chooser.showOpenDialog(pdfView.getScene().getWindow());
             if (file != null) {
-                view.load(file);
+                pdfView.load(file);
             }
         });
 
+        MenuItem closeItem = new MenuItem("Close PDF ...");
+        closeItem.setAccelerator(KeyCombination.valueOf("SHORTCUT+c"));
+        closeItem.setOnAction(evt -> pdfView.unload());
+        closeItem.disableProperty().bind(Bindings.isNull(pdfView.documentProperty()));
+
         Menu fileMenu = new Menu("File");
-        fileMenu.getItems().add(loadItem);
+        ObservableList<MenuItem> fileMenuItems = fileMenu.getItems();
+        fileMenuItems.add(loadItem);
+        fileMenuItems.add(closeItem);
 
         MenuBar menuBar = new MenuBar(fileMenu);
         menuBar.setUseSystemMenuBar(false);
 
-        VBox.setVgrow(view, Priority.ALWAYS);
-        VBox box = new VBox(menuBar, view);
+        VBox.setVgrow(pdfView, Priority.ALWAYS);
+        VBox box = new VBox(menuBar, pdfView);
         box.setFillWidth(true);
 
         Scene scene = new Scene(box);

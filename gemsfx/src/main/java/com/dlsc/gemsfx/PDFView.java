@@ -468,6 +468,16 @@ public class PDFView extends Control {
         setDocument(supplier.get());
     }
 
+    /**
+     * Un-loads currently loaded document.
+     */
+    public final void unload() {
+        setDocument(null);
+        setSearchText(null);
+        setZoomFactor(1);
+        setRotate(0);
+    }
+
     public interface Document {
 
         BufferedImage renderPage(int pageNumber, float scale);

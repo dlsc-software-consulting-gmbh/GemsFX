@@ -203,6 +203,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         getChildren().add(borderPane);
 
         view.documentProperty().addListener(it -> {
+            mainArea.setImage(null);
             imageCache.clear();
             view.setPage(-1);
             view.setPage(0);
@@ -340,12 +341,8 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         pageField.setMaxHeight(Double.MAX_VALUE);
         pageField.setAlignment(Pos.CENTER);
         pageField.setMinimumValue(0);
-        pageField.setValue(0);
-        view.pageProperty().addListener(it -> {
-                    pageField.setMinimumValue(1);
-                    pageField.setValue(view.getPage() + 1);
-                }
-        );
+        updateCurrentPageNumber(view, pageField);
+        view.pageProperty().addListener(it -> updateCurrentPageNumber(view, pageField));
         pageField.valueProperty().addListener(it -> {
             final Integer value = pageField.getValue();
             if (value != null) {
@@ -495,6 +492,16 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         PDFView.Document document = getSkinnable().getDocument();
         if (document != null) {
             pageField.setMaximumValue(document.getNumberOfPages());
+        }
+    }
+
+    private void updateCurrentPageNumber(PDFView view, IntegerInputField pageField) {
+        if (view.getDocument() != null) {
+            pageField.setMinimumValue(1);
+            pageField.setValue(view.getPage() + 1);
+        } else {
+            pageField.setMinimumValue(0);
+            pageField.setValue(0);
         }
     }
 
