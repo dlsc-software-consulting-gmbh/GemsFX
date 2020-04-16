@@ -514,6 +514,37 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         }
     }
 
+    /**
+     * Method to decrease the zoom factor for value specified as {@code delta}.
+     *
+     * @param delta zoom factor (decrease) delta
+     * @return true if the operation actually did cause a zoom change
+     */
+
+    private boolean decreaseZoomFactor(double delta) {
+        final PDFView pdfView = getSkinnable();
+        final double currentZoomFactor = pdfView.getZoomFactor();
+        if (!pdfView.isShowAll()) {
+            pdfView.setZoomFactor(Math.max(1, currentZoomFactor - delta));
+        }
+        return currentZoomFactor != pdfView.getZoomFactor();
+    }
+
+    /**
+     * Method to increase the zoom factor for value specified as {@code delta}.
+     *
+     * @param delta zoom factor (increase) delta
+     * @return true if the operation actually did cause a zoom change
+     */
+    private boolean increaseZoomFactor(double delta) {
+        final PDFView pdfView = getSkinnable();
+        final double currentZoomFactor = pdfView.getZoomFactor();
+        if (!pdfView.isShowAll()) {
+            pdfView.setZoomFactor(Math.min(pdfView.getMaxZoomFactor(), currentZoomFactor + delta));
+        }
+        return currentZoomFactor != pdfView.getZoomFactor();
+    }
+
     class PagerService extends Service<Void> {
         private boolean up;
 
@@ -688,6 +719,17 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             wrapper.setMaxWidth(Region.USE_PREF_SIZE);
             wrapper.setMaxHeight(Region.USE_PREF_SIZE);
             wrapper.rotateProperty().bind(pdfView.pageRotationProperty());
+            wrapper.addEventHandler(ScrollEvent.SCROLL, evt -> {
+                if (evt.isShortcutDown()) {
+                    if (evt.getDeltaY() > 0) {
+                        increaseZoomFactor(0.5);
+                    }
+                    else {
+                        decreaseZoomFactor(0.5);
+                    }
+                    evt.consume();
+                }
+            });
 
             group = new Group(wrapper);
             pane.getChildren().addAll(group);
