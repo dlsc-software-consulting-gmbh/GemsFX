@@ -681,6 +681,17 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             wrapper.setMaxWidth(Region.USE_PREF_SIZE);
             wrapper.setMaxHeight(Region.USE_PREF_SIZE);
             wrapper.rotateProperty().bind(pdfView.pageRotationProperty());
+            wrapper.addEventHandler(ScrollEvent.SCROLL, evt -> {
+                if (evt.isControlDown()) {
+                    if (evt.getDeltaY() > 0) {
+                        pdfView.increaseZoomFactor(0.5);
+                    }
+                    else {
+                        pdfView.decreaseZoomFactor(0.5);
+                    }
+                    evt.consume();
+                }
+            });
 
             group = new Group(wrapper);
             pane.getChildren().addAll(group);
