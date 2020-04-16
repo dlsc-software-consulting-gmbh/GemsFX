@@ -285,35 +285,6 @@ public class PDFView extends Control {
     }
 
     /**
-     * Convenience method to decrease the zoom factor for value specified as {@code delta}.
-     *
-     * @param delta zoom factor (decrese) delta
-     * @return true if the operation actually did cause a zoom change
-     */
-
-    public final boolean decreaseZoomFactor(double delta) {
-        double currentZoomFactor = getZoomFactor();
-        if (!showAll.get()) {
-            setZoomFactor(Math.max(1, currentZoomFactor - delta));
-        }
-        return currentZoomFactor != getZoomFactor();
-    }
-
-    /**
-     * Convenience method to increase the zoom factor for value specified as {@code delta}.
-     *
-     * @param delta zoom factor (increase) delta
-     * @return true if the operation actually did cause a zoom change
-     */
-    public final boolean increaseZoomFactor(double delta) {
-        double currentZoomFactor = getZoomFactor();
-        if (!showAll.get()) {
-            setZoomFactor(Math.min(getMaxZoomFactor(), currentZoomFactor + delta));
-        }
-        return currentZoomFactor != getZoomFactor();
-    }
-
-    /**
      * A flag that controls whether we always want to show the entire page. If "true" then the page
      * will be constantly resized to fit the viewport of the scroll pane in which it is showing. In
      * this mode zooming is not possible.
