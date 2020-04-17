@@ -1,13 +1,20 @@
 # Change Log
 
-## [Unreleased](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/HEAD)
-
-[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.5.2...HEAD)
+## [1.6.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.6.0) (2020-04-17)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.5.2...1.6.0)
 
 **Closed issues:**
 
+- PDFBox decoupling [\#8](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/8)
 - Highlights misalignment [\#6](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/6)
 - JavaFX application containing PDFView node wont exit [\#4](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/4)
+
+**Merged pull requests:**
+
+- Added option to zoom document with the use of ctrl+scroll [\#12](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/12) ([PrimosK](https://github.com/PrimosK))
+- Closing of current document [\#11](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/11) ([PrimosK](https://github.com/PrimosK))
+- Add total number of pages indicator [\#10](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/10) ([PrimosK](https://github.com/PrimosK))
+- Pdf box decoupling [\#9](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/9) ([PrimosK](https://github.com/PrimosK))
 
 ## [1.5.2](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.5.2) (2020-04-07)
 [Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.5.1...1.5.2)
