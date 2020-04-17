@@ -141,6 +141,7 @@
 
 .pdf-view .page-control .page-number-button {
     -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0;
+    -fx-background-insets: 0 0 -1 0, 0, 1 0 1 0, 2 0 2 0;
 }
 
 .pdf-view .page-control .next-page-button {
