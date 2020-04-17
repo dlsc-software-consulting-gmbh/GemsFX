@@ -144,7 +144,7 @@ public class PDFView extends Control {
 
     /**
      * Caching thumbnails can be useful for low powered systems with enough memory. The default value
-     * is "false". When set to "true" each thumbnail image will be added to a hashmap cache, hence making it
+     * is "true". When set to "true" each thumbnail image will be added to a hashmap cache, hence making it
      * necessary to only render once.
      */
     private final BooleanProperty cacheThumbnails = new SimpleBooleanProperty(this, "cacheThumbnails", true);
