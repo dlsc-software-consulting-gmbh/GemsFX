@@ -2,7 +2,6 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.PDFView.Document.DocumentProcessingException;
 import com.dlsc.gemsfx.skins.PDFViewSkin;
-import com.dlsc.gemsfx.util.PdfBoxDocument;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.FloatProperty;
@@ -219,6 +218,20 @@ public class PDFView extends Control {
     }
 
     /**
+     * Convenience method to rotate the generated image by -90 degrees.
+     */
+    public final void rotateLeft() {
+        setPageRotation(getPageRotation() - 90);
+    }
+
+    /**
+     * Convenience method to rotate the generated image by +90 degrees.
+     */
+    public final void rotateRight() {
+        setPageRotation(getPageRotation() + 90);
+    }
+
+    /**
      * Stores the number of the currently showing page.
      */
     private final IntegerProperty page = new SimpleIntegerProperty(this, "page");
@@ -378,12 +391,18 @@ public class PDFView extends Control {
 
     private final ListProperty<SearchResult> searchResults = new SimpleListProperty<>(this, "searchResults", FXCollections.observableArrayList());
 
-    public final ObservableList<SearchResult> getSearchResults() {
-        return searchResults.get();
-    }
-
+    /**
+     * Stores the list of currently found search results.
+     *
+     * @return the search results
+     * @see #setSearchText(String)
+     */
     public final ListProperty<SearchResult> searchResultsProperty() {
         return searchResults;
+    }
+
+    public final ObservableList<SearchResult> getSearchResults() {
+        return searchResults.get();
     }
 
     public final void setSearchResults(ObservableList<SearchResult> searchResults) {
@@ -392,12 +411,19 @@ public class PDFView extends Control {
 
     private final ObjectProperty<SearchResult> selectedSearchResult = new SimpleObjectProperty<>(this, "selectedSearchResult");
 
-    public final SearchResult getSelectedSearchResult() {
-        return selectedSearchResult.get();
-    }
-
+    /**
+     * Stores the currently selected search result.
+     *
+     * @return the selected search result
+     * @see #getSearchResults()
+     * @see #setSearchText(String)
+     */
     public final ObjectProperty<SearchResult> selectedSearchResultProperty() {
         return selectedSearchResult;
+    }
+
+    public final SearchResult getSelectedSearchResult() {
+        return selectedSearchResult.get();
     }
 
     public final void setSelectedSearchResult(SearchResult selectedSearchResult) {
@@ -406,12 +432,17 @@ public class PDFView extends Control {
 
     private final ObjectProperty<Color> searchResultColor = new SimpleObjectProperty<>(this, "searchResultColor", Color.RED);
 
-    public final Color getSearchResultColor() {
-        return searchResultColor.get();
-    }
-
+    /**
+     * Stores the color to be used for highlighting search results.
+     *
+     * @return the search result highlight color
+     */
     public final ObjectProperty<Color> searchResultColorProperty() {
         return searchResultColor;
+    }
+
+    public final Color getSearchResultColor() {
+        return searchResultColor.get();
     }
 
     public final void setSearchResultColor(Color searchResultColor) {
@@ -422,32 +453,29 @@ public class PDFView extends Control {
      * Loads the given PDF file.
      *
      * @param file a file containing a PDF document
-     *
-     * @throws DocumentProcessingException if there is error reading/parsing of a document.
+     * @throws DocumentProcessingException if there is an error while reading/parsing a document.
      */
     public final void load(File file) {
         Objects.requireNonNull(file, "file can not be null");
-        load(() -> new PdfBoxDocument(file));
+        load(() -> new PDFBoxDocument(file));
     }
 
     /**
      * Loads the given PDF file.
      *
      * @param stream a stream returning a PDF document
-     *
-     * @throws DocumentProcessingException if there is error reading/parsing of a document.
+     * @throws DocumentProcessingException if there is an error while reading/parsing a document.
      */
     public final void load(InputStream stream) {
         Objects.requireNonNull(stream, "stream can not be null");
-        load(() -> new PdfBoxDocument(stream));
+        load(() -> new PDFBoxDocument(stream));
     }
 
     /**
      * Sets the document retrieved from the given supplier.
      *
      * @param supplier Document supplier.
-     *
-     * @throws DocumentProcessingException if there is error reading/parsing of a document.
+     * @throws DocumentProcessingException if there is an error while reading/parsing of a document.
      */
     public final void load(Supplier<Document> supplier) {
         Objects.requireNonNull(supplier, "supplier can not be null");
@@ -464,28 +492,76 @@ public class PDFView extends Control {
         setRotate(0);
     }
 
+    /**
+     * The interface that needs to be implemented by any model object that
+     * represents a PDF document and that wants to be displayed by the view.
+     *
+     * @see #setDocument(Document)
+     * @see PDFBoxDocument
+     */
     public interface Document {
 
+        /**
+         * Renders the page specified by the given number at the given scale.
+         *
+         * @param pageNumber the page number
+         * @param scale      the scale
+         * @return the generated buffered image
+         */
         BufferedImage renderPage(int pageNumber, float scale);
 
+        /**
+         * Returns the total number of pages inside the document.
+         *
+         * @return the total number of pages
+         */
         int getNumberOfPages();
 
+        /**
+         * Determines if the given page has a landscape orientation.
+         *
+         * @param pageNumber the page
+         * @return true if the page has to be shown in landscape mode
+         */
         boolean isLandscape(int pageNumber);
 
+        /**
+         * Closes the document.
+         */
         void close();
 
+        /**
+         * A specialized exception for signalling processing errors while
+         * reading / parsing a PDF file.
+         */
         class DocumentProcessingException extends RuntimeException {
+
+            /**
+             * Constructs a new processing exception wrapping the given
+             * cause.
+             *
+             * @param cause the reason for the exception
+             */
             public DocumentProcessingException(Throwable cause) {
                 super(cause);
             }
         }
-
     }
 
+    /**
+     * Documents that can be searched for a given text need to implement this
+     * interface and return a list of search results.
+     */
     public interface SearchableDocument extends Document {
 
-        List<PDFView.SearchResult> getSearchResults(String searchText);
-
+        /**
+         * Returns the list of search results for the given
+         * search text.
+         *
+         * @param searchText the text for which to search
+         * @return the list of search results
+         */
+        List<SearchResult> getSearchResults(String searchText);
     }
 
     /**
@@ -498,6 +574,14 @@ public class PDFView extends Control {
         private final int pageNumber;
         private final Rectangle2D marker;
 
+        /**
+         * Constructs a new search result.
+         *
+         * @param searchText  the text for which was searched
+         * @param textSnippet a snippet of the text found at the search hit location
+         * @param pageNumber  the page where the result can be found
+         * @param marker      the visual bounds of the search hit
+         */
         public SearchResult(String searchText, String textSnippet, int pageNumber, Rectangle2D marker) {
             this.searchText = searchText;
             this.textSnippet = textSnippet;
@@ -525,8 +609,6 @@ public class PDFView extends Control {
             return pageNumber;
         }
 
-
-
         @Override
         public int compareTo(SearchResult other) {
             int result = Integer.compare(this.pageNumber, other.pageNumber);
@@ -534,18 +616,24 @@ public class PDFView extends Control {
             if (result == 0) {
                 result = Double.compare(this.getMarker().getMinY(), other.getMarker().getMinY());
             }
+
             return result;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+            if (o == null || getClass() != o.getClass()) {
                 return false;
+            }
+
             SearchResult that = (SearchResult) o;
-            return pageNumber == that.pageNumber && Objects.equals(searchText, that.searchText) && Objects
-                    .equals(textSnippet, that.textSnippet) && Objects.equals(marker, that.marker);
+            return pageNumber == that.pageNumber &&
+                    Objects.equals(searchText, that.searchText) &&
+                    Objects.equals(textSnippet, that.textSnippet) &&
+                    Objects.equals(marker, that.marker);
         }
 
         @Override

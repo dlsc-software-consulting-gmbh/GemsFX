@@ -374,13 +374,13 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         rotateLeft.getStyleClass().addAll("tool-bar-button", "rotate-left");
         rotateLeft.setTooltip(new Tooltip("Rotate page left"));
         rotateLeft.setGraphic(new FontIcon(MaterialDesign.MDI_ROTATE_LEFT));
-        rotateLeft.setOnAction(evt -> rotateLeft());
+        rotateLeft.setOnAction(evt -> view.rotateLeft());
 
         Button rotateRight = new Button();
         rotateRight.getStyleClass().addAll("tool-bar-button", "rotate-right");
         rotateRight.setTooltip(new Tooltip("Rotate page right"));
         rotateRight.setGraphic(new FontIcon(MaterialDesign.MDI_ROTATE_RIGHT));
-        rotateRight.setOnAction(evt -> rotateRight());
+        rotateRight.setOnAction(evt -> view.rotateRight());
 
         // zoom slider
         Slider zoomSlider = new Slider();
@@ -430,14 +430,6 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 spacer,
                 searchField
         );
-    }
-
-    private void rotateLeft() {
-        getSkinnable().setPageRotation(getSkinnable().getPageRotation() - 90);
-    }
-
-    private void rotateRight() {
-        getSkinnable().setPageRotation(getSkinnable().getPageRotation() + 90);
     }
 
     private HBox createSearchNavigator() {
