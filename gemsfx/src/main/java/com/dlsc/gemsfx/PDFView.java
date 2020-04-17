@@ -292,7 +292,7 @@ public class PDFView extends Control {
     /**
      * The resolution / scale at which the thumbnails will be rendered. The default value is ".5".
      */
-    private final FloatProperty thumbnailPageScale = new SimpleFloatProperty(this, "thumbnailScale", .5f);
+    private final FloatProperty thumbnailPageScale = new SimpleFloatProperty(this, "thumbnailScale", 1f);
 
     public final float getThumbnailPageScale() {
         return thumbnailPageScale.get();

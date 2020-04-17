@@ -70,7 +70,6 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -361,6 +360,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         totalPages.setMaxHeight(Double.MAX_VALUE);
         totalPages.setAlignment(Pos.CENTER);
         totalPages.setOnAction(event -> view.gotoLastPage());
+        totalPages.setFocusTraversable(false);
         updateTotalPagesNumber(totalPages);
         view.documentProperty().addListener(it -> updateTotalPagesNumber(totalPages));
 
@@ -1016,24 +1016,18 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         protected Image call() {
             if (page >= 0 && page < getSkinnable().getDocument().getNumberOfPages()) {
                 if (!isCancelled()) {
-                    try {
-                        final Image renderedImage = renderPDFPage(page, scale);
-                        if (getSkinnable().isCacheThumbnails() && thumbnail) {
-                            imageCache.put(page, renderedImage);
-                        }
-                        return renderedImage;
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    final Image renderedImage = renderPDFPage(page, scale);
+                    if (getSkinnable().isCacheThumbnails() && thumbnail) {
+                        imageCache.put(page, renderedImage);
                     }
+                    return renderedImage;
                 }
             }
 
             return null;
         }
 
-        private Image renderPDFPage(int pageNumber, float scale)
-                throws IOException {
+        private Image renderPDFPage(int pageNumber, float scale) {
             BufferedImage bufferedImage = getSkinnable().getDocument().renderPage(pageNumber, scale);
 
             // only highlight search results in the main view (for performance reasons)
@@ -1045,8 +1039,9 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         }
 
         private void highlightSearchResults(int pageNumber, float scale, BufferedImage bufferedImage) {
-            final List<SearchResult> searchResults =
-                    getSkinnable().getSearchResults().stream().filter(result -> result.getPageNumber() == pageNumber).collect(Collectors.toList());
+            final List<SearchResult> searchResults = getSkinnable().getSearchResults().stream()
+                    .filter(result -> result.getPageNumber() == pageNumber)
+                    .collect(Collectors.toList());
 
             if (!searchResults.isEmpty()) {
                 final Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
@@ -1058,9 +1053,12 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 graphics.setColor(new java.awt.Color((int) (255 * searchResultColor.getRed()), (int) (255 * searchResultColor.getGreen()), (int) (255 * searchResultColor.getBlue())));
 
                 searchResults.forEach(result -> {
-                    Rectangle2D hihlightMarker = result.getScaledMarker(scale);
-                    graphics.fillRect((int) hihlightMarker.getMinX(), (int) hihlightMarker.getMinY(), (int) hihlightMarker.getWidth(),
-                            (int) hihlightMarker.getHeight());
+                    Rectangle2D highlightMarker = result.getScaledMarker(scale);
+                    graphics.fillRect(
+                            (int) highlightMarker.getMinX(),
+                            (int) highlightMarker.getMinY(),
+                            (int) highlightMarker.getWidth(),
+                            (int) highlightMarker.getHeight());
                 });
             }
         }
@@ -1126,6 +1124,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 if (item != null) {
                     final Image image = imageCache.get(item.getPageNumber());
                     if (getSkinnable().isCacheThumbnails() && image != null) {
+                        renderService.cancel();
                         imageView.setImage(image);
                     } else {
                         renderService.setPage(item.getPageNumber());
@@ -1201,14 +1200,18 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             setMinSize(0, 0);
 
-            indexProperty().addListener(it -> {
-                final Image image = imageCache.get(getIndex());
+            final InvalidationListener invalidationListener = it -> {
+                final Image image = imageCache.get(getItem());
                 if (getSkinnable().isCacheThumbnails() && image != null) {
+                    renderService.cancel();
                     imageView.setImage(image);
                 } else {
                     renderService.setPage(getIndex());
                 }
-            });
+            };
+
+
+            itemProperty().addListener(invalidationListener);
 
             renderService.scaleProperty().bind(PDFViewSkin.this.getSkinnable().thumbnailPageScaleProperty());
             renderService.valueProperty().addListener(it -> imageView.setImage(renderService.getValue()));
