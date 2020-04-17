@@ -1,6 +1,9 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.PDFView;
+import com.dlsc.gemsfx.PDFView.Document;
+import com.dlsc.gemsfx.PDFView.SearchResult;
+import com.dlsc.gemsfx.PDFView.SearchableDocument;
 import com.dlsc.unitfx.IntegerInputField;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
@@ -90,9 +93,9 @@ public class PDFViewSkin extends SkinBase<PDFView> {
     private final ObservableList<Integer> pdfFilePages = FXCollections.observableArrayList();
     private final BorderPane borderPane;
 
-    private ListView<Integer> thumbnailListView = new ListView<>();
+    private final ListView<Integer> thumbnailListView = new ListView<>();
 
-    private ListView<PageSearchResult> searchResultListView = new ListView<>();
+    private final ListView<PageSearchResult> searchResultListView = new ListView<>();
 
     private final Map<Integer, Image> imageCache = new HashMap<>();
 
@@ -128,7 +131,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         });
 
         view.selectedSearchResultProperty().addListener(it -> {
-            final PDFView.SearchResult result = view.getSelectedSearchResult();
+            final SearchResult result = view.getSelectedSearchResult();
             if (result != null) {
                 pageSearchResults.stream()
                         .filter(r -> r.getPageNumber() == result.getPageNumber()).findFirst()
@@ -268,7 +271,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             PDFView.Document document = getSkinnable().getDocument();
 
             if (document instanceof PDFView.SearchableDocument) {
-                return new SearchTask((PDFView.SearchableDocument)document, getSkinnable().getSearchText());
+                return new SearchTask((PDFView.SearchableDocument) document, getSkinnable().getSearchText());
             } else {
                 throw new SearchException("Document is not searchable.");
             }
@@ -283,16 +286,16 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
     static class SearchTask extends Task<List<PDFView.SearchResult>> {
 
-        private final PDFView.SearchableDocument document;
+        private final SearchableDocument document;
         private final String searchText;
 
-        public SearchTask(PDFView.SearchableDocument document, String searchText) {
+        public SearchTask(SearchableDocument document, String searchText) {
             this.document = document;
             this.searchText = searchText;
         }
 
         @Override
-        protected List<PDFView.SearchResult> call() throws Exception {
+        protected List<SearchResult> call() throws Exception {
             if (StringUtils.isBlank(searchText)) {
                 return Collections.emptyList();
             }
@@ -371,13 +374,13 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         rotateLeft.getStyleClass().addAll("tool-bar-button", "rotate-left");
         rotateLeft.setTooltip(new Tooltip("Rotate page left"));
         rotateLeft.setGraphic(new FontIcon(MaterialDesign.MDI_ROTATE_LEFT));
-        rotateLeft.setOnAction(evt -> view.rotateLeft());
+        rotateLeft.setOnAction(evt -> rotateLeft());
 
         Button rotateRight = new Button();
         rotateRight.getStyleClass().addAll("tool-bar-button", "rotate-right");
         rotateRight.setTooltip(new Tooltip("Rotate page right"));
         rotateRight.setGraphic(new FontIcon(MaterialDesign.MDI_ROTATE_RIGHT));
-        rotateRight.setOnAction(evt -> view.rotateRight());
+        rotateRight.setOnAction(evt -> rotateRight());
 
         // zoom slider
         Slider zoomSlider = new Slider();
@@ -408,7 +411,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         searchField.setPromptText("Search ...");
         searchField.textProperty().bindBidirectional(view.searchTextProperty());
         searchField.managedProperty().bind(searchField.visibleProperty());
-        searchField.visibleProperty().bind(Bindings.createBooleanBinding(() -> pdfView.getDocument() instanceof PDFView.SearchableDocument, pdfView.documentProperty()));
+        searchField.visibleProperty().bind(Bindings.createBooleanBinding(() -> pdfView.getDocument() instanceof SearchableDocument, pdfView.documentProperty()));
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -427,6 +430,14 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 spacer,
                 searchField
         );
+    }
+
+    private void rotateLeft() {
+        getSkinnable().setPageRotation(getSkinnable().getPageRotation() - 90);
+    }
+
+    private void rotateRight() {
+        getSkinnable().setPageRotation(getSkinnable().getPageRotation() + 90);
     }
 
     private HBox createSearchNavigator() {
@@ -489,7 +500,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
     }
 
     private void updateMaximumValue(IntegerInputField pageField) {
-        PDFView.Document document = getSkinnable().getDocument();
+        Document document = getSkinnable().getDocument();
         if (document != null) {
             pageField.setMaximumValue(document.getNumberOfPages());
         }
@@ -506,7 +517,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
     }
 
     private void updateTotalPagesNumber(Button totalPagesButton) {
-        PDFView.Document document = getSkinnable().getDocument();
+        Document document = getSkinnable().getDocument();
         if (document != null) {
             totalPagesButton.setText("/ " + document.getNumberOfPages());
         } else {
@@ -559,7 +570,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
     }
 
     class PagerTask extends Task<Void> {
-        private boolean up;
+        private final boolean up;
 
         public PagerTask(boolean up) {
             this.up = up;
@@ -587,10 +598,10 @@ public class PDFViewSkin extends SkinBase<PDFView> {
     class MainAreaScrollPane extends ScrollPane {
 
         private final StackPane wrapper;
-        private Pane pane;
-        private Group group;
-        private RenderService mainAreaRenderService = new RenderService(false);
-        private Rectangle bouncer = new Rectangle();
+        private final Pane pane;
+        private final Group group;
+        private final RenderService mainAreaRenderService = new RenderService(false);
+        private final Rectangle bouncer = new Rectangle();
         private ImageView imageView;
 
         public MainAreaScrollPane() {
@@ -675,7 +686,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 protected void layoutChildren() {
                     super.layoutChildren();
 
-                    final PDFView.SearchResult result = pdfView.getSelectedSearchResult();
+                    final SearchResult result = pdfView.getSelectedSearchResult();
                     if (result != null) {
 
                         final Rectangle2D marker = result.getScaledMarker(pdfView.getPageScale() * pdfView.getZoomFactor());
@@ -723,8 +734,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 if (evt.isShortcutDown()) {
                     if (evt.getDeltaY() > 0) {
                         increaseZoomFactor(0.5);
-                    }
-                    else {
+                    } else {
                         decreaseZoomFactor(0.5);
                     }
                     evt.consume();
@@ -829,7 +839,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                 parallel.stop();
             }
 
-            final PDFView.SearchResult selectedSearchResult = getSkinnable().getSelectedSearchResult();
+            final SearchResult selectedSearchResult = getSkinnable().getSelectedSearchResult();
 
             if (selectedSearchResult == null) {
                 return;
@@ -1013,8 +1023,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
                         }
                         return renderedImage;
 
-                    }
-                    catch (IOException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -1024,8 +1033,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         }
 
         private Image renderPDFPage(int pageNumber, float scale)
-                throws IOException
-        {
+                throws IOException {
             BufferedImage bufferedImage = getSkinnable().getDocument().renderPage(pageNumber, scale);
 
             // only highlight search results in the main view (for performance reasons)
@@ -1037,7 +1045,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
         }
 
         private void highlightSearchResults(int pageNumber, float scale, BufferedImage bufferedImage) {
-            final List<PDFView.SearchResult> searchResults =
+            final List<SearchResult> searchResults =
                     getSkinnable().getSearchResults().stream().filter(result -> result.getPageNumber() == pageNumber).collect(Collectors.toList());
 
             if (!searchResults.isEmpty()) {
@@ -1059,7 +1067,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
     }
 
     private void updatePagesList() {
-        PDFView.Document document = getSkinnable().getDocument();
+        Document document = getSkinnable().getDocument();
         pdfFilePages.clear();
         if (document != null) {
             for (int i = 0; i < document.getNumberOfPages(); i++) {
@@ -1147,12 +1155,12 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
                 final String text = item.getItems().stream()
                         .filter(searchResult -> searchResult.getTextSnippet() != null)
-                        .map(PDFView.SearchResult::getTextSnippet)
+                        .map(SearchResult::getTextSnippet)
                         .collect(Collectors.joining("... "));
 
                 summaryLabel.setText(text.substring(0, Math.min(120, text.length())));
 
-                PDFView.Document document = getSkinnable().getDocument();
+                Document document = getSkinnable().getDocument();
                 if (document.isLandscape(item.pageNumber)) {
                     imageView.fitWidthProperty().bind(getSkinnable().thumbnailSizeProperty().divide(3));
                     imageView.fitHeightProperty().unbind();
@@ -1230,7 +1238,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
         private final int pageNumber;
         private final String searchText;
-        private final List<PDFView.SearchResult> items = new ArrayList<>();
+        private final List<SearchResult> items = new ArrayList<>();
 
         public PageSearchResult(int pageNumber, String searchText) {
             this.pageNumber = pageNumber;
@@ -1245,7 +1253,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             return pageNumber;
         }
 
-        public List<PDFView.SearchResult> getItems() {
+        public List<SearchResult> getItems() {
             return items;
         }
 

@@ -147,7 +147,7 @@ public class PDFView extends Control {
      * is "false". When set to "true" each thumbnail image will be added to a hashmap cache, hence making it
      * necessary to only render once.
      */
-    private final BooleanProperty cacheThumbnails = new SimpleBooleanProperty(this, "cacheThumbnails", false);
+    private final BooleanProperty cacheThumbnails = new SimpleBooleanProperty(this, "cacheThumbnails", true);
 
     public final boolean isCacheThumbnails() {
         return cacheThumbnails.get();
@@ -216,20 +216,6 @@ public class PDFView extends Control {
 
     public final void setPageRotation(double pageRotation) {
         this.pageRotation.set(pageRotation);
-    }
-
-    /**
-     * Convenience method to rotate the generated image by -90 degrees.
-     */
-    public final void rotateLeft() {
-        setPageRotation(getPageRotation() - 90);
-    }
-
-    /**
-     * Convenience method to rotate the generated image by +90 degrees.
-     */
-    public final void rotateRight() {
-        setPageRotation(getPageRotation() + 90);
     }
 
     /**
