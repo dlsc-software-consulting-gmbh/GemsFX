@@ -25,11 +25,9 @@
     <properties>
         <javafx.version>13.0.1</javafx.version>
         <javax.activation.version>1.2.0</javax.activation.version>
-        <jaxb.api.version>2.4.0-b180830.0438</jaxb.api.version>
         <lombok.version>1.18.6</lombok.version>
         <ikonli.version>11.3.5</ikonli.version>
-        <jaxb.api.version>2.3.3</jaxb.api.version>
-        <jaxb.impl.version>2.3.3</jaxb.impl.version>
+        <jaxb.version>2.3.3</jaxb.version>
     </properties>
 
     <developers>
@@ -166,13 +164,13 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>${jaxb.api.version}</version>
+            <version>${jaxb.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>${jaxb.impl.version}</version>
+            <version>${jaxb.version}</version>
         </dependency>
 
         <dependency>
