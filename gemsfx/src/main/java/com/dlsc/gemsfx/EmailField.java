@@ -12,6 +12,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.controlsfx.control.textfield.CustomTextField;
 
 /**
  * A specialized control for entering an email address. The control validates
@@ -20,6 +21,8 @@ import org.apache.commons.validator.routines.EmailValidator;
 public class EmailField extends Control {
 
     private static final EmailValidator emailValidator = EmailValidator.getInstance();
+
+    private final CustomTextField editor = new CustomTextField();
 
     public EmailField() {
         getStyleClass().add("email-field");
@@ -40,6 +43,10 @@ public class EmailField extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return EmailField.class.getResource("email-field.css").toExternalForm();
+    }
+
+    public final CustomTextField getEditor() {
+        return editor;
     }
 
     // required

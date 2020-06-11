@@ -1,10 +1,10 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.EmailField;
-import com.dlsc.unitfx.CustomTextField;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.StackPane;
+import org.controlsfx.control.textfield.CustomTextField;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class EmailFieldSkin extends SkinBase<EmailField> {
@@ -20,7 +20,7 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         validationIconWrapper.visibleProperty().bind(field.validProperty().not());
         validationIconWrapper.managedProperty().bind(field.validProperty().not());
 
-        CustomTextField customTextField = new CustomTextField();
+        CustomTextField customTextField = field.getEditor();
 
         /*
          * Needed because custom text field brings its own user agent stylesheet. Not
