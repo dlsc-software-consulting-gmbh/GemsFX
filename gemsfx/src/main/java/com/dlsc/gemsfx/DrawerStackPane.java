@@ -65,6 +65,7 @@ public class DrawerStackPane extends StackPane {
         drawer.setVisible(false);
         drawer.setMinHeight(0);
         drawer.setPrefHeight(0);
+        drawer.setManaged(false);
 
         glassPane = new GlassPane();
 
