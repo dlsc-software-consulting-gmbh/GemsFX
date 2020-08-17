@@ -1,0 +1,91 @@
+/* -----------------------------------------------------------------------------------------------------
+ * FilterView
+ */
+
+.filter-view {
+}
+
+.filter-view .header-box {
+    -fx-spacing: 10;
+}
+
+.filter-view .title-box {
+    -fx-spacing: 5px;
+}
+
+.filter-view .title-subtitle-box {
+    -fx-spacing: 5px;
+}
+
+.filter-view .title {
+    -fx-font-size: 1.5em;
+}
+
+.filter-view .title-postfix {
+}
+
+.filter-view .subtitle {
+    -fx-font-size: 15px;
+}
+
+.filter-view .search-field {
+    -fx-min-width: 400px;
+    -fx-max-width: 400px;
+    -fx-background-radius: 0px;
+    -fx-background-insets: 0px;
+    -fx-background-insets: 0px, 1px;
+    -fx-background-color: #e0e0e0, white;
+}
+
+.filter-view .search-field .ikonli-font-icon {
+    -fx-icon-color: gray;
+}
+
+.filter-view .filter-groups .menu-button {
+    -fx-background-radius: 0px;
+    -fx-border-radius: 0px;
+}
+
+.filter-view .filter-groups .menu-button.last {
+}
+
+.filter-view .filter-groups .menu-button:hover {
+}
+
+.filter-view .filter-groups .menu-button > .label {
+}
+
+.filter-view .filter-groups .menu-button .arrow {
+}
+
+.filter-view .filter-groups .menu-button:hover .arrow {
+}
+
+.filter-view .filter-container {
+    -fx-spacing: 25px;
+}
+
+.filter-view .filter-groups {
+    -fx-pref-height: 40px;
+    -fx-min-height: 40px;
+    -fx-spacing: 10px;
+}
+
+.filter-view .filters {
+    -fx-hgap: 10px;
+    -fx-vgap: 5px;
+    -fx-padding: 0px 0px 0px 0px;
+}
+
+.filter-view .filters .item-count-label {
+    -fx-font-size: 14px;
+}
+
+.filter-view .clear-filter-label {
+    -fx-underline: true;
+    -fx-cursor: hand;
+    -fx-text-fill: -fx-accent;
+}
+
+.filter-view .clear-filter-label:hover {
+}

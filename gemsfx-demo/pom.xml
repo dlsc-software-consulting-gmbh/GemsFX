@@ -57,6 +57,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>fr.brouillard.oss</groupId>
+            <artifactId>cssfx</artifactId>
+            <version>11.3.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.dlsc.gemsfx</groupId>
             <artifactId>gemsfx</artifactId>
             <version>1.7.2</version>
