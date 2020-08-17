@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.7.3](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.7.3) (2020-08-17)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.7.2...1.7.3)
+
+**Merged pull requests:**
+
+- Bump log4j-core from 2.12.0 to 2.13.2 in /gemsfx-demo [\#13](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/13) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [1.7.2](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.7.2) (2020-06-22)
 [Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.7.1...1.7.2)
 
