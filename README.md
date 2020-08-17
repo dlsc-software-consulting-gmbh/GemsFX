@@ -24,6 +24,12 @@ A stackpane with an optional node that can be shown inside a drawer. The drawer 
 
 ![DrawerStackPane](gemsfx/docs/drawer-stackpane.png)
 
+## FilterView
+
+A control for filtering the content of an obserable list. Works in combination with TableView, ListView, or any control that is based on observable lists.
+
+![FilterView](gemsfx/docs/filter-view.png)
+
 ## RichTextArea
 
 A read-only text area that is capable of displaying nicely formatted text. The control comes with a rich model and a fluent API that will allow you to quickly compose rich text.

@@ -13,6 +13,12 @@ import javafx.scene.layout.Region;
 
 import java.util.function.Consumer;
 
+/**
+ * A small "badge-style" view representing a model object. One usage inside GemsFX
+ * is the display of the currently active filters inside {@link FilterView}.
+ *
+ * @param <T> the model object represented by the chip
+ */
 public class ChipView<T> extends Control {
 
     public ChipView() {
@@ -35,15 +41,20 @@ public class ChipView<T> extends Control {
 
     private final ObjectProperty<T> value = new SimpleObjectProperty<>(this, "value");
 
-    public ObjectProperty<T> valueProperty() {
+    /**
+     * The value / model object represented by the chip view.
+     *
+     * @return the value of the view
+     */
+    public final ObjectProperty<T> valueProperty() {
         return value;
     }
 
-    public T getValue() {
+    public final T getValue() {
         return value.get();
     }
 
-    public void setValue(T value) {
+    public final void setValue(T value) {
         this.value.set(value);
     }
 
@@ -51,15 +62,20 @@ public class ChipView<T> extends Control {
 
     private final StringProperty text = new SimpleStringProperty(this, "text", "Untitled");
 
-    public StringProperty textProperty() {
+    public final StringProperty textProperty() {
         return text;
     }
 
-    public String getText() {
+    /**
+     * The text shown by the view.
+     *
+     * @return the chip view's text
+     */
+    public final String getText() {
         return text.get();
     }
 
-    public void setText(String text) {
+    public final void setText(String text) {
         this.text.set(text);
     }
 
@@ -67,15 +83,20 @@ public class ChipView<T> extends Control {
 
     private final ObjectProperty<Node> graphic = new SimpleObjectProperty<>(this, "graphic");
 
-    public ObjectProperty<Node> graphicProperty() {
+    /**
+     * The graphic node shown by the chip view.
+     *
+     * @return the chip view's graphic
+     */
+    public final ObjectProperty<Node> graphicProperty() {
         return graphic;
     }
 
-    public Node getGraphic() {
+    public final Node getGraphic() {
         return graphic.get();
     }
 
-    public void setGraphic(Node graphic) {
+    public final void setGraphic(Node graphic) {
         this.graphic.set(graphic);
     }
 
@@ -83,15 +104,22 @@ public class ChipView<T> extends Control {
 
     private final ObjectProperty<ContentDisplay> contentDisplay = new SimpleObjectProperty<>(this, "contentDisplay", ContentDisplay.LEFT);
 
-    public ContentDisplay getContentDisplay() {
+    public final ContentDisplay getContentDisplay() {
         return contentDisplay.get();
     }
 
-    public ObjectProperty<ContentDisplay> contentDisplayProperty() {
+    /**
+     * The content display property of the chip will be bound to the same property
+     * of the label used by the chip's skin. This property allows applications to
+     * switch to a "graphics only" mode (see {@link ContentDisplay#GRAPHIC_ONLY}).
+     *
+     * @return the content display value
+     */
+    public final ObjectProperty<ContentDisplay> contentDisplayProperty() {
         return contentDisplay;
     }
 
-    public void setContentDisplay(ContentDisplay contentDisplay) {
+    public final void setContentDisplay(ContentDisplay contentDisplay) {
         this.contentDisplay.set(contentDisplay);
     }
 
@@ -99,15 +127,22 @@ public class ChipView<T> extends Control {
 
     private final ObjectProperty<Consumer<T>> onClose = new SimpleObjectProperty<>(this, "onClose");
 
-    public ObjectProperty<Consumer<T>> onCloseProperty() {
+    /**
+     * A callback consumer that will be invoked when the user clicks on the
+     * close icon of the chip. Applications can use this property / consumer
+     * to update the UI as a result of the closing.
+     *
+     * @return the on-close consumer
+     */
+    public final ObjectProperty<Consumer<T>> onCloseProperty() {
         return onClose;
     }
 
-    public Consumer<T> getOnClose() {
+    public final Consumer<T> getOnClose() {
         return onClose.get();
     }
 
-    public void setOnClose(Consumer<T> onClose) {
+    public final void setOnClose(Consumer<T> onClose) {
         this.onClose.set(onClose);
     }
 }

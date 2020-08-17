@@ -19,6 +19,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -32,6 +33,26 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+/**
+ * A view for presenting a set of predefined filter groups, each one with a list of filters.
+ * The user can select one or more filters from each group. Elements found in the resulting
+ * filtered list have to match ALL filters. The selected filters will be shown as "chips"
+ * (see @link {@link ChipView}).
+ * <p>
+ * Items can be added via the {@link #getItems()} list. Table or list views have to use
+ * the {@link #getFilteredItems()} list. This filtered list can also be wrapped via a
+ * {@link SortedList} and then added to a table or list view.
+ * </p>
+ * <p>
+ * An input field for filtering based on text input will appear as soon as a text filter provider
+ * has been defined. See {@link #setTextFilterProvider(Callback)}.
+ * </p>
+ * <p>
+ * Applications with additional filtering needs can utilize the {@link #additionalFilterPredicateProperty()}.
+ * </p>
+ *
+ * @param <T> the type of the model objects filtered by the view
+ */
 public class FilterView<T> extends Control {
 
     public FilterView() {
@@ -95,109 +116,147 @@ public class FilterView<T> extends Control {
 
     private final BooleanProperty showHeader = new SimpleBooleanProperty(this, "showHeader", true);
 
-    public boolean isShowHeader() {
+    public final boolean isShowHeader() {
         return showHeader.get();
     }
 
-    public BooleanProperty showHeaderProperty() {
+    /**
+     * A flag to control whether the title, subtitle, and the search field
+     * will be shown or not.
+     *
+     * @return true if the header will be shown (default is "true")
+     */
+    public final BooleanProperty showHeaderProperty() {
         return showHeader;
     }
 
-    public void setShowHeader(boolean showHeader) {
+    public final void setShowHeader(boolean showHeader) {
         this.showHeader.set(showHeader);
     }
 
     private final ObjectProperty<Node> extras = new SimpleObjectProperty<>(this, "extras");
 
-    public Node getExtras() {
+    public final Node getExtras() {
         return extras.get();
     }
 
-    public ObjectProperty<Node> extrasProperty() {
+    /**
+     * An extra node that can be added to the header of the filter view. The node will appear
+     * to the right of the (optional) text filter field.
+     *
+     * @return
+     */
+    public final ObjectProperty<Node> extrasProperty() {
         return extras;
     }
 
-    public void setExtras(Node extras) {
+    public final void setExtras(Node extras) {
         this.extras.set(extras);
     }
 
     private final StringProperty title = new SimpleStringProperty(this, "title", "Untitled");
 
-    public String getTitle() {
+    public final String getTitle() {
         return title.get();
     }
 
-    public StringProperty titleProperty() {
+    /**
+     * The title for the filter view
+     *
+     * @return the title text
+     */
+    public final StringProperty titleProperty() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public final void setTitle(String title) {
         this.title.set(title);
     }
 
     private final StringProperty titlePostfix = new SimpleStringProperty(this, "titlePostfix", "");
 
-    public String getTitlePostfix() {
+    public final String getTitlePostfix() {
         return titlePostfix.get();
     }
 
-    public StringProperty titlePostfixProperty() {
+    /**
+     * A text that can be added to the title text. Via the {@link #titlePostfixStyleProperty()} it
+     * can be styled differently than the title.
+     *
+     * @return the title postfix text
+     */
+    public final StringProperty titlePostfixProperty() {
         return titlePostfix;
     }
 
-    public void setTitlePostfix(String titlePostfix) {
+    public final void setTitlePostfix(String titlePostfix) {
         this.titlePostfix.set(titlePostfix);
     }
 
     private final StringProperty titlePostfixStyle = new SimpleStringProperty(this, "titlePostfix", "");
 
-    public String getTitlePostfixStyle() {
+    public final String getTitlePostfixStyle() {
         return titlePostfixStyle.get();
     }
 
-    public StringProperty titlePostfixStyleProperty() {
+    /**
+     * A CSS styleclass that will be applied to the title postfix label.
+     *
+     * @return the title postfix style
+     */
+    public final StringProperty titlePostfixStyleProperty() {
         return titlePostfixStyle;
     }
 
-    public void setTitlePostfixStyle(String titlePostfixStyle) {
+    public final void setTitlePostfixStyle(String titlePostfixStyle) {
         this.titlePostfixStyle.set(titlePostfixStyle);
     }
 
     private final StringProperty subtitle = new SimpleStringProperty(this, "subtitle", "");
 
-    public String getSubtitle() {
+    public final String getSubtitle() {
         return subtitle.get();
     }
 
-    public StringProperty subtitleProperty() {
+    /**
+     * The subtitle text for the filter view.
+     *
+     * @return the subtitle text
+     */
+    public final StringProperty subtitleProperty() {
         return subtitle;
     }
 
-    public void setSubtitle(String subtitle) {
+    public final void setSubtitle(String subtitle) {
         this.subtitle.set(subtitle);
     }
 
     private final ListProperty<T> items = new SimpleListProperty<>(this, "items", FXCollections.observableArrayList());
 
-    public ObservableList getItems() {
+    public final ObservableList getItems() {
         return items.get();
     }
 
-    public ListProperty<T> itemsProperty() {
+    /**
+     * The list of items that will be managed by the view.
+     *
+     * @return the model
+     */
+    public final ListProperty<T> itemsProperty() {
         return items;
     }
 
-    public void setItems(ObservableList items) {
+    public final void setItems(ObservableList items) {
         this.items.set(items);
     }
 
     private final ReadOnlyListWrapper<T> filteredItems = new ReadOnlyListWrapper<>();
 
-    public ReadOnlyListProperty<T> filteredItemsProperty() {
+    public final ReadOnlyListProperty<T> filteredItemsProperty() {
         return filteredItems.getReadOnlyProperty();
     }
 
-    public ObservableList getFilteredItems() {
+    public final ObservableList getFilteredItems() {
         return filteredItems.getReadOnlyProperty();
     }
 
@@ -205,15 +264,21 @@ public class FilterView<T> extends Control {
 
     private final StringProperty filterText = new SimpleStringProperty(this, "filterText");
 
-    public String getFilterText() {
+    public final String getFilterText() {
         return filterText.get();
     }
 
-    public StringProperty filterTextProperty() {
+    /**
+     * Stores the filter text entered by the user inside the filter text field.
+     *
+     * @see #setTextFilterProvider(Callback)
+     * @return the filter text
+     */
+    public final StringProperty filterTextProperty() {
         return filterText;
     }
 
-    public void setFilterText(String filterText) {
+    public final void setFilterText(String filterText) {
         this.filterText.set(filterText);
     }
 
@@ -221,31 +286,46 @@ public class FilterView<T> extends Control {
 
     private final ObjectProperty<Callback<String, Predicate<T>>> textFilterProvider = new SimpleObjectProperty<>(this, "textFilterProvider");
 
-    public Callback<String, Predicate<T>> getTextFilterProvider() {
+    public final Callback<String, Predicate<T>> getTextFilterProvider() {
         return textFilterProvider.get();
     }
 
-    public ObjectProperty<Callback<String, Predicate<T>>> textFilterProviderProperty() {
+    /**
+     * Returns a filter predicate for a given text. This predicate will be added to the list of
+     * internally managed predicates. The input field for text will only appear if this predicate
+     * has been specified.
+     *
+     * @return the text filter predicate provider
+     */
+    public final ObjectProperty<Callback<String, Predicate<T>>> textFilterProviderProperty() {
         return textFilterProvider;
     }
 
-    public void setTextFilterProvider(Callback<String, Predicate<T>> textFilterProvider) {
+    public final void setTextFilterProvider(Callback<String, Predicate<T>> textFilterProvider) {
         this.textFilterProvider.set(textFilterProvider);
     }
 
     // filter groups
 
-    private final ObservableList<FilterGroup<T>> filterGroups = FXCollections.observableArrayList();
+    private final ListProperty<FilterGroup<T>> filterGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    public ObservableList<FilterGroup<T>> getFilterGroups() {
+    public final ObservableList<FilterGroup<T>> getFilterGroups() {
+        return filterGroups.get();
+    }
+
+    public final ListProperty<FilterGroup<T>> filterGroupsProperty() {
         return filterGroups;
     }
 
-    // filters
+    public final void setFilterGroups(ObservableList<FilterGroup<T>> filterGroups) {
+        this.filterGroups.set(filterGroups);
+    }
+
+// filters
 
     private final ObservableList<Filter> filters = FXCollections.observableArrayList();
 
-    public ObservableList<Filter> getFilters() {
+    public final ObservableList<Filter> getFilters() {
         return filters;
     }
 
@@ -253,15 +333,15 @@ public class FilterView<T> extends Control {
 
     private final ObjectProperty<Predicate<T>> additionalFilterPredicate = new SimpleObjectProperty<>(this, "additionalFilterPredicate", item -> true);
 
-    public Predicate<T> getAdditionalFilterPredicate() {
+    public final Predicate<T> getAdditionalFilterPredicate() {
         return additionalFilterPredicate.get();
     }
 
-    public ObjectProperty<Predicate<T>> additionalFilterPredicateProperty() {
+    public final ObjectProperty<Predicate<T>> additionalFilterPredicateProperty() {
         return additionalFilterPredicate;
     }
 
-    public void setAdditionalFilterPredicate(Predicate<T> additionalFilterPredicate) {
+    public final void setAdditionalFilterPredicate(Predicate<T> additionalFilterPredicate) {
         this.additionalFilterPredicate.set(additionalFilterPredicate);
     }
 
@@ -269,22 +349,31 @@ public class FilterView<T> extends Control {
 
     private final ReadOnlyObjectWrapper<Predicate<T>> filterPredicate = new ReadOnlyObjectWrapper<>(this, "filterPredicate", item -> true);
 
-    public Predicate getFilterPredicate() {
+    public final Predicate getFilterPredicate() {
         return filterPredicate.get();
     }
 
-    public ReadOnlyObjectProperty<Predicate<T>> filterPredicateProperty() {
+    public final ReadOnlyObjectProperty<Predicate<T>> filterPredicateProperty() {
         return filterPredicate.getReadOnlyProperty();
     }
 
 
+    /**
+     * A filter group consists of a group of filters and has a name. The name
+     * is displayed in the UI as part of the dropdown list that expostes the
+     * available filters.
+     *
+     * @param <T> the type of the model objects managed by the filter view
+     */
     public static class FilterGroup<T> {
 
-        private final String id;
-
+        /**
+         * Constructs a new group.
+         *
+         * @param name the name that will be shown in the UI, e.g. "Gender"
+         */
         public FilterGroup(String name) {
             setName(name);
-            id = name.toLowerCase().replace(" ", "-");
 
             filters.addListener((Change<? extends Filter<T>> change) -> {
                 while (change.next()) {
@@ -295,51 +384,74 @@ public class FilterView<T> extends Control {
             });
         }
 
-        public String getId() {
-            return id;
-        }
-
         // filters
 
-        private final ObservableList<Filter<T>> filters = FXCollections.observableArrayList();
+        private final ListProperty<Filter<T>> filters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-        public ObservableList<Filter<T>> getFilters() {
+        public final ObservableList<Filter<T>> getFilters() {
+            return filters.get();
+        }
+
+        public final ListProperty<Filter<T>> filtersProperty() {
             return filters;
         }
 
-        // filter groups
+        public final void setFilters(ObservableList<Filter<T>> filters) {
+            this.filters.set(filters);
+        }
 
-        private StringProperty name = new SimpleStringProperty(this, "name", "Untitled");
+        // group name
 
-        public StringProperty nameProperty() {
+        private final StringProperty name = new SimpleStringProperty(this, "name", "Untitled");
+
+        /**
+         * The name of the filter as shown in the filter group's dropdown list.
+         *
+         * @return the filter name
+         */
+        public final StringProperty nameProperty() {
             return name;
         }
 
-        public String getName() {
+        public final String getName() {
             return name.get();
         }
 
-        public void setName(String name) {
+        public final void setName(String name) {
             this.name.set(name);
         }
     }
 
-    public static class Filter<T> implements Predicate<T> {
+    /**
+     * A filter is a predicate that will be used for filtering the elements of an
+     * observable list. A filter may only be added to one {@link FilterGroup}.
+     *
+     * @see FilterGroup#getFilters()
+     * @see FilteredList#setPredicate(Predicate)
+     *
+     * @param <T> the type of the model objects managed by the filter view
+     */
+    public abstract static class Filter<T> implements Predicate<T> {
 
-        private final String id;
         private FilterGroup<T> group;
 
+        /**
+         * Constructs a new filter with the given name.
+         *
+         * @param name the name of the filter (e.g. "Male")
+         */
         public Filter(String name) {
             Objects.requireNonNull(name, "filter name can not be null");
             setName(name);
-            this.id = name.toLowerCase().replace(" ", "-");
         }
 
-        public String getId() {
-            return id;
-        }
-
-        FilterGroup<T> getGroup() {
+        /**
+         * Returns the group to which the filter belongs.
+         *
+         * @see FilterGroup#getFilters()
+         * @return the filter's "parent" group
+         */
+        public FilterGroup<T> getGroup() {
             return group;
         }
 
@@ -347,23 +459,25 @@ public class FilterView<T> extends Control {
             this.group = group;
         }
 
-        private StringProperty name = new SimpleStringProperty(this, "name", "Untitled");
+        // name
 
-        public StringProperty nameProperty() {
+        private final StringProperty name = new SimpleStringProperty(this, "name", "Untitled");
+
+        /**
+         * The name of the filter as shown inside the UI.
+         *
+         * @return the filter's name
+         */
+        public final StringProperty nameProperty() {
             return name;
         }
 
-        public String getName() {
+        public final String getName() {
             return name.get();
         }
 
-        public void setName(String name) {
+        public final void setName(String name) {
             this.name.set(name);
-        }
-
-        @Override
-        public boolean test(T t) {
-            return false;
         }
     }
 }

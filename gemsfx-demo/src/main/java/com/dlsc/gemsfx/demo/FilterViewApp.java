@@ -62,12 +62,91 @@ public class FilterViewApp extends Application {
         firstNameGroup.getFilters().add(new Filter<>("Elizabeth") {
             @Override
             public boolean test(Person person) {
-                switch (person.getFirstName()) {
-                    case "Elizabeth":
-                        return true;
-                    default:
-                        return false;
+                return person.getFirstName().equals("Elizabeth");
+            }
+        });
+
+        lastNameGroup.getFilters().add(new Filter<>("Miller") {
+            @Override
+            public boolean test(Person person) {
+                return person.getLastName().equals("Miller");
+            }
+        });
+
+        lastNameGroup.getFilters().add(new Filter<>("Smith") {
+            @Override
+            public boolean test(Person person) {
+                return person.getLastName().equals("Smith");
+            }
+        });
+
+        birthdayGroup.getFilters().add(new Filter<>("1970 - 1980") {
+            @Override
+            public boolean test(Person person) {
+                if (person.getBirthday().getYear() < 1970) {
+                    return false;
                 }
+                if (person.getBirthday().getYear() > 1980) {
+                    return false;
+                }
+
+                return true;
+            }
+        });
+
+        birthdayGroup.getFilters().add(new Filter<>("1980 - 1990") {
+            @Override
+            public boolean test(Person person) {
+                if (person.getBirthday().getYear() < 1980) {
+                    return false;
+                }
+                if (person.getBirthday().getYear() > 1990) {
+                    return false;
+                }
+
+                return true;
+            }
+        });
+
+        birthdayGroup.getFilters().add(new Filter<>("1990 - 2000") {
+            @Override
+            public boolean test(Person person) {
+                if (person.getBirthday().getYear() < 1990) {
+                    return false;
+                }
+                if (person.getBirthday().getYear() > 2000) {
+                    return false;
+                }
+
+                return true;
+            }
+        });
+
+        birthdayGroup.getFilters().add(new Filter<>("2000 - 2010") {
+            @Override
+            public boolean test(Person person) {
+                if (person.getBirthday().getYear() < 2000) {
+                    return false;
+                }
+                if (person.getBirthday().getYear() > 2010) {
+                    return false;
+                }
+
+                return true;
+            }
+        });
+
+        roleGroup.getFilters().add(new Filter<>("Parent") {
+            @Override
+            public boolean test(Person person) {
+                return person.getRole().equals("Parent");
+            }
+        });
+
+        roleGroup.getFilters().add(new Filter<>("Children") {
+            @Override
+            public boolean test(Person person) {
+                return person.getRole().equals("Son") || person.getRole().equals("Daughter");
             }
         });
 
@@ -81,7 +160,7 @@ public class FilterViewApp extends Application {
         filterView.getItems().add(new Person("Jennifer", "Miller", LocalDate.of(1975, 1, 12), "Parent"));
         filterView.getItems().add(new Person("Paul", "Miller", LocalDate.of(1996, 11, 6), "Son"));
         filterView.getItems().add(new Person("Eric", "Miller", LocalDate.of(1998, 8, 30), "Son"));
-        filterView.getItems().add(new Person("Elizabeth", "Miller", LocalDate.of(2000, 3, 5), "Daughter"));
+        filterView.getItems().add(new Person("Elizabeth", "Smith", LocalDate.of(2000, 3, 5), "Daughter"));
 
         TableColumn<Person, String> firstNameColumn = new TableColumn<>("First Name");
         TableColumn<Person, String> lastNameColumn = new TableColumn<>("Last Name");
