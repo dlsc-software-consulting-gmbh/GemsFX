@@ -34,7 +34,7 @@ public class ChipView<T> extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return getClass().getResource("chip-view.css").toExternalForm();
+        return ChipView.class.getResource("chip-view.css").toExternalForm();
     }
 
     // value
