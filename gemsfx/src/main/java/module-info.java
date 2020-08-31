@@ -26,6 +26,7 @@ module com.dlsc.gemsfx {
     exports com.dlsc.gemsfx;
     exports com.dlsc.gemsfx.keyboard;
     exports com.dlsc.gemsfx.richtextarea;
+    exports com.dlsc.gemsfx.templatepane;
 
     opens com.dlsc.gemsfx.keyboard;
 }
