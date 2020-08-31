@@ -1,0 +1,16 @@
+.list-header {
+	-fx-padding: 0.0 5.0 0.0 5.0;
+	-fx-background-color: -fx-body-color;
+	-fx-border-color: 
+        derive(-fx-base, 80%) 
+        linear-gradient(to bottom, derive(-fx-base,80%) 20%, derive(-fx-base,-10%) 90%)
+        derive(-fx-base, 10%) 
+        linear-gradient(to bottom, derive(-fx-base,80%) 20%, derive(-fx-base,-10%) 90%),
+        /* Outer border: */
+        transparent -fx-box-border -fx-box-border transparent;
+    -fx-border-insets: 0 1 1 0, 0 0 0 0;
+    -fx-border-width: 0.083333em 0.083333em 0.083333em 0, 0.083333em 0.083333em 0.083333em;    
+	-fx-pref-height: 24;
+	-fx-alignment: baseline-center;
+	-fx-font-weight: bold;
+}

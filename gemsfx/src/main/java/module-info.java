@@ -24,6 +24,7 @@ module com.dlsc.gemsfx {
 
     exports com.dlsc.gemsfx.util;
     exports com.dlsc.gemsfx;
+    exports com.dlsc.gemsfx.columnbrowser;
     exports com.dlsc.gemsfx.keyboard;
     exports com.dlsc.gemsfx.richtextarea;
 
