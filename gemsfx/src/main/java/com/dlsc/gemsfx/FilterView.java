@@ -420,6 +420,24 @@ public class FilterView<T> extends Control {
         public final void setName(String name) {
             this.name.set(name);
         }
+
+        private final StringProperty id = new SimpleStringProperty(this, "id");
+
+        public final String getId() {
+            return id.get();
+        }
+
+        /**
+         * An identifier, useful for persisting session state of the filter view.
+         * @return the ID of the filter group
+         */
+        public final StringProperty idProperty() {
+            return id;
+        }
+
+        public final void setId(String id) {
+            this.id.set(id);
+        }
     }
 
     /**
@@ -478,6 +496,24 @@ public class FilterView<T> extends Control {
 
         public final void setName(String name) {
             this.name.set(name);
+        }
+
+        private final StringProperty id = new SimpleStringProperty(this, "id");
+
+        public final String getId() {
+            return id.get();
+        }
+
+        /**
+         * An identifier, useful for persisting session state of the filter view.
+         * @return the ID of the filter group
+         */
+        public final StringProperty idProperty() {
+            return id;
+        }
+
+        public final void setId(String id) {
+            this.id.set(id);
         }
     }
 }
