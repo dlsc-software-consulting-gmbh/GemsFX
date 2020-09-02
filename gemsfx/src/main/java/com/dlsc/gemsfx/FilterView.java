@@ -371,8 +371,9 @@ public class FilterView<T> extends Control {
          * Constructs a new group.
          *
          * @param name the name that will be shown in the UI, e.g. "Gender"
+         * @param id the id of the group
          */
-        public FilterGroup(String name) {
+        public FilterGroup(String name, String id) {
             setName(name);
 
             filters.addListener((Change<? extends Filter<T>> change) -> {
@@ -382,6 +383,10 @@ public class FilterView<T> extends Control {
                     }
                 }
             });
+        }
+
+        public FilterGroup(String name) {
+            this(name, name.toLowerCase().replace("_", "-").replace("&", "and").replace(" ", "-"));
         }
 
         // filters
@@ -420,6 +425,24 @@ public class FilterView<T> extends Control {
         public final void setName(String name) {
             this.name.set(name);
         }
+
+        private final StringProperty id = new SimpleStringProperty(this, "id");
+
+        public final String getId() {
+            return id.get();
+        }
+
+        /**
+         * An identifier, useful for persisting session state of the filter view.
+         * @return the ID of the filter group
+         */
+        public final StringProperty idProperty() {
+            return id;
+        }
+
+        public final void setId(String id) {
+            this.id.set(id);
+        }
     }
 
     /**
@@ -439,10 +462,21 @@ public class FilterView<T> extends Control {
          * Constructs a new filter with the given name.
          *
          * @param name the name of the filter (e.g. "Male")
+         * @param id the id of the filter
          */
-        public Filter(String name) {
+        public Filter(String name, String id) {
             Objects.requireNonNull(name, "filter name can not be null");
             setName(name);
+            setId(id);
+        }
+
+        /**
+         * Constructs a new filter with the given name.
+         *
+         * @param name the name of the filter (e.g. "Male")
+         */
+        public Filter(String name) {
+            this(name, name.toLowerCase().replace("_", "-").replace("&", "and").replace(" ", "-"));
         }
 
         /**
@@ -478,6 +512,24 @@ public class FilterView<T> extends Control {
 
         public final void setName(String name) {
             this.name.set(name);
+        }
+
+        private final StringProperty id = new SimpleStringProperty(this, "id");
+
+        public final String getId() {
+            return id.get();
+        }
+
+        /**
+         * An identifier, useful for persisting session state of the filter view.
+         * @return the ID of the filter group
+         */
+        public final StringProperty idProperty() {
+            return id;
+        }
+
+        public final void setId(String id) {
+            this.id.set(id);
         }
     }
 }
