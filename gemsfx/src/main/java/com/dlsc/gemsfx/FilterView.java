@@ -271,8 +271,8 @@ public class FilterView<T> extends Control {
     /**
      * Stores the filter text entered by the user inside the filter text field.
      *
-     * @see #setTextFilterProvider(Callback)
      * @return the filter text
+     * @see #setTextFilterProvider(Callback)
      */
     public final StringProperty filterTextProperty() {
         return filterText;
@@ -371,10 +371,11 @@ public class FilterView<T> extends Control {
          * Constructs a new group.
          *
          * @param name the name that will be shown in the UI, e.g. "Gender"
-         * @param id the id of the group
+         * @param id   the id of the group
          */
         public FilterGroup(String name, String id) {
             setName(name);
+            setId(id);
 
             filters.addListener((Change<? extends Filter<T>> change) -> {
                 while (change.next()) {
@@ -386,7 +387,7 @@ public class FilterView<T> extends Control {
         }
 
         public FilterGroup(String name) {
-            this(name, name.toLowerCase().replace("_", "-").replace("&", "and").replace(" ", "-"));
+            this(name, StringUtils.replaceEach(name, new String[]{"(", ")", "&", "_", " "}, new String[]{"", "", "and", "-", "-"}).toLowerCase());
         }
 
         // filters
@@ -434,6 +435,7 @@ public class FilterView<T> extends Control {
 
         /**
          * An identifier, useful for persisting session state of the filter view.
+         *
          * @return the ID of the filter group
          */
         public final StringProperty idProperty() {
@@ -449,10 +451,9 @@ public class FilterView<T> extends Control {
      * A filter is a predicate that will be used for filtering the elements of an
      * observable list. A filter may only be added to one {@link FilterGroup}.
      *
+     * @param <T> the type of the model objects managed by the filter view
      * @see FilterGroup#getFilters()
      * @see FilteredList#setPredicate(Predicate)
-     *
-     * @param <T> the type of the model objects managed by the filter view
      */
     public abstract static class Filter<T> implements Predicate<T> {
 
@@ -462,7 +463,7 @@ public class FilterView<T> extends Control {
          * Constructs a new filter with the given name.
          *
          * @param name the name of the filter (e.g. "Male")
-         * @param id the id of the filter
+         * @param id   the id of the filter
          */
         public Filter(String name, String id) {
             Objects.requireNonNull(name, "filter name can not be null");
@@ -476,14 +477,14 @@ public class FilterView<T> extends Control {
          * @param name the name of the filter (e.g. "Male")
          */
         public Filter(String name) {
-            this(name, name.toLowerCase().replace("_", "-").replace("&", "and").replace(" ", "-"));
+            this(name, StringUtils.replaceEach(name, new String[]{"(", ")", "&", "_", " "}, new String[]{"", "", "and", "-", "-"}).toLowerCase());
         }
 
         /**
          * Returns the group to which the filter belongs.
          *
-         * @see FilterGroup#getFilters()
          * @return the filter's "parent" group
+         * @see FilterGroup#getFilters()
          */
         public FilterGroup<T> getGroup() {
             return group;
@@ -522,6 +523,7 @@ public class FilterView<T> extends Control {
 
         /**
          * An identifier, useful for persisting session state of the filter view.
+         *
          * @return the ID of the filter group
          */
         public final StringProperty idProperty() {

@@ -87,8 +87,8 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
 
         searchTextField.visibleProperty().bind(view.textFilterProviderProperty().isNotNull());
         searchTextField.managedProperty().bind(view.textFilterProviderProperty().isNotNull());
+        searchTextField.textProperty().bindBidirectional(view.filterTextProperty());
 
-        view.filterTextProperty().bindBidirectional(searchTextField.textProperty());
         view.textFilterProviderProperty().addListener(it -> updateGroups());
         view.getFilterGroups().addListener((Observable it) -> updateGroups());
 
