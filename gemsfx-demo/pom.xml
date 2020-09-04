@@ -9,7 +9,7 @@
     <parent>
         <groupId>com.dlsc.gemsfx</groupId>
         <artifactId>parent</artifactId>
-        <version>1.7.5</version>
+        <version>1.7.6</version>
     </parent>
 
     <artifactId>gemsfx-demo</artifactId>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>com.dlsc.gemsfx</groupId>
             <artifactId>gemsfx</artifactId>
-            <version>1.7.5</version>
+            <version>1.7.6</version>
         </dependency>
 
         <dependency>
