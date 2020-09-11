@@ -1,0 +1,9 @@
+.toggle-button {
+	-fx-border-color: black;
+	-fx-border-width: .5px;
+	-fx-background-color: lightgray;
+}
+
+.toggle-button:selected {
+	-fx-background-color: lightblue;
+}

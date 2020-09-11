@@ -1,0 +1,106 @@
+* {
+	-tile-blue: blue;
+	-tile-red: red;
+	-tile-green: green;
+	-tile-gray: gray;
+	-tile-pink: pink;
+}
+
+.tile-node {
+	-fx-text-fill: white;
+	-fx-alignment: center;
+	-fx-font-weight: bold;	
+	-fx-border-color: black;
+	-fx-line-width: .5px;
+}
+
+/* 
+ * -----------------------------------------
+ * Header Styles
+ * -----------------------------------------
+ */
+.above-header {
+	-fx-background-color: -tile-blue;
+}
+
+.header-left {
+	-fx-background-color: -tile-red;
+}
+
+.header {
+	-fx-background-color: -tile-green;
+}
+
+.header-right {
+	-fx-background-color: -tile-red;
+}
+
+.below-header {
+	-fx-background-color: -tile-blue;
+}
+
+/* 
+ * -----------------------------------------
+ * Center Styles
+ * -----------------------------------------
+ */
+.left {
+	-fx-background-color: -tile-red;	
+}
+
+.right {
+	-fx-background-color: -tile-red;	
+}
+
+.content-left {
+	-fx-background-color: -tile-green;	
+}
+
+.content-right {
+	-fx-background-color: -tile-green;	
+}
+
+.above-sides {
+	-fx-background-color: -tile-gray;	
+}
+
+.below-sides {
+	-fx-background-color: -tile-gray;	
+}
+
+.above-content {
+	-fx-background-color: -tile-pink;	
+}
+
+.below-content {
+	-fx-background-color: -tile-pink;	
+}
+
+.content {
+	-fx-background-color: -tile-red;
+}
+
+/* 
+ * -----------------------------------------
+ * Footer Styles
+ * -----------------------------------------
+ */
+.above-footer {
+	-fx-background-color: -tile-blue;
+}
+
+.footer-left {
+	-fx-background-color: -tile-red;
+}
+
+.footer {
+	-fx-background-color: -tile-green;
+}
+
+.footer-right {
+	-fx-background-color: -tile-red;
+}
+
+.below-footer {
+	-fx-background-color: -tile-blue;
+}
