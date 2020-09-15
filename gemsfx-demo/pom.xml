@@ -16,6 +16,7 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <main.class>com.dlsc.gemsfx.demo.KeyboardApp</main.class>
     </properties>
 
     <build>
