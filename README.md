@@ -12,6 +12,10 @@
 
 *At least **JDK 11** is required.*
 
+## Payment Option Controls
+
+Graphics provided by Gregoire Segretain (https://www.sketchappsources.com/contributor/gregoiresgt)
+
 ## Keyboard / KeyboardPane
 
 An on-screen keyboard, especially useful for touch applications (mobile, tablet).
