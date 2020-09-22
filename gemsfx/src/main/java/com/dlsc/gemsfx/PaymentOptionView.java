@@ -7,8 +7,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * A control for displaying different types of payment options, e.g. various
+ * credit cards (MasterCard, American Express, Visa) but also new online options
+ * such as PayPal or ApplePay.
+ */
 public class PaymentOptionView extends ImageView {
 
+    /**
+     * Constructs a new view.
+     */
     public PaymentOptionView() {
         InvalidationListener updateListener = it -> updateView();
         optionProperty().addListener(updateListener);
@@ -30,7 +38,7 @@ public class PaymentOptionView extends ImageView {
             case AMAZON:
                 fileName = "Amazon";
                 break;
-            case AMEX:
+            case AMERICAN_EXPRESS:
                 fileName = "AmericanExpress";
                 break;
             case APPLE_PAY:
@@ -205,7 +213,7 @@ public class PaymentOptionView extends ImageView {
         }
     }
 
-    // TYPE
+    // OPTION SUPPORT
 
     private final ObjectProperty<Option> option = new SimpleObjectProperty<>(this, "option", Option.MASTERCARD);
 
@@ -213,6 +221,11 @@ public class PaymentOptionView extends ImageView {
         return option.get();
     }
 
+    /**
+     * The option determines which graphic will be shown, e.g. Option.MASTER_CARD.
+     *
+     * @return the currently displayed payment option
+     */
     public final ObjectProperty<Option> optionProperty() {
         return option;
     }
@@ -221,12 +234,21 @@ public class PaymentOptionView extends ImageView {
         this.option.set(option);
     }
 
+
+    // THEME SUPPORT
+
     private final ObjectProperty<Theme> theme = new SimpleObjectProperty<>(this, "style", Theme.DARK);
 
     public final Theme getTheme() {
         return theme.get();
     }
 
+    /**
+     * The theme determines if the view displays the dark or the light version
+     * of a payment option graphic.
+     *
+     * @return the currently used theme (dark, light)
+     */
     public final ObjectProperty<Theme> themeProperty() {
         return theme;
     }
@@ -235,17 +257,40 @@ public class PaymentOptionView extends ImageView {
         this.theme.set(theme);
     }
 
+    /**
+     * The payment option supports two different themes. A dark and a light
+     * theme. The light theme consists of payment option graphics with a light /
+     * white background. The dark theme uses different solid background colors
+     * for each option.
+     *
+     * @see PaymentOptionView#setTheme(Theme)
+     */
     public enum Theme {
+
+        /**
+         * The dark theme returns graphics with solid color backgrounds, other than
+         * white.
+         */
         DARK,
+
+        /**
+         * The light theme returns each payment option graphic with a white background.
+         */
         LIGHT
     }
 
+    /**
+     * The list of supported payment options consisting of popular credit cards and online
+     * payment options.
+     *
+     * @see PaymentOptionView#setOption(Option)
+     */
     public enum Option {
         UNKNOWN,
         CHECKOUT2,
         ALI_PAY,
         AMAZON,
-        AMEX,
+        AMERICAN_EXPRESS,
         APPLE_PAY,
         BANCONTACT,
         BITCOIN,
