@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.8.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.8.0) (2020-09-22)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.7.6...1.8.0)
+
+**Merged pull requests:**
+
+- Make demos launchable from command line and document that [\#16](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/16) ([sebkur](https://github.com/sebkur))
+
 ## [1.7.6](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.7.6) (2020-09-04)
 [Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.7.5...1.7.6)
 
