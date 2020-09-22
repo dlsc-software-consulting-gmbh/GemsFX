@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -27,6 +28,7 @@ public class PaymentOptionTilesApp extends Application {
 
         for (Option option : Option.values()) {
             PaymentOptionView view = new PaymentOptionView();
+            Tooltip.install(view, new Tooltip("Option: " + option.name()));
             view.setFitWidth(100);
             view.themeProperty().bind(theme);
             view.setPreserveRatio(true);
@@ -50,7 +52,7 @@ public class PaymentOptionTilesApp extends Application {
                     parent.setStyle("-fx-background-color: white;");
                     break;
                 case LIGHT:
-                    parent.setStyle("-fx-background-color: navy;");
+                    parent.setStyle("-fx-background-color: rgb(57,73,92);");
                     break;
             }
         });

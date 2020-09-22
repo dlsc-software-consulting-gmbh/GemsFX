@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 public class PaymentOptionView extends ImageView {
 
     public PaymentOptionView() {
-        final InvalidationListener updateListener = it -> updateView();
+        InvalidationListener updateListener = it -> updateView();
         optionProperty().addListener(updateListener);
         themeProperty().addListener(updateListener);
         updateView();
@@ -187,19 +187,18 @@ public class PaymentOptionView extends ImageView {
                 throw new IllegalArgumentException("option can not be " + getOption());
         }
 
-        switch (getTheme()) {
-            case DARK:
-                fileName = fileName + "-dark.png";
-                break;
-            case LIGHT:
-                fileName = fileName + "-light.png";
-                break;
-            default:
-                throw new IllegalArgumentException("theme can not be " + getTheme());
-        }
-
         if (StringUtils.isNotBlank(fileName)) {
-            System.out.println(fileName);
+            switch (getTheme()) {
+                case DARK:
+                    fileName = fileName + "-dark.png";
+                    break;
+                case LIGHT:
+                    fileName = fileName + "-light.png";
+                    break;
+                default:
+                    throw new IllegalArgumentException("theme can not be " + getTheme());
+            }
+
             setImage(new Image(PaymentOptionView.class.getResource("paymentoptions/" + fileName).toExternalForm()));
         } else {
             setImage(null);

@@ -40,7 +40,7 @@ public class PaymentOptionApp extends Application {
                     parent.setStyle("-fx-background-color: white;");
                     break;
                 case LIGHT:
-                    parent.setStyle("-fx-background-color: navy;");
+                    parent.setStyle("-fx-background-color: rgb(57,73,92);");
                     break;
             }
         });

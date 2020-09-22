@@ -14,7 +14,9 @@
 
 ## Payment Option Controls
 
-Graphics provided by Gregoire Segretain (https://www.sketchappsources.com/contributor/gregoiresgt)
+A specialized subclass of ImageView that can be used to display different graphics for different payment options. Graphics provided by Gregoire Segretain (https://www.sketchappsources.com/contributor/gregoiresgt)
+
+![LightOption](gemsfx/docs/payment-options-light.png) ![DarkOption](gemsfx/docs/payment-options-dark.png)
 
 ## Keyboard / KeyboardPane
 
