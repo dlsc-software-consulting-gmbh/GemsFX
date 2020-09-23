@@ -10,7 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * A control for displaying different types of payment options, e.g. various
  * credit cards (MasterCard, American Express, Visa) but also new online options
- * such as PayPal or ApplePay.
+ * such as PayPal or ApplePay. The default width is initialized with 100 pixels,
+ * however the images are much bigger than that (500x300).
  */
 public class PaymentOptionView extends ImageView {
 
@@ -21,6 +22,8 @@ public class PaymentOptionView extends ImageView {
         InvalidationListener updateListener = it -> updateView();
         optionProperty().addListener(updateListener);
         themeProperty().addListener(updateListener);
+        setFitWidth(100);
+        setPreserveRatio(true);
         updateView();
     }
 
