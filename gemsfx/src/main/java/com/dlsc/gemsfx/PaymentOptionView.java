@@ -32,6 +32,9 @@ public class PaymentOptionView extends ImageView {
         switch (getOption()) {
             case UNKNOWN:
                 break;
+            case CREDIT_CARD:
+                fileName = "CreditCard";
+                break;
             case CHECKOUT2:
                 fileName = "2checkout";
                 break;
@@ -290,6 +293,7 @@ public class PaymentOptionView extends ImageView {
      */
     public enum Option {
         UNKNOWN,
+        CREDIT_CARD,
         CHECKOUT2,
         ALI_PAY,
         AMAZON,
