@@ -105,14 +105,12 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
         updateGroups();
         updateFilters();
 
-        getSkinnable().getFilters().addListener((Observable it) -> {
-            Platform.runLater(() -> {
-                for (Filter filter : filterItemMap.keySet()) {
-                    CheckMenuItem menuItem = filterItemMap.get(filter);
-                    menuItem.setSelected(getSkinnable().getFilters().contains(filter));
-                }
-            });
-        });
+        getSkinnable().getFilters().addListener((Observable it) -> Platform.runLater(() -> {
+            for (Filter filter : filterItemMap.keySet()) {
+                CheckMenuItem menuItem = filterItemMap.get(filter);
+                menuItem.setSelected(getSkinnable().getFilters().contains(filter));
+            }
+        }));
     }
 
     private void updateTitlePostfixLabelStyle(Label label) {
@@ -139,7 +137,7 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
             HBox.setHgrow(menuButton, Priority.ALWAYS);
 
             MenuItem all = new MenuItem("All");
-            final ObservableList<Filter> activeFilters = getSkinnable().getFilters();
+            ObservableList<Filter<T>> activeFilters = getSkinnable().getFilters();
 
             all.setOnAction(evt -> {
                 // first remove all, otherwise we end up with duplicates
@@ -184,7 +182,7 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
     private void updateFilters() {
         filtersPane.getChildren().clear();
 
-        final FilterView<T> filterView = getSkinnable();
+        FilterView<T> filterView = getSkinnable();
 
         if (!filterView.getFilters().isEmpty() || StringUtils.isNotBlank(filterView.getFilterText())) {
             filterView.getFilters().forEach(f -> {

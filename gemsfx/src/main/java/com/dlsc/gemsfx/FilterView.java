@@ -246,7 +246,7 @@ public class FilterView<T> extends Control {
         return items;
     }
 
-    public final void setItems(ObservableList items) {
+    public final void setItems(ObservableList<T> items) {
         this.items.set(items);
     }
 
@@ -256,7 +256,7 @@ public class FilterView<T> extends Control {
         return filteredItems.getReadOnlyProperty();
     }
 
-    public final ObservableList getFilteredItems() {
+    public final ObservableList<T> getFilteredItems() {
         return filteredItems.getReadOnlyProperty();
     }
 
@@ -321,12 +321,20 @@ public class FilterView<T> extends Control {
         this.filterGroups.set(filterGroups);
     }
 
-// filters
+    // filters
 
-    private final ObservableList<Filter> filters = FXCollections.observableArrayList();
+    private final ListProperty<Filter<T>> filters = new SimpleListProperty<>(this, "filters", FXCollections.observableArrayList());
 
-    public final ObservableList<Filter> getFilters() {
+    public ObservableList<Filter<T>> getFilters() {
+        return filters.get();
+    }
+
+    public ListProperty<Filter<T>> filtersProperty() {
         return filters;
+    }
+
+    public void setFilters(ObservableList<Filter<T>> filters) {
+        this.filters.set(filters);
     }
 
     // additional filter predicate
@@ -349,7 +357,7 @@ public class FilterView<T> extends Control {
 
     private final ReadOnlyObjectWrapper<Predicate<T>> filterPredicate = new ReadOnlyObjectWrapper<>(this, "filterPredicate", item -> true);
 
-    public final Predicate getFilterPredicate() {
+    public final Predicate<T> getFilterPredicate() {
         return filterPredicate.get();
     }
 
