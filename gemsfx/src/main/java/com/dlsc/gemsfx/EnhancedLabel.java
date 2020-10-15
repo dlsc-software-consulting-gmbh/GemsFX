@@ -88,6 +88,8 @@ public class EnhancedLabel extends Label {
         contextMenu.getItems().add(copyItem);
 
         setContextMenu(contextMenu);
+
+        setOnContextMenuRequested(evt -> setSelected(true));
     }
 
     private void copyText() {
