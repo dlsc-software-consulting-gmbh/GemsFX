@@ -1,0 +1,4 @@
+.enhanced-label:selected {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+}

@@ -23,7 +23,7 @@
     </scm>
 
     <properties>
-        <javafx.version>13.0.1</javafx.version>
+        <javafx.version>15</javafx.version>
         <javax.activation.version>1.2.0</javax.activation.version>
         <lombok.version>1.18.6</lombok.version>
         <ikonli.version>11.5.0</ikonli.version>
