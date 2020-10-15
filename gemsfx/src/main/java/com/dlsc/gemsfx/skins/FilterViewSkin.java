@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.ChipView;
+import com.dlsc.gemsfx.EnhancedLabel;
 import com.dlsc.gemsfx.FilterView;
 import com.dlsc.gemsfx.FilterView.Filter;
 import javafx.application.Platform;
@@ -31,11 +32,11 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
     public FilterViewSkin(FilterView<T> view) {
         super(view);
 
-        Label titleLabel = new Label();
+        EnhancedLabel titleLabel = view.getTitleLabel();
         titleLabel.textProperty().bind(view.titleProperty());
         titleLabel.getStyleClass().add("title");
 
-        Label titlePostfixLabel = new Label();
+        EnhancedLabel titlePostfixLabel = view.getTitlePostfixLabel();
         titlePostfixLabel.textProperty().bind(view.titlePostfixProperty());
         titlePostfixLabel.getStyleClass().addAll("title", "title-postfix");
 
@@ -46,7 +47,7 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
         HBox titleBox = new HBox(titleLabel, titlePostfixLabel);
         titleBox.getStyleClass().add("title-box");
 
-        Label subtitleLabel = new Label();
+        EnhancedLabel subtitleLabel = view.getSubtitleLabel();
         subtitleLabel.textProperty().bind(view.subtitleProperty());
         subtitleLabel.getStyleClass().add("subtitle");
 

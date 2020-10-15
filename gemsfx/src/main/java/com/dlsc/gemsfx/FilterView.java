@@ -55,6 +55,10 @@ import java.util.function.Predicate;
  */
 public class FilterView<T> extends Control {
 
+    private final EnhancedLabel titleLabel = new EnhancedLabel();
+    private final EnhancedLabel titlePostfixLabel = new EnhancedLabel();
+    private final EnhancedLabel subtitleLabel = new EnhancedLabel();
+
     public FilterView() {
         getStyleClass().add("filter-view");
 
@@ -107,6 +111,18 @@ public class FilterView<T> extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return FilterView.class.getResource("filter-view.css").toExternalForm();
+    }
+
+    public final EnhancedLabel getTitleLabel() {
+        return titleLabel;
+    }
+
+    public final EnhancedLabel getTitlePostfixLabel() {
+        return titlePostfixLabel;
+    }
+
+    public final EnhancedLabel getSubtitleLabel() {
+        return subtitleLabel;
     }
 
     @Override
