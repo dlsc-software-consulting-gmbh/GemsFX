@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.9.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.9.0) (2020-10-15)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.8.3...1.9.0)
+
+**Merged pull requests:**
+
+- Bump junit from 4.12 to 4.13.1 in /gemsfx [\#19](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/19) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add more demos to README [\#17](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/17) ([sebkur](https://github.com/sebkur))
+
 ## [1.8.3](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.8.3) (2020-10-02)
 [Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.8.2...1.8.3)
 
