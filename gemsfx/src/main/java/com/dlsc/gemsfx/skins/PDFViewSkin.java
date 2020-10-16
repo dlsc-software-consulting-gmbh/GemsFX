@@ -1108,7 +1108,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
             setGraphic(finalBox);
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 
-            renderService.scaleProperty().bind(PDFViewSkin.this.getSkinnable().thumbnailPageScaleProperty());
+            renderService.scaleProperty().bind(getSkinnable().thumbnailPageScaleProperty());
             renderService.valueProperty().addListener(it -> imageView.setImage(renderService.getValue()));
 
             itemProperty().addListener(it -> {
@@ -1205,7 +1205,7 @@ public class PDFViewSkin extends SkinBase<PDFView> {
 
             itemProperty().addListener(invalidationListener);
 
-            renderService.scaleProperty().bind(PDFViewSkin.this.getSkinnable().thumbnailPageScaleProperty());
+            renderService.scaleProperty().bind(getSkinnable().thumbnailPageScaleProperty());
             renderService.valueProperty().addListener(it -> imageView.setImage(renderService.getValue()));
         }
 

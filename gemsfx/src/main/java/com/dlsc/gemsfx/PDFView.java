@@ -611,10 +611,10 @@ public class PDFView extends Control {
 
         @Override
         public int compareTo(SearchResult other) {
-            int result = Integer.compare(this.pageNumber, other.pageNumber);
+            int result = Integer.compare(pageNumber, other.pageNumber);
 
             if (result == 0) {
-                result = Double.compare(this.getMarker().getMinY(), other.getMarker().getMinY());
+                result = Double.compare(getMarker().getMinY(), other.getMarker().getMinY());
             }
 
             return result;
