@@ -1,10 +1,10 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.ChipView;
-import com.dlsc.gemsfx.EnhancedLabel;
 import com.dlsc.gemsfx.FilterView;
 import com.dlsc.gemsfx.FilterView.Filter;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -25,47 +25,18 @@ import java.util.Map;
 
 public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
 
-    private SearchTextField searchTextField = new SearchTextField();
-    private HBox filterGroupsPane = new HBox();
-    private FlowPane filtersPane = new FlowPane();
+    private final SearchTextField searchTextField = new SearchTextField();
+    private final HBox filterGroupsPane = new HBox();
+    private final FlowPane filtersPane = new FlowPane();
+    private final HBox headerBox = new HBox();
 
     public FilterViewSkin(FilterView<T> view) {
         super(view);
 
-        EnhancedLabel titleLabel = view.getTitleLabel();
-        titleLabel.textProperty().bind(view.titleProperty());
-        titleLabel.getStyleClass().add("title");
-
-        EnhancedLabel titlePostfixLabel = view.getTitlePostfixLabel();
-        titlePostfixLabel.textProperty().bind(view.titlePostfixProperty());
-        titlePostfixLabel.getStyleClass().addAll("title", "title-postfix");
-
-        // the title postfix label can have an additional style
-        updateTitlePostfixLabelStyle(titlePostfixLabel);
-        view.titlePostfixStyleProperty().addListener(it -> updateTitlePostfixLabelStyle(titlePostfixLabel));
-
-        HBox titleBox = new HBox(titleLabel, titlePostfixLabel);
-        titleBox.getStyleClass().add("title-box");
-
-        EnhancedLabel subtitleLabel = view.getSubtitleLabel();
-        subtitleLabel.textProperty().bind(view.subtitleProperty());
-        subtitleLabel.getStyleClass().add("subtitle");
-
-        VBox titleAndSubtitleBox = new VBox(titleBox, subtitleLabel);
-        HBox.setHgrow(titleAndSubtitleBox, Priority.ALWAYS);
-
-        HBox headerBox;
-
-        if (view.getExtras() != null) {
-            headerBox = new HBox(titleAndSubtitleBox, searchTextField, view.getExtras());
-        } else {
-            headerBox = new HBox(titleAndSubtitleBox, searchTextField);
-        }
-
-        headerBox.setFillHeight(true);
-        headerBox.getStyleClass().add("header-box");
-        headerBox.visibleProperty().bind(view.showHeaderProperty());
-        headerBox.managedProperty().bind(view.showHeaderProperty());
+        InvalidationListener updateHeaderListener = it -> updateHeaderBox();
+        view.titleLabelProperty().addListener(updateHeaderListener);
+        view.titlePostfixLabelProperty().addListener(updateHeaderListener);
+        view.subtitleLabelProperty().addListener(updateHeaderListener);
 
         view.extrasProperty().addListener((obs, oldExtras, newExtras) -> {
             if (oldExtras != null) {
@@ -112,13 +83,40 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
                 menuItem.setSelected(getSkinnable().getFilters().contains(filter));
             }
         }));
+
+        headerBox.setFillHeight(true);
+        headerBox.getStyleClass().add("header-box");
+        headerBox.visibleProperty().bind(view.showHeaderProperty());
+        headerBox.managedProperty().bind(view.showHeaderProperty());
+
+        updateHeaderBox();
     }
 
-    private void updateTitlePostfixLabelStyle(Label label) {
-        label.getStyleClass().setAll("title", "title-postfix");
-        String style = getSkinnable().getTitlePostfixStyle();
-        if (StringUtils.isNotBlank(style)) {
-            label.getStyleClass().add(style);
+    private void updateHeaderBox() {
+        FilterView<T> view = getSkinnable();
+
+        Label titleLabel = view.getTitleLabel();
+        titleLabel.textProperty().bind(view.titleProperty());
+        titleLabel.getStyleClass().add("title");
+
+        Label titlePostfixLabel = view.getTitlePostfixLabel();
+        titlePostfixLabel.textProperty().bind(view.titlePostfixProperty());
+        titlePostfixLabel.getStyleClass().addAll("title", "title-postfix");
+
+        HBox titleBox = new HBox(titleLabel, titlePostfixLabel);
+        titleBox.getStyleClass().add("title-box");
+
+        Label subtitleLabel = view.getSubtitleLabel();
+        subtitleLabel.textProperty().bind(view.subtitleProperty());
+        subtitleLabel.getStyleClass().add("subtitle");
+
+        VBox titleAndSubtitleBox = new VBox(titleBox, subtitleLabel);
+        HBox.setHgrow(titleAndSubtitleBox, Priority.ALWAYS);
+
+        if (view.getExtras() != null) {
+            headerBox.getChildren().setAll(titleAndSubtitleBox, searchTextField, view.getExtras());
+        } else {
+            headerBox.getChildren().setAll(titleAndSubtitleBox, searchTextField);
         }
     }
 

@@ -22,6 +22,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
 import org.apache.commons.lang3.StringUtils;
@@ -55,14 +56,10 @@ import java.util.function.Predicate;
  */
 public class FilterView<T> extends Control {
 
-    private final EnhancedLabel titleLabel = new EnhancedLabel();
-    private final EnhancedLabel titlePostfixLabel = new EnhancedLabel();
-    private final EnhancedLabel subtitleLabel = new EnhancedLabel();
-
     public FilterView() {
         getStyleClass().add("filter-view");
 
-        final InvalidationListener updatePredicateListener = (Observable it) -> {
+        InvalidationListener updatePredicateListener = (Observable it) -> {
 
             // first group the filters together according to the group to which they belong
 
@@ -113,21 +110,60 @@ public class FilterView<T> extends Control {
         return FilterView.class.getResource("filter-view.css").toExternalForm();
     }
 
-    public final EnhancedLabel getTitleLabel() {
-        return titleLabel;
-    }
-
-    public final EnhancedLabel getTitlePostfixLabel() {
-        return titlePostfixLabel;
-    }
-
-    public final EnhancedLabel getSubtitleLabel() {
-        return subtitleLabel;
-    }
-
     @Override
     protected Skin<?> createDefaultSkin() {
         return new FilterViewSkin<>(this);
+    }
+
+    private final ObjectProperty<Label> titleLabel = new SimpleObjectProperty<>(this, "titleLabel", new Label());
+
+    public final Label getTitleLabel() {
+        return titleLabel.get();
+    }
+
+    /**
+     * The label instance that will be used for displaying the title of the view.
+     */
+    public final ObjectProperty<Label> titleLabelProperty() {
+        return titleLabel;
+    }
+
+    public final void setTitleLabel(Label titleLabel) {
+        this.titleLabel.set(titleLabel);
+    }
+
+    private final ObjectProperty<Label> titlePostfixLabel = new SimpleObjectProperty<>(this, "titlePostfixLabel", new Label());
+
+    public final Label getTitlePostfixLabel() {
+        return titlePostfixLabel.get();
+    }
+
+    /**
+     * The label instance that will be used for displaying the title postfix text of the view.
+     */
+    public final ObjectProperty<Label> titlePostfixLabelProperty() {
+        return titlePostfixLabel;
+    }
+
+    public final void setTitlePostfixLabel(Label titlePostfixLabel) {
+        this.titlePostfixLabel.set(titlePostfixLabel);
+    }
+
+    private final ObjectProperty<Label> subtitleLabel = new SimpleObjectProperty<>(this, "subtitleLabel", new Label());
+
+    public Label getSubtitleLabel() {
+        return subtitleLabel.get();
+    }
+
+    /**
+     * The label instance that will be used for displaying the subtitle of the view.
+     */
+    public ObjectProperty<Label> subtitleLabelProperty() {
+        return subtitleLabel;
+    }
+
+    public void setSubtitleLabel(Label subtitleLabel) {
+        this.subtitleLabel.set(subtitleLabel);
     }
 
     private final BooleanProperty showHeader = new SimpleBooleanProperty(this, "showHeader", true);
@@ -160,7 +196,7 @@ public class FilterView<T> extends Control {
      * An extra node that can be added to the header of the filter view. The node will appear
      * to the right of the (optional) text filter field.
      *
-     * @return
+     * @return the extra node
      */
     public final ObjectProperty<Node> extrasProperty() {
         return extras;
@@ -196,8 +232,7 @@ public class FilterView<T> extends Control {
     }
 
     /**
-     * A text that can be added to the title text. Via the {@link #titlePostfixStyleProperty()} it
-     * can be styled differently than the title.
+     * A text that can be added to the title text.
      *
      * @return the title postfix text
      */
@@ -207,25 +242,6 @@ public class FilterView<T> extends Control {
 
     public final void setTitlePostfix(String titlePostfix) {
         this.titlePostfix.set(titlePostfix);
-    }
-
-    private final StringProperty titlePostfixStyle = new SimpleStringProperty(this, "titlePostfix", "");
-
-    public final String getTitlePostfixStyle() {
-        return titlePostfixStyle.get();
-    }
-
-    /**
-     * A CSS styleclass that will be applied to the title postfix label.
-     *
-     * @return the title postfix style
-     */
-    public final StringProperty titlePostfixStyleProperty() {
-        return titlePostfixStyle;
-    }
-
-    public final void setTitlePostfixStyle(String titlePostfixStyle) {
-        this.titlePostfixStyle.set(titlePostfixStyle);
     }
 
     private final StringProperty subtitle = new SimpleStringProperty(this, "subtitle", "");
@@ -249,7 +265,7 @@ public class FilterView<T> extends Control {
 
     private final ListProperty<T> items = new SimpleListProperty<>(this, "items", FXCollections.observableArrayList());
 
-    public final ObservableList getItems() {
+    public final ObservableList<T> getItems() {
         return items.get();
     }
 

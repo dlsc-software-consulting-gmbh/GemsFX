@@ -1,0 +1,13 @@
+.photo-view .image-wrapper {
+    -fx-background-image: url("transparency.png");
+}
+
+.photo-view .image-wrapper .border-circle {
+    -fx-stroke: -fx-accent;
+    -fx-stroke-width: 4;
+    -fx-fill: transparent;
+}
+
+.photo-view .controls-wrapper {
+    -fx-spacing: 20px;
+}
