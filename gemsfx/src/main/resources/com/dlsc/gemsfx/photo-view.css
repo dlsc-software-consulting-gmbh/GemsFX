@@ -1,13 +1,19 @@
-.photo-view .image-wrapper {
+.photo-view > .box > .image-box > .upload-icon {
+    -fx-icon-size: 64px;
+    -fx-icon-color: -fx-accent;
+    -fx-icon-code: mdi-upload;
+}
+
+.photo-view > .box > .image-box {
     -fx-background-image: url("transparency.png");
 }
 
-.photo-view .image-wrapper .border-circle {
+.photo-view > .box > .image-box > .border-circle {
     -fx-stroke: -fx-accent;
     -fx-stroke-width: 4;
     -fx-fill: transparent;
 }
 
-.photo-view .controls-wrapper {
+.photo-view > .box {
     -fx-spacing: 20px;
 }

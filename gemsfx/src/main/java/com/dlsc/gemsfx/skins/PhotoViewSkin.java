@@ -3,25 +3,32 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.NumberBinding;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+
+import java.util.function.Supplier;
 
 public class PhotoViewSkin extends SkinBase<PhotoView> {
 
+    private static final double MIN_ZOOM = 1;
+    private static final double MAX_ZOOM = 10;
+
     private final Slider slider;
     private final ImageView imageView;
-    private final StackPane imageWrapper;
+    private final StackPane imageBox;
 
     private double startY;
     private double startX;
@@ -38,26 +45,32 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         imageView.translateYProperty().bind(view.photoTranslateYProperty());
         imageView.setCursor(Cursor.MOVE);
 
-        slider = new Slider(1,4,1);
+        slider = new Slider(MIN_ZOOM, MAX_ZOOM, 1);
         slider.setPrefWidth(200);
         slider.setMaxWidth(Region.USE_PREF_SIZE);
         slider.valueProperty().bindBidirectional(view.photoZoomProperty());
         StackPane.setAlignment(slider, Pos.BOTTOM_CENTER);
 
-        imageWrapper = new StackPane(imageView);
-        imageWrapper.getStyleClass().add("image-wrapper");
+        FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_UPLOAD);
+        fontIcon.visibleProperty().bind(view.photoSupplierProperty().isNotNull().and(view.photoProperty().isNull()));
+        fontIcon.getStyleClass().add("upload-icon");
 
-        NumberBinding min = Bindings.min(imageWrapper.widthProperty(), imageWrapper.heightProperty());
+        imageBox = new StackPane(imageView, fontIcon);
+        imageBox.getStyleClass().add("image-box");
 
-        imageView.fitWidthProperty().bind(min);
-        imageView.fitHeightProperty().bind(min);
+//        NumberBinding max = Bindings.max(imageBox.widthProperty(), imageBox.heightProperty());
 
-        imageWrapper.setOnMousePressed(evt -> {
+//        imageView.fitWidthProperty().bind(max);
+//        imageView.fitHeightProperty().bind(max);
+
+        imageView.setManaged(false);
+
+        imageBox.setOnMousePressed(evt -> {
             startX = evt.getX();
             startY = evt.getY();
         });
 
-        imageWrapper.setOnMouseDragged(evt -> {
+        imageBox.setOnMouseDragged(evt -> {
             double deltaX = startX - evt.getX();
             double deltaY = startY - evt.getY();
 
@@ -71,16 +84,28 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         Circle circle = new Circle();
         circle.getStyleClass().add("border-circle");
         circle.setManaged(false);
-        circle.radiusProperty().bind(Bindings.min(imageWrapper.widthProperty().divide(2),imageWrapper.heightProperty().divide(2)));
-        circle.centerXProperty().bind(imageWrapper.widthProperty().divide(2));
-        circle.centerYProperty().bind(imageWrapper.heightProperty().divide(2));
+        circle.radiusProperty().bind(Bindings.min(imageBox.widthProperty().divide(2), imageBox.heightProperty().divide(2)));
+        circle.centerXProperty().bind(imageBox.widthProperty().divide(2));
+        circle.centerYProperty().bind(imageBox.heightProperty().divide(2));
         circle.setEffect(new DropShadow());
-        imageWrapper.getChildren().add(circle);
+        imageBox.getChildren().add(circle);
 
-        VBox.setVgrow(imageWrapper, Priority.ALWAYS);
-        VBox controlsWrapper = new VBox(imageWrapper, slider);
-        controlsWrapper.getStyleClass().add("controls-wrapper");
+        VBox.setVgrow(imageBox, Priority.ALWAYS);
+        VBox controlsWrapper = new VBox(imageBox, slider);
+        controlsWrapper.getStyleClass().add("box");
         controlsWrapper.setAlignment(Pos.BOTTOM_CENTER);
+
+        controlsWrapper.setOnMouseClicked(evt -> {
+            if (view.getPhoto() == null) {
+                Supplier<Image> imageSupplier = view.getPhotoSupplier();
+                if (imageSupplier != null) {
+                    view.setPhoto(imageSupplier.get());
+                }
+            }
+        });
+
+        controlsWrapper.setOnScroll(evt -> view.setPhotoZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, view.getPhotoZoom() + Math.signum(evt.getDeltaY()) * .1))));
+        controlsWrapper.setOnZoom(evt -> view.setPhotoZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, view.getPhotoZoom() * evt.getZoomFactor()))));
 
         getChildren().setAll(controlsWrapper);
 
@@ -96,17 +121,45 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         }
     }
 
+    @Override
+    protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
+        super.layoutChildren(contentX, contentY, contentWidth, contentHeight);
+
+        double mw = contentX + contentWidth / 2;
+        double mh = contentY + contentHeight / 2;
+
+        final Image image = imageView.getImage();
+
+        if (image != null) {
+            double iw = image.getWidth();
+            double ih = image.getHeight();
+
+            double sx = contentWidth / iw;
+            double sy = contentHeight / ih;
+
+            double s = Math.max(sx, sy);
+
+            double pw = s * iw;
+            double ph = s * ih;
+
+            imageView.setFitWidth(pw);
+            imageView.setFitHeight(ph);
+
+            imageView.resizeRelocate(mw - pw / 2, mh - ph / 2, pw, ph);
+        }
+    }
+
     private void updateRectangleClip() {
     }
 
     private void updateCircleClip() {
         Circle circle = new Circle();
-        circle.radiusProperty().bind(Bindings.min(imageWrapper.widthProperty().divide(2),imageWrapper.heightProperty().divide(2)));
-        circle.centerXProperty().bind(imageWrapper.widthProperty().divide(2));
-        circle.centerYProperty().bind(imageWrapper.heightProperty().divide(2));
+        circle.radiusProperty().bind(Bindings.min(imageBox.widthProperty().divide(2), imageBox.heightProperty().divide(2)));
+        circle.centerXProperty().bind(imageBox.widthProperty().divide(2));
+        circle.centerYProperty().bind(imageBox.heightProperty().divide(2));
         circle.setEffect(new InnerShadow());
 
         circle.centerXProperty().addListener(it -> System.out.println("cx: " + circle.getCenterX()));
-        imageWrapper.setClip(circle);
+        imageBox.setClip(circle);
     }
 }
