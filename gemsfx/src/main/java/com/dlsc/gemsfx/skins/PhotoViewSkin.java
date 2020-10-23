@@ -5,6 +5,7 @@ import com.dlsc.gemsfx.PhotoView.ClipShape;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
@@ -16,8 +17,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.function.Supplier;
 
@@ -44,26 +43,18 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         imageView.translateXProperty().bind(view.photoTranslateXProperty());
         imageView.translateYProperty().bind(view.photoTranslateYProperty());
         imageView.setCursor(Cursor.MOVE);
+        imageView.setManaged(false);
 
         slider = new Slider(MIN_ZOOM, MAX_ZOOM, 1);
         slider.setPrefWidth(200);
         slider.setMaxWidth(Region.USE_PREF_SIZE);
         slider.valueProperty().bindBidirectional(view.photoZoomProperty());
+        slider.visibleProperty().bind(view.editableProperty());
+        slider.managedProperty().bind(view.editableProperty());
         StackPane.setAlignment(slider, Pos.BOTTOM_CENTER);
 
-        FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_UPLOAD);
-        fontIcon.visibleProperty().bind(view.photoSupplierProperty().isNotNull().and(view.photoProperty().isNull()));
-        fontIcon.getStyleClass().add("upload-icon");
-
-        imageBox = new StackPane(imageView, fontIcon);
+        imageBox = new StackPane(imageView);
         imageBox.getStyleClass().add("image-box");
-
-//        NumberBinding max = Bindings.max(imageBox.widthProperty(), imageBox.heightProperty());
-
-//        imageView.fitWidthProperty().bind(max);
-//        imageView.fitHeightProperty().bind(max);
-
-        imageView.setManaged(false);
 
         imageBox.setOnMousePressed(evt -> {
             startX = evt.getX();
@@ -111,6 +102,23 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
 
         view.clipShapeProperty().addListener(it -> updateClip());
         updateClip();
+
+        view.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> updatePlaceholder(oldPlaceholder, newPlaceholder));
+        updatePlaceholder(null, view.getPlaceholder());
+    }
+
+    private void updatePlaceholder(Node oldPlaceholder, Node newPlaceholder) {
+        PhotoView view = getSkinnable();
+
+        if (oldPlaceholder != null) {
+            imageBox.getChildren().remove(oldPlaceholder);
+            oldPlaceholder.visibleProperty().unbind();
+        }
+
+        if (newPlaceholder != null) {
+            imageBox.getChildren().add(newPlaceholder);
+            newPlaceholder.visibleProperty().bind(view.photoSupplierProperty().isNotNull().and(view.photoProperty().isNull()).and(view.editableProperty()));
+        }
     }
 
     private void updateClip() {

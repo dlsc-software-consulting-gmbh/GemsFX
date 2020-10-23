@@ -19,8 +19,8 @@ public class PhotoViewApp extends Application {
         Scene scene = new Scene(stackPane);
         stage.setTitle("Photo View Demo");
         stage.setScene(scene);
-        stage.setWidth(1000);
-        stage.setHeight(850);
+        stage.setWidth(250);
+        stage.setHeight(250);
         stage.centerOnScreen();
         stage.show();
     }

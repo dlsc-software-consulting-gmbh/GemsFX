@@ -7,19 +7,35 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.css.PseudoClass;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.Node;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class PhotoView extends Control {
+
+    private static final PseudoClass EMPTY_PSEUDO_CLASS = PseudoClass.getPseudoClass("empty");
 
     public enum ClipShape {
         CIRCLE,
@@ -30,13 +46,27 @@ public class PhotoView extends Control {
 
     public PhotoView() {
         getStyleClass().add("photo-view");
-        //setPhoto(new Image(PhotoView.class.getResource("dirk.jpg").toExternalForm()));
+
+        setFocusTraversable(true);
+
+        pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, true);
 
         photo.addListener(it -> {
             setPhotoZoom(1);
             setPhotoTranslateX(0);
             setPhotoTranslateY(0);
+            requestLayout();
+            pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getPhoto() == null);
         });
+
+        FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_UPLOAD);
+        fontIcon.getStyleClass().add("upload-icon");
+
+        Label placeholder = new Label("DROP PHOTO");
+        placeholder.setGraphic(fontIcon);
+        placeholder.setContentDisplay(ContentDisplay.TOP);
+        placeholder.getStyleClass().add("placeholder");
+        setPlaceholder(placeholder);
 
         /*
          * We need to also add the stylesheet directly as otherwise the styling for the
@@ -67,6 +97,47 @@ public class PhotoView extends Control {
 
             return null;
         });
+
+        setOnDragOver(evt -> {
+            if (isEditable()) {
+                evt.acceptTransferModes(TransferMode.ANY);
+            }
+        });
+
+        setOnDragDropped(evt -> {
+            if (isEditable()) {
+                Dragboard dragboard = evt.getDragboard();
+                List<File> files = dragboard.getFiles();
+
+                if (files != null) {
+                    try {
+                        File file = files.get(0);
+                        final BufferedImage image = ImageIO.read(file);
+                        if (image != null) {
+                            setPhoto(SwingFXUtils.toFXImage(image, new WritableImage(image.getWidth(), image.getHeight())));
+                        }
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        setOnKeyPressed(evt -> {
+            switch (evt.getCode()) {
+                case BACK_SPACE:
+                case DELETE:
+                    setPhoto(null);
+                    break;
+                case SPACE:
+                case ENTER:
+                    getPhotoSupplier().get();
+            }
+        });
+
+        setOnMouseClicked(evt -> requestFocus());
     }
 
     @Override
@@ -77,6 +148,22 @@ public class PhotoView extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return PhotoView.class.getResource("photo-view.css").toExternalForm();
+    }
+
+    // placeholder support
+
+    private final ObjectProperty<Node> placeholder = new SimpleObjectProperty<>(this, "placeholder");
+
+    public final Node getPlaceholder() {
+        return placeholder.get();
+    }
+
+    public final ObjectProperty<Node> placeholderProperty() {
+        return placeholder;
+    }
+
+    public final void setPlaceholder(Node placeholder) {
+        this.placeholder.set(placeholder);
     }
 
     private final BooleanProperty editable = new SimpleBooleanProperty(this, "editable", true);
