@@ -28,8 +28,16 @@
 }
 
 .photo-view:focused > .box > .image-box > .border-circle {
-    -fx-stroke: -fx-accent;
     -fx-stroke-width: 6;
+}
+
+
+.photo-view > .box > .image-box > .border-rectangle {
+    -fx-stroke: -fx-accent;
+    -fx-stroke-width: 4;
     -fx-fill: transparent;
 }
 
+.photo-view:focused > .box > .image-box > .border-rectangle {
+    -fx-stroke-width: 6;
+}

@@ -17,17 +17,17 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 
 import java.util.function.Supplier;
 
 public class PhotoViewSkin extends SkinBase<PhotoView> {
 
-    private static final double MIN_ZOOM = 1;
-    private static final double MAX_ZOOM = 10;
-
     private final Slider slider;
     private final ImageView imageView;
     private final StackPane imageBox;
+    private final Circle circle;
+    private final Rectangle rectangle;
 
     private double startY;
     private double startX;
@@ -45,7 +45,10 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         imageView.setCursor(Cursor.MOVE);
         imageView.setManaged(false);
 
-        slider = new Slider(MIN_ZOOM, MAX_ZOOM, 1);
+        slider = new Slider();
+        slider.setMin(1);
+        slider.maxProperty().bind(view.maxZoomProperty());
+        slider.setValue(1);
         slider.setPrefWidth(200);
         slider.setMaxWidth(Region.USE_PREF_SIZE);
         slider.valueProperty().bindBidirectional(view.photoZoomProperty());
@@ -72,14 +75,24 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             startY = evt.getY();
         });
 
-        Circle circle = new Circle();
+        circle = new Circle();
         circle.getStyleClass().add("border-circle");
         circle.setManaged(false);
         circle.radiusProperty().bind(Bindings.min(imageBox.widthProperty().divide(2), imageBox.heightProperty().divide(2)));
         circle.centerXProperty().bind(imageBox.widthProperty().divide(2));
         circle.centerYProperty().bind(imageBox.heightProperty().divide(2));
         circle.setEffect(new DropShadow());
-        imageBox.getChildren().add(circle);
+        circle.setMouseTransparent(true);
+
+        rectangle = new Rectangle();
+        rectangle.getStyleClass().add("border-rectangle");
+        rectangle.setManaged(false);
+        rectangle.widthProperty().bind(Bindings.min(imageBox.widthProperty(), imageBox.heightProperty()));
+        rectangle.heightProperty().bind(Bindings.min(imageBox.widthProperty(), imageBox.heightProperty()));
+        rectangle.layoutXProperty().bind(imageBox.widthProperty().divide(2).subtract(rectangle.widthProperty().divide(2)));
+        rectangle.layoutYProperty().bind(imageBox.heightProperty().divide(2).subtract(rectangle.heightProperty().divide(2)));
+        rectangle.setEffect(new DropShadow());
+        rectangle.setMouseTransparent(true);
 
         VBox.setVgrow(imageBox, Priority.ALWAYS);
         VBox controlsWrapper = new VBox(imageBox, slider);
@@ -95,16 +108,31 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             }
         });
 
-        controlsWrapper.setOnScroll(evt -> view.setPhotoZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, view.getPhotoZoom() + Math.signum(evt.getDeltaY()) * .1))));
-        controlsWrapper.setOnZoom(evt -> view.setPhotoZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, view.getPhotoZoom() * evt.getZoomFactor()))));
+        controlsWrapper.setOnScroll(evt -> view.setPhotoZoom(Math.min(view.getMaxZoom(), Math.max(1, view.getPhotoZoom() + Math.signum(evt.getDeltaY()) * .1))));
+        controlsWrapper.setOnZoom(evt -> view.setPhotoZoom(Math.min(view.getMaxZoom(), Math.max(1, view.getPhotoZoom() * evt.getZoomFactor()))));
 
         getChildren().setAll(controlsWrapper);
 
-        view.clipShapeProperty().addListener(it -> updateClip());
+        view.clipShapeProperty().addListener(it -> {
+            updateBorderShape();
+            updateClip();
+        });
+
+        updateBorderShape();
         updateClip();
 
         view.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> updatePlaceholder(oldPlaceholder, newPlaceholder));
         updatePlaceholder(null, view.getPlaceholder());
+    }
+
+    private void updateBorderShape() {
+        if (getSkinnable().getClipShape().equals(ClipShape.CIRCLE)) {
+            imageBox.getChildren().remove(rectangle);
+            imageBox.getChildren().add(circle);
+        } else {
+            imageBox.getChildren().remove(circle);
+            imageBox.getChildren().add(rectangle);
+        }
     }
 
     private void updatePlaceholder(Node oldPlaceholder, Node newPlaceholder) {
@@ -116,7 +144,11 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         }
 
         if (newPlaceholder != null) {
-            imageBox.getChildren().add(newPlaceholder);
+            if (view.getClipShape().equals(ClipShape.CIRCLE)) {
+                imageBox.getChildren().setAll(imageView, newPlaceholder, circle);
+            } else {
+                imageBox.getChildren().setAll(imageView, newPlaceholder, rectangle);
+            }
             newPlaceholder.visibleProperty().bind(view.photoSupplierProperty().isNotNull().and(view.photoProperty().isNull()).and(view.editableProperty()));
         }
     }
@@ -158,16 +190,21 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
     }
 
     private void updateRectangleClip() {
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(rectangle.widthProperty());
+        clip.heightProperty().bind(rectangle.heightProperty());
+        clip.layoutXProperty().bind(rectangle.layoutXProperty());
+        clip.layoutYProperty().bind(rectangle.layoutYProperty());
+        clip.setEffect(new InnerShadow());
+        imageBox.setClip(clip);
     }
 
     private void updateCircleClip() {
-        Circle circle = new Circle();
-        circle.radiusProperty().bind(Bindings.min(imageBox.widthProperty().divide(2), imageBox.heightProperty().divide(2)));
-        circle.centerXProperty().bind(imageBox.widthProperty().divide(2));
-        circle.centerYProperty().bind(imageBox.heightProperty().divide(2));
-        circle.setEffect(new InnerShadow());
-
-        circle.centerXProperty().addListener(it -> System.out.println("cx: " + circle.getCenterX()));
-        imageBox.setClip(circle);
+        Circle clip = new Circle();
+        clip.radiusProperty().bind(circle.radiusProperty());
+        clip.centerXProperty().bind(circle.centerXProperty());
+        clip.centerYProperty().bind(circle.centerYProperty());
+        clip.setEffect(new InnerShadow());
+        imageBox.setClip(clip);
     }
 }

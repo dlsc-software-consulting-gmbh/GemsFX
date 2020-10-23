@@ -47,6 +47,8 @@ public class PhotoView extends Control {
     public PhotoView() {
         getStyleClass().add("photo-view");
 
+       // setPhoto(new Image(PhotoView.class.getResource("dirk.jpg").toExternalForm()));
+
         setFocusTraversable(true);
 
         pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, true);
@@ -126,14 +128,16 @@ public class PhotoView extends Control {
         });
 
         setOnKeyPressed(evt -> {
-            switch (evt.getCode()) {
-                case BACK_SPACE:
-                case DELETE:
-                    setPhoto(null);
-                    break;
-                case SPACE:
-                case ENTER:
-                    getPhotoSupplier().get();
+            if (isEditable()) {
+                switch (evt.getCode()) {
+                    case BACK_SPACE:
+                    case DELETE:
+                        setPhoto(null);
+                        break;
+                    case SPACE:
+                    case ENTER:
+                        getPhotoSupplier().get();
+                }
             }
         });
 
@@ -264,5 +268,19 @@ public class PhotoView extends Control {
 
     public final void setPhotoTranslateY(double photoTranslateY) {
         this.photoTranslateY.set(photoTranslateY);
+    }
+
+    private final DoubleProperty maxZoom = new SimpleDoubleProperty(this, "maxZoom", 5);
+
+    public final double getMaxZoom() {
+        return maxZoom.get();
+    }
+
+    public final DoubleProperty maxZoomProperty() {
+        return maxZoom;
+    }
+
+    public final void setMaxZoom(double maxZoom) {
+        this.maxZoom.set(maxZoom);
     }
 }
