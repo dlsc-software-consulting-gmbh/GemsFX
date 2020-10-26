@@ -52,8 +52,6 @@ public class PhotoView extends Control {
     public PhotoView() {
         getStyleClass().add("photo-view");
 
-        setPhoto(new Image(PhotoView.class.getResource("dirk.jpg").toExternalForm()));
-
         setFocusTraversable(true);
 
         pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, true);
