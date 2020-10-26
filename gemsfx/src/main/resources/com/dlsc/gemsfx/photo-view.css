@@ -13,6 +13,7 @@
 
 .photo-view > .box > .image-box > .placeholder {
     -fx-text-fill: gray;
+    -fx-font-size: 10px;
 }
 
 .photo-view > .box > .image-box > .placeholder > .upload-icon {

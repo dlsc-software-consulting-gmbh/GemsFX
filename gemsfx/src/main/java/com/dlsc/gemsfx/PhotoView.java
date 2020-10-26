@@ -18,6 +18,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -47,7 +48,7 @@ public class PhotoView extends Control {
     public PhotoView() {
         getStyleClass().add("photo-view");
 
-       // setPhoto(new Image(PhotoView.class.getResource("dirk.jpg").toExternalForm()));
+        setPhoto(new Image(PhotoView.class.getResource("dirk.jpg").toExternalForm()));
 
         setFocusTraversable(true);
 
@@ -64,7 +65,8 @@ public class PhotoView extends Control {
         FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_UPLOAD);
         fontIcon.getStyleClass().add("upload-icon");
 
-        Label placeholder = new Label("DROP PHOTO");
+        Label placeholder = new Label("DROP PHOTO\nOR CLICK TO ADD");
+        placeholder.setTextAlignment(TextAlignment.CENTER);
         placeholder.setGraphic(fontIcon);
         placeholder.setContentDisplay(ContentDisplay.TOP);
         placeholder.getStyleClass().add("placeholder");
@@ -170,6 +172,8 @@ public class PhotoView extends Control {
         this.placeholder.set(placeholder);
     }
 
+    // editable support
+
     private final BooleanProperty editable = new SimpleBooleanProperty(this, "editable", true);
 
     public final boolean isEditable() {
@@ -200,6 +204,8 @@ public class PhotoView extends Control {
         this.photoSupplier.set(photoSupplier);
     }
 
+    // clip shape support
+
     private final ObjectProperty<ClipShape> clipShape = new SimpleObjectProperty<>(this, "clipShape", ClipShape.CIRCLE);
 
     public ClipShape getClipShape() {
@@ -213,6 +219,8 @@ public class PhotoView extends Control {
     public void setClipShape(ClipShape clipShape) {
         this.clipShape.set(clipShape);
     }
+
+    // photo support
 
     private final ObjectProperty<Image> photo = new SimpleObjectProperty<>(this, "image");
 
@@ -228,6 +236,8 @@ public class PhotoView extends Control {
         this.photo.set(photo);
     }
 
+    // photo zoom
+
     private final DoubleProperty photoZoom = new SimpleDoubleProperty(this, "photoZoom", 1);
 
     public final double getPhotoZoom() {
@@ -241,6 +251,8 @@ public class PhotoView extends Control {
     public final void setPhotoZoom(double photoZoom) {
         this.photoZoom.set(photoZoom);
     }
+
+    // photo translate x
 
     private final DoubleProperty photoTranslateX = new SimpleDoubleProperty(this, "photoTranslateX");
 
@@ -256,6 +268,8 @@ public class PhotoView extends Control {
         this.photoTranslateX.set(photoTranslateX);
     }
 
+    // photo translate y
+
     private final DoubleProperty photoTranslateY = new SimpleDoubleProperty(this, "photoTranslateY");
 
     public final double getPhotoTranslateY() {
@@ -269,6 +283,8 @@ public class PhotoView extends Control {
     public final void setPhotoTranslateY(double photoTranslateY) {
         this.photoTranslateY.set(photoTranslateY);
     }
+
+    // max zoom
 
     private final DoubleProperty maxZoom = new SimpleDoubleProperty(this, "maxZoom", 5);
 

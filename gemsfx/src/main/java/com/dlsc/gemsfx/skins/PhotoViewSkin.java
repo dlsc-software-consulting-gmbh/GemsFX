@@ -23,29 +23,10 @@ import java.util.function.Supplier;
 
 public class PhotoViewSkin extends SkinBase<PhotoView> {
 
-    private final Slider slider;
-    private final ImageView imageView;
-    private final StackPane imageBox;
-    private final Circle circle;
-    private final Rectangle rectangle;
-
-    private double startY;
-    private double startX;
-
     public PhotoViewSkin(PhotoView view) {
         super(view);
 
-        imageView = new ImageView();
-        imageView.setPreserveRatio(true);
-        imageView.imageProperty().bind(view.photoProperty());
-        imageView.scaleXProperty().bind(view.photoZoomProperty());
-        imageView.scaleYProperty().bind(view.photoZoomProperty());
-        imageView.translateXProperty().bind(view.photoTranslateXProperty());
-        imageView.translateYProperty().bind(view.photoTranslateYProperty());
-        imageView.setCursor(Cursor.MOVE);
-        imageView.setManaged(false);
-
-        slider = new Slider();
+        Slider slider = new Slider();
         slider.setMin(1);
         slider.maxProperty().bind(view.maxZoomProperty());
         slider.setValue(1);
@@ -56,45 +37,10 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         slider.managedProperty().bind(view.editableProperty());
         StackPane.setAlignment(slider, Pos.BOTTOM_CENTER);
 
-        imageBox = new StackPane(imageView);
+        ImageBox imageBox = new ImageBox(view);
         imageBox.getStyleClass().add("image-box");
-
-        imageBox.setOnMousePressed(evt -> {
-            startX = evt.getX();
-            startY = evt.getY();
-        });
-
-        imageBox.setOnMouseDragged(evt -> {
-            double deltaX = startX - evt.getX();
-            double deltaY = startY - evt.getY();
-
-            view.setPhotoTranslateX(view.getPhotoTranslateX() - deltaX);
-            view.setPhotoTranslateY(view.getPhotoTranslateY() - deltaY);
-
-            startX = evt.getX();
-            startY = evt.getY();
-        });
-
-        circle = new Circle();
-        circle.getStyleClass().add("border-circle");
-        circle.setManaged(false);
-        circle.radiusProperty().bind(Bindings.min(imageBox.widthProperty().divide(2), imageBox.heightProperty().divide(2)));
-        circle.centerXProperty().bind(imageBox.widthProperty().divide(2));
-        circle.centerYProperty().bind(imageBox.heightProperty().divide(2));
-        circle.setEffect(new DropShadow());
-        circle.setMouseTransparent(true);
-
-        rectangle = new Rectangle();
-        rectangle.getStyleClass().add("border-rectangle");
-        rectangle.setManaged(false);
-        rectangle.widthProperty().bind(Bindings.min(imageBox.widthProperty(), imageBox.heightProperty()));
-        rectangle.heightProperty().bind(Bindings.min(imageBox.widthProperty(), imageBox.heightProperty()));
-        rectangle.layoutXProperty().bind(imageBox.widthProperty().divide(2).subtract(rectangle.widthProperty().divide(2)));
-        rectangle.layoutYProperty().bind(imageBox.heightProperty().divide(2).subtract(rectangle.heightProperty().divide(2)));
-        rectangle.setEffect(new DropShadow());
-        rectangle.setMouseTransparent(true);
-
         VBox.setVgrow(imageBox, Priority.ALWAYS);
+
         VBox controlsWrapper = new VBox(imageBox, slider);
         controlsWrapper.getStyleClass().add("box");
         controlsWrapper.setAlignment(Pos.BOTTOM_CENTER);
@@ -112,99 +58,158 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         controlsWrapper.setOnZoom(evt -> view.setPhotoZoom(Math.min(view.getMaxZoom(), Math.max(1, view.getPhotoZoom() * evt.getZoomFactor()))));
 
         getChildren().setAll(controlsWrapper);
+    }
 
-        view.clipShapeProperty().addListener(it -> {
+    public class ImageBox extends StackPane {
+
+        private final ImageView imageView;
+        private final Circle circle;
+        private final Rectangle rectangle;
+
+        private double startY;
+        private double startX;
+
+        public ImageBox(PhotoView view) {
+            imageView = new ImageView();
+            imageView.setPreserveRatio(true);
+            imageView.imageProperty().bind(view.photoProperty());
+            imageView.scaleXProperty().bind(view.photoZoomProperty());
+            imageView.scaleYProperty().bind(view.photoZoomProperty());
+            imageView.translateXProperty().bind(Bindings.createDoubleBinding(() -> view.getPhotoTranslateX() * imageView.getFitWidth(), view.photoTranslateXProperty(), imageView.fitWidthProperty()));
+            imageView.translateYProperty().bind(Bindings.createDoubleBinding(() -> view.getPhotoTranslateY() * imageView.getFitHeight(), view.photoTranslateYProperty(), imageView.fitHeightProperty()));
+            imageView.setCursor(Cursor.MOVE);
+            imageView.setManaged(false);
+
+            view.photoProperty().addListener(it -> requestLayout());
+
+            setOnMousePressed(evt -> {
+                startX = evt.getX();
+                startY = evt.getY();
+            });
+
+            setOnMouseDragged(evt -> {
+                double deltaX = (startX - evt.getX()) / imageView.getFitWidth();
+                double deltaY = (startY - evt.getY()) / imageView.getFitHeight();
+
+                view.setPhotoTranslateX(view.getPhotoTranslateX() - deltaX);
+                view.setPhotoTranslateY(view.getPhotoTranslateY() - deltaY);
+
+                startX = evt.getX();
+                startY = evt.getY();
+            });
+
+            circle = new Circle();
+            circle.getStyleClass().add("border-circle");
+            circle.setManaged(false);
+            circle.radiusProperty().bind(Bindings.min(widthProperty().divide(2), heightProperty().divide(2)));
+            circle.centerXProperty().bind(widthProperty().divide(2));
+            circle.centerYProperty().bind(heightProperty().divide(2));
+            circle.setEffect(new DropShadow());
+            circle.setMouseTransparent(true);
+
+            rectangle = new Rectangle();
+            rectangle.getStyleClass().add("border-rectangle");
+            rectangle.setManaged(false);
+            rectangle.widthProperty().bind(Bindings.min(widthProperty(), heightProperty()));
+            rectangle.heightProperty().bind(Bindings.min(widthProperty(), heightProperty()));
+            rectangle.layoutXProperty().bind(widthProperty().divide(2).subtract(rectangle.widthProperty().divide(2)));
+            rectangle.layoutYProperty().bind(heightProperty().divide(2).subtract(rectangle.heightProperty().divide(2)));
+            rectangle.setEffect(new DropShadow());
+            rectangle.setMouseTransparent(true);
+
+            view.clipShapeProperty().addListener(it -> {
+                updateBorderShape();
+                updateClip();
+            });
+
+            view.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> updatePlaceholder(oldPlaceholder, newPlaceholder));
+
             updateBorderShape();
             updateClip();
-        });
-
-        updateBorderShape();
-        updateClip();
-
-        view.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> updatePlaceholder(oldPlaceholder, newPlaceholder));
-        updatePlaceholder(null, view.getPlaceholder());
-    }
-
-    private void updateBorderShape() {
-        if (getSkinnable().getClipShape().equals(ClipShape.CIRCLE)) {
-            imageBox.getChildren().remove(rectangle);
-            imageBox.getChildren().add(circle);
-        } else {
-            imageBox.getChildren().remove(circle);
-            imageBox.getChildren().add(rectangle);
-        }
-    }
-
-    private void updatePlaceholder(Node oldPlaceholder, Node newPlaceholder) {
-        PhotoView view = getSkinnable();
-
-        if (oldPlaceholder != null) {
-            imageBox.getChildren().remove(oldPlaceholder);
-            oldPlaceholder.visibleProperty().unbind();
+            updatePlaceholder(null, view.getPlaceholder());
         }
 
-        if (newPlaceholder != null) {
-            if (view.getClipShape().equals(ClipShape.CIRCLE)) {
-                imageBox.getChildren().setAll(imageView, newPlaceholder, circle);
+        private void updateBorderShape() {
+            if (getSkinnable().getClipShape().equals(ClipShape.CIRCLE)) {
+                getChildren().remove(rectangle);
+                getChildren().add(circle);
             } else {
-                imageBox.getChildren().setAll(imageView, newPlaceholder, rectangle);
+                getChildren().remove(circle);
+                getChildren().add(rectangle);
             }
-            newPlaceholder.visibleProperty().bind(view.photoSupplierProperty().isNotNull().and(view.photoProperty().isNull()).and(view.editableProperty()));
         }
-    }
 
-    private void updateClip() {
-        if (getSkinnable().getClipShape().equals(ClipShape.CIRCLE)) {
-            updateCircleClip();
-        } else {
-            updateRectangleClip();
+        private void updatePlaceholder(Node oldPlaceholder, Node newPlaceholder) {
+            PhotoView view = getSkinnable();
+
+            if (oldPlaceholder != null) {
+                getChildren().remove(oldPlaceholder);
+                oldPlaceholder.visibleProperty().unbind();
+            }
+
+            if (newPlaceholder != null) {
+                if (view.getClipShape().equals(ClipShape.CIRCLE)) {
+                    getChildren().setAll(imageView, newPlaceholder, circle);
+                } else {
+                    getChildren().setAll(imageView, newPlaceholder, rectangle);
+                }
+                newPlaceholder.visibleProperty().bind(view.photoSupplierProperty().isNotNull().and(view.photoProperty().isNull()).and(view.editableProperty()));
+            }
         }
-    }
 
-    @Override
-    protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
-        super.layoutChildren(contentX, contentY, contentWidth, contentHeight);
-
-        double mw = contentX + contentWidth / 2;
-        double mh = contentY + contentHeight / 2;
-
-        final Image image = imageView.getImage();
-
-        if (image != null) {
-            double iw = image.getWidth();
-            double ih = image.getHeight();
-
-            double sx = contentWidth / iw;
-            double sy = contentHeight / ih;
-
-            double s = Math.max(sx, sy);
-
-            double pw = s * iw;
-            double ph = s * ih;
-
-            imageView.setFitWidth(pw);
-            imageView.setFitHeight(ph);
-
-            imageView.resizeRelocate(mw - pw / 2, mh - ph / 2, pw, ph);
+        private void updateClip() {
+            if (getSkinnable().getClipShape().equals(ClipShape.CIRCLE)) {
+                updateCircleClip();
+            } else {
+                updateRectangleClip();
+            }
         }
-    }
 
-    private void updateRectangleClip() {
-        Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(rectangle.widthProperty());
-        clip.heightProperty().bind(rectangle.heightProperty());
-        clip.layoutXProperty().bind(rectangle.layoutXProperty());
-        clip.layoutYProperty().bind(rectangle.layoutYProperty());
-        clip.setEffect(new InnerShadow());
-        imageBox.setClip(clip);
-    }
+        @Override
+        protected void layoutChildren() {
+            super.layoutChildren();
 
-    private void updateCircleClip() {
-        Circle clip = new Circle();
-        clip.radiusProperty().bind(circle.radiusProperty());
-        clip.centerXProperty().bind(circle.centerXProperty());
-        clip.centerYProperty().bind(circle.centerYProperty());
-        clip.setEffect(new InnerShadow());
-        imageBox.setClip(clip);
+            double mw = getWidth() / 2;
+            double mh = getHeight() / 2;
+
+            Image image = imageView.getImage();
+
+            if (image != null) {
+                double iw = image.getWidth();
+                double ih = image.getHeight();
+
+                double sx = circle.getRadius() * 2 / iw;
+                double sy = circle.getRadius() * 2 / ih;
+
+                double s = Math.min(sx, sy);
+
+                double pw = s * iw;
+                double ph = s * ih;
+
+                imageView.setFitWidth(pw);
+                imageView.setFitHeight(ph);
+
+                imageView.resizeRelocate(mw - pw / 2, mh - ph / 2, pw, ph);
+            }
+        }
+
+        private void updateRectangleClip() {
+            Rectangle clip = new Rectangle();
+            clip.widthProperty().bind(rectangle.widthProperty());
+            clip.heightProperty().bind(rectangle.heightProperty());
+            clip.layoutXProperty().bind(rectangle.layoutXProperty());
+            clip.layoutYProperty().bind(rectangle.layoutYProperty());
+            clip.setEffect(new InnerShadow());
+            setClip(clip);
+        }
+
+        private void updateCircleClip() {
+            Circle clip = new Circle();
+            clip.radiusProperty().bind(circle.radiusProperty());
+            clip.centerXProperty().bind(circle.centerXProperty());
+            clip.centerYProperty().bind(circle.centerYProperty());
+            clip.setEffect(new InnerShadow());
+            setClip(clip);
+        }
     }
 }
