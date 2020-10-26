@@ -8,6 +8,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -19,7 +21,6 @@ public class PhotoViewApp extends Application {
     @Override
     public void start(Stage stage) {
         PhotoView photoView = new PhotoView();
-        VBox vBox = new VBox(40, photoView);
         VBox.setVgrow(photoView, Priority.ALWAYS);
 
         ComboBox<ClipShape> comboBox = new ComboBox<>();
@@ -31,16 +32,42 @@ public class PhotoViewApp extends Application {
 
         HBox hBox = new HBox(20, comboBox, editableBox);
         hBox.setAlignment(Pos.CENTER);
-        vBox.getChildren().add(hBox);
 
-        StackPane stackPane = new StackPane(vBox);
+        VBox leftSide = new VBox(40, photoView, hBox);
+        leftSide.setAlignment(Pos.TOP_CENTER);
+
+        ImageView originalImageView = new ImageView();
+        originalImageView.setPreserveRatio(true);
+        originalImageView.imageProperty().bind(photoView.photoProperty());
+        originalImageView.setFitWidth(100);
+        originalImageView.setFitHeight(100);
+        VBox.setVgrow(originalImageView, Priority.ALWAYS);
+
+        ImageView croppedImageView = new ImageView();
+        croppedImageView.setPreserveRatio(true);
+        croppedImageView.imageProperty().bind(photoView.croppedImageProperty());
+        croppedImageView.setFitWidth(100);
+        croppedImageView.setFitHeight(100);
+        VBox.setVgrow(croppedImageView, Priority.ALWAYS);
+
+        Label originalLabel = new Label("Original");
+        Label croppedLabel = new Label("Cropped");
+
+        VBox.setMargin(croppedLabel, new Insets(20, 0, 0, 0));
+        VBox rightSide = new VBox(10, originalLabel, originalImageView, croppedLabel, croppedImageView);
+
+        HBox mainBox = new HBox(20, leftSide, rightSide);
+        mainBox.setFillHeight(false);
+
+        mainBox.setAlignment(Pos.TOP_CENTER);
+
+        StackPane stackPane = new StackPane(mainBox);
         stackPane.setPadding(new Insets(20));
 
         Scene scene = new Scene(stackPane);
         stage.setTitle("Photo View Demo");
         stage.setScene(scene);
-        stage.setWidth(250);
-        stage.setHeight(350);
+        stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
     }

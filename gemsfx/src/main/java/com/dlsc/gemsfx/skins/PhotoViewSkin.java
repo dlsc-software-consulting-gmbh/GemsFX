@@ -2,8 +2,8 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -22,11 +22,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
-import javax.imageio.ImageIO;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.function.Supplier;
 
 public class PhotoViewSkin extends SkinBase<PhotoView> {
@@ -51,7 +46,7 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
 
         VBox controlsWrapper = new VBox(imageBox, slider);
         controlsWrapper.getStyleClass().add("box");
-        controlsWrapper.setAlignment(Pos.BOTTOM_CENTER);
+        controlsWrapper.setAlignment(Pos.TOP_CENTER);
 
         controlsWrapper.setOnMouseClicked(evt -> {
             if (view.getPhoto() == null) {
@@ -92,22 +87,24 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             view.photoProperty().addListener(it -> requestLayout());
 
             setOnMousePressed(evt -> {
-                startX = evt.getX();
-                startY = evt.getY();
+                if (view.isEditable()) {
+                    startX = evt.getX();
+                    startY = evt.getY();
+                }
             });
 
             setOnMouseDragged(evt -> {
-                double deltaX = (startX - evt.getX()) / imageView.getFitWidth();
-                double deltaY = (startY - evt.getY()) / imageView.getFitHeight();
+                if (view.isEditable()) {
+                    double deltaX = (startX - evt.getX()) / imageView.getFitWidth();
+                    double deltaY = (startY - evt.getY()) / imageView.getFitHeight();
 
-                view.setPhotoTranslateX(view.getPhotoTranslateX() - deltaX);
-                view.setPhotoTranslateY(view.getPhotoTranslateY() - deltaY);
+                    view.setPhotoTranslateX(view.getPhotoTranslateX() - deltaX);
+                    view.setPhotoTranslateY(view.getPhotoTranslateY() - deltaY);
 
-                startX = evt.getX();
-                startY = evt.getY();
+                    startX = evt.getX();
+                    startY = evt.getY();
+                }
             });
-
-            setOnMouseClicked(evt -> crop());
 
             circle = new Circle();
             circle.getStyleClass().add("border-circle");
@@ -133,11 +130,20 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
                 updateClip();
             });
 
-            view.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> updatePlaceholder(oldPlaceholder, newPlaceholder));
+            view.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> {
+                updatePlaceholder(oldPlaceholder, newPlaceholder);
+            });
 
             updateBorderShape();
             updateClip();
             updatePlaceholder(null, view.getPlaceholder());
+
+            InvalidationListener cropListener = it -> crop();
+
+            view.photoProperty().addListener(cropListener);
+            view.photoZoomProperty().addListener(cropListener);
+            view.photoTranslateXProperty().addListener(cropListener);
+            view.photoTranslateYProperty().addListener(cropListener);
         }
 
         private void updateBorderShape() {
@@ -179,15 +185,14 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         public void crop() {
             Image image = getSkinnable().getPhoto();
 
+            if (image == null) {
+                getSkinnable().getProperties().put("cropped.image", null);
+                return;
+            }
+
             double scale = image.getWidth() / (imageView.getFitWidth() * getSkinnable().getPhotoZoom());
-            System.out.println("scale = " + scale);
-
-            System.out.println("tx = " + getSkinnable().getPhotoTranslateX() + ", ty = " + getSkinnable().getPhotoTranslateY());
-
             double moveX = getSkinnable().getPhotoTranslateX() * image.getWidth() / getSkinnable().getPhotoZoom();
             double moveY = getSkinnable().getPhotoTranslateY() * image.getHeight() / getSkinnable().getPhotoZoom();
-
-            System.out.println("moveX = " + moveX + ", moveY = " + moveY);
 
             int x = (int) (image.getWidth() / 2 - moveX);
             int y = (int) (image.getHeight() / 2 - moveY);
@@ -207,26 +212,9 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
                 h = (int) (rectangle.getHeight());
             }
 
-            System.out.println("x = " + x + ", y = " + y + ", w = " + w + ", h = " + h);
-
             PixelReader reader = getSkinnable().getPhoto().getPixelReader();
-//            WritableImage croppedImage = new WritableImage(reader, Math.max(0, x), Math.max(0, y), (int) Math.min(image.getWidth(), w), (int) Math.min(image.getHeight(), h));
-            WritableImage croppedImage = new WritableImage(reader, 0, 0, (int) image.getWidth(), (int) image.getHeight());
-            saveToFile(croppedImage, x, y, w, h);
-        }
-
-        public void saveToFile(Image image, int x, int y, int w, int h) {
-            BufferedImage alphaLessImage = new BufferedImage((int) image.getWidth(), (int) image.getHeight(), BufferedImage.TYPE_INT_RGB);
-            File outputFile = new File("/Users/lemmi/image.jpg");
-            BufferedImage bImage = SwingFXUtils.fromFXImage(image, alphaLessImage);
-            Graphics graphics = bImage.getGraphics();
-            graphics.drawRect(x, y, w, h);
-
-            try {
-                ImageIO.write(bImage, "jpeg", outputFile);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            WritableImage croppedImage = new WritableImage(reader, Math.max(0, x), Math.max(0, y), (int) Math.min(image.getWidth(), w), (int) Math.min(image.getHeight(), h));
+            getSkinnable().getProperties().put("cropped.image", croppedImage);
         }
 
         @Override

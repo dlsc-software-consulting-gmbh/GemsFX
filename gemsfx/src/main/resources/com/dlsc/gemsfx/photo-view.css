@@ -1,3 +1,8 @@
+.photo-view {
+    -fx-pref-width: 256px;
+    -fx-pref-height: 256px;
+}
+
 .photo-view > .box {
     -fx-spacing: 20px;
 }

@@ -4,9 +4,12 @@ import com.dlsc.gemsfx.skins.PhotoViewSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.MapChangeListener;
 import javafx.css.PseudoClass;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Node;
@@ -145,6 +148,16 @@ public class PhotoView extends Control {
         });
 
         setOnMouseClicked(evt -> requestFocus());
+
+        MapChangeListener<? super Object, ? super Object> propertiesListener = change -> {
+            if (change.wasAdded()) {
+                if (change.getKey().equals("cropped.image")) {
+                    croppedImage.set((Image) change.getValueAdded());
+                }
+            }
+        };
+
+        getProperties().addListener(propertiesListener);
     }
 
     @Override
@@ -155,6 +168,18 @@ public class PhotoView extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return PhotoView.class.getResource("photo-view.css").toExternalForm();
+    }
+
+    // cropped image support
+
+    public ReadOnlyObjectWrapper<Image> croppedImage = new ReadOnlyObjectWrapper<>(this, "croppedImage");
+
+    public final Image getCroppedImage() {
+        return croppedImage.get();
+    }
+
+    public final ReadOnlyObjectProperty<Image> croppedImageProperty() {
+        return croppedImage.getReadOnlyProperty();
     }
 
     // photo effect
