@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
 import javafx.beans.binding.Bindings;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -12,6 +13,8 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -19,6 +22,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
+import javax.imageio.ImageIO;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.function.Supplier;
 
 public class PhotoViewSkin extends SkinBase<PhotoView> {
@@ -78,6 +86,7 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             imageView.translateXProperty().bind(Bindings.createDoubleBinding(() -> view.getPhotoTranslateX() * imageView.getFitWidth(), view.photoTranslateXProperty(), imageView.fitWidthProperty()));
             imageView.translateYProperty().bind(Bindings.createDoubleBinding(() -> view.getPhotoTranslateY() * imageView.getFitHeight(), view.photoTranslateYProperty(), imageView.fitHeightProperty()));
             imageView.setCursor(Cursor.MOVE);
+            imageView.effectProperty().bind(view.photoEffectProperty());
             imageView.setManaged(false);
 
             view.photoProperty().addListener(it -> requestLayout());
@@ -97,6 +106,8 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
                 startX = evt.getX();
                 startY = evt.getY();
             });
+
+            setOnMouseClicked(evt -> crop());
 
             circle = new Circle();
             circle.getStyleClass().add("border-circle");
@@ -165,6 +176,59 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             }
         }
 
+        public void crop() {
+            Image image = getSkinnable().getPhoto();
+
+            double scale = image.getWidth() / (imageView.getFitWidth() * getSkinnable().getPhotoZoom());
+            System.out.println("scale = " + scale);
+
+            System.out.println("tx = " + getSkinnable().getPhotoTranslateX() + ", ty = " + getSkinnable().getPhotoTranslateY());
+
+            double moveX = getSkinnable().getPhotoTranslateX() * image.getWidth() / getSkinnable().getPhotoZoom();
+            double moveY = getSkinnable().getPhotoTranslateY() * image.getHeight() / getSkinnable().getPhotoZoom();
+
+            System.out.println("moveX = " + moveX + ", moveY = " + moveY);
+
+            int x = (int) (image.getWidth() / 2 - moveX);
+            int y = (int) (image.getHeight() / 2 - moveY);
+            int w;
+            int h;
+
+
+            if (getSkinnable().getClipShape().equals(ClipShape.CIRCLE)) {
+                x -= (circle.getRadius() * scale);
+                y -= (circle.getRadius() * scale);
+                w = (int) (circle.getRadius() * scale * 2);
+                h = (int) (circle.getRadius() * scale * 2);
+            } else {
+                x = (int) (rectangle.getWidth() / 2);
+                y = (int) (rectangle.getHeight() / 2);
+                w = (int) (rectangle.getWidth());
+                h = (int) (rectangle.getHeight());
+            }
+
+            System.out.println("x = " + x + ", y = " + y + ", w = " + w + ", h = " + h);
+
+            PixelReader reader = getSkinnable().getPhoto().getPixelReader();
+//            WritableImage croppedImage = new WritableImage(reader, Math.max(0, x), Math.max(0, y), (int) Math.min(image.getWidth(), w), (int) Math.min(image.getHeight(), h));
+            WritableImage croppedImage = new WritableImage(reader, 0, 0, (int) image.getWidth(), (int) image.getHeight());
+            saveToFile(croppedImage, x, y, w, h);
+        }
+
+        public void saveToFile(Image image, int x, int y, int w, int h) {
+            BufferedImage alphaLessImage = new BufferedImage((int) image.getWidth(), (int) image.getHeight(), BufferedImage.TYPE_INT_RGB);
+            File outputFile = new File("/Users/lemmi/image.jpg");
+            BufferedImage bImage = SwingFXUtils.fromFXImage(image, alphaLessImage);
+            Graphics graphics = bImage.getGraphics();
+            graphics.drawRect(x, y, w, h);
+
+            try {
+                ImageIO.write(bImage, "jpeg", outputFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         @Override
         protected void layoutChildren() {
             super.layoutChildren();
@@ -178,8 +242,16 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
                 double iw = image.getWidth();
                 double ih = image.getHeight();
 
-                double sx = circle.getRadius() * 2 / iw;
-                double sy = circle.getRadius() * 2 / ih;
+                double sx;
+                double sy;
+
+                if (getSkinnable().getClipShape().equals(ClipShape.CIRCLE)) {
+                    sx = circle.getRadius() * 2 / iw;
+                    sy = circle.getRadius() * 2 / ih;
+                } else {
+                    sx = rectangle.getWidth() / iw;
+                    sy = rectangle.getHeight() / ih;
+                }
 
                 double s = Math.min(sx, sy);
 

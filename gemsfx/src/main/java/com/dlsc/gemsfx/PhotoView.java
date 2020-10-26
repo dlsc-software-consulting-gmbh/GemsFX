@@ -14,6 +14,7 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.Dragboard;
@@ -154,6 +155,22 @@ public class PhotoView extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return PhotoView.class.getResource("photo-view.css").toExternalForm();
+    }
+
+    // photo effect
+
+    private final ObjectProperty<Effect> photoEffect = new SimpleObjectProperty<>(this, "photoEffect");
+
+    public final Effect getPhotoEffect() {
+        return photoEffect.get();
+    }
+
+    public final ObjectProperty<Effect> photoEffectProperty() {
+        return photoEffect;
+    }
+
+    public final void setPhotoEffect(Effect photoEffect) {
+        this.photoEffect.set(photoEffect);
     }
 
     // placeholder support
