@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -33,7 +34,11 @@ public class PhotoViewApp extends Application {
         HBox hBox = new HBox(20, comboBox, editableBox);
         hBox.setAlignment(Pos.CENTER);
 
-        VBox leftSide = new VBox(40, photoView, hBox);
+        Button useCroppedImage = new Button("Use Cropped Image");
+        useCroppedImage.setOnAction(evt -> photoView.setPhoto(photoView.getCroppedImage()));
+        useCroppedImage.setMaxWidth(Double.MAX_VALUE);
+
+        VBox leftSide = new VBox(40, photoView, hBox, useCroppedImage);
         leftSide.setAlignment(Pos.TOP_CENTER);
 
         ImageView originalImageView = new ImageView();

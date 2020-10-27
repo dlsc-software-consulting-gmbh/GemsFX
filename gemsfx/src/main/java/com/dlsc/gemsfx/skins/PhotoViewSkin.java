@@ -213,7 +213,13 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             }
 
             PixelReader reader = getSkinnable().getPhoto().getPixelReader();
-            WritableImage croppedImage = new WritableImage(reader, Math.max(0, x), Math.max(0, y), (int) Math.min(image.getWidth(), w), (int) Math.min(image.getHeight(), h));
+
+            int ix = Math.max(0, x);
+            int iy = Math.max(0, y);
+            int iw = (int) Math.min(image.getWidth() - ix, w);
+            int ih = (int) Math.min(image.getHeight() - iy, h);
+
+            WritableImage croppedImage = new WritableImage(reader, ix, iy, iw, ih);
             getSkinnable().getProperties().put("cropped.image", croppedImage);
         }
 
