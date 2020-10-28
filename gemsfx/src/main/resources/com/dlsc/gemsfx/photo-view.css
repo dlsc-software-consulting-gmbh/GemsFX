@@ -33,6 +33,10 @@
     -fx-fill: transparent;
 }
 
+.photo-view.file-drag > .box > .image-box > .border-circle {
+    -fx-stroke: red;
+}
+
 .photo-view:focused > .box > .image-box > .border-circle {
     -fx-stroke-width: 6;
 }

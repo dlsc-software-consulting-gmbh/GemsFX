@@ -2,7 +2,8 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
-import javafx.application.Application;
+import com.jpro.webapi.JProApplication;
+import com.jpro.webapi.WebAPI.FileUploader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,7 +18,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class PhotoViewApp extends Application {
+public class PhotoViewApp extends JProApplication {
+
+    private FileUploader fileHandler;
+
+    private Label progressLabel;
 
     @Override
     public void start(Stage stage) {
@@ -70,11 +75,59 @@ public class PhotoViewApp extends Application {
         stackPane.setPadding(new Insets(20));
 
         Scene scene = new Scene(stackPane);
+
         stage.setTitle("Photo View Demo");
         stage.setScene(scene);
         stage.sizeToScene();
         stage.centerOnScreen();
+
+        System.out.println("CHECK");
+
+        if (getWebAPI().isBrowser()) {
+
+            System.out.println("BROWSER");
+
+            photoView.setPhotoSupplier(() -> {
+                return null;
+            });
+
+            progressLabel = new Label();
+
+            leftSide.getChildren().add(progressLabel);
+
+            fileHandler = getWebAPI().makeFileUploadNode(photoView);
+
+            fileHandler.setSelectFileOnClick(true);
+            fileHandler.setSelectFileOnDrop(true);
+            fileHandler.fileDragOverProperty().addListener((o, oldV, newV) -> {
+                if (newV) {
+                    photoView.getStyleClass().add("file-drag");
+                } else {
+                    if (photoView.getStyleClass().contains("file-drag")) {
+                        photoView.getStyleClass().remove("file-drag");
+                    }
+                }
+            });
+
+
+            fileHandler.setOnFileSelected((file) -> {
+                updateText();
+                fileHandler.uploadFile();
+            });
+
+            fileHandler.progressProperty().addListener((obs, oldV, newV) -> {
+                updateText();
+            });
+        }
+
         stage.show();
+
+    }
+
+    private void updateText() {
+        String percentages = "";
+        percentages = (int) (fileHandler.getProgress() * 100) + "%";
+        progressLabel.setText(fileHandler.selectedFileProperty() + percentages);
     }
 
     public static void main(String[] args) {

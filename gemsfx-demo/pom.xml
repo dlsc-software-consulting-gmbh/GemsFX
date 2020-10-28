@@ -30,6 +30,26 @@
         <main.class>com.dlsc.gemsfx.demo.KeyboardApp</main.class>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jcenter</id>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
+
+        <repository>
+            <id>jpro - sandec repository</id>
+            <url>http://sandec.bintray.com/repo</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jpro - sandec repository</id>
+            <url>http://sandec.bintray.com/repo</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+
     <build>
         <plugins>
             <plugin>
@@ -64,10 +84,44 @@
                     <target>11</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>com.sandec.jpro</groupId>
+                <artifactId>jpro-maven-plugin</artifactId>
+                <version>2020.1.0</version>
+                <configuration>
+                    <visible>false</visible>
+                    <mainClassName>
+                        com.dlsc.gemsfx.demo.PhotoViewApp
+                    </mainClassName>
+                    <openingPath>/</openingPath>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>create-jpro-release</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>release</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>com.sandec.jpro</groupId>
+            <artifactId>jpro-webapi</artifactId>
+            <version>2020.1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>fr.brouillard.oss</groupId>
             <artifactId>cssfx</artifactId>
