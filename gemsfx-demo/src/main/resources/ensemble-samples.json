@@ -6,8 +6,7 @@
       "desc": "A nice little control for creating user photos / avatars.",
       "project": "gemsfx",
       "preview": "/preview-photo-view.png",
-      "classname": "com.dlsc.gemsfx.demo.PhotoViewApp",
-      "disabled": true
+      "classname": "com.dlsc.gemsfx.demo.PhotoViewApp"
     },
     {
       "category": "gemsfx",
@@ -16,7 +15,6 @@
       "project": "gemsfx",
       "preview": "/preview-payment.png",
       "classname": "com.dlsc.gemsfx.demo.PaymentOptionApp",
-      "disabled": true
     },
     {
       "category": "gemsfx",
