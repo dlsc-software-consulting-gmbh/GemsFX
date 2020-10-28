@@ -12,8 +12,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class KeyView extends KeyViewBase<Key> {
+    private static final Logger LOG = Logger.getLogger(KeyView.class.getName());
 
     private final VBox vBox = new VBox();
     private String text;
@@ -148,7 +151,7 @@ public class KeyView extends KeyViewBase<Key> {
                     Platform.runLater(() -> showPopOver());
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOG.log(Level.SEVERE, "interrupted exception", e);
             }
         }
     }

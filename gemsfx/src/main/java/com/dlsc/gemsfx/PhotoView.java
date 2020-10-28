@@ -33,11 +33,11 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The photo view is mostly used to display a user profile picture.
@@ -59,6 +59,8 @@ import java.util.function.Supplier;
  * <b>Note: the values for the zoom and translate properties will all be reset when a new photo is set.</b>
  */
 public class PhotoView extends Control {
+
+    private final Logger LOG = Logger.getLogger(PhotoView.class.getName());
 
     private static final PseudoClass EMPTY_PSEUDO_CLASS = PseudoClass.getPseudoClass("empty");
 
@@ -117,10 +119,8 @@ public class PhotoView extends Control {
             if (file != null) {
                 try (FileInputStream stream = new FileInputStream(file)) {
                     return new Image(stream);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOG.log(Level.SEVERE, "error when trying to load selected image file", e);
                 }
             }
 
@@ -145,10 +145,8 @@ public class PhotoView extends Control {
                         if (image != null) {
                             setPhoto(SwingFXUtils.toFXImage(image, new WritableImage(image.getWidth(), image.getHeight())));
                         }
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOG.log(Level.SEVERE, "error when trying to use dropped image file", e);
                     }
                 }
             }

@@ -34,11 +34,15 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A custom control that displays a keyboard for touch-based text editing.
  */
 public class KeyboardView extends Control {
+
+    private static final Logger LOG = Logger.getLogger(KeyboardView.class.getName());
 
     /**
      * Constructs a new keyboard view.
@@ -107,9 +111,9 @@ public class KeyboardView extends Control {
             }
         });
 
-        final ObservableList<Keyboard> keyboards = getKeyboards();
+        ObservableList<Keyboard> keyboards = getKeyboards();
         keyboards.addListener((Observable it) -> {
-            final Keyboard selectedKeyboard = getSelectedKeyboard();
+            Keyboard selectedKeyboard = getSelectedKeyboard();
             if (!keyboards.isEmpty() && (selectedKeyboard == null || !keyboards.contains(selectedKeyboard))) {
                 setSelectedKeyboard(keyboards.get(0));
             }
@@ -135,8 +139,8 @@ public class KeyboardView extends Control {
      * @return the keyboard for the given locale, the US keyboard as a fallback
      */
     public final Keyboard loadKeyboard(Locale locale) {
-        final String country = locale.getCountry().toLowerCase();
-        final String language = locale.getLanguage().toLowerCase();
+        String country = locale.getCountry().toLowerCase();
+        String language = locale.getLanguage().toLowerCase();
 
         Keyboard keyboard = null;
         if (country != null && StringUtils.isNotBlank(country) && StringUtils.isNotBlank(language)) {
@@ -164,7 +168,7 @@ public class KeyboardView extends Control {
                 return loadKeyboard(in);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "error when trying to load keyboard, file name = " + fileName, e);
         }
 
         return null;
@@ -182,8 +186,7 @@ public class KeyboardView extends Control {
         Objects.requireNonNull(in, "input stream for keyboard map xml file can not be null");
         JAXBContext jc = JAXBContext.newInstance(Keyboard.class);
         Unmarshaller unmarshaller = jc.createUnmarshaller();
-        Keyboard keyboard = (Keyboard) unmarshaller.unmarshal(in);
-        return keyboard;
+        return (Keyboard) unmarshaller.unmarshal(in);
     }
 
     // dark mode

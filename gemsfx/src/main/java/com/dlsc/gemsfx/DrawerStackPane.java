@@ -637,7 +637,6 @@ public class DrawerStackPane extends StackPane {
             return Math.min(1, Math.max(.1, height));
         } catch (SecurityException ex) {
             LOG.log(Level.SEVERE, "problem encountered when trying to load drawer height from user preferences", ex);
-            ex.printStackTrace();
         }
 
         return .9;
