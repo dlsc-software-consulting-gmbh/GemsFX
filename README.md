@@ -12,6 +12,16 @@
 
 *At least **JDK 11** is required.*
 
+## Photo View
+
+A control for adding and editing a user profile photo (or whatever). The user can click on the control to choose an image file
+via a file chooser (replacable) or via drag and drop. Once added the user can move the image around and zoom in / out. As a convenience
+the view always provide a cropped version of the original image. This allows applications to store a smaller file on the server / in
+the database. The control supports some keyboard shortcuts. The file chooser can be activated by pressing SPACE or ENTER. The photo can
+be removed by pressing DELETE or BACK_SPACE.
+
+![PhotoView](gemsfx/docs/photo-view.png)
+
 ## Payment Option Controls
 
 A specialized subclass of ImageView that can be used to display different graphics for different payment options. Graphics provided by Gregoire Segretain (https://www.sketchappsources.com/contributor/gregoiresgt)
@@ -105,3 +115,4 @@ terminal:
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.EmailFieldApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PaymentOptionApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PaymentOptionTilesApp
+    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PhotoViewApp
