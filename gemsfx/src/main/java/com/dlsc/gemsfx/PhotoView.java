@@ -18,6 +18,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.effect.Effect;
+import javafx.scene.effect.SepiaTone;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.Dragboard;
@@ -38,6 +39,25 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * The photo view is mostly used to display a user profile picture.
+ * <h3>Features</h3>
+ * <ul>
+ *     <li>control can be used as read-only view or as an editor (see {@link #editableProperty()})</li>
+ *     <li>picture can moved around by dragging it</li>
+ *     <li>picture can be resized by pinch zoom (touch) or via scroll wheel</li>
+ *     <li>control provides a cropped "read only" version of the original image (see @{{@link #croppedImageProperty()}}). This is ideal
+ *     for saving memory when saving the image to the server / a database</li>
+ *     <li>applications can set a custom "photo supplier" to replace the built-in file chooser (see {@link #photoSupplierProperty()})</li>
+ *     <li>drag and drop an image file onto the view</li>
+ *     <li>circular and rectangle shape (see {@link #setClipShape(ClipShape)})</li>
+ *     <li>customizable maximum zoom value</li>
+ *     <li>keyboard support: backspace and delete keys delete the picture, space or enter trigger the file supplier (default: show the file chooser)</li>
+ *     <li>pseudo class support: "empty" if the {@link #photoProperty()} is null</li>
+ *     <li>an effect can be applied directly to the image (see {@link #photoEffectProperty()})</li>
+ * </ul>
+ * <b>Note: the values for the zoom and translate properties will all be reset when a new photo is set.</b>
+ */
 public class PhotoView extends Control {
 
     private static final PseudoClass EMPTY_PSEUDO_CLASS = PseudoClass.getPseudoClass("empty");
@@ -49,6 +69,9 @@ public class PhotoView extends Control {
 
     private FileChooser fileChooser;
 
+    /**
+     * Constructs a new photo view.
+     */
     public PhotoView() {
         getStyleClass().add("photo-view");
 
@@ -118,7 +141,7 @@ public class PhotoView extends Control {
                 if (files != null) {
                     try {
                         File file = files.get(0);
-                        final BufferedImage image = ImageIO.read(file);
+                        BufferedImage image = ImageIO.read(file);
                         if (image != null) {
                             setPhoto(SwingFXUtils.toFXImage(image, new WritableImage(image.getWidth(), image.getHeight())));
                         }
@@ -176,6 +199,14 @@ public class PhotoView extends Control {
         return croppedImage.get();
     }
 
+    /**
+     * A read-only property that contains the cropped version of the original image. An image
+     * becomes cropped when the user moves it around or zooms into it. The cropped image is a good
+     * candidate for saving it to the server or database. However, applications can choose freely
+     * whether they prefer to store the original image or not.
+     *
+     * @return the cropped image version of the original image
+     */
     public final ReadOnlyObjectProperty<Image> croppedImageProperty() {
         return croppedImage.getReadOnlyProperty();
     }
@@ -188,6 +219,12 @@ public class PhotoView extends Control {
         return photoEffect.get();
     }
 
+    /**
+     * An effect that will be applied to the image, not the whole control. Applications
+     * could for example apply a sepia effect (see {@link SepiaTone}).
+     *
+     * @return the photo effect
+     */
     public final ObjectProperty<Effect> photoEffectProperty() {
         return photoEffect;
     }
@@ -204,6 +241,12 @@ public class PhotoView extends Control {
         return placeholder.get();
     }
 
+    /**
+     * A placeholder that will be shown when no photo / image has been specified. The default
+     * placeholder prompts the user to "click to add or drop a file".
+     *
+     * @return the placeholder node
+     */
     public final ObjectProperty<Node> placeholderProperty() {
         return placeholder;
     }
@@ -220,6 +263,14 @@ public class PhotoView extends Control {
         return editable.get();
     }
 
+    /**
+     * Controls whether the user will be able to edit the photo / image. If editable
+     * the control will display a slider below the photo for zooming. The user will also
+     * be able to zoom in via pinch zoom or scroll wheel. Via mouse dragging the user can
+     * move the photo around.
+     *
+     * @return "true" if the view is editable
+     */
     public final BooleanProperty editableProperty() {
         return editable;
     }
@@ -236,6 +287,13 @@ public class PhotoView extends Control {
         return photoSupplier.get();
     }
 
+    /**
+     * The photo supplier will be invoked when the user clicks on the control (or hits space oder
+     * enter keys). The default photo supplier registered on the control will bring up a file chooser
+     * so that the user can select the image file.
+     *
+     * @return the photo supplier
+     */
     public ObjectProperty<Supplier<Image>> photoSupplierProperty() {
         return photoSupplier;
     }
@@ -252,6 +310,12 @@ public class PhotoView extends Control {
         return clipShape.get();
     }
 
+    /**
+     * The clip shape determines whether the control will clip the photo via a circle
+     * or a rectangle shape.
+     *
+     * @return the clip shape (circle, rectangle)
+     */
     public ObjectProperty<ClipShape> clipShapeProperty() {
         return clipShape;
     }
@@ -268,6 +332,11 @@ public class PhotoView extends Control {
         return photo.get();
     }
 
+    /**
+     * Stores the original photo.
+     *
+     * @return the photo
+     */
     public final ObjectProperty<Image> photoProperty() {
         return photo;
     }
@@ -284,6 +353,12 @@ public class PhotoView extends Control {
         return photoZoom.get();
     }
 
+    /**
+     * The zoom applied to the photo so that the photo's content fills out the
+     * view as good as possible.
+     *
+     * @return the photo zoom
+     */
     public final DoubleProperty photoZoomProperty() {
         return photoZoom;
     }
@@ -300,6 +375,13 @@ public class PhotoView extends Control {
         return photoTranslateX.get();
     }
 
+    /**
+     * Stores the percentage-based amount of the horizontal translation. We can not use pixel-based
+     * translation as the view might change its size. This value changes when the user drags the photo
+     * left or right.
+     *
+     * @return the translate x value (in percent)
+     */
     public final DoubleProperty photoTranslateXProperty() {
         return photoTranslateX;
     }
@@ -316,6 +398,13 @@ public class PhotoView extends Control {
         return photoTranslateY.get();
     }
 
+    /**
+     * Stores the percentage-based amount of the vertical translation. We can not use pixel-based
+     * translation as the view might change its size. This value changes when the user drags the photo
+     * up or down.
+     *
+     * @return the translate y value (in percent)
+     */
     public final DoubleProperty photoTranslateYProperty() {
         return photoTranslateY;
     }
@@ -332,6 +421,12 @@ public class PhotoView extends Control {
         return maxZoom.get();
     }
 
+    /**
+     * Stores the maximum amount that the user will be allowed to zoom into the view.
+     * The default value is 5.
+     *
+     * @return the maximum zoom value (default 5)
+     */
     public final DoubleProperty maxZoomProperty() {
         return maxZoom;
     }
