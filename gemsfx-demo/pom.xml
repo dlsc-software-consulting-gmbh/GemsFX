@@ -14,8 +14,19 @@
 
     <artifactId>gemsfx-demo</artifactId>
 
+    <description>Demos for GemsFX</description>
+
+    <url>https://github.com/dlemmermann/GemsFX</url>
+    <licenses>
+        <license>
+            <name>Apache 2.0</name>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://github.com/dlsc-software-consulting-gmbh/GemsFX</url>
+    </scm>
+
     <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
         <main.class>com.dlsc.gemsfx.demo.KeyboardApp</main.class>
     </properties>
 

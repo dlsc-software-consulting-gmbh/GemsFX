@@ -4,6 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.dlsc.gemsfx</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.13.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
     <groupId>com.dlsc.gemsfx</groupId>
     <artifactId>gemsfx</artifactId>
     <version>1.13.0</version>
@@ -37,85 +44,6 @@
             <organization>DLSC Software &amp; Consulting</organization>
         </developer>
     </developers>
-
-    <distributionManagement>
-        <repository>
-            <id>bintray-dlsc-oss-repository</id>
-            <name>dlsc-oss-repository</name>
-            <url>
-                https://api.bintray.com/maven/dlsc-oss/repository/GemsFX/;publish=1
-            </url>
-        </repository>
-    </distributionManagement>
-
-    <repositories>
-
-        <repository>
-            <id>bintray-dlsc-oss-repository</id>
-            <name>bintray</name>
-            <url>https://dl.bintray.com/dlsc-oss/repository</url>
-        </repository>
-
-    </repositories>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <failOnError>false</failOnError>
-                    <force>true</force>
-                    <windowtitle>GemsFX API</windowtitle>
-                    <additionalJOption>-J-Djavafx.javadoc=true
-                    </additionalJOption>
-                    <docfilessubdirs>true</docfilessubdirs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-docs
-                        </id> <!-- this is used for inheritance merges -->
-                        <phase>package
-                        </phase> <!-- bind to the packaging phase -->
-                        <goals>
-                            <goal>aggregate</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
 
@@ -211,6 +139,7 @@
             <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>

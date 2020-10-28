@@ -20,12 +20,21 @@
         <sonar.organization>dlsc-software-consulting-gmbh</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
-        <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <asciidoctor.maven.plugin.version>1.6.0</asciidoctor.maven.plugin.version>
         <asciidoctorj.version>1.6.2</asciidoctorj.version>
         <jruby.version>9.2.6.0</jruby.version>
     </properties>
+
+    <repositories>
+
+        <repository>
+            <id>bintray-dlsc-oss-repository</id>
+            <name>bintray</name>
+            <url>https://dl.bintray.com/dlsc-oss/repository</url>
+        </repository>
+
+    </repositories>
 
     <distributionManagement>
         <repository>
@@ -49,6 +58,61 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                    <force>true</force>
+                    <windowtitle>GemsFX API</windowtitle>
+                    <additionalJOption>-J-Djavafx.javadoc=true
+                    </additionalJOption>
+                    <docfilessubdirs>true</docfilessubdirs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-docs
+                        </id> <!-- this is used for inheritance merges -->
+                        <phase>package
+                        </phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>

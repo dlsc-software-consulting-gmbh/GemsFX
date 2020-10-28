@@ -1,0 +1,55 @@
+{
+  "samples": [
+    {
+      "category": "gemsfx",
+      "name": "PhotoViewApp",
+      "desc": "A nice little control for creating user photos / avatars.",
+      "project": "gemsfx",
+      "preview": "/preview-photo-view.png",
+      "classname": "com.dlsc.gemsfx.demo.PhotoViewApp",
+      "disabled": true
+    },
+    {
+      "category": "gemsfx",
+      "name": "PaymentOptionApp",
+      "desc": "A control for visualizing various payment options (e.g. Paypal, MasterCard, etc...).",
+      "project": "gemsfx",
+      "preview": "/preview-payment.png",
+      "classname": "com.dlsc.gemsfx.demo.PaymentOptionApp",
+      "disabled": true
+    },
+    {
+      "category": "gemsfx",
+      "name": "PaymentOptionTilesApp",
+      "desc": "A control for visualizing various payment options (e.g. Paypal, MasterCard, etc...).",
+      "project": "gemsfx",
+      "preview": "/preview-payment.png",
+      "classname": "com.dlsc.gemsfx.demo.PaymentOptionTilesApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "FilterViewApp",
+      "desc": "A view for filtering based on various categories.",
+      "project": "gemsfx",
+      "preview": "/preview-filterview.png",
+      "classname": "com.dlsc.gemsfx.demo.FilterViewApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "RichTextAreaApp",
+      "desc": "A control for easily creating rich text via API (not interactively).",
+      "project": "gemsfx",
+      "preview": "/preview-richtextareaapp.png",
+      "classname": "com.dlsc.gemsfx.demo.RichTextAreaApp",
+      "disabled": true
+    },
+    {
+      "category": "gemsfx",
+      "name": "PDFViewApp",
+      "desc": "A view for displaying PDF files (based on Apache PDFBox).",
+      "project": "gemsfx",
+      "preview": "/preview-pdfviewer.png",
+      "classname": "com.dlsc.gemsfx.demo.PDFViewApp"
+    }
+  ]
+}

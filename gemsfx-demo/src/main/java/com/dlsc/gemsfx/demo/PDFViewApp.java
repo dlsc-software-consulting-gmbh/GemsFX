@@ -42,6 +42,12 @@ public class PDFViewApp extends Application {
             }
         });
 
+        try {
+            pdfView.load(getClass().getResourceAsStream("/tesla3-owners-manual-short.pdf"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         MenuItem closeItem = new MenuItem("Close PDF ...");
         closeItem.setAccelerator(KeyCombination.valueOf("SHORTCUT+c"));
         closeItem.setOnAction(evt -> pdfView.unload());
