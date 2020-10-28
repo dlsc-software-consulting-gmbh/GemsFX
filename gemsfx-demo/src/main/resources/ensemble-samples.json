@@ -14,7 +14,7 @@
       "desc": "A control for visualizing various payment options (e.g. Paypal, MasterCard, etc...).",
       "project": "gemsfx",
       "preview": "/preview-payment.png",
-      "classname": "com.dlsc.gemsfx.demo.PaymentOptionApp",
+      "classname": "com.dlsc.gemsfx.demo.PaymentOptionApp"
     },
     {
       "category": "gemsfx",
