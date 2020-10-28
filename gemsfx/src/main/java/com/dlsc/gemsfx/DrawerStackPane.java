@@ -25,6 +25,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -33,6 +34,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+/**
+ * A custom stackpane that supports a drawer view sliding in from bottom to top. The content of the drawer gets added
+ * in the normal way via the childrens list. The content for the drawer has to be added by calling {@link #setDrawerContent(Node)}.
+ *
+ * <h3>Features</h3>
+ * <ul>
+ *     <li>User can resize the drawer via a handle at the top</li>
+ *     <li>The drawer automatically closes completely if the user drags the resize handle below the lower bounds of the stackpane</li>
+ *     <li>Opening and closing can be animated (see {@link #setAnimateDrawer(boolean)})</li>
+ *     <li>When the drawer is open the content of the stackpane will be blocked from user input via a dark semi-transparent glass pane</li>
+ *     <li>The glass pane fades in / out</li>
+ *     <li>The drawer can have its own preferred width (see {@link #setPreferredDrawerWidth(double)})</li>
+ *     <li>The control can automatically persist the drawer height via the Java preferences API (see {@link #setPreferencesKey(String)})</li>
+ *     <li>Auto hiding: drawer will close when the user clicks into the background (onto the glass pane)</li>
+ * </ul>
+ */
 public class DrawerStackPane extends StackPane {
 
     private static final Logger LOG = Logger.getLogger(DrawerStackPane.class.getName());
@@ -47,11 +64,19 @@ public class DrawerStackPane extends StackPane {
 
     private HBox headerBox;
 
+    /**
+     * Constructs a new drawer stack pane.
+     *
+     * @param nodes the children nodes
+     */
     public DrawerStackPane(Node... nodes) {
         super(nodes);
         init();
     }
 
+    /**
+     * Constructs a new drawer stack pane.
+     */
     public DrawerStackPane() {
         super();
         init();
@@ -82,9 +107,7 @@ public class DrawerStackPane extends StackPane {
             }
         });
 
-        headerBox.setOnMousePressed(evt -> {
-            startY = evt.getScreenY();
-        });
+        headerBox.setOnMousePressed(evt -> startY = evt.getScreenY());
 
         headerBox.setOnMouseReleased(evt -> {
             if (startY != -1 && evt.getY() > drawer.getHeight()) {
@@ -156,8 +179,16 @@ public class DrawerStackPane extends StackPane {
         return DrawerStackPane.class.getResource("drawer-stackpane.css").toExternalForm();
     }
 
+    // fade in / out support
+
     private final BooleanProperty fadeInOut = new SimpleBooleanProperty(this, "fadeInOut", true);
 
+    /**
+     * Specifies whether the glass pane (used for blocking user input to nodes in the background) will
+     * use a fade transition when it becomes visible.
+     *
+     * @return true if the glass pane will fade in / out smoothly when appearing / disappearing
+     */
     public final BooleanProperty fadeInOutProperty() {
         return fadeInOut;
     }
@@ -166,9 +197,11 @@ public class DrawerStackPane extends StackPane {
         return fadeInOut.get();
     }
 
-    public final void setFadeInOut(boolean animate) {
-        this.fadeInOut.set(animate);
+    public final void setFadeInOut(boolean fadeInOut) {
+        this.fadeInOut.set(fadeInOut);
     }
+
+    // auto hide support
 
     private final BooleanProperty autoHide = new SimpleBooleanProperty(this, "autoHide", true);
 
@@ -234,13 +267,27 @@ public class DrawerStackPane extends StackPane {
         }
     }
 
-    public void setPreferencesKey(String id) {
-        this.preferenceKey = id;
+    /**
+     * Sets the key that will be used when storing the last drawer height via
+     * the Java preferences API.
+     *
+     * @param key the preferences key
+     */
+    public void setPreferencesKey(String key) {
+        preferenceKey = key;
     }
 
+    /**
+     * Returns the key that will be used when storing the last drawer height via
+     * the Java preferences API.
+     *
+     * @return the preferences key
+     */
     public String getPreferencesKey() {
         return preferenceKey;
     }
+
+    // max drawer height support
 
     private final DoubleProperty maxDrawerHeight = new SimpleDoubleProperty(this, "maxDrawerHeight", 1);
 
@@ -248,6 +295,12 @@ public class DrawerStackPane extends StackPane {
         return maxDrawerHeight.get();
     }
 
+    /**
+     * The maximum drawer height, a value between 0 and 1 with 1 meaning that the drawer can
+     * be as high as the stackpane.
+     *
+     * @return the maximum drawer height (value between 0 and 1)
+     */
     public DoubleProperty maxDrawerHeightProperty() {
         return maxDrawerHeight;
     }
@@ -256,12 +309,20 @@ public class DrawerStackPane extends StackPane {
         this.maxDrawerHeight.set(maxDrawerHeight);
     }
 
+    // min drawer height support
+
     private final DoubleProperty minDrawerHeight = new SimpleDoubleProperty(this, "minDrawerHeight", .1);
 
     public double getMinDrawerHeight() {
         return minDrawerHeight.get();
     }
 
+    /**
+     * The minimum drawer height, a value between 0 and 1 with 0 meaning that the drawer can be made
+     * completely invisible.
+     *
+     * @return the minimum drawer height (value between 0 and 1)
+     */
     public DoubleProperty minDrawerHeightProperty() {
         return minDrawerHeight;
     }
@@ -274,9 +335,9 @@ public class DrawerStackPane extends StackPane {
     protected void layoutChildren() {
         super.layoutChildren();
 
-        final double availableHeight = getHeight() - 20;
-        final double maxDrawerWidth = getWidth() - 100;
-        final double drawerWidth = getPreferredDrawerWidth() != -1 ? Math.min(getPreferredDrawerWidth(), maxDrawerWidth) : maxDrawerWidth;
+        double availableHeight = getHeight() - 20;
+        double maxDrawerWidth = getWidth() - 100;
+        double drawerWidth = getPreferredDrawerWidth() != -1 ? Math.min(getPreferredDrawerWidth(), maxDrawerWidth) : maxDrawerWidth;
 
         drawer.resizeRelocate((getWidth() - drawerWidth) / 2, getHeight() - getDrawerHeight() * availableHeight, drawerWidth, availableHeight * getDrawerHeight());
     }
@@ -359,39 +420,58 @@ public class DrawerStackPane extends StackPane {
 
     private final ObjectProperty<Runnable> onDrawerClose = new SimpleObjectProperty<>(this, "onDrawerClose");
 
-    public Runnable getOnDrawerClose() {
+    public final Runnable getOnDrawerClose() {
         return onDrawerClose.get();
     }
 
-    public ObjectProperty<Runnable> onDrawerCloseProperty() {
+    /**
+     * A callback that will be invoked when the drawer gets closed.
+     *
+     * @return a callback that will be invoked when the drawer gets closed
+     */
+    public final ObjectProperty<Runnable> onDrawerCloseProperty() {
         return onDrawerClose;
     }
 
-    public void setOnDrawerClose(Runnable onDrawerClose) {
+    public final void setOnDrawerClose(Runnable onDrawerClose) {
         this.onDrawerClose.set(onDrawerClose);
     }
 
+    // show drawer title support
+
     private final BooleanProperty showDrawerTitle = new SimpleBooleanProperty(this, "showDrawerTitle", false);
 
-    public boolean isShowDrawerTitle() {
+    public final boolean isShowDrawerTitle() {
         return showDrawerTitle.get();
     }
 
-    public BooleanProperty showDrawerTitleProperty() {
+    /**
+     * A flag used to signal whether the drawer should have a title bar or not.
+     *
+     * @return true if the drawer shows a title
+     */
+    public final BooleanProperty showDrawerTitleProperty() {
         return showDrawerTitle;
     }
 
-    public void setShowDrawerTitle(boolean showDrawerTitle) {
+    public final void setShowDrawerTitle(boolean showDrawerTitle) {
         this.showDrawerTitle.set(showDrawerTitle);
     }
 
+    // drawer title support
+
     private final StringProperty drawerTitle = new SimpleStringProperty(this, "drawerTitle", "Untitled");
 
-    public String getDrawerTitle() {
+    public final String getDrawerTitle() {
         return drawerTitle.get();
     }
 
-    public StringProperty drawerTitleProperty() {
+    /**
+     * The text shown as the title of the drawer.
+     *
+     * @return the drawer title text
+     */
+    public final StringProperty drawerTitleProperty() {
         return drawerTitle;
     }
 
@@ -399,31 +479,45 @@ public class DrawerStackPane extends StackPane {
         this.drawerTitle.set(drawerTitle);
     }
 
+    // drawer content support
+
     private final ObjectProperty<Node> drawerContent = new SimpleObjectProperty<>(this, "drawerContent");
 
-    public Node getDrawerContent() {
+    public final Node getDrawerContent() {
         return drawerContent.get();
     }
 
-    public ObjectProperty<Node> drawerContentProperty() {
+    /**
+     * Stores the content of the drawer.
+     *
+     * @return the drawer content
+     */
+    public final ObjectProperty<Node> drawerContentProperty() {
         return drawerContent;
     }
 
-    public void setDrawerContent(Node drawerContent) {
+    public final void setDrawerContent(Node drawerContent) {
         this.drawerContent.set(drawerContent);
     }
 
+    // drawer title extra
+
     private final ObjectProperty<Node> drawerTitleExtra = new SimpleObjectProperty<>(this, "drawerTitleExtra");
 
-    public Node getDrawerTitleExtra() {
+    public final Node getDrawerTitleExtra() {
         return drawerTitleExtra.get();
     }
 
-    public ObjectProperty<Node> drawerTitleExtraProperty() {
+    /**
+     * An extra node that will be added to the title bar.
+     *
+     * @return an extra node that will be added to the title bar
+     */
+    public final ObjectProperty<Node> drawerTitleExtraProperty() {
         return drawerTitleExtra;
     }
 
-    public void setDrawerTitleExtra(Node drawerTitleExtra) {
+    public final void setDrawerTitleExtra(Node drawerTitleExtra) {
         this.drawerTitleExtra.set(drawerTitleExtra);
     }
 
@@ -431,45 +525,89 @@ public class DrawerStackPane extends StackPane {
         return getPreferencesKey() + ".drawer.height";
     }
 
+    // show drawer support
+
     private final BooleanProperty showDrawer = new SimpleBooleanProperty(this, "showDrawer", false);
 
     public boolean isShowDrawer() {
         return showDrawer.get();
     }
 
-    public BooleanProperty showDrawerProperty() {
+    /**
+     * A flag used to control whether the drawer should show itself or not.
+     *
+     * @return true if the drawer should show itself
+     */
+    public final BooleanProperty showDrawerProperty() {
         return showDrawer;
     }
 
-    public void setShowDrawer(boolean showDrawer) {
+    public final void setShowDrawer(boolean showDrawer) {
         this.showDrawer.set(showDrawer);
     }
 
-    private final DoubleProperty preferredDrawerWidth = new SimpleDoubleProperty(this, "preferredDrawerWidth", -1);
+    // preferred drawer width support
 
-    public double getPreferredDrawerWidth() {
+    private final DoubleProperty preferredDrawerWidth = new SimpleDoubleProperty(this, "preferredDrawerWidth", Region.USE_COMPUTED_SIZE);
+
+    public final double getPreferredDrawerWidth() {
         return preferredDrawerWidth.get();
     }
 
-    public DoubleProperty preferredDrawerWidthProperty() {
+    /**
+     * Stores the preferred width of the drawer. Normally this value is is equal to
+     * {@link Region#USE_COMPUTED_SIZE}.
+     *
+     * @return the preferred drawer width
+     */
+    public final DoubleProperty preferredDrawerWidthProperty() {
         return preferredDrawerWidth;
     }
 
-    public void setPreferredDrawerWidth(double preferredDrawerWidth) {
+    public final void setPreferredDrawerWidth(double preferredDrawerWidth) {
         this.preferredDrawerWidth.set(preferredDrawerWidth);
     }
 
+    // drawer animation support
+
+    private final BooleanProperty animateDrawer = new SimpleBooleanProperty(this, "animateDrawer", true);
+
+    public final boolean isAnimateDrawer() {
+        return animateDrawer.get();
+    }
+
+    /**
+     * Determines whether the drawer will smoothly slide in / out when the
+     * user opens / closes it. If not then the drawer will just appear instantly.
+     *
+     * @return true if the drawer will be animated (slide in / out)
+     */
+    public final BooleanProperty animateDrawerProperty() {
+        return animateDrawer;
+    }
+
+    public final void setAnimateDrawer(boolean animateDrawer) {
+        this.animateDrawer.set(animateDrawer);
+    }
+
+    // drawer height support
+
     private final DoubleProperty drawerHeight = new SimpleDoubleProperty(this, "drawerHeight");
 
-    public double getDrawerHeight() {
+    public final double getDrawerHeight() {
         return Math.min(1, Math.max(.1, drawerHeight.get()));
     }
 
-    public DoubleProperty drawerHeightProperty() {
+    /**
+     * Stores the current height of the drawer as a value between 0 (not showing) and 1 (using full height of stackpane).
+     *
+     * @return the drawer height (value between 0 and 1)
+     */
+    public final DoubleProperty drawerHeightProperty() {
         return drawerHeight;
     }
 
-    public void setDrawerHeight(double drawerHeight) {
+    public final void setDrawerHeight(double drawerHeight) {
         this.drawerHeight.set(drawerHeight);
     }
 
@@ -534,19 +672,5 @@ public class DrawerStackPane extends StackPane {
         if (onClose != null) {
             onClose.run();
         }
-    }
-
-    private final BooleanProperty animateDrawer = new SimpleBooleanProperty(this, "animateDrawer", true);
-
-    public boolean isAnimateDrawer() {
-        return animateDrawer.get();
-    }
-
-    public BooleanProperty animateDrawerProperty() {
-        return animateDrawer;
-    }
-
-    public void setAnimateDrawer(boolean animateDrawer) {
-        this.animateDrawer.set(animateDrawer);
     }
 }
