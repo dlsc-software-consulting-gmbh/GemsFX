@@ -11,12 +11,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.net.MalformedURLException;
 
 public class PhotoViewApp extends JProApplication {
 
@@ -93,7 +97,7 @@ public class PhotoViewApp extends JProApplication {
 
             progressLabel = new Label();
 
-            leftSide.getChildren().add(progressLabel);
+            leftSide.getChildren().add(progressLabel = new Label());
 
             fileHandler = getWebAPI().makeFileUploadNode(photoView);
 
@@ -118,6 +122,17 @@ public class PhotoViewApp extends JProApplication {
             fileHandler.progressProperty().addListener((obs, oldV, newV) -> {
                 updateText();
             });
+
+            fileHandler.uploadedFileProperty().addListener(it -> {
+                final File uploadedFile = fileHandler.getUploadedFile();
+                if (uploadedFile != null) {
+                    try {
+                        photoView.setPhoto(new Image(uploadedFile.toURI().toURL().toExternalForm()));
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
 
         stage.show();
@@ -127,7 +142,7 @@ public class PhotoViewApp extends JProApplication {
     private void updateText() {
         String percentages = "";
         percentages = (int) (fileHandler.getProgress() * 100) + "%";
-        progressLabel.setText(fileHandler.selectedFileProperty() + percentages);
+        progressLabel.setText(fileHandler.getSelectedFile() + ": " + percentages);
     }
 
     public static void main(String[] args) {
