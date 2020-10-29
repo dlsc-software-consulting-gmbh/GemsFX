@@ -255,10 +255,10 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
                 w = (int) (circle.getRadius() * scale * 2);
                 h = (int) (circle.getRadius() * scale * 2);
             } else {
-                x = (int) (rectangle.getWidth() / 2);
-                y = (int) (rectangle.getHeight() / 2);
-                w = (int) (rectangle.getWidth());
-                h = (int) (rectangle.getHeight());
+                x -= (int) (rectangle.getWidth() / 2 * scale);
+                y -= (int) (rectangle.getHeight() / 2 * scale);
+                w = (int) (rectangle.getWidth() * scale);
+                h = (int) (rectangle.getHeight() * scale);
             }
 
             PixelReader reader = getSkinnable().getPhoto().getPixelReader();

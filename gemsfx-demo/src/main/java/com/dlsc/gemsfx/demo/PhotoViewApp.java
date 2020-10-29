@@ -12,6 +12,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -30,7 +31,7 @@ public class PhotoViewApp extends JProApplication {
 
     private FileUploader fileHandler;
 
-    private Label progressLabel;
+    private ProgressBar progressBar;
 
     @Override
     public void start(Stage stage) {
@@ -68,20 +69,25 @@ public class PhotoViewApp extends JProApplication {
         originalImageView.imageProperty().bind(photoView.photoProperty());
         originalImageView.setFitWidth(100);
         originalImageView.setFitHeight(100);
-        VBox.setVgrow(originalImageView, Priority.ALWAYS);
+        StackPane originalImageWrapper = new StackPane(originalImageView);
+        originalImageWrapper.setPrefSize(100, 100);
+        VBox.setVgrow(originalImageWrapper, Priority.ALWAYS);
 
         ImageView croppedImageView = new ImageView();
         croppedImageView.setPreserveRatio(true);
         croppedImageView.imageProperty().bind(photoView.croppedImageProperty());
         croppedImageView.setFitWidth(100);
         croppedImageView.setFitHeight(100);
-        VBox.setVgrow(croppedImageView, Priority.ALWAYS);
+
+        StackPane croppedImageWrapper = new StackPane(croppedImageView);
+        croppedImageWrapper.setPrefSize(100, 100);
+        VBox.setVgrow(croppedImageWrapper, Priority.ALWAYS);
 
         Label originalLabel = new Label("Original");
         Label croppedLabel = new Label("Cropped");
 
         VBox.setMargin(croppedLabel, new Insets(20, 0, 0, 0));
-        VBox rightSide = new VBox(10, originalLabel, originalImageView, croppedLabel, croppedImageView);
+        VBox rightSide = new VBox(10, originalLabel, originalImageWrapper, croppedLabel, croppedImageWrapper);
 
         HBox mainBox = new HBox(20, leftSide, rightSide);
         mainBox.setFillHeight(false);
@@ -117,9 +123,11 @@ public class PhotoViewApp extends JProApplication {
             placeholder.getStyleClass().add("placeholder");
             photoView.setPlaceholder(placeholder);
 
-            progressLabel = new Label();
+            progressBar = new ProgressBar();
+            progressBar.setVisible(false);
+            progressBar.setMaxWidth(Double.MAX_VALUE);
 
-            leftSide.getChildren().add(progressLabel = new Label());
+            leftSide.getChildren().add(progressBar);
 
             fileHandler = getWebAPI().makeFileUploadNode(photoView);
 
@@ -155,6 +163,8 @@ public class PhotoViewApp extends JProApplication {
                     }
                 }
             });
+
+            progressBar.progressProperty().bind(fileHandler.progressProperty());
         }
 
         stage.show();
@@ -162,9 +172,8 @@ public class PhotoViewApp extends JProApplication {
     }
 
     private void updateText() {
-        String percentages = "";
-        percentages = (int) (fileHandler.getProgress() * 100) + "%";
-        progressLabel.setText(fileHandler.getSelectedFile() + ": " + percentages);
+        int percentages = (int) (fileHandler.getProgress() * 100);
+        progressBar.setVisible(percentages < 100);
     }
 
     public static void main(String[] args) {
