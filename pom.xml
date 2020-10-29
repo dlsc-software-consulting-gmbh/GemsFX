@@ -24,6 +24,15 @@
         </license>
     </licenses>
 
+    <developers>
+        <developer>
+            <name>Dirk Lemmermann</name>
+            <email>dlemmermann@gmail.com</email>
+            <organization>DLSC Software &amp; Consulting GmbH</organization>
+            <url>http://www.dlsc.com</url>
+        </developer>
+    </developers>
+
     <scm>
         <url>https://github.com/dlsc-software-consulting-gmbh/GemsFX</url>
     </scm>
