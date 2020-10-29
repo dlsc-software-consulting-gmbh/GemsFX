@@ -13,7 +13,7 @@
 
     <groupId>com.dlsc.gemsfx</groupId>
     <artifactId>gemsfx</artifactId>
-    <version>1.16.0</version>
+    <version>${parent.version}</version>
     <packaging>jar</packaging>
 
     <name>GemsFX</name>
