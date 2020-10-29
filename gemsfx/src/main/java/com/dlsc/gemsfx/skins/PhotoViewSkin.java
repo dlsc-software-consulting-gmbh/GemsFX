@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Service;
@@ -218,7 +219,7 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             protected Void call() throws Exception {
                 Thread.sleep(200);
                 if (!isCancelled()) {
-                    doCrop();
+                    Platform.runLater(() -> doCrop());
                 }
 
                 return null;
