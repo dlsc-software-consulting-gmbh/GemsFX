@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,7 +18,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -31,7 +35,11 @@ public class PhotoViewApp extends JProApplication {
     @Override
     public void start(Stage stage) {
         PhotoView photoView = new PhotoView();
-        VBox.setVgrow(photoView, Priority.ALWAYS);
+
+        StackPane photoViewWrapper = new StackPane(photoView);
+        photoViewWrapper.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-border-color: gray;");
+
+        VBox.setVgrow(photoViewWrapper, Priority.ALWAYS);
 
         ComboBox<ClipShape> comboBox = new ComboBox<>();
         comboBox.getItems().setAll(ClipShape.values());
@@ -43,11 +51,16 @@ public class PhotoViewApp extends JProApplication {
         HBox hBox = new HBox(20, comboBox, editableBox);
         hBox.setAlignment(Pos.CENTER);
 
+        CheckBox createCroppedImage = new CheckBox("Create cropped image");
+        createCroppedImage.disableProperty().bind(photoView.photoProperty().isNull());
+        createCroppedImage.selectedProperty().bindBidirectional(photoView.createCroppedImageProperty());
+
         Button useCroppedImage = new Button("Use Cropped Image");
+        useCroppedImage.disableProperty().bind(createCroppedImage.selectedProperty().not().or(photoView.photoProperty().isNull()));
         useCroppedImage.setOnAction(evt -> photoView.setPhoto(photoView.getCroppedImage()));
         useCroppedImage.setMaxWidth(Double.MAX_VALUE);
 
-        VBox leftSide = new VBox(40, photoView, hBox, useCroppedImage);
+        VBox leftSide = new VBox(40, photoViewWrapper, hBox, createCroppedImage, useCroppedImage);
         leftSide.setAlignment(Pos.TOP_CENTER);
 
         ImageView originalImageView = new ImageView();
@@ -85,15 +98,24 @@ public class PhotoViewApp extends JProApplication {
         stage.sizeToScene();
         stage.centerOnScreen();
 
-        System.out.println("CHECK");
-
         if (getWebAPI().isBrowser()) {
 
-            System.out.println("BROWSER");
 
-            photoView.setPhotoSupplier(() -> {
-                return null;
-            });
+            /*
+             * Replace the placeholder as the default placeholder also says that the
+             * user can "click" to add a new photo. In JPRO we can't support the click
+             * as otherwise the dragging of the photo won't work and instead the file
+             * chooser will keep showing up.
+             */
+            FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_UPLOAD);
+            fontIcon.getStyleClass().add("upload-icon");
+
+            Label placeholder = new Label("DROP IMAGE\nFILE HERE");
+            placeholder.setTextAlignment(TextAlignment.CENTER);
+            placeholder.setGraphic(fontIcon);
+            placeholder.setContentDisplay(ContentDisplay.TOP);
+            placeholder.getStyleClass().add("placeholder");
+            photoView.setPlaceholder(placeholder);
 
             progressLabel = new Label();
 
@@ -101,7 +123,7 @@ public class PhotoViewApp extends JProApplication {
 
             fileHandler = getWebAPI().makeFileUploadNode(photoView);
 
-            fileHandler.setSelectFileOnClick(true);
+            fileHandler.setSelectFileOnClick(false);
             fileHandler.setSelectFileOnDrop(true);
             fileHandler.fileDragOverProperty().addListener((o, oldV, newV) -> {
                 if (newV) {

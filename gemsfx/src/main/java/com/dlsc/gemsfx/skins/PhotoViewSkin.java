@@ -4,6 +4,8 @@ import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -30,6 +32,7 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         super(view);
 
         Slider slider = new Slider();
+        slider.disableProperty().bind(view.photoProperty().isNull());
         slider.setMin(1);
         slider.maxProperty().bind(view.maxZoomProperty());
         slider.setValue(1);
@@ -65,6 +68,8 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
 
     public class ImageBox extends StackPane {
 
+        private final CropService cropService;
+
         private final ImageView imageView;
         private final Circle circle;
         private final Rectangle rectangle;
@@ -73,6 +78,8 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         private double startX;
 
         public ImageBox(PhotoView view) {
+            cropService = new CropService();
+
             imageView = new ImageView();
             imageView.setPreserveRatio(true);
             imageView.imageProperty().bind(view.photoProperty());
@@ -138,12 +145,22 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             updateClip();
             updatePlaceholder(null, view.getPlaceholder());
 
-            InvalidationListener cropListener = it -> crop();
+            InvalidationListener cropListener = it -> {
+                if (view.isCreateCroppedImage()) {
+                    crop();
+                }
+            };
 
             view.photoProperty().addListener(cropListener);
             view.photoZoomProperty().addListener(cropListener);
             view.photoTranslateXProperty().addListener(cropListener);
             view.photoTranslateYProperty().addListener(cropListener);
+
+            view.createCroppedImageProperty().addListener(it -> {
+                if (view.isCreateCroppedImage()) {
+                    crop();
+                }
+            });
         }
 
         private void updateBorderShape() {
@@ -182,12 +199,43 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             }
         }
 
+        /*
+         * We use a service for cropping so that we do not crop
+         * every single time the user moves the original image but
+         * instead wait until the user is done moving.
+         */
+        class CropService extends Service<Void> {
+
+            @Override
+            protected Task<Void> createTask() {
+                return new CropTask();
+            }
+        }
+
+        class CropTask extends Task<Void> {
+
+            @Override
+            protected Void call() throws Exception {
+                Thread.sleep(200);
+                if (!isCancelled()) {
+                    doCrop();
+                }
+
+                return null;
+            }
+        }
+
         public void crop() {
+            if (getSkinnable().isCreateCroppedImage()) {
+                cropService.restart();
+            }
+        }
+
+        private void doCrop() {
             Image image = getSkinnable().getPhoto();
 
             if (image == null) {
                 getSkinnable().getProperties().put("cropped.image", null);
-                return;
             }
 
             double scale = image.getWidth() / (imageView.getFitWidth() * getSkinnable().getPhotoZoom());

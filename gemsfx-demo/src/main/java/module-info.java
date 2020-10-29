@@ -5,5 +5,7 @@ module com.dlsc.gemsfx.demo {
     requires java.xml.bind;
     requires fr.brouillard.oss.cssfx;
     requires com.dlsc.gemsfx;
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.materialdesign;
     exports com.dlsc.gemsfx.demo;
 }

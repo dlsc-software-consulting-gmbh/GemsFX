@@ -92,7 +92,7 @@ public class PhotoView extends Control {
         FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_UPLOAD);
         fontIcon.getStyleClass().add("upload-icon");
 
-        Label placeholder = new Label("DROP PHOTO\nOR CLICK TO ADD");
+        Label placeholder = new Label("DROP IMAGE FILE\nOR CLICK TO ADD");
         placeholder.setTextAlignment(TextAlignment.CENTER);
         placeholder.setGraphic(fontIcon);
         placeholder.setContentDisplay(ContentDisplay.TOP);
@@ -177,6 +177,12 @@ public class PhotoView extends Control {
         };
 
         getProperties().addListener(propertiesListener);
+
+        createCroppedImageProperty().addListener(it -> {
+            if (!isCreateCroppedImage()) {
+                croppedImage.set(null);
+            }
+        });
     }
 
     @Override
@@ -190,6 +196,28 @@ public class PhotoView extends Control {
     }
 
     // cropped image support
+
+    public final BooleanProperty createCroppedImage = new SimpleBooleanProperty(this, "createCroppedImage", true);
+
+    public final boolean isCreateCroppedImage() {
+        return createCroppedImage.get();
+    }
+
+    /**
+     * Specifies whether the view should constantly create a cropped image version of the
+     * original image whenever the user edits the original. Creating a cropped image can have
+     * a performance impact on slower hardware (e.g. embedded).
+     *
+     * @see #croppedImageProperty()
+     * @return true if the view should create the cropped image
+     */
+    public final BooleanProperty createCroppedImageProperty() {
+        return createCroppedImage;
+    }
+
+    public final void setCreateCroppedImage(boolean createCroppedImage) {
+        this.createCroppedImage.set(createCroppedImage);
+    }
 
     public ReadOnlyObjectWrapper<Image> croppedImage = new ReadOnlyObjectWrapper<>(this, "croppedImage");
 
