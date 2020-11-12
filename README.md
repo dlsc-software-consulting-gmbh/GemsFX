@@ -12,6 +12,19 @@
 
 *At least **JDK 11** is required.*
 
+## Time Picker
+
+A small control used for entering a time. The control can be configured with a "step rate" for the minutes field (e.g. "15 minutes") that will be used when
+incrementing or decrementing the minutes field via the keyboard (arrow keys). The control can also be configured to only allow a time within the time range
+defined by an earliest and a latest time. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
+or not when they reach their minimum or maximum value. For example: the minute field shows 59 minutes and the user wants to increase it via the arrow key. Then
+the new value will be "0" when rollover is enabled. If not the value will remain at 59. Rollover combined with "linking fields" will cause the hours field to 
+get increased when the minute field rolls over from 59 to 0 or decreased when the minute field rolls over from 0 to 59.
+
+![TimePicker](gemsfx/docs/time-picker.png)
+
+![TimePicker Popup](gemsfx/docs/time-picker-popup.png)
+
 ## Photo View
 
 A control for adding and editing a user profile photo (or whatever). The user can click on the control to choose an image file

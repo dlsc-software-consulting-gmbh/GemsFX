@@ -1,0 +1,127 @@
+.time-picker {
+    -fx-padding: 0px;
+    -fx-pref-height: 2.1em;
+}
+
+.time-picker > .box {
+    -fx-alignment: center;
+    -fx-spacing: 0px;
+}
+
+.time-picker > .box > .spacer {
+    -fx-pref-width: 0px;
+}
+
+.time-picker > .box > .edit-button {
+    -fx-pref-width: 27px;
+    -fx-padding: 5px 5px;
+    -fx-cursor: arrow;
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 1 1 1 0, 1, 2;
+    -fx-background-radius: 0 3 3 0, 0 2 2 0, 0 1 1 0;
+}
+
+.time-picker:focused > .box > .edit-button {
+    -fx-background-color: -fx-focus-color, -fx-inner-border, -fx-body-color, -fx-faint-focus-color, -fx-body-color;
+    -fx-background-insets: 0, 1, 2, 1, 2.6;
+    -fx-background-radius: 0 2 2 0, 0 1 1 0, 0 1 1 0, 0 1 1 0;
+    -fx-border-color: -fx-faint-focus-color;
+    -fx-border-width: 0 0 0 1;
+    -fx-border-insets: 0 0 0 -1;
+}
+
+.time-picker > .box > .edit-button > .ikonli-font-icon {
+    -fx-icon-code: mdi-clock;
+    -fx-icon-size: 14px;
+    -fx-icon-color: -fx-mark-color;
+}
+
+.time-picker > .box > .fields-box {
+    -fx-padding: 0px 5px;
+}
+
+.time-picker > .box > .fields-box > .separator {
+    -fx-padding: 0px 1px;
+}
+
+.time-picker > .box > .fields-box > .time-field {
+    -fx-pref-width: 1.6em;
+}
+
+.time-picker > .box > .fields-box > .time-field:focused {
+    -fx-background-radius: 2px;
+    -fx-background-color: -fx-selection-bar;
+    -fx-text-fill: white;
+}
+
+.time-picker > .box > .fields-box > .time-field.hour {
+    -fx-padding: 0px 2px;
+    -fx-alignment: center-right;
+}
+
+.time-picker > .box > .fields-box > .time-field.minute {
+    -fx-padding: 0px 2px;
+    -ffx-alignment: center-left;
+}
+
+/* --------------------------------------------------------------
+ * TimePickerPopup
+ */
+.time-picker .time-picker-popup .box {
+    -fx-spacing: 5px;
+    -fx-pref-height: 210px;
+    -fx-background-color: -fx-box-border, white;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
+}
+
+
+.time-picker .time-picker-popup .box .time-list-view {
+}
+
+.time-picker .time-picker-popup .box .time-list-view .list-cell {
+    -fx-alignment: center;
+    -fx-background-color: white;
+}
+
+.time-picker .time-picker-popup .box .time-list-view .list-cell .time-label {
+    -fx-padding: .5em 0em;
+    -fx-alignment: center;
+    -fx-font-weight: bold;
+    -fx-background-color: gray;
+    -fx-background-radius: 2px;
+    -fx-pref-width: 3em;
+    -fx-text-fill: white;
+}
+
+.time-picker .time-picker-popup .box .time-list-view .list-cell:hover .time-label {
+    -fx-background-color: lightgray;
+    -fx-background-insets: 0;
+    -fx-text-fill: black;
+}
+
+.time-picker .time-picker-popup .box .time-list-view .list-cell:selected .time-label {
+    -fx-background-insets: 0;
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+}
+
+.time-picker .time-picker-popup .box .time-list-view .vertical-scroll-bar {
+    -fx-pref-width: 0;
+}
+
+.time-picker .time-picker-popup .box .time-list-view {
+    -fx-background-insets: 0px;
+    -fx-pref-width: 70px;
+}
+
+.time-picker .time-picker-popup .box .time-list-view > .virtual-flow > .scroll-bar,
+.time-picker .time-picker-popup .box .time-list-view > .virtual-flow > .scroll-bar .decrement-arrow,
+.time-picker .time-picker-popup .box .time-list-view > .virtual-flow > .scroll-bar .increment-arrow,
+.time-picker .time-picker-popup .box .time-list-view > .virtual-flow > .scroll-bar .decrement-button,
+.time-picker .time-picker-popup .box .time-list-view > .virtual-flow > .scroll-bar .increment-button {
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}
+
