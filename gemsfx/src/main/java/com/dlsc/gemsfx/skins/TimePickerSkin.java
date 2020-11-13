@@ -1,6 +1,11 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TimePicker;
+
+import org.kordamp.ikonli.javafx.FontIcon;
+
+import java.time.LocalTime;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
@@ -14,9 +19,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.time.LocalTime;
 
 public class TimePickerSkin extends SkinBase<TimePicker> {
 
@@ -157,7 +159,12 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
             valueProperty().addListener(it -> {
                 Integer value = Math.min(getValue(), getMaximumValue());
                 if (value != null) {
-                    getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(value, getSkinnable().getTime().getMinute()));
+                    LocalTime time = getSkinnable().getTime();
+                    if (time != null) {
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(value, time.getMinute()));
+                    } else {
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(value, 0));
+                    }
                 }
             });
         }
@@ -182,7 +189,12 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
             valueProperty().addListener(it -> {
                 Integer value = Math.min(getValue(), getMaximumValue());
                 if (value != null) {
-                    getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(getSkinnable().getTime().getHour(), value));
+                    LocalTime time = getSkinnable().getTime();
+                    if (time != null) {
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(time.getHour(), value));
+                    } else {
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(0, value));
+                    }
                 }
             });
         }

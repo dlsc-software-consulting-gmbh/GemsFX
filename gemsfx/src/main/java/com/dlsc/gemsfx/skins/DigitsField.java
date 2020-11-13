@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TimePicker;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -34,7 +35,16 @@ public abstract class DigitsField extends TimeField {
          * Make sure the text is filled with a leading zero when the value is smaller than
          * 10 and the "fillDigits" was true.
          */
-        textProperty().bind(Bindings.createStringBinding(() -> getValue() < 10 && fillDigits ? "0" + getValue() : Integer.toString(getValue()), valueProperty()));
+        textProperty().bind(Bindings.createStringBinding(() -> {
+            Integer value = getValue();
+            if (value == null) {
+                return "";
+            } else if (value < 10 && fillDigits) {
+                return "0" + value;
+            }
+
+            return Integer.toString(value);
+        }, valueProperty()));
 
         focusedProperty().addListener(it -> {
             if (!isFocused()) {
@@ -121,37 +131,47 @@ public abstract class DigitsField extends TimeField {
 
     @Override
     void decrement() {
-        int newValue = getValue() - getStepRate();
-        if (newValue < getMinimumValue()) {
-            TimePicker timePicker = getTimePicker();
-            if (timePicker.isRollover()) {
-                setValue(getMaximumValue() - getMaximumValue() % getStepRate());
-                if (timePicker.getLinkingFields() && previousField != null) {
-                    previousField.decrement();
+        Integer value = getValue();
+        if (value != null) {
+            int newValue = value - getStepRate();
+            if (newValue < getMinimumValue()) {
+                TimePicker timePicker = getTimePicker();
+                if (timePicker.isRollover()) {
+                    setValue(getMaximumValue() - getMaximumValue() % getStepRate());
+                    if (timePicker.getLinkingFields() && previousField != null) {
+                        previousField.decrement();
+                    }
+                } else {
+                    setValue(getMinimumValue());
                 }
             } else {
-                setValue(getMinimumValue());
+                setValue(newValue);
             }
         } else {
-            setValue(newValue);
+            setValue(0);
         }
     }
 
     @Override
     void increment() {
-        int newValue = getValue() + getStepRate();
-        if (newValue > getMaximumValue()) {
-            TimePicker timePicker = getTimePicker();
-            if (timePicker.isRollover()) {
-                setValue(getMinimumValue());
-                if (timePicker.getLinkingFields() && previousField != null) {
-                    previousField.increment();
+        Integer value = getValue();
+        if (value != null) {
+            int newValue = value + getStepRate();
+            if (newValue > getMaximumValue()) {
+                TimePicker timePicker = getTimePicker();
+                if (timePicker.isRollover()) {
+                    setValue(getMinimumValue());
+                    if (timePicker.getLinkingFields() && previousField != null) {
+                        previousField.increment();
+                    }
+                } else {
+                    setValue(getMaximumValue());
                 }
             } else {
-                setValue(getMaximumValue());
+                setValue(newValue);
             }
         } else {
-            setValue(newValue);
+            setValue(0);
         }
     }
 
@@ -194,15 +214,17 @@ public abstract class DigitsField extends TimeField {
     }
 
     private void constrainValue() {
-        double value = getValue();
-        if (value < getMinimumValue().doubleValue()) {
-            setValue(getMinimumValue());
-            return;
-        }
+        Integer value = getValue();
+        if (value != null) {
+            if (value < getMinimumValue()) {
+                setValue(getMinimumValue());
+                return;
+            }
 
-        if (value > getMaximumValue().doubleValue()) {
-            setValue(getMaximumValue());
-            return;
+            if (value > getMaximumValue()) {
+                setValue(getMaximumValue());
+                return;
+            }
         }
     }
 
@@ -215,7 +237,7 @@ public abstract class DigitsField extends TimeField {
         return value;
     }
 
-    private final ObjectProperty<Integer> value = new SimpleObjectProperty<>(this, "value", 0);
+    private final ObjectProperty<Integer> value = new SimpleObjectProperty<>(this, "value");
 
     public final Integer getValue() {
         return valueProperty().get();

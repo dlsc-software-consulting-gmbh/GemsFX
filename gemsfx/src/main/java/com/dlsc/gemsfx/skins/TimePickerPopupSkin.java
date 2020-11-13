@@ -1,14 +1,18 @@
 package com.dlsc.gemsfx.skins;
 
+import java.time.LocalTime;
+
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Skin;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-
-import java.time.LocalTime;
 
 public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
 
@@ -25,7 +29,12 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
         hourListView.getSelectionModel().selectedItemProperty().addListener(it -> {
             Integer newHour = hourListView.getSelectionModel().getSelectedItem();
             if (newHour != null) {
-                popup.setTime(LocalTime.of(newHour, popup.getTime().getMinute()));
+                LocalTime time = popup.getTime();
+                if (time != null) {
+                    popup.setTime(LocalTime.of(newHour, time.getMinute()));
+                } else {
+                    popup.setTime(LocalTime.of(newHour, 0));
+                }
             }
         });
 
@@ -34,7 +43,12 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
         minuteListView.getSelectionModel().selectedItemProperty().addListener(it -> {
             Integer newMinute = minuteListView.getSelectionModel().getSelectedItem();
             if (newMinute != null) {
-                popup.setTime(LocalTime.of(popup.getTime().getHour(), newMinute));
+                LocalTime time = popup.getTime();
+                if (time != null) {
+                    popup.setTime(LocalTime.of(time.getHour(), newMinute));
+                } else {
+                    popup.setTime(LocalTime.of(0, newMinute));
+                }
             }
         });
 

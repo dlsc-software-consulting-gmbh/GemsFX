@@ -1,24 +1,35 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TimePicker;
+
+import java.time.LocalTime;
+
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-
-import java.time.LocalTime;
 
 public class TimePickerApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-       TimePicker timePicker = new TimePicker();
+        TimePicker timePicker = new TimePicker();
 
         CheckBox rollOverBox = new CheckBox("Rollover");
         rollOverBox.selectedProperty().bindBidirectional(timePicker.rolloverProperty());

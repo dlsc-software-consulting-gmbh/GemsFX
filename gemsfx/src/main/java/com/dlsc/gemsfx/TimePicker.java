@@ -1,7 +1,17 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.TimePickerSkin;
-import javafx.beans.property.*;
+
+import java.time.LocalTime;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.MapChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
@@ -9,8 +19,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Region;
-
-import java.time.LocalTime;
 
 /**
  * A control for letting the user enter a time of day (see {@link LocalTime}). The control
@@ -262,7 +270,7 @@ public class TimePicker extends Control {
     public final void adjust() {
         adjustmentInProgress = true;
         try {
-            boolean adjusted = adjustViaTimeBounds() || adjustVisStepRate();
+            boolean adjusted = adjustViaTimeBounds() || adjustViaStepRate();
             if (adjusted) {
                 /*
                  * Only update property if it changes to "true". The control will
@@ -277,76 +285,84 @@ public class TimePicker extends Control {
 
     private boolean adjustViaTimeBounds() {
         LocalTime time = getTime();
-        LocalTime earliestTime = getEarliestTime();
-        LocalTime latestTime = getLatestTime();
+        if (time != null) {
+            LocalTime earliestTime = getEarliestTime();
+            LocalTime latestTime = getLatestTime();
 
-        int hour = time.getHour();
-        int minute = time.getMinute();
+            int hour = time.getHour();
+            int minute = time.getMinute();
 
-        LocalTime newTime = LocalTime.of(hour, minute);
+            LocalTime newTime = LocalTime.of(hour, minute);
 
-        if (time.isBefore(earliestTime)) {
+            if (time.isBefore(earliestTime)) {
 
-            // adjustment of hours needed?
-            if (hour < earliestTime.getHour()) {
-                newTime = newTime.withHour(earliestTime.getHour());
+                // adjustment of hours needed?
+                if (hour < earliestTime.getHour()) {
+                    newTime = newTime.withHour(earliestTime.getHour());
+                }
+
+                // still too early? adjust minutes
+                if (newTime.isBefore(earliestTime)) {
+                    newTime = newTime.withMinute(earliestTime.getMinute());
+                }
+
+            } else if (time.isAfter(latestTime)) {
+
+                // adjustment of hours needed?
+                if (hour > latestTime.getHour()) {
+                    newTime = newTime.withHour(latestTime.getHour());
+                }
+
+                // still too early? adjust minutes
+                if (newTime.isAfter(latestTime)) {
+                    newTime = newTime.withMinute(latestTime.getMinute());
+                }
+
             }
 
-            // still too early? adjust minutes
-            if (newTime.isBefore(earliestTime)) {
-                newTime = newTime.withMinute(earliestTime.getMinute());
+            boolean adjusted = newTime.getHour() != time.getHour() || newTime.getMinute() != time.getMinute();
+
+            if (adjusted) {
+                setTime(newTime);
             }
 
-        } else if (time.isAfter(latestTime)) {
-
-            // adjustment of hours needed?
-            if (hour > latestTime.getHour()) {
-                newTime = newTime.withHour(latestTime.getHour());
-            }
-
-            // still too early? adjust minutes
-            if (newTime.isAfter(latestTime)) {
-                newTime = newTime.withMinute(latestTime.getMinute());
-            }
-
+            return adjusted;
         }
 
-        boolean adjusted = newTime.getHour() != time.getHour() || newTime.getMinute() != time.getMinute();
-
-        if (adjusted) {
-            setTime(newTime);
-        }
-
-        return adjusted;
+        return false;
     }
 
-    private boolean adjustVisStepRate() {
+    private boolean adjustViaStepRate() {
         LocalTime time = getTime();
-        int hour = time.getHour();
+        if (time != null) {
+            int hour = time.getHour();
 
-        int unadjustedMinutes = time.getMinute();
-        int lowerAdjustment = unadjustedMinutes - time.getMinute() % getStepRateInMinutes();
-        int higherAdjustment = lowerAdjustment + getStepRateInMinutes();
+            int unadjustedMinutes = time.getMinute();
+            int lowerAdjustment = unadjustedMinutes - time.getMinute() % getStepRateInMinutes();
+            int higherAdjustment = lowerAdjustment + getStepRateInMinutes();
 
-        LocalTime adjustedTime = LocalTime.of(hour, lowerAdjustment);
-        if (Math.abs(lowerAdjustment - unadjustedMinutes) > Math.abs(higherAdjustment - unadjustedMinutes)) {
-            if (higherAdjustment > 59) {
-                higherAdjustment = lowerAdjustment;
+            LocalTime adjustedTime = LocalTime.of(hour, lowerAdjustment);
+            if (Math.abs(lowerAdjustment - unadjustedMinutes) > Math.abs(higherAdjustment - unadjustedMinutes)) {
+                if (higherAdjustment > 59) {
+                    higherAdjustment = lowerAdjustment;
+                }
+
+                adjustedTime = LocalTime.of(hour, higherAdjustment);
             }
 
-            adjustedTime = LocalTime.of(hour, higherAdjustment);
+            /*
+             * We have to check "manually" for equality of the original time and the adjusted time as equality for us
+             * means "equal hour and equal minutes", which is different than what the equals() method of LocalTime is
+             * checking (also checks seconds and nanos). Without this check we enter into an infinite recursion.
+             */
+            if (adjustedTime.getHour() != time.getHour() || adjustedTime.getMinute() != time.getMinute()) {
+                setTime(adjustedTime);
+            }
+
+            return !(time.getHour() == adjustedTime.getHour() && time.getMinute() == adjustedTime.getMinute());
         }
 
-        /*
-         * We have to check "manually" for equality of the original time and the adjusted time as equality for us
-         * means "equal hour and equal minutes", which is different than what the equals() method of LocalTime is
-         * checking (also checks seconds and nanos). Without this check we enter into an infinite recursion.
-         */
-        if (adjustedTime.getHour() != time.getHour() || adjustedTime.getMinute() != time.getMinute()) {
-            setTime(adjustedTime);
-        }
-
-        return !(time.getHour() == adjustedTime.getHour() && time.getMinute() == adjustedTime.getMinute());
+        return false;
     }
 
     private final ObjectProperty<LocalTime> time = new SimpleObjectProperty<>(this, "time");
