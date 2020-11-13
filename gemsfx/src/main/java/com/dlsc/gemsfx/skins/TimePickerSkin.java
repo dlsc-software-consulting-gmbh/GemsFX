@@ -42,7 +42,7 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
         FontIcon clockIcon = new FontIcon();
 
         editButton.getStyleClass().add("edit-button");
-        editButton.setOnAction(evt -> picker.getProperties().put("TIME_PICKER_POPUP", "TIME_PICKER_POPUP"));
+        editButton.setOnAction(evt -> picker.getOnShowPopup().accept(picker));
         editButton.setMaxHeight(Double.MAX_VALUE);
         editButton.setGraphic(clockIcon);
         editButton.setFocusTraversable(false);

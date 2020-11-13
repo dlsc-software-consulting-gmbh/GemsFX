@@ -3,6 +3,7 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.skins.TimePickerSkin;
 
 import java.time.LocalTime;
+import java.util.function.Consumer;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -95,7 +96,7 @@ public class TimePicker extends Control {
 
         setOnKeyPressed(evt -> {
             if (evt.getCode().equals(KeyCode.F4) || evt.getCode().equals(KeyCode.ENTER)) {
-                show();
+                getOnShowPopup().accept(this);
             }
         });
 
@@ -128,6 +129,8 @@ public class TimePicker extends Control {
                 adjusted.set(false);
             }
         });
+
+        setOnShowPopup(picker -> show());
     }
 
     private final ReadOnlyBooleanWrapper showing = new ReadOnlyBooleanWrapper(this, "showing", false);
@@ -466,5 +469,25 @@ public class TimePicker extends Control {
 
     public final void setRollover(boolean rollover) {
         this.rollover.set(rollover);
+    }
+
+    private final ObjectProperty<Consumer<TimePicker>> onShowPopup = new SimpleObjectProperty<>(this, "onShowPopup");
+
+    public final Consumer<TimePicker> getOnShowPopup() {
+        return onShowPopup.get();
+    }
+
+    /**
+     * This consumer will be invoked to bring up a control for entering the
+     * time without using the keyboard. The default implementation shows a popup.
+     *
+     * @return the "on show popup" consumer
+     */
+    public final ObjectProperty<Consumer<TimePicker>> onShowPopupProperty() {
+        return onShowPopup;
+    }
+
+    public final void setOnShowPopup(Consumer<TimePicker> onShowPopup) {
+        this.onShowPopup.set(onShowPopup);
     }
 }
