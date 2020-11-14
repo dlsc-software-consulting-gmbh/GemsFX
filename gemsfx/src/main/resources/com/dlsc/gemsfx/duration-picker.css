@@ -31,7 +31,7 @@
 }
 
 .duration-picker > .box > .edit-button > .ikonli-font-icon {
-    -fx-icon-code: mdi-clock;
+    -fx-icon-code: mdi-timer;
     -fx-icon-size: 14px;
     -fx-icon-color: -fx-mark-color;
 }
