@@ -144,7 +144,7 @@ public class TimePicker extends Control {
      *
      * @return true if the popup should be showing
      */
-    public ReadOnlyBooleanProperty showingProperty() {
+    public final ReadOnlyBooleanProperty showingProperty() {
         return showing.getReadOnlyProperty();
     }
 
@@ -432,7 +432,7 @@ public class TimePicker extends Control {
 
     private final BooleanProperty linkingFields = new SimpleBooleanProperty(this, "linkingFields", true);
 
-    public final boolean getLinkingFields() {
+    public final boolean isLinkingFields() {
         return linkingFields.get();
     }
 

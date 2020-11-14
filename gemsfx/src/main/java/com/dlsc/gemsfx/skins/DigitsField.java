@@ -138,7 +138,7 @@ public abstract class DigitsField extends TimeField {
                 TimePicker timePicker = getTimePicker();
                 if (timePicker.isRollover()) {
                     setValue(getMaximumValue() - getMaximumValue() % getStepRate());
-                    if (timePicker.getLinkingFields() && previousField != null) {
+                    if (timePicker.isLinkingFields() && previousField != null) {
                         previousField.decrement();
                     }
                 } else {
@@ -161,7 +161,7 @@ public abstract class DigitsField extends TimeField {
                 TimePicker timePicker = getTimePicker();
                 if (timePicker.isRollover()) {
                     setValue(getMinimumValue());
-                    if (timePicker.getLinkingFields() && previousField != null) {
+                    if (timePicker.isLinkingFields() && previousField != null) {
                         previousField.increment();
                     }
                 } else {

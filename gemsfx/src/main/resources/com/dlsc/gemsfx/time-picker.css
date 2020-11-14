@@ -61,7 +61,7 @@
 
 .time-picker > .box > .fields-box > .time-field.minute {
     -fx-padding: 0px 2px;
-    -ffx-alignment: center-left;
+    -fx-alignment: center-left;
 }
 
 /* --------------------------------------------------------------

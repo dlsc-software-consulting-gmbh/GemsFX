@@ -1,0 +1,135 @@
+.duration-picker {
+    -fx-padding: 0px;
+    -fx-pref-height: 2.1em;
+}
+
+.duration-picker > .box {
+    -fx-alignment: center;
+    -fx-spacing: 0px;
+}
+
+.duration-picker > .box > .spacer {
+    -fx-pref-width: 0px;
+}
+
+.duration-picker > .box > .edit-button {
+    -fx-pref-width: 27px;
+    -fx-padding: 5px 5px;
+    -fx-cursor: arrow;
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 1 1 1 0, 1, 2;
+    -fx-background-radius: 0 3 3 0, 0 2 2 0, 0 1 1 0;
+}
+
+.duration-picker:focused > .box > .edit-button {
+    -fx-background-color: -fx-focus-color, -fx-inner-border, -fx-body-color, -fx-faint-focus-color, -fx-body-color;
+    -fx-background-insets: 0, 1, 2, 1, 2.6;
+    -fx-background-radius: 0 2 2 0, 0 1 1 0, 0 1 1 0, 0 1 1 0;
+    -fx-border-color: -fx-faint-focus-color;
+    -fx-border-width: 0 0 0 1;
+    -fx-border-insets: 0 0 0 -1;
+}
+
+.duration-picker > .box > .edit-button > .ikonli-font-icon {
+    -fx-icon-code: mdi-clock;
+    -fx-icon-size: 14px;
+    -fx-icon-color: -fx-mark-color;
+}
+
+.duration-picker > .box > .fields-box {
+    -fx-padding: 0px 5px;
+}
+
+.duration-picker > .box > .fields-box > .separator {
+    -fx-padding: 0px 1px;
+}
+
+.duration-picker > .box > .fields-box > .unit-field {
+    -fx-min-width: 1.6em;
+    -fx-padding: 0px 2px;
+    -fx-alignment: center;
+}
+
+.duration-picker > .box > .fields-box > .unit-field:focused {
+    -fx-background-radius: 2px;
+    -fx-background-color: -fx-selection-bar;
+    -fx-text-fill: white;
+}
+
+.duration-picker > .box > .fields-box > .unit-field.days {
+}
+
+.duration-picker > .box > .fields-box > .unit-field.hours {
+}
+
+.duration-picker > .box > .fields-box > .unit-field.minutes {
+}
+
+.duration-picker > .box > .fields-box > .unit-field.seconds {
+}
+
+.duration-picker > .box > .fields-box > .unit-field.millis {
+    -fx-min-width: 2.4em;
+}
+
+/* --------------------------------------------------------------
+ * DurationPickerPopup
+ */
+.duration-picker .duration-picker-popup .box {
+    -fx-spacing: 5px;
+    -fx-pref-height: 210px;
+    -fx-background-color: -fx-box-border, white;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
+}
+
+
+.duration-picker .duration-picker-popup .box .unit-list-view {
+}
+
+.duration-picker .duration-picker-popup .box .unit-list-view .list-cell {
+    -fx-alignment: center;
+    -fx-background-color: white;
+}
+
+.duration-picker .duration-picker-popup .box .unit-list-view .list-cell .unit-label {
+    -fx-padding: .5em 0em;
+    -fx-alignment: center;
+    -fx-font-weight: bold;
+    -fx-background-color: gray;
+    -fx-background-radius: 2px;
+    -fx-pref-width: 3em;
+    -fx-text-fill: white;
+}
+
+.duration-picker .duration-picker-popup .box .unit-list-view .list-cell:hover .unit-label {
+    -fx-background-color: lightgray;
+    -fx-background-insets: 0;
+    -fx-text-fill: black;
+}
+
+.duration-picker .duration-picker-popup .box .unit-list-view .list-cell:selected .unit-label {
+    -fx-background-insets: 0;
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+}
+
+.duration-picker .duration-picker-popup .box .unit-list-view .vertical-scroll-bar {
+    -fx-pref-width: 0;
+}
+
+.duration-picker .duration-picker-popup .box .unit-list-view {
+    -fx-background-insets: 0px;
+    -fx-pref-width: 70px;
+}
+
+.duration-picker .duration-picker-popup .box .unit-list-view > .virtual-flow > .scroll-bar,
+.duration-picker .duration-picker-popup .box .unit-list-view > .virtual-flow > .scroll-bar .decrement-arrow,
+.duration-picker .duration-picker-popup .box .unit-list-view > .virtual-flow > .scroll-bar .increment-arrow,
+.duration-picker .duration-picker-popup .box .unit-list-view > .virtual-flow > .scroll-bar .decrement-button,
+.duration-picker .duration-picker-popup .box .unit-list-view > .virtual-flow > .scroll-bar .increment-button {
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}
+
