@@ -45,7 +45,6 @@
 }
 
 .duration-picker > .box > .fields-box > .unit-field {
-    -fx-min-width: -infinity;
     -fx-padding: 0px 2px;
     -fx-alignment: center;
 }
@@ -80,7 +79,7 @@
 .duration-picker .duration-picker-popup .box .header-label {
     -fx-max-width: infinity;
     -fx-alignment: center;
-    -fx-font-style: bold;
+    -fx-font-size: .8em;
 }
 
 .duration-picker .duration-picker-popup .box .unit-list-view {

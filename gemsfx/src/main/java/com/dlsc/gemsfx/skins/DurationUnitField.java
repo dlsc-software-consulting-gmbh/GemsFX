@@ -17,6 +17,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
 
 /**
  * A control used for visualizing digits as part of the {@link TimePicker} control.
@@ -37,6 +38,8 @@ public class DurationUnitField extends Label {
 
         this.picker = Objects.requireNonNull(picker);
         this.chronoUnit = chronoUnit;
+
+        setMinWidth(Region.USE_PREF_SIZE);
 
         updateStyles();
         labelTypeProperty().addListener(it -> updateStyles());

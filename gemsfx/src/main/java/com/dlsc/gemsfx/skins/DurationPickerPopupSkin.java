@@ -100,7 +100,10 @@ public class DurationPickerPopupSkin implements Skin<DurationPickerPopup> {
 
                     for (ChronoUnit unit : getSkinnable().getFields()) {
                         ListView<Integer> listView = listViewMap.get(unit);
-                        duration = duration.plus(listView.getSelectionModel().getSelectedItem(), unit);
+                        Integer selectedItem = listView.getSelectionModel().getSelectedItem();
+                        if (selectedItem != null) {
+                            duration = duration.plus(selectedItem, unit);
+                        }
                     }
 
                     getSkinnable().setDuration(duration);

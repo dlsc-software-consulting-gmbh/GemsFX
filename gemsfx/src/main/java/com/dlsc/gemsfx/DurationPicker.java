@@ -327,11 +327,25 @@ public class DurationPicker extends Control {
     }
 
     /**
-     * The possible types of labels used by the duration picker.
+     * The possible types of labels used by the duration picker, see
+     * {@link #setLabelType(LabelType)}.
      */
     public enum LabelType {
+
+        /**
+         * Do not display any label for the values.
+         */
         NONE,
+
+        /**
+         * Display short labels for each field, e.g. "d" for "days",
+         * "h" for "hours", etc...
+         */
         SHORT,
+
+        /**
+         * Display the full name of a field, e.g. "days", "hours", ...
+         */
         LONG
     }
 
