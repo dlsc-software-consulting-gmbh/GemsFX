@@ -2,6 +2,22 @@
   "samples": [
     {
       "category": "gemsfx",
+      "name": "TimePickerApp",
+      "desc": "A control for entering a time (Java time API)",
+      "project": "gemsfx",
+      "preview": "/preview-time-picker.png",
+      "classname": "com.dlsc.gemsfx.demo.TimePickerApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "DurationPickerApp",
+      "desc": "A control for entering a duration (Java time API)",
+      "project": "gemsfx",
+      "preview": "/preview-duration-picker.png",
+      "classname": "com.dlsc.gemsfx.demo.DurationPickerApp"
+    },
+    {
+      "category": "gemsfx",
       "name": "PhotoViewApp",
       "desc": "A nice little control for creating user photos / avatars.",
       "project": "gemsfx",
