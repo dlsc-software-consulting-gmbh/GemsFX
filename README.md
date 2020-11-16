@@ -13,7 +13,14 @@ get increased when the minute field rolls over from 59 to 0 or decreased when th
 
 ![TimePicker](gemsfx/docs/time-picker.png)
 
-![TimePicker Popup](gemsfx/docs/time-picker-popup.png)
+## Duration Picker
+
+A small control used for entering a duration. The control can be configured to only allow a duration within the range
+defined by a minimum and maximum duration. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
+or not when they reach their minimum or maximum value. The control supports similar features as the time picker: rollover fields, keyboard support, linking fields, 
+filling fields with leading zeros, etc..
+
+![TimePicker](gemsfx/docs/duration-picker.png)
 
 ## Photo View
 
@@ -120,3 +127,4 @@ terminal:
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PaymentOptionTilesApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PhotoViewApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.TimePickerApp
+    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.DurationPickerApp
