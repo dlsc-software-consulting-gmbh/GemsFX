@@ -326,42 +326,33 @@ public class DurationPicker extends Control {
         this.maximumDuration.set(maximumDuration);
     }
 
-    // show units
-
-    private final BooleanProperty showUnits = new SimpleBooleanProperty(this, "showUnits", true);
-
-    public final boolean isShowUnits() {
-        return showUnits.get();
+    /**
+     * The possible types of labels used by the duration picker.
+     */
+    public enum LabelType {
+        NONE,
+        SHORT,
+        LONG
     }
 
-    public final BooleanProperty showUnitsProperty() {
-        return showUnits;
-    }
+    private final ObjectProperty<LabelType> labelType = new SimpleObjectProperty<>(this, "labelType", LabelType.SHORT);
 
-    public final void setShowUnits(boolean showUnits) {
-        this.showUnits.set(showUnits);
-    }
-
-    // short labels
-
-    private final BooleanProperty displayShortLabel = new SimpleBooleanProperty(this, "displayShortLabel", true);
-
-    public final boolean isDisplayShortLabel() {
-        return displayShortLabel.get();
+    public final LabelType getLabelType() {
+        return labelType.get();
     }
 
     /**
-     * Controls whether the labels used for the units will be abbreviated or not, example:
-     * "days" or "d", "hours" or "h".
+     * The label type determines if the control will show no labels, short labels (e.g. "d") or
+     * long labels (e.g. "days").
      *
-     * @return true if labels will be short
+     * @return the type of labels shown for each unit
      */
-    public final BooleanProperty displayShortLabelProperty() {
-        return displayShortLabel;
+    public final ObjectProperty<LabelType> labelTypeProperty() {
+        return labelType;
     }
 
-    public final void setDisplayShortLabel(boolean displayShortLabel) {
-        this.displayShortLabel.set(displayShortLabel);
+    public final void setLabelType(LabelType labelType) {
+        this.labelType.set(labelType);
     }
 
     // fill digits

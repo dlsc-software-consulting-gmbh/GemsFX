@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.DurationPicker;
+import com.dlsc.gemsfx.DurationPicker.LabelType;
 import com.dlsc.gemsfx.TimePicker;
 
 import java.time.Duration;
@@ -8,10 +9,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
@@ -40,8 +39,7 @@ public class DurationUnitField extends Label {
         this.chronoUnit = chronoUnit;
 
         updateStyles();
-        showUnitsProperty().addListener(it -> updateStyles());
-        displayShortLabelProperty().addListener(it -> updateStyles());
+        labelTypeProperty().addListener(it -> updateStyles());
 
         getStyleClass().addAll("unit-field", chronoUnit.name().toLowerCase());
 
@@ -65,30 +63,33 @@ public class DurationUnitField extends Label {
                 result = Long.toString(value);
             }
 
-            if (isShowUnits()) {
+            if (!getLabelType().equals(LabelType.NONE)) {
+
+                boolean shortLabels = getLabelType().equals(LabelType.SHORT);
+
                 // TODO: i18n
                 switch (chronoUnit) {
                     case DAYS:
-                        result += isDisplayShortLabel() ? "d" : " days";
+                        result += shortLabels ? "d" : " days";
                         break;
                     case HOURS:
-                        result += isDisplayShortLabel() ? "h" : " hours";
+                        result += shortLabels ? "h" : " hours";
                         break;
                     case MINUTES:
-                        result += isDisplayShortLabel() ? "m" : " minutes";
+                        result += shortLabels ? "m" : " minutes";
                         break;
                     case SECONDS:
-                        result += isDisplayShortLabel() ? "s" : " seconds";
+                        result += shortLabels ? "s" : " seconds";
                         break;
                     case MILLIS:
-                        result += isDisplayShortLabel() ? "ms" : " millis";
+                        result += shortLabels ? "ms" : " millis";
                         break;
                 }
             }
 
             return result;
 
-        }, valueProperty(), displayShortLabelProperty(), showUnitsProperty()));
+        }, valueProperty(), labelTypeProperty()));
 
         focusedProperty().addListener(it -> {
             if (!isFocused()) {
@@ -179,12 +180,18 @@ public class DurationUnitField extends Label {
 
     private void updateStyles() {
         getStyleClass().setAll("label", "unit-field");
-        if (isShowUnits()) {
-            getStyleClass().add("show-unit");
+        switch (getLabelType()) {
+            case NONE:
+                getStyleClass().add("no-label");
+                break;
+            case SHORT:
+                getStyleClass().add("short-label");
+                break;
+            case LONG:
+                getStyleClass().add("long-label");
+                break;
         }
-        if (isDisplayShortLabel()) {
-            getStyleClass().add("short-label");
-        }
+
         getStyleClass().add(getChronoUnit().name().toLowerCase());
     }
 
@@ -404,34 +411,18 @@ public class DurationUnitField extends Label {
         return duration;
     }
 
-    // show units
+    private final ObjectProperty<LabelType> labelType = new SimpleObjectProperty<>(this, "labelType", LabelType.SHORT);
 
-    private final BooleanProperty showUnits = new SimpleBooleanProperty(this, "showUnits", true);
-
-    private final boolean isShowUnits() {
-        return showUnits.get();
+    public final LabelType getLabelType() {
+        return labelType.get();
     }
 
-    public final BooleanProperty showUnitsProperty() {
-        return showUnits;
+    public final ObjectProperty<LabelType> labelTypeProperty() {
+        return labelType;
     }
 
-    // display short labels
-
-    private final BooleanProperty displayShortLabel = new SimpleBooleanProperty(this, "displayShortLabel");
-
-    public final boolean isDisplayShortLabel() {
-        return displayShortLabel.get();
-    }
-
-    /**
-     * Controls whether the labels used for the units will be abbreviated or not, example:
-     * "days" or "d", "hours" or "h".
-     *
-     * @return true if labels will be short
-     */
-    public final BooleanProperty displayShortLabelProperty() {
-        return displayShortLabel;
+    public final void setLabelType(LabelType labelType) {
+        this.labelType.set(labelType);
     }
 
 }

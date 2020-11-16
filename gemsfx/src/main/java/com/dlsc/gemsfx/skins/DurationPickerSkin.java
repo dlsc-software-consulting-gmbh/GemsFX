@@ -155,8 +155,7 @@ public class DurationPickerSkin extends SkinBase<DurationPicker> {
         }
         field.setValue(0L);
         field.durationProperty().bind(getSkinnable().durationProperty());
-        field.showUnitsProperty().bind(getSkinnable().showUnitsProperty());
-        field.displayShortLabelProperty().bind(getSkinnable().displayShortLabelProperty());
+        field.labelTypeProperty().bind(getSkinnable().labelTypeProperty());
 
         field.valueProperty().addListener(it -> {
             Long value = Math.min(field.getValue(), field.getMaximumValue());

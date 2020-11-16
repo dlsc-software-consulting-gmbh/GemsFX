@@ -45,9 +45,18 @@
 }
 
 .duration-picker > .box > .fields-box > .unit-field {
-    -fx-min-width: -infinity; /* 1.6em; */
+    -fx-min-width: -infinity;
     -fx-padding: 0px 2px;
     -fx-alignment: center;
+}
+
+.duration-picker > .box > .fields-box > .unit-field.no-label {
+}
+
+.duration-picker > .box > .fields-box > .unit-field.short-label {
+}
+
+.duration-picker > .box > .fields-box > .unit-field.long-label {
 }
 
 .duration-picker > .box > .fields-box > .unit-field:focused {
@@ -61,13 +70,18 @@
  */
 .duration-picker .duration-picker-popup .box {
     -fx-spacing: 5px;
-    -fx-pref-height: 210px;
+    -fx-pref-height: 230px;
     -fx-background-color: -fx-box-border, white;
     -fx-background-insets: 0, 1;
     -fx-padding: 10px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
 }
 
+.duration-picker .duration-picker-popup .box .header-label {
+    -fx-max-width: infinity;
+    -fx-alignment: center;
+    -fx-font-style: bold;
+}
 
 .duration-picker .duration-picker-popup .box .unit-list-view {
 }

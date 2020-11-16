@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DurationPicker;
+import com.dlsc.gemsfx.DurationPicker.LabelType;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -32,8 +33,9 @@ public class DurationPickerApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         DurationPicker durationPicker = new DurationPicker();
-        durationPicker.setShowUnits(false);
-        durationPicker.setDisplayShortLabel(true);
+
+        durationPicker.setLabelType(LabelType.SHORT);
+        durationPicker.setMaxWidth(Double.MAX_VALUE);
 
         ZonedDateTime timeA = ZonedDateTime.now();
         ZonedDateTime timeB = ZonedDateTime.now().plusDays(2).plusHours(10).plusMinutes(23).plusSeconds(55);
@@ -43,16 +45,11 @@ public class DurationPickerApp extends Application {
         CheckBox rollOverBox = new CheckBox("Rollover");
         rollOverBox.selectedProperty().bindBidirectional(durationPicker.rolloverProperty());
 
-        CheckBox showUnits = new CheckBox("Show units");
-        showUnits.selectedProperty().bindBidirectional(durationPicker.showUnitsProperty());
-
-        CheckBox displayShortLabels = new CheckBox("Short labels");
-        displayShortLabels.selectedProperty().bindBidirectional(durationPicker.displayShortLabelProperty());
-
         CheckBox linkFieldsBox = new CheckBox("Link fields");
         linkFieldsBox.selectedProperty().bindBidirectional(durationPicker.linkingFieldsProperty());
 
         CheckBox fullWidth = new CheckBox("Full width");
+        fullWidth.setSelected(durationPicker.getMaxWidth() == Double.MAX_VALUE);
         fullWidth.selectedProperty().addListener(it -> {
             if (fullWidth.isSelected()) {
                 durationPicker.setMaxWidth(Double.MAX_VALUE);
@@ -79,6 +76,30 @@ public class DurationPickerApp extends Application {
         Button updateButton = new Button("Update with zero duration");
         updateButton.setOnAction(evt -> durationPicker.setDuration(Duration.ZERO));
 
+        ComboBox<LabelType> labelTypeBox = new ComboBox<>();
+        labelTypeBox.getItems().addAll(LabelType.values());
+        labelTypeBox.valueProperty().bindBidirectional(durationPicker.labelTypeProperty());
+        labelTypeBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(LabelType labelType) {
+                switch (labelType) {
+                    case NONE:
+                        return "No labels";
+                    case SHORT:
+                        return "Short labels";
+                    case LONG:
+                        return "Long labels";
+                    default:
+                        return "(Unknown label type: " + labelType + ")";
+                }
+            }
+
+            @Override
+            public LabelType fromString(String s) {
+                return null;
+            }
+        });
+
         ComboBox<Integer> configurationBox = new ComboBox<>();
         configurationBox.getItems().addAll(0, 1, 2, 3);
         configurationBox.setValue(0);
@@ -92,7 +113,7 @@ public class DurationPickerApp extends Application {
                     durationPicker.getFields().setAll(ChronoUnit.HOURS, ChronoUnit.MINUTES);
                     break;
                 case 2:
-                    durationPicker.getFields().setAll(ChronoUnit.DAYS, ChronoUnit.HOURS);
+                    durationPicker.getFields().setAll(ChronoUnit.DAYS, ChronoUnit.HOURS, ChronoUnit.MINUTES);
                     break;
                 case 3:
                     durationPicker.getFields().setAll(ChronoUnit.MINUTES, ChronoUnit.SECONDS, ChronoUnit.MILLIS);
@@ -108,7 +129,7 @@ public class DurationPickerApp extends Application {
                     case 1:
                         return "Hours & Minutes";
                     case 2:
-                        return "Days & Hours";
+                        return "Days & Hours & Minutes";
                     case 3:
                         return "Minutes, Seconds, Millis";
                     default:
@@ -173,10 +194,12 @@ public class DurationPickerApp extends Application {
         gridPane.add(minimumDurationBox, 1, 1);
         gridPane.add(new Label("Maximum duration:"), 0, 2);
         gridPane.add(maximumDurationBox, 1, 02);
+        gridPane.add(new Label("Labels:"), 0, 3);
+        gridPane.add(labelTypeBox, 1, 3);
 
         VBox box0 = new VBox(20, durationPicker, valueLabel);
         VBox box1 = new VBox(20, datePicker, textField);
-        VBox box2 = new VBox(20, fullWidth, showPopupButtonBox, linkFieldsBox, rollOverBox, showUnits, displayShortLabels, gridPane);
+        VBox box2 = new VBox(20, fullWidth, showPopupButtonBox, linkFieldsBox, rollOverBox, gridPane);
         HBox box3 = new HBox(20, showOrHidePopupButton, updateButton);
 
         box1.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-background-radius: 2px; -fx-border-color: gray; -fx-border-radius: 2px;");
