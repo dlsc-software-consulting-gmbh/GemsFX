@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Consumer;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -42,6 +43,11 @@ public class DurationPicker extends Control {
             }
         });
 
+        InvalidationListener constrainListener = it -> constrain();
+        durationProperty().addListener(constrainListener);
+        minimumDurationProperty().addListener(constrainListener);
+        maximumDurationProperty().addListener(constrainListener);
+
         setSeparatorFactory(pair -> {
             Label label = new Label(":");
             label.getStyleClass().add("separator");
@@ -65,6 +71,27 @@ public class DurationPicker extends Control {
         };
 
         getProperties().addListener(propertiesListener);
+
+        getStylesheets().add(getUserAgentStylesheet());
+    }
+
+    private void constrain() {
+        Duration duration = getDuration();
+        if (duration != null) {
+            Duration minimumDuration = getMinimumDuration();
+            if (minimumDuration != null) {
+                if (duration.minus(minimumDuration).isNegative()) {
+                    setDuration(minimumDuration);
+                }
+            }
+
+            Duration maximumDuration = getMaximumDuration();
+            if (maximumDuration != null) {
+                if (maximumDuration.minus(duration).isNegative()) {
+                    setDuration(maximumDuration);
+                }
+            }
+        }
     }
 
     @Override
@@ -315,6 +342,28 @@ public class DurationPicker extends Control {
         this.showUnits.set(showUnits);
     }
 
+    // short labels
+
+    private final BooleanProperty displayShortLabel = new SimpleBooleanProperty(this, "displayShortLabel", true);
+
+    public final boolean isDisplayShortLabel() {
+        return displayShortLabel.get();
+    }
+
+    /**
+     * Controls whether the labels used for the units will be abbreviated or not, example:
+     * "days" or "d", "hours" or "h".
+     *
+     * @return true if labels will be short
+     */
+    public final BooleanProperty displayShortLabelProperty() {
+        return displayShortLabel;
+    }
+
+    public final void setDisplayShortLabel(boolean displayShortLabel) {
+        this.displayShortLabel.set(displayShortLabel);
+    }
+
     // fill digits
 
     private final BooleanProperty fillDigits = new SimpleBooleanProperty(this, "fillDigits", true);
@@ -337,27 +386,5 @@ public class DurationPicker extends Control {
 
     public final void setFillDigits(boolean fillDigits) {
         this.fillDigits.set(fillDigits);
-    }
-
-    // use abbreviations
-
-    private final BooleanProperty displayShortLabel = new SimpleBooleanProperty(this, "displayShortLabel", true);
-
-    public final boolean isDisplayShortLabel() {
-        return displayShortLabel.get();
-    }
-
-    /**
-     * Controls whether the labels used for the units will be abbreviated or not, example:
-     * "days" or "d", "hours" or "h".
-     *
-     * @return true if labels will be short
-     */
-    public final BooleanProperty displayShortLabelProperty() {
-        return displayShortLabel;
-    }
-
-    public final void setDisplayShortLabel(boolean displayShortLabel) {
-        this.displayShortLabel.set(displayShortLabel);
     }
 }

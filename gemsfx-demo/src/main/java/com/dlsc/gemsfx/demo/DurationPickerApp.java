@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.DurationPicker;
 
 import java.time.Duration;
-import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -33,6 +32,8 @@ public class DurationPickerApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         DurationPicker durationPicker = new DurationPicker();
+        durationPicker.setShowUnits(false);
+        durationPicker.setDisplayShortLabel(true);
 
         ZonedDateTime timeA = ZonedDateTime.now();
         ZonedDateTime timeB = ZonedDateTime.now().plusDays(2).plusHours(10).plusMinutes(23).plusSeconds(55);
@@ -109,7 +110,7 @@ public class DurationPickerApp extends Application {
                     case 2:
                         return "Days & Hours";
                     case 3:
-                        return "Miinutes, Seconds, Millis";
+                        return "Minutes, Seconds, Millis";
                     default:
                        return "";
                 }
@@ -120,34 +121,47 @@ public class DurationPickerApp extends Application {
                 return null;
             }
         });
-        ComboBox<Integer> stepRateBox = new ComboBox<>();
-        stepRateBox.getItems().addAll(1, 5, 10, 15, 30);
-//        stepRateBox.valueProperty().addListener(it -> timePicker.setStepRateInMinutes(stepRateBox.getValue()));
-//        stepRateBox.getSelectionModel().select(Integer.valueOf(timePicker.getStepRateInMinutes())); // must be "Integer" object, not int
 
-        ComboBox<LocalTime> earliestTimeBox = new ComboBox<>();
-        earliestTimeBox.getItems().addAll(LocalTime.MIN, LocalTime.of(6, 30), LocalTime.of(23, 00));
-   //     earliestTimeBox.valueProperty().addListener(it -> timePicker.setEarliestTime(earliestTimeBox.getValue()));
-        earliestTimeBox.getSelectionModel().select(LocalTime.MIN);
+        ComboBox<Duration> minimumDurationBox = new ComboBox<>();
+        minimumDurationBox.getItems().addAll(Duration.ZERO, Duration.ofMinutes(30), Duration.ofDays(1), Duration.ofHours(20));
+        minimumDurationBox.valueProperty().addListener(it -> durationPicker.setMinimumDuration(minimumDurationBox.getValue()));
+        minimumDurationBox.getSelectionModel().select(0);
 
-        ComboBox<LocalTime> latestTimeBox = new ComboBox<>();
-        latestTimeBox.getItems().addAll(LocalTime.MAX, LocalTime.of(18, 00), LocalTime.of(2, 00));
-      //  latestTimeBox.valueProperty().addListener(it -> timePicker.setLatestTime(latestTimeBox.getValue()));
-        latestTimeBox.getSelectionModel().select(LocalTime.MAX);
-        latestTimeBox.setConverter(new StringConverter<>() {
+        ComboBox<Duration> maximumDurationBox = new ComboBox<>();
+        maximumDurationBox.getItems().addAll(null, Duration.ofMinutes(30), Duration.ofDays(1), Duration.ofHours(20));
+        maximumDurationBox.valueProperty().addListener(it -> durationPicker.setMaximumDuration(maximumDurationBox.getValue()));
+        maximumDurationBox.getSelectionModel().select(0);
+
+        final StringConverter<Duration> converter = new StringConverter<>() {
             @Override
-            public String toString(LocalTime time) {
-                if (time.equals(LocalTime.MAX)) {
-                    return "23:59";
+            public String toString(Duration duration) {
+                if (duration == null) {
+                    return "None";
                 }
-                return time.toString();
+                if (duration.equals(Duration.ZERO)) {
+                    return "0 Minutes";
+                }
+                if (duration.equals(Duration.ofMinutes(30))) {
+                    return "30 Minutes";
+                }
+                if (duration.equals(Duration.ofDays(1))) {
+                    return "1 Day";
+                }
+                if (duration.equals(Duration.ofHours(20))) {
+                    return "20 Hours";
+                }
+
+                return duration.toString();
             }
 
             @Override
-            public LocalTime fromString(String string) {
+            public Duration fromString(String string) {
                 return null;
             }
-        });
+        };
+
+        minimumDurationBox.setConverter(converter);
+        maximumDurationBox.setConverter(converter);
 
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
@@ -155,10 +169,10 @@ public class DurationPickerApp extends Application {
 
         gridPane.add(new Label("Configuration:"), 0, 0);
         gridPane.add(configurationBox, 1, 0);
-        gridPane.add(new Label("Earliest time:"), 0, 1);
-        gridPane.add(earliestTimeBox, 1, 1);
-        gridPane.add(new Label("Latest time:"), 0, 2);
-        gridPane.add(latestTimeBox, 1, 02);
+        gridPane.add(new Label("Minimum duration:"), 0, 1);
+        gridPane.add(minimumDurationBox, 1, 1);
+        gridPane.add(new Label("Maximum duration:"), 0, 2);
+        gridPane.add(maximumDurationBox, 1, 02);
 
         VBox box0 = new VBox(20, durationPicker, valueLabel);
         VBox box1 = new VBox(20, datePicker, textField);

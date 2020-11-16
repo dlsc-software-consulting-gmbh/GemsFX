@@ -39,6 +39,10 @@ public class DurationUnitField extends Label {
         this.picker = Objects.requireNonNull(picker);
         this.chronoUnit = chronoUnit;
 
+        updateStyles();
+        showUnitsProperty().addListener(it -> updateStyles());
+        displayShortLabelProperty().addListener(it -> updateStyles());
+
         getStyleClass().addAll("unit-field", chronoUnit.name().toLowerCase());
 
         setAlignment(Pos.CENTER);
@@ -173,6 +177,17 @@ public class DurationUnitField extends Label {
         });
     }
 
+    private void updateStyles() {
+        getStyleClass().setAll("label", "unit-field");
+        if (isShowUnits()) {
+            getStyleClass().add("show-unit");
+        }
+        if (isDisplayShortLabel()) {
+            getStyleClass().add("short-label");
+        }
+        getStyleClass().add(getChronoUnit().name().toLowerCase());
+    }
+
     public final ChronoUnit getChronoUnit() {
         return chronoUnit;
     }
@@ -236,11 +251,11 @@ public class DurationUnitField extends Label {
     }
 
     private void handleArrowKey(KeyEvent evt) {
-        if (evt.getCode().equals(KeyCode.UP)) {
+        if (evt.getCode().equals(KeyCode.DOWN)) {
             decrement();
             evt.consume();
             picker.getProperties().put("ADJUST_TIME", "ADJUST_TIME");
-        } else if (evt.getCode().equals(KeyCode.DOWN)) {
+        } else if (evt.getCode().equals(KeyCode.UP)) {
             increment();
             evt.consume();
             picker.getProperties().put("ADJUST_TIME", "ADJUST_TIME");
@@ -250,11 +265,11 @@ public class DurationUnitField extends Label {
     void decrement() {
         Long value = getValue();
         if (value != null) {
-            long newValue = value - getStepRate();
+            long newValue = value - 1;
             if (newValue < getMinimumValue()) {
                 // check for max value because days, for example, can't rollover without a max value
                 if (picker.isRollover() && getMaximumValue() != Long.MAX_VALUE) {
-                    setValue(getMaximumValue() - getMaximumValue() % getStepRate());
+                    setValue(getMaximumValue());
                     if (picker.isLinkingFields() && previousField != null) {
                         previousField.decrement();
                     }
@@ -272,7 +287,7 @@ public class DurationUnitField extends Label {
     void increment() {
         Long value = getValue();
         if (value != null) {
-            long newValue = value + getStepRate();
+            long newValue = value + 1;
             if (newValue > getMaximumValue()) {
                 if (picker.isRollover()) {
                     setValue(getMinimumValue());
@@ -306,26 +321,6 @@ public class DurationUnitField extends Label {
      */
     final void setPreviousField(DurationUnitField field) {
         this.previousField = field;
-    }
-
-    private final LongProperty stepRate = new SimpleLongProperty(this, "stepRate", 1);
-
-    public final long getStepRate() {
-        return stepRate.get();
-    }
-
-    /**
-     * The step rate of the field. The field's value increases or decreases by this amount
-     * when the user hits the arrow up or down keys.
-     *
-     * @return the field's step rate
-     */
-    public final LongProperty stepRateProperty() {
-        return stepRate;
-    }
-
-    public final void setStepRate(long stepRate) {
-        this.stepRate.set(stepRate);
     }
 
     private void constrainValue() {

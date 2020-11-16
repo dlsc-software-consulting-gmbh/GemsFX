@@ -45,7 +45,7 @@
 }
 
 .duration-picker > .box > .fields-box > .unit-field {
-    -fx-min-width: 1.6em;
+    -fx-min-width: -infinity; /* 1.6em; */
     -fx-padding: 0px 2px;
     -fx-alignment: center;
 }
@@ -54,22 +54,6 @@
     -fx-background-radius: 2px;
     -fx-background-color: -fx-selection-bar;
     -fx-text-fill: white;
-}
-
-.duration-picker > .box > .fields-box > .unit-field.days {
-}
-
-.duration-picker > .box > .fields-box > .unit-field.hours {
-}
-
-.duration-picker > .box > .fields-box > .unit-field.minutes {
-}
-
-.duration-picker > .box > .fields-box > .unit-field.seconds {
-}
-
-.duration-picker > .box > .fields-box > .unit-field.millis {
-    -fx-min-width: 2.4em;
 }
 
 /* --------------------------------------------------------------
