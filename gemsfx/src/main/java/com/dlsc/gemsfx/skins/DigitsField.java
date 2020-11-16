@@ -120,13 +120,20 @@ public abstract class DigitsField extends TimeField {
     private void handleArrowKey(KeyEvent evt) {
         if (evt.getCode().equals(KeyCode.DOWN)) {
             decrement();
-            evt.consume();
             getTimePicker().getProperties().put("ADJUST_TIME", "ADJUST_TIME");
         } else if (evt.getCode().equals(KeyCode.UP)) {
             increment();
-            evt.consume();
             getTimePicker().getProperties().put("ADJUST_TIME", "ADJUST_TIME");
+        } else if (evt.getCode().equals(KeyCode.RIGHT)) {
+            if (nextField != null) {
+                nextField.requestFocus();
+            }
+        } else if (evt.getCode().equals(KeyCode.LEFT)) {
+            if (previousField != null) {
+                previousField.requestFocus();
+            }
         }
+        evt.consume();
     }
 
     @Override
