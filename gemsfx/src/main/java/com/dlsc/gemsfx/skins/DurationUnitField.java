@@ -9,8 +9,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
@@ -60,7 +62,7 @@ public class DurationUnitField extends Label {
 
             if (value == null) {
                 result = "";
-            } else if (picker.isFillDigits()) {
+            } else if (isFillDigits()) {
                 result = fill(Long.toString(value), chronoUnit);
             } else {
                 result = Long.toString(value);
@@ -92,7 +94,7 @@ public class DurationUnitField extends Label {
 
             return result;
 
-        }, valueProperty(), labelTypeProperty()));
+        }, valueProperty(), labelTypeProperty(), fillDigitsProperty()));
 
         focusedProperty().addListener(it -> {
             if (!isFocused()) {
@@ -424,8 +426,13 @@ public class DurationUnitField extends Label {
         return labelType;
     }
 
-    public final void setLabelType(LabelType labelType) {
-        this.labelType.set(labelType);
+    private final BooleanProperty fillDigits = new SimpleBooleanProperty(this, "fillDigits", true);
+
+    public final boolean isFillDigits() {
+        return fillDigits.get();
     }
 
+    public final BooleanProperty fillDigitsProperty() {
+        return fillDigits;
+    }
 }

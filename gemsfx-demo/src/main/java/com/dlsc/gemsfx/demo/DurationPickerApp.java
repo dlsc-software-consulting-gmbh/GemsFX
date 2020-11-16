@@ -58,11 +58,14 @@ public class DurationPickerApp extends Application {
             }
         });
 
-        CheckBox showPopupButtonBox = new CheckBox("Show button");
+        CheckBox showPopupButtonBox = new CheckBox("Show popup button");
         showPopupButtonBox.selectedProperty().bindBidirectional(durationPicker.showPopupTriggerButtonProperty());
 
         Button showOrHidePopupButton = new Button("Show Popup");
         showOrHidePopupButton.setOnAction(evt -> durationPicker.show());
+
+        CheckBox fillDigitsCheckBox = new CheckBox("Fill digits with leading zeros");
+        fillDigitsCheckBox.selectedProperty().bindBidirectional(durationPicker.fillDigitsProperty());
 
         Label valueLabel = new Label();
         valueLabel.textProperty().bind(Bindings.createStringBinding(() -> "Duration: " + humanReadableFormat(durationPicker.getDuration()), durationPicker.durationProperty()));
@@ -199,7 +202,7 @@ public class DurationPickerApp extends Application {
 
         VBox box0 = new VBox(20, durationPicker, valueLabel);
         VBox box1 = new VBox(20, datePicker, textField);
-        VBox box2 = new VBox(20, fullWidth, showPopupButtonBox, linkFieldsBox, rollOverBox, gridPane);
+        VBox box2 = new VBox(20, fullWidth, showPopupButtonBox, fillDigitsCheckBox, linkFieldsBox, rollOverBox, gridPane);
         HBox box3 = new HBox(20, showOrHidePopupButton, updateButton);
 
         box1.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-background-radius: 2px; -fx-border-color: gray; -fx-border-radius: 2px;");
