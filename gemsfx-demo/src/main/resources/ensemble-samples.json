@@ -39,23 +39,6 @@
       "project": "gemsfx",
       "preview": "/preview-filterview.png",
       "classname": "com.dlsc.gemsfx.demo.FilterViewApp"
-    },
-    {
-      "category": "gemsfx",
-      "name": "Rich Text Area",
-      "desc": "A control for easily creating rich text via API.",
-      "project": "gemsfx",
-      "preview": "/preview-richtextareaapp.png",
-      "classname": "com.dlsc.gemsfx.demo.RichTextAreaApp",
-      "disabled": true
-    },
-    {
-      "category": "gemsfx",
-      "name": "PDF View",
-      "desc": "A view for displaying PDF files (based on Apache PDFBox).",
-      "project": "gemsfx",
-      "preview": "/preview-pdfviewer.png",
-      "classname": "com.dlsc.gemsfx.demo.PDFViewApp"
     }
   ]
 }

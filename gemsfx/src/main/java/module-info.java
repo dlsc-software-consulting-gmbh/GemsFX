@@ -19,7 +19,6 @@ module com.dlsc.gemsfx {
 
     requires retrofit2;
     requires okhttp3;
-    requires org.apache.pdfbox;
     requires java.desktop;
 
     exports com.dlsc.gemsfx.util;
