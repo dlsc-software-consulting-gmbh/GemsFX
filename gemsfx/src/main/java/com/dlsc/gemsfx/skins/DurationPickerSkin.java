@@ -162,7 +162,9 @@ public class DurationPickerSkin extends SkinBase<DurationPicker> {
         field.valueProperty().addListener(it -> {
             Long value = Math.min(field.getValue(), field.getMaximumValue());
             if (value != null) {
-                getSkinnable().getProperties().put("NEW_DURATION", createDuration());
+                if (!field.isUpdating()) {
+                    getSkinnable().getProperties().put("NEW_DURATION", createDuration());
+                }
             }
         });
 

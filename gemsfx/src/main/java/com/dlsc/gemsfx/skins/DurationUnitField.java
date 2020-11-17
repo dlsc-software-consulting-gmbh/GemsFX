@@ -157,30 +157,41 @@ public class DurationUnitField extends Label {
         });
 
         duration.addListener(it -> {
-            Duration duration = this.duration.get();
-            if (duration == null) {
-                setValue(null);
-                return;
-            }
+            updating = true;
+            try {
+                Duration duration = this.duration.get();
+                if (duration == null) {
+                    setValue(null);
+                    return;
+                }
 
-            switch (chronoUnit) {
-                case DAYS:
-                    setValue(duration.toDaysPart());
-                    break;
-                case HOURS:
-                    setValue((long) duration.toHoursPart());
-                    break;
-                case MINUTES:
-                    setValue((long) duration.toMinutesPart());
-                    break;
-                case SECONDS:
-                    setValue((long) duration.toSecondsPart());
-                    break;
-                case MILLIS:
-                    setValue((long) duration.toMillisPart());
-                    break;
+                switch (chronoUnit) {
+                    case DAYS:
+                        setValue(duration.toDaysPart());
+                        break;
+                    case HOURS:
+                        setValue((long) duration.toHoursPart());
+                        break;
+                    case MINUTES:
+                        setValue((long) duration.toMinutesPart());
+                        break;
+                    case SECONDS:
+                        setValue((long) duration.toSecondsPart());
+                        break;
+                    case MILLIS:
+                        setValue((long) duration.toMillisPart());
+                        break;
+                }
+            } finally {
+                updating = false;
             }
         });
+    }
+
+    private boolean updating;
+
+    public boolean isUpdating() {
+        return updating;
     }
 
     private void updateStyles() {
