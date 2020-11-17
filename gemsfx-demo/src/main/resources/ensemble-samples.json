@@ -2,7 +2,7 @@
   "samples": [
     {
       "category": "gemsfx",
-      "name": "TimePickerApp",
+      "name": "Time Picker",
       "desc": "A control for entering a time (Java time API)",
       "project": "gemsfx",
       "preview": "/preview-time-picker.png",
@@ -10,7 +10,7 @@
     },
     {
       "category": "gemsfx",
-      "name": "DurationPickerApp",
+      "name": "Duration Picker",
       "desc": "A control for entering a duration (Java time API)",
       "project": "gemsfx",
       "preview": "/preview-duration-picker.png",
@@ -18,7 +18,7 @@
     },
     {
       "category": "gemsfx",
-      "name": "PhotoViewApp",
+      "name": "Photo View",
       "desc": "A nice little control for creating user photos / avatars.",
       "project": "gemsfx",
       "preview": "/preview-photo-view.png",
@@ -26,7 +26,7 @@
     },
     {
       "category": "gemsfx",
-      "name": "PaymentOptionApp",
+      "name": "Payment Option",
       "desc": "A control for visualizing various payment options (e.g. Paypal, MasterCard, etc...).",
       "project": "gemsfx",
       "preview": "/preview-payment.png",
@@ -34,15 +34,7 @@
     },
     {
       "category": "gemsfx",
-      "name": "PaymentOptionTilesApp",
-      "desc": "A control for visualizing various payment options (e.g. Paypal, MasterCard, etc...).",
-      "project": "gemsfx",
-      "preview": "/preview-payment.png",
-      "classname": "com.dlsc.gemsfx.demo.PaymentOptionTilesApp"
-    },
-    {
-      "category": "gemsfx",
-      "name": "FilterViewApp",
+      "name": "Filter View",
       "desc": "A view for filtering based on various categories.",
       "project": "gemsfx",
       "preview": "/preview-filterview.png",
@@ -50,8 +42,8 @@
     },
     {
       "category": "gemsfx",
-      "name": "RichTextAreaApp",
-      "desc": "A control for easily creating rich text via API (not interactively).",
+      "name": "Rich Text Area",
+      "desc": "A control for easily creating rich text via API.",
       "project": "gemsfx",
       "preview": "/preview-richtextareaapp.png",
       "classname": "com.dlsc.gemsfx.demo.RichTextAreaApp",
@@ -59,7 +51,7 @@
     },
     {
       "category": "gemsfx",
-      "name": "PDFViewApp",
+      "name": "PDF View",
       "desc": "A view for displaying PDF files (based on Apache PDFBox).",
       "project": "gemsfx",
       "preview": "/preview-pdfviewer.png",
