@@ -3,6 +3,8 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.TimePicker;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
@@ -53,7 +55,13 @@ public class TimePickerApp extends Application {
         showOrHidePopupButton.setOnAction(evt -> timePicker.show());
 
         Label valueLabel = new Label();
-        valueLabel.textProperty().bind(Bindings.createStringBinding(() -> "Time: " + timePicker.getTime() + " (adjusted: " + (timePicker.isAdjusted() ? "yes" : "no") + ")", timePicker.timeProperty(), timePicker.adjustedProperty()));
+        valueLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+            LocalTime time = timePicker.getTime();
+            if (time != null) {
+                return "Time: " + DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(time) + " (adjusted: " + (timePicker.isAdjusted() ? "yes" : "no") + ")";
+            }
+            return "empty";
+        }, timePicker.timeProperty(), timePicker.adjustedProperty()));
 
         TextField textField = new TextField();
         textField.setPromptText("Text field");
@@ -66,6 +74,9 @@ public class TimePickerApp extends Application {
             timePicker.setTime(LocalTime.now());
             timePicker.adjust();
         });
+
+        Button nullButton = new Button("Set 'null'");
+        nullButton.setOnAction(evt -> timePicker.setTime(null));
 
         ComboBox<Integer> stepRateBox = new ComboBox<>();
         stepRateBox.getItems().addAll(1, 5, 10, 15, 30);
@@ -110,7 +121,7 @@ public class TimePickerApp extends Application {
         VBox box0 = new VBox(20, timePicker, valueLabel);
         VBox box1 = new VBox(20, datePicker, textField);
         VBox box2 = new VBox(20, fullWidth, showPopupButtonBox, linkFieldsBox, rollOverBox, gridPane);
-        HBox box3 = new HBox(20, showOrHidePopupButton, updateButton);
+        HBox box3 = new HBox(20, showOrHidePopupButton, updateButton, nullButton);
 
         box1.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-background-radius: 2px; -fx-border-color: gray; -fx-border-radius: 2px;");
         box2.setStyle(box1.getStyle()); // same style

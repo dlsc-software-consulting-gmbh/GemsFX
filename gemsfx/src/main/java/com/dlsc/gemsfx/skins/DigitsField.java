@@ -16,7 +16,7 @@ import javafx.scene.input.KeyEvent;
  */
 public abstract class DigitsField extends TimeField {
 
-    private String str = "";
+    private String typedText = "";
 
     private TimeField nextField;
 
@@ -38,7 +38,7 @@ public abstract class DigitsField extends TimeField {
         textProperty().bind(Bindings.createStringBinding(() -> {
             Integer value = getValue();
             if (value == null) {
-                return "";
+                return "--";
             } else if (value < 10 && fillDigits) {
                 return "0" + value;
             }
@@ -58,18 +58,25 @@ public abstract class DigitsField extends TimeField {
         setFocusTraversable(true);
         setAlignment(Pos.CENTER);
 
-        valueProperty().addListener(it -> str = Integer.toString(getValue()));
+        valueProperty().addListener(it -> {
+            Integer value = getValue();
+            if (value == null) {
+                typedText = "";
+            } else {
+                typedText = Integer.toString(value);
+            }
+        });
 
         focusedProperty().addListener(it -> {
             if (isFocused()) {
                 // we regained focus, so nothing is in the "history"
-                str = "";
+                typedText = "";
             }
         });
 
         timePicker.adjustedProperty().addListener(it -> {
             if (timePicker.isAdjusted()) {
-                str = "";
+                typedText = "";
             }
         });
 
@@ -82,7 +89,7 @@ public abstract class DigitsField extends TimeField {
                 if (evt.getCode().isDigitKey()) {
                     handleDigit(evt);
                     handled = true;
-                } else if (evt.getCode().equals(KeyCode.BACK_SPACE) && str.length() > 0) {
+                } else if (evt.getCode().equals(KeyCode.BACK_SPACE) && typedText.length() > 0) {
                     handleBackspace();
                     handled = true;
                 } else if (evt.getCode().equals(KeyCode.SPACE) && nextField != null) {
@@ -91,13 +98,13 @@ public abstract class DigitsField extends TimeField {
 
                 if (handled) {
 
-                    if (str.length() == 0) {
+                    if (typedText.length() == 0) {
                         setValue(getMinimumValue());
                     } else {
-                        setValue(Integer.parseInt(str));
+                        setValue(Integer.parseInt(typedText));
                     }
 
-                    if (str.length() == 2 && nextField != null) {
+                    if (typedText.length() == 2 && nextField != null) {
                         nextField.requestFocus();
                     }
                 }
@@ -106,15 +113,15 @@ public abstract class DigitsField extends TimeField {
     }
 
     private void handleBackspace() {
-        str = str.substring(0, str.length() - 1);
+        typedText = typedText.substring(0, typedText.length() - 1);
     }
 
     private void handleDigit(KeyEvent evt) {
-        if (str.length() == 2) {
-            str = "";
+        if (typedText.length() == 2) {
+            typedText = "";
         }
 
-        str = str + evt.getCode().getChar();
+        typedText = typedText + evt.getCode().getChar();
     }
 
     private void handleArrowKey(KeyEvent evt) {

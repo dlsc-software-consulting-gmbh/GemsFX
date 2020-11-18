@@ -22,6 +22,8 @@ import javafx.scene.layout.Region;
 
 public class TimePickerSkin extends SkinBase<TimePicker> {
 
+    private static final PseudoClass EMPTY_PSEUDO_CLASS = PseudoClass.getPseudoClass("empty");
+
     private final HourField hourField;
 
     private final MinuteField minuteField;
@@ -82,6 +84,15 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
                 popup.hide();
             }
         });
+
+        updateEmptyPseudoClass();
+    }
+
+    private void updateEmptyPseudoClass() {
+        hourField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
+        minuteField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
+        getSkinnable().getSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
+        System.out.println(hourField.getPseudoClassStates().contains(EMPTY_PSEUDO_CLASS));
     }
 
     private void showPopup() {
@@ -134,7 +145,12 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
         if (time != null) {
             hourField.setValue(time.getHour());
             minuteField.setValue(time.getMinute());
+        } else {
+            hourField.setValue(null);
+            minuteField.setValue(null);
         }
+
+        updateEmptyPseudoClass();
     }
 
     private class HourField extends DigitsField {
@@ -155,8 +171,10 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
             });
 
             valueProperty().addListener(it -> {
-                Integer value = Math.min(getValue(), getMaximumValue());
+                Integer value = getValue();
                 if (value != null) {
+                    // constrain value
+                    value = Math.min(value, getMaximumValue());
                     LocalTime time = getSkinnable().getTime();
                     if (time != null) {
                         getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(value, time.getMinute()));
@@ -185,13 +203,17 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
             });
 
             valueProperty().addListener(it -> {
-                Integer value = Math.min(getValue(), getMaximumValue());
+                Integer value = getValue();
                 if (value != null) {
-                    LocalTime time = getSkinnable().getTime();
-                    if (time != null) {
-                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(time.getHour(), value));
-                    } else {
-                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(0, value));
+                    // constrain value
+                    value = Math.min(value, getMaximumValue());
+                    if (value != null) {
+                        LocalTime time = getSkinnable().getTime();
+                        if (time != null) {
+                            getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(time.getHour(), value));
+                        } else {
+                            getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(0, value));
+                        }
                     }
                 }
             });

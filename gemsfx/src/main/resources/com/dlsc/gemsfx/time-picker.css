@@ -44,8 +44,16 @@
     -fx-padding: 0px 1px;
 }
 
+.time-picker > .box > .fields-box > .separator:empty {
+    -fx-text-fill: derive(-fx-control-inner-background,-30%);
+}
+
 .time-picker > .box > .fields-box > .time-field {
     -fx-pref-width: 1.6em;
+}
+
+.time-picker > .box > .fields-box > .time-field:empty {
+    -fx-text-fill: derive(-fx-control-inner-background, -30%);
 }
 
 .time-picker > .box > .fields-box > .time-field:focused {
