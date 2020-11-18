@@ -30,7 +30,7 @@
     </scm>
 
     <properties>
-        <main.class>com.dlsc.gemsfx.demo.KeyboardApp</main.class>
+        <main.class>com.dlsc.gemsfx.demo.TimePickerApp</main.class>
     </properties>
 
     <repositories>

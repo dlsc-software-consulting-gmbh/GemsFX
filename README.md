@@ -38,12 +38,6 @@ A specialized subclass of ImageView that can be used to display different graphi
 
 ![LightOption](gemsfx/docs/payment-options-light.png) ![DarkOption](gemsfx/docs/payment-options-dark.png)
 
-## Keyboard / KeyboardPane
-
-An on-screen keyboard, especially useful for touch applications (mobile, tablet).
-
-![Keyboard](gemsfx/docs/keyboard.png)
-
 ## DrawerStackPane
 
 A stackpane with an optional node that can be shown inside a drawer. The drawer is animated and can slide in and out. When the drawer is showing a semi-transparent glass pane will cover the background. In addition the last height of the drawer can be persisted via the preferences API so that next time the drawer will show itself like in the last user session.
@@ -104,10 +98,6 @@ You can run the demos using Maven by typing any of the following lines into your
 terminal:
 
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.EnhancedLabelApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.KeyboardApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.KeyboardDarkApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.KeyboardPaneDemoApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.KeyboardPaneWithArrowKeysApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PDFViewApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.DrawerApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.FilterViewApp

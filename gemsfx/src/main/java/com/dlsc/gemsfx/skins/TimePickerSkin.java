@@ -92,7 +92,6 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
         hourField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
         minuteField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
         getSkinnable().getSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
-        System.out.println(hourField.getPseudoClassStates().contains(EMPTY_PSEUDO_CLASS));
     }
 
     private void showPopup() {
