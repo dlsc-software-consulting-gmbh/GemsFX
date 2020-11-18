@@ -4,7 +4,7 @@
       "category": "gemsfx",
       "name": "Time Picker",
       "desc": "A control for entering a time (Java time API)",
-      "project": "gemsfx",
+      "project": "GemsFX",
       "preview": "/preview-time-picker.png",
       "classname": "com.dlsc.gemsfx.demo.TimePickerApp"
     },
@@ -12,7 +12,7 @@
       "category": "gemsfx",
       "name": "Duration Picker",
       "desc": "A control for entering a duration (Java time API)",
-      "project": "gemsfx",
+      "project": "GemsFX",
       "preview": "/preview-duration-picker.png",
       "classname": "com.dlsc.gemsfx.demo.DurationPickerApp"
     },
@@ -20,7 +20,7 @@
       "category": "gemsfx",
       "name": "Photo View",
       "desc": "A nice little control for creating user photos / avatars.",
-      "project": "gemsfx",
+      "project": "GemsFX",
       "preview": "/preview-photo-view.png",
       "classname": "com.dlsc.gemsfx.demo.PhotoViewApp"
     },
@@ -28,7 +28,7 @@
       "category": "gemsfx",
       "name": "Payment Option",
       "desc": "A control for visualizing various payment options (e.g. Paypal, MasterCard, etc...).",
-      "project": "gemsfx",
+      "project": "GemsFX",
       "preview": "/preview-payment.png",
       "classname": "com.dlsc.gemsfx.demo.PaymentOptionApp"
     },
@@ -36,7 +36,7 @@
       "category": "gemsfx",
       "name": "Filter View",
       "desc": "A view for filtering based on various categories.",
-      "project": "gemsfx",
+      "project": "GemsFX",
       "preview": "/preview-filterview.png",
       "classname": "com.dlsc.gemsfx.demo.FilterViewApp"
     }
