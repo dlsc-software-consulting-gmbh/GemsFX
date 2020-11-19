@@ -160,11 +160,8 @@ public class DurationPickerSkin extends SkinBase<DurationPicker> {
         field.fillDigitsProperty().bind(getSkinnable().fillDigitsProperty());
 
         field.valueProperty().addListener(it -> {
-            Long value = Math.min(field.getValue(), field.getMaximumValue());
-            if (value != null) {
-                if (!field.isUpdating()) {
-                    getSkinnable().getProperties().put("NEW_DURATION", createDuration());
-                }
+            if (!field.isUpdating()) {
+                getSkinnable().getProperties().put("NEW_DURATION", createDuration());
             }
         });
 
@@ -177,8 +174,9 @@ public class DurationPickerSkin extends SkinBase<DurationPicker> {
         for (DurationUnitField field : durationUnitFields) {
             ChronoUnit chronoUnit = field.getChronoUnit();
             Long value = field.getValue();
-
-            duration = duration.plus(value, chronoUnit);
+            if (value != null) {
+                duration = duration.plus(value, chronoUnit);
+            }
         }
 
         return duration;

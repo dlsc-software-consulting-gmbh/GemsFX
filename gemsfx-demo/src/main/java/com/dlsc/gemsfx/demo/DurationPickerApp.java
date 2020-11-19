@@ -76,8 +76,11 @@ public class DurationPickerApp extends Application {
         DatePicker datePicker = new DatePicker();
         datePicker.setMaxWidth(Double.MAX_VALUE);
 
-        Button updateButton = new Button("Update with zero duration");
-        updateButton.setOnAction(evt -> durationPicker.setDuration(Duration.ZERO));
+        Button zeroButton = new Button("Set 'zero' duration");
+        zeroButton.setOnAction(evt -> durationPicker.setDuration(Duration.ZERO));
+
+        Button nullButton = new Button("Set to NULL");
+        nullButton.setOnAction(evt -> durationPicker.setDuration(null));
 
         ComboBox<LabelType> labelTypeBox = new ComboBox<>();
         labelTypeBox.getItems().addAll(LabelType.values());
@@ -203,7 +206,7 @@ public class DurationPickerApp extends Application {
         VBox box0 = new VBox(20, durationPicker, valueLabel);
         VBox box1 = new VBox(20, datePicker, textField);
         VBox box2 = new VBox(20, fullWidth, showPopupButtonBox, fillDigitsCheckBox, linkFieldsBox, rollOverBox, gridPane);
-        HBox box3 = new HBox(20, showOrHidePopupButton, updateButton);
+        HBox box3 = new HBox(20, showOrHidePopupButton, zeroButton, nullButton);
 
         box1.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-background-radius: 2px; -fx-border-color: gray; -fx-border-radius: 2px;");
         box2.setStyle(box1.getStyle()); // same style
@@ -237,7 +240,10 @@ public class DurationPickerApp extends Application {
     }
 
     private String humanReadableFormat(Duration duration) {
-        return duration.toDays() + " days, " + duration.toHoursPart() + " hours, " + duration.toMinutesPart() + " minutes, " + duration.toSecondsPart() + " seconds, " + duration.toMillisPart() + " millis";
+        if (duration != null) {
+            return duration.toDays() + " days, " + duration.toHoursPart() + " hours, " + duration.toMinutesPart() + " minutes, " + duration.toSecondsPart() + " seconds, " + duration.toMillisPart() + " millis";
+        }
+        return "null";
     }
 
     public static void main(String[] args) {

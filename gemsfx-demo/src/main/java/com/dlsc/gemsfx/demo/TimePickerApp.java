@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.TimePicker;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 
 import fr.brouillard.oss.cssfx.CSSFX;
@@ -68,6 +69,15 @@ public class TimePickerApp extends Application {
 
         DatePicker datePicker = new DatePicker();
         datePicker.setMaxWidth(Double.MAX_VALUE);
+        datePicker.valueProperty().addListener(it -> System.out.println("date: " + datePicker.getValue()));
+        datePicker.getEditor().textProperty().addListener(it -> {
+            System.out.println("text: " + datePicker.getEditor().getText());
+            try {
+                DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).parse(datePicker.getEditor().getText());
+                System.out.println("goood!!!");
+            } catch (DateTimeParseException ex) {
+            }
+        });
 
         Button updateButton = new Button("Update with current time");
         updateButton.setOnAction(evt -> {

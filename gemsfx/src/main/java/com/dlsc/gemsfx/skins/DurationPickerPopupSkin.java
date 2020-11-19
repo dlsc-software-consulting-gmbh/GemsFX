@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -19,6 +20,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 public class DurationPickerPopupSkin implements Skin<DurationPickerPopup> {
+    private final ResourceBundle i18n = ResourceBundle.getBundle("duration-picker");
 
     private final DurationPickerPopup popup;
     private final HBox box;
@@ -119,19 +121,19 @@ public class DurationPickerPopupSkin implements Skin<DurationPickerPopup> {
                 default:
                     label.setText(chronoUnit.name());
                 case MILLIS:
-                    label.setText("Millis");
+                    label.setText(i18n.getString("popup.unit.title.millis"));
                     break;
                 case SECONDS:
-                    label.setText("Seconds");
+                    label.setText(i18n.getString("popup.unit.title.seconds"));
                     break;
                 case MINUTES:
-                    label.setText("Minutes");
+                    label.setText(i18n.getString("popup.unit.title.minutes"));
                     break;
                 case HOURS:
-                    label.setText("Hours");
+                    label.setText(i18n.getString("popup.unit.title.hours"));
                     break;
                 case DAYS:
-                    label.setText("Days");
+                    label.setText(i18n.getString("popup.unit.title.days"));
                     break;
             }
             VBox.setVgrow(unitListView, Priority.ALWAYS);

@@ -7,6 +7,7 @@ import com.dlsc.gemsfx.TimePicker;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -25,11 +26,12 @@ import javafx.scene.layout.Region;
  * A control used for visualizing digits as part of the {@link TimePicker} control.
  */
 public class DurationUnitField extends Label {
+    private final ResourceBundle i18n = ResourceBundle.getBundle("duration-picker");
 
     private final DurationPicker picker;
     private final ChronoUnit chronoUnit;
 
-    private String str = "";
+    private String typedText = "";
 
     private DurationUnitField nextField;
 
@@ -61,9 +63,10 @@ public class DurationUnitField extends Label {
             String result;
 
             if (value == null) {
-                result = "";
+                result = isFillDigits() ? fill("", chronoUnit, "-") : "-";
+                result += " "; // add extra space to separate from unit, e.g. ("-- hours")
             } else if (isFillDigits()) {
-                result = fill(Long.toString(value), chronoUnit);
+                result = fill(Long.toString(value), chronoUnit, "0");
             } else {
                 result = Long.toString(value);
             }
@@ -72,22 +75,21 @@ public class DurationUnitField extends Label {
 
                 boolean shortLabels = getLabelType().equals(LabelType.SHORT);
 
-                // TODO: i18n
                 switch (chronoUnit) {
                     case DAYS:
-                        result += shortLabels ? "d" : " days";
+                        result += shortLabels ? i18n.getString("unit.short.days") : " " + i18n.getString("unit.long.days");
                         break;
                     case HOURS:
-                        result += shortLabels ? "h" : " hours";
+                        result += shortLabels ? i18n.getString("unit.short.hours") : " " + i18n.getString("unit.long.hours");
                         break;
                     case MINUTES:
-                        result += shortLabels ? "m" : " minutes";
+                        result += shortLabels ? i18n.getString("unit.short.minutes") : " " + i18n.getString("unit.long.minutes");
                         break;
                     case SECONDS:
-                        result += shortLabels ? "s" : " seconds";
+                        result += shortLabels ? i18n.getString("unit.short.seconds") : " " + i18n.getString("unit.long.seconds");
                         break;
                     case MILLIS:
-                        result += shortLabels ? "ms" : " millis";
+                        result += shortLabels ? i18n.getString("unit.short.millis") : " " + i18n.getString("unit.long.millis");
                         break;
                 }
             }
@@ -102,18 +104,24 @@ public class DurationUnitField extends Label {
             }
         });
 
-        minimumValueProperty().addListener(it -> constrainValue());
         maximumValueProperty().addListener(it -> constrainValue());
 
         setFocusTraversable(true);
         setAlignment(Pos.CENTER);
 
-        valueProperty().addListener(it -> str = Long.toString(getValue()));
+        valueProperty().addListener(it -> {
+            Long value = getValue();
+            if (value != null) {
+                typedText = Long.toString(value);
+            } else {
+                typedText = "";
+            }
+        });
 
         focusedProperty().addListener(it -> {
             if (isFocused()) {
                 // we regained focus, so nothing is in the "history"
-                str = "";
+                typedText = "";
             }
         });
 
@@ -126,7 +134,7 @@ public class DurationUnitField extends Label {
                 if (evt.getCode().isDigitKey()) {
                     handleDigit(evt);
                     handled = true;
-                } else if (evt.getCode().equals(KeyCode.BACK_SPACE) && str.length() > 0) {
+                } else if (evt.getCode().equals(KeyCode.BACK_SPACE) && typedText.length() > 0) {
                     handleBackspace();
                     handled = true;
                 } else if (evt.getCode().equals(KeyCode.SPACE) && nextField != null) {
@@ -135,10 +143,10 @@ public class DurationUnitField extends Label {
 
                 if (handled) {
 
-                    if (str.length() == 0) {
-                        setValue(getMinimumValue());
+                    if (typedText.length() == 0) {
+                        setValue(0L);
                     } else {
-                        setValue(Long.parseLong(str));
+                        setValue(Math.min(getMaximumValue(), Long.parseLong(typedText)));
                     }
 
                     int jumpLength = 2;
@@ -149,7 +157,7 @@ public class DurationUnitField extends Label {
                         jumpLength = 4;
                     }
 
-                    if (jumpLength != -1 && str.length() == jumpLength && nextField != null) {
+                    if (jumpLength != -1 && typedText.length() == jumpLength && nextField != null) {
                         nextField.requestFocus();
                     }
                 }
@@ -215,36 +223,44 @@ public class DurationUnitField extends Label {
         return chronoUnit;
     }
 
-    private String fill(String str, ChronoUnit chronoUnit) {
-        if (value == null) {
-            return "";
-        }
+    private String fill(String str, ChronoUnit chronoUnit, String fillCharacter) {
+        int length = str.length();
 
         switch (chronoUnit) {
             default:
-                return str;
+                switch (length) {
+                    case 0:
+                        return fillCharacter;
+                    default:
+                        return str;
+                }
             case HOURS:
             case MINUTES:
             case SECONDS:
-                if (str.length() < 2) {
-                    return "0" + str;
+                switch (length) {
+                    case 0:
+                        return fillCharacter + fillCharacter;
+                    case 1:
+                        return fillCharacter + str;
+                    default:
+                        return str;
                 }
-                break;
             case MILLIS:
-                if (str.length() < 2) {
-                    return "00" + str;
+                switch (length) {
+                    case 0:
+                        return fillCharacter + fillCharacter + fillCharacter;
+                    case 1:
+                        return fillCharacter + fillCharacter + str;
+                    case 2:
+                        return fillCharacter + str;
+                    default:
+                        return str;
                 }
-                if (str.length() < 3) {
-                    return "0" + str;
-                }
-                break;
         }
-
-        return str;
     }
 
     private void handleBackspace() {
-        str = str.substring(0, str.length() - 1);
+        typedText = typedText.substring(0, typedText.length() - 1);
     }
 
     private void handleDigit(KeyEvent evt) {
@@ -265,11 +281,11 @@ public class DurationUnitField extends Label {
                 break;
         }
 
-        if (maxLength != -1 && str.length() == maxLength) {
-            str = "";
+        if (maxLength != -1 && typedText.length() == maxLength) {
+            typedText = "";
         }
 
-        str = str + evt.getCode().getChar();
+        typedText = typedText + evt.getCode().getChar();
     }
 
     private void handleArrowKey(KeyEvent evt) {
@@ -295,7 +311,7 @@ public class DurationUnitField extends Label {
         Long value = getValue();
         if (value != null) {
             long newValue = value - 1;
-            if (newValue < getMinimumValue()) {
+            if (newValue < 0L) {
                 // check for max value because days, for example, can't rollover without a max value
                 if (picker.isRollover() && getMaximumValue() != Long.MAX_VALUE) {
                     setValue(getMaximumValue());
@@ -303,7 +319,7 @@ public class DurationUnitField extends Label {
                         previousField.decrement();
                     }
                 } else {
-                    setValue(getMinimumValue());
+                    setValue(0L);
                 }
             } else {
                 setValue(newValue);
@@ -319,7 +335,7 @@ public class DurationUnitField extends Label {
             long newValue = value + 1;
             if (newValue > getMaximumValue()) {
                 if (picker.isRollover()) {
-                    setValue(getMinimumValue());
+                    setValue(0L);
                     if (picker.isLinkingFields() && previousField != null) {
                         previousField.increment();
                     }
@@ -340,7 +356,7 @@ public class DurationUnitField extends Label {
      * @param field the next
      */
     final void setNextField(DurationUnitField field) {
-        this.nextField = field;
+        nextField = field;
     }
 
     /*
@@ -349,20 +365,16 @@ public class DurationUnitField extends Label {
      * @param field the next
      */
     final void setPreviousField(DurationUnitField field) {
-        this.previousField = field;
+        previousField = field;
     }
 
     private void constrainValue() {
         Long value = getValue();
         if (value != null) {
-            if (value < getMinimumValue()) {
-                setValue(getMinimumValue());
-                return;
-            }
-
-            if (value > getMaximumValue()) {
+            if (value < 0L) {
+                setValue(0L);
+            } else if (value > getMaximumValue()) {
                 setValue(getMaximumValue());
-                return;
             }
         }
     }
@@ -387,26 +399,6 @@ public class DurationUnitField extends Label {
     }
 
     /**
-     * The minimum value that can be entered in this field.
-     *
-     * @return the minimum value.
-     */
-    public final LongProperty minimumValueProperty() {
-        return minimumValue;
-    }
-
-    private final LongProperty minimumValue = new SimpleLongProperty(this, "minimumValue", 0);
-
-    public final Long getMinimumValue() {
-        return minimumValueProperty().get();
-    }
-
-    public final void setMinimumValue(Long minimumValue) {
-        minimumValueProperty().set(minimumValue);
-    }
-
-
-    /**
      * The maximum value that can be entered in this field.
      *
      * @return the maximum value.
@@ -417,11 +409,11 @@ public class DurationUnitField extends Label {
 
     private final LongProperty maximumValue = new SimpleLongProperty(this, "maximumValue", Long.MAX_VALUE);
 
-    public final Long getMaximumValue() {
+    final Long getMaximumValue() {
         return maximumValueProperty().get();
     }
 
-    public final void setMaximumValue(Long maximumValue) {
+    final void setMaximumValue(Long maximumValue) {
         maximumValueProperty().set(maximumValue);
     }
 
