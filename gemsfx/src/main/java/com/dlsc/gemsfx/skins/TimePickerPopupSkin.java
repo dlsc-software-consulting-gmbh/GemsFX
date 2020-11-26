@@ -93,7 +93,7 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
             hourListView.getItems().add(hour);
         }
 
-        for (int minute = 0; minute < 59; minute = minute + getSkinnable().getStepRateInMinutes()) {
+        for (int minute = 0; minute < 60; minute = minute + getSkinnable().getStepRateInMinutes()) {
             minuteListView.getItems().add(minute);
         }
     }
