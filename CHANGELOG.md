@@ -1,5 +1,28 @@
 # Change Log
 
+## [Unreleased](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/HEAD)
+
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.22.0...HEAD)
+
+**Implemented enhancements:**
+
+- Duration Picker - Localization. [\#25](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/25)
+
+## [1.22.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.22.0) (2020-11-26)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.21.0...1.22.0)
+
+**Closed issues:**
+
+- TimePicker Popup misses minute 59 [\#27](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/27)
+- Duration Picker -  Strange behavior when typing an invalid number. [\#24](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/24)
+- Duration Picker - Setting duration to zero does not clear all fields. [\#23](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/23)
+- jdk15 JFX15 Exception [\#22](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/22)
+- Localization, custom CSS, components [\#21](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/21)
+- Missing icons [\#20](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/20)
+- Problem launching DrawerApp [\#18](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/18)
+- Developer guide [\#15](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/15)
+- How to attach a textfield to numeric keyboard of GemsFX keyboard in KeyboardPane? [\#14](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/14)
+
 ## [1.21.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.21.0) (2020-11-18)
 [Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.20.1...1.21.0)
 
