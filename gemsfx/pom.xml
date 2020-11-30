@@ -51,6 +51,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.dlsc.pickerfx</groupId>
+            <artifactId>pickerfx</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+
+        <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.6</version>

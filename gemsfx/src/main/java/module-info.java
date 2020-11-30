@@ -16,6 +16,7 @@ module com.dlsc.gemsfx {
     requires retrofit2;
     requires okhttp3;
     requires java.desktop;
+    requires com.dlsc.pickerfx;
 
     exports com.dlsc.gemsfx.util;
     exports com.dlsc.gemsfx;

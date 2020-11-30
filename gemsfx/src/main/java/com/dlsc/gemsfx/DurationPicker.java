@@ -56,6 +56,8 @@ public class DurationPicker extends Control {
 
         setOnShowPopup(picker -> show());
 
+        setMaximumDuration(Duration.ofDays(7));
+
         getFields().setAll(ChronoUnit.DAYS, ChronoUnit.HOURS, ChronoUnit.MINUTES, ChronoUnit.SECONDS, ChronoUnit.MILLIS);
 
         MapChangeListener<? super Object, ? super Object> propertiesListener = change -> {

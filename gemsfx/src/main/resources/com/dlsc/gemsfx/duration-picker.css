@@ -67,66 +67,38 @@
 /* --------------------------------------------------------------
  * DurationPickerPopup
  */
-.duration-picker .duration-picker-popup .box {
-    -fx-spacing: 5px;
-    -fx-pref-height: 230px;
-    -fx-background-color: -fx-box-border, white;
-    -fx-background-insets: 0, 1;
-    -fx-padding: 10px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
-}
 
-.duration-picker .duration-picker-popup .box .header-label {
-    -fx-max-width: infinity;
-    -fx-alignment: center;
-    -fx-font-size: .8em;
-}
-
-.duration-picker .duration-picker-popup .box .unit-list-view {
-}
-
-.duration-picker .duration-picker-popup .box .unit-list-view .list-cell {
-    -fx-alignment: center;
+.duration-picker-popup .box {
     -fx-background-color: white;
 }
 
-.duration-picker .duration-picker-popup .box .unit-list-view .list-cell .unit-label {
-    -fx-padding: .5em 0em;
-    -fx-alignment: center;
-    -fx-font-weight: bold;
-    -fx-background-color: gray;
-    -fx-background-radius: 2px;
-    -fx-pref-width: 3em;
-    -fx-text-fill: white;
+.duration-picker-popup .box .picker {
+    -fx-cell-size: 30px;
+    -fx-indicator-size: 30px;
 }
 
-.duration-picker .duration-picker-popup .box .unit-list-view .list-cell:hover .unit-label {
-    -fx-background-color: lightgray;
-    -fx-background-insets: 0;
+.duration-picker-popup .box .picker:vertical .segment {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%,
+    rgba(255, 255, 255, .4),
+    rgba(255, 255, 255, .6) 25%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, .6) 75%,
+    rgba(255, 255, 255, .4) 100%);
+    -fx-pref-height: 150;
+    -fx-pref-width: 50;
+}
+
+.duration-picker-popup .box .picker .segment > .segment-cell {
+    -fx-font-size: 1.25em;
+    -fx-font-family: null;
     -fx-text-fill: black;
-}
-
-.duration-picker .duration-picker-popup .box .unit-list-view .list-cell:selected .unit-label {
+    -fx-background-color: transparent;
     -fx-background-insets: 0;
-    -fx-background-color: -fx-accent;
-    -fx-text-fill: white;
 }
 
-.duration-picker .duration-picker-popup .box .unit-list-view .vertical-scroll-bar {
-    -fx-pref-width: 0;
+.duration-picker-popup .box .colon {
+    -fx-font-family: null;
+    -fx-pref-width: 15;
+    -fx-font-size: 1.25em !important;
+    -fx-background-color: white;
 }
-
-.duration-picker .duration-picker-popup .box .unit-list-view {
-    -fx-background-insets: 0px;
-    -fx-pref-width: 70px;
-}
-
-.duration-picker .duration-picker-popup .box .unit-list-view > .virtual-flow > .scroll-bar,
-.duration-picker .duration-picker-popup .box .unit-list-view > .virtual-flow > .scroll-bar .decrement-arrow,
-.duration-picker .duration-picker-popup .box .unit-list-view > .virtual-flow > .scroll-bar .increment-arrow,
-.duration-picker .duration-picker-popup .box .unit-list-view > .virtual-flow > .scroll-bar .decrement-button,
-.duration-picker .duration-picker-popup .box .unit-list-view > .virtual-flow > .scroll-bar .increment-button {
-    -fx-pref-width: 0;
-    -fx-pref-height: 0;
-}
-
