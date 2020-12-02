@@ -1,8 +1,7 @@
 # Change Log
 
-## [Unreleased](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/HEAD)
-
-[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.22.0...HEAD)
+## [1.23.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.23.0) (2020-12-02)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.22.0...1.23.0)
 
 **Implemented enhancements:**
 
