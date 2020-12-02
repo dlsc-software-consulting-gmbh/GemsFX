@@ -75,30 +75,58 @@
 .duration-picker-popup .box .picker {
     -fx-cell-size: 30px;
     -fx-indicator-size: 30px;
+    -fx-padding: 1px;
+    -fx-border-width: 1;
+    -fx-border-color: -fx-box-border;
+    -fx-background-color: -fx-control-inner-background-alt;
+}
+
+.duration-picker-popup .box .picker .container {
+    -fx-spacing: 0px;
+    -fx-padding: 0px;
 }
 
 .duration-picker-popup .box .picker:vertical .segment {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%,
-    rgba(255, 255, 255, .4),
-    rgba(255, 255, 255, .6) 25%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, .6) 75%,
-    rgba(255, 255, 255, .4) 100%);
+    -fx-background-color: -fx-control-inner-background;
     -fx-pref-height: 150;
     -fx-pref-width: 50;
+    -fx-padding: 0px;
 }
 
-.duration-picker-popup .box .picker .segment > .segment-cell {
-    -fx-font-size: 1.25em;
+.duration-picker-popup .box .picker:vertical .segment > .segment-cell {
+    -fx-font-size: 1em;
     -fx-font-family: null;
     -fx-text-fill: black;
     -fx-background-color: transparent;
     -fx-background-insets: 0;
 }
 
-.duration-picker-popup .box .colon {
+.duration-picker-popup .box .picker:vertical .colon {
+    -fx-padding: 0px 2px;
     -fx-font-family: null;
-    -fx-pref-width: 15;
-    -fx-font-size: 1.25em !important;
-    -fx-background-color: white;
+    -fx-pref-width: 5;
+    -fx-font-size: 1em;
+    -fx-background-color: transparent;
+}
+
+.duration-picker-popup .picker:vertical > .shadow {
+    -fx-background-color: transparent;
+}
+
+.duration-picker-popup .picker:vertical > .indicator {
+    -fx-border-color: black;
+    -fx-border-width: 1;
+    -fx-border-insets: 0;
+    -fx-background-color: -fx-accent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-opacity: .4;
+}
+
+.duration-picker-popup .picker:vertical .segment-separator {
+    -fx-background-color: -fx-box-border;
+    -fx-pref-width: 1;
+    -fx-min-width: 1;
+    -fx-max-width: 1;
+    -fx-pref-height: 20;
 }

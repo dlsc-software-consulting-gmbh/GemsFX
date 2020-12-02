@@ -230,7 +230,7 @@ public class DurationPickerApp extends Application {
         stackPane.setPadding(new Insets(20));
 
         Scene scene = new Scene(stackPane);
-        CSSFX.start();
+        CSSFX.start(scene);
 
         primaryStage.setTitle("DurationPicker");
         primaryStage.setScene(scene);

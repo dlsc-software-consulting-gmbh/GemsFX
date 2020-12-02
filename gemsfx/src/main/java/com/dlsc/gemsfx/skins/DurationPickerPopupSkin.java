@@ -21,6 +21,7 @@ public class DurationPickerPopupSkin implements Skin<DurationPickerPopup> {
         durationPicker.valueProperty().bindBidirectional(popup.durationProperty());
         durationPicker.maximumDurationProperty().bind(popup.maximumDurationProperty());
         durationPicker.minimumDurationProperty().bind(popup.minimumDurationProperty());
+        durationPicker.fieldsProperty().bind(popup.fieldsProperty());
 
         hBox.setFillHeight(true);
         hBox.getChildren().add(durationPicker);
