@@ -49,6 +49,33 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
+/**
+ * A pane that allows applications to display a lightweight dialog right inside the application
+ * window instead of a separate window. The dialogs are animated and fly-in from top to center and
+ * fly-out from center to top.
+ * <p>
+ * The dialog pane should be added to the application in such a way that it covers the entire area
+ * of the window. If the application is using a StackPane as its root container then the dialog
+ * pane can simply be added as the last child of the StackPane.
+ * </p>
+ * <h3>Example</h3>
+ * To show an information dialog one can simply call:
+ * <p>
+ * <pre>
+ *    dialogPane.showInformation("My Title", "My message");
+ * </pre>
+ * </p>
+ * <p>
+ * If an application wants to act upon the button that was pressed after showing a confirmation dialog
+ * then the following can be written:
+ * <p>
+ * <pre>
+ *     dialogPane.showConfirmation("Confirm", "Really delete?").thenAccept(buttonType -> { ... });
+ * </pre>
+ * </p>
+ *
+ * </p>
+ */
 public class DialogPane extends Pane {
 
     private final GlassPane glassPane;
