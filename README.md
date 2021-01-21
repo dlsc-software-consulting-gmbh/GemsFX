@@ -2,6 +2,22 @@
 
 *At least **JDK 11** is required.*
 
+## Dialog Pane
+
+The class DialogPane can be used as a layer on top of any application. It offers various methods to display different
+types of dialogs.
+
+* Information
+* Warning
+* Error
+* Confirmation
+* Node (any UI)
+* Busy (spinning animation, indeterminate)
+* Single line text input
+* Multiple line text input
+
+![DialogPane](gemsfx/docs/dialog-pane.png)
+
 ## Time Picker
 
 A small control used for entering a time. The control can be configured with a "step rate" for the minutes field (e.g. "15 minutes") that will be used when
@@ -98,6 +114,7 @@ You can run the demos using Maven by typing any of the following lines into your
 terminal:
 
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.EnhancedLabelApp
+    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.DialogsApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.DrawerApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.FilterViewApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.RichTextAreaApp
