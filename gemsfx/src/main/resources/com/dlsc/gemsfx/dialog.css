@@ -1,0 +1,122 @@
+.dialog-pane {
+    -fx-background-color: transparent;
+}
+
+.dialog-pane > .content-pane {
+    -fx-background-radius: 3px;
+    -fx-background-color: -fx-base;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
+    -fx-min-width: 350px;
+    -fx-min-height: 250px;
+}
+
+.dialog-pane > .content-pane .prompt-node-wrapper {
+    -fx-spacing: 10px;
+}
+
+.dialog-pane > .content-pane > .glass-pane {
+    -fx-background-color: rgba(0, 0, 0, .5);
+}
+
+.dialog-pane > .content-pane > .vbox {
+}
+
+.dialog-pane > .content-pane > .vbox .label {
+}
+
+.dialog-pane > .content-pane > .vbox > .button-bar {
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+    -fx-background-color: rgba(100, 112, 122, 0.2);
+    -fx-alignment: center;
+}
+
+.dialog-pane > .content-pane > .vbox > .button-bar > .button {
+}
+
+.dialog-pane > .content-pane > .vbox > .button-bar > .button:default {
+}
+
+.dialog-pane > .content-pane > .vbox > .header {
+    -fx-padding: 25px 50px 0px 50px;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-spacing: 15px;
+}
+
+.dialog-pane > .content-pane > .vbox > .header > .title {
+    -fx-alignment: center;
+    -fx-padding: 0;
+    -fx-font-size: 24px;
+    -fx-font-family: "Rubik Medium";
+}
+
+.dialog-pane > .content-pane > .vbox > .content {
+}
+
+.dialog-pane > .content-pane > .vbox > .content.padding {
+    -fx-padding: 30px 30px 50px 30px;
+}
+
+.dialog-pane > .content-pane.information > .vbox > .header > .icon {
+    -fx-image: url("dialog-information.png");
+}
+
+.dialog-pane > .content-pane.warning > .vbox > .header > .icon {
+    -fx-image: url("dialog-warning.png");
+}
+
+.dialog-pane > .content-pane.error > .vbox > .header > .icon {
+    -fx-image: url("dialog-error.png");
+}
+
+.dialog-pane > .content-pane.confirmation > .vbox > .header > .icon {
+    -fx-image: url("dialog-confirm.png");
+}
+
+/* ----------------------------------------------------------------------------
+ * BusyIndicator
+ */
+
+.dialog-pane .busy-indicator {
+    -size: 100px;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+    -fx-background-color: transparent;
+}
+
+/* ----------------------------------------------------------------------------
+ * CircularProgressIndicator
+ */
+
+.dialog-pane > .content-pane .circular-progress {
+    -indicator-color: white;
+}
+
+.dialog-pane > .content-pane .circular-progress .indicator {
+    -fx-stroke-type: centered;
+    -fx-stroke: -fx-accent;
+    -fx-fill: transparent;
+}
+
+/* ----------------------------------------------------------------------------
+ * Glass Pane
+ */
+.dialog-pane > .glass-pane {
+    -fx-background-color: black;
+    -fx-opacity: .6;
+}
+
+/* ----------------------------------------------------------------------------
+ * ResizableTextArea
+ */
+.dialog-pane > .content-pane .resizable-text-area .resize-corner {
+    -fx-padding: 0px 2px 2px 0px;
+}
+
+.dialog-pane > .content-pane .resizable-text-area .resize-corner .ikonli-font-icon {
+    -fx-icon-size: 24px;
+    -fx-icon-color: -fx-accent;
+}
