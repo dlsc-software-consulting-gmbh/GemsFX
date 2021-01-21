@@ -2,6 +2,14 @@
   "samples": [
     {
       "category": "gemsfx",
+      "name": "Dialog Pane",
+      "desc": "A pane for displaying dialogs.",
+      "project": "GemsFX",
+      "preview": "/preview-dialogs.png",
+      "classname": "com.dlsc.gemsfx.demo.DialogsApp"
+    },
+    {
+      "category": "gemsfx",
       "name": "Time Picker",
       "desc": "A control for entering a time (Java time API)",
       "project": "GemsFX",
