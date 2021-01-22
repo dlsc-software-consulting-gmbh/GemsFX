@@ -2,6 +2,8 @@
 
 *At least **JDK 11** is required.*
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
+
 ## Dialog Pane
 
 The class DialogPane can be used as a layer on top of any application. It offers various methods to display different
