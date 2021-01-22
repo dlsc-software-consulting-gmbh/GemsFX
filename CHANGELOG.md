@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.25.1](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.25.1) (2021-01-22)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.25.0...1.25.1)
+
+**Implemented enhancements:**
+
+- Duration Picker - RFE - Wrapping in the popup.  [\#26](https://github.com/dlsc-software-consulting-gmbh/GemsFX/issues/26)
+
+**Merged pull requests:**
+
+- Update README.md [\#30](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/30) ([joehei](https://github.com/joehei))
+- Avoiding exception with JPro [\#28](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/28) ([FlorianKirmaier](https://github.com/FlorianKirmaier))
+
 ## [1.25.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.25.0) (2021-01-21)
 [Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.24.0...1.25.0)
 
