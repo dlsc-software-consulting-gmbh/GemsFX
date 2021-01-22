@@ -16,12 +16,12 @@ public class RTTableCell extends RTElementContainer<RTTableCell> {
     }
 
     public final RTTableCell withRowSpan(int span) {
-        this.rowSpan = rowSpan;
+        rowSpan = span;
         return this;
     }
 
     public final RTTableCell withColSpan(int span) {
-        this.colSpan = colSpan;
+        colSpan = span;
         return this;
     }
 

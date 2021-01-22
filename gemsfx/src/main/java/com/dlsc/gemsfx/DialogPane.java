@@ -43,6 +43,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -139,16 +140,13 @@ public class DialogPane extends Pane {
         sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
-                    switch (evt.getCode()) {
-                        case ESCAPE:
-                            // hide the last dialog that was opened
-                            if (!dialogs.isEmpty()) {
-                                Dialog<?> dialog = dialogs.get(dialogs.size() - 1);
-                                if (!dialog.isCancelled()) {
-                                    dialog.cancel();
-                                }
+                    if (evt.getCode() == KeyCode.ESCAPE) {// hide the last dialog that was opened
+                        if (!dialogs.isEmpty()) {
+                            Dialog<?> dialog = dialogs.get(dialogs.size() - 1);
+                            if (!dialog.isCancelled()) {
+                                dialog.cancel();
                             }
-                            break;
+                        }
                     }
                 });
             }
@@ -410,7 +408,7 @@ public class DialogPane extends Pane {
     private void slideInOut(double visibility, DoubleProperty visibilityProperty, Supplier<Node> nodeSupplier) {
         Node node = nodeSupplier.get();
 
-        if (true) {
+        if (!getAnimationDuration().equals(Duration.ZERO)) {
             if (visibility == 1) {
                 ensureNodeInChildrenList(node);
                 node.setVisible(true);
@@ -462,7 +460,7 @@ public class DialogPane extends Pane {
 
     @Override
     protected void layoutChildren() {
-        final Insets insets = getInsets();
+        Insets insets = getInsets();
 
         double contentY = insets.getTop();
         double contentX = insets.getLeft();

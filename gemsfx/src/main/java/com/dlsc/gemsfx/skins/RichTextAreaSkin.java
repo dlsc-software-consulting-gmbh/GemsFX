@@ -18,6 +18,10 @@ import com.dlsc.gemsfx.richtextarea.RTTableRow;
 import com.dlsc.gemsfx.richtextarea.RTText;
 import com.dlsc.gemsfx.richtextarea.RTTextElement;
 import com.dlsc.gemsfx.richtextarea.RichTextArea;
+
+import java.util.List;
+import java.util.function.Consumer;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -39,22 +43,16 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 public class RichTextAreaSkin extends SkinBase<RichTextArea> {
 
     private final Label placeholder = new Label();
-
-    private Section rootSection;
-
-    private VBox container = new VBox();
 
     public RichTextAreaSkin(RichTextArea control) {
         super(control);
 
         placeholder.textProperty().bind(control.placeholderTextProperty());
 
+        VBox container = new VBox();
         container.setFillWidth(true);
 
         placeholder.getStyleClass().add("placeholder");
@@ -75,10 +73,8 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
 
     /**
      * Defines horizontal text alignment.
-     *
-     * @defaultValue TextAlignment.LEFT
      */
-    private final ObjectProperty<TextAlignment> textAlignment = new SimpleObjectProperty<>(this, "textAlignment");
+    private final ObjectProperty<TextAlignment> textAlignment = new SimpleObjectProperty<>(this, "textAlignment", TextAlignment.LEFT);
 
     public final void setTextAlignment(TextAlignment value) {
         textAlignment.set(value);
@@ -94,8 +90,6 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
 
     /**
      * Defines the vertical space in pixel between lines.
-     *
-     * @defaultValue 0
      */
     private final DoubleProperty lineSpacing = new SimpleDoubleProperty(this, "lineSpacing", 0);
 
@@ -112,13 +106,13 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
     }
 
     private void updateText() {
-        final RTDocument document = getSkinnable().getDocument();
+        RTDocument document = getSkinnable().getDocument();
         getChildren().clear();
 
         if (document == null || document.getElements().isEmpty()) {
             getChildren().add(placeholder);
         } else {
-            rootSection = new Section();
+            Section rootSection = new Section();
             getChildren().add(rootSection);
 
             processBlockElements(document, rootSection);
@@ -255,7 +249,7 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
         javafx.scene.text.Text uiText = createText(link, section);
 
         uiText.setOnMouseClicked(evt -> {
-            final Consumer<String> hyperlinkHandler = getSkinnable().getHyperlinkHandler();
+            Consumer<String> hyperlinkHandler = getSkinnable().getHyperlinkHandler();
             if (hyperlinkHandler != null) {
                 hyperlinkHandler.accept(link.getTarget());
             }
@@ -411,7 +405,7 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
             double ph = getInsets().getTop() + getInsets().getBottom();
             for (Node node : getChildren()) {
                 if (node instanceof ImageView) {
-                    final ImageView imageView = (ImageView) node;
+                    ImageView imageView = (ImageView) node;
                     javafx.scene.image.Image image = imageView.getImage();
                     double w = Math.min(image.getWidth(), getWidth());
                     ph += image.getHeight() * (w / image.getWidth());
@@ -427,16 +421,16 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
 
         @Override
         protected void layoutChildren() {
-            final double width = getWidth();
-            final Insets insets = getInsets();
-            final double contentWidth = width - insets.getLeft() - insets.getRight();
+            double width = getWidth();
+            Insets insets = getInsets();
+            double contentWidth = width - insets.getLeft() - insets.getRight();
 
             double y = insets.getTop();
             for (Node node : getChildren()) {
                 double w;
                 double h;
                 if (node instanceof ImageView) {
-                    final ImageView imageView = (ImageView) node;
+                    ImageView imageView = (ImageView) node;
                     javafx.scene.image.Image image = imageView.getImage();
                     w = Math.min(image.getWidth(), contentWidth);
                     h = image.getHeight() * (w / image.getWidth());

@@ -34,7 +34,7 @@ public class DurationPicker extends Control {
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
         minimumDurationProperty().addListener(it -> {
-            final Duration minimumDuration = getMinimumDuration();
+            Duration minimumDuration = getMinimumDuration();
             if (minimumDuration == null) {
                 throw new IllegalArgumentException("the minimum duration can not be null, it always has to be at least Duration.ZERO");
             }
@@ -121,7 +121,7 @@ public class DurationPicker extends Control {
         return showing.getReadOnlyProperty();
     }
 
-    private final void setShowing(boolean showing) {
+    private void setShowing(boolean showing) {
         this.showing.set(showing);
     }
 

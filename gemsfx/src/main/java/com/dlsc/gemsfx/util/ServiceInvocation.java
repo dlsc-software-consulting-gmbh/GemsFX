@@ -1,20 +1,7 @@
-/**
+/*
  * Copyright 2019 DLSC Software & Consulting GmbH.
  */
 package com.dlsc.gemsfx.util;
-
-
-import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyDoubleWrapper;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.concurrent.Worker;
-import retrofit2.Response;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -30,6 +17,18 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleWrapper;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.concurrent.Worker;
+import retrofit2.Response;
 
 /**
  * A utility class used to invoke backend services via Retrofit on a separate thread and to
@@ -78,8 +77,8 @@ public final class ServiceInvocation<T> implements Worker<T> {
         return thread;
     });
 
-    private String name;
-    private ServiceSupplier<T> service;
+    private final String name;
+    private final ServiceSupplier<T> service;
 
     private Consumer<String> onStart;
     private Consumer<T> onSuccess;
@@ -100,7 +99,7 @@ public final class ServiceInvocation<T> implements Worker<T> {
 
     private boolean simulatingFailure;
 
-    private long delay = 0;
+    private long delay;
 
     private ServiceInvocation(String name, ServiceSupplier<T> service) {
         this.name = Objects.requireNonNull(name, "service invocation name can not be null");
@@ -164,7 +163,7 @@ public final class ServiceInvocation<T> implements Worker<T> {
     public CompletableFuture<Void> execute(Executor executor) {
         Objects.requireNonNull(executor, "executor can not be null");
 
-        final CompletableFuture<Void> result = new CompletableFuture<>();
+        CompletableFuture<Void> result = new CompletableFuture<>();
 
         state.set(State.RUNNING);
         totalWork.set(1);
@@ -192,7 +191,7 @@ public final class ServiceInvocation<T> implements Worker<T> {
                 Response<T> response = service.get();
 
                 if (LOG.isLoggable(Level.FINE)) {
-                    final Duration duration = Duration.between(startTime, Instant.now());
+                    Duration duration = Duration.between(startTime, Instant.now());
                     LOG.fine("server side call duration: " + duration.toMillis() + "ms");
                 }
 
@@ -240,13 +239,13 @@ public final class ServiceInvocation<T> implements Worker<T> {
             state.set(State.FAILED);
         });
 
-        final String errorMessage = simulatingFailure ? "Simulated failure" : response.errorBody().string();
+        String errorMessage = simulatingFailure ? "Simulated failure" : (response.errorBody() != null ? response.errorBody().string() : "");
 
         LOG.log(Level.SEVERE, "service call was not successful: " + errorMessage);
 
         if (onStatusCode != null || onStatusCodeDefault != null) {
 
-            final BiConsumer<String, String> statusCodeConsumer = getOnStatusCode(HttpStatusCode.fromStatusCode(response.code()));
+            BiConsumer<String, String> statusCodeConsumer = getOnStatusCode(HttpStatusCode.fromStatusCode(response.code()));
 
             if (statusCodeConsumer != null) {
 
@@ -255,7 +254,7 @@ public final class ServiceInvocation<T> implements Worker<T> {
             }
         }
 
-        final BiConsumer<String, String> onFailureHandler = getOnFailure();
+        BiConsumer<String, String> onFailureHandler = getOnFailure();
 
         if (onFailureHandler != null) {
             runAndWait(() -> {
@@ -264,7 +263,7 @@ public final class ServiceInvocation<T> implements Worker<T> {
             });
         } else {
 
-            final BiConsumer<String, Response> onFailureDetailedHandler = getOnFailureDetailed();
+            BiConsumer<String, Response> onFailureDetailedHandler = getOnFailureDetailed();
 
             if (onFailureDetailedHandler != null) {
                 LOG.finer("invoking onFailureDetailed handler");
@@ -282,7 +281,7 @@ public final class ServiceInvocation<T> implements Worker<T> {
             message.set("Server-side error");
         });
 
-        final BiConsumer<String, Exception> onExceptionHandler = getOnException();
+        BiConsumer<String, Exception> onExceptionHandler = getOnException();
 
         if (onExceptionHandler != null) {
             try {
@@ -344,7 +343,7 @@ public final class ServiceInvocation<T> implements Worker<T> {
      * @return the service invocation
      */
     public ServiceInvocation<T> withSimulatingFailure(boolean failure) {
-        this.simulatingFailure = failure;
+        simulatingFailure = failure;
         return this;
     }
 
@@ -512,7 +511,7 @@ public final class ServiceInvocation<T> implements Worker<T> {
     }
 
     private void runAndWait(Runnable runnable) throws ExecutionException, InterruptedException {
-        final CompletableFuture<Void> result = new CompletableFuture<>();
+        CompletableFuture<Void> result = new CompletableFuture<>();
         Platform.runLater(() -> {
             try {
                 runnable.run();
@@ -527,7 +526,7 @@ public final class ServiceInvocation<T> implements Worker<T> {
 
     // state
 
-    private ReadOnlyObjectWrapper<State> state = new ReadOnlyObjectWrapper<>(this, "state", State.READY);
+    private final ReadOnlyObjectWrapper<State> state = new ReadOnlyObjectWrapper<>(this, "state", State.READY);
 
     /**
      * Returns the worker state of the service invocation (running, succeeded, ...).
@@ -551,7 +550,7 @@ public final class ServiceInvocation<T> implements Worker<T> {
 
     // value
 
-    private ReadOnlyObjectWrapper<T> value = new ReadOnlyObjectWrapper<>(this, "value");
+    private final ReadOnlyObjectWrapper<T> value = new ReadOnlyObjectWrapper<>(this, "value");
 
     @Override
     public T getValue() {
@@ -565,7 +564,7 @@ public final class ServiceInvocation<T> implements Worker<T> {
 
     // exceptions
 
-    private ReadOnlyObjectWrapper<Throwable> exception = new ReadOnlyObjectWrapper<>(this, "exception");
+    private final ReadOnlyObjectWrapper<Throwable> exception = new ReadOnlyObjectWrapper<>(this, "exception");
 
     @Override
     public Throwable getException() {

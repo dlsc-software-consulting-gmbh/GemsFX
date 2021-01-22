@@ -46,7 +46,7 @@ public class ScrollPaneApp extends Application {
         HBox footer = new HBox(10, animated, comboBox);
 
         comboBox.valueProperty().addListener(it -> {
-            final Node lookup = box.lookup("#" + comboBox.getValue());
+            Node lookup = box.lookup("#" + comboBox.getValue());
 //            scrollPane.showNode(lookup, animated.isSelected());
             scrollPane.bottomNode(lookup);
         });

@@ -667,7 +667,7 @@ public class DrawerStackPane extends StackPane {
 
     private void postHiding() {
         drawer.setVisible(false);
-        final Runnable onClose = getOnDrawerClose();
+        Runnable onClose = getOnDrawerClose();
         if (onClose != null) {
             onClose.run();
         }

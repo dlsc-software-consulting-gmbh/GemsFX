@@ -17,7 +17,7 @@ public class RTLink extends RTTextElement<RTLink> {
     }
 
     public final RTLink withTarget(String url) {
-        this.target.set(url);
+        target.set(url);
         return this;
     }
 

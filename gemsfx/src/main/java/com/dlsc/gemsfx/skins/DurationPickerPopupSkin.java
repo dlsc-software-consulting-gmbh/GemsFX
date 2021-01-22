@@ -8,7 +8,6 @@ import javafx.scene.layout.HBox;
 
 public class DurationPickerPopupSkin implements Skin<DurationPickerPopup> {
     private final DurationPickerPopup popup;
-    private final DurationPicker durationPicker;
     private final HBox hBox;
 
     public DurationPickerPopupSkin(DurationPickerPopup popup) {
@@ -17,7 +16,7 @@ public class DurationPickerPopupSkin implements Skin<DurationPickerPopup> {
         hBox = new HBox();
         hBox.getStyleClass().add("box");
 
-        durationPicker = new DurationPicker();
+        DurationPicker durationPicker = new DurationPicker();
         durationPicker.valueProperty().bindBidirectional(popup.durationProperty());
         durationPicker.maximumDurationProperty().bind(popup.maximumDurationProperty());
         durationPicker.minimumDurationProperty().bind(popup.minimumDurationProperty());

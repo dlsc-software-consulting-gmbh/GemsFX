@@ -1,5 +1,7 @@
 package com.dlsc.gemsfx;
 
+import java.util.function.Supplier;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,8 +19,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
-
-import java.util.function.Supplier;
 
 /**
  * An enhanced label that allows for selecting the (whole) label and copying to the clipboard
@@ -137,7 +137,7 @@ public class EnhancedLabel extends Label {
         this.copyMenuItemText.set(copyMenuItemText);
     }
 
-    private final ObjectProperty<Supplier<String>> copyContentSupplier = new SimpleObjectProperty<>(this, "copyContentProvider", () -> getText());
+    private final ObjectProperty<Supplier<String>> copyContentSupplier = new SimpleObjectProperty<>(this, "copyContentProvider", this::getText);
 
     public final Supplier<String> getCopyContentSupplier() {
         return copyContentSupplier.get();

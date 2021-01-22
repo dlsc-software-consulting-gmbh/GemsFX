@@ -2,7 +2,6 @@ module com.dlsc.gemsfx {
     requires transitive javafx.controls;
     requires javafx.swing;
 
-    requires org.kordamp.iconli.core;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign;
 

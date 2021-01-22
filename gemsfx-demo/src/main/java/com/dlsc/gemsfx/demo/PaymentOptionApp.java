@@ -31,7 +31,7 @@ public class PaymentOptionApp extends Application {
 
         VBox.setVgrow(paymentOptionView, Priority.ALWAYS);
 
-        final VBox parent = new VBox(40, paymentOptionView, box);
+        VBox parent = new VBox(40, paymentOptionView, box);
         parent.setAlignment(Pos.CENTER);
 
         themeBox.valueProperty().addListener(it -> {

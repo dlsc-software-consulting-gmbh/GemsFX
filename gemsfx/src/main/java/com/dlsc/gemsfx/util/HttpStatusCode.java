@@ -48,33 +48,31 @@ public enum HttpStatusCode {
     private final HttpStatusCode.Family family;
 
     HttpStatusCode(int statusCode, String reasonPhrase) {
-        this.code = statusCode;
-        this.reason = reasonPhrase;
-        this.family = HttpStatusCode.Family.familyOf(statusCode);
+        code = statusCode;
+        reason = reasonPhrase;
+        family = HttpStatusCode.Family.familyOf(statusCode);
     }
 
     public HttpStatusCode.Family getFamily() {
-        return this.family;
+        return family;
     }
 
     public int getStatusCode() {
-        return this.code;
+        return code;
     }
 
     public String getReasonPhrase() {
-        return this.toString();
+        return toString();
     }
 
     public String toString() {
-        return this.reason;
+        return reason;
     }
 
     public static HttpStatusCode fromStatusCode(int statusCode) {
-        HttpStatusCode[] var1 = values();
-        int var2 = var1.length;
+        HttpStatusCode[] codes = values();
 
-        for (int var3 = 0; var3 < var2; ++var3) {
-            HttpStatusCode s = var1[var3];
+        for (HttpStatusCode s : codes) {
             if (s.code == statusCode) {
                 return s;
             }

@@ -211,7 +211,7 @@ public abstract class DigitsField extends TimeField {
      * @param field the next
      */
     final void setNextField(TimeField field) {
-        this.nextField = field;
+        nextField = field;
     }
 
     /*
@@ -220,7 +220,7 @@ public abstract class DigitsField extends TimeField {
      * @param field the next
      */
     final void setPreviousField(TimeField field) {
-        this.previousField = field;
+        previousField = field;
     }
 
     private final IntegerProperty stepRate = new SimpleIntegerProperty(this, "stepRate", 1);

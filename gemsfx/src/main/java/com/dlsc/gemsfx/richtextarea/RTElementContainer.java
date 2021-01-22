@@ -6,7 +6,7 @@ import javafx.collections.ObservableList;
 
 public abstract class RTElementContainer<SELF extends RTElementContainer> extends RTElement<SELF> {
 
-    private ReadOnlyListWrapper<RTElement> elements = new ReadOnlyListWrapper<>(this, "elements", FXCollections.observableArrayList());
+    private final ReadOnlyListWrapper<RTElement> elements = new ReadOnlyListWrapper<>(this, "elements", FXCollections.observableArrayList());
 
     protected RTElementContainer() {
     }

@@ -66,13 +66,11 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
 
         updateLists();
 
-        popup.showingProperty().addListener(it -> {
-            Platform.runLater(() -> {
-                updateListViewSelection();
-                hourListView.scrollTo(hourListView.getSelectionModel().getSelectedIndex());
-                minuteListView.scrollTo(minuteListView.getSelectionModel().getSelectedIndex());
-            });
-        });
+        popup.showingProperty().addListener(it -> Platform.runLater(() -> {
+            updateListViewSelection();
+            hourListView.scrollTo(hourListView.getSelectionModel().getSelectedIndex());
+            minuteListView.scrollTo(minuteListView.getSelectionModel().getSelectedIndex());
+        }));
     }
 
     private void updateListViewSelection() {
@@ -114,11 +112,10 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
 
     public abstract static class TimeCell extends ListCell<Integer> {
 
-        private Label label = new Label();
-
         public TimeCell() {
             getStyleClass().add("time-cell");
 
+            Label label = new Label();
             label.getStyleClass().add("time-label");
             label.visibleProperty().bind(emptyProperty().not());
             label.textProperty().bind(textProperty());
@@ -128,7 +125,7 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
         }
     }
 
-    private class HourCell extends TimeCell {
+    private static class HourCell extends TimeCell {
 
         public HourCell() {
             getStyleClass().add("hour-cell");

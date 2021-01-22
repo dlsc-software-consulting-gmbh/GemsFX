@@ -4,6 +4,13 @@ import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
 import com.jpro.webapi.JProApplication;
 import com.jpro.webapi.WebAPI.FileUploader;
+
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+
+import java.io.File;
+import java.net.MalformedURLException;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,11 +28,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
-
-import java.io.File;
-import java.net.MalformedURLException;
 
 public class PhotoViewApp extends JProApplication {
 
@@ -137,9 +139,7 @@ public class PhotoViewApp extends JProApplication {
                 if (newV) {
                     photoView.getStyleClass().add("file-drag");
                 } else {
-                    if (photoView.getStyleClass().contains("file-drag")) {
-                        photoView.getStyleClass().remove("file-drag");
-                    }
+                    photoView.getStyleClass().remove("file-drag");
                 }
             });
 
@@ -154,7 +154,7 @@ public class PhotoViewApp extends JProApplication {
             });
 
             fileHandler.uploadedFileProperty().addListener(it -> {
-                final File uploadedFile = fileHandler.getUploadedFile();
+                File uploadedFile = fileHandler.getUploadedFile();
                 if (uploadedFile != null) {
                     try {
                         photoView.setPhoto(new Image(uploadedFile.toURI().toURL().toExternalForm()));

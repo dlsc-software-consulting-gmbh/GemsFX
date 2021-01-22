@@ -2,6 +2,9 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
+
+import java.util.function.Supplier;
+
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -24,8 +27,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-
-import java.util.function.Supplier;
 
 public class PhotoViewSkin extends SkinBase<PhotoView> {
 
@@ -138,9 +139,7 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
                 updateClip();
             });
 
-            view.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> {
-                updatePlaceholder(oldPlaceholder, newPlaceholder);
-            });
+            view.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> updatePlaceholder(oldPlaceholder, newPlaceholder));
 
             updateBorderShape();
             updateClip();
@@ -219,7 +218,7 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             protected Void call() throws Exception {
                 Thread.sleep(200);
                 if (!isCancelled()) {
-                    Platform.runLater(() -> doCrop());
+                    Platform.runLater(ImageBox.this::doCrop);
                 }
 
                 return null;
@@ -237,6 +236,7 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
 
             if (image == null) {
                 getSkinnable().getProperties().put("cropped.image", null);
+                return;
             }
 
             double scale = image.getWidth() / (imageView.getFitWidth() * getSkinnable().getPhotoZoom());
@@ -247,7 +247,6 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             int y = (int) (image.getHeight() / 2 - moveY);
             int w;
             int h;
-
 
             if (getSkinnable().getClipShape().equals(ClipShape.CIRCLE)) {
                 x -= (circle.getRadius() * scale);

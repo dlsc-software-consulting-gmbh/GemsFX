@@ -3,6 +3,9 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.FilterView;
 import com.dlsc.gemsfx.FilterView.Filter;
 import com.dlsc.gemsfx.FilterView.FilterGroup;
+
+import java.time.LocalDate;
+
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.collections.transformation.SortedList;
@@ -14,8 +17,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import java.time.LocalDate;
 
 public class FilterViewApp extends Application {
 
@@ -86,11 +87,7 @@ public class FilterViewApp extends Application {
                 if (person.getBirthday().getYear() < 1970) {
                     return false;
                 }
-                if (person.getBirthday().getYear() > 1980) {
-                    return false;
-                }
-
-                return true;
+                return person.getBirthday().getYear() <= 1980;
             }
         });
 
@@ -100,11 +97,7 @@ public class FilterViewApp extends Application {
                 if (person.getBirthday().getYear() < 1980) {
                     return false;
                 }
-                if (person.getBirthday().getYear() > 1990) {
-                    return false;
-                }
-
-                return true;
+                return person.getBirthday().getYear() <= 1990;
             }
         });
 
@@ -114,11 +107,7 @@ public class FilterViewApp extends Application {
                 if (person.getBirthday().getYear() < 1990) {
                     return false;
                 }
-                if (person.getBirthday().getYear() > 2000) {
-                    return false;
-                }
-
-                return true;
+                return person.getBirthday().getYear() <= 2000;
             }
         });
 
@@ -128,11 +117,7 @@ public class FilterViewApp extends Application {
                 if (person.getBirthday().getYear() < 2000) {
                     return false;
                 }
-                if (person.getBirthday().getYear() > 2010) {
-                    return false;
-                }
-
-                return true;
+                return person.getBirthday().getYear() <= 2010;
             }
         });
 

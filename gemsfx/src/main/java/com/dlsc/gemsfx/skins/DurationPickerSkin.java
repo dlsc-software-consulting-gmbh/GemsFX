@@ -27,13 +27,13 @@ import javafx.util.Pair;
 public class DurationPickerSkin extends SkinBase<DurationPicker> {
 
     private final HBox innerBox = new HBox();
-    private final Button editButton = new Button();
     private final DurationPickerPopup popup;
     private final List<DurationUnitField> durationUnitFields = new ArrayList<>();
 
     public DurationPickerSkin(DurationPicker picker) {
         super(picker);
 
+        Button editButton = new Button();
         editButton.getStyleClass().add("edit-button");
         editButton.setOnAction(evt -> picker.getOnShowPopup().accept(picker));
         editButton.setMaxHeight(Double.MAX_VALUE);

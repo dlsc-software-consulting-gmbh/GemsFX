@@ -1,6 +1,21 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.PhotoViewSkin;
+
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -26,18 +41,6 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * The photo view is mostly used to display a user profile picture.
@@ -219,7 +222,7 @@ public class PhotoView extends Control {
         this.createCroppedImage.set(createCroppedImage);
     }
 
-    public ReadOnlyObjectWrapper<Image> croppedImage = new ReadOnlyObjectWrapper<>(this, "croppedImage");
+    private final ReadOnlyObjectWrapper<Image> croppedImage = new ReadOnlyObjectWrapper<>(this, "croppedImage");
 
     public final Image getCroppedImage() {
         return croppedImage.get();

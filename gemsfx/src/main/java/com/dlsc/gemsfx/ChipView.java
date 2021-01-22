@@ -1,6 +1,9 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.ChipViewSkin;
+
+import java.util.function.Consumer;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -10,8 +13,6 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
-
-import java.util.function.Consumer;
 
 /**
  * A small "badge-style" view representing a model object. One usage inside GemsFX
@@ -29,7 +30,7 @@ public class ChipView<T> extends Control {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new ChipViewSkin(this);
+        return new ChipViewSkin<>(this);
     }
 
     @Override

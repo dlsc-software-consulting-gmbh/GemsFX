@@ -159,7 +159,7 @@ public class DurationPickerApp extends Application {
         maximumDurationBox.valueProperty().addListener(it -> durationPicker.setMaximumDuration(maximumDurationBox.getValue()));
         maximumDurationBox.getSelectionModel().select(0);
 
-        final StringConverter<Duration> converter = new StringConverter<>() {
+        StringConverter<Duration> converter = new StringConverter<>() {
             @Override
             public String toString(Duration duration) {
                 if (duration == null) {

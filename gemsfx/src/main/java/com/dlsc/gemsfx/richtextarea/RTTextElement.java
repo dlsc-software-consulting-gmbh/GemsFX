@@ -36,27 +36,27 @@ public abstract class RTTextElement<SELF extends RTTextElement> extends RTElemen
     }
 
     public final SELF withSubscript(boolean on) {
-        this.subscript = on;
+        subscript = on;
         return (SELF) this;
     }
 
     public final SELF withSuperscript(boolean on) {
-        this.superscript = on;
+        superscript = on;
         return (SELF) this;
     }
 
     public final SELF withItalic(boolean on) {
-        this.italic = on;
+        italic = on;
         return (SELF) this;
     }
 
     public final SELF withBold(boolean on) {
-        this.bold = on;
+        bold = on;
         return (SELF) this;
     }
 
     public final SELF withTextFill(Color color) {
-        this.textFill = color;
+        textFill = color;
         return (SELF) this;
     }
 

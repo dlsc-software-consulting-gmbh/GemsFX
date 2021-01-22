@@ -206,13 +206,11 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
                 if (value != null) {
                     // constrain value
                     value = Math.min(value, getMaximumValue());
-                    if (value != null) {
-                        LocalTime time = getSkinnable().getTime();
-                        if (time != null) {
-                            getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(time.getHour(), value));
-                        } else {
-                            getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(0, value));
-                        }
+                    LocalTime time = getSkinnable().getTime();
+                    if (time != null) {
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(time.getHour(), value));
+                    } else {
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(0, value));
                     }
                 }
             });

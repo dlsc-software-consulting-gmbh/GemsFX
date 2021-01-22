@@ -85,7 +85,7 @@ public class FilterView<T> extends Control {
                 predicate = predicate.and(groupPredicate);
             }
 
-            final Callback<String, Predicate<T>> textFilterProvider = getTextFilterProvider();
+            Callback<String, Predicate<T>> textFilterProvider = getTextFilterProvider();
             if (textFilterProvider != null && StringUtils.isNotBlank(getFilterText())) {
                 predicate = predicate.and(textFilterProvider.call(getFilterText().toLowerCase()));
             }

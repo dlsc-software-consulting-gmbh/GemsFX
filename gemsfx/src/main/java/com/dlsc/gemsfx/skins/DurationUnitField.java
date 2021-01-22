@@ -228,12 +228,10 @@ public class DurationUnitField extends Label {
 
         switch (chronoUnit) {
             default:
-                switch (length) {
-                    case 0:
-                        return fillCharacter;
-                    default:
-                        return str;
+                if (length == 0) {
+                    return fillCharacter;
                 }
+                return str;
             case HOURS:
             case MINUTES:
             case SECONDS:

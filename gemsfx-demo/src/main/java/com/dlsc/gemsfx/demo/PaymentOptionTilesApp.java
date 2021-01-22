@@ -42,7 +42,7 @@ public class PaymentOptionTilesApp extends Application {
 
         VBox.setVgrow(pane, Priority.ALWAYS);
 
-        final VBox parent = new VBox(40, pane, themeBox);
+        VBox parent = new VBox(40, pane, themeBox);
         parent.setPadding(new Insets(20));
         parent.setAlignment(Pos.CENTER);
 

@@ -1,17 +1,19 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.ChipView;
+
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 public class ChipViewSkin<T> extends SkinBase<ChipView<T>> {
 
-    public ChipViewSkin(ChipView chip) {
+    public ChipViewSkin(ChipView<T> chip) {
         super(chip);
 
         Label label = new Label();
