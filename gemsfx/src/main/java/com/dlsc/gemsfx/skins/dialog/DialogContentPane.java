@@ -18,14 +18,13 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class DialogContentPane extends StackPane {
 
-    private final HBox dialogButtonBar;
+    private final ButtonBar dialogButtonBar;
     private final Dialog<?> dialog;
 
     public DialogContentPane(Dialog<?> dialog) {
@@ -59,20 +58,15 @@ public class DialogContentPane extends StackPane {
             dialogContentPane.getStyleClass().add("padding");
         }
 
-        dialogButtonBar = new HBox() {
-            @Override
-            protected void layoutChildren() {
-                double maxWidth = 0;
-                for (Node node : getChildren()) {
-                    maxWidth = Math.max(maxWidth, node.prefWidth(-1));
-                }
-                for (Node node : getChildren()) {
-                    ((Button) node).setPrefWidth(maxWidth);
-                }
+        dialogButtonBar = new ButtonBar();
 
-                super.layoutChildren();
-            }
-        };
+        if (System.getProperty("os.name").startsWith("Mac")) {
+            dialogButtonBar.setButtonOrder("L_NCYOAHE+U+FBIX_R");
+        } else if (System.getProperty("os.name").startsWith("Windows")) {
+            dialogButtonBar.setButtonOrder("L_YNOCAHE+U+FBXI_R");
+        } else {
+            dialogButtonBar.setButtonOrder("L_HENYCOA+U+FBIX_R");
+        }
 
         dialogButtonBar.getStyleClass().add("button-bar");
         dialogButtonBar.managedProperty().bind(dialogButtonBar.visibleProperty());
@@ -123,7 +117,7 @@ public class DialogContentPane extends StackPane {
     }
 
     private void createButtons() {
-        dialogButtonBar.getChildren().clear();
+        dialogButtonBar.getButtons().clear();
         dialogButtonBar.setVisible(dialog.isShowButtonsBar());
 
         boolean hasDefault = false;
@@ -185,7 +179,7 @@ public class DialogContentPane extends StackPane {
                 }
             }
 
-            dialogButtonBar.getChildren().add(button);
+            dialogButtonBar.getButtons().add(button);
         }
     }
 

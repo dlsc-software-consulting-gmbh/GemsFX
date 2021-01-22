@@ -13,6 +13,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -56,7 +57,7 @@ public class DialogsApp extends Application {
         inputMultiLineButton.setOnAction(evt -> dialogPane.showTextInput("Multiline Text Input", "Please enter something, anything really.", "Text already there ...", true));
 
         Button node1Button = new Button("Node 1");
-        node1Button.setOnAction(evt -> dialogPane.showNode(INFORMATION, "Select Person", createCustomNode(), List.of(new ButtonType("Send Mail"), new ButtonType("Call"))));
+        node1Button.setOnAction(evt -> dialogPane.showNode(INFORMATION, "Select Person", createCustomNode(), List.of(new ButtonType("Send Mail", ButtonBar.ButtonData.APPLY), new ButtonType("Call", ButtonBar.ButtonData.APPLY))));
 
         Button node2Button = new Button("Node 2");
         node2Button.setOnAction(evt -> dialogPane.showNode(INFORMATION, "Generic Node Dialog", createGenericNode()));
