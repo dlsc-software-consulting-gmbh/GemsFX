@@ -129,6 +129,7 @@ public class PhotoViewApp extends JProApplication {
             progressBar.setVisible(false);
             progressBar.setMaxWidth(Double.MAX_VALUE);
 
+            photoView.setPhotoSupplier(() -> null);
             leftSide.getChildren().add(progressBar);
 
             fileHandler = getWebAPI().makeFileUploadNode(photoView);
