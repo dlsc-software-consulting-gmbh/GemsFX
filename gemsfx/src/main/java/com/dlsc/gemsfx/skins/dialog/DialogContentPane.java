@@ -21,6 +21,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
 public class DialogContentPane extends StackPane {
 
@@ -32,7 +33,7 @@ public class DialogContentPane extends StackPane {
 
         setFocusTraversable(false);
 
-        DialogPane shell = this.dialog.getGlassPane();
+        DialogPane shell = this.dialog.getDialogPane();
 
         VBox box = new VBox();
         box.getStyleClass().add("vbox");
@@ -155,7 +156,7 @@ public class DialogContentPane extends StackPane {
                     if (buttonType.equals(ButtonType.CANCEL)) {
                         dialog.cancel();
                     } else {
-                        dialog.getGlassPane().hideDialog(dialog);
+                        dialog.getDialogPane().hideDialog(dialog);
                         dialog.complete(buttonType);
                     }
                 });
@@ -184,7 +185,12 @@ public class DialogContentPane extends StackPane {
     }
 
     protected Button createButton(ButtonType buttonType) {
-        Button button = new Button(buttonType.getText());
+        String text = buttonType.getText();
+        StringConverter<ButtonType> converter = getDialog().getDialogPane().getConverter();
+        if (converter != null) {
+            text = converter.toString(buttonType);
+        }
+        Button button = new Button(text);
         ButtonData buttonData = buttonType.getButtonData();
         ButtonBar.setButtonUniformSize(button, dialog.isSameWidthButtons());
         ButtonBar.setButtonData(button, buttonData);

@@ -49,6 +49,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 
 /**
  * A pane that allows applications to display a lightweight dialog right inside the application
@@ -494,26 +495,90 @@ public class DialogPane extends Pane {
         }
     }
 
+    /**
+     * The various dialog types supported by {@link DialogPane}.
+     *
+     * @see Dialog#type
+     */
     public enum Type {
+
+        /**
+         * A dialog type that is asking for user input.
+         */
         INPUT,
+
+        /**
+         * A dialog type used for showing any kind of information to the user.
+         */
         INFORMATION,
+
+        /**
+         * A dialog type used for showing any kind of (severe) error to the user.
+         */
         ERROR,
+
+        /**
+         * A dialog type used for warning the user.
+         */
         WARNING,
+
+        /**
+         * A dialog type used for asking the user for confirmation before executing an action.
+         */
         CONFIRMATION,
+
+        /**
+         * A blank dialog that can be used for anything.
+         */
         BLANK
+    }
+
+    // converter
+
+    private final ObjectProperty<StringConverter<ButtonType>> converter = new SimpleObjectProperty<>(this, "converter", new StringConverter<ButtonType>() {
+        @Override
+        public String toString(ButtonType buttonType) {
+            if (buttonType != null) {
+                return buttonType.getText();
+            }
+            return "";
+        }
+
+        @Override
+        public ButtonType fromString(String string) {
+            return null;
+        }
+    });
+
+    public final StringConverter<ButtonType> getConverter() {
+        return converter.get();
+    }
+
+    /**
+     * A string converter can be applied to easily manipulate the default text representation of
+     * the various button types. An example could for example be that the application design asks
+     * for all UPPER case letters to be used for the buttons.
+     *
+     * @return a string converter
+     */
+    public final ObjectProperty<StringConverter<ButtonType>> converterProperty() {
+        return converter;
+    }
+
+    public final void setConverter(StringConverter<ButtonType> converter) {
+        this.converter.set(converter);
     }
 
     public static class Dialog<T> extends CompletableFuture<ButtonType> {
 
-
         private final Type type;
 
-        private final DialogPane glassPane;
+        private final DialogPane pane;
 
         private boolean padding = true;
 
         public Dialog(DialogPane pane, Type type) {
-            glassPane = Objects.requireNonNull(pane);
+            this.pane = Objects.requireNonNull(pane);
             this.type = Objects.requireNonNull(type);
 
             getStyleClass().add(type.name().toLowerCase());
@@ -525,7 +590,7 @@ public class DialogPane extends Pane {
                     break;
                 case INFORMATION:
                 case ERROR:
-                    getButtonTypes().setAll(ButtonType.CLOSE);
+                    getButtonTypes().setAll(ButtonType.OK);
                     break;
                 case CONFIRMATION:
                     getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
@@ -561,15 +626,15 @@ public class DialogPane extends Pane {
             return type;
         }
 
-        public DialogPane getGlassPane() {
-            return glassPane;
+        public DialogPane getDialogPane() {
+            return pane;
         }
 
         /**
          * Hides the dialog by cancelling it.
          */
         public void cancel() {
-            glassPane.hideDialog(this);
+            pane.hideDialog(this);
             setValue(null);
             complete(ButtonType.CANCEL);
         }
