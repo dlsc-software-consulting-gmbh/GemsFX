@@ -29,6 +29,7 @@ import javafx.beans.property.DoublePropertyBase;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -36,6 +37,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.stage.Window;
 import javafx.util.Duration;
 
 
@@ -207,6 +209,26 @@ public class CircularProgressIndicator extends Region {
         indeterminatePaneRotation.setInterpolator(Interpolator.LINEAR);
         indeterminatePaneRotation.setCycleCount(Animation.INDEFINITE);
         indeterminatePaneRotation.setDuration(new Duration(4500));
+
+        indeterminatePane.rotateProperty().addListener(it -> {
+            boolean stop;
+            Scene scene = indeterminatePane.getScene();
+            if (scene != null) {
+                Window window = scene.getWindow();
+                if (window == null) {
+                    stop = true;
+                } else {
+                    stop = !window.isShowing();
+                }
+            } else {
+                stop = true;
+            }
+
+            if (stop) {
+                stopIndeterminate();
+            }
+        });
+
     }
 
     private void registerListeners() {
