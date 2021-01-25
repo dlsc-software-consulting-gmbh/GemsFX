@@ -82,7 +82,7 @@ public class DialogPane extends Pane {
 
     private final GlassPane glassPane;
 
-    private final ObservableList<DialogContentPane> dialogPanes = FXCollections.observableArrayList();
+    private final ObservableList<DialogContentPane> dialogContentPanes = FXCollections.observableArrayList();
 
     private final Map<DialogContentPane, DoubleProperty> dialogVisibilityMap = new HashMap<>();
 
@@ -106,8 +106,8 @@ public class DialogPane extends Pane {
 
                     change.getAddedSubList().forEach(dialog -> {
                         DialogContentPane dialogPane = new DialogContentPane(dialog);
-                        dialogPane.blockedProperty().bind(Bindings.createBooleanBinding(() -> !dialogPanes.isEmpty() && dialogPanes.get(dialogPanes.size() - 1) != dialogPane, dialogPanes));
-                        dialogPanes.add(dialogPane);
+                        dialogPane.blockedProperty().bind(Bindings.createBooleanBinding(() -> !dialogContentPanes.isEmpty() && dialogContentPanes.get(dialogContentPanes.size() - 1) != dialogPane, dialogContentPanes));
+                        dialogContentPanes.add(dialogPane);
 
                         SimpleDoubleProperty visibility = new SimpleDoubleProperty();
                         visibility.addListener(it -> requestLayout());
@@ -119,7 +119,7 @@ public class DialogPane extends Pane {
                 } else if (change.wasRemoved()) {
 
                     change.getRemoved().forEach(dialog -> {
-                        Optional<DialogContentPane> dialogOptional = dialogPanes.stream().filter(d -> d.getDialog() == dialog).findFirst();
+                        Optional<DialogContentPane> dialogOptional = dialogContentPanes.stream().filter(d -> d.getDialog() == dialog).findFirst();
                         if (dialogOptional.isPresent()) {
                             DialogContentPane dialogPane = dialogOptional.get();
                             DoubleProperty visibility = dialogVisibilityMap.get(dialogPane);
@@ -428,7 +428,7 @@ public class DialogPane extends Pane {
                     getChildren().remove(node);
 
                     if (node instanceof DialogContentPane) {
-                        dialogPanes.remove(node);
+                        dialogContentPanes.remove(node);
                         dialogVisibilityMap.remove(node);
                     }
                 }
@@ -446,7 +446,7 @@ public class DialogPane extends Pane {
                 getChildren().remove(node);
 
                 if (node instanceof DialogContentPane) {
-                    dialogPanes.remove(node);
+                    dialogContentPanes.remove(node);
                     dialogVisibilityMap.remove(node);
                 }
             }
@@ -468,25 +468,25 @@ public class DialogPane extends Pane {
         double contentWidth = getWidth() - insets.getLeft() - insets.getRight();
         double contentHeight = getHeight() - insets.getTop() - insets.getBottom();
 
-        for (DialogContentPane dialogPane : dialogPanes) {
-            double dialogPrefWidth = dialogPane.prefWidth(-1);
-            double dialogPrefHeight = dialogPane.prefHeight(-1);
+        for (DialogContentPane dialogContentPane : dialogContentPanes) {
+            double dialogWidth = Math.min(dialogContentPane.maxWidth(-1), Math.max(dialogContentPane.minWidth(-1), dialogContentPane.prefWidth(-1)));
+            double dialogHeight = Math.min(dialogContentPane.maxHeight(-1), Math.max(dialogContentPane.minHeight(-1), dialogContentPane.prefHeight(-1)));
 
-            Dialog<?> dialog = dialogPane.getDialog();
+            Dialog<?> dialog = dialogContentPane.getDialog();
 
             if (dialog.isMaximize()) {
-                dialogPrefWidth = contentWidth * .9;
-                dialogPrefHeight = contentHeight * .9;
+                dialogWidth = contentWidth * .9;
+                dialogHeight = contentHeight * .9;
             } else {
                 // make sure the dialog fits into the visible area
-                dialogPrefWidth = Math.min(dialogPrefWidth, contentWidth * .9);
-                dialogPrefHeight = Math.min(dialogPrefHeight, contentHeight * .9);
+                dialogWidth = Math.min(dialogWidth, contentWidth * .9);
+                dialogHeight = Math.min(dialogHeight, contentHeight * .9);
             }
 
-            double dialogTargetY = contentY + (contentHeight - dialogPrefHeight) / 2;
-            DoubleProperty dialogVisibility = dialogVisibilityMap.get(dialogPane);
+            double dialogTargetY = contentY + (contentHeight - dialogHeight) / 2;
+            DoubleProperty dialogVisibility = dialogVisibilityMap.get(dialogContentPane);
             if (dialogVisibility != null) {
-                dialogPane.resizeRelocate(contentX + (contentWidth - dialogPrefWidth) / 2, dialogTargetY * dialogVisibility.get(), dialogPrefWidth, dialogPrefHeight);
+                dialogContentPane.resizeRelocate(contentX + (contentWidth - dialogWidth) / 2, dialogTargetY * dialogVisibility.get(), dialogWidth, dialogHeight);
             }
         }
 

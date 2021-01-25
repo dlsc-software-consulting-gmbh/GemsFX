@@ -19,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
@@ -192,6 +193,7 @@ public class DialogContentPane extends StackPane {
         }
         Button button = new Button(text);
         ButtonData buttonData = buttonType.getButtonData();
+        button.setMinWidth(Region.USE_PREF_SIZE);
         ButtonBar.setButtonUniformSize(button, dialog.isSameWidthButtons());
         ButtonBar.setButtonData(button, buttonData);
         button.setDefaultButton(buttonData.isDefaultButton());

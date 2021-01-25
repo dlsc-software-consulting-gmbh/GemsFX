@@ -22,6 +22,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -29,6 +30,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 
 import static com.dlsc.gemsfx.DialogPane.Type.INFORMATION;
 
@@ -57,13 +59,19 @@ public class DialogsApp extends Application {
         inputMultiLineButton.setOnAction(evt -> dialogPane.showTextInput("Multiline Text Input", "Please enter something, anything really.", "Text already there ...", true));
 
         Button node1Button = new Button("Node 1");
-        node1Button.setOnAction(evt -> dialogPane.showNode(INFORMATION, "Select Person", createCustomNode(), List.of(new ButtonType("Send Mail", ButtonBar.ButtonData.APPLY), new ButtonType("Call", ButtonBar.ButtonData.APPLY))));
+        node1Button.setOnAction(evt -> dialogPane.showNode(INFORMATION, "Select Person", createCustomNode(), List.of(new ButtonType("Send Mail", ButtonBar.ButtonData.OK_DONE), new ButtonType("Call", ButtonBar.ButtonData.APPLY))));
 
         Button node2Button = new Button("Node 2");
         node2Button.setOnAction(evt -> dialogPane.showNode(INFORMATION, "Generic Node Dialog", createGenericNode()));
 
         Button busyButton = new Button("Busy");
-        busyButton.setOnAction(evt -> dialogPane.showBusyIndicator());
+        busyButton.setOnAction(evt -> {
+            dialogPane.showBusyIndicator().thenAccept(buttonType -> {
+                if (buttonType.equals(ButtonType.CANCEL)) {
+                    dialogPane.showInformation("Cancelled", "The busy dialog has been cancelled via the ESC key.");
+                }
+            });
+        });
 
         Button maxButton = new Button("Maximize");
         maxButton.setOnAction(evt -> {
@@ -99,10 +107,43 @@ public class DialogsApp extends Application {
         durationBox.getItems().setAll(duration0, duration1, duration2, duration3, duration4, duration5);
         durationBox.valueProperty().bindBidirectional(dialogPane.animationDurationProperty());
 
+        ComboBox<String> styleBox = new ComboBox<>();
+        styleBox.getItems().setAll("Default", "Dark", "Custom");
+        styleBox.setValue("Default");
+        styleBox.valueProperty().addListener(it -> {
+            switch (styleBox.getValue()) {
+                case "Default":
+                    dialogPane.getStylesheets().clear();
+                    dialogPane.setConverter(null);
+                    break;
+                case "Dark":
+                    dialogPane.getStylesheets().setAll(DialogsApp.class.getResource("dialogs-dark.css").toExternalForm());
+                    dialogPane.setConverter(null);
+                    break;
+                case "Custom":
+                    dialogPane.getStylesheets().setAll(DialogsApp.class.getResource("dialogs-custom.css").toExternalForm());
+                    dialogPane.setConverter(new StringConverter<>() {
+                        @Override
+                        public String toString(ButtonType object) {
+                            return object.getText().toUpperCase();
+                        }
+
+                        @Override
+                        public ButtonType fromString(String string) {
+                            return null;
+                        }
+                    });
+                    break;
+            }
+        });
+
         VBox.setVgrow(flowPane, Priority.ALWAYS);
         VBox.setVgrow(durationBox, Priority.ALWAYS);
 
-        VBox vBox = new VBox(flowPane, durationBox);
+        HBox hBox = new HBox(10, new Label("Animation:"), durationBox, new Label("Style:"), styleBox);
+        hBox.setAlignment(Pos.CENTER);
+
+        VBox vBox = new VBox(flowPane, hBox);
         vBox.setPadding(new Insets(50));
         vBox.setAlignment(Pos.CENTER);
 
@@ -117,7 +158,6 @@ public class DialogsApp extends Application {
 
         Scene scene = new Scene(anchorPane);
 
-        scene.focusOwnerProperty().addListener(it -> System.out.println("focus owner: " + scene.getFocusOwner()));
         CSSFX.start(scene);
 
         primaryStage.setTitle("Dialogs");
