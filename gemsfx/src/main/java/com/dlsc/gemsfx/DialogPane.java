@@ -1,8 +1,5 @@
 package com.dlsc.gemsfx;
 
-import com.dlsc.gemsfx.skins.dialog.BusyIndicator;
-import com.dlsc.gemsfx.skins.dialog.DialogContentPane;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintWriter;
@@ -17,12 +14,18 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+import javafx.animation.Animation;
+import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
+import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.DoublePropertyBase;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -37,17 +40,32 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.stage.Window;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 
@@ -264,6 +282,10 @@ public class DialogPane extends Pane {
 
     public final Dialog<ButtonType> showInformation(String title, String message, List<ButtonType> buttons) {
         return doShowDialog(Type.INFORMATION, title, message, buttons);
+    }
+
+    public final Dialog<String> showTextInput(String title, String text) {
+        return showTextInput(title, null, null, text, false);
     }
 
     public final Dialog<String> showTextInput(String title, String text, boolean multiline) {
@@ -770,6 +792,506 @@ public class DialogPane extends Pane {
 
         public final Throwable getException() {
             return exception.get();
+        }
+
+        Map<ButtonType, Button> buttonMap = new HashMap<>();
+
+        public final Button getButton(ButtonType type) {
+            return buttonMap.get(type);
+        }
+    }
+
+    public class DialogContentPane extends StackPane {
+
+        private final ButtonBar dialogButtonBar;
+        private final Dialog<?> dialog;
+
+        public DialogContentPane(Dialog<?> dialog) {
+            this.dialog = Objects.requireNonNull(dialog);
+
+            setFocusTraversable(false);
+
+            DialogPane shell = this.dialog.getDialogPane();
+
+            VBox box = new VBox();
+            box.getStyleClass().add("vbox");
+            box.setFillWidth(true);
+
+            VBox dialogHeader = new VBox();
+            dialogHeader.setAlignment(Pos.CENTER);
+            dialogHeader.getStyleClass().add("header");
+            dialogHeader.managedProperty().bind(dialogHeader.visibleProperty());
+
+            Label dialogTitle = new Label("Dialog");
+            dialogTitle.setMaxWidth(Double.MAX_VALUE);
+            dialogTitle.getStyleClass().add("title");
+
+            ImageView dialogIcon = new ImageView();
+            dialogIcon.getStyleClass().addAll("icon");
+
+            dialogHeader.getChildren().setAll(dialogIcon, dialogTitle);
+
+            StackPane dialogContentPane = new StackPane();
+            dialogContentPane.getStyleClass().add("content");
+            if (dialog.isPadding()) {
+                dialogContentPane.getStyleClass().add("padding");
+            }
+
+            dialogButtonBar = new ButtonBar();
+
+            if (System.getProperty("os.name").startsWith("Mac")) {
+                dialogButtonBar.setButtonOrder("L_NCYOAHE+U+FBIX_R");
+            } else if (System.getProperty("os.name").startsWith("Windows")) {
+                dialogButtonBar.setButtonOrder("L_YNOCAHE+U+FBXI_R");
+            } else {
+                dialogButtonBar.setButtonOrder("L_HENYCOA+U+FBIX_R");
+            }
+
+            dialogButtonBar.getStyleClass().add("button-bar");
+            dialogButtonBar.managedProperty().bind(dialogButtonBar.visibleProperty());
+
+            VBox.setVgrow(dialogTitle, Priority.NEVER);
+            VBox.setVgrow(dialogContentPane, Priority.ALWAYS);
+            VBox.setVgrow(dialogButtonBar, Priority.NEVER);
+
+            dialogContentPane.getChildren().setAll(this.dialog.getContent());
+
+            boolean blankDialog = this.dialog.getType().equals(Type.BLANK);
+
+            dialogHeader.setVisible(!blankDialog);
+            dialogButtonBar.setVisible(!blankDialog);
+
+            dialogTitle.textProperty().bind(this.dialog.titleProperty());
+            getStyleClass().setAll("content-pane");
+            getStyleClass().addAll(this.dialog.getStyleClass());
+
+            if (!blankDialog) {
+                createButtons();
+            }
+
+            box.getChildren().setAll(dialogHeader, dialogContentPane, dialogButtonBar);
+
+            GlassPane glassPane = new GlassPane();
+            glassPane.hideProperty().bind(blocked.not());
+            glassPane.fadeInOutProperty().bind(shell.fadeInOutProperty());
+            getChildren().addAll(box, glassPane);
+        }
+
+        private final BooleanProperty blocked = new SimpleBooleanProperty(this, "blocked");
+
+        public boolean isBlocked() {
+            return blocked.get();
+        }
+
+        public BooleanProperty blockedProperty() {
+            return blocked;
+        }
+
+        public void setBlocked(boolean blocked) {
+            this.blocked.set(blocked);
+        }
+
+        public Dialog<?> getDialog() {
+            return dialog;
+        }
+
+        private void createButtons() {
+            dialogButtonBar.getButtons().clear();
+            dialogButtonBar.setVisible(dialog.isShowButtonsBar());
+
+            boolean hasDefault = false;
+            for (ButtonType buttonType : dialog.getButtonTypes()) {
+                Button button = createButton(buttonType);
+                dialog.buttonMap.put(buttonType, button);
+
+                switch (buttonType.getButtonData()) {
+                    case LEFT:
+                    case RIGHT:
+                    case HELP:
+                    case HELP_2:
+                    case NO:
+                    case NEXT_FORWARD:
+                    case BACK_PREVIOUS:
+                    case APPLY:
+                    case CANCEL_CLOSE:
+                    case OTHER:
+                    case BIG_GAP:
+                    case SMALL_GAP:
+                        break;
+                    case YES:
+                    case OK_DONE:
+                    case FINISH:
+                        button.disableProperty().bind(dialog.validProperty().not());
+                        break;
+
+                }
+
+                if (button != null) {
+                    ButtonData buttonData = buttonType.getButtonData();
+
+                    button.setDefaultButton(!hasDefault && buttonData != null && buttonData.isDefaultButton());
+                    button.setCancelButton(buttonData != null && buttonData.isCancelButton());
+                    button.setOnAction(evt -> {
+                        if (buttonType.equals(ButtonType.CANCEL)) {
+                            dialog.cancel();
+                        } else {
+                            dialog.getDialogPane().hideDialog(dialog);
+                            dialog.complete(buttonType);
+                        }
+                    });
+
+                    hasDefault |= buttonData != null && buttonData.isDefaultButton();
+
+                    /*
+                     * Special support for list views. A double click inside of them triggers
+                     * the default button.
+                     */
+                    if (button.isDefaultButton()) {
+
+                        Node content = dialog.getContent();
+                        if (content instanceof ListView) {
+                            content.setOnMouseClicked(evt -> {
+                                if (evt.getClickCount() == 2) {
+                                    button.fire();
+                                }
+                            });
+                        }
+                    }
+                }
+
+                dialogButtonBar.getButtons().add(button);
+            }
+        }
+
+        protected Button createButton(ButtonType buttonType) {
+            String text = buttonType.getText();
+            StringConverter<ButtonType> converter = getDialog().getDialogPane().getConverter();
+            if (converter != null) {
+                text = converter.toString(buttonType);
+            }
+            Button button = new Button(text);
+            ButtonData buttonData = buttonType.getButtonData();
+            button.setMinWidth(Region.USE_PREF_SIZE);
+            ButtonBar.setButtonUniformSize(button, dialog.isSameWidthButtons());
+            ButtonBar.setButtonData(button, buttonData);
+            button.setDefaultButton(buttonData.isDefaultButton());
+            button.setCancelButton(buttonData.isCancelButton());
+            return button;
+        }
+    }
+
+    public class BusyIndicator extends CircularProgressIndicator {
+
+        public BusyIndicator() {
+            getStyleClass().add("busy-indicator");
+        }
+
+        public void stop() {
+            setProgress(0);
+        }
+
+        public void start() {
+            setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        }
+    }
+
+    /**
+     * Created by hansolo on 08.04.16.
+     */
+    public class CircularProgressIndicator extends Region {
+        private static final double PREFERRED_WIDTH = 24;
+        private static final double PREFERRED_HEIGHT = 24;
+        private static final double MINIMUM_WIDTH = 12;
+        private static final double MINIMUM_HEIGHT = 12;
+        private static final double MAXIMUM_WIDTH = 1024;
+        private static final double MAXIMUM_HEIGHT = 1024;
+        private final DoubleProperty dashOffset = new SimpleDoubleProperty(0);
+        private final DoubleProperty dashArray_0 = new SimpleDoubleProperty(1);
+        private StackPane indeterminatePane;
+        private Pane progressPane;
+        private Circle circle;
+        private Arc arc;
+        private final Timeline timeline;
+        private RotateTransition indeterminatePaneRotation;
+        private final InvalidationListener listener;
+        private final DoubleProperty progress;
+        private final BooleanProperty indeterminate;
+        private final BooleanProperty roundLineCap;
+        private boolean isRunning;
+
+
+        // ******************** Constructors **************************************
+        public CircularProgressIndicator() {
+            getStyleClass().add("circular-progress");
+            progress = new DoublePropertyBase(0) {
+                @Override
+                public void invalidated() {
+                    if (get() < 0) {
+                        startIndeterminate();
+                    } else {
+                        stopIndeterminate();
+                        set(Math.max(0, Math.min(1, get())));
+                        redraw();
+                    }
+                }
+
+                @Override
+                public Object getBean() {
+                    return this;
+                }
+
+                @Override
+                public String getName() {
+                    return "progress";
+                }
+            };
+            indeterminate = new BooleanPropertyBase(false) {
+                @Override
+                public Object getBean() {
+                    return this;
+                }
+
+                @Override
+                public String getName() {
+                    return "indeterminate";
+                }
+            };
+            roundLineCap = new BooleanPropertyBase(false) {
+                @Override
+                public void invalidated() {
+                    if (get()) {
+                        circle.setStrokeLineCap(StrokeLineCap.ROUND);
+                        arc.setStrokeLineCap(StrokeLineCap.ROUND);
+                    } else {
+                        circle.setStrokeLineCap(StrokeLineCap.SQUARE);
+                        arc.setStrokeLineCap(StrokeLineCap.SQUARE);
+                    }
+                }
+
+                @Override
+                public Object getBean() {
+                    return this;
+                }
+
+                @Override
+                public String getName() {
+                    return "roundLineCap";
+                }
+            };
+            isRunning = false;
+            timeline = new Timeline();
+            listener = observable -> {
+                circle.setStrokeDashOffset(dashOffset.get());
+                circle.getStrokeDashArray().setAll(dashArray_0.getValue(), 200d);
+            };
+            init();
+            initGraphics();
+            registerListeners();
+        }
+
+
+        // ******************** Initialization ************************************
+        private void init() {
+            if (Double.compare(getPrefWidth(), 0.0) <= 0 || Double.compare(getPrefHeight(), 0.0) <= 0 ||
+                    Double.compare(getWidth(), 0.0) <= 0 || Double.compare(getHeight(), 0.0) <= 0) {
+                if (getPrefWidth() > 0 && getPrefHeight() > 0) {
+                    setPrefSize(getPrefWidth(), getPrefHeight());
+                } else {
+                    setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                }
+            }
+
+            if (Double.compare(getMinWidth(), 0.0) <= 0 || Double.compare(getMinHeight(), 0.0) <= 0) {
+                setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
+            }
+
+            if (Double.compare(getMaxWidth(), 0.0) <= 0 || Double.compare(getMaxHeight(), 0.0) <= 0) {
+                setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
+            }
+        }
+
+        private void initGraphics() {
+            double center = PREFERRED_WIDTH * 0.5;
+            double radius = PREFERRED_WIDTH * 0.45;
+            circle = new Circle();
+            circle.setCenterX(center);
+            circle.setCenterY(center);
+            circle.setRadius(radius);
+            circle.getStyleClass().add("indicator");
+            circle.setStrokeLineCap(isRoundLineCap() ? StrokeLineCap.ROUND : StrokeLineCap.SQUARE);
+            circle.setStrokeWidth(PREFERRED_WIDTH * 0.10526316);
+            circle.setStrokeDashOffset(dashOffset.get());
+            circle.getStrokeDashArray().setAll(dashArray_0.getValue(), 200d);
+
+            arc = new Arc(center, center, radius, radius, 90, -360.0 * getProgress());
+            arc.setStrokeLineCap(isRoundLineCap() ? StrokeLineCap.ROUND : StrokeLineCap.SQUARE);
+            arc.setStrokeWidth(PREFERRED_WIDTH * 0.1);
+            arc.getStyleClass().add("indicator");
+
+            indeterminatePane = new StackPane(circle);
+            indeterminatePane.setVisible(false);
+
+            progressPane = new Pane(arc);
+            progressPane.setVisible(Double.compare(getProgress(), 0.0) != 0);
+
+            getChildren().setAll(progressPane, indeterminatePane);
+
+            // Setup timeline animation
+            KeyValue kvDashOffset_0 = new KeyValue(dashOffset, 0, Interpolator.EASE_BOTH);
+            KeyValue kvDashOffset_50 = new KeyValue(dashOffset, -32, Interpolator.EASE_BOTH);
+            KeyValue kvDashOffset_100 = new KeyValue(dashOffset, -64, Interpolator.EASE_BOTH);
+
+            KeyValue kvDashArray_0_0 = new KeyValue(dashArray_0, 5, Interpolator.EASE_BOTH);
+            KeyValue kvDashArray_0_50 = new KeyValue(dashArray_0, 89, Interpolator.EASE_BOTH);
+            KeyValue kvDashArray_0_100 = new KeyValue(dashArray_0, 89, Interpolator.EASE_BOTH);
+
+            KeyValue kvRotate_0 = new KeyValue(circle.rotateProperty(), -10, Interpolator.LINEAR);
+            KeyValue kvRotate_100 = new KeyValue(circle.rotateProperty(), 370, Interpolator.LINEAR);
+
+            KeyFrame kf0 = new KeyFrame(Duration.ZERO, kvDashOffset_0, kvDashArray_0_0, kvRotate_0);
+            KeyFrame kf1 = new KeyFrame(Duration.millis(1000), kvDashOffset_50, kvDashArray_0_50);
+            KeyFrame kf2 = new KeyFrame(Duration.millis(1500), kvDashOffset_100, kvDashArray_0_100, kvRotate_100);
+
+            timeline.setCycleCount(Animation.INDEFINITE);
+            timeline.getKeyFrames().setAll(kf0, kf1, kf2);
+
+            // Setup additional pane rotation
+            indeterminatePaneRotation = new RotateTransition();
+            indeterminatePaneRotation.setNode(indeterminatePane);
+            indeterminatePaneRotation.setFromAngle(0);
+            indeterminatePaneRotation.setToAngle(-360);
+            indeterminatePaneRotation.setInterpolator(Interpolator.LINEAR);
+            indeterminatePaneRotation.setCycleCount(Animation.INDEFINITE);
+            indeterminatePaneRotation.setDuration(new Duration(4500));
+
+            indeterminatePane.rotateProperty().addListener(it -> {
+                boolean stop;
+                Scene scene = indeterminatePane.getScene();
+                if (scene != null) {
+                    Window window = scene.getWindow();
+                    if (window == null) {
+                        stop = true;
+                    } else {
+                        stop = !window.isShowing();
+                    }
+                } else {
+                    stop = true;
+                }
+
+                if (stop) {
+                    stopIndeterminate();
+                }
+            });
+
+        }
+
+        private void registerListeners() {
+            widthProperty().addListener(o -> resize());
+            heightProperty().addListener(o -> resize());
+            progress.addListener(o -> redraw());
+            dashOffset.addListener(listener);
+        }
+
+
+        // ******************** Methods *******************************************
+        public double getProgress() {
+            return progress.get();
+        }
+
+        public void setProgress(double PROGRESS) {
+            progress.set(PROGRESS);
+        }
+
+        public DoubleProperty progressProperty() {
+            return progress;
+        }
+
+        private void startIndeterminate() {
+            if (isRunning) return;
+            manageNode(indeterminatePane, true);
+            manageNode(progressPane, false);
+            timeline.play();
+            indeterminatePaneRotation.play();
+            isRunning = true;
+            indeterminate.set(true);
+        }
+
+        private void stopIndeterminate() {
+            if (!isRunning) return;
+            timeline.stop();
+            indeterminatePaneRotation.stop();
+            indeterminatePane.setRotate(0);
+            manageNode(progressPane, true);
+            manageNode(indeterminatePane, false);
+            isRunning = false;
+            indeterminate.set(false);
+        }
+
+        public boolean isIndeterminate() {
+            return Double.compare(ProgressIndicator.INDETERMINATE_PROGRESS, getProgress()) == 0;
+        }
+
+        public ReadOnlyBooleanProperty indeterminateProperty() {
+            return indeterminate;
+        }
+
+        public boolean isRoundLineCap() {
+            return roundLineCap.get();
+        }
+
+        public void setRoundLineCap(boolean BOOLEAN) {
+            roundLineCap.set(BOOLEAN);
+        }
+
+        public BooleanProperty roundLineCapProperty() {
+            return roundLineCap;
+        }
+
+        private void manageNode(Node NODE, boolean MANAGED) {
+            if (MANAGED) {
+                NODE.setManaged(true);
+                NODE.setVisible(true);
+            } else {
+                NODE.setVisible(false);
+                NODE.setManaged(false);
+            }
+        }
+
+
+        // ******************** Resizing ******************************************
+        private void resize() {
+            double width = getWidth() - getInsets().getLeft() - getInsets().getRight();
+            double height = getHeight() - getInsets().getTop() - getInsets().getBottom();
+            double size = Math.min(width, height);
+
+            if (width > 0 && height > 0) {
+                indeterminatePane.setMaxSize(size, size);
+                indeterminatePane.setPrefSize(size, size);
+                indeterminatePane.relocate((getWidth() - size) * 0.5, (getHeight() - size) * 0.5);
+
+                progressPane.setMaxSize(size, size);
+                progressPane.setPrefSize(size, size);
+                progressPane.relocate((getWidth() - size) * 0.5, (getHeight() - size) * 0.5);
+
+                double center = size * 0.5;
+                double radius = size * 0.45;
+
+                arc.setCenterX(center);
+                arc.setCenterY(center);
+                arc.setRadiusX(radius);
+                arc.setRadiusY(radius);
+                arc.setStrokeWidth(size * 0.10526316);
+
+                double factor = size / 24;
+                circle.setScaleX(factor);
+                circle.setScaleY(factor);
+            }
+        }
+
+        private void redraw() {
+            double progress = getProgress();
+            progressPane.setVisible(Double.compare(progress, 0) > 0);
+            arc.setLength(-360.0 * progress);
         }
     }
 }
