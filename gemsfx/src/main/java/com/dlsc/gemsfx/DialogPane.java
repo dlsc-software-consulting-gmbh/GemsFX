@@ -36,12 +36,17 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -100,11 +105,25 @@ public class DialogPane extends Pane {
 
     private final GlassPane glassPane;
 
-    private final ObservableList<DialogContentPane> dialogContentPanes = FXCollections.observableArrayList();
+    private final ObservableList<ContentPane> dialogContentPanes = FXCollections.observableArrayList();
 
-    private final Map<DialogContentPane, DoubleProperty> dialogVisibilityMap = new HashMap<>();
+    private final Map<ContentPane, DoubleProperty> dialogVisibilityMap = new HashMap<>();
 
     private final ListProperty<Dialog> dialogs = new SimpleListProperty<>(this, "dialogs", FXCollections.observableArrayList());
+
+    private final EventHandler<KeyEvent> escapeHandler = evt -> {
+        if (evt.getCode() == KeyCode.ESCAPE) {// hide the last dialog that was opened
+            if (!dialogs.isEmpty()) {
+                Dialog<?> dialog = dialogs.get(dialogs.size() - 1);
+                if (!dialog.isCancelled()) {
+                    dialog.cancel();
+                    evt.consume();
+                }
+            }
+        }
+    };
+
+    private final WeakEventHandler<KeyEvent> weakEscapeHandler = new WeakEventHandler<>(escapeHandler);
 
     public DialogPane() {
         getStyleClass().add("dialog-pane");
@@ -123,7 +142,7 @@ public class DialogPane extends Pane {
                 if (change.wasAdded()) {
 
                     change.getAddedSubList().forEach(dialog -> {
-                        DialogContentPane dialogPane = new DialogContentPane(dialog);
+                        ContentPane dialogPane = new ContentPane(dialog);
                         dialogPane.blockedProperty().bind(Bindings.createBooleanBinding(() -> !dialogContentPanes.isEmpty() && dialogContentPanes.get(dialogContentPanes.size() - 1) != dialogPane, dialogContentPanes));
                         dialogContentPanes.add(dialogPane);
 
@@ -137,9 +156,9 @@ public class DialogPane extends Pane {
                 } else if (change.wasRemoved()) {
 
                     change.getRemoved().forEach(dialog -> {
-                        Optional<DialogContentPane> dialogOptional = dialogContentPanes.stream().filter(d -> d.getDialog() == dialog).findFirst();
+                        Optional<ContentPane> dialogOptional = dialogContentPanes.stream().filter(d -> d.getDialog() == dialog).findFirst();
                         if (dialogOptional.isPresent()) {
-                            DialogContentPane dialogPane = dialogOptional.get();
+                            ContentPane dialogPane = dialogOptional.get();
                             DoubleProperty visibility = dialogVisibilityMap.get(dialogPane);
                             slideInOut(0, visibility, () -> dialogPane);
                         }
@@ -157,17 +176,11 @@ public class DialogPane extends Pane {
         getChildren().add(glassPane);
 
         sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (oldScene != null) {
+                oldScene.removeEventHandler(KeyEvent.KEY_PRESSED, weakEscapeHandler);
+            }
             if (newScene != null) {
-                newScene.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
-                    if (evt.getCode() == KeyCode.ESCAPE) {// hide the last dialog that was opened
-                        if (!dialogs.isEmpty()) {
-                            Dialog<?> dialog = dialogs.get(dialogs.size() - 1);
-                            if (!dialog.isCancelled()) {
-                                dialog.cancel();
-                            }
-                        }
-                    }
-                });
+                newScene.addEventHandler(KeyEvent.KEY_PRESSED, weakEscapeHandler);
             }
         });
     }
@@ -449,7 +462,7 @@ public class DialogPane extends Pane {
                     node.setVisible(false);
                     getChildren().remove(node);
 
-                    if (node instanceof DialogContentPane) {
+                    if (node instanceof ContentPane) {
                         dialogContentPanes.remove(node);
                         dialogVisibilityMap.remove(node);
                     }
@@ -467,7 +480,7 @@ public class DialogPane extends Pane {
                 visibilityProperty.set(0);
                 getChildren().remove(node);
 
-                if (node instanceof DialogContentPane) {
+                if (node instanceof ContentPane) {
                     dialogContentPanes.remove(node);
                     dialogVisibilityMap.remove(node);
                 }
@@ -490,7 +503,7 @@ public class DialogPane extends Pane {
         double contentWidth = getWidth() - insets.getLeft() - insets.getRight();
         double contentHeight = getHeight() - insets.getTop() - insets.getBottom();
 
-        for (DialogContentPane dialogContentPane : dialogContentPanes) {
+        for (ContentPane dialogContentPane : dialogContentPanes) {
             double dialogWidth = Math.min(dialogContentPane.maxWidth(-1), Math.max(dialogContentPane.minWidth(-1), dialogContentPane.prefWidth(-1)));
             double dialogHeight = Math.min(dialogContentPane.maxHeight(-1), Math.max(dialogContentPane.minHeight(-1), dialogContentPane.prefHeight(-1)));
 
@@ -801,15 +814,21 @@ public class DialogPane extends Pane {
         }
     }
 
-    public class DialogContentPane extends StackPane {
+    public class ContentPane extends StackPane {
 
         private final ButtonBar dialogButtonBar;
         private final Dialog<?> dialog;
 
-        public DialogContentPane(Dialog<?> dialog) {
-            this.dialog = Objects.requireNonNull(dialog);
+        private final ChangeListener<Node> focusListener = (o, oldOwner, newOwner) -> {
+            if (newOwner != null && !isInsideDialogPane(newOwner.getParent()) && getScene() != null) {
+                requestFocus();
+            }
+        };
 
-            setFocusTraversable(false);
+        private final WeakChangeListener<Node> weakFocusListener = new WeakChangeListener<>(focusListener);
+
+        public ContentPane(Dialog<?> dialog) {
+            this.dialog = Objects.requireNonNull(dialog);
 
             DialogPane shell = this.dialog.getDialogPane();
 
@@ -831,10 +850,11 @@ public class DialogPane extends Pane {
 
             dialogHeader.getChildren().setAll(dialogIcon, dialogTitle);
 
-            StackPane dialogContentPane = new StackPane();
-            dialogContentPane.getStyleClass().add("content");
+            StackPane content = new StackPane();
+            content.getStyleClass().add("content");
+
             if (dialog.isPadding()) {
-                dialogContentPane.getStyleClass().add("padding");
+                content.getStyleClass().add("padding");
             }
 
             dialogButtonBar = new ButtonBar();
@@ -849,12 +869,20 @@ public class DialogPane extends Pane {
 
             dialogButtonBar.getStyleClass().add("button-bar");
             dialogButtonBar.managedProperty().bind(dialogButtonBar.visibleProperty());
+            dialogButtonBar.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (oldScene != null) {
+                    oldScene.focusOwnerProperty().removeListener(weakFocusListener);
+                }
+                if (newScene != null) {
+                    newScene.focusOwnerProperty().addListener(weakFocusListener);
+                }
+            });
 
             VBox.setVgrow(dialogTitle, Priority.NEVER);
-            VBox.setVgrow(dialogContentPane, Priority.ALWAYS);
+            VBox.setVgrow(content, Priority.ALWAYS);
             VBox.setVgrow(dialogButtonBar, Priority.NEVER);
 
-            dialogContentPane.getChildren().setAll(this.dialog.getContent());
+            content.getChildren().setAll(this.dialog.getContent());
 
             boolean blankDialog = this.dialog.getType().equals(Type.BLANK);
 
@@ -869,12 +897,22 @@ public class DialogPane extends Pane {
                 createButtons();
             }
 
-            box.getChildren().setAll(dialogHeader, dialogContentPane, dialogButtonBar);
+            box.getChildren().setAll(dialogHeader, content, dialogButtonBar);
 
             GlassPane glassPane = new GlassPane();
             glassPane.hideProperty().bind(blocked.not());
             glassPane.fadeInOutProperty().bind(shell.fadeInOutProperty());
             getChildren().addAll(box, glassPane);
+        }
+
+        private boolean isInsideDialogPane(Parent parent) {
+            if (parent == null) {
+                return false;
+            } else if (parent instanceof DialogPane) {
+                return true;
+            }
+
+            return isInsideDialogPane(parent.getParent());
         }
 
         private final BooleanProperty blocked = new SimpleBooleanProperty(this, "blocked");
@@ -969,6 +1007,7 @@ public class DialogPane extends Pane {
             if (converter != null) {
                 text = converter.toString(buttonType);
             }
+
             Button button = new Button(text);
             ButtonData buttonData = buttonType.getButtonData();
             button.setMinWidth(Region.USE_PREF_SIZE);
@@ -976,6 +1015,7 @@ public class DialogPane extends Pane {
             ButtonBar.setButtonData(button, buttonData);
             button.setDefaultButton(buttonData.isDefaultButton());
             button.setCancelButton(buttonData.isCancelButton());
+
             return button;
         }
     }
