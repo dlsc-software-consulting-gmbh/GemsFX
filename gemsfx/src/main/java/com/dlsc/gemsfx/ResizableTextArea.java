@@ -7,6 +7,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -20,6 +21,7 @@ public class ResizableTextArea extends Control {
 
     public ResizableTextArea() {
         getStyleClass().add("resizable-text-area");
+        getStylesheets().add(getUserAgentStylesheet());
         editor.textProperty().bindBidirectional(textProperty());
     }
 
@@ -31,6 +33,11 @@ public class ResizableTextArea extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new ResizableTextAreaSkin(this);
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return ResizableTextArea.class.getResource("resizable-text-area.css").toExternalForm();
     }
 
     public final TextArea getEditor() {
@@ -97,6 +104,7 @@ public class ResizableTextArea extends Control {
             resizeCorner.setPrefSize(10, 10);
             resizeCorner.setMaxSize(10, 10);
             resizeCorner.setOnMousePressed(evt -> {
+                editor.requestFocus();
                 startX = evt.getScreenX();
                 startY = evt.getScreenY();
                 startW = editor.getWidth();
@@ -130,6 +138,8 @@ public class ResizableTextArea extends Control {
                 }
             });
             StackPane.setAlignment(resizeCorner, Pos.BOTTOM_RIGHT);
+
+            editor.focusedProperty().addListener(it -> resizeIcon.pseudoClassStateChanged(PseudoClass.getPseudoClass("active"), editor.isFocused()));
 
             StackPane pane = new StackPane(editor, resizeCorner);
             getChildren().setAll(pane);

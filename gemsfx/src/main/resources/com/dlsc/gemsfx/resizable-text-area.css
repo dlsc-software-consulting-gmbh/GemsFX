@@ -1,0 +1,11 @@
+.resizable-text-area .resize-corner {
+    -fx-padding: 0px 2px 2px 0px;
+}
+
+.resizable-text-area .resize-corner .ikonli-font-icon {
+    -fx-icon-size: 24px;
+}
+
+.resizable-text-area .resize-corner .ikonli-font-icon:active {
+    -fx-icon-color: -fx-accent;
+}
