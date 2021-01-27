@@ -19,6 +19,7 @@ public class ResizableTextAreaApp extends Application {
     @Override
     public void start(Stage stage) {
         ResizableTextArea textArea = new ResizableTextArea();
+        textArea.getEditor().setWrapText(true);
         textArea.setMinHeight(100);
 
         VBox box = new VBox(textArea);

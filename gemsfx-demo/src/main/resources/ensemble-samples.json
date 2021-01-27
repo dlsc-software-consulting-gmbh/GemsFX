@@ -2,6 +2,14 @@
   "samples": [
     {
       "category": "gemsfx",
+      "name": "Resizable Text Area",
+      "desc": "A text area that can be resized by the user.",
+      "project": "GemsFX",
+      "preview": "/preview-resizable-text-area.png",
+      "classname": "com.dlsc.gemsfx.demo.ResizableTextAreaApp"
+    },
+    {
+      "category": "gemsfx",
       "name": "Dialog Pane",
       "desc": "A pane for displaying dialogs.",
       "project": "GemsFX",

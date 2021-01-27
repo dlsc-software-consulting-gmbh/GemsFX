@@ -20,6 +20,13 @@ types of dialogs.
 
 ![DialogPane](gemsfx/docs/dialog-pane.png)
 
+## Resizable Text Area
+
+A custom control that wraps a text area and adds a resize handle to the lower right corner of it. The area can be configured to be
+resizable in vertical, horizontal, or both directions. 
+
+![ResizableTextArea](gemsfx/docs/resizable-text-area.png)
+
 ## Time Picker
 
 A small control used for entering a time. The control can be configured with a "step rate" for the minutes field (e.g. "15 minutes") that will be used when
