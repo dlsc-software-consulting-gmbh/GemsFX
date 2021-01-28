@@ -444,7 +444,7 @@ public class DialogPane extends Pane {
     private void slideInOut(double visibility, DoubleProperty visibilityProperty, Supplier<Node> nodeSupplier) {
         Node node = nodeSupplier.get();
 
-        if (!getAnimationDuration().equals(Duration.ZERO)) {
+        if (!getAnimationDuration().equals(Duration.ZERO) && isAnimateDialogs()) {
             if (visibility == 1) {
                 ensureNodeInChildrenList(node);
                 node.setVisible(true);
@@ -456,6 +456,7 @@ public class DialogPane extends Pane {
             KeyValue value1 = new KeyValue(visibilityProperty, visibility);
             KeyValue value2 = new KeyValue(node.opacityProperty(), visibility == 0 ? 0 : 1);
             KeyFrame frame = new KeyFrame(getAnimationDuration(), value1, value2);
+
             Timeline timeline = new Timeline(frame);
             timeline.setOnFinished(evt -> {
                 if (visibility == 0) {
