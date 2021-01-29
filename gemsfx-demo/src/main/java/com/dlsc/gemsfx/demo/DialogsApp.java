@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -65,13 +66,11 @@ public class DialogsApp extends Application {
         node2Button.setOnAction(evt -> dialogPane.showNode(INFORMATION, "Generic Node Dialog", createGenericNode()));
 
         Button busyButton = new Button("Busy");
-        busyButton.setOnAction(evt -> {
-            dialogPane.showBusyIndicator().thenAccept(buttonType -> {
-                if (buttonType.equals(ButtonType.CANCEL)) {
-                    dialogPane.showInformation("Cancelled", "The busy dialog has been cancelled via the ESC key.");
-                }
-            });
-        });
+        busyButton.setOnAction(evt -> dialogPane.showBusyIndicator().thenAccept(buttonType -> {
+            if (buttonType.equals(ButtonType.CANCEL)) {
+                dialogPane.showInformation("Cancelled", "The busy dialog has been cancelled via the ESC key.");
+            }
+        }));
 
         Button maxButton = new Button("Maximize");
         maxButton.setOnAction(evt -> {
@@ -137,10 +136,14 @@ public class DialogsApp extends Application {
             }
         });
 
+        CheckBox closeButtonBox = new CheckBox("Show close button:");
+        closeButtonBox.selectedProperty().bindBidirectional(dialogPane.showCloseButtonProperty());
+
         VBox.setVgrow(flowPane, Priority.ALWAYS);
         VBox.setVgrow(durationBox, Priority.ALWAYS);
+        VBox.setVgrow(closeButtonBox, Priority.ALWAYS);
 
-        HBox hBox = new HBox(10, new Label("Animation:"), durationBox, new Label("Style:"), styleBox);
+        HBox hBox = new HBox(10, new Label("Animation:"), durationBox, new Label("Style:"), styleBox, closeButtonBox);
         hBox.setAlignment(Pos.CENTER);
 
         VBox vBox = new VBox(flowPane, hBox);
@@ -158,7 +161,7 @@ public class DialogsApp extends Application {
 
         Scene scene = new Scene(anchorPane);
 
-        CSSFX.start(scene);
+        CSSFX.start();
 
         primaryStage.setTitle("Dialogs");
         primaryStage.setScene(scene);

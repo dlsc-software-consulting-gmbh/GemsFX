@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx;
 
 import org.apache.commons.lang3.StringUtils;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -184,11 +186,27 @@ public class DialogPane extends Pane {
                 newScene.addEventHandler(KeyEvent.KEY_PRESSED, weakEscapeHandler);
             }
         });
+
+        getStylesheets().add(getUserAgentStylesheet());
     }
 
     @Override
     public String getUserAgentStylesheet() {
         return DialogPane.class.getResource("dialog.css").toExternalForm();
+    }
+
+    private final BooleanProperty showCloseButton = new SimpleBooleanProperty(this, "showCloseButton", true);
+
+    public boolean isShowCloseButton() {
+        return showCloseButton.get();
+    }
+
+    public BooleanProperty showCloseButtonProperty() {
+        return showCloseButton;
+    }
+
+    public void setShowCloseButton(boolean showCloseButton) {
+        this.showCloseButton.set(showCloseButton);
     }
 
     private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(this, "animationDuration", Duration.millis(100));
@@ -458,6 +476,7 @@ public class DialogPane extends Pane {
 
             KeyValue value1 = new KeyValue(visibilityProperty, visibility);
             KeyValue value2 = new KeyValue(node.opacityProperty(), visibility == 0 ? 0 : 1);
+
             KeyFrame frame = new KeyFrame(getAnimationDuration(), value1, value2);
 
             Timeline timeline = new Timeline(frame);
@@ -639,33 +658,61 @@ public class DialogPane extends Pane {
             }
         }
 
-        public boolean isPadding() {
+        private final BooleanProperty showCloseButton = new SimpleBooleanProperty(this, "showCloseButton", true);
+
+        public final boolean isShowCloseButton() {
+            return showCloseButton.get();
+        }
+
+        public final BooleanProperty showCloseButtonProperty() {
+            return showCloseButton;
+        }
+
+        public final void setShowCloseButton(boolean showCloseButton) {
+            this.showCloseButton.set(showCloseButton);
+        }
+
+        private final ObjectProperty<Duration> delay = new SimpleObjectProperty<>(this, "delay", Duration.millis(100));
+
+        public final Duration getDelay() {
+            return delay.get();
+        }
+
+        public final ObjectProperty<Duration> delayProperty() {
+            return delay;
+        }
+
+        public final void setDelay(Duration delay) {
+            this.delay.set(delay);
+        }
+
+        public final boolean isPadding() {
             return padding;
         }
 
-        public void setPadding(boolean padding) {
+        public final void setPadding(boolean padding) {
             this.padding = padding;
         }
 
         private final ObjectProperty<T> value = new SimpleObjectProperty<>(this, "value");
 
-        public T getValue() {
+        public final T getValue() {
             return value.get();
         }
 
-        public ObjectProperty<T> valueProperty() {
+        public final ObjectProperty<T> valueProperty() {
             return value;
         }
 
-        public void setValue(T value) {
+        public final void setValue(T value) {
             this.value.set(value);
         }
 
-        public Type getType() {
+        public final Type getType() {
             return type;
         }
 
-        public DialogPane getDialogPane() {
+        public final DialogPane getDialogPane() {
             return pane;
         }
 
@@ -678,9 +725,7 @@ public class DialogPane extends Pane {
             complete(ButtonType.CANCEL);
         }
 
-        // valid property
-
-        // important to have default set to true
+        // valid property (important to have default set to true)
         private final BooleanProperty valid = new SimpleBooleanProperty(this, "valid", true);
 
         public boolean isValid() {
@@ -818,7 +863,7 @@ public class DialogPane extends Pane {
         }
     }
 
-    public class ContentPane extends StackPane {
+    private class ContentPane extends StackPane {
 
         private final ButtonBar dialogButtonBar;
         private final Dialog<?> dialog;
@@ -836,15 +881,6 @@ public class DialogPane extends Pane {
 
             DialogPane shell = this.dialog.getDialogPane();
 
-            VBox box = new VBox();
-            box.getStyleClass().add("vbox");
-            box.setFillWidth(true);
-
-            VBox dialogHeader = new VBox();
-            dialogHeader.setAlignment(Pos.CENTER);
-            dialogHeader.getStyleClass().add("header");
-            dialogHeader.managedProperty().bind(dialogHeader.visibleProperty());
-
             Label dialogTitle = new Label("Dialog");
             dialogTitle.setMaxWidth(Double.MAX_VALUE);
             dialogTitle.getStyleClass().add("title");
@@ -852,6 +888,10 @@ public class DialogPane extends Pane {
             ImageView dialogIcon = new ImageView();
             dialogIcon.getStyleClass().addAll("icon");
 
+            VBox dialogHeader = new VBox();
+            dialogHeader.setAlignment(Pos.CENTER);
+            dialogHeader.getStyleClass().add("header");
+            dialogHeader.managedProperty().bind(dialogHeader.visibleProperty());
             dialogHeader.getChildren().setAll(dialogIcon, dialogTitle);
 
             StackPane content = new StackPane();
@@ -901,12 +941,29 @@ public class DialogPane extends Pane {
                 createButtons();
             }
 
+            VBox box = new VBox();
+            box.getStyleClass().add("vbox");
+            box.setFillWidth(true);
             box.getChildren().setAll(dialogHeader, content, dialogButtonBar);
 
             GlassPane glassPane = new GlassPane();
             glassPane.hideProperty().bind(blocked.not());
             glassPane.fadeInOutProperty().bind(shell.fadeInOutProperty());
-            getChildren().addAll(box, glassPane);
+
+            FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_CLOSE);
+
+            Button closeButton = new Button();
+            closeButton.setGraphic(fontIcon);
+            closeButton.setAlignment(Pos.CENTER);
+            closeButton.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+            closeButton.getStyleClass().add("close-button");
+            closeButton.visibleProperty().bind(dialog.showCloseButtonProperty().and(showCloseButtonProperty()));
+            closeButton.managedProperty().bind(dialog.showCloseButtonProperty().and(showCloseButtonProperty()));
+            closeButton.setOnAction(evt -> dialog.cancel());
+
+            StackPane.setAlignment(closeButton, Pos.TOP_RIGHT);
+
+            getChildren().addAll(box, closeButton, glassPane);
         }
 
         private boolean isInsideDialogPane(Parent parent) {
@@ -1025,7 +1082,7 @@ public class DialogPane extends Pane {
         }
     }
 
-    public class BusyIndicator extends CircularProgressIndicator {
+    private class BusyIndicator extends CircularProgressIndicator {
 
         public BusyIndicator() {
             getStyleClass().add("busy-indicator");
@@ -1043,7 +1100,7 @@ public class DialogPane extends Pane {
     /**
      * Created by hansolo on 08.04.16.
      */
-    public class CircularProgressIndicator extends Region {
+    private class CircularProgressIndicator extends Region {
         private static final double PREFERRED_WIDTH = 24;
         private static final double PREFERRED_HEIGHT = 24;
         private static final double MINIMUM_WIDTH = 12;

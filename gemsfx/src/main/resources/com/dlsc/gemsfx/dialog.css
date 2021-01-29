@@ -74,6 +74,34 @@
     -fx-image: url("dialog-confirm.png");
 }
 
+.dialog-pane > .content-pane > .close-button {
+    -fx-background-radius: 3px;
+    -fx-background-color: rgba(100, 112, 122, 0.2);
+    -fx-background-insets: 0px;
+    -fx-padding: 2px;
+    -size: 24px;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+    -fx-translate-x: -5px;
+    -fx-translate-y: 5px;
+}
+
+.dialog-pane > .content-pane > .close-button:hover {
+    -fx-background-color: rgba(100, 112, 122, 0.4);
+}
+
+.dialog-pane > .content-pane > .close-button:pressed {
+    -fx-background-color: rgba(100, 112, 122, 0.1);
+}
+
+.dialog-pane > .content-pane > .close-button .ikonli-font-icon {
+    -fx-icon-color: -fx-text-background-color;
+}
+
 /* ----------------------------------------------------------------------------
  * BusyIndicator
  */

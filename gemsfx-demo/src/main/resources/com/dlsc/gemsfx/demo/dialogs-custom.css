@@ -32,7 +32,9 @@
 
 .dialog-pane > .content-pane > .vbox .label {
     -fx-text-fill: white;
+    -fx-font-family: "Inter Bold";
 }
+
 
 .dialog-pane > .content-pane > .vbox > .button-bar {
     -fx-padding: 10px 30px;
@@ -120,10 +122,12 @@
 
 .dialog-pane > .content-pane .text-field {
     -fx-pref-width: 280px;
-    -fx-background-color: #8A939B;
     -fx-background-radius: 3px;
+    -fx-background-color: #202830;
     -fx-text-fill: white;
+    -fx-font-size: 12px;
     -fx-padding: 10px;
+    -fx-font-family: "Inter Bold";
 }
 
 .dialog-pane > .content-pane .text-area {
@@ -133,6 +137,15 @@
 
 .dialog-pane > .content-pane .text-area .text {
     -fx-text-fill: white;
+}
+
+.dialog-pane > .content-pane > .close-button {
+    -fx-graphic: url("dialog-cancel.png");
+    -size: 21px;
+    -fx-background-color: #64707A;
+    -fx-background-radius: 1000px;
+    -fx-translate-y: 18px;
+    -fx-translate-x: -16px;
 }
 
 /* ----------------------------------------------------------------------------
