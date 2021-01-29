@@ -406,7 +406,7 @@ public class DialogPane extends Pane {
         return dialog;
     }
 
-    private final BooleanProperty animateDialogs = new SimpleBooleanProperty(this, "animateDialogs", false);
+    private final BooleanProperty animateDialogs = new SimpleBooleanProperty(this, "animateDialogs", true);
 
     public final BooleanProperty animateDialogsProperty() {
         return animateDialogs;
