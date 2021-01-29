@@ -1010,6 +1010,7 @@ public class DialogPane extends Pane {
             }
 
             Button button = new Button(text);
+            button.getStyleClass().add(buttonType.getButtonData().getTypeCode().toLowerCase());
             ButtonData buttonData = buttonType.getButtonData();
             button.setMinWidth(Region.USE_PREF_SIZE);
             ButtonBar.setButtonUniformSize(button, dialog.isSameWidthButtons());
