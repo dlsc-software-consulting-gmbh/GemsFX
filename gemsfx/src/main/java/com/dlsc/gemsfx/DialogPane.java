@@ -20,6 +20,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -320,12 +321,14 @@ public class DialogPane extends Pane {
             textArea.getEditor().setPrefRowCount(6);
             textArea.setResizeVertical(true);
             textArea.setResizeHorizontal(true);
+            textArea.getEditor().skinProperty().addListener(it -> Platform.runLater(() -> textArea.getEditor().requestFocus()));
             textInputControl = textArea.getEditor();
             node = textArea;
         } else {
             TextField textField = new TextField(text);
             textField.setPromptText(prompt);
             textField.setPrefColumnCount(20);
+            textField.skinProperty().addListener(it -> Platform.runLater(() -> textField.requestFocus()));
             textInputControl = textField;
             node = textField;
         }
