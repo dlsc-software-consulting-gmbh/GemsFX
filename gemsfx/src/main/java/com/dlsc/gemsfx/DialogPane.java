@@ -115,7 +115,7 @@ public class DialogPane extends Pane {
     private final ListProperty<Dialog> dialogs = new SimpleListProperty<>(this, "dialogs", FXCollections.observableArrayList());
 
     private final EventHandler<KeyEvent> escapeHandler = evt -> {
-        if (evt.getCode() == KeyCode.ESCAPE) {// hide the last dialog that was opened
+        if (evt.getCode() == KeyCode.ESCAPE) { // hide the last dialog that was opened
             if (!dialogs.isEmpty()) {
                 Dialog<?> dialog = dialogs.get(dialogs.size() - 1);
                 if (!dialog.isCancelled()) {
@@ -180,10 +180,10 @@ public class DialogPane extends Pane {
 
         sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (oldScene != null) {
-                oldScene.removeEventHandler(KeyEvent.KEY_PRESSED, weakEscapeHandler);
+                oldScene.removeEventFilter(KeyEvent.KEY_PRESSED, weakEscapeHandler);
             }
             if (newScene != null) {
-                newScene.addEventHandler(KeyEvent.KEY_PRESSED, weakEscapeHandler);
+                newScene.addEventFilter(KeyEvent.KEY_PRESSED, weakEscapeHandler);
             }
         });
 
