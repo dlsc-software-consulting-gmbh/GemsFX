@@ -78,8 +78,7 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
         if (time != null) {
             hourListView.getSelectionModel().select(Integer.valueOf(time.getHour()));
             minuteListView.getSelectionModel().select(Integer.valueOf(time.getMinute()));
-        }
-        else {
+        } else {
             hourListView.getSelectionModel().clearSelection();
             minuteListView.getSelectionModel().clearSelection();
         }
