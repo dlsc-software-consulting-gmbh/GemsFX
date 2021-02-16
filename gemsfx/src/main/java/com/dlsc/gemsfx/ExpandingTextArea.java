@@ -32,7 +32,6 @@ public class ExpandingTextArea extends TextArea {
     }
 
     private void init() {
-        getStylesheets().add(ExpandingTextArea.class.getResource("expanding-text-area.css").toExternalForm());
         getStyleClass().add("expanding-text-area");
         setWrapText(true);
 
