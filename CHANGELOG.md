@@ -1,5 +1,16 @@
 # Change Log
 
+## [Unreleased](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/HEAD)
+
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.28.0...HEAD)
+
+**Merged pull requests:**
+
+- clear listview selection when time Picker value is null \(Empty\) [\#31](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/31) ([alialkubaisi](https://github.com/alialkubaisi))
+
+## [1.28.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.28.0) (2021-02-16)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.26.4...1.28.0)
+
 ## [1.26.4](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.26.4) (2021-01-31)
 [Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.26.3...1.26.4)
 
