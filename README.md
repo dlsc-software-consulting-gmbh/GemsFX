@@ -27,6 +27,12 @@ resizable in vertical, horizontal, or both directions.
 
 ![ResizableTextArea](gemsfx/docs/resizable-text-area.png)
 
+## Expanding Text Area
+
+A customized text area that grows based on its text content. The text area will never show vertical or horizontal scrollbars.
+
+![ExpandingTextArea](gemsfx/docs/expanding-text-area.png)
+
 ## Time Picker
 
 A small control used for entering a time. The control can be configured with a "step rate" for the minutes field (e.g. "15 minutes") that will be used when
@@ -127,6 +133,7 @@ terminal:
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.DurationPickerApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.EmailFieldApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.EnhancedLabelApp
+    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.ExpandingTextAreaApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.FilterViewApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PaymentOptionApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PaymentOptionTilesApp
