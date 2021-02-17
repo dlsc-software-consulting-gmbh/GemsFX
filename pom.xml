@@ -7,7 +7,7 @@
     <name>GemsFXParent</name>
     <groupId>com.dlsc.gemsfx</groupId>
     <artifactId>parent</artifactId>
-    <version>1.28.2</version>
+    <version>1.28.3</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -73,7 +73,7 @@
             <dependency>
                 <groupId>com.dlsc.gemsfx</groupId>
                 <artifactId>gemsfx</artifactId>
-                <version>1.28.2</version>
+                <version>1.28.3</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
