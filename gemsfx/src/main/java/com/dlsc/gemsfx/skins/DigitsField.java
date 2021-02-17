@@ -7,6 +7,8 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -15,8 +17,6 @@ import javafx.scene.input.KeyEvent;
  * A control used for visualizing digits as part of the {@link TimePicker} control.
  */
 public abstract class DigitsField extends TimeField {
-
-    private String typedText = "";
 
     private TimeField nextField;
 
@@ -31,27 +31,6 @@ public abstract class DigitsField extends TimeField {
 
         setOnMouseClicked(evt -> requestFocus());
 
-        /*
-         * Make sure the text is filled with a leading zero when the value is smaller than
-         * 10 and the "fillDigits" was true.
-         */
-        textProperty().bind(Bindings.createStringBinding(() -> {
-            Integer value = getValue();
-            if (value == null) {
-                return "--";
-            } else if (value < 10 && fillDigits) {
-                return "0" + value;
-            }
-
-            return Integer.toString(value);
-        }, valueProperty()));
-
-        focusedProperty().addListener(it -> {
-            if (!isFocused()) {
-                constrainValue();
-            }
-        });
-
         minimumValueProperty().addListener(it -> constrainValue());
         maximumValueProperty().addListener(it -> constrainValue());
 
@@ -61,22 +40,59 @@ public abstract class DigitsField extends TimeField {
         valueProperty().addListener(it -> {
             Integer value = getValue();
             if (value == null) {
-                typedText = "";
+                setTypedText("");
             } else {
-                typedText = Integer.toString(value);
+                String oldText = getTypedText();
+                String newText = Integer.toString(value);
+
+                if (oldText != null && oldText.length() == 2 && newText.length() == 1) {
+                    newText = "0" + newText;
+                }
+
+                setTypedText(newText);
             }
         });
+
+        /*
+         * Make sure the text is filled with a leading zero when the value is smaller than
+         * 10 and the "fillDigits" was true.
+         */
+        textProperty().bind(Bindings.createStringBinding(() -> {
+            Integer value = getValue();
+            if (value == null) {
+                if (isFocused()) {
+                    return "";
+                }
+                return "--";
+            } else if (value < 10 && (fillDigits || getTypedText().length() > 1)) {
+                return "0" + value;
+            }
+
+            return Integer.toString(value);
+        }, valueProperty(), focusedProperty()));
 
         focusedProperty().addListener(it -> {
             if (isFocused()) {
                 // we regained focus, so nothing is in the "history"
-                typedText = "";
+                String text = getText();
+                if (text.equals("--")) {
+                    setTypedText("");
+                } else {
+                    setTypedText(text);
+                }
+            } else {
+                if (getValue() == null) {
+                    Integer minimumValue = getMinimumValue();
+                    setValue(minimumValue);
+                }
+
+                constrainValue();
             }
         });
 
         timePicker.adjustedProperty().addListener(it -> {
             if (timePicker.isAdjusted()) {
-                typedText = "";
+                setTypedText("");
             }
         });
 
@@ -89,7 +105,7 @@ public abstract class DigitsField extends TimeField {
                 if (evt.getCode().isDigitKey()) {
                     handleDigit(evt);
                     handled = true;
-                } else if (evt.getCode().equals(KeyCode.BACK_SPACE) && typedText.length() > 0) {
+                } else if (evt.getCode().equals(KeyCode.BACK_SPACE)) {
                     handleBackspace();
                     handled = true;
                 } else if (evt.getCode().equals(KeyCode.SPACE) && nextField != null) {
@@ -98,13 +114,13 @@ public abstract class DigitsField extends TimeField {
 
                 if (handled) {
 
-                    if ("".equals(typedText) || typedText.length() == 0) {
-                        setValue(getMinimumValue());
+                    if ("".equals(typedText) || getTypedText().length() == 0) {
+                        setValue(null);
                     } else {
-                        setValue(Integer.parseInt(typedText));
+                        setValue(Integer.parseInt(getTypedText()));
                     }
 
-                    if (typedText.length() == 2 && nextField != null) {
+                    if (getTypedText().length() == 2 && nextField != null) {
                         nextField.requestFocus();
                     }
                 }
@@ -112,13 +128,23 @@ public abstract class DigitsField extends TimeField {
         });
     }
 
+    private final StringProperty typedText = new SimpleStringProperty(this, "typedText");
+
+    private void setTypedText(String text) {
+        typedText.set(text);
+    }
+
+    private String getTypedText() {
+        return typedText.get();
+    }
+
     private void handleBackspace() {
-        typedText = typedText.substring(0, typedText.length() - 1);
+        setTypedText(getTypedText().substring(0, getTypedText().length() - 1));
     }
 
     private void handleDigit(KeyEvent evt) {
-        if (typedText.length() == 2) {
-            typedText = "";
+        if (getTypedText().length() == 2) {
+            setTypedText("");
         }
 
         switch (evt.getText()) {
@@ -132,7 +158,7 @@ public abstract class DigitsField extends TimeField {
             case "7":
             case "8":
             case "9":
-                typedText = typedText + evt.getText();
+                setTypedText(getTypedText() + evt.getText());
                 break;
             default:
                 break;

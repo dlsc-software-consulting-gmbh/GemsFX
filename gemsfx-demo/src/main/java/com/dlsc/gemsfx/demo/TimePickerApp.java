@@ -71,10 +71,8 @@ public class TimePickerApp extends Application {
         datePicker.setMaxWidth(Double.MAX_VALUE);
         datePicker.valueProperty().addListener(it -> System.out.println("date: " + datePicker.getValue()));
         datePicker.getEditor().textProperty().addListener(it -> {
-            System.out.println("text: " + datePicker.getEditor().getText());
             try {
                 DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).parse(datePicker.getEditor().getText());
-                System.out.println("goood!!!");
             } catch (DateTimeParseException ex) {
             }
         });
