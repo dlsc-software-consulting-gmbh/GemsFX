@@ -6,8 +6,10 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -29,12 +31,18 @@ public class ExpandingTextAreaApp extends Application {
         textArea.setMaxWidth(400);
 
         VBox parent = new VBox(20, textField, expandingTextArea, textArea);
+        parent.setMinHeight(Region.USE_PREF_SIZE);
 
         parent.setFillWidth(false);
         parent.setAlignment(Pos.CENTER);
-        parent.setPadding(new Insets(100, 0, 100, 0));
+        parent.setPadding(new Insets(20, 0, 20, 0));
 
-        Scene scene = new Scene(parent);
+        ScrollPane scrollPane = new ScrollPane(parent);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+
+        Scene scene = new Scene(scrollPane);
+
         stage.setTitle("Expanding Text Area");
         stage.setScene(scene);
         stage.setWidth(1000);
