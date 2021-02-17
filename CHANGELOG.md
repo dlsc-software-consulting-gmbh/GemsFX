@@ -1,8 +1,7 @@
 # Change Log
 
-## [Unreleased](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/HEAD)
-
-[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.28.0...HEAD)
+## [1.28.1](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.28.1) (2021-02-17)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.28.0...1.28.1)
 
 **Merged pull requests:**
 
