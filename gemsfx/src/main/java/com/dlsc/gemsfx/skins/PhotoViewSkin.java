@@ -54,16 +54,27 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
         controlsWrapper.setAlignment(Pos.TOP_CENTER);
 
         controlsWrapper.setOnMouseClicked(evt -> {
-            if (view.getPhoto() == null) {
-                Supplier<Image> imageSupplier = view.getPhotoSupplier();
-                if (imageSupplier != null) {
-                    view.setPhoto(imageSupplier.get());
+            if (view.isEditable()) {
+                if (view.getPhoto() == null) {
+                    Supplier<Image> imageSupplier = view.getPhotoSupplier();
+                    if (imageSupplier != null) {
+                        view.setPhoto(imageSupplier.get());
+                    }
                 }
             }
         });
 
-        controlsWrapper.setOnScroll(evt -> view.setPhotoZoom(Math.min(view.getMaxZoom(), Math.max(1, view.getPhotoZoom() + Math.signum(evt.getDeltaY()) * .1))));
-        controlsWrapper.setOnZoom(evt -> view.setPhotoZoom(Math.min(view.getMaxZoom(), Math.max(1, view.getPhotoZoom() * evt.getZoomFactor()))));
+        controlsWrapper.setOnScroll(evt -> {
+            if (view.isEditable()) {
+                view.setPhotoZoom(Math.min(view.getMaxZoom(), Math.max(1, view.getPhotoZoom() + Math.signum(evt.getDeltaY()) * .1)));
+            }
+        });
+
+        controlsWrapper.setOnZoom(evt -> {
+            if (view.isEditable()) {
+                view.setPhotoZoom(Math.min(view.getMaxZoom(), Math.max(1, view.getPhotoZoom() * evt.getZoomFactor())));
+            }
+        });
 
         getChildren().setAll(controlsWrapper);
     }
