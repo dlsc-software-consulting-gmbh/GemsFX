@@ -199,6 +199,12 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
                     getChildren().setAll(imageView, newPlaceholder, rectangle);
                 }
                 newPlaceholder.visibleProperty().bind(view.photoSupplierProperty().isNotNull().and(view.photoProperty().isNull()).and(view.editableProperty()));
+            } else {
+                if (view.getClipShape().equals(ClipShape.CIRCLE)) {
+                    getChildren().setAll(imageView, circle);
+                } else {
+                    getChildren().setAll(imageView, rectangle);
+                }
             }
         }
 
