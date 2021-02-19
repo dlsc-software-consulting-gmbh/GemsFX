@@ -31,7 +31,7 @@
 
     <properties>
         <javafx.version>14.0.1</javafx.version>
-        <ikonli.version>11.5.0</ikonli.version>
+        <ikonli.version>12.2.0</ikonli.version>
     </properties>
 
     <developers>
