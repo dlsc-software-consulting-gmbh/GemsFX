@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.29.1](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.29.1) (2021-02-22)
+[Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.29.0...1.29.1)
+
+**Merged pull requests:**
+
+- Handling StringIndexOutOfBounds exception when pressing backspace after deleting all numbers [\#32](https://github.com/dlsc-software-consulting-gmbh/GemsFX/pull/32) ([grigala](https://github.com/grigala))
+
 ## [1.29.0](https://github.com/dlsc-software-consulting-gmbh/GemsFX/tree/1.29.0) (2021-02-19)
 [Full Changelog](https://github.com/dlsc-software-consulting-gmbh/GemsFX/compare/1.28.3...1.29.0)
 
