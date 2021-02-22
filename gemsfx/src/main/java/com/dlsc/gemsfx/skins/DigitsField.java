@@ -2,6 +2,8 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TimePicker;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -139,7 +141,9 @@ public abstract class DigitsField extends TimeField {
     }
 
     private void handleBackspace() {
-        setTypedText(getTypedText().substring(0, getTypedText().length() - 1));
+        if (StringUtils.isNotBlank(getTypedText())) {
+            setTypedText(getTypedText().substring(0, getTypedText().length() - 1));
+        }
     }
 
     private void handleDigit(KeyEvent evt) {
