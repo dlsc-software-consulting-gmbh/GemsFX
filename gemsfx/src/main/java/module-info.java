@@ -1,4 +1,5 @@
 module com.dlsc.gemsfx {
+    requires javafx.base;
     requires transitive javafx.controls;
     requires javafx.swing;
 
@@ -19,6 +20,8 @@ module com.dlsc.gemsfx {
 
     exports com.dlsc.gemsfx;
     exports com.dlsc.gemsfx.incubator;
+    exports com.dlsc.gemsfx.incubator.columnbrowser;
+    exports com.dlsc.gemsfx.incubator.templatepane;
     exports com.dlsc.gemsfx.richtextarea;
     exports com.dlsc.gemsfx.util;
 }
