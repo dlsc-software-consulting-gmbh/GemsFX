@@ -32,12 +32,22 @@ public class TemplatePane extends Control {
 
 	private final ObservableMap<Position, Tile> tilesMap = FXCollections.observableHashMap();
 
+        /*
+        AR: ermöglicht das Entfernen von Nodes aus der TemplatePane.
+        */
 	public final Tile setNode(Position pos, Node node) {
 		Tile tile = tilesMap.get(pos);
-		tile.setNode(node);
-		getChildren().add(node);
-		node.setManaged(false);
-		return tile;
+                if (node!=null) {
+            		tile.setNode(node);
+                        getChildren().add(node);
+                        node.setManaged(false);
+                } else {
+                        tile.visibleProperty().unbind();
+                        tile.setVisible(false);
+                        getChildren().remove(tile.getNode());
+                        tile.setNode(null);
+                }
+                return tile;
 	}
 
 	public final Node getNode(Position pos) {
