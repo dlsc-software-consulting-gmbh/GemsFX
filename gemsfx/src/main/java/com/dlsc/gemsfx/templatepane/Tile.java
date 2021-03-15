@@ -194,11 +194,7 @@ public class Tile {
 	}
 
 	public final void setVisible(final boolean visible) {
-                /*
-                AR: Für den Fall, dass die TemplatePaneControls gebunden sind
-                */
-                this.visibleProperty().unbind();
-                this.visibleProperty().set(visible);
+		this.visibleProperty().set(visible);
 	}
 
 	private final DoubleProperty layoutX = new SimpleDoubleProperty(this, "layoutX", 0);

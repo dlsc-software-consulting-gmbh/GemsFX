@@ -94,10 +94,6 @@ public class TemplatePaneSkin extends SkinBase<TemplatePane> {
 		currentTileBounds.forEach((tile, bounds) -> tile.resize(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight()));
 	}
 
-        /*
-        AR: Es konnten negative Werte für contentHeight / contentWidth entstehen
-            Dadurch kam es zu Exceptions bei der Erstellung des Rectangle2D
-        */
 	private Map<Tile, Rectangle2D> computeBounds(double contentX, double contentY, double contentWidth, double contentHeight) {
 		Map<Tile, Rectangle2D> boundsMap = new HashMap<>();
 
@@ -105,67 +101,67 @@ public class TemplatePaneSkin extends SkinBase<TemplatePane> {
 		double aboveHeaderHeight = layoutAboveHeader(boundsMap, contentX, contentY, contentWidth, contentHeight);
 		contentY += aboveHeaderHeight;
 		contentHeight -= aboveHeaderHeight;
-                if (contentHeight<0) contentHeight = 0;
+		if (contentHeight<0) contentHeight = 0;
 
 		double headerHeight = layoutHeader(boundsMap, contentX, contentY, contentWidth, contentHeight);
 		contentY += headerHeight;
 		contentHeight -= headerHeight;
-                if (contentHeight<0) contentHeight = 0;
+		if (contentHeight<0) contentHeight = 0;
 
 		double belowHeaderHeight = layoutBelowHeader(boundsMap, contentX, contentY, contentWidth, contentHeight);
 		contentY += belowHeaderHeight;
 		contentHeight -= belowHeaderHeight;
-                if (contentHeight<0) contentHeight = 0;
+		if (contentHeight<0) contentHeight = 0;
 
 		// fill from the bottom
 
 		double belowFooterHeight = layoutBelowFooter(boundsMap, contentX, contentY + contentHeight, contentWidth, contentHeight);
 		contentHeight -= belowFooterHeight;
-                if (contentHeight<0) contentHeight = 0;
+		if (contentHeight<0) contentHeight = 0;
 
 		double footerHeight = layoutFooter(boundsMap, contentX, contentY + contentHeight, contentWidth, contentHeight);
 		contentHeight -= footerHeight;
-                if (contentHeight<0) contentHeight = 0;
+		if (contentHeight<0) contentHeight = 0;
 
 		double aboveFooterHeight = layoutAboveFooter(boundsMap, contentX, contentY + contentHeight, contentWidth, contentHeight);
 		contentHeight -= aboveFooterHeight;
-                if (contentHeight<0) contentHeight = 0;
+		if (contentHeight<0) contentHeight = 0;
 
 		double leftWidth = layoutLeft(boundsMap, contentX, contentY, contentWidth, contentHeight);
 		contentX += leftWidth;
 		contentWidth -= leftWidth;
-                if (contentWidth<0) contentWidth = 0;
+		if (contentWidth<0) contentWidth = 0;
 
 		double rightWidth = layoutRight(boundsMap, contentX + contentWidth, contentY, contentWidth, contentHeight);
 		contentWidth -= rightWidth;
-                if (contentWidth<0) contentWidth = 0;
+		if (contentWidth<0) contentWidth = 0;
 
 		double aboveSidesHeight = layoutAboveSides(boundsMap, contentX, contentY, contentWidth, contentHeight);
 		contentHeight -= aboveSidesHeight;
-                if (contentHeight<0) contentHeight = 0;
+		if (contentHeight<0) contentHeight = 0;
 		contentY += aboveSidesHeight;
 
 		double belowSidesHeight = layoutBelowSides(boundsMap, contentX, contentY + contentHeight, contentWidth, contentHeight);
 		contentHeight -= belowSidesHeight;
-                if (contentHeight<0) contentHeight = 0;
+		if (contentHeight<0) contentHeight = 0;
 
 		double contentLeftWidth = layoutContentLeft(boundsMap, contentX, contentY, contentWidth, contentHeight);
 		contentX += contentLeftWidth;
 		contentWidth -= contentLeftWidth;
-                if (contentWidth<0) contentWidth = 0;
+		if (contentWidth<0) contentWidth = 0;
 
 		double contentRightWidth = layoutContentRight(boundsMap, contentX + contentWidth, contentY, contentWidth, contentHeight);
 		contentWidth -= contentRightWidth;
-                if (contentWidth<0) contentWidth = 0;
+		if (contentWidth<0) contentWidth = 0;
 
 		double aboveContentHeight = layoutAboveContent(boundsMap, contentX, contentY, contentWidth, contentHeight);
 		contentHeight -= aboveContentHeight;
-                if (contentHeight<0) contentHeight = 0;
+		if (contentHeight<0) contentHeight = 0;
 		contentY += aboveContentHeight;
 
 		double belowContentHeight = layoutBelowContent(boundsMap, contentX, contentY + contentHeight, contentWidth, contentHeight);
 		contentHeight -= belowContentHeight;
-                if (contentHeight<0) contentHeight = 0;
+		if (contentHeight<0) contentHeight = 0;
 
 		layoutContent(boundsMap, contentX, contentY, contentWidth, contentHeight);
 
