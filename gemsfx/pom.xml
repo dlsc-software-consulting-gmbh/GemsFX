@@ -30,14 +30,14 @@
     </scm>
 
     <properties>
-        <javafx.version>14.0.1</javafx.version>
+        <javafx.version>16</javafx.version>
         <ikonli.version>12.2.0</ikonli.version>
     </properties>
 
     <developers>
         <developer>
             <name>Dirk Lemmermann</name>
-            <url>http://www.dlsc.com</url>
+            <url>https://www.dlsc.com</url>
             <organization>DLSC Software &amp; Consulting</organization>
         </developer>
     </developers>
@@ -47,13 +47,13 @@
         <dependency>
             <groupId>com.dlsc.unitfx</groupId>
             <artifactId>unitfx</artifactId>
-            <version>1.0.7</version>
+            <version>1.0.8</version>
         </dependency>
 
         <dependency>
             <groupId>com.dlsc.pickerfx</groupId>
             <artifactId>pickerfx</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </dependency>
 
         <dependency>
@@ -89,7 +89,7 @@
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-            <version>11.0.1</version>
+            <version>11.1.0</version>
         </dependency>
 
         <dependency>
@@ -113,7 +113,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.6</version>
+            <version>3.11</version>
         </dependency>
 
         <!-- Testing -->
