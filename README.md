@@ -51,7 +51,7 @@ defined by a minimum and maximum duration. A popup can be used to work with the 
 or not when they reach their minimum or maximum value. The control supports similar features as the time picker: rollover fields, keyboard support, linking fields, 
 filling fields with leading zeros, etc..
 
-![TimePicker](gemsfx/docs/duration-picker.png)
+![DurationPicker](gemsfx/docs/duration-picker.png)
 
 ## Photo View
 
@@ -77,7 +77,7 @@ A stackpane with an optional node that can be shown inside a drawer. The drawer 
 
 ## FilterView
 
-A control for filtering the content of an obserable list. Works in combination with TableView, ListView, or any control that is based on observable lists.
+A control for filtering the content of an observable list. Works in combination with TableView, ListView, or any control that is based on observable lists.
 
 ![FilterView](gemsfx/docs/filter-view.png)
 

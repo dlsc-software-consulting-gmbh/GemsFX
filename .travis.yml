@@ -20,7 +20,7 @@ env:
 # BINTRAY_REPO=repo
 # BINTRAY_PACKAGE=package
 
-jdk: oraclejdk12
+jdk: oraclejdk11
 
 addons:
   apt:
