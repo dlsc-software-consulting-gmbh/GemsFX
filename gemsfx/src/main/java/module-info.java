@@ -24,4 +24,5 @@ module com.dlsc.gemsfx {
     exports com.dlsc.gemsfx.incubator.templatepane;
     exports com.dlsc.gemsfx.richtextarea;
     exports com.dlsc.gemsfx.util;
+    exports com.dlsc.gemsfx.skins;
 }

@@ -1,0 +1,4 @@
+.before-after-view .divider {
+    -fx-pref-width: 5px;
+    -fx-background-color: white;
+}
