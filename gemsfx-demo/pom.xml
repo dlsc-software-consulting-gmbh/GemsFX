@@ -41,14 +41,14 @@
 
         <repository>
             <id>jpro - sandec repository</id>
-            <url>https://sandec.bintray.com/repo</url>
+            <url>https://sandec.jfrog.io/artifactory/repo</url>
         </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
             <id>jpro - sandec repository</id>
-            <url>https://sandec.bintray.com/repo</url>
+            <url>https://sandec.jfrog.io/artifactory/repo</url>
         </pluginRepository>
     </pluginRepositories>
 
