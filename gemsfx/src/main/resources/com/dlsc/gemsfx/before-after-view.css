@@ -1,4 +1,29 @@
-.before-after-view .divider {
-    -fx-pref-width: 5px;
-    -fx-background-color: white;
+.before-after-view {
+    -fx-border-color: -fx-box-border;
+}
+
+.before-after-view  > .divider {
+    -fx-padding: 0 0.25em 0 0.25em; /* 0 3 0 3 */
+}
+/* horizontal the two nodes are placed to the left/right of each other. */
+.before-after-view:horizontal > .divider {
+    -fx-background-color: -fx-box-border, -fx-inner-border-horizontal;
+    -fx-background-insets: 0, 0 1 0 1;
+}
+/* vertical the two nodes are placed on top of each other. */
+.before-after-view:vertical > .divider {
+    -fx-background-color: -fx-box-border, -fx-inner-border;
+    -fx-background-insets: 0, 1 0 1 0;
+}
+
+.before-after-view  > .handle {
+    -fx-padding: 1em;
+    -fx-background-radius: 1000px;
+    -fx-background-insets: 0, 1;
+    -fx-background-color: -fx-box-border, -fx-inner-border-horizontal;
+}
+
+.before-after-view .handle .ikonli-font-icon {
+    -fx-icon-size: 18px;
+    -fx-icon-color: black;
 }

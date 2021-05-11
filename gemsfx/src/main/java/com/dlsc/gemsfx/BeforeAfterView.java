@@ -5,12 +5,20 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.css.PseudoClass;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 
 public class BeforeAfterView extends Control {
+
+    private static final PseudoClass horizontal = PseudoClass.getPseudoClass("horizontal");
+    private static final PseudoClass vertical = PseudoClass.getPseudoClass("vertical");
 
     public BeforeAfterView() {
         getStyleClass().add("before-after-view");
@@ -24,6 +32,38 @@ public class BeforeAfterView extends Control {
         after.setPrefSize(600, 400);
         after.setStyle("-fx-background-color: green;");
         setAfter(after);
+
+        beforeProperty().addListener(it -> {
+            Node node = getBefore();
+            if (node != null) {
+                node.setMouseTransparent(true);
+            }
+        });
+
+        afterProperty().addListener(it -> {
+            Node node = getAfter();
+            if (node != null) {
+                node.setMouseTransparent(true);
+            }
+        });
+
+        orientationProperty().addListener(it -> updatePseudoClass());
+        updatePseudoClass();
+    }
+
+    private void updatePseudoClass() {
+        pseudoClassStateChanged(horizontal, getOrientation().equals(Orientation.HORIZONTAL));
+        pseudoClassStateChanged(vertical, getOrientation().equals(Orientation.VERTICAL));
+    }
+
+    public BeforeAfterView(Node beforeNode, Node afterNode) {
+        this();
+        setBefore(beforeNode);
+        setAfter(afterNode);
+    }
+
+    public BeforeAfterView(Image beforeImage, Image afterImage) {
+        this(new ImageView(beforeImage), new ImageView(afterImage));
     }
 
     @Override
@@ -34,6 +74,20 @@ public class BeforeAfterView extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return BeforeAfterView.class.getResource("before-after-view.css").toExternalForm();
+    }
+
+    private final ObjectProperty<Orientation> orientation = new SimpleObjectProperty<>(this, "orientation", Orientation.HORIZONTAL);
+
+    public Orientation getOrientation() {
+        return orientation.get();
+    }
+
+    public ObjectProperty<Orientation> orientationProperty() {
+        return orientation;
+    }
+
+    public void setOrientation(Orientation orientation) {
+        this.orientation.set(orientation);
     }
 
     private final DoubleProperty dividerPosition = new SimpleDoubleProperty(this, "dividerPosition", .5);

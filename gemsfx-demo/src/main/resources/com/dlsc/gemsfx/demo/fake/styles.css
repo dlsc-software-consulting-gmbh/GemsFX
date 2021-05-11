@@ -1,0 +1,140 @@
+.styled-settings-pane {
+    -gray1: #3C434C;
+    -gray3: #202830;
+    -fx-base: -gray3;
+    -emphasize: rgba(69, 78, 95, 1);
+    -fx-focus-color: derive(-emphasize, 40%);
+    -fx-accent: #00B3FF;
+    -fx-background-color: -gray1;
+    -fx-font-family: "Inter Bold";
+}
+
+.styled-settings-pane .check-box .box {
+    -fx-background-color: #3C434C;
+}
+
+.styled-settings-pane .check-box {
+    -fx-graphic-text-gap: 90px;
+}
+
+.styled-settings-pane .check-box .box .mark {
+    -fx-pref-width: 18px;
+    -fx-pref-height: 18px;
+    -fx-shape: null;
+    -fx-background-color: transparent;
+    -fx-background-image: url("unchecked.png");
+}
+
+.styled-settings-pane-pane .check-box:selected .box .mark {
+    -fx-background-image: url("checked.png");
+}
+
+/* ----------------------------------------------------------------------------
+ * SettingsPane
+ */
+.settings-pane {
+    -fx-min-width: 360px;
+    -fx-padding: 10px 0px 0px 0px;
+}
+
+.settings-pane .inner-box {
+    -fx-padding: 30px 50px;
+    -fx-spacing: 5px;
+}
+
+.settings-pane .inner-box .header .close-button {
+    -fx-background-color: transparent;
+    -fx-translate-x: 40px;
+    -fx-translate-y: -30px;
+}
+
+.settings-pane .inner-box .header .close-button:hover {
+    -fx-background-color: rgba(100, 112, 122, 0.4);
+}
+
+.settings-pane .inner-box .header .close-button:pressed {
+    -fx-background-color: rgba(100, 112, 122, 0.1);
+}
+
+.settings-pane .inner-box .header .close-button .ikonli-font-icon {
+    -fx-icon-color: -fx-text-background-color;
+}
+
+.settings-pane .inner-box .separator {
+    -fx-padding: 15px 0px;
+}
+
+.settings-pane .inner-box .title {
+    -fx-font-size: 20px;
+    -fx-padding: 0px 0px 30px 0px;
+}
+
+.settings-pane .inner-box .section-title {
+    -fx-font-family: "Inter Bold";
+    -fx-font-size: 14px;
+    -fx-padding: 0px 0px 10px 0px;
+}
+
+.settings-pane .inner-box .setting-check-box {
+    -fx-graphic-text-gap: 15px;
+    -fx-padding: 5px 0px;
+}
+
+.settings-pane .inner-box .setting-check-box .text {
+    -fx-font-family: "Inter Bold";
+    -fx-font-size: 10px;
+}
+
+.settings-pane .inner-box .seconds-label {
+    -fx-font-family: "Inter Bold";
+    -fx-font-size: 8px;
+}
+
+.settings-pane .inner-box .setting-box {
+    -fx-spacing: 5px;
+}
+
+.styled-settings-pane .inner-box .setting-box .spinner {
+    -fx-font-family: "Inter Bold";
+    -fx-font-size: 10px;
+    -fx-background-color: -gray3;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 3px;
+    -fx-pref-height: 30px;
+    -fx-pref-width: 60px;
+    -fx-padding: 0px;
+}
+
+.styled-settings-pane .inner-box .setting-box .spinner:focused {
+    -fx-background-insets: 0px;
+}
+
+.styled-settings-pane .inner-box .setting-box .spinner .text-field {
+    -fx-background-color: -gray3;
+    -fx-text-fill: white;
+}
+
+.styled-settings-pane .inner-box .setting-box .spinner .increment-arrow-button,
+.styled-settings-pane .inner-box .setting-box .spinner .decrement-arrow-button {
+    -fx-background-color: -gray3;
+}
+
+.styled-settings-pane .inner-box .setting-box .spinner .increment-arrow-button .increment-arrow,
+.styled-settings-pane .inner-box .setting-box .spinner .decrement-arrow-button .decrement-arrow {
+    -fx-background-color: transparent;
+}
+
+.styled-settings-pane .inner-box .setting-box .spinner .increment-arrow-button:pressed .increment-arrow,
+.styled-settings-pane .inner-box .setting-box .spinner .decrement-arrow-button:pressed .decrement-arrow {
+    -fx-background-color: -fx-accent;
+}
+
+.styled-settings-pane .footer {
+    -fx-background-color: rgba(100, 112, 122, 0.2);
+    -fx-padding: 10px;
+}
+
+.styled-settings-pane .separator:horizontal .line {
+    -fx-border-color: #444C55 transparent transparent transparent;
+    -fx-border-insets: 0;
+}

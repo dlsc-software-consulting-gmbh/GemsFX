@@ -9,4 +9,5 @@ module com.dlsc.gemsfx.demo {
     requires org.kordamp.ikonli.materialdesign;
 
     exports com.dlsc.gemsfx.demo;
+    exports com.dlsc.gemsfx.demo.fake;
 }
