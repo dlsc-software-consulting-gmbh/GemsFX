@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.BeforeAfterView;
 import javafx.beans.InvalidationListener;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.StackPane;
@@ -15,6 +16,7 @@ public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
     private StackPane divider = new StackPane();
     private StackPane handle = new StackPane();
     private double startX;
+    private double startY;
 
     public BeforeAfterViewSkin(BeforeAfterView view) {
         super(view);
@@ -31,12 +33,23 @@ public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
         handle.getChildren().add(new FontIcon(MaterialDesign.MDI_DRAG));
         handle.setMouseTransparent(true);
 
-        view.setOnMousePressed(evt -> startX = evt.getX());
+        view.setOnMousePressed(evt -> {
+            startX = evt.getX();
+            startY = evt.getY();
+        });
+
         view.setOnMouseDragged(evt -> {
-            double x = evt.getX();
-            double delta = x - startX;
-            view.setDividerPosition(Math.min(1, Math.max(0, view.getDividerPosition() + (delta / view.getWidth()))));
-            startX = x;
+            if (view.getOrientation().equals(Orientation.HORIZONTAL)) {
+                double x = evt.getX();
+                double delta = x - startX;
+                view.setDividerPosition(Math.min(1, Math.max(0, view.getDividerPosition() + (delta / view.getWidth()))));
+                startX = x;
+            } else {
+                double y = evt.getY();
+                double delta = y - startY;
+                view.setDividerPosition(Math.min(1, Math.max(0, view.getDividerPosition() + (delta / view.getHeight()))));
+                startY = y;
+            }
         });
 
         Rectangle clip = new Rectangle();
@@ -47,6 +60,7 @@ public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
         InvalidationListener updateListener = it -> updateView();
         view.beforeProperty().addListener(updateListener);
         view.afterProperty().addListener(updateListener);
+        view.orientationProperty().addListener(updateListener);
 
         view.dividerPositionProperty().addListener(it -> view.requestLayout());
 
@@ -61,13 +75,20 @@ public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
 
         double dividerPosition = getSkinnable().getDividerPosition();
         double dividerPrefWidth = divider.prefWidth(-1);
+        double dividerPrefHeight = divider.prefHeight(-1);
         double handlePrefWidth = handle.prefWidth(-1);
         double handlePrefHeight = handle.prefHeight(-1);
         double my = contentY + contentHeight / 2;
         double x = contentX + (contentWidth * dividerPosition);
+        double y = contentY + (contentHeight * dividerPosition);
 
-        divider.resizeRelocate(x - dividerPrefWidth / 2, contentY, dividerPrefWidth, contentHeight);
-        handle.resizeRelocate(x - handlePrefWidth / 2, my - handlePrefHeight / 2, handlePrefWidth, handlePrefHeight);
+        if (getSkinnable().getOrientation().equals(Orientation.HORIZONTAL)) {
+            divider.resizeRelocate(x - dividerPrefWidth / 2, contentY, dividerPrefWidth, contentHeight);
+            handle.resizeRelocate(x - handlePrefWidth / 2, my - handlePrefHeight / 2, handlePrefWidth, handlePrefHeight);
+        } else {
+            divider.resizeRelocate(contentX, y - dividerPrefHeight / 2, contentWidth, dividerPrefHeight);
+            handle.resizeRelocate(contentX + contentWidth / 2 - handlePrefWidth / 2, y - handlePrefHeight / 2, handlePrefWidth, handlePrefHeight);
+        }
     }
 
     private void updateView() {
@@ -80,8 +101,13 @@ public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
             content.getChildren().add(wrapper);
 
             Rectangle clip = new Rectangle();
-            clip.widthProperty().bind(wrapper.widthProperty().multiply(view.dividerPositionProperty()));
-            clip.heightProperty().bind(wrapper.heightProperty());
+            if (view.getOrientation().equals(Orientation.HORIZONTAL)) {
+                clip.widthProperty().bind(wrapper.widthProperty().multiply(view.dividerPositionProperty()));
+                clip.heightProperty().bind(wrapper.heightProperty());
+            } else {
+                clip.heightProperty().bind(wrapper.heightProperty().multiply(view.dividerPositionProperty()));
+                clip.widthProperty().bind(wrapper.widthProperty());
+            }
             wrapper.setClip(clip);
         }
 
@@ -91,9 +117,16 @@ public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
             content.getChildren().add(wrapper);
 
             Rectangle clip = new Rectangle();
-            clip.xProperty().bind(wrapper.widthProperty().multiply(view.dividerPositionProperty()));
-            clip.widthProperty().bind(wrapper.widthProperty().subtract(wrapper.widthProperty().multiply(view.dividerPositionProperty())));
-            clip.heightProperty().bind(wrapper.heightProperty());
+            if (view.getOrientation().equals(Orientation.HORIZONTAL)) {
+                clip.xProperty().bind(wrapper.widthProperty().multiply(view.dividerPositionProperty()));
+                clip.widthProperty().bind(wrapper.widthProperty().subtract(wrapper.widthProperty().multiply(view.dividerPositionProperty())));
+                clip.heightProperty().bind(wrapper.heightProperty());
+            } else {
+                clip.yProperty().bind(wrapper.heightProperty().multiply(view.dividerPositionProperty()));
+                clip.heightProperty().bind(wrapper.heightProperty().subtract(wrapper.heightProperty().multiply(view.dividerPositionProperty())));
+                clip.widthProperty().bind(wrapper.widthProperty());
+            }
+
             wrapper.setClip(clip);
         }
     }

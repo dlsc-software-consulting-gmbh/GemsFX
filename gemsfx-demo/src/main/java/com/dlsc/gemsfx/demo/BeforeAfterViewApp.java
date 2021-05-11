@@ -4,11 +4,13 @@ import com.dlsc.gemsfx.BeforeAfterView;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class BeforeAfterViewApp extends Application {
@@ -21,11 +23,16 @@ public class BeforeAfterViewApp extends Application {
         BeforeAfterView beforeAfterView = new BeforeAfterView(beforeImage, afterImage);
         beforeAfterView.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
-        StackPane stackPane = new StackPane(beforeAfterView);
-        stackPane.setPadding(new Insets(20));
-        stackPane.setAlignment(Pos.CENTER);
+        ComboBox<Orientation> orientationComboBox = new ComboBox<>();
+        orientationComboBox.getItems().addAll(Orientation.values());
+        orientationComboBox.valueProperty().bindBidirectional(beforeAfterView.orientationProperty());
 
-        Scene scene = new Scene(stackPane);
+        VBox vBox = new VBox(40, beforeAfterView, orientationComboBox);
+
+        vBox.setPadding(new Insets(20));
+        vBox.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(vBox);
         CSSFX.start();
 
         stage.setTitle("BeforeAfterView");

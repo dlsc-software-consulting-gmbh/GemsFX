@@ -2,21 +2,27 @@
     -fx-border-color: -fx-box-border;
 }
 
-.before-after-view  > .divider {
+.before-after-view:horizontal > .divider {
     -fx-padding: 0 0.25em 0 0.25em; /* 0 3 0 3 */
 }
+
+.before-after-view:vertical > .divider {
+    -fx-padding: 0.25em 0 0.25em 0; /* 0 3 0 3 */
+}
+
 /* horizontal the two nodes are placed to the left/right of each other. */
 .before-after-view:horizontal > .divider {
     -fx-background-color: -fx-box-border, -fx-inner-border-horizontal;
     -fx-background-insets: 0, 0 1 0 1;
 }
+
 /* vertical the two nodes are placed on top of each other. */
 .before-after-view:vertical > .divider {
     -fx-background-color: -fx-box-border, -fx-inner-border;
     -fx-background-insets: 0, 1 0 1 0;
 }
 
-.before-after-view  > .handle {
+.before-after-view > .handle {
     -fx-padding: 1em;
     -fx-background-radius: 1000px;
     -fx-background-insets: 0, 1;
