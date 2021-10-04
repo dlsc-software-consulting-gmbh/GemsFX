@@ -2,9 +2,6 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
-
-import java.util.function.Supplier;
-
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -27,6 +24,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+
+import java.util.function.Supplier;
 
 public class PhotoViewSkin extends SkinBase<PhotoView> {
 
@@ -312,7 +311,7 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
                     sy = rectangle.getHeight() / ih;
                 }
 
-                double s = Math.min(sx, sy);
+                double s = Math.max(sx, sy);
 
                 double pw = s * iw;
                 double ph = s * ih;
