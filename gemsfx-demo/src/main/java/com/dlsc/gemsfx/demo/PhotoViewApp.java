@@ -4,22 +4,11 @@ import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
 import com.jpro.webapi.JProApplication;
 import com.jpro.webapi.WebAPI.FileUploader;
-
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
-
-import java.io.File;
-import java.net.MalformedURLException;
-
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -28,6 +17,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+
+import java.io.File;
+import java.net.MalformedURLException;
 
 public class PhotoViewApp extends JProApplication {
 
@@ -170,6 +164,13 @@ public class PhotoViewApp extends JProApplication {
 
         stage.show();
 
+        Platform.runLater(() -> {
+            try {
+                photoView.setPhoto(new Image((new File("/Users/lemmi/Desktop/test.png").toURI().toURL().toExternalForm())));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void updateText() {
