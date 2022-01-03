@@ -7,13 +7,13 @@
     <parent>
         <groupId>com.dlsc.gemsfx</groupId>
         <artifactId>parent</artifactId>
-        <version>1.29.2</version>
+        <version>1.30.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.dlsc.gemsfx</groupId>
     <artifactId>gemsfx</artifactId>
-    <version>1.29.2</version>
+    <version>1.30.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>GemsFX</name>
@@ -28,11 +28,6 @@
     <scm>
         <url>https://github.com/dlsc-software-consulting-gmbh/GemsFX</url>
     </scm>
-
-    <properties>
-        <javafx.version>16</javafx.version>
-        <ikonli.version>12.2.0</ikonli.version>
-    </properties>
 
     <developers>
         <developer>
@@ -59,7 +54,7 @@
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.6</version>
+            <version>1.7</version>
         </dependency>
 
         <dependency>
@@ -71,25 +66,21 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>${javafx.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>${javafx.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-            <version>11.1.0</version>
         </dependency>
 
         <dependency>
