@@ -58,7 +58,7 @@ jobs:
       - name: Release to GitHub
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./mvnw -B --file pom.xml -Prelease -pl :gemsfx-parent jreleaser:full-release
+        run: ./mvnw -B --file pom.xml -Prelease -pl :parent jreleaser:full-release
 
       - name: JReleaser output
         if: always()
