@@ -1,0 +1,348 @@
+## Changelog
+
+- 51b67f5 🏁 Releasing version 1.30.0
+- 2596d50 Moved release build to Java 14.
+- 3a4a1c0 🏁 Releasing version 1.30.0
+- a7fa3ce Moved release build to Java 11.
+- 248900f 🏁 Releasing version 1.30.0
+- e36ce72 New workflow, new dependency management.
+- 51de35a Added support for the maven wrapper.
+- 3ce90bb Fixed issues with background loading images in the PhotoView control.
+- 9d0e427 Added new workflows.
+- e69109d Merge pull request #43 from dlsc-software-consulting-gmbh/dependabot/maven/gemsfx-demo/org.apache.logging.log4j-log4j-core-2.17.0
+- f27b262 Merge pull request #42 from dlsc-software-consulting-gmbh/dependabot/maven/gemsfx-demo/org.apache.logging.log4j-log4j-api-2.17.0
+- eec05e0 Bump log4j-core from 2.15.0 to 2.17.0 in /gemsfx-demo
+- 482ab75 Bump log4j-api from 2.15.0 to 2.17.0 in /gemsfx-demo
+- 82e70d6 Merge pull request #39 from dlsc-software-consulting-gmbh/dependabot/maven/gemsfx-demo/org.apache.logging.log4j-log4j-core-2.15.0
+- cd99701 Merge pull request #38 from dlsc-software-consulting-gmbh/dependabot/maven/gemsfx-demo/org.apache.logging.log4j-log4j-api-2.15.0
+- 22949d4 Bump log4j-core from 2.14.1 to 2.15.0 in /gemsfx-demo
+- dae0bdf Bump log4j-api from 2.14.1 to 2.15.0 in /gemsfx-demo
+- 4a27ad8 Changed calculation of scaling factor fro using "min" of x / y scaling to using "max" of x / y scaling.
+- f586ee6 New BeforeAfterView control.
+- 5c6e28c New BeforeAfterView control.
+- e1bf83e New BeforeAfterView control (WIP).
+- d179a9d Fixed JPro repository location.
+- 7534d09 Updated to version 1.29.2.
+- 6f473b4 Spring cleaning.
+- 094c746 Java 11 related fixes.
+- 56f79f3 Merge pull request #34 from lorenzpahl/use-https-repository-url
+- bc06e64 Use HTTPS repository URL
+- af50807 Added TemplatePane and ColumnBrowser as incubator controls.
+- fe9c4c2 increment version to 1.29.1
+- 90b99b9 update changelog at 44eaacf
+- 44eaacf Merge pull request #32 from grigala/master
+- ed7a8fe Handling SIOOB exception when pressing backspace after all numbers are deleted
+- b5deb50 increment version to 1.29.0
+- dfd4f84 update changelog at 0187a16
+- 0187a16 Updated ikonli to version 12.2.0
+- 99ad3a5 increment version to 1.28.3
+- daa2f01 update changelog at c3216e3
+- c3216e3 Fixed an issue in PhotoView where setting the placeholder to null would stop the view from working properly.
+- fa452e0 Fixed an issue in PhotoView where the user could still perform certain editing operations even when the view was not editable.
+- b4a7170 increment version to 1.28.2
+- 8ac4c28 update changelog at b6b2c20
+- b6b2c20 Fixed ExpandingTextArea demo to use a scrollpane to allow for infinite vertical growth.
+- 2090ff7 increment version to 1.28.1
+- ea25613 update changelog at 632ae6c
+- 632ae6c Minor tweak to editing behaviour of TimePicker control.
+- 0809bdb Fixed formatting.
+- e349e47 increment version to 1.28.0
+- 2abe4ae update changelog at 7e61b93
+- e8498b0 Merge pull request #31 from alialkubaisi/clear-selection
+- 7e61b93 Removed unused CSS file of ExpandingTextArea.
+- 9ded24f Added new ExpandingTextArea control.
+- 8b0af20 clear listview selection when time Picker value is null (Empty)
+- 98bb96e increment version to 1.26.4
+- aef8695 update changelog at cfdde0b
+- cfdde0b Using event filter now for ESC key handling in DialogPane.
+- 51671a1 increment version to 1.26.3
+- 8763ff6 update changelog at 8fa1b3e
+- 8fa1b3e Support for a close button.
+- b910371 increment version to 1.27.0
+- 35f9ab3 update changelog at d074e8b
+- d074e8b increment version to 1.26.2
+- e556ac0 update changelog at 22cf8d4
+- 27c13c0 Changed default value of "animateDialogs" to true.
+- 22cf8d4 Now automatically setting the focus on textfield and textarea when showing the text input dialogs.
+- c2dd11e increment version to 1.26.1
+- bc8bed7 update changelog at ef43638
+- ef43638 Added the button type "code" (e.g. o, c, ....) as a styleclass to each button.
+- 26a2d7e Fixed missing check for isAnimateDialogs().
+- b5eff4d increment version to 1.26.0
+- 2ec363e update changelog at 8d56d12
+- 8d56d12 Updated docs and ensemble demos for the new resizable text area.
+- 91ce474 Updated docs and ensemble demos for the new resizable text area.
+- ea929c7 Fixed focus handling of buttons. Focus now stays inside the dialog.
+- b271f0c Refined the resizable text area, ready for roll-out.
+- 640f142 increment version to 1.25.6
+- 495915b update changelog at daaa0a9
+- daaa0a9 Added padding to the icons used for the custom dialog theme.
+- da78aaa increment version to 1.25.5
+- 91e677b update changelog at 7613dc4
+- 7613dc4 Refactored DialogPane code. Added map of created buttons to Dialog model class.
+- d651c6e increment version to 1.25.4
+- 2b7ad57 update changelog at 91866b5
+- 91866b5 Enriched dialog demo. Added min / max sizes support for dialogs.
+- a39dc4b increment version to 1.25.3
+- e80ec27 update changelog at 27aeb3b
+- 27aeb3b Added a string converter to DialogPane and also changed the button used for information and error dialogs. Used to by CLOSE, now is OK.
+- ca4a557 increment version to 1.25.2
+- d02b4d9 update changelog at 4915dfe
+- 4915dfe Fixed memory leak caused by busy dialog (infinite indeterminate rotation animation).
+- a543e4e increment version to 1.25.1
+- 7c791f5 update changelog at 4bf9532
+- 4bf9532 Started using the ButtonBar control of JavaFX for proper arrangement of buttons based on operating system.
+- 32f120e Merge pull request #28 from FlorianKirmaier/master
+- e49b587 Merge pull request #30 from joehei/master
+- fd70c96 Update README.md
+- 48fe91a Code cleanup after running code analysis.
+- eb2f20f increment version to 1.25.0
+- 3e381a8 update changelog at d248ecf
+- d248ecf Resized image of dialog example for docs.
+- 90f8c04 Added some basic javadoc to the new DialogPane class.
+- b2145a5 Added information to README.md covering the new DialogPane class.
+- a792f1e Added ensemble information for dialogs demo.
+- 5ec4f0a Added DialogPane.
+- 710b008 increment version to 1.24.0
+- a95467b update changelog at d57b65a
+- d57b65a User was able to enter text other than just the digitis 0..9.
+- b563d68 User was able to enter text other than just the digitis 0..9.
+- 55b8efc Avoiding exception with JPro, because we use the file chooser from the WebAPI instead of the native file chooser
+- f6d9702 update changelog at e7a3ac0
+- e7a3ac0 Updated to version 1.23.0
+- 5d60af1 Refined styling of duration picker popup / picker.
+- 1349e68 Started integration of picker control from PickerFX project for choosing a value inside the DurationPicker popup.
+- 49321eb increment version to 1.22.0
+- 7eef39e update changelog at 061b6fa
+- 061b6fa Fixed issue #27 "Missing minute 59"
+- d0b7830 Added German resource bundle for duration picker.
+- 92e4932 Added i18n resource bundle. Various fixes to make the duration picker work with a NULL duration.
+- ca8e59c increment version to 1.21.0
+- 85a14de update changelog at aea2bc0
+- aea2bc0 Updated jfx-ensemble config.
+- e1bc9c7 Updated README.md file.
+- e645dfd Moved the keyboard control into its own project on GitHub: KeyboardFX.
+- aa10bcb increment version to 1.20.1
+- cb1ffe5 update changelog at b7a0527
+- b7a0527 Implemented better support for NULL time in TimePicker
+- dadf01e increment version to 1.20.0
+- 6f8a634 update changelog at b1d5221
+- b1d5221 Removed PDFView documentation in README.md.
+- a209979 Removed PDFView stylesheet.
+- 7bcfdea Fixed an issue in DurationPicker where setting a duration would result in strange results.
+- 9cfd083 Moved the PDFView control out of GemsFX and into the new project PDFViewFX.
+- ccdc844 Renamed the titles of the ensemble demos.
+- a2f0e35 Now handling all arrow keys and consuming events.
+- d4c5b9f increment version to 1.19.1
+- 21ddc15 update changelog at bd475aa
+- bd475aa Added new ensemble demos.
+- 41b5f33 increment version to 1.19.0
+- dbcf532 update changelog at f5097d2
+- f5097d2 Added documentation for new duration picker control.
+- c297c1e Fixed "fill digits" support.
+- 63bcf42 Minor bug fixes for DurationPicker.
+- e244189 Finished popup for duration picker.
+- 3493f99 More work on duration picker.
+- b2ac173 Reversed arrow up / down semantics.
+- cfee84c Changed icon of duration picker button.
+- b7a4f17 Added duration picker.
+- 590dfec Added "onShowPopup" consumer property to TimePicker. Allows for easy replacement of popup UI for interactive time selection.
+- 938c746 Added ability to TimePicker to deal with NULL time.
+- b37ae3c Updated README with launch instructions for TimePickerApp.
+- c0fe214 increment version to 1.18.0
+- 341433a update changelog at c5a3360
+- c5a3360 Updated badges.
+- a0a4ec7 Updated badges.
+- cc2b87c Added new TimePicker control.
+- 927c8e6 increment version to 1.17.0
+- 18bb031 update changelog at 68a52b8
+- 68a52b8 Fixed pom files.
+- a15ab1c Added developer info to parent pom.xml file.
+- dfecb2e Added developer info to parent pom.xml file.
+- 444b7a6 increment version to 1.16.0
+- c65324e update changelog at 21f1690
+- 21f1690 Various small fixes for the PhotoView control and its demo app.
+- 18ec59b Added service concurrency API for creation of cropped image. Drastically improves performance.
+- 6e8cfc6 Added service concurrency API for creation of cropped image. Drastically improves performance.
+- bdb65a1 Integrated JPRO, working on file drag and drop support for PhotoView.
+- 7264457 Integrated JPRO, working on file drag and drop support for PhotoView.
+- c39853d increment version to 1.15.0
+- bfb02a5 update changelog at 20ad3fa
+- 20ad3fa Updated ensemble-samples.json
+- 0635ad0 Updated ensemble-samples.json
+- 8423cad Added description, scm, license, etc... to parent pom.xml.
+- 7054053 increment version to 1.14.0
+- fce19a1 update changelog at 8e03c91
+- 8e03c91 Support for EnsembleFX.
+- 4bfdf16 increment version to 1.13.0
+- ce679d4 update changelog at 58ae87f
+- 58ae87f Updated the README.md file with information on the PhotoView.
+- 69d7f9e Replaced e.printStackTrace() with calls to java.util.logging loggers.
+- ea6f335 Added Javadocs to PhotoView.
+- 257c97d Added Javadocs to DrawerStackPane and some minor code cleanup.
+- 2a5e068 increment version to 1.12.0
+- 30acfdc update changelog at befad89
+- befad89 Fixed a bug related to small images and cropping.
+- d3a2120 increment version to 1.11.0
+- 2a2b156 update changelog at fb4322f
+- fb4322f Removed default photo from PhotoView.
+- 00d943b increment version to 1.10.0
+- 85c39c1 update changelog at f5ba8de
+- f5ba8de Added read-only property storing the current crop version of the original image.
+- 639f406 Added support for cropping the original image used inside the PhotoView control.
+- 3689fbe Refined PhotoView.
+- 9eea6e2 More PhotoView greatness.
+- 1db4ed8 More PhotoView greatness.
+- 7200b19 More PhotoView greatness.
+- 7e70b99 Initial work on a photo (editor) view / avatar thingy.
+- 0c9693f Minor code cleanup.
+- 79730a9 increment version to 1.9.0
+- 4828f68 update changelog at 64b9b08
+- 64b9b08 Added getter methods for labels used by FilterView. Labels are now of type EnhancedLabel. Enhanced labels can be customized.
+- 6f73515 Minor refinements made to "EnhancedLabel". N
+- 05c0a22 Added new control called "EnhancedLabel".
+- c009998 Merge pull request #19 from dlsc-software-consulting-gmbh/dependabot/maven/gemsfx/junit-junit-4.13.1
+- 0bdb01c Merge pull request #17 from sebkur/add-more-demos-to-readme
+- 22b7aca Bump junit from 4.12 to 4.13.1 in /gemsfx
+- afc6db5 increment version to 1.8.3
+- 23668ce update changelog at aaa7519
+- aaa7519 Added missing generic types and some code cleanup.
+- 98eb61b increment version to 1.8.2
+- cacfbfd update changelog at 6db48ea
+- 6db48ea Added image for generic "credit card" payment option.
+- 5959418 increment version to 1.8.1
+- 2e3b43f update changelog at e230461
+- e230461 Changed initial width of payment option view to 100 pixels. Also defaulting "preserveRatio" to true.
+- 8b4387e increment version to 1.8.0
+- 7aa76d1 update changelog at 449cf58
+- 449cf58 Added instructions to README.md on how to launch the new demo apps for the new PaymentOptionsView.
+- 0f60ca1 Fixed small bugs in PaymentOptionView and added documentation covering the new control.
+- 5e8b37b Refined PaymentOptionView.
+- 4136555 Added another demo app for PaymentOptionView.
+- 702705a Added another demo app for PaymentOptionView.
+- 4b62a54 Initial work on a new PaymentOptionView.
+- fd049bc Add more demos to README
+- 0f0e9e6 Merge pull request #16 from sebkur/cli-launchability
+- 8c41f32 Pre-populate main.class variable in demo's pom.xml
+- 1822c72 Make demos launchable from command line and document that
+- 7e8b77e Added sonarcloud badges.
+- fd228d5 Added new css files.
+- 0954eec Added new css files.
+- 6487c8e Added sonarcloud
+- 2c01ee7 increment version to 1.7.6
+- dc9cb1a update changelog at 4e162bd
+- 4e162bd Automatically setting filter and filter group IDs as part of their constructors.
+- 07fc377 Added ID fields to filter and filter groups.
+- 3b7eada increment version to 1.7.5
+- 4f6d74d update changelog at 47e6ed9
+- 47e6ed9 increment version to 1.7.4
+- d94e2e6 update changelog at 605f856
+- 605f856 Fixed stylesheet loading for ChipView and FilterView.
+- ed52dea increment version to 1.7.3
+- 93db26f update changelog at b5a3b5e
+- b5a3b5e Merge pull request #13 from dlsc-software-consulting-gmbh/dependabot/maven/gemsfx-demo/org.apache.logging.log4j-log4j-core-2.13.2
+- 2ff39ed Added documentation for FilterView and ChipView. Extended FilterView demo.
+- 576f593 Added FilterView and ChipView controls.
+- 24cbeac Bump log4j-core from 2.12.0 to 2.13.2 in /gemsfx-demo
+- 55bdf57 increment version to 1.7.2
+- 57df9f4 update changelog at f171bc4
+- f171bc4 Made drawer content of DrawerStackPane non-managed. Otherwise caused infinite layout passes.
+- f7e451c increment version to 1.7.1
+- 46906be update changelog at 2f1261f
+- 2f1261f Replaced editor used by EmailField with CustomTextField of ControlsFX project. Exposed the editor via API in EmailField.
+- 0a0d71e increment version to 1.7.0
+- d42c2b9 update changelog at ba0cdcc
+- ba0cdcc Unified version properties for api and impl of jaxb.
+- d750054 Moved to latest jakarta xml binding api.
+- 1cca891 increment version to 1.6.0
+- e454994 update changelog at 4a491dd
+- 4a491dd Increased the default thumbnail resolution to 1 (from .5).
+- 2225183 Added javadocs. Moved PDFBoxDocument into same package as the PDFView itself. Code cleanup.
+- 08f8bce Changed default value of "cacheThumbnails" to "true".
+- a25f5d3 Fixed thumbnail caching. Code cleanup.
+- 3f5d734 Some restyling of the "page count button".
+- f30290f Moved "rotateLeft/Right" convenience methods into skin. Applications should use "pageRotation" property instead.
+- 36e964f Merge pull request #12 from PrimosK/ctrl-scroll-zoom
+- 33bc36b Following changes were made:
+- af251a4 Added option zo zoom document with the use of ctrl+scroll.
+- f9eae20 Merge pull request #11 from PrimosK/closing-document
+- 8964346 Set current page number to 0 when document is un-loaded.
+- b288953 Added PDFView.unload() method which unloads currently loaded document and re-sets the state of the UI.
+- 8321df0 Merge pull request #10 from PrimosK/total-number-of-pages
+- 8616fbb Added total pages indicator which is at the same time a convenient way of jumping to the last page.
+- c5d150c Merge pull request #9 from PrimosK/pdf-box-decoupling
+- 0da391f Some PDF providers might not provide text snippets so we simply filter out the ones which are null.
+- e15c052 Replaced tabs with spaces.
+- 1a84b7f PdfBox de-coupling.
+- ad88904 increment version to 1.5.2
+- cc974a0 update changelog at c3060d7
+- 131d4dc Merge branch 'highlight-misplacement'
+- c3060d7 Merge pull request #7 from PrimosK/highlight-misplacement
+- 3accd5a Merge pull request #5 from PrimosK/pdfview-thread-executor-fix
+- d0c1b85 Fixes misaligned highlights.
+- 6775c7c Fixes the issue of JavaFX application, containing PDFView node, not exiting properly.
+- eceacf0 increment version to 1.5.1
+- c7196cc update changelog at 8368f5e
+- 8368f5e Updated dependency to UnitFX 1.0.7 in order to target Java 11 instead of 12.
+- dde0721 Merge pull request #3 from PrimosK/jkd-11-compatibility
+- 402eaa4 Changed the `source` and `target` level of the (Maven) Java Compiler to Java 11.
+- 8f047a4 increment version to 1.5.0
+- 55baa05 update changelog at 71fe921
+- 1e19bbc Fixed PDFView demo app.
+- 71fe921 Updated README.md
+- 08df997 Some cleanup, styling.
+- 3217ab3 Auto-scrolling for page list view when page property changes. Fixed mouse wheel scrolling for page 0. Misc.
+- e24e34a Fixed issue with bouncer still showing up after user finished search.
+- e9fd733 More list scrolling synchronisation, UI polishing. Styling.
+- 40db470 UI polishing.
+- 1dce6bc Improved search. Polished UI. Used icons for toolbar buttons.
+- e881d48 Added new search result list view to left-hand side.
+- 07121af First attempt at searching and highlighting in PDF files.
+- ad8209c increment version to 1.4.0
+- fbba835 update changelog at ccb1887
+- ccb1887 Added new EmailField control.
+- 3125da6 Updated README.md
+- d8fb489 Updated README.md
+- 5e11c9c Updated README.md
+- 559b05a Updated README.md
+- b426f4f Updated README.md
+- 34474ab Updated PDFBox version to 2.0.18.
+- 5832213 increment version to 1.3.0
+- c3d6b0c update changelog at 89d7d94
+- 89d7d94 Added updated PDFView control.
+- caafebd increment version to 1.2.2
+- 928d4a2 update changelog at 132c586
+- 132c586 Minor fixes to DrawerStackPane.
+- 7262e8e increment version to 1.2.1
+- 1dded51 update changelog at fc50268
+- fc50268 Updated ikonli version.
+- 5d16ba9 Added rich text area demo app.
+- 4444d0c increment version to 1.2.0
+- 04e0358 update changelog at 1d6be6f
+- 1d6be6f Code cleanup and javadocs for rich text area.
+- 4ad94d8 Updated to RichTextArea.
+- ccbf20f Some experiments regarding rich text labels (WIP).
+- f4c9347 Some experiments regarding rich text labels (WIP).
+- 1fdfa26 Added "auto-hide" property to DrawerStackPane.
+- ac0f236 Added PDF viewer control.
+- 831070f Added On-Screen Keyboard.
+- f24612c increment version to 1.1.0
+- 1bbb40c update changelog at 73fa447
+- 73fa447 Added DrawerStackPane.
+- 76c6df4 update changelog at 989b7bd
+- 989b7bd Removed unused files.
+- 8d99d23 Initial commit.
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- joehei
+- Lorenz Pahl ([@lorenzpahl](https://github.com/lorenzpahl))
+- PrimosK
+- dependabot[bot]
+- Sebastian Kürten
+- Travis CI ([@traviscibot](https://github.com/traviscibot))
+- floriankirmaier
+- Dirk Lemmermann ([@dlemmermann](https://github.com/dlemmermann))
+- George Grigalashvili ([@grigala](https://github.com/grigala))
+- Ali
