@@ -35,11 +35,6 @@
 
     <repositories>
         <repository>
-            <id>jcenter</id>
-            <url>https://jcenter.bintray.com/</url>
-        </repository>
-
-        <repository>
             <id>jpro - sandec repository</id>
             <url>https://sandec.jfrog.io/artifactory/repo</url>
         </repository>
