@@ -41,10 +41,15 @@ public class SearchFieldApp extends Application {
         CheckBox createNewItemBox = new CheckBox("Create new country 'on-the-fly' if it can't be found in the data set.");
         field.newItemProducerProperty().bind(Bindings.createObjectBinding(() -> name -> new Country(name), createNewItemBox.selectedProperty()));
 
-        VBox vbox = new VBox(20, hBox, createNewItemBox, field);
+        CheckBox showPromptText = new CheckBox("Show prompt text");
+        field.getEditor().promptTextProperty().bind(Bindings.createStringBinding(() -> showPromptText.isSelected() ? "Start typing country name ..." : null, showPromptText.selectedProperty()));
+
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, hBox, field);
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);
+        scene.focusOwnerProperty().addListener(it -> System.out.println("focus owner: " + scene.getFocusOwner()));
+        primaryStage.setTitle("Search Field");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         primaryStage.centerOnScreen();

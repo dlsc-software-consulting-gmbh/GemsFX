@@ -64,6 +64,7 @@ public class SearchField<T> extends Control {
     public SearchField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
+        setFocusTraversable(false);
         setPlaceholder(new Label("No items found"));
 
         focusedProperty().addListener(it -> {
@@ -106,23 +107,6 @@ public class SearchField<T> extends Control {
             }
         });
 
-        setCellFactory(listView -> new ListCell<>() {
-            {
-                getStyleClass().add("spotlight-list-cell");
-                setPrefWidth(0);
-            }
-
-            @Override
-            protected void updateItem(T item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (item != null && !empty) {
-                    setText(getConverter().toString(item));
-                } else {
-                    setText("");
-                }
-            }
-        });
         setComparator(Comparator.comparing(Object::toString));
 
         fullText.bind(Bindings.createStringBinding(() -> editor.getText() + getAutoCompletedText(), editor.textProperty(), autoCompletedText));

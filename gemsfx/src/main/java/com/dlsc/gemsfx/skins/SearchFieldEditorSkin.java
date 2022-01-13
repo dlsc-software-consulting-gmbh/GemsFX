@@ -16,6 +16,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
@@ -154,7 +155,21 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
         Insets insets = textField.getInsets();
         double gap = Math.max(0, searchField.getAutoCompletionGap());
 
-        Node lookup = textField.lookup(".text");
+        Node lookup = null;
+        Set<Node> nodes = textField.lookupAll(".text");
+        if (nodes.size() > 2) { // normal text, prompt text, autocomplete tex
+            // there might be two nodes with ".text" style class if the field uses a prompt text
+            Optional<Node> lookupOptional = nodes.stream().filter(n -> (n instanceof Text) && !((Text) n).getText().equals(textField.getPromptText())).findFirst();
+            if (lookupOptional.isPresent()) {
+                lookup = lookupOptional.get();
+            }
+        } else {
+            lookup = textField.lookup(".text");
+        }
+
+        if (lookup == null) {
+            return;
+        }
 
         Bounds standardTextBounds = lookup.getLayoutBounds();
 

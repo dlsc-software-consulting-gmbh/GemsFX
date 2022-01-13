@@ -4,6 +4,13 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 
+## Search Field
+
+An auto-suggest text field with a behaviour similar to the spotlight search experience on Mac. While typing the field will
+automatically finish the entered text if it has a search result where the name starts with the exact typed text. At any time the typed text and the auto-completed text will be visually distinguishable. The field is also capable of creating a new object for the entered text if no result can be found.
+
+![SearchField](gemsfx/docs/search-field.png)
+
 ## Dialog Pane
 
 The class DialogPane can be used as a layer on top of any application. It offers various methods to display different
