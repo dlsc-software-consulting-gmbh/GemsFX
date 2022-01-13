@@ -1,0 +1,13 @@
+.spotlight-text-field .auto-completion-label {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgb(0, 0, 0, .4);
+}
+
+.spotlight-text-field .icon-wrapper {
+    -fx-padding: 0px 0px;
+}
+
+.spotlight-text-field .icon-wrapper .ikonli-font-icon {
+    -fx-icon-size: 16px;
+    -fx-icon-color: lightgrey;
+}
