@@ -6,7 +6,12 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Insets;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 public class GlassPane extends StackPane {
@@ -16,6 +21,7 @@ public class GlassPane extends StackPane {
     public GlassPane() {
         getStyleClass().add("glass-pane");
 
+        setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
         setMouseTransparent(false);
         setVisible(false);
 

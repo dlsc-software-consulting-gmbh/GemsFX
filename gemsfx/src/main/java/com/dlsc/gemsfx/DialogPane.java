@@ -1,44 +1,10 @@
 package com.dlsc.gemsfx;
 
-import org.apache.commons.lang3.StringUtils;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
-
-import javafx.animation.Animation;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.RotateTransition;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.BooleanPropertyBase;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.DoublePropertyBase;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
@@ -51,24 +17,12 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
+import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
-import javafx.scene.control.TitledPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -76,6 +30,16 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import org.apache.commons.lang3.StringUtils;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 /**
  * A pane that allows applications to display a lightweight dialog right inside the application
@@ -136,9 +100,9 @@ public class DialogPane extends Pane {
         mouseTransparentProperty().bind(showingDialogProperty().not());
 
         glassPane = new GlassPane();
+        glassPane.fadeInOutProperty().bind(fadeInOutProperty());
         glassPane.fadeInOutDurationProperty().bind(animationDurationProperty());
         glassPane.hideProperty().bind(dialogs.emptyProperty());
-        glassPane.fadeInOutProperty().bind(fadeInOutProperty());
 
         dialogs.addListener((ListChangeListener.Change<? extends Dialog> change) -> {
             while (change.next()) {
