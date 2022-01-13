@@ -1,10 +1,11 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.SpotlightTextField;
+import com.dlsc.gemsfx.SearchField;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-public class SpotlightTextFieldApp extends Application {
+public class SearchFieldApp extends Application {
 
     private List<Country> countries = new ArrayList<>();
 
@@ -29,7 +30,7 @@ public class SpotlightTextFieldApp extends Application {
         }
 
         CountriesSpotlightField field = new CountriesSpotlightField();
-        field.setPrefColumnCount(30);
+        field.getEditor().setPrefColumnCount(30);
 
         // show selected item
         Label label = new Label("Selected country:");
@@ -37,7 +38,10 @@ public class SpotlightTextFieldApp extends Application {
         value.textProperty().bind(Bindings.createStringBinding(() -> field.getSelectedItem() != null ? field.getSelectedItem().getName() : "<no selection>", field.selectedItemProperty()));
         HBox hBox = new HBox(10, label, value);
 
-        VBox vbox = new VBox(20, hBox, field);
+        CheckBox createNewItemBox = new CheckBox("Create new country 'on-the-fly' if it can't be found in the data set.");
+        field.newItemProducerProperty().bind(Bindings.createObjectBinding(() -> name -> new Country(name), createNewItemBox.selectedProperty()));
+
+        VBox vbox = new VBox(20, hBox, createNewItemBox, field);
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);
@@ -51,7 +55,7 @@ public class SpotlightTextFieldApp extends Application {
         launch(args);
     }
 
-    public class CountriesSpotlightField extends SpotlightTextField<Country> {
+    public class CountriesSpotlightField extends SearchField<Country> {
 
         public CountriesSpotlightField() {
             setSuggestionProvider(request -> countries.stream().filter(country -> country.getName().toLowerCase().contains(request.getUserText().toLowerCase())).collect(Collectors.toList()));
@@ -72,6 +76,7 @@ public class SpotlightTextFieldApp extends Application {
             setMatcher((broker, searchText) -> broker.getName().toLowerCase().startsWith(searchText.toLowerCase()));
             setComparator(Comparator.comparing(Country::getName));
             setPlaceholder(new Label("No countries found"));
+            getEditor().setPromptText("Start typing country name ...");
         }
     }
 

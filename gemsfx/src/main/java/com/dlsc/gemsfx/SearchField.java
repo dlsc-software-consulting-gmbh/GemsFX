@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx;
 
-import com.dlsc.gemsfx.skins.SpotlightTextFieldSkin;
+import com.dlsc.gemsfx.skins.SearchFieldSkin;
+import javafx.animation.RotateTransition;
+import javafx.animation.Transition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.concurrent.Service;
@@ -8,11 +10,14 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -41,12 +46,13 @@ import java.util.function.BiFunction;
  * @see #setNewItemProducer(Callback)
  * @see #setComparator(Comparator)
  */
-public class SpotlightTextField<T> extends TextField {
+public class SearchField<T> extends Control {
 
     private static final String DEFAULT_STYLE_CLASS = "spotlight-text-field";
 
     private final SearchService searchService = new SearchService();
 
+    private TextField editor = new TextField();
 
     /**
      * Constructs a new spotlight field. The field will set defaults for the
@@ -55,21 +61,29 @@ public class SpotlightTextField<T> extends TextField {
      *
      * @see #setNewItemProducer(Callback)
      */
-    public SpotlightTextField() {
+    public SearchField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
         setPlaceholder(new Label("No items found"));
 
         focusedProperty().addListener(it -> {
             if (!isFocused() && getSelectedItem() == null) {
-                setText("");
+                editor.setText("");
             }
         });
 
         addEventFilter(KeyEvent.ANY, evt -> {
             if (evt.getCode().equals(KeyCode.RIGHT)) {
-                setText(getFullText());
-                positionCaret(getFullText().length());
+                editor.setText(getFullText());
+                editor.positionCaret(getFullText().length());
+                evt.consume();
+            } else if (evt.getCode().equals(KeyCode.LEFT)) {
+                editor.positionCaret(Math.max(0, editor.getCaretPosition() - 1));
+            } else if (evt.getCode().equals(KeyCode.ESCAPE)) {
+                cancel();
+                evt.consume();
+            } else if (KeyCombination.keyCombination("shortcut+a").match(evt)) {
+                editor.selectAll();
                 evt.consume();
             }
         });
@@ -111,15 +125,15 @@ public class SpotlightTextField<T> extends TextField {
         });
         setComparator(Comparator.comparing(Object::toString));
 
-        fullText.bind(Bindings.createStringBinding(() -> getText() + getAutoCompletedText(), textProperty(), autoCompletedText));
+        fullText.bind(Bindings.createStringBinding(() -> editor.getText() + getAutoCompletedText(), editor.textProperty(), autoCompletedText));
 
-        textProperty().addListener(it -> searchService.restart());
+        editor.textProperty().addListener(it -> searchService.restart());
 
         selectedItem.addListener(it -> {
             T selectedItem = getSelectedItem();
             if (selectedItem != null) {
                 String displayName = getConverter().toString(selectedItem);
-                String text = getText();
+                String text = editor.getText();
                 if (StringUtils.startsWithIgnoreCase(displayName, text)) {
                     autoCompletedText.set(displayName.substring(text.length()));
                 } else {
@@ -130,7 +144,7 @@ public class SpotlightTextField<T> extends TextField {
             }
         });
 
-        textProperty().addListener(it -> autoCompletedText.set(""));
+        editor.textProperty().addListener(it -> autoCompletedText.set(""));
 
         converter.addListener(it -> {
             if (getConverter() == null) {
@@ -162,14 +176,95 @@ public class SpotlightTextField<T> extends TextField {
             }
         });
 
+        RotateTransition rotateTransition = new RotateTransition();
+        rotateTransition.nodeProperty().bind(busyGraphicProperty());
+        rotateTransition.setCycleCount(RotateTransition.INDEFINITE);
+        rotateTransition.setByAngle(360);
+        rotateTransition.setDuration(Duration.millis(500));
+
+        searching.addListener(it -> {
+            if (searching.get()) {
+                rotateTransition.play();
+            } else {
+                rotateTransition.stop();
+            }
+        });
+
+        sceneProperty().addListener(it -> {
+            if (getScene() == null) {
+                rotateTransition.stop();
+            }
+        });
+
         searchService.setOnSucceeded(evt -> updateView(searchService.getValue()));
+        searching.bind(searchService.runningProperty());
+    }
+
+    private final ObjectProperty<Node> graphic = new SimpleObjectProperty<>(this, "graphic", new FontIcon(MaterialDesign.MDI_MAGNIFY));
+
+    public final Node getGraphic() {
+        return graphic.get();
+    }
+
+    public final ObjectProperty<Node> graphicProperty() {
+        return graphic;
+    }
+
+    public final void setGraphic(Node graphic) {
+        this.graphic.set(graphic);
+    }
+
+    private final ObjectProperty<Node> busyGraphic = new SimpleObjectProperty<>(this, "busyGraphic", new FontIcon(MaterialDesign.MDI_CACHED));
+
+    public final Node getBusyGraphic() {
+        return busyGraphic.get();
+    }
+
+    public final ObjectProperty<Node> busyGraphicProperty() {
+        return busyGraphic;
+    }
+
+    public final void setBusyGraphic(Node busyGraphic) {
+        this.busyGraphic.set(busyGraphic);
+    }
+
+    private final ReadOnlyBooleanWrapper searching = new ReadOnlyBooleanWrapper(this, "searching");
+
+    public final boolean isSearching() {
+        return searching.get();
+    }
+
+    private final ObjectProperty<Transition> busyTransition = new SimpleObjectProperty<>(this, "busyTransition");
+
+    public final Transition getBusyTransition() {
+        return busyTransition.get();
+    }
+
+    /**
+     * A flag indicating whether the asynchronous search is currently in progress.
+     * This flag can be used to animate something that expresses that the search is
+     * ongoing.
+     *
+     * @return true if the search is currently in progress
+     */
+    public final ReadOnlyBooleanProperty searchingProperty() {
+        return searching.getReadOnlyProperty();
+    }
+
+    /**
+     * Returns the text field control used for editing the text.
+     *
+     * @return the text field editor control
+     */
+    public final TextField getEditor() {
+        return editor;
     }
 
     private class SearchService extends Service<Collection<T>> {
 
         @Override
         protected Task<Collection<T>> createTask() {
-            return new SearchTask(getText());
+            return new SearchTask(editor.getText());
         }
     }
 
@@ -183,14 +278,13 @@ public class SpotlightTextField<T> extends TextField {
 
         @Override
         protected Collection<T> call() throws Exception {
-            Thread.sleep(Double.valueOf(getSearchDelay().toMillis()).intValue());
+            Thread.sleep(250); // same as in AutoCompletionBinding
 
             if (!isCancelled() && StringUtils.isNotBlank(searchText)) {
-
-                return getSuggestionProvider().call(new ISpotlightSuggestionRequest() {
+                return getSuggestionProvider().call(new ISearchFieldSuggestionRequest() {
                     @Override
                     public boolean isCancelled() {
-                        return false;
+                        return SearchTask.this.isCancelled();
                     }
 
                     @Override
@@ -204,18 +298,11 @@ public class SpotlightTextField<T> extends TextField {
         }
     }
 
-    private final ObjectProperty<Duration> searchDelay = new SimpleObjectProperty<>(this, "searchDelay", Duration.millis(200));
-
-    public Duration getSearchDelay() {
-        return searchDelay.get();
-    }
-
-    public ObjectProperty<Duration> searchDelayProperty() {
-        return searchDelay;
-    }
-
-    public void setSearchDelay(Duration searchDelay) {
-        this.searchDelay.set(searchDelay);
+    /**
+     * Cancels the current search in progress.
+     */
+    public final void cancel() {
+        searchService.cancel();
     }
 
     private void updateView(Collection<T> items) {
@@ -223,7 +310,7 @@ public class SpotlightTextField<T> extends TextField {
             return;
         }
 
-        String searchText = getText();
+        String searchText = editor.getText();
         if (StringUtils.isNotBlank(searchText)) {
             try {
                 BiFunction<T, String, Boolean> matcher = getMatcher();
@@ -256,12 +343,12 @@ public class SpotlightTextField<T> extends TextField {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new SpotlightTextFieldSkin(this);
+        return new SearchFieldSkin(this);
     }
 
     @Override
     public String getUserAgentStylesheet() {
-        return SpotlightTextField.class.getResource("spotlight-text-field.css").toExternalForm();
+        return SearchField.class.getResource("spotlight-text-field.css").toExternalForm();
     }
 
     private final ReadOnlyBooleanWrapper newItem = new ReadOnlyBooleanWrapper(this, "newItem");
@@ -378,17 +465,17 @@ public class SpotlightTextField<T> extends TextField {
         return selectedItem;
     }
 
-    private final ObjectProperty<Callback<ISpotlightSuggestionRequest, Collection<T>>> suggestionProvider = new SimpleObjectProperty<>(this, "suggestionProvider");
+    private final ObjectProperty<Callback<ISearchFieldSuggestionRequest, Collection<T>>> suggestionProvider = new SimpleObjectProperty<>(this, "suggestionProvider");
 
-    public final Callback<ISpotlightSuggestionRequest, Collection<T>> getSuggestionProvider() {
+    public final Callback<ISearchFieldSuggestionRequest, Collection<T>> getSuggestionProvider() {
         return suggestionProvider.get();
     }
 
-    public final ObjectProperty<Callback<ISpotlightSuggestionRequest, Collection<T>>> suggestionProviderProperty() {
+    public final ObjectProperty<Callback<ISearchFieldSuggestionRequest, Collection<T>>> suggestionProviderProperty() {
         return suggestionProvider;
     }
 
-    public final void setSuggestionProvider(Callback<ISpotlightSuggestionRequest, Collection<T>> suggestionProvider) {
+    public final void setSuggestionProvider(Callback<ISearchFieldSuggestionRequest, Collection<T>> suggestionProvider) {
         this.suggestionProvider.set(suggestionProvider);
     }
 
@@ -435,7 +522,7 @@ public class SpotlightTextField<T> extends TextField {
     /**
      * Represents a suggestion fetch request
      */
-    public interface ISpotlightSuggestionRequest {
+    public interface ISearchFieldSuggestionRequest {
 
         /**
          * Is this request canceled?

@@ -26,7 +26,7 @@
  */
 package com.dlsc.gemsfx.skins.autocomplete;
 
-import com.dlsc.gemsfx.SpotlightTextField.ISpotlightSuggestionRequest;
+import com.dlsc.gemsfx.SearchField.ISearchFieldSuggestionRequest;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
@@ -89,7 +89,7 @@ public class AutoCompletionTextFieldBinding<T> extends AutoCompletionBinding<T> 
      * @param suggestionProvider
      */
     public AutoCompletionTextFieldBinding(final TextField textField,
-                                          Callback<ISpotlightSuggestionRequest, Collection<T>> suggestionProvider) {
+                                          Callback<ISearchFieldSuggestionRequest, Collection<T>> suggestionProvider) {
 
         this(textField, suggestionProvider, AutoCompletionTextFieldBinding
                 .<T>defaultStringConverter());
@@ -103,7 +103,7 @@ public class AutoCompletionTextFieldBinding<T> extends AutoCompletionBinding<T> 
      * @param suggestionProvider
      */
     public AutoCompletionTextFieldBinding(final TextField textField,
-                                          Callback<ISpotlightSuggestionRequest, Collection<T>> suggestionProvider,
+                                          Callback<ISearchFieldSuggestionRequest, Collection<T>> suggestionProvider,
                                           final StringConverter<T> converter) {
 
         super(textField, suggestionProvider, converter);

@@ -5,7 +5,7 @@
 
 package com.dlsc.gemsfx.skins.autocomplete;
 
-import com.dlsc.gemsfx.SpotlightTextField;
+import com.dlsc.gemsfx.SearchField;
 import com.dlsc.gemsfx.skins.autocomplete.AutoCompletePopup.SuggestionEvent;
 import javafx.beans.binding.Bindings;
 import javafx.event.Event;
@@ -37,7 +37,7 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
         this.control = control;
         suggestionList = new ListView(control.getSuggestions());
         suggestionList.getStyleClass().add("auto-completion-list-view");
-        suggestionList.getStylesheets().add(SpotlightTextField.class.getResource("auto-completion-list-view.css").toExternalForm());
+        suggestionList.getStylesheets().add(SearchField.class.getResource("auto-completion-list-view.css").toExternalForm());
         suggestionList.prefHeightProperty().bind(Bindings.min(control.visibleRowCountProperty(), Bindings.size(suggestionList.getItems())).multiply(24).add(18));
         suggestionList.setCellFactory(cellFactory);
         suggestionList.prefWidthProperty().bind(control.prefWidthProperty());
