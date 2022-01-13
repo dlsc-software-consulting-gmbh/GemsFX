@@ -23,10 +23,6 @@
     -fx-spacing: 10px;
 }
 
-.dialog-pane > .content-pane > .glass-pane {
-    -fx-background-color: rgba(0, 0, 0, .5);
-}
-
 .dialog-pane > .content-pane > .vbox {
 }
 
@@ -173,14 +169,6 @@
     -fx-stroke-type: centered;
     -fx-stroke: -fx-accent;
     -fx-fill: transparent;
-}
-
-/* ----------------------------------------------------------------------------
- * Glass Pane
- */
-.dialog-pane > .glass-pane {
-    -fx-background-color: black;
-    -fx-opacity: .6;
 }
 
 /* ----------------------------------------------------------------------------
