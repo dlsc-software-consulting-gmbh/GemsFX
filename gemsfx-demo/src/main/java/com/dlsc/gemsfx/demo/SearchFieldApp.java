@@ -38,13 +38,18 @@ public class SearchFieldApp extends Application {
         value.textProperty().bind(Bindings.createStringBinding(() -> field.getSelectedItem() != null ? field.getSelectedItem().getName() : "<no selection>", field.selectedItemProperty()));
         HBox hBox = new HBox(10, label, value);
 
+        Label label2 = new Label("Number of suggestions found:");
+        Label value2 = new Label();
+        value2.textProperty().bind(Bindings.createStringBinding(() -> Integer.toString(field.getSuggestions().size()), field.getSuggestions()));
+        HBox hBox2 = new HBox(10, label2, value2);
+
         CheckBox createNewItemBox = new CheckBox("Create new country 'on-the-fly' if it can't be found in the data set.");
         field.newItemProducerProperty().bind(Bindings.createObjectBinding(() -> name -> new Country(name), createNewItemBox.selectedProperty()));
 
         CheckBox showPromptText = new CheckBox("Show prompt text");
         field.getEditor().promptTextProperty().bind(Bindings.createStringBinding(() -> showPromptText.isSelected() ? "Start typing country name ..." : null, showPromptText.selectedProperty()));
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, hBox, field);
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, hBox, hBox2, field);
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);

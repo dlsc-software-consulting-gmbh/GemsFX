@@ -5,6 +5,8 @@ import javafx.animation.RotateTransition;
 import javafx.animation.Transition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
@@ -265,7 +267,7 @@ public class SearchField<T> extends Control {
             Thread.sleep(250); // same as in AutoCompletionBinding
 
             if (!isCancelled() && StringUtils.isNotBlank(searchText)) {
-                return getSuggestionProvider().call(new ISearchFieldSuggestionRequest() {
+                return getSuggestionProvider().call(new SearchFieldSuggestionRequest() {
                     @Override
                     public boolean isCancelled() {
                         return SearchTask.this.isCancelled();
@@ -289,10 +291,13 @@ public class SearchField<T> extends Control {
         searchService.cancel();
     }
 
-    private void updateView(Collection<T> items) {
-        if (items == null) {
+    private void updateView(Collection<T> suggestions) {
+        if (suggestions == null) {
+            this.suggestions.clear();
             return;
         }
+
+        this.suggestions.setAll(suggestions);
 
         String searchText = editor.getText();
         if (StringUtils.isNotBlank(searchText)) {
@@ -301,7 +306,7 @@ public class SearchField<T> extends Control {
 
                 newItem.set(false);
 
-                items.stream().filter(item -> matcher.apply(item, searchText)).findFirst().ifPresentOrElse(item -> {
+                suggestions.stream().filter(item -> matcher.apply(item, searchText)).findFirst().ifPresentOrElse(item -> {
                     selectedItem.set(null);
                     selectedItem.set(item);
                 }, () -> {
@@ -333,6 +338,17 @@ public class SearchField<T> extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return SearchField.class.getResource("search-field.css").toExternalForm();
+    }
+
+    private final ListProperty<T> suggestions = new SimpleListProperty<>(this, "suggestions", FXCollections.observableArrayList());
+
+    /**
+     * Returns a read-only (unmodifiable) list of the current suggestions.
+     *
+     * @return the list of suggestions
+     */
+    public ObservableList getSuggestions() {
+        return FXCollections.unmodifiableObservableList(suggestions);
     }
 
     private final ReadOnlyBooleanWrapper newItem = new ReadOnlyBooleanWrapper(this, "newItem");
@@ -449,17 +465,17 @@ public class SearchField<T> extends Control {
         return selectedItem;
     }
 
-    private final ObjectProperty<Callback<ISearchFieldSuggestionRequest, Collection<T>>> suggestionProvider = new SimpleObjectProperty<>(this, "suggestionProvider");
+    private final ObjectProperty<Callback<SearchFieldSuggestionRequest, Collection<T>>> suggestionProvider = new SimpleObjectProperty<>(this, "suggestionProvider");
 
-    public final Callback<ISearchFieldSuggestionRequest, Collection<T>> getSuggestionProvider() {
+    public final Callback<SearchFieldSuggestionRequest, Collection<T>> getSuggestionProvider() {
         return suggestionProvider.get();
     }
 
-    public final ObjectProperty<Callback<ISearchFieldSuggestionRequest, Collection<T>>> suggestionProviderProperty() {
+    public final ObjectProperty<Callback<SearchFieldSuggestionRequest, Collection<T>>> suggestionProviderProperty() {
         return suggestionProvider;
     }
 
-    public final void setSuggestionProvider(Callback<ISearchFieldSuggestionRequest, Collection<T>> suggestionProvider) {
+    public final void setSuggestionProvider(Callback<SearchFieldSuggestionRequest, Collection<T>> suggestionProvider) {
         this.suggestionProvider.set(suggestionProvider);
     }
 
@@ -506,7 +522,7 @@ public class SearchField<T> extends Control {
     /**
      * Represents a suggestion fetch request
      */
-    public interface ISearchFieldSuggestionRequest {
+    public interface SearchFieldSuggestionRequest {
 
         /**
          * Is this request canceled?

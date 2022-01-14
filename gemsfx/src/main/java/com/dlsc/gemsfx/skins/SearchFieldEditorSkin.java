@@ -1,7 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.SearchField;
-import com.dlsc.gemsfx.SearchField.ISearchFieldSuggestionRequest;
+import com.dlsc.gemsfx.SearchField.SearchFieldSuggestionRequest;
 import com.dlsc.gemsfx.skins.autocomplete.AutoCompletePopup;
 import com.dlsc.gemsfx.skins.autocomplete.AutoCompletePopupSkin;
 import com.dlsc.gemsfx.skins.autocomplete.AutoCompletionBinding;
@@ -88,11 +88,11 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
             binding.dispose();
         }
 
-        Callback<ISearchFieldSuggestionRequest, Collection<T>> suggestionProvider = searchField.getSuggestionProvider();
+        Callback<SearchFieldSuggestionRequest, Collection<T>> suggestionProvider = searchField.getSuggestionProvider();
         StringConverter<T> converter = searchField.getConverter();
         Callback<ListView<T>, ListCell<T>> cellFactory = searchField.getCellFactory();
 
-        Callback<ISearchFieldSuggestionRequest, Collection<T>> innerSuggestionProvider = request -> {
+        Callback<SearchFieldSuggestionRequest, Collection<T>> innerSuggestionProvider = request -> {
             if (StringUtils.isNotBlank(request.getUserText())) {
                 List<T> result = new ArrayList<>(suggestionProvider.call(request));
                 Collections.sort(result, createInnerComparator());

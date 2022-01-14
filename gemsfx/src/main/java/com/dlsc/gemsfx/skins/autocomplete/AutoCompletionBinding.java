@@ -26,7 +26,7 @@
  */
 package com.dlsc.gemsfx.skins.autocomplete;
 
-import com.dlsc.gemsfx.SearchField.ISearchFieldSuggestionRequest;
+import com.dlsc.gemsfx.SearchField.SearchFieldSuggestionRequest;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -69,7 +69,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     private final Object suggestionsTaskLock = new Object();
 
     private FetchSuggestionsTask suggestionsTask;
-    private Callback<ISearchFieldSuggestionRequest, Collection<T>> suggestionProvider;
+    private Callback<SearchFieldSuggestionRequest, Collection<T>> suggestionProvider;
     private boolean ignoreInputChanges;
     private long delay = 250;
 
@@ -88,7 +88,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      * @param converter          The converter to be used to convert suggestions to strings
      */
     protected AutoCompletionBinding(Node completionTarget,
-                                    Callback<ISearchFieldSuggestionRequest, Collection<T>> suggestionProvider,
+                                    Callback<SearchFieldSuggestionRequest, Collection<T>> suggestionProvider,
                                     StringConverter<T> converter) {
 
         this.completionTarget = completionTarget;
@@ -389,7 +389,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      * This task is responsible to fetch suggestions asynchronous
      * by using the current defined suggestionProvider
      */
-    private class FetchSuggestionsTask extends Task<Void> implements ISearchFieldSuggestionRequest {
+    private class FetchSuggestionsTask extends Task<Void> implements SearchFieldSuggestionRequest {
         private final String userText;
         private final long delay;
 
@@ -400,7 +400,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
 
         @Override
         protected Void call() throws Exception {
-            Callback<ISearchFieldSuggestionRequest, Collection<T>> provider = suggestionProvider;
+            Callback<SearchFieldSuggestionRequest, Collection<T>> provider = suggestionProvider;
             if (provider != null) {
                 long startTime = System.currentTimeMillis();
                 long sleepTime = startTime + delay - System.currentTimeMillis();
