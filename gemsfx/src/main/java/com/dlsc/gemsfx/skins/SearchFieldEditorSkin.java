@@ -110,6 +110,7 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
         autoCompletionPopup.setSkin(skin);
 
         ListView<T> listView = (ListView<T>) skin.getNode();
+        listView.getStylesheets().add(SearchField.class.getResource("search-field.css").toExternalForm());
         listView.setMinHeight(200);
         listView.placeholderProperty().bind(searchField.placeholderProperty());
         listView.getSelectionModel().selectedItemProperty().addListener(it -> {

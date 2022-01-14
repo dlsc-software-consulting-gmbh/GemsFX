@@ -1,0 +1,32 @@
+.search-field .auto-completion-label {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgb(0, 0, 0, .4);
+}
+
+.search-field .graphic-wrapper {
+    -fx-padding: 0px 0px;
+}
+
+.search-field .graphic-wrapper .ikonli-font-icon {
+    -fx-icon-size: 16px;
+    -fx-icon-color: -fx-text-inner-color;
+}
+
+.search-field-list-cell {
+}
+
+.search-field-list-cell .text {
+    -fx-fill: -fx-selection-bar-text;
+}
+
+.search-field-list-cell .text.start {
+}
+
+.search-field-list-cell .text.middle {
+    -fx-underline: true;
+}
+
+.search-field-list-cell .text.end {
+}
+
+

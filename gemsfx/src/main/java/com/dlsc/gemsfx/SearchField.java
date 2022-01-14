@@ -48,7 +48,7 @@ import java.util.function.BiFunction;
  */
 public class SearchField<T> extends Control {
 
-    private static final String DEFAULT_STYLE_CLASS = "spotlight-text-field";
+    private static final String DEFAULT_STYLE_CLASS = "search-field";
 
     private final SearchService searchService = new SearchService();
 
@@ -332,7 +332,7 @@ public class SearchField<T> extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return SearchField.class.getResource("spotlight-text-field.css").toExternalForm();
+        return SearchField.class.getResource("search-field.css").toExternalForm();
     }
 
     private final ReadOnlyBooleanWrapper newItem = new ReadOnlyBooleanWrapper(this, "newItem");
