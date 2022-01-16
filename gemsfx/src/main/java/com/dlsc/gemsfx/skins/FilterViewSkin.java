@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.ChipView;
 import com.dlsc.gemsfx.FilterView;
 import com.dlsc.gemsfx.FilterView.Filter;
+import com.dlsc.gemsfx.SearchTextField;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;

@@ -28,19 +28,6 @@
     -fx-font-size: 15px;
 }
 
-.filter-view .search-field {
-    -fx-min-width: 400px;
-    -fx-max-width: 400px;
-    -fx-background-radius: 0px;
-    -fx-background-insets: 0px;
-    -fx-background-insets: 0px, 1px;
-    -fx-background-color: #e0e0e0, white;
-}
-
-.filter-view .search-field .ikonli-font-icon {
-    -fx-icon-color: gray;
-}
-
 .filter-view .filter-groups .menu-button {
     -fx-background-radius: 0px;
     -fx-border-radius: 0px;
