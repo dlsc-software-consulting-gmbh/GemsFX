@@ -7,6 +7,10 @@
     -fx-background-color: #e0e0e0, white;
 }
 
+.search-field.round {
+    -fx-background-radius: 1000px;
+}
+
 .search-field .wrapper {
     -fx-padding: 0px 5px;
 }
