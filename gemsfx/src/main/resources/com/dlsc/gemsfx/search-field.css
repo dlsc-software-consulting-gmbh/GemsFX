@@ -12,21 +12,54 @@
     -fx-icon-color: -fx-text-inner-color;
 }
 
-.search-field-list-cell {
+.search-field-list-view {
+    -fx-pref-height: 200px;
 }
 
-.search-field-list-cell .text {
+.search-field-list-view .search-field-list-cell {
+}
+
+.search-field-list-view .search-field-list-cell .text {
     -fx-fill: -fx-selection-bar-text;
 }
 
-.search-field-list-cell .text.start {
+.search-field-list-view .search-field-list-cell .text.start {
 }
 
-.search-field-list-cell .text.middle {
+.search-field-list-view .search-field-list-cell .text.middle {
     -fx-underline: true;
 }
 
-.search-field-list-cell .text.end {
+.search-field-list-view .search-field-list-cell .text.end {
 }
 
-
+/* -----------------------------------------------------------------------
+ * Style based on Modena.css combo-box-popup style
+ */
+.search-field-list-view {
+    -fx-background-color:
+            linear-gradient(to bottom,
+            derive(-fx-color,-17%),
+            derive(-fx-color,-30%)
+            ),
+            -fx-control-inner-background;
+    -fx-background-insets: -1 -2 -1 -1, 0 -1 0 0;
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.2) , 12, 0.0 , 0 , 8 );
+}
+.search-field-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 4 0 4 5;
+    /* No alternate highlighting */
+    -fx-background: -fx-control-inner-background;
+}
+.search-field-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    -fx-background:  -fx-selection-bar-non-focused;
+    -fx-background-color:  -fx-background;
+}
+.search-field-popup  > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover,
+.search-field-popup  > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-selection-bar;
+}
+.search-field-list-view > .placeholder > .label {
+    -fx-text-fill: derive(-fx-control-inner-background,-30%);
+}

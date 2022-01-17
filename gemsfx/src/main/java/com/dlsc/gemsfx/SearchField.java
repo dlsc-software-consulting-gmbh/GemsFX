@@ -2,13 +2,15 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.SearchFieldSkin;
 import javafx.animation.RotateTransition;
-import javafx.animation.Transition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -18,6 +20,7 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -66,6 +69,9 @@ public class SearchField<T> extends Control {
     public SearchField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
+        editor.textProperty().bindBidirectional(textProperty());
+        editor.promptTextProperty().bindBidirectional(promptTextProperty());
+
         setFocusTraversable(false);
         setPlaceholder(new Label("No items found"));
 
@@ -76,7 +82,7 @@ public class SearchField<T> extends Control {
         });
 
         addEventFilter(KeyEvent.ANY, evt -> {
-            if (evt.getCode().equals(KeyCode.RIGHT)) {
+            if (evt.getCode().equals(KeyCode.RIGHT) || evt.getCode().equals(KeyCode.ENTER)) {
                 editor.setText(getFullText());
                 editor.positionCaret(getFullText().length());
                 evt.consume();
@@ -182,7 +188,13 @@ public class SearchField<T> extends Control {
             }
         });
 
-        searchService.setOnSucceeded(evt -> updateView(searchService.getValue()));
+        searchService.setOnRunning(evt -> fireEvent(new SearchEvent(SearchEvent.SEARCH_STARTED)));
+
+        searchService.setOnSucceeded(evt -> {
+            updateView(searchService.getValue());
+            fireEvent(new SearchEvent(SearchEvent.SEARCH_FINISHED));
+        });
+
         searching.bind(searchService.runningProperty());
     }
 
@@ -192,6 +204,75 @@ public class SearchField<T> extends Control {
         return graphic.get();
     }
 
+    private class SearchEventHandlerProperty extends SimpleObjectProperty<EventHandler<SearchEvent>> {
+
+        private final EventType<SearchEvent> eventType;
+
+        public SearchEventHandlerProperty(final String name, final EventType<SearchEvent> eventType) {
+            super(SearchField.this, name);
+            this.eventType = eventType;
+        }
+
+        @Override
+        protected void invalidated() {
+            setEventHandler(eventType, get());
+        }
+    }
+
+    private SearchEventHandlerProperty onSearchStarted;
+
+    /**
+     * An event handler that can be used to get informed whenever the field starts a search.
+     * This event gets fired often while the user is still typing as the search gets reset
+     * with every keystroke.
+     *
+     * @return the "search started" event handler
+     */
+    public final ObjectProperty<EventHandler<SearchEvent>> onSearchStartedProperty() {
+        if (onSearchStarted == null) {
+            onSearchStarted = new SearchEventHandlerProperty("onSearchStartedProperty", SearchEvent.SEARCH_STARTED);
+        }
+
+        return onSearchStarted;
+    }
+
+    public final void setOnSearchStarted(EventHandler<SearchEvent> value) {
+        onSearchStartedProperty().set(value);
+    }
+
+    public final EventHandler<SearchEvent> getOnSearchStarted() {
+        return onSearchStarted == null ? null : onSearchStartedProperty().get();
+    }
+
+    private SearchEventHandlerProperty onSearchFinished;
+
+
+    /**
+     * An event handler that can be used to get informed whenever the field finishes a search.
+     *
+     * @return the "search finished" event handler
+     */
+    public final ObjectProperty<EventHandler<SearchEvent>> onSearchFinishedProperty() {
+        if (onSearchFinished == null) {
+            onSearchFinished = new SearchEventHandlerProperty("onSearchFinishedProperty", SearchEvent.SEARCH_FINISHED);
+        }
+
+        return onSearchFinished;
+    }
+
+    public final void setOnSearchFinished(EventHandler<SearchEvent> value) {
+        onSearchFinishedProperty().set(value);
+    }
+
+    public final EventHandler<SearchEvent> getOnSearchFinished() {
+        return onSearchFinished == null ? null : onSearchFinishedProperty().get();
+    }
+
+    /**
+     * Stores a node that will be shown on the field's right-hand side whenever the field is idle.
+     *
+     * @return the field's graphic
+     */
     public final ObjectProperty<Node> graphicProperty() {
         return graphic;
     }
@@ -206,6 +287,11 @@ public class SearchField<T> extends Control {
         return busyGraphic.get();
     }
 
+    /**
+     * Stores a node that will be shown on the field's right side whenever a search is ongoing.
+     *
+     * @return the busy graphic
+     */
     public final ObjectProperty<Node> busyGraphicProperty() {
         return busyGraphic;
     }
@@ -218,12 +304,6 @@ public class SearchField<T> extends Control {
 
     public final boolean isSearching() {
         return searching.get();
-    }
-
-    private final ObjectProperty<Transition> busyTransition = new SimpleObjectProperty<>(this, "busyTransition");
-
-    public final Transition getBusyTransition() {
-        return busyTransition.get();
     }
 
     /**
@@ -246,6 +326,18 @@ public class SearchField<T> extends Control {
         return editor;
     }
 
+    /**
+     * Selects the given item and sets the editor's text to the string
+     * provided by the converter for the item.
+     *
+     * @param item the selected item
+     */
+    public void select(T item) {
+        setSelectedItem(item);
+        editor.setText(getConverter().toString(item));
+        editor.positionCaret(editor.getText().length());
+    }
+
     private class SearchService extends Service<Collection<T>> {
 
         @Override
@@ -264,7 +356,7 @@ public class SearchField<T> extends Control {
 
         @Override
         protected Collection<T> call() throws Exception {
-            Thread.sleep(250); // same as in AutoCompletionBinding
+            Thread.sleep(250);
 
             if (!isCancelled() && StringUtils.isNotBlank(searchText)) {
                 return getSuggestionProvider().call(new SearchFieldSuggestionRequest() {
@@ -342,13 +434,16 @@ public class SearchField<T> extends Control {
 
     private final ListProperty<T> suggestions = new SimpleListProperty<>(this, "suggestions", FXCollections.observableArrayList());
 
+    private final ObservableList<T> readOnlySuggestions = FXCollections.unmodifiableObservableList(suggestions);
+
     /**
      * Returns a read-only (unmodifiable) list of the current suggestions.
      *
+     * @see #suggestionProviderProperty()
      * @return the list of suggestions
      */
-    public ObservableList getSuggestions() {
-        return FXCollections.unmodifiableObservableList(suggestions);
+    public final ObservableList getSuggestions() {
+        return readOnlySuggestions;
     }
 
     private final ReadOnlyBooleanWrapper newItem = new ReadOnlyBooleanWrapper(this, "newItem");
@@ -357,6 +452,12 @@ public class SearchField<T> extends Control {
         return newItem.get();
     }
 
+    /**
+     * Determines if the selected item has been created on-the-fly via the {@link #newItemProducer}. This
+     * will only ever happen if a new item producer has been specified.
+     *
+     * @return true if the selected item was not part of the suggestion list and has been created on-the-fly
+     */
     public ReadOnlyBooleanProperty newItemProperty() {
         return newItem.getReadOnlyProperty();
     }
@@ -367,6 +468,12 @@ public class SearchField<T> extends Control {
         return cellFactory.get();
     }
 
+    /**
+     * A cell factory that can be used by a list view to visualize the list of suggestions.
+     *
+     * @see #getSuggestions()
+     * @return the cell factory used by the suggestion list view
+     */
     public ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactoryProperty() {
         return cellFactory;
     }
@@ -381,6 +488,14 @@ public class SearchField<T> extends Control {
         return comparator.get();
     }
 
+    /**
+     * A comparator used to sort the list of suggestions. The field will try to find a first best match
+     * inside the sorted list. Internally the control uses an "inner" comparator to ensure that suggestions
+     * appear based on the entered text, which means that a perfect match will always show up first and then
+     * the suggests that "start" with the search string.
+     *
+     * @return the sorting comparator used for the suggestions list
+     */
     public final ObjectProperty<Comparator<T>> comparatorProperty() {
         return comparator;
     }
@@ -395,6 +510,12 @@ public class SearchField<T> extends Control {
         return newItemProducer.get();
     }
 
+    /**
+     * A callback used for creating a new object on-the-fly if no item matches the search
+     * text.
+     *
+     * @return the callback for producing a new object of the field supported object type
+     */
     public final ObjectProperty<Callback<String, T>> newItemProducerProperty() {
         return newItemProducer;
     }
@@ -409,6 +530,11 @@ public class SearchField<T> extends Control {
         return autoCompletionGap.get();
     }
 
+    /**
+     * Defines the gap (in pixels) between the user typed text and the autocompleted text.
+     *
+     * @return the gap (in pixels) between the user typed text and the autocompleted text
+     */
     public final DoubleProperty autoCompletionGapProperty() {
         return autoCompletionGap;
     }
@@ -423,8 +549,58 @@ public class SearchField<T> extends Control {
         return fullText.get();
     }
 
+    /**
+     * A read-only property containing the concatenation of the regular text of the text field and
+     * the autocompleted text.
+     *
+     * @see #getText()
+     * @see #getAutoCompletedText()
+     *
+     * @return the full text shown by the text field
+     */
     public final ReadOnlyStringProperty fullTextProperty() {
         return fullText.getReadOnlyProperty();
+    }
+
+    private final StringProperty text = new SimpleStringProperty(this, "text", "");
+
+    public final String getText() {
+        return text.get();
+    }
+
+    /**
+     * A convenience property bound to the editor's text property.
+     *
+     * @return the text shown by the field
+     */
+    public final StringProperty textProperty() {
+        return text;
+    }
+
+    public final void setText(String text) {
+        this.text.set(text);
+    }
+
+    private final StringProperty promptText = new SimpleStringProperty(this, "text", "");
+
+    public final String getPromptText() {
+        return promptText.get();
+    }
+
+    /**
+     * A convenience property to set the prompt text shown by the text field when no text
+     * has been entered yet (e.g. "Search ...").
+     *
+     * @see TextField#promptTextProperty()
+     *
+     * @return the prompt text
+     */
+    public final StringProperty promptTextProperty() {
+        return promptText;
+    }
+
+    public final void setPromptText(String promptText) {
+        this.promptText.set(promptText);
     }
 
     private final ReadOnlyStringWrapper autoCompletedText = new ReadOnlyStringWrapper(this, "autoCompletedText");
@@ -433,6 +609,12 @@ public class SearchField<T> extends Control {
         return autoCompletedText.get();
     }
 
+    /**
+     * A read-only property containing the automatically completed text. This
+     * property is completely managed by the control.
+     *
+     * @return the auto-completed text (e.g. "ates" after the user entered "United St" in a country search field).
+     */
     public final ReadOnlyStringProperty autoCompletedTextProperty() {
         return autoCompletedText.getReadOnlyProperty();
     }
@@ -443,6 +625,12 @@ public class SearchField<T> extends Control {
         return matcher.get();
     }
 
+    /**
+     * The function that is used to determine if an item in the suggestion list is a good match for
+     * auto selection.
+     *
+     * @return the function used for determining the best match in the suggestion list
+     */
     public final ObjectProperty<BiFunction<T, String, Boolean>> matcherProperty() {
         return matcher;
     }
@@ -461,6 +649,11 @@ public class SearchField<T> extends Control {
         this.selectedItem.set(selectedItem);
     }
 
+    /**
+     * Contains the currently selected item.
+     *
+     * @return the selected item
+     */
     public final ObjectProperty<T> selectedItemProperty() {
         return selectedItem;
     }
@@ -471,6 +664,11 @@ public class SearchField<T> extends Control {
         return suggestionProvider.get();
     }
 
+    /**
+     * A callback used for looking up a list of suggestions for the current search text.
+     *
+     * @return #getSuggestions
+     */
     public final ObjectProperty<Callback<SearchFieldSuggestionRequest, Collection<T>>> suggestionProviderProperty() {
         return suggestionProvider;
     }
@@ -485,6 +683,11 @@ public class SearchField<T> extends Control {
         return converter.get();
     }
 
+    /**
+     * A converter for turning the objects returned by the suggestion provider into text.
+     *
+     * @return the converter for turning the objects returned by the suggestion provider into text
+     */
     public final ObjectProperty<StringConverter<T>> converterProperty() {
         return converter;
     }
@@ -497,10 +700,8 @@ public class SearchField<T> extends Control {
     private ObjectProperty<Node> placeholder;
 
     /**
-     * This Node is shown to the user when the listview has no content to show.
-     * This may be the case because the list model has no data in the first
-     * place or that a filter has been applied to the list model, resulting
-     * in there being nothing to show the user.
+     * The placeholder UI when no suggestions have been returned by the suggestion
+     * provider.
      *
      * @return the placeholder property for the list view of the auto suggest popup
      */
@@ -537,5 +738,35 @@ public class SearchField<T> extends Control {
          * @return {@link String} containing the user text
          */
         String getUserText();
+    }
+
+    /**
+     * An event type used by the {@link SearchField} to indicate the start and
+     * end of searching operations.
+     */
+    public static class SearchEvent extends Event {
+
+        /**
+         * An event that gets fired when the field starts a search.
+         */
+        public static final EventType<SearchEvent> SEARCH_STARTED = new EventType<>(Event.ANY, "SEARCH_STARTED");
+
+        /**
+         * An event that gets fired when the field finishes a search.
+         */
+        public static final EventType<SearchEvent> SEARCH_FINISHED = new EventType<>(Event.ANY, "SEARCH_FINISHED");
+
+        public SearchEvent(EventType<? extends SearchEvent> eventType) {
+            super(eventType);
+        }
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this)
+                    .append("eventType", eventType)
+                    .append("target", target)
+                    .append("consumed", consumed)
+                    .toString();
+        }
     }
 }

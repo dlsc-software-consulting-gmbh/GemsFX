@@ -44,12 +44,15 @@ public class SearchFieldApp extends Application {
         HBox hBox2 = new HBox(10, label2, value2);
 
         CheckBox createNewItemBox = new CheckBox("Create new country 'on-the-fly' if it can't be found in the data set.");
-        field.newItemProducerProperty().bind(Bindings.createObjectBinding(() -> name -> new Country(name), createNewItemBox.selectedProperty()));
+        field.newItemProducerProperty().bind(Bindings.createObjectBinding(() -> createNewItemBox.isSelected() ? name -> new Country(name) : null, createNewItemBox.selectedProperty()));
 
         CheckBox showPromptText = new CheckBox("Show prompt text");
         field.getEditor().promptTextProperty().bind(Bindings.createStringBinding(() -> showPromptText.isSelected() ? "Start typing country name ..." : null, showPromptText.selectedProperty()));
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, hBox, hBox2, field);
+        CheckBox usePlaceholder = new CheckBox("Show placeholder when search result is empty");
+        field.placeholderProperty().bind(Bindings.createObjectBinding(() -> usePlaceholder.isSelected() ? new Label("No countries found") : null, usePlaceholder.selectedProperty()));
+
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hBox, hBox2, field);
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);
@@ -85,8 +88,9 @@ public class SearchFieldApp extends Application {
             });
             setMatcher((broker, searchText) -> broker.getName().toLowerCase().startsWith(searchText.toLowerCase()));
             setComparator(Comparator.comparing(Country::getName));
-            setPlaceholder(new Label("No countries found"));
             getEditor().setPromptText("Start typing country name ...");
+            setOnSearchStarted(evt -> System.out.println(evt));
+            setOnSearchFinished(evt -> System.out.println(evt));
         }
     }
 
@@ -99,6 +103,11 @@ public class SearchFieldApp extends Application {
 
         public String getName() {
             return name;
+        }
+
+        @Override
+        public String toString() {
+            return "Country: " + name;
         }
     }
 
@@ -182,7 +191,7 @@ public class SearchFieldApp extends Application {
                 "Indonesia," +
                 "Iran," +
                 "Iraq," +
-                "Ireland {Republic}," +
+                "Ireland," +
                 "Israel," +
                 "Italy," +
                 "Ivory Coast," +
@@ -224,7 +233,7 @@ public class SearchFieldApp extends Application {
                 "Montenegro," +
                 "Morocco," +
                 "Mozambique," +
-                "Myanmar, {Burma}," +
+                "Myanmar" +
                 "Namibia," +
                 "Nauru," +
                 "Nepal," +
