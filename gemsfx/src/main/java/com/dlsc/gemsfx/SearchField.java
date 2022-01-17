@@ -188,20 +188,14 @@ public class SearchField<T> extends Control {
             }
         });
 
-        searchService.setOnRunning(evt -> fireEvent(new SearchEvent(SearchEvent.SEARCH_STARTED)));
+        searchService.setOnRunning(evt -> fireEvent(new SearchEvent(SearchEvent.SEARCH_STARTED, searchService.getText())));
 
         searchService.setOnSucceeded(evt -> {
             updateView(searchService.getValue());
-            fireEvent(new SearchEvent(SearchEvent.SEARCH_FINISHED));
+            fireEvent(new SearchEvent(SearchEvent.SEARCH_FINISHED, searchService.getText()));
         });
 
         searching.bind(searchService.runningProperty());
-    }
-
-    private final ObjectProperty<Node> graphic = new SimpleObjectProperty<>(this, "graphic", new FontIcon(MaterialDesign.MDI_MAGNIFY));
-
-    public final Node getGraphic() {
-        return graphic.get();
     }
 
     private class SearchEventHandlerProperty extends SimpleObjectProperty<EventHandler<SearchEvent>> {
@@ -268,6 +262,12 @@ public class SearchField<T> extends Control {
         return onSearchFinished == null ? null : onSearchFinishedProperty().get();
     }
 
+    private final ObjectProperty<Node> graphic = new SimpleObjectProperty<>(this, "graphic", new FontIcon(MaterialDesign.MDI_MAGNIFY));
+
+    public final Node getGraphic() {
+        return graphic.get();
+    }
+
     /**
      * Stores a node that will be shown on the field's right-hand side whenever the field is idle.
      *
@@ -306,6 +306,26 @@ public class SearchField<T> extends Control {
         return searching.get();
     }
 
+    private final BooleanProperty hidePopupWithSingleChoice = new SimpleBooleanProperty(this, "", false);
+
+    public final boolean isHidePopupWithSingleChoice() {
+        return hidePopupWithSingleChoice.get();
+    }
+
+    /**
+     * Hides the popup window with the suggestion list if the list only contains a single
+     * elements. The default is "false".
+     *
+     * @return true if the popup showing the list of suggestions will not appear if only a single choice is available
+     */
+    public final BooleanProperty hidePopupWithSingleChoiceProperty() {
+        return hidePopupWithSingleChoice;
+    }
+
+    public final void setHidePopupWithSingleChoice(boolean hidePopupWithSingleChoice) {
+        this.hidePopupWithSingleChoice.set(hidePopupWithSingleChoice);
+    }
+
     /**
      * A flag indicating whether the asynchronous search is currently in progress.
      * This flag can be used to animate something that expresses that the search is
@@ -340,9 +360,16 @@ public class SearchField<T> extends Control {
 
     private class SearchService extends Service<Collection<T>> {
 
+        private String text;
+
         @Override
         protected Task<Collection<T>> createTask() {
-            return new SearchTask(editor.getText());
+            text = editor.getText();
+            return new SearchTask(text);
+        }
+
+        public String getText() {
+            return text;
         }
     }
 
@@ -743,6 +770,9 @@ public class SearchField<T> extends Control {
     /**
      * An event type used by the {@link SearchField} to indicate the start and
      * end of searching operations.
+     *
+     * @see SearchField#setOnSearchStarted(EventHandler)
+     * @see SearchField#setOnSearchFinished(EventHandler)
      */
     public static class SearchEvent extends Event {
 
@@ -756,8 +786,15 @@ public class SearchField<T> extends Control {
          */
         public static final EventType<SearchEvent> SEARCH_FINISHED = new EventType<>(Event.ANY, "SEARCH_FINISHED");
 
-        public SearchEvent(EventType<? extends SearchEvent> eventType) {
+        private String text;
+
+        public SearchEvent(EventType<? extends SearchEvent> eventType, String text) {
             super(eventType);
+            this.text = text;
+        }
+
+        public String getText() {
+            return text;
         }
 
         @Override
@@ -766,6 +803,7 @@ public class SearchField<T> extends Control {
                     .append("eventType", eventType)
                     .append("target", target)
                     .append("consumed", consumed)
+                    .append("text", text)
                     .toString();
         }
     }

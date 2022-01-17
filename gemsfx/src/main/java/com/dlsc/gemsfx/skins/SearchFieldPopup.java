@@ -36,7 +36,8 @@ public class SearchFieldPopup<T> extends PopupControl {
 
         searchField.addEventHandler(SearchField.SearchEvent.SEARCH_FINISHED, evt -> {
             if ((!searchField.getSuggestions().isEmpty() || searchField.getPlaceholder() != null)
-                    && StringUtils.isNotBlank(searchField.getEditor().getText())) {
+                    && StringUtils.isNotBlank(searchField.getEditor().getText())
+                    && (!searchField.isHidePopupWithSingleChoice() || !(searchField.getSuggestions().size() == 1 && searchField.getSuggestions().get(0).equals(searchField.getSelectedItem())))) {
                 show(searchField);
                 selectFirstSuggestion();
             } else {

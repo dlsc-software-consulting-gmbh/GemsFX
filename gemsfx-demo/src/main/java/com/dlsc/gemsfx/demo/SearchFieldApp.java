@@ -52,7 +52,10 @@ public class SearchFieldApp extends Application {
         CheckBox usePlaceholder = new CheckBox("Show placeholder when search result is empty");
         field.placeholderProperty().bind(Bindings.createObjectBinding(() -> usePlaceholder.isSelected() ? new Label("No countries found") : null, usePlaceholder.selectedProperty()));
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hBox, hBox2, field);
+        CheckBox hideWithSingleChoiceBox = new CheckBox("Hide popup if it has only the currently selected item in it");
+        field.hidePopupWithSingleChoiceProperty().bind(hideWithSingleChoiceBox.selectedProperty());
+
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, hBox, hBox2, field);
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);
