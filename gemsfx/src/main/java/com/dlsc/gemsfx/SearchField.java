@@ -410,13 +410,13 @@ public class SearchField<T> extends Control {
         searchService.cancel();
     }
 
-    private void updateView(Collection<T> suggestions) {
-        if (suggestions == null) {
-            this.suggestions.clear();
+    private void updateView(Collection<T> newSuggestions) {
+        if (newSuggestions == null) {
+            suggestions.clear();
             return;
         }
 
-        this.suggestions.setAll(suggestions);
+        suggestions.setAll(newSuggestions);
 
         String searchText = editor.getText();
         if (StringUtils.isNotBlank(searchText)) {
@@ -425,7 +425,7 @@ public class SearchField<T> extends Control {
 
                 newItem.set(false);
 
-                suggestions.stream().filter(item -> matcher.apply(item, searchText)).findFirst().ifPresentOrElse(item -> {
+                newSuggestions.stream().filter(item -> matcher.apply(item, searchText)).findFirst().ifPresentOrElse(item -> {
                     selectedItem.set(null);
                     selectedItem.set(item);
                 }, () -> {
