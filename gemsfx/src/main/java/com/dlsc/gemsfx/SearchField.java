@@ -469,7 +469,7 @@ public class SearchField<T> extends Control {
      * @see #suggestionProviderProperty()
      * @return the list of suggestions
      */
-    public final ObservableList getSuggestions() {
+    public final ObservableList<T> getSuggestions() {
         return readOnlySuggestions;
     }
 
