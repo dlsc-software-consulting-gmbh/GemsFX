@@ -17,7 +17,7 @@ public class SearchTextField extends CustomTextField {
             getStyleClass().add("round");
         }
 
-        getStyleClass().add("search-field");
+        getStyleClass().add("search-text-field");
 
         getStylesheets().add(SearchTextField.class.getResource("search-text-field.css").toExternalForm());
 

@@ -1,4 +1,4 @@
-.search-field {
+.search-text-field {
     -fx-min-width: 400px;
     -fx-max-width: 400px;
     -fx-background-radius: 0px;
@@ -7,15 +7,15 @@
     -fx-background-color: #e0e0e0, white;
 }
 
-.search-field.round {
+.search-text-field.round {
     -fx-background-radius: 1000px;
 }
 
-.search-field .wrapper {
+.search-text-field .wrapper {
     -fx-padding: 0px 5px;
 }
 
-.search-field .wrapper .ikonli-font-icon {
+.search-text-field .wrapper .ikonli-font-icon {
     -fx-icon-size: 16px;
     -fx-icon-color: -fx-text-inner-color;
 }
