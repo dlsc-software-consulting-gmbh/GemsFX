@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -32,6 +33,14 @@ public class SearchFieldApp extends Application {
         CountriesSpotlightField field = new CountriesSpotlightField();
         field.getEditor().setPrefColumnCount(30);
 
+        Region regionLeft = new Region();
+        regionLeft.setPrefWidth(30);
+        regionLeft.setStyle("-fx-background-color: red;");
+
+        Region regionRight = new Region();
+        regionRight.setPrefWidth(30);
+        regionRight.setStyle("-fx-background-color: orange;");
+
         // show selected item
         Label label = new Label("Selected country:");
         Label value = new Label();
@@ -47,15 +56,27 @@ public class SearchFieldApp extends Application {
         field.newItemProducerProperty().bind(Bindings.createObjectBinding(() -> createNewItemBox.isSelected() ? name -> new Country(name) : null, createNewItemBox.selectedProperty()));
 
         CheckBox showPromptText = new CheckBox("Show prompt text");
+        showPromptText.setSelected(true);
         field.getEditor().promptTextProperty().bind(Bindings.createStringBinding(() -> showPromptText.isSelected() ? "Start typing country name ..." : null, showPromptText.selectedProperty()));
 
         CheckBox usePlaceholder = new CheckBox("Show placeholder when search result is empty");
+        usePlaceholder.setSelected(true);
         field.placeholderProperty().bind(Bindings.createObjectBinding(() -> usePlaceholder.isSelected() ? new Label("No countries found") : null, usePlaceholder.selectedProperty()));
 
         CheckBox hideWithSingleChoiceBox = new CheckBox("Hide popup if it has only the currently selected item in it");
         field.hidePopupWithSingleChoiceProperty().bind(hideWithSingleChoiceBox.selectedProperty());
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, hBox, hBox2, field);
+        CheckBox showSearchIconBox = new CheckBox("Show search icon");
+        showSearchIconBox.setSelected(true);
+        field.showSearchIconProperty().bind(showSearchIconBox.selectedProperty());
+
+        CheckBox showLeftRightNodes = new CheckBox("Show extra left & right nodes");
+        showLeftRightNodes.setSelected(false);
+
+        field.leftProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionLeft : null, showLeftRightNodes.selectedProperty()));
+        field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
+
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, hBox, hBox2, field);
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);

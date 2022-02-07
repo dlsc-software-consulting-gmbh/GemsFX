@@ -807,4 +807,62 @@ public class SearchField<T> extends Control {
                     .toString();
         }
     }
+
+    private final ObjectProperty<Node> left = new SimpleObjectProperty<>(this, "left");
+
+    public final Node getLeft() {
+        return left.get();
+    }
+
+    /**
+     * A custom node that can be shown on the left-hand side of the field.
+     *
+     * @return a custom node for the left-hand side (e.g. "clear" button)
+     */
+    public final ObjectProperty<Node> leftProperty() {
+        return left;
+    }
+
+    public final void setLeft(Node left) {
+        this.left.set(left);
+    }
+
+    private final ObjectProperty<Node> right = new SimpleObjectProperty<>(this, "left");
+
+    public final Node getRight() {
+        return right.get();
+    }
+
+    /**
+     * A custom node that can be shown on the right-hand side of the field.
+     *
+     * @return a custom node for the right-hand side (e.g. "clear" button)
+     */
+    public final ObjectProperty<Node> rightProperty() {
+        return right;
+    }
+
+    public final void setRight(Node right) {
+        this.right.set(right);
+    }
+
+    private final BooleanProperty showSearchIcon = new SimpleBooleanProperty(this, "showSearchIcon", true);
+
+    public boolean isShowSearchIcon() {
+        return showSearchIcon.get();
+    }
+
+    /**
+     * Determines if the field will show an icon on the right-hand side which indicates
+     * that the field is a search field.
+     *
+     * @return true if a search icon will be shown
+     */
+    public BooleanProperty showSearchIconProperty() {
+        return showSearchIcon;
+    }
+
+    public void setShowSearchIcon(boolean showSearchIcon) {
+        this.showSearchIcon.set(showSearchIcon);
+    }
 }
