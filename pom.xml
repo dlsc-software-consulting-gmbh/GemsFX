@@ -47,7 +47,7 @@
         <project.identifier>gemsfx</project.identifier>
         <project.github.repository>dlsc-software-consulting-gmbh/GemsFX</project.github.repository>
         <local.repository.path>/tmp/repository</local.repository.path>
-        <java.version>14</java.version>
+        <java.version>11</java.version>
         <javafx.version>18-ea+9</javafx.version>
         <ikonli.version>12.3.0</ikonli.version>
         <sonar.projectKey>dlsc-software-consulting-gmbh_GemsFX</sonar.projectKey>

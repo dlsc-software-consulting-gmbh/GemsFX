@@ -1,6 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.SearchField;
+import com.dlsc.gemsfx.TagsField;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-public class SearchFieldApp extends Application {
+public class TagsFieldApp extends Application {
 
     private List<Country> countries = new ArrayList<>();
 
@@ -31,7 +31,7 @@ public class SearchFieldApp extends Application {
             countries.add(new Country(st.nextToken()));
         }
 
-        CountriesSearchField field = new CountriesSearchField();
+        CountriesTagsField field = new CountriesTagsField();
         field.getEditor().setPrefColumnCount(30);
 
         Region regionLeft = new Region();
@@ -80,24 +80,24 @@ public class SearchFieldApp extends Application {
         VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, hBox, hBox2, field);
         vbox.setPadding(new Insets(20));
 
+        CSSFX.start();
+
         Scene scene = new Scene(vbox);
         scene.focusOwnerProperty().addListener(it -> System.out.println("focus owner: " + scene.getFocusOwner()));
-        primaryStage.setTitle("Search Field");
+        primaryStage.setTitle("Tags Field");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         primaryStage.centerOnScreen();
         primaryStage.show();
-
-        CSSFX.start();
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    public class CountriesSearchField extends SearchField<Country> {
+    public class CountriesTagsField extends TagsField<Country> {
 
-        public CountriesSearchField() {
+        public CountriesTagsField() {
             setSuggestionProvider(request -> countries.stream().filter(country -> country.getName().toLowerCase().contains(request.getUserText().toLowerCase())).collect(Collectors.toList()));
             setConverter(new StringConverter<>() {
                 @Override

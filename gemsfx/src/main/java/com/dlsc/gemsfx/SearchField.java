@@ -16,6 +16,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -864,5 +866,53 @@ public class SearchField<T> extends Control {
 
     public void setShowSearchIcon(boolean showSearchIcon) {
         this.showSearchIcon.set(showSearchIcon);
+    }
+
+    public static class SearchFieldListCell<T> extends ListCell<T> {
+
+        private SearchField<T> searchField;
+        private TextFlow textFlow = new TextFlow();
+        private Text text1 = new Text();
+        private Text text2 = new Text();
+        private Text text3 = new Text();
+
+        public SearchFieldListCell(SearchField<T> searchField) {
+            this.searchField = searchField;
+
+            getStyleClass().add("search-field-list-cell");
+
+            textFlow.getChildren().setAll(text1, text2, text3);
+            text1.getStyleClass().addAll("text", "start");
+            text2.getStyleClass().addAll("text", "middle");
+            text3.getStyleClass().addAll("text", "end");
+
+            setPrefWidth(0);
+            setGraphic(textFlow);
+            setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        }
+
+        @Override
+        protected void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (item != null && !empty) {
+                String cellText = searchField.getConverter().toString(item);
+                String text = searchField.getEditor().getText();
+                int index = cellText.toLowerCase().indexOf(text.toLowerCase());
+                if (index >= 0) {
+                    text1.setText(cellText.substring(0, index));
+                    text2.setText(cellText.substring(index, index + text.length()));
+                    text3.setText(cellText.substring(index + text.length()));
+                } else {
+                    text1.setText(cellText);
+                    text2.setText("");
+                    text3.setText("");
+                }
+            } else {
+                text1.setText("");
+                text2.setText("");
+                text3.setText("");
+            }
+        }
     }
 }
