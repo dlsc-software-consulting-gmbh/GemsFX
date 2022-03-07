@@ -118,6 +118,12 @@
             <groupId>com.sandec.jpro</groupId>
             <artifactId>jpro-webapi</artifactId>
             <version>2021.2.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

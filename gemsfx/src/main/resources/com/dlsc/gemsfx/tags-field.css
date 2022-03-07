@@ -1,7 +1,18 @@
-.tags-field .auto-completion-label {
-    -fx-background-color: transparent;
-    -fx-text-fill: -fx-text-background-color;
-    -fx-opacity: .5;
+.tags-field {
+    -fx-padding: 0px;
+}
+
+.tags-field:contains-focus {
+    -fx-highlight-fill: -fx-accent;
+    -fx-highlight-text-fill: white;
+    -fx-background-color:
+            -fx-focus-color,
+            -fx-control-inner-background,
+            -fx-faint-focus-color,
+            linear-gradient(from 0px 0px to 0px 5px, derive(-fx-control-inner-background, -9%), -fx-control-inner-background);
+    -fx-background-insets: -0.2, 1, -1.4, 3;
+    -fx-background-radius: 3, 2, 4, 0;
+    -fx-prompt-text-fill: transparent;
 }
 
 .tags-field .graphic-wrapper {
@@ -13,15 +24,70 @@
     -fx-icon-color: -fx-text-background-color;
 }
 
-.tags-field .text-field {
+.tags-field .auto-completion-label {
     -fx-background-color: transparent;
-    -fx-padding: 0px;
-    -fx-min-width: 100px;
+    -fx-text-fill: -fx-text-background-color;
+    -fx-opacity: .5;
 }
 
-.tags-field .flow-pane {
+.tags-field > .flow-pane {
+    -fx-padding: 0.166667em;
     -fx-vgap: 5px;
     -fx-hgap: 5px;
+}
+
+.tags-field > .flow-pane > .text-field {
+    -fx-background-color: transparent;
+    -fx-pref-width: 150px;
+}
+
+.tags-field:filled > .flow-pane > .text-field {
+    -fx-padding: 0.166667em 0.583em 0.166667em 0em; /* 4 7 4 0 */
+}
+
+.tags-field > .flow-pane > .chip-view.first {
+    -fx-background-radius: 0.166667em 0.333333em 0.333333em 0.166667em;
+}
+
+.tags-field > .flow-pane > .chip-view {
+    -fx-background-radius: 0.333333em;
+}
+
+.tags-field > .flow-pane > .chip-view > .chip-container > .label {
+    -fx-background: -fx-accent;
+    -fx-text-fill: -fx-text-background-color;
+    -fx-font-size: 12px;
+    -fx-padding: 0.083333em 0.666667em 0.083333em 0.666667em;
+}
+
+.tags-field > .flow-pane > .chip-view > .chip-container > .close-icon {
+    -fx-cursor: hand;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -size: 1.666667em;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+}
+
+.tags-field > .flow-pane > .chip-view > .chip-container > .close-icon:hover {
+    -fx-background-color: white;
+}
+
+.tags-field > .flow-pane > .chip-view > .chip-container > .close-icon:pressed {
+}
+
+.tags-field > .flow-pane > .chip-view > .chip-container > .close-icon > .ikonli-font-icon {
+    -fx-background: -fx-accent;
+    -fx-icon-size: 12px;
+    -fx-icon-color: -fx-text-background-color;
+}
+
+.tags-field > .flow-pane > .chip-view > .chip-container > .close-icon:hover > .ikonli-font-icon {
+    -fx-icon-color: -fx-text-background-color;
 }
 
 .search-field-list-view {
@@ -32,12 +98,7 @@
  * Style based on Modena.css combo-box-popup style
  */
 .search-field-list-view {
-    -fx-background-color:
-            linear-gradient(to bottom,
-            derive(-fx-color,-17%),
-            derive(-fx-color,-30%)
-            ),
-            -fx-control-inner-background;
+    -fx-background-color: linear-gradient(to bottom, derive(-fx-color,-17%), derive(-fx-color,-30%)), -fx-control-inner-background;
     -fx-background-insets: -1 -2 -1 -1, 0 -1 0 0;
     -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.2) , 12, 0.0 , 0 , 8 );
 }

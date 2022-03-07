@@ -5,10 +5,13 @@ import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -77,7 +80,12 @@ public class TagsFieldApp extends Application {
         field.leftProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionLeft : null, showLeftRightNodes.selectedProperty()));
         field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, hBox, hBox2, field);
+        HBox fieldsBox = new HBox(10, field, new TextField());
+        fieldsBox.setFillHeight(false);
+        fieldsBox.setAlignment(Pos.TOP_LEFT);
+        HBox.setHgrow(field, Priority.ALWAYS);
+
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, hBox, hBox2, fieldsBox);
         vbox.setPadding(new Insets(20));
 
         CSSFX.start();
