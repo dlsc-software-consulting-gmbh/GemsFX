@@ -39,6 +39,7 @@
 .tags-field > .flow-pane > .text-field {
     -fx-background-color: transparent;
     -fx-pref-width: 150px;
+    -fx-padding: 0.166667em 0.583em 0.166667em 0.416667em; /* 4 7 4 5 */
 }
 
 .tags-field:filled > .flow-pane > .text-field {

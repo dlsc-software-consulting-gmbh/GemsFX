@@ -80,7 +80,10 @@ public class TagsFieldApp extends Application {
         field.leftProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionLeft : null, showLeftRightNodes.selectedProperty()));
         field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
 
-        HBox fieldsBox = new HBox(10, field, new TextField());
+        TextField textField = new TextField();
+        textField.setPromptText("Normal textfield ...");
+
+        HBox fieldsBox = new HBox(10, field, textField);
         fieldsBox.setFillHeight(false);
         fieldsBox.setAlignment(Pos.TOP_LEFT);
         HBox.setHgrow(field, Priority.ALWAYS);

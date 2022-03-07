@@ -8,22 +8,30 @@ import javafx.css.PseudoClass;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
 
     private static final PseudoClass FILLED = PseudoClass.getPseudoClass("filled");
 
     private static final PseudoClass CONTAINS_FOCUS = PseudoClass.getPseudoClass("contains-focus");
+    private static final int MAX_UNDO_AND_REDO_STEPS = 25;
 
     private InnerFlowPane flowPane = new InnerFlowPane();
+
+    private Deque<Command> undoStack = new ArrayDeque<>();
+
+    private Deque<Command> redoStack = new ArrayDeque<>();
 
     public TagsFieldSkin(TagsField<T> field) {
         super(field);
 
         flowPane.getStyleClass().add("flow-pane");
-
         flowPane.prefWrapLengthProperty().bind(field.widthProperty());
 
         field.getEditor().focusedProperty().addListener(it -> field.pseudoClassStateChanged(CONTAINS_FOCUS, field.getEditor().isFocused()));
@@ -36,7 +44,8 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
                 T selectedItem = field.getSelectedItem();
                 if (selectedItem != null) {
                     if (!field.getTags().contains(selectedItem)) {
-                        field.getTags().add(selectedItem);
+                        AddTagCommand cmd = new AddTagCommand(selectedItem);
+                        execute(cmd);
                         field.setText("");
                     }
                 }
@@ -46,8 +55,13 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
         field.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
             if (evt.getCode().equals(KeyCode.BACK_SPACE) && field.getText().equals("")) {
                 if (!field.getTags().isEmpty()) {
-                    field.getTags().remove(field.getTags().size() - 1);
+                    T item = field.getTags().get(field.getTags().size() - 1);
+                    execute(new RemoveTagCommand(item));
                 }
+            } else if (KeyCombination.keyCombination("shortcut+z").match(evt)) {
+                undo();
+            } else if (KeyCombination.keyCombination("shortcut+shift+z").match(evt)) {
+                redo();
             }
         });
 
@@ -55,6 +69,33 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
 
         field.getTags().addListener((Observable it) -> updateView());
         updateView();
+    }
+
+    private void execute(Command cmd) {
+        cmd.execute();
+        undoStack.push(cmd);
+        if (undoStack.size() > MAX_UNDO_AND_REDO_STEPS) {
+            undoStack.removeLast();
+        }
+    }
+
+    private void undo() {
+        if (!undoStack.isEmpty()) {
+            Command cmd = undoStack.pop();
+            cmd.undo();
+            redoStack.push(cmd);
+            if (redoStack.size() > MAX_UNDO_AND_REDO_STEPS) {
+                redoStack.removeLast();
+            }
+        }
+    }
+
+    private void redo() {
+        if (!redoStack.isEmpty()) {
+            Command cmd = redoStack.pop();
+            cmd.execute();
+            undoStack.push(cmd);
+        }
     }
 
     private void updateView() {
@@ -92,6 +133,7 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
         @Override
         protected void layoutChildren() {
             super.layoutChildren();
+
             TextField editor = getSkinnable().getEditor();
             double w = getWidth() - getInsets().getLeft() - getInsets().getRight();
 
@@ -99,6 +141,51 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
                     snapPositionY(editor.getBoundsInParent().getMinY()),
                     snapSizeX(w - editor.getBoundsInParent().getMinX()),
                     snapSizeY(editor.prefHeight(-1)));
+        }
+    }
+
+    interface Command {
+
+        void undo();
+
+        void execute();
+    }
+
+    class AddTagCommand implements Command {
+
+        private T item;
+
+        public AddTagCommand(T item) {
+            this.item = item;
+        }
+
+        @Override
+        public void undo() {
+            getSkinnable().getTags().remove(item);
+        }
+
+        @Override
+        public void execute() {
+            getSkinnable().getTags().add(item);
+        }
+    }
+
+    class RemoveTagCommand implements Command {
+
+        private T item;
+
+        public RemoveTagCommand(T item) {
+            this.item = item;
+        }
+
+        @Override
+        public void undo() {
+            getSkinnable().getTags().add(item);
+        }
+
+        @Override
+        public void execute() {
+            getSkinnable().getTags().remove(item);
         }
     }
 }
