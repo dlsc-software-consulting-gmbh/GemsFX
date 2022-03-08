@@ -39,6 +39,7 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
 
         suggestionList.placeholderProperty().bind(searchField.placeholderProperty());
 
+        suggestionList.getSelectionModel().selectedItemProperty().addListener(it -> control.getSearchField().setSelectedItem(suggestionList.getSelectionModel().getSelectedItem()));
         registerEventListener();
     }
 
@@ -102,14 +103,17 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
 
         control.getSearchField().getEditor().focusedProperty().addListener((it, oldFocused, newFocused) -> {
             if (!newFocused) {
-                control.hide();
+                //control.hide();
             }
         });
 
     }
 
     private void selectItem() {
-        searchField.select(suggestionList.getSelectionModel().getSelectedItem());
+        T selectedItem = suggestionList.getSelectionModel().getSelectedItem();
+        if (selectedItem != null) {
+            searchField.select(selectedItem);
+        }
     }
 
     public Node getNode() {

@@ -1,4 +1,5 @@
 module com.dlsc.gemsfx.demo {
+    requires org.scenicview.scenicview;
     requires javafx.web;
     requires javafx.controls;
     requires org.controlsfx.controls;
@@ -9,5 +10,4 @@ module com.dlsc.gemsfx.demo {
     requires org.kordamp.ikonli.materialdesign;
 
     exports com.dlsc.gemsfx.demo;
-    exports com.dlsc.gemsfx.demo.fake;
 }

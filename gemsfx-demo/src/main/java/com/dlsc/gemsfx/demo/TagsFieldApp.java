@@ -7,6 +7,7 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -16,6 +17,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import org.scenicview.ScenicView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -81,14 +83,20 @@ public class TagsFieldApp extends Application {
         field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
 
         TextField textField = new TextField();
-        textField.setPromptText("Normal textfield ...");
+        textField.setPromptText("Normal text field ...");
 
         HBox fieldsBox = new HBox(10, field, textField);
         fieldsBox.setFillHeight(false);
         fieldsBox.setAlignment(Pos.TOP_LEFT);
         HBox.setHgrow(field, Priority.ALWAYS);
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, hBox, hBox2, fieldsBox);
+//        ComboBox<String> comboBox = new ComboBox<>();
+//        comboBox.getItems().setAll("Dirk", "Katja", "Philip", "Jule", "Armin");
+//        comboBox.getSelectionModel().select(0);
+
+        Button button = new Button("Scenic View");
+        button.setOnAction(evt -> ScenicView.show(field.getScene()));
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, hBox, hBox2, button, field);
         vbox.setPadding(new Insets(20));
 
         CSSFX.start();
@@ -143,7 +151,7 @@ public class TagsFieldApp extends Application {
 
         @Override
         public String toString() {
-            return "Country: " + name;
+            return name;
         }
     }
 

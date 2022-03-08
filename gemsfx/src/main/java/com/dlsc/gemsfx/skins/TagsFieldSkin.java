@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.ChipView;
+import com.dlsc.gemsfx.SearchField.SearchFieldListCell;
 import com.dlsc.gemsfx.TagsField;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
@@ -20,16 +21,29 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
     private static final PseudoClass FILLED = PseudoClass.getPseudoClass("filled");
 
     private static final PseudoClass CONTAINS_FOCUS = PseudoClass.getPseudoClass("contains-focus");
-    private static final int MAX_UNDO_AND_REDO_STEPS = 25;
 
-    private InnerFlowPane flowPane = new InnerFlowPane();
+    private static final int MAX_UNDO_AND_REDO_STEPS = 50;
 
-    private Deque<Command> undoStack = new ArrayDeque<>();
+    private final FlowPane flowPane;
 
-    private Deque<Command> redoStack = new ArrayDeque<>();
+    private final Deque<Command> undoStack = new ArrayDeque<>();
+
+    private final Deque<Command> redoStack = new ArrayDeque<>();
 
     public TagsFieldSkin(TagsField<T> field) {
         super(field);
+
+        flowPane = new FlowPane() {
+            @Override
+            protected void layoutChildren() {
+                super.layoutChildren();
+
+                TextField editor = getSkinnable().getEditor();
+                double w = getWidth() - getInsets().getLeft() - getInsets().getRight();
+
+                editor.resize(w - editor.getBoundsInParent().getMinX(), editor.getHeight());
+            }
+        };
 
         flowPane.getStyleClass().add("flow-pane");
         flowPane.prefWrapLengthProperty().bind(field.widthProperty());
@@ -67,6 +81,8 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
 
         getChildren().addAll(flowPane);
 
+        field.setCellFactory(view -> new SearchFieldListCell(field));
+
         field.getTags().addListener((Observable it) -> updateView());
         updateView();
     }
@@ -81,6 +97,7 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
 
     private void undo() {
         if (!undoStack.isEmpty()) {
+            getSkinnable().clear();
             Command cmd = undoStack.pop();
             cmd.undo();
             redoStack.push(cmd);
@@ -126,22 +143,6 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
         }
 
         flowPane.getChildren().add(editor);
-    }
-
-    class InnerFlowPane extends FlowPane {
-
-        @Override
-        protected void layoutChildren() {
-            super.layoutChildren();
-
-            TextField editor = getSkinnable().getEditor();
-            double w = getWidth() - getInsets().getLeft() - getInsets().getRight();
-
-            editor.resizeRelocate(snapPositionX(editor.getBoundsInParent().getMinX()),
-                    snapPositionY(editor.getBoundsInParent().getMinY()),
-                    snapSizeX(w - editor.getBoundsInParent().getMinX()),
-                    snapSizeY(editor.prefHeight(-1)));
-        }
     }
 
     interface Command {

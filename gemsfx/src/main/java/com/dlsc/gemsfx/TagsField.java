@@ -11,6 +11,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
 
+import java.util.Collection;
+
 public class TagsField<T> extends SearchField<T> {
 
     private static final String DEFAULT_STYLE_CLASS = "tags-field";
@@ -40,6 +42,15 @@ public class TagsField<T> extends SearchField<T> {
     @Override
     public String getUserAgentStylesheet() {
         return TagsField.class.getResource("tags-field.css").toExternalForm();
+    }
+
+    @Override
+    protected void update(Collection<T> newSuggestions) {
+        if (newSuggestions != null) {
+            newSuggestions.removeAll(getTags());
+        }
+
+        super.update(newSuggestions);
     }
 
     private final ListProperty<T> tags = new SimpleListProperty<>(this, "tags", FXCollections.observableArrayList());

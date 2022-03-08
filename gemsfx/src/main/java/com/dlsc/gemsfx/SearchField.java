@@ -117,6 +117,8 @@ public class SearchField<T> extends Control {
             }
         });
 
+        setCellFactory(view -> new SearchFieldListCell(this));
+
         setComparator(Comparator.comparing(Object::toString));
 
         fullText.bind(Bindings.createStringBinding(() -> editor.getText() + getAutoCompletedText(), editor.textProperty(), autoCompletedText));
@@ -193,7 +195,7 @@ public class SearchField<T> extends Control {
         searchService.setOnRunning(evt -> fireEvent(new SearchEvent(SearchEvent.SEARCH_STARTED, searchService.getText())));
 
         searchService.setOnSucceeded(evt -> {
-            updateView(searchService.getValue());
+            update(searchService.getValue());
             fireEvent(new SearchEvent(SearchEvent.SEARCH_FINISHED, searchService.getText()));
         });
 
@@ -412,7 +414,7 @@ public class SearchField<T> extends Control {
         searchService.cancel();
     }
 
-    private void updateView(Collection<T> newSuggestions) {
+    protected void update(Collection<T> newSuggestions) {
         if (newSuggestions == null) {
             suggestions.clear();
             return;
@@ -459,6 +461,13 @@ public class SearchField<T> extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return SearchField.class.getResource("search-field.css").toExternalForm();
+    }
+
+    /**
+     * Convenience method to invoke clear() on the text field.
+     */
+    public void clear() {
+        getEditor().clear();
     }
 
     private final ListProperty<T> suggestions = new SimpleListProperty<>(this, "suggestions", FXCollections.observableArrayList());

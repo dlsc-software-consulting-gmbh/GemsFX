@@ -63,6 +63,30 @@
       "project": "GemsFX",
       "preview": "/preview-filterview.png",
       "classname": "com.dlsc.gemsfx.demo.FilterViewApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Search Text Field",
+      "desc": "A regular text input field styled for search use cases.",
+      "project": "GemsFX",
+      "preview": "/preview-search-text-field.png",
+      "classname": "com.dlsc.gemsfx.demo.SearchTextFieldApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Search Field",
+      "desc": "An autocompletion text input field.",
+      "project": "GemsFX",
+      "preview": "/preview-search-field.png",
+      "classname": "com.dlsc.gemsfx.demo.SearchFieldApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Tags Field",
+      "desc": "An autocompletion tags input field.",
+      "project": "GemsFX",
+      "preview": "/preview-tags-field.png",
+      "classname": "com.dlsc.gemsfx.demo.TagsFieldApp"
     }
   ]
 }

@@ -132,7 +132,7 @@ public class SearchFieldApp extends Application {
 
         @Override
         public String toString() {
-            return "Country: " + name;
+            return name;
         }
     }
 

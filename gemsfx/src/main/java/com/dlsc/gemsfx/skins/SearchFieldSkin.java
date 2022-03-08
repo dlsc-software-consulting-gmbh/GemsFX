@@ -10,6 +10,5 @@ public class SearchFieldSkin<T> extends SkinBase<SearchField<T>> {
         super(searchField);
         searchField.getEditor().setSkin(new SearchFieldEditorSkin<>(searchField));
         getChildren().add(searchField.getEditor());
-        searchField.setCellFactory(view -> new SearchFieldListCell(searchField));
     }
 }

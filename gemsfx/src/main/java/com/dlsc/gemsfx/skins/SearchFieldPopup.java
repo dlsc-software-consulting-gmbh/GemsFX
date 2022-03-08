@@ -30,7 +30,7 @@ public class SearchFieldPopup<T> extends PopupControl {
 
         prefWidthProperty().bind(searchField.widthProperty());
         setAutoFix(true);
-        setAutoHide(true);
+        setAutoHide(false);
         setHideOnEscape(true);
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
@@ -46,7 +46,7 @@ public class SearchFieldPopup<T> extends PopupControl {
         });
     }
 
-    public SearchField getSearchField() {
+    public SearchField<T> getSearchField() {
         return searchField;
     }
 
