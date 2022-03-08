@@ -68,12 +68,19 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
             StringConverter<T> converter = searchField.getConverter();
             String searchText = searchField.getText().toLowerCase();
 
-            if (converter.toString(o1).toLowerCase().startsWith(searchText)) {
-                result = +1;
+            String text1 = converter.toString(o1).toLowerCase();
+            String text2 = converter.toString(o2).toLowerCase();
+
+            if (text1.startsWith(searchText) && text2.startsWith(searchText)) {
+                return text1.compareTo(text2);
             }
 
-            if (converter.toString(o2).toLowerCase().startsWith(searchText)) {
+            if (text1.startsWith(searchText)) {
                 result = -1;
+            }
+
+            if (text2.startsWith(searchText)) {
+                result = +1;
             }
 
             return result;
@@ -103,7 +110,7 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
 
         control.getSearchField().getEditor().focusedProperty().addListener((it, oldFocused, newFocused) -> {
             if (!newFocused) {
-                //control.hide();
+                control.hide();
             }
         });
 
@@ -113,6 +120,7 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
         T selectedItem = suggestionList.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
             searchField.select(selectedItem);
+            searchField.commit();
         }
     }
 

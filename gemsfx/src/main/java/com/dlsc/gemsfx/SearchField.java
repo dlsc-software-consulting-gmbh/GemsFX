@@ -77,16 +77,20 @@ public class SearchField<T> extends Control {
         setFocusTraversable(false);
         setPlaceholder(new Label("No items found"));
 
-        focusedProperty().addListener(it -> {
-            if (!isFocused() && getSelectedItem() == null) {
-                editor.setText("");
+        editor.focusedProperty().addListener(it -> {
+            if (!isFocused()) {
+                commit();
+                if (getSelectedItem() == null) {
+                    editor.setText("");
+                }
+            } else {
+                Thread.dumpStack();
             }
         });
 
         addEventFilter(KeyEvent.ANY, evt -> {
             if (evt.getCode().equals(KeyCode.RIGHT) || evt.getCode().equals(KeyCode.ENTER)) {
-                editor.setText(getFullText());
-                editor.positionCaret(getFullText().length());
+                commit();
                 evt.consume();
             } else if (evt.getCode().equals(KeyCode.LEFT)) {
                 editor.positionCaret(Math.max(0, editor.getCaretPosition() - 1));
@@ -200,6 +204,21 @@ public class SearchField<T> extends Control {
         });
 
         searching.bind(searchService.runningProperty());
+    }
+
+    public void commit() {
+        T selectedItem = getSelectedItem();
+        if (selectedItem != null) {
+            String text = getConverter().toString(selectedItem);
+            if (text != null) {
+                editor.setText(text);
+                editor.positionCaret(text.length());
+            } else {
+                clear();
+            }
+        } else {
+            clear();
+        }
     }
 
     private class SearchEventHandlerProperty extends SimpleObjectProperty<EventHandler<SearchEvent>> {
@@ -477,8 +496,8 @@ public class SearchField<T> extends Control {
     /**
      * Returns a read-only (unmodifiable) list of the current suggestions.
      *
-     * @see #suggestionProviderProperty()
      * @return the list of suggestions
+     * @see #suggestionProviderProperty()
      */
     public final ObservableList<T> getSuggestions() {
         return readOnlySuggestions;
@@ -509,8 +528,8 @@ public class SearchField<T> extends Control {
     /**
      * A cell factory that can be used by a list view to visualize the list of suggestions.
      *
-     * @see #getSuggestions()
      * @return the cell factory used by the suggestion list view
+     * @see #getSuggestions()
      */
     public ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactoryProperty() {
         return cellFactory;
@@ -591,10 +610,9 @@ public class SearchField<T> extends Control {
      * A read-only property containing the concatenation of the regular text of the text field and
      * the autocompleted text.
      *
+     * @return the full text shown by the text field
      * @see #getText()
      * @see #getAutoCompletedText()
-     *
-     * @return the full text shown by the text field
      */
     public final ReadOnlyStringProperty fullTextProperty() {
         return fullText.getReadOnlyProperty();
@@ -629,9 +647,8 @@ public class SearchField<T> extends Control {
      * A convenience property to set the prompt text shown by the text field when no text
      * has been entered yet (e.g. "Search ...").
      *
-     * @see TextField#promptTextProperty()
-     *
      * @return the prompt text
+     * @see TextField#promptTextProperty()
      */
     public final StringProperty promptTextProperty() {
         return promptText;

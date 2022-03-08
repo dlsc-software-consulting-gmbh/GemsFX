@@ -30,16 +30,40 @@ public class SearchFieldPopup<T> extends PopupControl {
 
         prefWidthProperty().bind(searchField.widthProperty());
         setAutoFix(true);
-        setAutoHide(false);
+        setAutoHide(true);
         setHideOnEscape(true);
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
         searchField.addEventHandler(SearchField.SearchEvent.SEARCH_FINISHED, evt -> {
             if ((!searchField.getSuggestions().isEmpty() || searchField.getPlaceholder() != null)
-                    && StringUtils.isNotBlank(searchField.getEditor().getText())
-                    && (!searchField.isHidePopupWithSingleChoice() || !(searchField.getSuggestions().size() == 1 && searchField.getSuggestions().get(0).equals(searchField.getSelectedItem())))) {
-                show(searchField);
-                selectFirstSuggestion();
+                    && StringUtils.isNotBlank(searchField.getEditor().getText())) {
+
+                // assuming that we don't have to show ti
+                boolean showIt = false;
+                if (searchField.getSuggestions().size() == 1) {
+                    if (!searchField.isHidePopupWithSingleChoice()) {
+                        // code said, show it even with only a single suggestion
+                        // but let's see if the suggestion is identical to the typed text, then we really do not want to show it
+                        if (!searchField.getConverter().toString(searchField.getSuggestions().get(0)).equalsIgnoreCase(searchField.getText())) {
+                            System.out.println("showing it, because the typed text is not identical to the single suggestion");
+                            showIt = true;
+                        }
+                    } else {
+                        showIt = true;
+                        System.out.println("showing it because the field 'hidePopupWithSingleChoice' is false");
+                    }
+                } else {
+                    System.out.println("showing it, because we have more than one suggested item");
+                    // more than one suggested item, definitely show the popup
+                    showIt = true;
+                }
+
+                if (showIt) {
+                    show(searchField);
+                    selectFirstSuggestion();
+                } else {
+                    hide();
+                }
             } else {
                 hide();
             }
