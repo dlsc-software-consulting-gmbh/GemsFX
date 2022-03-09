@@ -46,8 +46,6 @@ public class SearchFieldPopup<T> extends PopupControl {
                         if (!searchField.getConverter().toString(searchField.getSuggestions().get(0)).equalsIgnoreCase(searchField.getText())) {
                             showIt = true;
                         }
-                    } else {
-                        showIt = true;
                     }
                 } else {
                     // more than one suggested item, definitely show the popup

@@ -82,7 +82,7 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
             tagView.getStyleClass().add("tag-view");
             tagView.setOnMousePressed(evt -> {
                 // the field has to have focus, or we do not receive keyboard events
-                field.requestFocus();
+                field.getEditor().requestFocus();
 
                 if (evt.getButton().equals(MouseButton.PRIMARY)) {
 

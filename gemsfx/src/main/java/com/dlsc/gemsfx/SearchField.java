@@ -327,7 +327,7 @@ public class SearchField<T> extends Control {
         return searching.get();
     }
 
-    private final BooleanProperty hidePopupWithSingleChoice = new SimpleBooleanProperty(this, "", false);
+    private final BooleanProperty hidePopupWithSingleChoice = new SimpleBooleanProperty(this, "", true);
 
     public final boolean isHidePopupWithSingleChoice() {
         return hidePopupWithSingleChoice.get();

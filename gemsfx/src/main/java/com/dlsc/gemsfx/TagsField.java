@@ -32,8 +32,9 @@ public class TagsField<T> extends SearchField<T> {
     private final Deque<Command> redoStack = new ArrayDeque<>();
 
     public TagsField() {
-        setShowSearchIcon(false);
         getStyleClass().addAll("text-input", DEFAULT_STYLE_CLASS);
+
+        setFocusTraversable(false);
 
         getEditor().focusedProperty().addListener(it -> {
             if (getEditor().isFocused()) {

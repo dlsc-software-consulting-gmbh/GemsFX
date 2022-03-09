@@ -92,11 +92,11 @@ public class TagsFieldApp extends Application {
         field.placeholderProperty().bind(Bindings.createObjectBinding(() -> usePlaceholder.isSelected() ? new Label("No countries found") : null, usePlaceholder.selectedProperty()));
 
         CheckBox hideWithSingleChoiceBox = new CheckBox("Hide popup if it has only the currently selected item in it");
-        field.hidePopupWithSingleChoiceProperty().bind(hideWithSingleChoiceBox.selectedProperty());
+        hideWithSingleChoiceBox.selectedProperty().bindBidirectional(field.hidePopupWithSingleChoiceProperty());
 
         CheckBox showSearchIconBox = new CheckBox("Show search icon");
         showSearchIconBox.setSelected(true);
-        field.showSearchIconProperty().bind(showSearchIconBox.selectedProperty());
+        showSearchIconBox.selectedProperty().bindBidirectional(field.showSearchIconProperty());
 
         CheckBox showLeftRightNodes = new CheckBox("Show extra left & right nodes");
         showLeftRightNodes.setSelected(false);

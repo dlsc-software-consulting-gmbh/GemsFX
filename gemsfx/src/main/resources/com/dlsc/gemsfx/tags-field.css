@@ -1,5 +1,5 @@
 .tags-field {
-    -fx-padding: 0px;
+    -fx-padding: 0em;
 }
 
 .tags-field:contains-focus {
@@ -16,7 +16,7 @@
 }
 
 .tags-field .graphic-wrapper {
-    -fx-padding: 0px 0px;
+    -fx-padding: 0em 0em;
 }
 
 .tags-field .graphic-wrapper .ikonli-font-icon {
@@ -32,8 +32,8 @@
 
 .tags-field > .flow-pane {
     -fx-padding: 0.166667em;
-    -fx-vgap: 2px;
-    -fx-hgap: 2px;
+    -fx-vgap: 0.166667em; /* 2px */
+    -fx-hgap: 0.166667em;
 }
 
 .tags-field > .flow-pane > .text-field {
