@@ -46,48 +46,22 @@
     -fx-padding: 0.166667em 0.583em 0.166667em 0em; /* 4 7 4 0 */
 }
 
-.tags-field > .flow-pane > .chip-view.first {
-    -fx-background-radius: 0.166667em 0.333333em 0.333333em 0.166667em;
+.tags-field > .flow-pane > .tag-view.first {
+    -fx-background-radius: 0.166667em;
 }
 
-.tags-field > .flow-pane > .chip-view {
-    -fx-cursor: default;
-    -fx-background-radius: 0.333333em;
-    -fx-background-insets: 1px 1px;
-}
-
-.tags-field > .flow-pane > .chip-view > .chip-container > .label {
+.tags-field > .flow-pane > .tag-view {
     -fx-background: -fx-accent;
+    -fx-background-color: -fx-background;
     -fx-text-fill: -fx-text-background-color;
-    -fx-font-size: 12px;
-    -fx-padding: 0.083333em 0.666667em 0.083333em 0.666667em;
+    -fx-cursor: default;
+    -fx-background-radius: 0.166667em;
+    -fx-padding: 0.166667em 0.666667em;
 }
 
-.tags-field > .flow-pane > .chip-view > .chip-container > .close-icon {
-    -fx-cursor: hand;
-    -fx-background-color: transparent;
-    -fx-background-insets: 0;
-    -size: 1.666667em;
-    -fx-pref-width: -size;
-    -fx-pref-height: -size;
-    -fx-min-width: -size;
-    -fx-min-height: -size;
-    -fx-max-width: -size;
-    -fx-max-height: -size;
-}
-
-.tags-field > .flow-pane > .chip-view > .chip-container > .close-icon:hover {
-}
-
-.tags-field > .flow-pane > .chip-view > .chip-container > .close-icon:pressed {
-}
-
-.tags-field > .flow-pane > .chip-view > .chip-container > .close-icon > .ikonli-font-icon {
-    -fx-background: -fx-accent;
-    -fx-icon-size: 12px;
-    -fx-icon-color: -fx-text-background-color;
-}
-
-.tags-field > .flow-pane > .chip-view > .chip-container > .close-icon:hover > .ikonli-font-icon {
-    -fx-icon-color: -fx-text-background-color;
+.tags-field > .flow-pane > .tag-view:selected {
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-accent, -fx-background;
+    -fx-background-insets: 0em, 0.083333em;
+    -fx-text-fill: -fx-accent;
 }

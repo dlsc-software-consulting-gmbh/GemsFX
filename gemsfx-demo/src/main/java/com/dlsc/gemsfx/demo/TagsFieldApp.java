@@ -58,6 +58,28 @@ public class TagsFieldApp extends Application {
         value2.textProperty().bind(Bindings.createStringBinding(() -> Integer.toString(field.getSuggestions().size()), field.getSuggestions()));
         HBox hBox2 = new HBox(10, label2, value2);
 
+        Label label2a = new Label("Selected tags indices:");
+        Label value2a = new Label();
+        value2a.setWrapText(true);
+        value2a.textProperty().bind(Bindings.createStringBinding(() -> field.getTagSelectionModel().getSelectedIndices().stream()
+                .map(index -> Integer.toString(index))
+                .collect(Collectors.joining(", ")), field.getTagSelectionModel().getSelectedIndices()));
+        HBox hBox2a = new HBox(10, label2a, value2a);
+
+        Label label3 = new Label("Selected tags list:");
+        Label value3 = new Label();
+        value3.setWrapText(true);
+        value3.textProperty().bind(Bindings.createStringBinding(() -> field.getTagSelectionModel().getSelectedItems().stream()
+                .map(item -> field.getConverter().toString(item))
+                .collect(Collectors.joining(", ")), field.getTagSelectionModel().getSelectedItems()));
+        HBox hBox3 = new HBox(10, label3, value3);
+
+        Label label4 = new Label("Selected tag item:");
+        Label value4 = new Label();
+        value4.textProperty().bind(Bindings.createStringBinding(() -> field.getTagSelectionModel().getSelectedItem() != null ?
+                field.getConverter().toString(field.getTagSelectionModel().getSelectedItem()) : "---", field.getTagSelectionModel().selectedItemProperty()));
+        HBox hBox4 = new HBox(10, label4, value4);
+
         CheckBox createNewItemBox = new CheckBox("Create new country 'on-the-fly' if it can't be found in the data set.");
         field.newItemProducerProperty().bind(Bindings.createObjectBinding(() -> createNewItemBox.isSelected() ? name -> new Country(name) : null, createNewItemBox.selectedProperty()));
 
@@ -94,9 +116,24 @@ public class TagsFieldApp extends Application {
 //        comboBox.getItems().setAll("Dirk", "Katja", "Philip", "Jule", "Armin");
 //        comboBox.getSelectionModel().select(0);
 
-        Button button = new Button("Scenic View");
-        button.setOnAction(evt -> ScenicView.show(field.getScene()));
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, hBox, hBox2, button, field);
+        Button scenicViewButton = new Button("Scenic View");
+        scenicViewButton.setOnAction(evt -> ScenicView.show(field.getScene()));
+
+        Button generateButton = new Button("Generate Tags");
+        generateButton.setOnAction(evt -> {
+            int s = countries.size();
+            for (int i = 0; i < 5; i++) {
+                int index = (int) (Math.random() * s);
+                Country country = countries.get(index);
+                if (!field.getTags().contains(country)) {
+                    field.addTags(country);
+                }
+            }
+        });
+
+        HBox buttonBox = new HBox(10, scenicViewButton, generateButton);
+
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, hBox, hBox2, hBox2a, hBox3, hBox4, buttonBox, field);
         vbox.setPadding(new Insets(20));
 
         CSSFX.start();

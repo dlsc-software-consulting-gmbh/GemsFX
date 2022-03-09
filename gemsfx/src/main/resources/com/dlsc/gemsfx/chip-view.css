@@ -3,7 +3,8 @@
  */
 
 .chip-view {
-    -fx-background-color: -fx-accent;
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-background;
     -fx-background-radius: 1000;
 }
 

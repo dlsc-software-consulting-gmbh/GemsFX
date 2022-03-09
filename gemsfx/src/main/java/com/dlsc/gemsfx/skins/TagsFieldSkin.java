@@ -1,22 +1,29 @@
 package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.ChipView;
 import com.dlsc.gemsfx.SearchField.SearchFieldListCell;
 import com.dlsc.gemsfx.TagsField;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.scene.Node;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
 
     private static final PseudoClass FILLED = PseudoClass.getPseudoClass("filled");
-
     private static final PseudoClass CONTAINS_FOCUS = PseudoClass.getPseudoClass("contains-focus");
+    private static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
 
     private final FlowPane flowPane;
+
+    private final Map<T, Node> tagViewMap = new HashMap<>();
 
     public TagsFieldSkin(TagsField<T> field) {
         super(field);
@@ -45,35 +52,78 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
 
         field.setCellFactory(view -> new SearchFieldListCell(field));
 
+        field.getTagSelectionModel().getSelectedItems().addListener((Observable it) -> tagViewMap.entrySet().forEach(entry -> entry.getValue().pseudoClassStateChanged(SELECTED, field.getTagSelectionModel().getSelectedItems().contains(entry.getKey()))));
+        field.getEditor().setOnMouseClicked(evt -> field.getTagSelectionModel().clearSelection());
+
         field.getTags().addListener((Observable it) -> updateView());
         updateView();
     }
 
+    private int leadSelection;
+
     private void updateView() {
         flowPane.getChildren().clear();
+        tagViewMap.clear();
 
         TagsField<T> field = getSkinnable();
-        ObservableList<T> tags = field.getTags();
         TextField editor = field.getEditor();
+
+        ObservableList<T> tags = field.getTags();
+
+        MultipleSelectionModel<T> selectionModel = field.getTagSelectionModel();
 
         for (int i = 0; i < tags.size(); i++) {
             T tag = tags.get(i);
-            ChipView<T> chipView = new ChipView<>();
-            chipView.setValue(tag);
-            chipView.setText(field.getConverter().toString(tag));
-            chipView.setOnClose(evt -> field.getTags().remove(tag));
-            chipView.setFocusTraversable(false);
-            chipView.getStyleClass().add("tag-view");
 
-            if (i == 0) {
-                chipView.getStyleClass().add("first");
+            final int index = i;
+
+            Node tagView = getSkinnable().getTagViewFactory().call(tag);
+            tagView.setFocusTraversable(false);
+            tagView.getStyleClass().add("tag-view");
+            tagView.setOnMousePressed(evt -> {
+                // the field has to have focus, or we do not receive keyboard events
+                field.requestFocus();
+
+                if (evt.getButton().equals(MouseButton.PRIMARY)) {
+
+                    if (evt.isShortcutDown()) {
+                        if (!selectionModel.isSelected(index)) {
+                            selectionModel.select(index);
+                        } else {
+                            selectionModel.clearSelection(index);
+                        }
+                    } else if (evt.isShiftDown()) {
+                        if (leadSelection >= 0) {
+                            int from = Math.min(leadSelection, index);
+                            int to = Math.max(leadSelection, index);
+                            selectionModel.selectRange(from, to + 1);
+                        } else {
+                            selectionModel.select(index);
+                        }
+                    } else {
+                        boolean wasSelected = selectionModel.isSelected(index);
+                        selectionModel.clearSelection();
+                        if (!wasSelected) {
+                            selectionModel.select(index);
+                        }
+                    }
+
+                    leadSelection = index;
+                }
+            });
+            if (tags.size() == 1) {
+                tagView.getStyleClass().add("only");
+            } else if (i == 0) {
+                tagView.getStyleClass().add("first");
+            } else if (i == tags.size() - 1) {
+                tagView.getStyleClass().add("last");
+            } else {
+                tagView.getStyleClass().add("middle");
             }
 
-            if (i == tags.size() - 1) {
-                chipView.getStyleClass().add("last");
-            }
+            tagViewMap.put(tag, tagView);
 
-            flowPane.getChildren().add(chipView);
+            flowPane.getChildren().add(tagView);
         }
 
         flowPane.getChildren().add(editor);

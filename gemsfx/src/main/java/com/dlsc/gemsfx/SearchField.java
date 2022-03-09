@@ -83,8 +83,6 @@ public class SearchField<T> extends Control {
                 if (getSelectedItem() == null) {
                     editor.setText("");
                 }
-            } else {
-                Thread.dumpStack();
             }
         });
 
