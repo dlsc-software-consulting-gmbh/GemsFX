@@ -69,7 +69,7 @@ public class TagsField<T> extends SearchField<T> {
                 if (selectedItem != null) {
                     if (!getTags().contains(selectedItem)) {
                         addTags(selectedItem);
-                        Platform.runLater(() -> clear());
+                        Platform.runLater(this::clear);
                     }
                 }
             }
