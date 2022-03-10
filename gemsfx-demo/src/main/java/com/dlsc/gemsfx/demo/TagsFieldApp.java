@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TagsField;
+import com.jpro.webapi.WebAPI;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -124,6 +125,8 @@ public class TagsFieldApp extends Application {
 
         Button scenicViewButton = new Button("Scenic View");
         scenicViewButton.setOnAction(evt -> ScenicView.show(field.getScene()));
+        scenicViewButton.setVisible(!WebAPI.isBrowser());
+        scenicViewButton.setManaged(!WebAPI.isBrowser());
 
         Button generateButton = new Button("Generate Tags");
         generateButton.setOnAction(evt -> {
