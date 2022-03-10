@@ -7,10 +7,7 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -98,6 +95,15 @@ public class TagsFieldApp extends Application {
         showSearchIconBox.setSelected(true);
         showSearchIconBox.selectedProperty().bindBidirectional(field.showSearchIconProperty());
 
+        CheckBox singleSelectionBox = new CheckBox("Single tag selection");
+        singleSelectionBox.selectedProperty().addListener(it -> {
+            if (singleSelectionBox.isSelected()) {
+                field.getTagSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+            } else {
+                field.getTagSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            }
+        });
+
         CheckBox showLeftRightNodes = new CheckBox("Show extra left & right nodes");
         showLeftRightNodes.setSelected(false);
 
@@ -133,7 +139,7 @@ public class TagsFieldApp extends Application {
 
         HBox buttonBox = new HBox(10, scenicViewButton, generateButton);
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, hBox, hBox2, hBox2a, hBox3, hBox4, buttonBox, field);
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, singleSelectionBox, hBox, hBox2, hBox2a, hBox3, hBox4, buttonBox, field);
         vbox.setPadding(new Insets(20));
 
         CSSFX.start();

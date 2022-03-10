@@ -32,7 +32,7 @@ import java.util.Comparator;
 import java.util.function.BiFunction;
 
 /**
- * The spotlight text field is a standard text field with auto suggest capabilities
+ * The search field is a standard text field with auto suggest capabilities
  * and a selection model for a specific type of object. This type is defined by the
  * generic type argument. The main difference to other auto suggest text fields is that
  * the main outcome of this field is an object and not just the text entered by the
@@ -101,7 +101,7 @@ public class SearchField<T> extends Control {
             }
         });
 
-        setMatcher((item, searchText) -> item.toString().toLowerCase().startsWith(searchText.toLowerCase()));
+        setMatcher((item, searchText) -> getConverter().toString(item).startsWith(searchText.toLowerCase()));
 
         setConverter(new StringConverter<>() {
             @Override
@@ -204,6 +204,11 @@ public class SearchField<T> extends Control {
         searching.bind(searchService.runningProperty());
     }
 
+    /**
+     * Makes the field commit to the currently selected item and updates
+     * the field to show the full text provided by the converter for the
+     * item.
+     */
     public void commit() {
         T selectedItem = getSelectedItem();
         if (selectedItem != null) {
@@ -431,6 +436,12 @@ public class SearchField<T> extends Control {
         searchService.cancel();
     }
 
+    /**
+     * Updates the control with the newly found list of suggestions. The suggestions
+     * are provided by a background search service.
+     *
+     * @param newSuggestions the new suggestions to use for the field
+     */
     protected void update(Collection<T> newSuggestions) {
         if (newSuggestions == null) {
             suggestions.clear();
@@ -503,7 +514,7 @@ public class SearchField<T> extends Control {
 
     private final ReadOnlyBooleanWrapper newItem = new ReadOnlyBooleanWrapper(this, "newItem");
 
-    public boolean isNewItem() {
+    public final boolean isNewItem() {
         return newItem.get();
     }
 
@@ -513,13 +524,13 @@ public class SearchField<T> extends Control {
      *
      * @return true if the selected item was not part of the suggestion list and has been created on-the-fly
      */
-    public ReadOnlyBooleanProperty newItemProperty() {
+    public final ReadOnlyBooleanProperty newItemProperty() {
         return newItem.getReadOnlyProperty();
     }
 
     private final ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactory = new SimpleObjectProperty<>(this, "cellFactory");
 
-    public Callback<ListView<T>, ListCell<T>> getCellFactory() {
+    public final Callback<ListView<T>, ListCell<T>> getCellFactory() {
         return cellFactory.get();
     }
 
@@ -529,11 +540,11 @@ public class SearchField<T> extends Control {
      * @return the cell factory used by the suggestion list view
      * @see #getSuggestions()
      */
-    public ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactoryProperty() {
+    public final ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactoryProperty() {
         return cellFactory;
     }
 
-    public void setCellFactory(Callback<ListView<T>, ListCell<T>> cellFactory) {
+    public final void setCellFactory(Callback<ListView<T>, ListCell<T>> cellFactory) {
         this.cellFactory.set(cellFactory);
     }
 
@@ -679,8 +690,12 @@ public class SearchField<T> extends Control {
     }
 
     /**
-     * The function that is used to determine if an item in the suggestion list is a good match for
-     * auto selection.
+     * The function that is used to determine the first item in the suggestion list that is a good match
+     * for auto selection. This is normally the case if the text provided by the converter for an item starts
+     * with exactly the text typed by the user. Auto selection will cause the field to automatically complete
+     * the text typed by the user with the name of the match.
+     *
+     * @see #converterProperty()
      *
      * @return the function used for determining the best match in the suggestion list
      */
@@ -694,14 +709,6 @@ public class SearchField<T> extends Control {
 
     private final ObjectProperty<T> selectedItem = new SimpleObjectProperty<>(this, "selectedItem");
 
-    public final T getSelectedItem() {
-        return selectedItem.get();
-    }
-
-    public final void setSelectedItem(T selectedItem) {
-        this.selectedItem.set(selectedItem);
-    }
-
     /**
      * Contains the currently selected item.
      *
@@ -709,6 +716,14 @@ public class SearchField<T> extends Control {
      */
     public final ObjectProperty<T> selectedItemProperty() {
         return selectedItem;
+    }
+
+    public final T getSelectedItem() {
+        return selectedItem.get();
+    }
+
+    public final void setSelectedItem(T selectedItem) {
+        this.selectedItem.set(selectedItem);
     }
 
     private final ObjectProperty<Callback<SearchFieldSuggestionRequest, Collection<T>>> suggestionProvider = new SimpleObjectProperty<>(this, "suggestionProvider");
@@ -774,7 +789,7 @@ public class SearchField<T> extends Control {
     }
 
     /**
-     * Represents a suggestion fetch request
+     * Represents a suggestion fetch request.
      */
     public interface SearchFieldSuggestionRequest {
 
@@ -874,7 +889,7 @@ public class SearchField<T> extends Control {
 
     private final BooleanProperty showSearchIcon = new SimpleBooleanProperty(this, "showSearchIcon", true);
 
-    public boolean isShowSearchIcon() {
+    public final boolean isShowSearchIcon() {
         return showSearchIcon.get();
     }
 
@@ -884,14 +899,22 @@ public class SearchField<T> extends Control {
      *
      * @return true if a search icon will be shown
      */
-    public BooleanProperty showSearchIconProperty() {
+    public final BooleanProperty showSearchIconProperty() {
         return showSearchIcon;
     }
 
-    public void setShowSearchIcon(boolean showSearchIcon) {
+    public final void setShowSearchIcon(boolean showSearchIcon) {
         this.showSearchIcon.set(showSearchIcon);
     }
 
+    /**
+     * A custom list cell implementation that is capable of underlining the part
+     * of the text that matches the user-typed search text. The cell uses a text flow
+     * node that is composed of three text nodes. One of the text nodes will be underlined
+     * and represents the user search text.
+     *
+     * @param <T> the type of the cell
+     */
     public static class SearchFieldListCell<T> extends ListCell<T> {
 
         private SearchField<T> searchField;

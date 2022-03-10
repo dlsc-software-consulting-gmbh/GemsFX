@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
@@ -21,6 +22,17 @@ import javafx.util.Callback;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This field is a specialization of the {@link SearchField} control and supports
+ * the additional feature of using the selected object as a tag. Tags are shown in front
+ * of the text input field. The control provides an observable list of the currently
+ * added tags. In addition, the field also allows the user to select one or more of
+ * the tags. The selection state is provided by the selection model. The field adds
+ * and removes tags via undoable commands which means that, for example, a deleted tag
+ * can be recovered by pressing the standard undo (or redo) shortcut.
+ *
+ * @param <T> the type of objects to search for and to tag
+ */
 public class TagsField<T> extends SearchField<T> {
 
     private static final int MAX_UNDO_AND_REDO_STEPS = 50;
@@ -31,6 +43,9 @@ public class TagsField<T> extends SearchField<T> {
 
     private final Deque<Command> redoStack = new ArrayDeque<>();
 
+    /**
+     * Constructs a new tag field.
+     */
     public TagsField() {
         getStyleClass().addAll("text-input", DEFAULT_STYLE_CLASS);
 
@@ -47,8 +62,6 @@ public class TagsField<T> extends SearchField<T> {
             tagLabel.setText(getConverter().toString(tag));
             return tagLabel;
         });
-
-        getStylesheets().add(getUserAgentStylesheet());
 
         addEventFilter(KeyEvent.KEY_RELEASED, evt -> {
             if (evt.getCode().equals(KeyCode.RIGHT) || evt.getCode().equals(KeyCode.ENTER)) {
@@ -96,6 +109,10 @@ public class TagsField<T> extends SearchField<T> {
         return TagsField.class.getResource("tags-field.css").toExternalForm();
     }
 
+    /**
+     * Overridden to modify the behaviour for the tag field. The override method
+     * commits the currently selected item to become a tag.
+     */
     @Override
     public void commit() {
         T selectedItem = getSelectedItem();
@@ -105,6 +122,11 @@ public class TagsField<T> extends SearchField<T> {
         }
     }
 
+    /**
+     * Overridden to remove the already tagged items from the suggestion list.
+     *
+     * @param newSuggestions the new suggestions to use for the field
+     */
     @Override
     protected void update(Collection<T> newSuggestions) {
         if (newSuggestions != null) {
@@ -133,12 +155,6 @@ public class TagsField<T> extends SearchField<T> {
         this.tags.set(tags);
     }
 
-    private final ObjectProperty<Callback<T, Node>> tagViewFactory = new SimpleObjectProperty<>(this, "tagViewFactory");
-
-    public final Callback<T, Node> getTagViewFactory() {
-        return tagViewFactory.get();
-    }
-
     /**
      * Used to add one or more tags programmatically. This ensures that tags are added via an undoable command.
      *
@@ -164,14 +180,20 @@ public class TagsField<T> extends SearchField<T> {
         execute(new ClearTagsCommand(getTags()));
     }
 
+    private final ObjectProperty<Callback<T, Node>> tagViewFactory = new SimpleObjectProperty<>(this, "tagViewFactory");
+
     /**
      * A callback used to create the nodes that represent the tags. The default
-     * implementation uses the {@link ChipView} control.
+     * implementation uses labels.
      *
      * @return a node factory for the tags
      */
     public final ObjectProperty<Callback<T, Node>> tagViewFactoryProperty() {
         return tagViewFactory;
+    }
+
+    public final Callback<T, Node> getTagViewFactory() {
+        return tagViewFactory.get();
     }
 
     public final void setTagViewFactory(Callback<T, Node> tagViewFactory) {
@@ -184,6 +206,11 @@ public class TagsField<T> extends SearchField<T> {
         return tagSelectionModel.get();
     }
 
+    /**
+     * A selection model for the tags shown by the field.
+     *
+     * @return the selection model
+     */
     public final ObjectProperty<MultipleSelectionModel<T>> tagSelectionModelProperty() {
         return tagSelectionModel;
     }
@@ -299,8 +326,9 @@ public class TagsField<T> extends SearchField<T> {
 
         public TagFieldSelectionModel() {
             selectedIndices.addListener((Observable it) -> selectedItems.setAll(selectedIndices.stream().map(index -> getTags().get(index)).collect(Collectors.toList())));
-
+            setSelectionMode(SelectionMode.MULTIPLE);
             getTags().addListener((javafx.beans.Observable it) -> clearSelection());
+            selectionModeProperty().addListener(it -> clearSelection());
         }
 
         @Override
@@ -311,9 +339,14 @@ public class TagsField<T> extends SearchField<T> {
 
         @Override
         public void select(int index) {
-            selectedIndices.add(index);
-            setSelectedIndex(index);
-            setSelectedItem(getTags().get(index));
+            if (getSelectionMode().equals(SelectionMode.SINGLE)) {
+                clearSelection();
+            }
+            if (!selectedIndices.contains(index)) {
+                selectedIndices.add(index);
+                setSelectedIndex(index);
+                setSelectedItem(getTags().get(index));
+            }
         }
 
         @Override
@@ -369,18 +402,19 @@ public class TagsField<T> extends SearchField<T> {
 
         @Override
         public void selectRange(int start, int end) {
-            super.selectRange(start, end);
+            if (getSelectionMode().equals(SelectionMode.SINGLE)) {
+                clearSelection();
+                select(end - 1);
+            } else {
+                super.selectRange(start, end);
+            }
         }
 
         @Override
         public void selectIndices(int index, int... indices) {
-            if (!selectedIndices.contains(index)) {
-                selectedIndices.add(index);
-            }
+            select(index);
             for (int i : indices) {
-                if (!selectedIndices.contains(i)) {
-                    selectedIndices.add(i);
-                }
+                select(i);
             }
         }
 
