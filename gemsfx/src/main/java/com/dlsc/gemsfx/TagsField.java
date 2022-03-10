@@ -386,7 +386,7 @@ public class TagsField<T> extends SearchField<T> {
 
         @Override
         public void selectAll() {
-            selectIndices(0, getTags().size() - 1);
+            selectRange(0, getTags().size());
         }
 
         @Override
