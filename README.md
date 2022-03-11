@@ -4,17 +4,27 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 
+## Search Text Field
+
+A textfield that has been nicely decorated to express that it is used for performing searches.
+
+![SearchTextField](gemsfx/docs/search-text-field.png)
+
 ## Search Field
 
-An auto-suggest text field with a behaviour similar to the spotlight search experience on Mac. While typing the field will
-automatically finish the entered text if it has a search result where the name starts with the exact typed text. At any time the typed text and the auto-completed text will be visually distinguishable. The field is also capable of creating a new object for the entered text if no result can be found.
+An auto-suggest text field with a behaviour similar to the spotlight search experience on Mac. While typing the field will automatically finish the entered text if it has a search result where the name starts with the exact typed text. At any time the typed text and the auto-completed text will be visually distinguishable. The field is also capable of creating a new object for the entered text if no result can be found.
 
 ![SearchField](gemsfx/docs/search-field.png)
 
+## Tags Field
+
+An extension of the SearchField control that supports the creation of tags. Selected values are converted into tags when the user hits enter, the right arrow key, or tab. The API of this control allows applications to retrieve the tags, or to monitor the selection state of the tags. The control uses a FlowPane for its layout, which allows the tags to span multiple rows.
+
+![TagsField](gemsfx/docs/tags-field.png)
+
 ## Dialog Pane
 
-The class DialogPane can be used as a layer on top of any application. It offers various methods to display different
-types of dialogs.
+The class DialogPane can be used as a layer on top of any application. It offers various methods to display different types of dialogs.
 
 * Information
 * Warning
@@ -29,8 +39,7 @@ types of dialogs.
 
 ## Resizable Text Area
 
-A custom control that wraps a text area and adds a resize handle to the lower right corner of it. The area can be configured to be
-resizable in vertical, horizontal, or both directions. 
+A custom control that wraps a text area and adds a resize handle to the lower right corner of it. The area can be configured to be resizable in vertical, horizontal, or both directions. 
 
 ![ResizableTextArea](gemsfx/docs/resizable-text-area.png)
 
@@ -147,4 +156,7 @@ terminal:
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PhotoViewApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.ResizableTextAreaApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.RichTextAreaApp
+    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.SearchFieldApp
+    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.SearchTextFieldApp
+    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.TagsFieldApp
     mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.TimePickerApp

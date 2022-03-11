@@ -47,6 +47,8 @@ import java.util.function.BiFunction;
  * <h3>Matcher</h3>
  *
  * @param <T> the type of objects to work on
+ *
+ * @see #setSuggestionProvider(Callback)
  * @see #setConverter(StringConverter)
  * @see #setCellFactory(Callback)
  * @see #setMatcher(BiFunction)
