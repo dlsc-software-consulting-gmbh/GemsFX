@@ -12,11 +12,10 @@ A textfield that has been nicely decorated to express that it is used for perfor
 
 ## Search Field
 
-An auto-suggest text field with a behaviour similar to the spotlight search experience on Mac. While typing the field will automatically finish the entered text if it has a search result where the name starts with the exact typed text. At any time the typed text and the auto-completed text will be visually distinguishable. The field is also capable of creating a new object for the entered text if no result can be found.
+An auto-suggest text field with a behaviour similar to the spotlight search experience on Mac. While typing the field will automatically finish the entered text if it has a search result where the name starts with the exact typed text. At any time the typed text and the auto-completed text will be visually distinguishable. The field is also capable of creating a new object for the entered text if no result can be found. For detailed instructions [read the WIKI page](https://github.com/dlsc-software-consulting-gmbh/GemsFX/wiki/SearchField).
+
 
 ![SearchField](gemsfx/docs/search-field.png)
-
-For detailed instructions [read the WIKI page](https://github.com/dlsc-software-consulting-gmbh/GemsFX/wiki/SearchField).
 
 ## Tags Field
 
