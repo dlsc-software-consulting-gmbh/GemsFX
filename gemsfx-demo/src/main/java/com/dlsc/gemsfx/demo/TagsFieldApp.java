@@ -178,7 +178,7 @@ public class TagsFieldApp extends Application {
                     return new Country(string);
                 }
             });
-            setMatcher((broker, searchText) -> broker.getName().toLowerCase().startsWith(searchText.toLowerCase()));
+            setMatcher((country, searchText) -> country.getName().toLowerCase().startsWith(searchText.toLowerCase()));
             setComparator(Comparator.comparing(Country::getName));
             getEditor().setPromptText("Start typing country name ...");
         }
