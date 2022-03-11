@@ -16,6 +16,8 @@ An auto-suggest text field with a behaviour similar to the spotlight search expe
 
 ![SearchField](gemsfx/docs/search-field.png)
 
+For detailed instructions [read the WIKI page](https://github.com/dlsc-software-consulting-gmbh/GemsFX/wiki/SearchField).
+
 ## Tags Field
 
 An extension of the SearchField control that supports the creation of tags. Selected values are converted into tags when the user hits enter, the right arrow key, or tab. The API of this control allows applications to retrieve the tags, or to monitor the selection state of the tags. The control uses a FlowPane for its layout, which allows the tags to span multiple rows.
