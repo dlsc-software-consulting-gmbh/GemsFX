@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.SearchField.SearchFieldListCell;
 import com.dlsc.gemsfx.TagsField;
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
@@ -55,7 +56,10 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
         field.getTagSelectionModel().getSelectedItems().addListener((Observable it) -> tagViewMap.entrySet().forEach(entry -> entry.getValue().pseudoClassStateChanged(SELECTED, field.getTagSelectionModel().getSelectedItems().contains(entry.getKey()))));
         field.getEditor().setOnMouseClicked(evt -> field.getTagSelectionModel().clearSelection());
 
-        field.getTags().addListener((Observable it) -> updateView());
+        InvalidationListener updateViewListener = it -> updateView();
+        field.tagViewFactoryProperty().addListener(updateViewListener);
+        field.getTags().addListener(updateViewListener);
+
         updateView();
     }
 
