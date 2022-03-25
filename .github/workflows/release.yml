@@ -11,7 +11,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: 'Checkout code'
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
@@ -33,7 +34,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Update version
+      - name: 'Update version'
         id: version
         run: |
           VERSION=${{ github.event.inputs.version }}
@@ -44,7 +45,7 @@ jobs:
           git commit -a -m "🏁 Releasing version $VERSION"
           git push origin HEAD:master
 
-      - name: Release to Maven Central
+      - name: 'Release to Maven Central'
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.SONATYPE_PASSWORD }}
@@ -55,12 +56,12 @@ jobs:
             -Drepository.url=https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git \
             -Dmaven.site.skip=true -Drelease=true deploy
 
-      - name: Release to GitHub
+      - name: 'Release to GitHub'
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./mvnw -B --file pom.xml -Prelease -pl :parent jreleaser:full-release
 
-      - name: JReleaser output
+      - name: 'JReleaser output'
         if: always()
         uses: actions/upload-artifact@v2
         with:

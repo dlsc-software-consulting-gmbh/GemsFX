@@ -80,7 +80,7 @@ public class SearchField<T> extends Control {
         setPlaceholder(new Label("No items found"));
 
         editor.focusedProperty().addListener(it -> {
-            if (!isFocused()) {
+            if (!editor.isFocused()) {
                 commit();
                 if (getSelectedItem() == null) {
                     editor.setText("");
@@ -127,7 +127,15 @@ public class SearchField<T> extends Control {
 
         fullText.bind(Bindings.createStringBinding(() -> editor.getText() + getAutoCompletedText(), editor.textProperty(), autoCompletedText));
 
-        editor.textProperty().addListener(it -> searchService.restart());
+        editor.textProperty().addListener(it -> {
+            if (!committing) {
+                if (StringUtils.isNotBlank(editor.getText())) {
+                    searchService.restart();
+                } else {
+                    update(null);
+                }
+            }
+        });
 
         selectedItem.addListener(it -> {
             T selectedItem = getSelectedItem();
@@ -206,23 +214,30 @@ public class SearchField<T> extends Control {
         searching.bind(searchService.runningProperty());
     }
 
+    private boolean committing;
+
     /**
      * Makes the field commit to the currently selected item and updates
      * the field to show the full text provided by the converter for the
      * item.
      */
     public void commit() {
-        T selectedItem = getSelectedItem();
-        if (selectedItem != null) {
-            String text = getConverter().toString(selectedItem);
-            if (text != null) {
-                editor.setText(text);
-                editor.positionCaret(text.length());
+        committing = true;
+        try {
+            T selectedItem = getSelectedItem();
+            if (selectedItem != null) {
+                String text = getConverter().toString(selectedItem);
+                if (text != null) {
+                    editor.setText(text);
+                    editor.positionCaret(text.length());
+                } else {
+                    clear();
+                }
             } else {
                 clear();
             }
-        } else {
-            clear();
+        } finally {
+            committing = false;
         }
     }
 
@@ -382,8 +397,7 @@ public class SearchField<T> extends Control {
      */
     public void select(T item) {
         setSelectedItem(item);
-        editor.setText(getConverter().toString(item));
-        editor.positionCaret(editor.getText().length());
+        commit();
     }
 
     private class SearchService extends Service<Collection<T>> {

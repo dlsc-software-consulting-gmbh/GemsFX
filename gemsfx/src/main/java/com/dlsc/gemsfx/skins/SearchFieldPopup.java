@@ -28,7 +28,7 @@ public class SearchFieldPopup<T> extends PopupControl {
     public SearchFieldPopup(SearchField searchField) {
         this.searchField = Objects.requireNonNull(searchField);
 
-        prefWidthProperty().bind(searchField.widthProperty());
+        minWidthProperty().bind(searchField.widthProperty());
         setAutoFix(true);
         setAutoHide(true);
         setHideOnEscape(true);
@@ -37,10 +37,11 @@ public class SearchFieldPopup<T> extends PopupControl {
         searchField.addEventHandler(SearchField.SearchEvent.SEARCH_FINISHED, evt -> {
             if ((!searchField.getSuggestions().isEmpty() || searchField.getPlaceholder() != null) && StringUtils.isNotBlank(searchField.getEditor().getText())) {
 
-                // assuming that we don't have to show ti
+                // assuming that we don't have to show it
                 boolean showIt = false;
                 if (searchField.getSuggestions().size() == 1) {
                     if (!searchField.isHidePopupWithSingleChoice()) {
+
                         // code said "show it" even with only a single suggestion
                         // but let's see if the suggestion is identical to the typed text, then we really do not want to show it
                         if (!searchField.getConverter().toString(searchField.getSuggestions().get(0)).equalsIgnoreCase(searchField.getText())) {
