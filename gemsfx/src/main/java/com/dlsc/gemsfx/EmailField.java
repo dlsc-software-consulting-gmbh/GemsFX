@@ -27,6 +27,8 @@ public class EmailField extends Control {
     public EmailField() {
         getStyleClass().add("email-field");
 
+        setFocusTraversable(false);
+
         valid.bind(Bindings.createBooleanBinding(() -> {
             if (isRequired()) {
                 return emailValidator.isValid(getEmailAddress());

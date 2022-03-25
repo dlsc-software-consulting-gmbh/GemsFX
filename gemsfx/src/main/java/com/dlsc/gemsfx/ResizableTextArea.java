@@ -21,6 +21,7 @@ public class ResizableTextArea extends Control {
 
     public ResizableTextArea() {
         getStyleClass().add("resizable-text-area");
+        setFocusTraversable(false);
         getStylesheets().add(getUserAgentStylesheet());
         editor.textProperty().bindBidirectional(textProperty());
     }
