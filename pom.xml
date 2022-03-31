@@ -48,6 +48,7 @@
         <project.github.repository>dlsc-software-consulting-gmbh/GemsFX</project.github.repository>
         <local.repository.path>/tmp/repository</local.repository.path>
         <java.version>11</java.version>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
         <javafx.version>18-ea+12</javafx.version>
         <ikonli.version>12.3.0</ikonli.version>
         <sonar.projectKey>dlsc-software-consulting-gmbh_GemsFX</sonar.projectKey>
@@ -157,12 +158,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <release>11</release>
-                    <source>11</source>
-                    <target>11</target>
-                </configuration>
+                <version>3.10.1</version>
             </plugin>
 
             <plugin>
