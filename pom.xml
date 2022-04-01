@@ -13,7 +13,7 @@
     <parent>
         <groupId>com.dlsc</groupId>
         <artifactId>dlsc-maven-parent</artifactId>
-        <version>1.0.0</version>
+        <version>1.2.0</version>
     </parent>
 
     <modules>
@@ -48,8 +48,7 @@
         <project.github.repository>dlsc-software-consulting-gmbh/GemsFX</project.github.repository>
         <local.repository.path>/tmp/repository</local.repository.path>
         <java.version>11</java.version>
-        <maven.compiler.release>${java.version}</maven.compiler.release>
-        <javafx.version>18-ea+12</javafx.version>
+        <javafx.version>18</javafx.version>
         <ikonli.version>12.3.0</ikonli.version>
         <sonar.projectKey>dlsc-software-consulting-gmbh_GemsFX</sonar.projectKey>
         <sonar.organization>dlsc-software-consulting-gmbh</sonar.organization>
@@ -153,12 +152,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
             </plugin>
 
             <plugin>
