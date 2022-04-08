@@ -6,12 +6,12 @@
 
     <name>GemsFXDemo</name>
 
-    <version>1.45.0</version>
+    <version>1.45.1</version>
 
     <parent>
         <groupId>com.dlsc.gemsfx</groupId>
         <artifactId>parent</artifactId>
-        <version>1.45.0</version>
+        <version>1.45.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -137,7 +137,7 @@
         <dependency>
             <groupId>com.dlsc.gemsfx</groupId>
             <artifactId>gemsfx</artifactId>
-            <version>1.45.0</version>
+            <version>1.45.1</version>
         </dependency>
 
         <dependency>
