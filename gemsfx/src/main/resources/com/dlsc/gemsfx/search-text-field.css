@@ -1,6 +1,5 @@
 .search-text-field {
-    -fx-min-width: 400px;
-    -fx-max-width: 400px;
+    -fx-pref-width: 250px;
     -fx-background-radius: 0px;
     -fx-background-insets: 0px;
     -fx-background-insets: 0px, 1px;
