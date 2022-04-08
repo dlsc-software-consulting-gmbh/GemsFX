@@ -21,11 +21,11 @@ import java.util.Objects;
 public class SearchFieldPopup<T> extends PopupControl {
 
     private final ObservableList<T> suggestions = FXCollections.observableArrayList();
-    private final SearchField searchField;
+    private final SearchField<T> searchField;
 
     public static final String DEFAULT_STYLE_CLASS = "search-field-popup";
 
-    public SearchFieldPopup(SearchField searchField) {
+    public SearchFieldPopup(SearchField<T> searchField) {
         this.searchField = Objects.requireNonNull(searchField);
 
         minWidthProperty().bind(searchField.widthProperty());
@@ -40,7 +40,7 @@ public class SearchFieldPopup<T> extends PopupControl {
                 // assuming that we don't have to show it
                 boolean showIt = false;
                 if (searchField.getSuggestions().size() == 1) {
-                    if (!searchField.isHidePopupWithSingleChoice()) {
+                    if (!searchField.isHidePopupWithSingleChoice() || !searchField.getMatcher().apply(searchField.getSuggestions().get(0), evt.getText())) {
 
                         // code said "show it" even with only a single suggestion
                         // but let's see if the suggestion is identical to the typed text, then we really do not want to show it
