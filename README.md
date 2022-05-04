@@ -1,8 +1,18 @@
 # GemsFX
 
-*At least **JDK 11** is required.*
+*Requires **JDK 11** or higher.*
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
+
+## Stage Manager
+
+The `StageManager` class is a utility class that keeps track of a stage's location and dimensions. These values
+will be stored and used across user sessions via the `java.util.prefs` API.
+
+## Session Manager
+
+The `SessionManager` class is a utility class that can be used to monitor observables and persist them across user
+sessions. This can be useful, for example, for storing and restoring the position of the divider of a SplitPane.
 
 ## Search Text Field
 
