@@ -1,0 +1,28 @@
+.screens-view {
+
+}
+
+.screens-view .screen {
+    -fx-background-color: black, white;
+    -fx-background-insets: 0px, 1px;
+    -fx-background-radius: 3px;
+}
+
+.screens-view .screen .label {
+    -fx-font-size: 128;
+}
+
+.screens-view .screen.visual-bounds {
+    -fx-background-color: black, lightblue;
+    -fx-background-radius: 4px, 3px;
+    -fx-background-insets: 0px, 1px;
+}
+
+.screens-view .window {
+    -fx-background-color: rgba(255, 255, 255, .7);
+    -fx-border-color: lightgrey;
+}
+
+.screens-view .window .label {
+    -fx-font-size: 48;
+}

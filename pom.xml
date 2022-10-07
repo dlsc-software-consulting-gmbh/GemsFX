@@ -48,7 +48,7 @@
         <project.github.repository>dlsc-software-consulting-gmbh/GemsFX</project.github.repository>
         <local.repository.path>/tmp/repository</local.repository.path>
         <java.version>11</java.version>
-        <javafx.version>18</javafx.version>
+        <javafx.version>19</javafx.version>
         <ikonli.version>12.3.1</ikonli.version>
         <sonar.projectKey>dlsc-software-consulting-gmbh_GemsFX</sonar.projectKey>
         <sonar.organization>dlsc-software-consulting-gmbh</sonar.organization>
@@ -143,7 +143,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -157,7 +157,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.2</version>
                 <configuration>
                     <failOnError>false</failOnError>
                     <force>true</force>
