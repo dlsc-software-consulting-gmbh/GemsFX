@@ -106,10 +106,11 @@ public class StageManager {
 
         if (x == -1 && y == -1) {
             stage.centerOnScreen();
+        } else {
+            stage.setX(x);
+            stage.setY(y);
         }
 
-        stage.setX(x);
-        stage.setY(y);
         stage.setWidth(Math.max(minWidth, w));
         stage.setHeight(Math.max(minHeight, h));
 
