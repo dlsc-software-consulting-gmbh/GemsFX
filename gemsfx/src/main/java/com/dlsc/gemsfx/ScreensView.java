@@ -7,19 +7,34 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
 import javafx.scene.shape.Shape;
 import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
+/**
+ * A view for displaying the geometry of the currently available screens. This
+ * view displays each screen in its correct size. Big screens will be big, small
+ * ones will be smaller. In addition, the view can also display the currently
+ * showing windows of the application. For debugging purposes the view is also
+ * capable of showing arbitrary shapes inside the within the unified bounds of
+ * all screens.
+ */
 public class ScreensView extends Control {
 
+    private final static Image DEFAULT_WALLPAPER = new Image(ScreensView.class.getResource("wallpaper.jpg").toExternalForm(), false);
+
+    /**
+     * Constructs a new view.
+     */
     public ScreensView() {
         getStyleClass().add("screens-view");
-        Image wallpaper = new Image(ScreensView.class.getResource("wallpaper.jpg").toExternalForm(), false);
-        setWallpaperProvider(screen -> wallpaper);
+        setWallpaperProvider(screen -> DEFAULT_WALLPAPER);
     }
 
     @Override
@@ -30,6 +45,22 @@ public class ScreensView extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return ScreensView.class.getResource("screens-view.css").toExternalForm();
+    }
+
+    /**
+     * Utility method to quickly bring up an instance of this view.
+     *
+     * @return the view that was created by the methhod call (can be used for further configuration)
+     */
+    public static ScreensView show() {
+        ScreensView view = new ScreensView();
+        Stage stage = new Stage(StageStyle.UTILITY);
+        stage.setScene(new Scene(view));
+        stage.setX(10);
+        stage.setY(20);
+        stage.setTitle("Screens");
+        stage.show();
+        return view;
     }
 
     private final ObservableList<Shape> shapes = FXCollections.observableArrayList();
@@ -43,12 +74,38 @@ public class ScreensView extends Control {
         return shapes;
     }
 
+    private final BooleanProperty showReflection = new SimpleBooleanProperty(this, "showReflection", true);
+
+    public final boolean isShowReflection() {
+        return showReflection.get();
+    }
+
+    /**
+     * Determines if a reflection effect will be applied to the miniature screens.
+     *
+     * @return true if a reflection effect shall be shown
+     */
+    public final BooleanProperty showReflectionProperty() {
+        return showReflection;
+    }
+
+    public final void setShowReflection(boolean showReflection) {
+        this.showReflection.set(showReflection);
+    }
+
     private final BooleanProperty showWallpaper = new SimpleBooleanProperty(this, "showWallpaper", true);
 
     public final boolean isShowWallpaper() {
         return showWallpaper.get();
     }
 
+    /**
+     * Determines if the miniature screens should show a wallpaper or not. The wallpapers
+     * are controlled via the {@link #wallpaperProviderProperty()}. If no wallpapers are shown
+     * then the appearance of the miniature screens solely depends on CSS.
+     *
+     * @return true if the view should display wallpapers on the miniature screens
+     */
     public final BooleanProperty showWallpaperProperty() {
         return showWallpaper;
     }
@@ -63,6 +120,12 @@ public class ScreensView extends Control {
         return showWindows.get();
     }
 
+    /**
+     * Determines if the view should also show the currently active windows of
+     * the running application.
+     *
+     * @return true if the windows should also be showing
+     */
     public final BooleanProperty showWindowsProperty() {
         return showWindows;
     }
@@ -77,6 +140,12 @@ public class ScreensView extends Control {
         return wallpaperProvider.get();
     }
 
+    /**
+     * A callback used for looking up images that will be used as wallpapers on the miniature
+     * screens.
+     *
+     * @return a callback for determining which wallpaper to use for which screen
+     */
     public final ObjectProperty<Callback<Screen, Image>> wallpaperProviderProperty() {
         return wallpaperProvider;
     }

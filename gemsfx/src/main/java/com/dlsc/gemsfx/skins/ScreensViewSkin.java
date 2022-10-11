@@ -11,6 +11,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
@@ -25,6 +26,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -39,7 +41,21 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
 
         scalingGroup.setScaleX(0.2);
         scalingGroup.setScaleY(0.2);
+
         Group group = new Group(scalingGroup);
+        group.getStyleClass().add("container");
+        group.effectProperty().bind(Bindings.createObjectBinding(() -> {
+            if (view.isShowReflection()) {
+                Reflection reflection = new Reflection();
+                reflection.setFraction(.25);
+                reflection.setTopOffset(5);
+                reflection.setTopOpacity(.3);
+                reflection.setBottomOpacity(0);
+                return reflection;
+            } else {
+                return null;
+            }
+        }, view.showReflectionProperty()));
         getChildren().add(group);
 
         InvalidationListener updateViewListener = (Observable it) -> updateView();
@@ -118,6 +134,8 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
 
             if (visual) {
                 Label label = new Label("Screen " + Screen.getScreens().indexOf(screen));
+                label.setTextAlignment(TextAlignment.CENTER);
+                label.setWrapText(true);
                 if (Screen.getPrimary().equals(screen)) {
                     label.setText("Primary");
                 }
@@ -154,9 +172,12 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
             BooleanBinding visibleBinding = Bindings.createBooleanBinding(() -> window.isShowing(), window.showingProperty());
 
             if (window instanceof Stage) {
-                Label label = new Label();
                 Stage stage = (Stage) window;
                 visibleBinding = visibleBinding.and(stage.iconifiedProperty().not());
+
+                Label label = new Label();
+                label.setWrapText(true);
+                label.setTextAlignment(TextAlignment.CENTER);
                 label.textProperty().bind(stage.titleProperty());
                 getChildren().add(label);
             }

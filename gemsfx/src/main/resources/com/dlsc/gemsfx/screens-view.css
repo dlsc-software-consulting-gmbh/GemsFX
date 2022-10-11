@@ -1,5 +1,10 @@
 .screens-view {
+    -fx-background-color: white;
+    -fx-pref-width: 600;
+    -fx-pref-height: 400;
+}
 
+.screens-view .container {
 }
 
 .screens-view .screen {
@@ -25,7 +30,9 @@
 
 .screens-view .window {
     -fx-background-color: rgba(255, 255, 255, .7);
-    -fx-border-color: lightgrey;
+    -fx-border-width: 5px;
+    -fx-border-color: black;
+    -fx-border-style: dashed;
 }
 
 .screens-view .window .label {
