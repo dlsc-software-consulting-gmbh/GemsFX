@@ -10,6 +10,7 @@
 
 .screens-view .screen .label {
     -fx-font-size: 128;
+    -fx-opacity: .8;
 }
 
 .screens-view .screen.visual-bounds {
@@ -18,11 +19,15 @@
     -fx-background-insets: 0px, 1px;
 }
 
+.screens-view .screen.visual-bounds.wallpaper {
+    -fx-opacity: .8;
+}
+
 .screens-view .window {
     -fx-background-color: rgba(255, 255, 255, .7);
     -fx-border-color: lightgrey;
 }
 
 .screens-view .window .label {
-    -fx-font-size: 48;
+    -fx-font-size: 64;
 }

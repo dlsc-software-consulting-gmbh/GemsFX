@@ -20,10 +20,13 @@ public class ScreensViewApp extends Application {
     public void start(Stage stage) {
         ScreensView screensView = new ScreensView();
 
+        CheckBox showWallpaper = new CheckBox("Show Wallpaper");
+        showWallpaper.selectedProperty().bindBidirectional(screensView.showWallpaperProperty());
+
         CheckBox showWindows = new CheckBox("Show Windows");
         showWindows.selectedProperty().bindBidirectional(screensView.showWindowsProperty());
 
-        HBox controls = new HBox(showWindows);
+        HBox controls = new HBox(10, showWindows, showWallpaper);
         controls.setStyle("-fx-background-color: white");
         controls.setPadding(new Insets(10, 10, 10, 10));
         controls.setAlignment(Pos.CENTER_RIGHT);

@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.ScreensView;
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -10,11 +11,24 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Shape;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Callback;
 
 public class ScreensViewSkin extends SkinBase<ScreensView> {
 
@@ -28,10 +42,14 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
         Group group = new Group(scalingGroup);
         getChildren().add(group);
 
-        Screen.getScreens().addListener((Observable it) -> updateView());
-        Window.getWindows().addListener((Observable it) -> updateView());
+        InvalidationListener updateViewListener = (Observable it) -> updateView();
 
-        view.showWindowsProperty().addListener(it -> updateView());
+        view.showWallpaperProperty().addListener(updateViewListener);
+        view.showWindowsProperty().addListener(updateViewListener);
+        view.getShapes().addListener(updateViewListener);
+
+        Screen.getScreens().addListener(updateViewListener);
+        Window.getWindows().addListener(updateViewListener);
 
         updateView();
     }
@@ -58,6 +76,15 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
         }
 
         ScreensView view = getSkinnable();
+
+        for (Shape shape : view.getShapes()) {
+            scalingGroup.getChildren().add(shape);
+
+            minX = Math.min(minX, shape.getLayoutX());
+            minY = Math.min(minY, shape.getLayoutY());
+            maxX = Math.max(maxX, shape.getLayoutX() + shape.prefWidth(-1));
+            maxY = Math.max(maxY, shape.getLayoutY() + shape.prefHeight(-1));
+        }
 
         if (view.isShowWindows()) {
             for (Window window : Window.getWindows()) {
@@ -95,6 +122,21 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
                     label.setText("Primary");
                 }
                 getChildren().add(label);
+            }
+
+            ScreensView view = getSkinnable();
+
+            if (visual && view.isShowWallpaper()) {
+                getStyleClass().add("wallpaper");
+
+                Callback<Screen, Image> wallpaperProvider = view.getWallpaperProvider();
+                if (wallpaperProvider != null) {
+                    Image image = wallpaperProvider.call(screen);
+                    if (image != null) {
+                        setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.DEFAULT_WIDTHS)));
+                        setBackground(new Background(new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, false, true))));
+                    }
+                }
             }
         }
     }
