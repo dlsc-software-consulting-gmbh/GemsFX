@@ -10,6 +10,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
 import javafx.scene.shape.Shape;
 import javafx.stage.Screen;
@@ -35,6 +38,18 @@ public class ScreensView extends Control {
     public ScreensView() {
         getStyleClass().add("screens-view");
         setWallpaperProvider(screen -> DEFAULT_WALLPAPER);
+
+        DropShadow shadow = new DropShadow();
+        shadow.setBlurType(BlurType.THREE_PASS_BOX);
+        shadow.setRadius(2);
+        setShadow(shadow);
+
+        Reflection reflection = new Reflection();
+        reflection.setFraction(.25);
+        reflection.setTopOffset(5);
+        reflection.setTopOpacity(.3);
+        reflection.setBottomOpacity(0);
+        setReflection(reflection);
     }
 
     @Override
@@ -63,6 +78,46 @@ public class ScreensView extends Control {
         return view;
     }
 
+    private final ObjectProperty<DropShadow> shadow = new SimpleObjectProperty<>(this, "shadow");
+
+    public final DropShadow getShadow() {
+        return shadow.get();
+    }
+
+    /**
+     * Stores the instance of the {@link DropShadow} effect that will be applied
+     * to the screens in this view.
+     *
+     * @return the drop shadow effect
+     */
+    public final ObjectProperty<DropShadow> shadowProperty() {
+        return shadow;
+    }
+
+    public final void setShadow(DropShadow shadow) {
+        this.shadow.set(shadow);
+    }
+
+    private final ObjectProperty<Reflection> reflection = new SimpleObjectProperty<>(this, "reflection");
+
+    public final Reflection getReflection() {
+        return reflection.get();
+    }
+
+    /**
+     * Stores the instance of the {@link Reflection} effect that will be applied
+     * to the screens in this view.
+     *
+     * @return the reflection effect
+     */
+    public final ObjectProperty<Reflection> reflectionProperty() {
+        return reflection;
+    }
+
+    public final void setReflection(Reflection reflection) {
+        this.reflection.set(reflection);
+    }
+
     private final ObservableList<Shape> shapes = FXCollections.observableArrayList();
 
     /**
@@ -72,6 +127,25 @@ public class ScreensView extends Control {
      */
     public final ObservableList<Shape> getShapes() {
         return shapes;
+    }
+
+    private final BooleanProperty showShadow = new SimpleBooleanProperty(this, "showShadow", true);
+
+    public final boolean isShowShadow() {
+        return showShadow.get();
+    }
+
+    /**
+     * Determines if a shadow effect will be applied to the miniature screens.
+     *
+     * @return true if a shadow effect shall be shown
+     */
+    public final BooleanProperty showShadowProperty() {
+        return showShadow;
+    }
+
+    public final void setShowShadow(boolean showShadow) {
+        this.showShadow.set(showShadow);
     }
 
     private final BooleanProperty showReflection = new SimpleBooleanProperty(this, "showReflection", true);

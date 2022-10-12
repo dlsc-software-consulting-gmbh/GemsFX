@@ -1,5 +1,5 @@
 .screens-view {
-    -fx-background-color: white;
+    -fx-background-color: lightgrey;
     -fx-pref-width: 600;
     -fx-pref-height: 400;
 }
@@ -8,9 +8,11 @@
 }
 
 .screens-view .screen {
-    -fx-background-color: black, white;
-    -fx-background-insets: 0px, 1px;
-    -fx-background-radius: 3px;
+    -fx-background-color: transparent;
+}
+
+.screens-view .screen.no-wallpaper {
+    -fx-background-color: lightblue;
 }
 
 .screens-view .screen .label {
@@ -18,14 +20,13 @@
     -fx-opacity: .8;
 }
 
-.screens-view .screen.visual-bounds {
-    -fx-background-color: black, lightblue;
-    -fx-background-radius: 4px, 3px;
-    -fx-background-insets: 0px, 1px;
+.screens-view .glass {
+    -fx-background-color: radial-gradient(radius 75%, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
 }
 
-.screens-view .screen.visual-bounds.wallpaper {
-    -fx-opacity: .8;
+.screens-view .visible-area {
+    -fx-background-color: white;
+    -fx-opacity: .75;
 }
 
 .screens-view .window {

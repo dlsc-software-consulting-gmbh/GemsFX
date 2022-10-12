@@ -1,8 +1,11 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ScreensView;
-import fr.brouillard.oss.cssfx.CSSFX;
+import com.dlsc.gemsfx.util.SessionManager;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -14,22 +17,38 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.prefs.Preferences;
+
 public class ScreensViewApp extends Application {
 
     @Override
     public void start(Stage stage) {
         ScreensView screensView = new ScreensView();
 
-        CheckBox showReflection = new CheckBox("Show Reflection");
-        showReflection.selectedProperty().bindBidirectional(screensView.showReflectionProperty());
+        SessionManager sessionManager = new SessionManager(Preferences.userNodeForPackage(ScreensViewApp.class));
+        sessionManager.register("screens.view.app.reflection", this.showReflection);
+        sessionManager.register("screens.view.app.shadow", this.showShadow);
+        sessionManager.register("screens.view.app.wallpaper", this.showWallpaper);
+        sessionManager.register("screens.view.app.windows", this.showWindows);
 
-        CheckBox showWallpaper = new CheckBox("Show Wallpaper");
-        showWallpaper.selectedProperty().bindBidirectional(screensView.showWallpaperProperty());
+        screensView.showReflectionProperty().bindBidirectional(this.showReflection);
+        screensView.showShadowProperty().bindBidirectional(this.showShadow);
+        screensView.showWallpaperProperty().bindBidirectional(this.showWallpaper);
+        screensView.showWindowsProperty().bindBidirectional(this.showWindows);
 
-        CheckBox showWindows = new CheckBox("Show Windows");
-        showWindows.selectedProperty().bindBidirectional(screensView.showWindowsProperty());
+        CheckBox showReflection = new CheckBox("Reflection");
+        showReflection.selectedProperty().bindBidirectional(this.showReflection);
 
-        HBox controls = new HBox(10, showReflection, showWindows, showWallpaper);
+        CheckBox showShadow = new CheckBox("Shadow");
+        showShadow.selectedProperty().bindBidirectional(this.showShadow);
+
+        CheckBox showWallpaper = new CheckBox("Wallpaper");
+        showWallpaper.selectedProperty().bindBidirectional(this.showWallpaper);
+
+        CheckBox showWindows = new CheckBox("Windows");
+        showWindows.selectedProperty().bindBidirectional(this.showWindows);
+
+        HBox controls = new HBox(10, showShadow, showReflection, showWindows, showWallpaper);
         controls.setStyle("-fx-background-color: white");
         controls.setPadding(new Insets(10, 10, 10, 10));
         controls.setAlignment(Pos.CENTER_RIGHT);
@@ -46,18 +65,22 @@ public class ScreensViewApp extends Application {
         stage2.setScene(new Scene(new Label("Hello World")));
         stage2.setAlwaysOnTop(true);
         stage2.initOwner(stage);
+        StageManager.install(stage2, "screens.view.app.stage2");
         stage2.show();
 
-        stage.show();
-
-        CSSFX.start(scene);
         stage.setTitle("Screens View Demo");
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
         stage.centerOnScreen();
+        StageManager.install(stage, "screens.view.app.stage1");
         stage.show();
     }
+
+    private final BooleanProperty showShadow = new SimpleBooleanProperty(true);
+    private final BooleanProperty showReflection = new SimpleBooleanProperty(true);
+    private final BooleanProperty showWindows = new SimpleBooleanProperty(true);
+    private final BooleanProperty showWallpaper = new SimpleBooleanProperty(true);
 
     public static void main(String[] args) {
         launch();

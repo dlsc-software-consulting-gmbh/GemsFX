@@ -11,6 +11,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
@@ -25,6 +26,7 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
@@ -45,17 +47,21 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
         Group group = new Group(scalingGroup);
         group.getStyleClass().add("container");
         group.effectProperty().bind(Bindings.createObjectBinding(() -> {
-            if (view.isShowReflection()) {
-                Reflection reflection = new Reflection();
-                reflection.setFraction(.25);
-                reflection.setTopOffset(5);
-                reflection.setTopOpacity(.3);
-                reflection.setBottomOpacity(0);
+            DropShadow shadow = view.getShadow();
+            Reflection reflection = view.getReflection();
+
+            if (view.isShowShadow() && view.isShowReflection()) {
+                reflection.setInput(shadow);
                 return reflection;
-            } else {
-                return null;
+            } else if (view.isShowShadow()) {
+                return shadow;
+            } else if (view.isShowReflection()) {
+                reflection.setInput(null);
+                return reflection;
             }
-        }, view.showReflectionProperty()));
+
+            return null;
+        }, view.showReflectionProperty(), view.showShadowProperty()));
         getChildren().add(group);
 
         InvalidationListener updateViewListener = (Observable it) -> updateView();
@@ -81,14 +87,26 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
         double maxY = Double.MIN_VALUE;
 
         for (Screen screen : screens) {
-            scalingGroup.getChildren().add(new ScreenView(screen, false));
-            scalingGroup.getChildren().add(new ScreenView(screen, true));
+            Group group = new Group();
 
             Rectangle2D bounds = screen.getBounds();
+
+            Rectangle clip = new Rectangle(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+            clip.setArcWidth(32);
+            clip.setArcHeight(32);
+            group.setClip(clip);
+
+            group.getChildren().add(new BackgroundView(screen));
+            group.getChildren().add(new ScreenView(screen));
+            group.getChildren().add(new VisibleAreaView(screen));
+            group.getChildren().add(new GlassView(screen));
+
             minX = Math.min(minX, bounds.getMinX());
             minY = Math.min(minY, bounds.getMinY());
             maxX = Math.max(maxX, bounds.getMinX() + bounds.getWidth());
             maxY = Math.max(maxY, bounds.getMinY() + bounds.getHeight());
+
+            scalingGroup.getChildren().add(group);
         }
 
         ScreensView view = getSkinnable();
@@ -116,37 +134,14 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
         scalingGroup.scaleYProperty().bind(scale);
     }
 
-    private class ScreenView extends StackPane {
+    public class BackgroundView extends StackPane {
 
-        public ScreenView(Screen screen, boolean visual) {
-            getStyleClass().add("screen");
-
-            Rectangle2D bounds = screen.getBounds();
-            if (visual) {
-                getStyleClass().add("visual-bounds");
-                bounds = screen.getVisualBounds();
-            }
-
-            setLayoutX(bounds.getMinX());
-            setLayoutY(bounds.getMinY());
-            setPrefWidth(bounds.getWidth());
-            setPrefHeight(bounds.getHeight());
-
-            if (visual) {
-                Label label = new Label("Screen " + Screen.getScreens().indexOf(screen));
-                label.setTextAlignment(TextAlignment.CENTER);
-                label.setWrapText(true);
-                if (Screen.getPrimary().equals(screen)) {
-                    label.setText("Primary");
-                }
-                getChildren().add(label);
-            }
+        public BackgroundView(Screen screen) {
+            getStyleClass().add("background");
 
             ScreensView view = getSkinnable();
 
-            if (visual && view.isShowWallpaper()) {
-                getStyleClass().add("wallpaper");
-
+            if (view.isShowWallpaper()) {
                 Callback<Screen, Image> wallpaperProvider = view.getWallpaperProvider();
                 if (wallpaperProvider != null) {
                     Image image = wallpaperProvider.call(screen);
@@ -156,6 +151,74 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
                     }
                 }
             }
+
+            Rectangle2D bounds = screen.getBounds();
+            setLayoutX(bounds.getMinX());
+            setLayoutY(bounds.getMinY());
+            setPrefWidth(bounds.getWidth());
+            setPrefHeight(bounds.getHeight());
+        }
+    }
+
+    public class ScreenView extends StackPane {
+
+        public ScreenView(Screen screen) {
+            getStyleClass().add("screen");
+
+            ScreensView view = getSkinnable();
+            if (!view.isShowWallpaper()) {
+                getStyleClass().add("no-wallpaper");
+            }
+
+            Rectangle2D bounds = screen.getBounds();
+            setLayoutX(bounds.getMinX());
+            setLayoutY(bounds.getMinY());
+            setPrefWidth(bounds.getWidth());
+            setPrefHeight(bounds.getHeight());
+
+            Label label = new Label("Screen " + Screen.getScreens().indexOf(screen));
+            label.setTextAlignment(TextAlignment.CENTER);
+            label.setWrapText(true);
+            if (Screen.getPrimary().equals(screen)) {
+                label.setText("Primary");
+            }
+            getChildren().add(label);
+        }
+    }
+
+    public class VisibleAreaView extends StackPane {
+
+        public VisibleAreaView(Screen screen) {
+            getStyleClass().add("visible-area");
+
+            Rectangle2D bounds = screen.getBounds();
+            setLayoutX(bounds.getMinX());
+            setLayoutY(bounds.getMinY());
+            setPrefWidth(bounds.getWidth());
+            setPrefHeight(bounds.getHeight());
+
+            Rectangle2D visualBounds = screen.getVisualBounds();
+
+            Rectangle clipRectangle = new Rectangle(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+            clipRectangle.setArcWidth(32);
+            clipRectangle.setArcHeight(32);
+
+            Shape visibleAreaClip = clipRectangle;
+            visibleAreaClip = Shape.subtract(visibleAreaClip, new Rectangle(visualBounds.getMinX(), visualBounds.getMinY(), visualBounds.getWidth(), visualBounds.getHeight()));
+            setClip(visibleAreaClip);
+        }
+    }
+
+    public class GlassView extends StackPane {
+
+        public GlassView(Screen screen) {
+            getStyleClass().add("glass");
+
+            Rectangle2D bounds = screen.getBounds();
+            setLayoutX(bounds.getMinX());
+            setLayoutY(bounds.getMinY());
+            setPrefWidth(bounds.getWidth());
+            setPrefHeight(bounds.getHeight());
         }
     }
 

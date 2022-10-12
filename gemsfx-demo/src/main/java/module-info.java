@@ -8,6 +8,7 @@ module com.dlsc.gemsfx.demo {
     requires com.dlsc.gemsfx;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign;
+    requires java.prefs;
 
     exports com.dlsc.gemsfx.demo;
 }
