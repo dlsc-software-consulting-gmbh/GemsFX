@@ -4,6 +4,13 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 
+## ScreensView
+A small control that can be used to display the screen geometries as seen by the application. The view can also
+display the application's windows, and some arbitrary shapes (might be useful for debugging purposes).
+
+![ScreensView](gemsfx/docs/screens-view.png)
+
+
 ## Stage Manager
 
 The `StageManager` class is a utility class that keeps track of a stage's location and dimensions. These values
