@@ -26,16 +26,21 @@ public class ScreensViewApp extends Application {
         ScreensView screensView = new ScreensView();
 
         SessionManager sessionManager = new SessionManager(Preferences.userNodeForPackage(ScreensViewApp.class));
+        sessionManager.register("screens.view.app.window.dragging", this.enableWindowDragging);
         sessionManager.register("screens.view.app.reflection", this.showReflection);
         sessionManager.register("screens.view.app.shadow", this.showShadow);
         sessionManager.register("screens.view.app.wallpaper", this.showWallpaper);
         sessionManager.register("screens.view.app.windows", this.showWindows);
 
+        screensView.enableWindowDraggingProperty().bindBidirectional(this.enableWindowDragging);
         screensView.showReflectionProperty().bindBidirectional(this.showReflection);
         screensView.showShadowProperty().bindBidirectional(this.showShadow);
         screensView.showWallpaperProperty().bindBidirectional(this.showWallpaper);
         screensView.showWindowsProperty().bindBidirectional(this.showWindows);
 
+        CheckBox enableWindowDragging = new CheckBox("Draggable Windows");
+        enableWindowDragging.selectedProperty().bindBidirectional(this.enableWindowDragging);
+        enableWindowDragging.disableProperty().bind(this.showWindows.not());
         CheckBox showReflection = new CheckBox("Reflection");
         showReflection.selectedProperty().bindBidirectional(this.showReflection);
 
@@ -48,7 +53,7 @@ public class ScreensViewApp extends Application {
         CheckBox showWindows = new CheckBox("Windows");
         showWindows.selectedProperty().bindBidirectional(this.showWindows);
 
-        HBox controls = new HBox(10, showShadow, showReflection, showWindows, showWallpaper);
+        HBox controls = new HBox(10, enableWindowDragging, showShadow, showReflection, showWindows, showWallpaper);
         controls.setStyle("-fx-background-color: white");
         controls.setPadding(new Insets(10, 10, 10, 10));
         controls.setAlignment(Pos.CENTER_RIGHT);
@@ -77,6 +82,7 @@ public class ScreensViewApp extends Application {
         stage.show();
     }
 
+    private final BooleanProperty enableWindowDragging = new SimpleBooleanProperty(true);
     private final BooleanProperty showShadow = new SimpleBooleanProperty(true);
     private final BooleanProperty showReflection = new SimpleBooleanProperty(true);
     private final BooleanProperty showWindows = new SimpleBooleanProperty(true);

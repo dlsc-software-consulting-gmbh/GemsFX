@@ -20,6 +20,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
+import java.util.Objects;
+
 /**
  * A view for displaying the geometry of the currently available screens. This
  * view displays each screen in its correct size. Big screens will be big, small
@@ -30,7 +32,11 @@ import javafx.util.Callback;
  */
 public class ScreensView extends Control {
 
-    private final static Image DEFAULT_WALLPAPER = new Image(ScreensView.class.getResource("wallpaper.jpg").toExternalForm(), false);
+    private static final Image DEFAULT_WALLPAPER;
+
+    static {
+        DEFAULT_WALLPAPER = new Image(Objects.requireNonNull(ScreensView.class.getResource("wallpaper.jpg")).toExternalForm(), false);
+    }
 
     /**
      * Constructs a new view.
@@ -59,13 +65,13 @@ public class ScreensView extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return ScreensView.class.getResource("screens-view.css").toExternalForm();
+        return Objects.requireNonNull(ScreensView.class.getResource("screens-view.css")).toExternalForm();
     }
 
     /**
      * Utility method to quickly bring up an instance of this view.
      *
-     * @return the view that was created by the methhod call (can be used for further configuration)
+     * @return the view that was created by the method call (can be used for further configuration)
      */
     public static ScreensView show() {
         ScreensView view = new ScreensView();
@@ -208,7 +214,7 @@ public class ScreensView extends Control {
         this.showWindows.set(showWindows);
     }
 
-    private final ObjectProperty<Callback<Screen, Image>> wallpaperProvider = new SimpleObjectProperty(this, "wallpaperProvider");
+    private final ObjectProperty<Callback<Screen, Image>> wallpaperProvider = new SimpleObjectProperty<>(this, "wallpaperProvider");
 
     public final Callback<Screen, Image> getWallpaperProvider() {
         return wallpaperProvider.get();
@@ -226,5 +232,25 @@ public class ScreensView extends Control {
 
     public final void setWallpaperProvider(Callback<Screen, Image> wallpaperProvider) {
         this.wallpaperProvider.set(wallpaperProvider);
+    }
+
+    private final BooleanProperty enableWindowDragging = new SimpleBooleanProperty(this, "enableWindowDragging", true);
+
+    public final boolean isEnableWindowDragging() {
+        return enableWindowDragging.get();
+    }
+
+    /**
+     * A flag used to control whether the user will be able to drag the miniature windows on
+     * the miniature screens around or not.
+     *
+     * @return true if the user can modify the window positions
+     */
+    public final BooleanProperty enableWindowDraggingProperty() {
+        return enableWindowDragging;
+    }
+
+    public final void setEnableWindowDragging(boolean enableWindowDragging) {
+        this.enableWindowDragging.set(enableWindowDragging);
     }
 }

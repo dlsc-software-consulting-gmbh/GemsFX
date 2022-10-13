@@ -183,7 +183,7 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
         }
     }
 
-    public class VisibleAreaView extends StackPane {
+    static class VisibleAreaView extends StackPane {
 
         public VisibleAreaView(Screen screen) {
             getStyleClass().add("visible-area");
@@ -206,7 +206,7 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
         }
     }
 
-    public class GlassView extends StackPane {
+    static class GlassView extends StackPane {
 
         public GlassView(Screen screen) {
             getStyleClass().add("glass");
@@ -219,7 +219,10 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
         }
     }
 
-    private class WindowView extends StackPane {
+    class WindowView extends StackPane {
+
+        private double startX;
+        private double startY;
 
         public WindowView(Window window) {
             getStyleClass().add("window");
@@ -229,7 +232,7 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
             prefWidthProperty().bind(window.widthProperty());
             prefHeightProperty().bind(window.heightProperty());
 
-            BooleanBinding visibleBinding = Bindings.createBooleanBinding(() -> window.isShowing(), window.showingProperty());
+            BooleanBinding visibleBinding = Bindings.createBooleanBinding(window::isShowing, window.showingProperty());
 
             if (window instanceof Stage) {
                 Stage stage = (Stage) window;
@@ -247,6 +250,21 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
             setOnMouseClicked(evt -> {
                 if (evt.isStillSincePress() && evt.getButton().equals(MouseButton.PRIMARY)) {
                     toFront();
+                }
+            });
+
+            setOnMousePressed(evt -> {
+                startX = evt.getScreenX();
+                startY = evt.getScreenY();
+            });
+
+            setOnMouseDragged(evt -> {
+                if (getSkinnable().isEnableWindowDragging()) {
+                    window.setX(window.getX() + ((evt.getScreenX() - startX) * (1 / scalingGroup.getScaleX())));
+                    window.setY(window.getY() + ((evt.getScreenY() - startY) * (1 / scalingGroup.getScaleY())));
+
+                    startX = evt.getScreenX();
+                    startY = evt.getScreenY();
                 }
             });
         }
