@@ -41,9 +41,6 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
     public ScreensViewSkin(ScreensView view) {
         super(view);
 
-        scalingGroup.setScaleX(0.2);
-        scalingGroup.setScaleY(0.2);
-
         Group group = new Group(scalingGroup);
         group.getStyleClass().add("container");
         group.effectProperty().bind(Bindings.createObjectBinding(() -> {
