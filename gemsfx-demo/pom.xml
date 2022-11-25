@@ -76,7 +76,7 @@
             <plugin>
                 <groupId>com.sandec.jpro</groupId>
                 <artifactId>jpro-maven-plugin</artifactId>
-                <version>2021.2.2</version>
+                <version>2022.1.8</version>
                 <configuration>
                     <visible>false</visible>
                     <mainClassName>
@@ -119,7 +119,7 @@
         <dependency>
             <groupId>com.sandec.jpro</groupId>
             <artifactId>jpro-webapi</artifactId>
-            <version>2021.2.2</version>
+            <version>2022.1.8</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.openjfx</groupId>

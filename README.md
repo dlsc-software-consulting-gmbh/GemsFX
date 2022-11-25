@@ -6,7 +6,7 @@
 
 ## InfoCenterPane
 
-A view for displaying (groups of) notifications. Incoming / new notifications slide-in via an animation. Each group can have its own factory for the creation of notification views. A group with multiple notifications can be shown stacked or expanded. A threshold can be defined to determine the maximum number of notifications that  can be shown. If the notifcation count is higher than the user can switch to a list view showing them all.
+A view for displaying (groups of) notifications. Incoming / new notifications slide-in via an animation. Each group can have its own factory for the creation of notification views. A group with multiple notifications can be shown stacked or expanded. A threshold can be defined to determine the maximum number of notifications that  can be shown. If the notifcation count is higher than the user can switch to a list view showing them all. Groups can be pinned so that they always stay in the top position without being scrolled out of view.
 
 ![InfoCenterPane](gemsfx/docs/info-center-pane.png)
 
