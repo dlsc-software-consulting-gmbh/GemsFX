@@ -6,12 +6,12 @@
 
     <name>GemsFXDemo</name>
 
-    <version>1.49.0</version>
+    <version>1.50.0</version>
 
     <parent>
         <groupId>com.dlsc.gemsfx</groupId>
         <artifactId>parent</artifactId>
-        <version>1.49.0</version>
+        <version>1.50.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -30,7 +30,7 @@
     </scm>
 
     <properties>
-        <main.class>com.dlsc.gemsfx.demo.TimePickerApp</main.class>
+        <main.class>com.dlsc.gemsfx.demo.InfoCenterApp</main.class>
     </properties>
 
     <repositories>
@@ -80,7 +80,7 @@
                 <configuration>
                     <visible>false</visible>
                     <mainClassName>
-                        com.dlsc.gemsfx.demo.PhotoViewApp
+                        com.dlsc.gemsfx.demo.InfoCenterApp
                     </mainClassName>
                     <openingPath>/</openingPath>
                 </configuration>
@@ -137,7 +137,7 @@
         <dependency>
             <groupId>com.dlsc.gemsfx</groupId>
             <artifactId>gemsfx</artifactId>
-            <version>1.49.0</version>
+            <version>1.50.0</version>
         </dependency>
 
         <dependency>

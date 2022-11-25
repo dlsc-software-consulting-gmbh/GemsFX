@@ -1,0 +1,344 @@
+.info-center-view {
+    -fx-font-family: Arial;
+    -fx-pref-width: 450px;
+    -fx-min-width: 450px;
+    -fx-translate-x: -10;
+    -fx-translate-y: 10;
+}
+
+.info-center-view .default-icon {
+    -fx-icon-size: 42px;
+    -fx-icon-color: -fx-accent;
+    -fx-icon-code: gmi-info;
+}
+
+.info-center-view.transparent .pinned-separator {
+    -fx-background-color: rgba(255, 255, 255, .3);
+    -fx-background-insets: 0px 100px;
+    -fx-pref-height: 1px;
+}
+
+.info-center-view .scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-width: 0px;
+}
+
+.info-center-view .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.info-center-view .all-groups-container {
+    -fx-spacing: 10px;
+}
+
+.info-center-view.transparent .all-groups-container {
+    -fx-spacing: 0px;
+}
+
+
+.info-center-view .wrapper {
+    -fx-background-color: rgba(0, 0, 0, .3);
+    -fx-background-radius: 6px;
+    -fx-padding: 10px;
+}
+
+.info-center-view.transparent .wrapper {
+    -fx-background-color: transparent;
+    -fx-padding: 0px;
+}
+
+.info-center-view .all-groups-container .container {
+    -fx-spacing: 10px;
+    -fx-padding: 15px;
+}
+
+.info-center-view .all-groups-container .container.pinned {
+    -fx-padding: 20px 25px; /* needs more padding, because its content is not inside a scrollpane */
+}
+
+.info-center-view.transparent .all-groups-container .container.pinned {
+    -fx-padding: 20px 15px;
+}
+
+.info-center-view .all-groups-container .container .group-view {
+    -fx-spacing: 0px;
+}
+
+.info-center-view .all-groups-container .container .group-separator {
+    -fx-pref-height: 20px;
+}
+
+.info-center-view .all-groups-container .container .group-view > .header {
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+.info-center-view .all-groups-container .container .group-view > .header > .group-name-label {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
+}
+
+.info-center-view .all-groups-container .container .group-view > .header > .show-less-button,
+.info-center-view .all-groups-container .container .group-view > .header > .show-all-button {
+    -fx-font-weight: bold;
+    -fx-font-size: .9em;
+    -fx-pref-height: 2em;
+    -fx-padding: 0px 10px;
+    -fx-background-color: lightgrey;
+    -fx-text-fill: rgba(0, 0, 0, .6);
+    -fx-background-radius: 1000px;
+}
+
+.info-center-view .all-groups-container .container .group-view > .header > .show-less-button:pressed,
+.info-center-view .all-groups-container .container .group-view > .header > .show-all-button:pressed {
+    -fx-background-color: derive(lightgrey, -10%);
+}
+
+.info-center-view .all-groups-container .container .group-view > .header > .pin-button,
+.info-center-view .all-groups-container .container .group-view > .header > .clear-button {
+    -fx-font-size: .9em;
+    -size: 2em;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-padding: 0px;
+    -fx-background-color: lightgrey;
+    -fx-background-radius: 1000px;
+}
+
+.info-center-view .all-groups-container .container .group-view > .header > .clear-button .ikonli-font-icon {
+    -fx-icon-color: rgba(0, 0, 0, .6);
+    -fx-font-size: 16px;
+    -fx-icon-code: gmi-close;
+}
+
+.info-center-view .all-groups-container .container .group-view > .header > .pin-button .ikonli-font-icon {
+    -fx-icon-color: rgba(0, 0, 0, .6);
+    -fx-font-size: 14px;
+    -fx-icon-code: bi-pin-angle;
+}
+
+.info-center-view .all-groups-container .container .group-view > .header > .pin-button:selected .ikonli-font-icon {
+    -fx-icon-code: bi-pin-fill;
+}
+
+.info-center-view .single-group-wrapper {
+    -fx-spacing: 10px;
+}
+
+.info-center-view .single-group-wrapper > .single-group-header {
+    -fx-spacing: 10px;
+    -fx-padding: 0px 5px 0px 10px;
+    -fx-alignment: center-left;
+}
+
+.info-center-view .single-group-wrapper > .single-group-header > .group-name-label {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
+}
+
+.info-center-view .single-group-wrapper > .single-group-header > .close-show-all-button {
+    -fx-font-weight: bold;
+    -fx-font-size: .9em;
+    -fx-pref-height: 2em;
+    -fx-padding: 0px 10px;
+    -fx-background-color: lightgrey;
+    -fx-text-fill: rgba(0, 0, 0, .6);
+    -fx-background-radius: 1000px;
+}
+
+.info-center-view .single-group-wrapper > .single-group-header > .clear-all-button {
+    -fx-font-size: .9em;
+    -size: 2em;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-padding: 0px;
+    -fx-background-color: lightgrey;
+    -fx-background-radius: 1000px;
+}
+
+.info-center-view .single-group-wrapper > .single-group-header > .clear-all-button .ikonli-font-icon {
+    -fx-icon-color: rgba(0, 0, 0, .6);
+    -fx-font-size: 16px;
+    -fx-icon-code: gmi-close;
+}
+
+.info-center-view .single-group-wrapper .list-view {
+    -fx-background-color: transparent;
+    -fx-padding: 0px;
+}
+
+.info-center-view .single-group-wrapper .list-view .viewport {
+    -fx-background-color: transparent;
+}
+
+.info-center-view .single-group-wrapper .list-view .notification-list-cell {
+    -fx-background-color: transparent !important;
+    -fx-padding: 5px 15px 5px 15px;
+}
+
+.info-center-view .notification-view {
+}
+
+.info-center-view .notification-view .content .arrow-pane {
+    -size: 20;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+    -fx-background-radius: 1000px;
+    -fx-background-color: lightgrey;
+}
+
+.info-center-view .notification-view .content .arrow-pane .ikonli-font-icon {
+    -fx-icon-size: 16px;
+    -fx-icon-code: gmi-chevron-right;
+    -fx-rotate: 90;
+}
+
+.info-center-view .notification-view .content > .close-icon-wrapper {
+    -size: 24px;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+
+    -fx-translate-x: -5;
+    -fx-translate-y: -5;
+
+    -fx-background-radius: 1000px;
+    -fx-background-color: rgb(240, 240, 240);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
+}
+
+.info-center-view .notification-view .content > .close-icon-wrapper:pressed {
+    -fx-background-color: derive(rgb(240, 240, 240), -10%);
+}
+
+.info-center-view .notification-view .content > .close-icon-wrapper > .ikonli-font-icon {
+    -fx-icon-code: gmi-close;
+    -fx-icon-size: 14px;
+    -fx-icon-color: -fx-text-background-color;
+}
+
+.info-center-view .notification-view .content > .close-icon-wrapper > .label {
+    visibility: false;
+}
+
+.info-center-view .notification-view .content > .close-icon-wrapper.stack:hover {
+    -fx-min-width: 0;
+    -fx-min-height: 0;
+    -fx-pref-width: -1;
+    -fx-max-width: -1;
+    -fx-padding: 2px 10px;
+    -fx-font-size: .9em;
+}
+
+.info-center-view .notification-view .content > .close-icon-wrapper.stack:hover > .label {
+    visibility: true;
+}
+
+.info-center-view .notification-view .content > .close-icon-wrapper.stack:hover > .ikonli-font-icon {
+    visibility: false;
+}
+
+.info-center-view .notification-view .content {
+    -fx-background-radius: 8px;
+    -fx-background-color: rgb(240, 240, 240);
+    -fx-padding: 10px 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
+}
+
+.info-center-view .notification-view .text-container {
+    -fx-spacing: 0px;
+    -fx-padding: 0px 0px 0px 5px;
+}
+
+.info-center-view .notification-view .text-container .title-label {
+    -fx-font-weight: bold;
+}
+
+.info-center-view .notification-view .text-container .time-label {
+    -fx-text-fill: gray;
+}
+
+.info-center-view .notification-view .text-container .description-label {
+    -fx-text-fill: gray;
+}
+
+.info-center-view .notification-view .text-container .actions-box {
+    -fx-padding: 5px 0px 0px 0px;
+    -fx-spacing: 5px;
+}
+
+.info-center-view .notification-view .text-container .actions-box .button {
+    -fx-padding: 2px 5px;
+    -fx-background-color: lightgrey;
+    -fx-background-radius: 2px;
+}
+
+.info-center-view .notification-view .stack-notification1 {
+    /*-fx-translate-y: 10px;*/
+    /*-fx-scale-x: .95;*/
+    /*-fx-scale-y: .95;*/
+}
+
+.info-center-view .notification-view .stack-notification2 {
+    /*-fx-translate-y: 20px;*/
+    /*-fx-scale-x: .9;*/
+    /*-fx-scale-y: .9;*/
+}
+
+
+/* ----------------------------------------------------------------------------
+ * ScrollPane
+ */
+
+
+.info-center-view .scroll-bar {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -size: 6;
+    -fx-pref-width: -size;
+    -fx-min-width: -size;
+    -fx-max-width: -size;
+}
+
+.info-center-view .scroll-bar .track-background {
+    -fx-background-color: rgba(0, 0, 0, .3);
+    -fx-background-radius: 1000;
+}
+
+.info-center-view .scroll-bar .thumb {
+    -fx-background-color: rgba(0, 0, 0, .8);
+    -fx-background-radius: 1000;
+    -fx-background-insets: 0px 1px 0px 0px;
+    -size: 6;
+    -fx-pref-width: -size;
+    -fx-min-width: -size;
+    -fx-max-width: -size;
+}
+
+.info-center-view .scroll-bar:vertical .thumb {
+    -fx-background-insets: 0;
+}
+
+.info-center-view .scroll-bar:horizontal .thumb {
+    -fx-background-insets: 0;
+}
+
+.info-center-view .scroll-bar .increment-button,
+.info-center-view .scroll-bar .increment-arrow,
+.info-center-view .scroll-bar .decrement-button,
+.info-center-view .scroll-bar .decrement-arrow {
+    -fx-pref-width: 0 !important;
+    -fx-pref-height: 0 !important;
+}
+

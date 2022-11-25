@@ -4,7 +4,15 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 
+## InfoCenterPane
+
+A view for displaying (groups of) notifications. Incoming / new notifications slide-in via an animation. Each group can have its own factory for the creation of notification views. A group with multiple notifications can be shown stacked or expanded. A threshold can be defined to determine the maximum number of notifications that  can be shown. If the notifcation count is higher than the user can switch to a list view showing them all.
+
+![InfoCenterPane](gemsfx/docs/info-center-pane.png)
+
+
 ## ScreensView
+
 A small control that can be used to display the screen geometries as seen by the application. The view can also
 display the application's windows, and some arbitrary shapes (might be useful for debugging purposes).
 

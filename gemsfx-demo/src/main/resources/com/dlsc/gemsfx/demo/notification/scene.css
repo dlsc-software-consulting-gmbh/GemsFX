@@ -1,0 +1,11 @@
+.background {
+    -fx-background-image: url("wallpaper.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+}
+
+.background .button-box {
+    -fx-padding: 20px;
+    -fx-background-color: rgba(0, 0, 0, .5);
+    -fx-background-radius: 4px;
+}

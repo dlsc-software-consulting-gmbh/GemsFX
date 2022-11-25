@@ -5,6 +5,8 @@ module com.dlsc.gemsfx {
 
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign;
+    requires org.kordamp.ikonli.material;
+    requires org.kordamp.ikonli.bootstrapicons;
 
     requires java.logging;
     requires java.prefs;
@@ -25,4 +27,5 @@ module com.dlsc.gemsfx {
     exports com.dlsc.gemsfx.richtextarea;
     exports com.dlsc.gemsfx.util;
     exports com.dlsc.gemsfx.skins;
+    exports com.dlsc.gemsfx.infocenter;
 }
