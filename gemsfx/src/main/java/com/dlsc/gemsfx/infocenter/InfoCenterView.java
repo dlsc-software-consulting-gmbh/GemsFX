@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * A view capably of display groups of different types of notifications. The user
+ * A view capable of displaying groups of different types of notifications. The user
  * can choose to expand the groups or to stack all notifications of a group on top
  * of each other. The view is intended to be used together with the {@link InfoCenterPane},
  * so that the visibility of the view is actively managed.

@@ -1,1 +1,1 @@
-/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/bin/javadoc -J-Djavafx.javadoc=true @options @packages @argfile
+/Users/lemmi/.sdkman/candidates/java/19.0.1.fx-zulu/zulu-19.jdk/Contents/Home/bin/javadoc -J-Djavafx.javadoc=true @options @packages @argfile

@@ -1,1 +1,1 @@
-moduleSearchIndex = [{"l":"com.dlsc.gemsfx"}]
+moduleSearchIndex = [{"l":"com.dlsc.gemsfx"}];updateSearchResults();
