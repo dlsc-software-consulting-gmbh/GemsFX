@@ -87,6 +87,14 @@
       "project": "GemsFX",
       "preview": "/preview-tags-field.png",
       "classname": "com.dlsc.gemsfx.demo.TagsFieldApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Info Center / Notifications",
+      "desc": "A notification framework.",
+      "project": "GemsFX",
+      "preview": "/preview-info-center.png",
+      "classname": "com.dlsc.gemsfx.demo.InfoCenterApp"
     }
   ]
 }
