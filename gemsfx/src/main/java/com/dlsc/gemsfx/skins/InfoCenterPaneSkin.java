@@ -34,6 +34,7 @@ import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
 import javafx.scene.shape.Rectangle;
 
@@ -96,6 +97,38 @@ public class InfoCenterPaneSkin extends SkinBase<InfoCenterPane> {
 
         if (infoCenterPane.getInfoCenterView() != null) {
             getChildren().add(infoCenterPane.getInfoCenterView());
+        }
+    }
+
+    @Override protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+
+        Node content = getSkinnable().getContent();
+
+        if (content != null) {
+            return content.minWidth(height) + leftInset + rightInset;
+        } else {
+            return 0;
+        }
+    }
+    @Override protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+
+        Node content = getSkinnable().getContent();
+
+        if (content != null) {
+            return content.prefWidth(height) + leftInset + rightInset;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+
+        Node content = getSkinnable().getContent();
+
+        if (content != null) {
+            return content.maxWidth(height) + leftInset + rightInset;
+        } else {
+            return 0;
         }
     }
 

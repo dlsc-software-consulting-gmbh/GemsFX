@@ -7,6 +7,7 @@ import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
 import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import com.dlsc.gemsfx.infocenter.NotificationView;
+import com.jpro.webapi.WebAPI;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
@@ -133,11 +134,13 @@ public class InfoCenterApp extends Application {
         infoCenterPane.setContent(background);
 
         Scene scene = new Scene(infoCenterPane);
-        scene.getStylesheets().add(InfoCenterApp.class.getResource("notification/scene.css").toExternalForm());
+        infoCenterPane.getStylesheets().add(InfoCenterApp.class.getResource("notification/scene.css").toExternalForm());
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(800);
-        stage.centerOnScreen();
+        if(!WebAPI.isBrowser()) {
+            stage.centerOnScreen();
+        }
         stage.setTitle("InfoCenter");
         stage.show();
     }

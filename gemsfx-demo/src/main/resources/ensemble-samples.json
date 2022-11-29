@@ -5,7 +5,6 @@
       "name": "Expanding Text Area",
       "desc": "A text area that grows by itself to fit its content.",
       "project": "GemsFX",
-      "preview": "/preview-expanding-text-area.png",
       "classname": "com.dlsc.gemsfx.demo.ExpandingTextAreaApp"
     },
     {
