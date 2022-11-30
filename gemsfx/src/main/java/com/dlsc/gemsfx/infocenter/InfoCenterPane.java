@@ -17,6 +17,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
+import one.jpro.jproutils.treeshowing.TreeShowing;
 
 /**
  * A pane used for managing a single instance of {@link InfoCenterView}. The pane will show or
@@ -157,9 +158,8 @@ public class InfoCenterPane extends Control {
             }
         };
 
-        sceneProperty().addListener(it -> {
-            Scene scene = getScene();
-            if (scene != null) {
+        TreeShowing.treeShowing(this).addListener((p,o,n) -> {
+            if (n) {
                 timer.start();
             } else {
                 timer.stop();

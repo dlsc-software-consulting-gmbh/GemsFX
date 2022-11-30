@@ -48,6 +48,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import one.jpro.jproutils.treeshowing.TreeShowing;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.text.MessageFormat;
@@ -298,9 +299,8 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             }
         };
 
-        view.sceneProperty().addListener(it -> {
-            Scene scene = view.getScene();
-            if (scene != null) {
+        TreeShowing.treeShowing(view).addListener((p,o,n) -> {
+            if (n) {
                 timer.start();
             } else {
                 timer.stop();
