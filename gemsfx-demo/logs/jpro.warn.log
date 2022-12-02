@@ -12984,3 +12984,7 @@ Caused by: java.lang.NoClassDefFoundError: Could not initialize class com.jpro.i
 	at com.google.inject.internal.InjectorImpl$1.get(InjectorImpl.java:1100)
 	... 31 common frames omitted
 2022-11-25 14:46:23,783 [WARN] from javafx in application-akka.actor.default-dispatcher-7 - Unsupported JavaFX configuration: classes were loaded from 'unnamed module @412fbdab'
+2022-12-02 12:54:44,003 [WARN] from javafx in application-akka.actor.default-dispatcher-7 - Unsupported JavaFX configuration: classes were loaded from 'unnamed module @418dcf8e'
+2022-12-02 12:54:45,860 [WARN] from controllers.jpro in application-akka.actor.default-dispatcher-10 - jpro.plainFile - Couldn't get resource for: 'jpro/html/apple-touch-icon-precomposed.png'
+2022-12-02 12:54:45,876 [WARN] from controllers.jpro in application-akka.actor.default-dispatcher-11 - jpro.plainFile - Couldn't get resource for: 'jpro/html/apple-touch-icon.png'
+2022-12-02 12:55:36,153 [WARN] from controllers.jpro in application-akka.actor.default-dispatcher-4 - jpro.plainFile - Couldn't get resource for: 'jpro/html/favicon.ico'

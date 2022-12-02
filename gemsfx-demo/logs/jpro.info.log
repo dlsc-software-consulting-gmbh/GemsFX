@@ -13190,3 +13190,64 @@ Caused by: java.lang.NoClassDefFoundError: Could not initialize class com.jpro.i
 2022-11-25 14:51:08,438 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - zipped         : 3006904
 2022-11-25 14:51:08,438 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - 
 2022-11-25 14:52:46,733 [INFO] from com.jpro.internal.communicator.InstanceImpl in JavaFX Application Thread - Closing instance (id 818129688, name: default, reason: no-views)
+2022-12-02 12:54:42,194 [INFO] from akka.event.slf4j.Slf4jLogger in application-akka.actor.default-dispatcher-4 - Slf4jLogger started
+2022-12-02 12:54:42,935 [INFO] from play.api.Play in Thread-0 - Application started (Prod) (no global state)
+2022-12-02 12:54:43,633 [INFO] from play.core.server.AkkaHttpServer in Thread-0 - Enabling HTTP/2 on Akka HTTP server...
+2022-12-02 12:54:43,634 [INFO] from play.core.server.AkkaHttpServer in Thread-0 - Listening for HTTP on /0:0:0:0:0:0:0:0:8080
+2022-12-02 12:54:43,879 [INFO] from com.jpro.activity in application-akka.actor.default-dispatcher-7 - Starting the server
+2022-12-02 12:54:43,880 [INFO] from com.jpro.internal.server.Initializer$ in application-akka.actor.default-dispatcher-7 -  *** Starting JPro: https://www.jpro.one/ ***
+2022-12-02 12:54:43,880 [INFO] from com.jpro.internal.server.Initializer$ in application-akka.actor.default-dispatcher-7 - OS: Mac OS X
+2022-12-02 12:54:43,891 [INFO] from com.jpro.internal.server.Initializer$ in application-akka.actor.default-dispatcher-7 - JPro: 2022.1.8
+2022-12-02 12:54:43,891 [INFO] from com.jpro.internal.server.Initializer$ in application-akka.actor.default-dispatcher-7 - Java version: 11
+2022-12-02 12:54:43,891 [INFO] from com.jpro.internal.server.Initializer$ in application-akka.actor.default-dispatcher-7 - JVM: 11 Oracle Corporation
+2022-12-02 12:54:43,893 [INFO] from com.jpro.internal.server.Initializer$ in application-akka.actor.default-dispatcher-7 - JavaFX jar: file:/Users/lemmi/.m2/repository/org/openjfx/javafx-graphics/19.0.0.1-jpro+0/javafx-graphics-19.0.0.1-jpro+0-mac.jar
+2022-12-02 12:54:43,908 [INFO] from com.jpro.internal.server.Initializer$ in application-akka.actor.default-dispatcher-7 - redirected OUT / ERR
+2022-12-02 12:54:43,909 [INFO] from com.jpro.internal.server.Initializer$ in application-akka.actor.default-dispatcher-7 - installed SLF4JBridge
+2022-12-02 12:54:44,003 [WARN] from javafx in application-akka.actor.default-dispatcher-7 - Unsupported JavaFX configuration: classes were loaded from 'unnamed module @418dcf8e'
+2022-12-02 12:54:44,401 [INFO] from com.jpro.internal.server.Initializer$ in JavaFX Application Thread - JavaFX version: 19.0.0.1-jpro+0-2022-09-19-150913
+2022-12-02 12:54:44,423 [INFO] from com.jpro.internal.server.Initializer$ in application-akka.actor.default-dispatcher-7 - finished init!
+2022-12-02 12:54:45,860 [WARN] from controllers.jpro in application-akka.actor.default-dispatcher-10 - jpro.plainFile - Couldn't get resource for: 'jpro/html/apple-touch-icon-precomposed.png'
+2022-12-02 12:54:45,874 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-12 - application requested: default
+2022-12-02 12:54:45,876 [WARN] from controllers.jpro in application-akka.actor.default-dispatcher-11 - jpro.plainFile - Couldn't get resource for: 'jpro/html/apple-touch-icon.png'
+2022-12-02 12:54:45,887 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-12 - Creating Application: default
+2022-12-02 12:54:45,890 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-12 - remoteAddress 0:0:0:0:0:0:0:1
+2022-12-02 12:54:45,892 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-12 - host          localhost:8080
+2022-12-02 12:54:45,892 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-12 - uri           /app/ws/default
+2022-12-02 12:54:59,033 [INFO] from com.jpro.meta.stream.Util$ in JavaFX Application Thread - workaround for image, lossless: true filetype: png img: javafx.scene.image.Image@6bd31165
+2022-12-02 12:54:59,221 [INFO] from com.jpro.meta.stream.Util$ in JavaFX Application Thread - workaround for image, lossless: true filetype: png img: javafx.scene.image.Image@3459b12f
+2022-12-02 12:54:59,319 [INFO] from com.jpro.meta.stream.Util$ in JavaFX Application Thread - workaround for image, lossless: true filetype: png img: javafx.scene.image.Image@5f789178
+2022-12-02 12:55:21,503 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-12 - application requested: default
+2022-12-02 12:55:21,503 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-12 - Creating Application: default
+2022-12-02 12:55:21,504 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-12 - remoteAddress 0:0:0:0:0:0:0:1
+2022-12-02 12:55:21,504 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-12 - host          localhost:8080
+2022-12-02 12:55:21,504 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-12 - uri           /app/ws/default
+2022-12-02 12:55:21,816 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - Closing view (id 1312810163, name: default, reason: tab closed)
+2022-12-02 12:55:21,819 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - 
+2022-12-02 12:55:21,819 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - Application closed:
+2022-12-02 12:55:21,830 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - startTime      : Fri Dec 02 12:55:21 CET 2022      
+2022-12-02 12:55:21,830 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - averageLatency : 00:00:00.000 
+2022-12-02 12:55:21,830 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - averageJitter  : 00:00:00.000  
+2022-12-02 12:55:21,830 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - framerateServer: 00:00:00.000
+2022-12-02 12:55:21,831 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - framerateClient: 00:00:00.000
+2022-12-02 12:55:21,831 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - raw            : 32943
+2022-12-02 12:55:21,831 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - zipped         : 4711
+2022-12-02 12:55:21,831 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - 
+2022-12-02 12:55:22,712 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-11 - application requested: default
+2022-12-02 12:55:22,713 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-11 - Creating Application: default
+2022-12-02 12:55:22,713 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-11 - remoteAddress 0:0:0:0:0:0:0:1
+2022-12-02 12:55:22,713 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-11 - host          localhost:8080
+2022-12-02 12:55:22,713 [INFO] from controllers.jpro in application-akka.actor.default-dispatcher-11 - uri           /app/ws/default
+2022-12-02 12:55:25,997 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - Closing view (id 1120592953, name: default, reason: tab closed)
+2022-12-02 12:55:25,998 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - 
+2022-12-02 12:55:25,998 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - Application closed:
+2022-12-02 12:55:25,998 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - startTime      : Fri Dec 02 12:55:25 CET 2022      
+2022-12-02 12:55:25,998 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - averageLatency : 00:00:00.001 
+2022-12-02 12:55:25,998 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - averageJitter  : 00:00:00.000  
+2022-12-02 12:55:25,998 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - framerateServer: 00:00:00.000
+2022-12-02 12:55:25,999 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - framerateClient: 00:00:00.000
+2022-12-02 12:55:25,999 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - raw            : 131496
+2022-12-02 12:55:25,999 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - zipped         : 32630
+2022-12-02 12:55:25,999 [INFO] from com.jpro.internal.stats.ViewInfo$ in JavaFX Application Thread - 
+2022-12-02 12:55:26,897 [INFO] from com.jpro.internal.communicator.InstanceImpl in JavaFX Application Thread - Closing instance (id 1312810163, name: default, reason: no-views)
+2022-12-02 12:55:32,064 [INFO] from com.jpro.internal.communicator.InstanceImpl in JavaFX Application Thread - Closing instance (id 1120592953, name: default, reason: no-views)
+2022-12-02 12:55:36,153 [WARN] from controllers.jpro in application-akka.actor.default-dispatcher-4 - jpro.plainFile - Couldn't get resource for: 'jpro/html/favicon.ico'

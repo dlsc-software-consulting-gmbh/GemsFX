@@ -110,6 +110,7 @@ public class InfoCenterPaneSkin extends SkinBase<InfoCenterPane> {
             return 0;
         }
     }
+
     @Override protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
 
         Node content = getSkinnable().getContent();
@@ -132,9 +133,46 @@ public class InfoCenterPaneSkin extends SkinBase<InfoCenterPane> {
         }
     }
 
+    @Override protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+
+        Node content = getSkinnable().getContent();
+
+        if (content != null) {
+            return content.minHeight(width) + leftInset + rightInset;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+
+        Node content = getSkinnable().getContent();
+
+        if (content != null) {
+            return content.prefHeight(width) + leftInset + rightInset;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+
+        Node content = getSkinnable().getContent();
+
+        if (content != null) {
+            return content.maxHeight(width) + leftInset + rightInset;
+        } else {
+            return 0;
+        }
+    }
+
+
     @Override
     protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
-        super.layoutChildren(contentX, contentY, contentWidth, contentHeight);
+        Node content = getSkinnable().getContent();
+        if (content != null) {
+            content.resizeRelocate(contentX, contentY, contentWidth, contentHeight);
+        }
 
         // special layout for the info center view based on the animation progress / visibility
         InfoCenterView view = getSkinnable().getInfoCenterView();
@@ -143,7 +181,11 @@ public class InfoCenterPaneSkin extends SkinBase<InfoCenterPane> {
             double prefHeight = view.prefHeight(prefWidth);
             double v = visibility.get();
             double offset = prefWidth * v;
-            view.resizeRelocate(contentX + contentWidth - offset, contentY, prefWidth, Math.min(contentHeight, prefHeight));
+            if (view.getShowAllGroup() != null) {
+                view.resizeRelocate(contentX + contentWidth - offset, contentY, prefWidth, contentHeight);
+            } else {
+                view.resizeRelocate(contentX + contentWidth - offset, contentY, prefWidth, Math.min(contentHeight, prefHeight));
+            }
             view.setVisible(v > 0);
         }
     }

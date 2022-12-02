@@ -167,14 +167,14 @@ public class InfoCenterApp extends Application {
         Notification notification;
         switch ((int) (Math.random() * 3)) {
             case 0:
-                notification = new CalendarNotification("Calendar", "Meeting with shareholders");
+                notification = createMailNotification();
                 break;
             case 1:
                 notification = new SlackNotification("DLSC GmbH\nDirk Lemmermann", "Please send the material I requested.");
                 break;
             case 2:
             default:
-                notification = createMailNotification();
+                notification = new CalendarNotification("Calendar", "Meeting with shareholders");
         }
 
         if (randomizeTimeStamp) {
@@ -185,7 +185,7 @@ public class InfoCenterApp extends Application {
     }
 
     private MailNotification createMailNotification() {
-        Mail mail = new Mail("Purchase Order #8774911", "Dear Mr. Smith, the following order has been received by our service counter.", ZonedDateTime.now());
+        Mail mail = new Mail("Purchase Order #8774911", "Dear Mr. Smith, the following order has been\nreceived by our service counter.", ZonedDateTime.now());
         MailNotification mailNotification = new MailNotification(mail);
 
         NotificationAction<Mail> openMailAction = new NotificationAction<>("Open", (notification) -> {

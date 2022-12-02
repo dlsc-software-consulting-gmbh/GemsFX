@@ -177,3 +177,56 @@
 2022-11-25 14:51:08,438 [INFO] in scala-execution-context-global-44 - [[37minfo[0m] c.j.i.s.ViewInfo$ - zipped         : 3006904
 2022-11-25 14:51:08,438 [INFO] in scala-execution-context-global-44 - [[37minfo[0m] c.j.i.s.ViewInfo$ - 
 2022-11-25 14:52:46,733 [INFO] in scala-execution-context-global-44 - [[37minfo[0m] c.j.i.c.InstanceImpl - Closing instance (id 818129688, name: default, reason: no-views)
+2022-12-02 12:54:43,910 [INFO] in scala-execution-context-global-44 - [[37minfo[0m] c.j.i.s.Initializer$ - redirected OUT / ERR
+2022-12-02 12:54:43,910 [INFO] in scala-execution-context-global-44 - [[37minfo[0m] c.j.i.s.Initializer$ - installed SLF4JBridge
+2022-12-02 12:54:44,003 [INFO] in scala-execution-context-global-47 - [[33mwarn[0m] javafx - Unsupported JavaFX configuration: classes were loaded from 'unnamed module @418dcf8e'
+2022-12-02 12:54:44,401 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.Initializer$ - JavaFX version: 19.0.0.1-jpro+0-2022-09-19-150913
+2022-12-02 12:54:44,425 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.Initializer$ - finished init!
+2022-12-02 12:54:45,862 [INFO] in scala-execution-context-global-47 - [[33mwarn[0m] c.jpro - jpro.plainFile - Couldn't get resource for: 'jpro/html/apple-touch-icon-precomposed.png'
+2022-12-02 12:54:45,875 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - application requested: default
+2022-12-02 12:54:45,877 [INFO] in scala-execution-context-global-47 - [[33mwarn[0m] c.jpro - jpro.plainFile - Couldn't get resource for: 'jpro/html/apple-touch-icon.png'
+2022-12-02 12:54:45,888 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - Creating Application: default
+2022-12-02 12:54:45,890 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - remoteAddress 0:0:0:0:0:0:0:1
+2022-12-02 12:54:45,893 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - host          localhost:8080
+2022-12-02 12:54:45,893 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - uri           /app/ws/default
+2022-12-02 12:54:46,167 [INFO] in scala-execution-context-global-44 - G1 Young Generation
+2022-12-02 12:54:46,167 [INFO] in scala-execution-context-global-44 - G1 Old Generation
+2022-12-02 12:54:46,664 [INFO] in scala-execution-context-global-47 - PrismFontFactory - FontConfigManager.populateMaps!!!!
+2022-12-02 12:54:59,034 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.m.s.Util$ - workaround for image, lossless: true filetype: png img: javafx.scene.image.Image@6bd31165
+2022-12-02 12:54:59,221 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.m.s.Util$ - workaround for image, lossless: true filetype: png img: javafx.scene.image.Image@3459b12f
+2022-12-02 12:54:59,319 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.m.s.Util$ - workaround for image, lossless: true filetype: png img: javafx.scene.image.Image@5f789178
+2022-12-02 12:55:21,503 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - application requested: default
+2022-12-02 12:55:21,503 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - Creating Application: default
+2022-12-02 12:55:21,504 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - remoteAddress 0:0:0:0:0:0:0:1
+2022-12-02 12:55:21,504 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - host          localhost:8080
+2022-12-02 12:55:21,504 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - uri           /app/ws/default
+2022-12-02 12:55:21,816 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.ViewInfo$ - Closing view (id 1312810163, name: default, reason: tab closed)
+2022-12-02 12:55:21,819 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.ViewInfo$ - 
+2022-12-02 12:55:21,820 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.ViewInfo$ - Application closed:
+2022-12-02 12:55:21,830 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.ViewInfo$ - startTime      : Fri Dec 02 12:55:21 CET 2022      
+2022-12-02 12:55:21,830 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.ViewInfo$ - averageLatency : 00:00:00.000 
+2022-12-02 12:55:21,830 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.ViewInfo$ - averageJitter  : 00:00:00.000  
+2022-12-02 12:55:21,830 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.ViewInfo$ - framerateServer: 00:00:00.000
+2022-12-02 12:55:21,831 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.ViewInfo$ - framerateClient: 00:00:00.000
+2022-12-02 12:55:21,831 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.ViewInfo$ - raw            : 32943
+2022-12-02 12:55:21,831 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.ViewInfo$ - zipped         : 4711
+2022-12-02 12:55:21,831 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.j.i.s.ViewInfo$ - 
+2022-12-02 12:55:22,713 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - application requested: default
+2022-12-02 12:55:22,713 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - Creating Application: default
+2022-12-02 12:55:22,713 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - remoteAddress 0:0:0:0:0:0:0:1
+2022-12-02 12:55:22,713 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - host          localhost:8080
+2022-12-02 12:55:22,713 [INFO] in scala-execution-context-global-47 - [[37minfo[0m] c.jpro - uri           /app/ws/default
+2022-12-02 12:55:25,997 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.s.ViewInfo$ - Closing view (id 1120592953, name: default, reason: tab closed)
+2022-12-02 12:55:25,998 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.s.ViewInfo$ - 
+2022-12-02 12:55:25,998 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.s.ViewInfo$ - Application closed:
+2022-12-02 12:55:25,998 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.s.ViewInfo$ - startTime      : Fri Dec 02 12:55:25 CET 2022      
+2022-12-02 12:55:25,999 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.s.ViewInfo$ - averageLatency : 00:00:00.001 
+2022-12-02 12:55:25,999 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.s.ViewInfo$ - averageJitter  : 00:00:00.000  
+2022-12-02 12:55:25,999 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.s.ViewInfo$ - framerateServer: 00:00:00.000
+2022-12-02 12:55:25,999 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.s.ViewInfo$ - framerateClient: 00:00:00.000
+2022-12-02 12:55:25,999 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.s.ViewInfo$ - raw            : 131496
+2022-12-02 12:55:25,999 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.s.ViewInfo$ - zipped         : 32630
+2022-12-02 12:55:25,999 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.s.ViewInfo$ - 
+2022-12-02 12:55:26,897 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.c.InstanceImpl - Closing instance (id 1312810163, name: default, reason: no-views)
+2022-12-02 12:55:32,064 [INFO] in scala-execution-context-global-68 - [[37minfo[0m] c.j.i.c.InstanceImpl - Closing instance (id 1120592953, name: default, reason: no-views)
+2022-12-02 12:55:36,154 [INFO] in scala-execution-context-global-68 - [[33mwarn[0m] c.jpro - jpro.plainFile - Couldn't get resource for: 'jpro/html/favicon.ico'

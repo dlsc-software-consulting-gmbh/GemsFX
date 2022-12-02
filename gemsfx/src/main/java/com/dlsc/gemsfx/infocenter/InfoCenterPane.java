@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.input.MouseButton;
@@ -25,6 +24,13 @@ import one.jpro.jproutils.treeshowing.TreeShowing;
  * feature is kicking in.
  */
 public class InfoCenterPane extends Control {
+
+    @Override
+    public void requestLayout() {
+        super.requestLayout();
+
+//        Thread.dumpStack();
+    }
 
     /*
      * The managed info center instance.

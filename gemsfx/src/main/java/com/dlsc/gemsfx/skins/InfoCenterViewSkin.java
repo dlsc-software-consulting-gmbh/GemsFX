@@ -28,7 +28,6 @@ import javafx.collections.WeakListChangeListener;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -99,9 +98,9 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         BooleanBinding unpinnedNotificationsExist = Bindings.isNotEmpty(view.getUnmodifiableUnpinnedNotifications());
 
         pinnedGroupsContainer.getStyleClass().addAll("pinned", "container", "wrapper");
-        pinnedGroupsContainer.setMinHeight(Region.USE_PREF_SIZE);
         pinnedGroupsContainer.visibleProperty().bind(pinnedNotificationsExist);
         pinnedGroupsContainer.managedProperty().bind(pinnedNotificationsExist);
+        pinnedGroupsContainer.setMinHeight(Region.USE_PREF_SIZE);
 
         Region separator = new Region();
         separator.getStyleClass().add("pinned-separator");
@@ -208,7 +207,6 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             public void selectNext() {
             }
         });
-
         singleGroupListView.itemsProperty().addListener((obs, oldItems, newItems) -> {
             if (oldItems != null) {
                 oldItems.removeListener(weakListItemsListener);
@@ -258,16 +256,9 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         singleGroupContainer.getStyleClass().addAll("wrapper", "single-group-wrapper");
 
         StackPane stackPane = new StackPane(allGroupsContainer, singleGroupContainer);
-
-        if (view.getShowAllGroup() != null) {
-            singleGroupContainer.setVisible(true);
-            allGroupsContainer.setVisible(false);
-            allGroupsContainer.setOpacity(0);
-        } else {
-            singleGroupContainer.setVisible(false);
-            singleGroupContainer.setOpacity(0);
-            allGroupsContainer.setVisible(true);
-        }
+        stackPane.setMinHeight(0);
+        stackPane.setMaxHeight(Double.MAX_VALUE);
+        stackPane.getStyleClass().add("main-pane");
 
         getChildren().add(stackPane);
 
@@ -308,6 +299,24 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         });
 
         timer.start();
+
+        updateVisibilities();
+    }
+
+    private void updateVisibilities() {
+        if (getSkinnable().getShowAllGroup() != null) {
+            singleGroupContainer.setVisible(true);
+            singleGroupContainer.setManaged(true);
+            allGroupsContainer.setVisible(false);
+            allGroupsContainer.setManaged(false);
+            allGroupsContainer.setOpacity(0);
+        } else {
+            singleGroupContainer.setVisible(false);
+            singleGroupContainer.setManaged(false);
+            singleGroupContainer.setOpacity(0);
+            allGroupsContainer.setVisible(true);
+            allGroupsContainer.setManaged(true);
+        }
     }
 
     private void transitionBetweenStandardViewAndGroupView(NotificationGroup<?, ?> group) {
@@ -320,21 +329,25 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         Duration showAllFadeDuration = view.getShowAllFadeDuration();
         if (group != null) {
             singleGroupContainer.setVisible(true);
+            singleGroupContainer.setManaged(true);
             timeline.getKeyFrames().setAll(
                     new KeyFrame(showAllFadeDuration, new KeyValue(allGroupsContainer.opacityProperty(), 0, Interpolator.EASE_BOTH)),
                     new KeyFrame(showAllFadeDuration.multiply(2), new KeyValue(singleGroupContainer.opacityProperty(), 1, Interpolator.EASE_BOTH)));
             timeline.setOnFinished(evt -> {
                 view.setShowAllGroup(group);
                 allGroupsContainer.setVisible(false);
+                allGroupsContainer.setManaged(false);
             });
         } else {
             allGroupsContainer.setVisible(true);
+            allGroupsContainer.setManaged(true);
             timeline.getKeyFrames().setAll(
                     new KeyFrame(showAllFadeDuration, new KeyValue(allGroupsContainer.opacityProperty(), 1, Interpolator.EASE_BOTH)),
                     new KeyFrame(showAllFadeDuration, new KeyValue(singleGroupContainer.opacityProperty(), 0, Interpolator.EASE_BOTH)));
             timeline.setOnFinished(evt -> {
                 view.setShowAllGroup(null);
                 singleGroupContainer.setVisible(false);
+                singleGroupContainer.setManaged(false);
             });
         }
         timeline.play();
@@ -584,11 +597,6 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         }
 
         @Override
-        protected double computeMinHeight(double width) {
-            return super.computePrefHeight(width);
-        }
-
-        @Override
         protected double computePrefHeight(double width) {
             double h = getInsets().getTop() + getInsets().getBottom();
 
@@ -604,7 +612,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             if (!notificationViews.isEmpty()) {
                 // last one is on top
                 Node latestNotification = notificationViews.get(notificationViews.size() - 1);
-                h += Math.max(latestNotification.minHeight(width), latestNotification.prefHeight(width));
+                h += latestNotification.prefHeight(width);
             }
 
             double innerHeight = 0;
@@ -613,7 +621,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
                 for (int i = notificationViews.size() - 2; i >= 0; i--) {
                     Node node = notificationViews.get(i);
                     innerHeight += SPACING;
-                    innerHeight += Math.max(node.minHeight(width), node.prefHeight(width));
+                    innerHeight += node.prefHeight(width);
                 }
             }
 
@@ -739,16 +747,6 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
                 evt.consume();
             }
         });
-    }
-
-    @Override
-    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        NotificationGroup showAllGroup = getSkinnable().getShowAllGroup();
-        if (showAllGroup != null) {
-            return getSkinnable().getHeight() - topInset - bottomInset - (2 * getSkinnable().getTranslateY());
-        }
-
-        return Math.min(getSkinnable().getHeight() - topInset - bottomInset - getSkinnable().getTranslateY() * 2, allGroupsContainer.prefHeight(width - leftInset - rightInset));
     }
 
     private class NotificationListCell extends ListCell<Notification<?>> {
