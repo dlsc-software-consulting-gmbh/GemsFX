@@ -257,11 +257,38 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             HBox titleTimeBox = new HBox(titleLabel, upperRightPane);
             titleTimeBox.getStyleClass().add("title-time-box");
 
-            Label descriptionLabel = new Label();
+            Label descriptionLabel = new Label() {
+                @Override
+                protected double computePrefHeight(double width) {
+                    if (notification.getClass().getSimpleName().equals("MailNotification")) {
+                        System.out.println("pref width: " + width);
+                        if (width > 400) {
+                           // Thread.dumpStack();
+                        }
+                    }
+                    return super.computePrefHeight(width);
+                }
+                @Override
+                protected double computeMinHeight(double width) {
+                    if (notification.getClass().getSimpleName().equals("MailNotification")) {
+                        System.out.println("min width: " + width);
+                    }
+                    return super.computeMinHeight(width);
+                }
+                @Override
+                protected double computeMaxHeight(double width) {
+                    if (notification.getClass().getSimpleName().equals("MailNotification")) {
+                        System.out.println("max width: " + width);
+                    }
+                    return super.computeMaxHeight(width);
+                }
+            };
+
             descriptionLabel.textProperty().bind(notification.summaryProperty());
             descriptionLabel.getStyleClass().add("description-label");
             descriptionLabel.setWrapText(true);
-            descriptionLabel.setMaxWidth(Double.MAX_VALUE);
+
+//            descriptionLabel.setMaxWidth(Double.MAX_VALUE);
 
             HBox actionsBox = new HBox();
             actionsBox.getStyleClass().add("actions-box");
@@ -342,10 +369,6 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
 
             // we are updating the date and time here and also via an animation timer
             updateDateAndTimeLabel();
-        }
-
-        private void updateView() {
-
         }
 
         private void updateStackStyle() {

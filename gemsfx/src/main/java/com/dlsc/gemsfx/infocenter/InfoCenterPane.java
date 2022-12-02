@@ -25,13 +25,6 @@ import one.jpro.jproutils.treeshowing.TreeShowing;
  */
 public class InfoCenterPane extends Control {
 
-    @Override
-    public void requestLayout() {
-        super.requestLayout();
-
-//        Thread.dumpStack();
-    }
-
     /*
      * The managed info center instance.
      */
@@ -65,6 +58,8 @@ public class InfoCenterPane extends Control {
      */
     public InfoCenterPane(Node content) {
         getStyleClass().add("notification-pane");
+
+        infoCenterView.showAllGroupProperty().addListener(it -> requestLayout());
 
         // attach or remove the mouse handler when the content node gets replaced
         contentProperty().addListener((it, oldContent, newContent) -> {

@@ -43,17 +43,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-import javafx.util.Duration;
 import one.jpro.jproutils.treeshowing.TreeShowing;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -70,7 +67,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         // at all then also hide the info center.
         InfoCenterView infoCenterView = getSkinnable();
         if (infoCenterView.getShowAllGroup() != null && singleGroupListView.getItems().isEmpty()) {
-            transitionBetweenStandardViewAndGroupView(null);
+            getSkinnable().setShowAllGroup(null);
             if (infoCenterView.getUnmodifiableNotifications().isEmpty()) {
                 singleGroupListView.fireEvent(new InfoCenterEvent(InfoCenterEvent.HIDE));
             }
@@ -89,7 +86,6 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         // first check, might have been set before view was added to scene
         if (view.getOnShowAllGroupNotifications() == null) {
             view.setOnShowAllGroupNotifications(group -> {
-                transitionBetweenStandardViewAndGroupView(group);
                 view.setShowAllGroup(group);
             });
         }
@@ -111,9 +107,10 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         unpinnedGroupsContainer.setMinHeight(Region.USE_PREF_SIZE);
 
         ScrollPane scrollPane = new ScrollPane(unpinnedGroupsContainer) {
+
             @Override
             protected double computePrefHeight(double width) {
-                return unpinnedGroupsContainer.prefHeight(width) + getInsets().getTop() + getInsets().getBottom();
+                return unpinnedGroupsContainer.prefHeight(width - getInsets().getLeft() - getInsets().getRight()) + getInsets().getTop() + getInsets().getBottom();
             }
 
             @Override
@@ -241,7 +238,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         Button closeShowAllButton = new Button("Close Group");
         closeShowAllButton.setTooltip(new Tooltip("Switch back to view with all groups"));
         closeShowAllButton.getStyleClass().add("close-show-all-button");
-        closeShowAllButton.setOnAction(evt -> transitionBetweenStandardViewAndGroupView(null));
+        closeShowAllButton.setOnAction(evt -> view.setShowAllGroup(null));
 
         Button clearAllButton = new Button();
         clearAllButton.setGraphic(new FontIcon());
@@ -254,13 +251,14 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
 
         singleGroupContainer = new VBox(singleGroupHeader, singleGroupListView);
         singleGroupContainer.getStyleClass().addAll("wrapper", "single-group-wrapper");
+        VBox.setVgrow(singleGroupContainer, Priority.ALWAYS);
 
-        StackPane stackPane = new StackPane(allGroupsContainer, singleGroupContainer);
-        stackPane.setMinHeight(0);
-        stackPane.setMaxHeight(Double.MAX_VALUE);
-        stackPane.getStyleClass().add("main-pane");
+        VBox mainPane = new VBox(allGroupsContainer, singleGroupContainer);
+        mainPane.setMinHeight(0);
+        mainPane.setMaxHeight(Double.MAX_VALUE);
+        mainPane.getStyleClass().add("main-pane");
 
-        getChildren().add(stackPane);
+        getChildren().add(mainPane);
 
         InvalidationListener invalidationListener = (Observable it) -> updateView();
         view.getUnmodifiablePinnedGroups().addListener(invalidationListener);
@@ -301,6 +299,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         timer.start();
 
         updateVisibilities();
+        view.showAllGroupProperty().addListener(it -> updateVisibilities());
     }
 
     private void updateVisibilities() {
@@ -309,48 +308,12 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             singleGroupContainer.setManaged(true);
             allGroupsContainer.setVisible(false);
             allGroupsContainer.setManaged(false);
-            allGroupsContainer.setOpacity(0);
         } else {
             singleGroupContainer.setVisible(false);
             singleGroupContainer.setManaged(false);
-            singleGroupContainer.setOpacity(0);
             allGroupsContainer.setVisible(true);
             allGroupsContainer.setManaged(true);
         }
-    }
-
-    private void transitionBetweenStandardViewAndGroupView(NotificationGroup<?, ?> group) {
-        InfoCenterView view = getSkinnable();
-        if (Objects.equals(group, view.getShowAllGroup())) {
-            return;
-        }
-
-        Timeline timeline = new Timeline();
-        Duration showAllFadeDuration = view.getShowAllFadeDuration();
-        if (group != null) {
-            singleGroupContainer.setVisible(true);
-            singleGroupContainer.setManaged(true);
-            timeline.getKeyFrames().setAll(
-                    new KeyFrame(showAllFadeDuration, new KeyValue(allGroupsContainer.opacityProperty(), 0, Interpolator.EASE_BOTH)),
-                    new KeyFrame(showAllFadeDuration.multiply(2), new KeyValue(singleGroupContainer.opacityProperty(), 1, Interpolator.EASE_BOTH)));
-            timeline.setOnFinished(evt -> {
-                view.setShowAllGroup(group);
-                allGroupsContainer.setVisible(false);
-                allGroupsContainer.setManaged(false);
-            });
-        } else {
-            allGroupsContainer.setVisible(true);
-            allGroupsContainer.setManaged(true);
-            timeline.getKeyFrames().setAll(
-                    new KeyFrame(showAllFadeDuration, new KeyValue(allGroupsContainer.opacityProperty(), 1, Interpolator.EASE_BOTH)),
-                    new KeyFrame(showAllFadeDuration, new KeyValue(singleGroupContainer.opacityProperty(), 0, Interpolator.EASE_BOTH)));
-            timeline.setOnFinished(evt -> {
-                view.setShowAllGroup(null);
-                singleGroupContainer.setVisible(false);
-                singleGroupContainer.setManaged(false);
-            });
-        }
-        timeline.play();
     }
 
     private void updateTimes() {
@@ -719,7 +682,8 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
 
             if (!evt.isConsumed() && evt.isStillSincePress() && evt.getClickCount() == 1 && evt.getButton().equals(MouseButton.PRIMARY)) {
                 if (group.isExpanded()) {
-                    getSkinnable().fireEvent(new InfoCenterEvent(InfoCenterEvent.NOTIFICATION_CHOSEN, notification));
+                    InfoCenterView infoCenterView = getSkinnable();
+                    infoCenterView.fireEvent(new InfoCenterEvent(InfoCenterEvent.NOTIFICATION_CHOSEN, notification));
                     Callback<Notification<?>, OnClickBehaviour> onClick = notification.getOnClick();
                     if (onClick != null) {
                         OnClickBehaviour behaviour = onClick.call(notification);
@@ -731,11 +695,11 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
                                 break;
                             case HIDE:
                                 notificationView.fireEvent(new InfoCenterEvent(InfoCenterEvent.HIDE));
-                                transitionBetweenStandardViewAndGroupView(null);
+                                infoCenterView.setShowAllGroup(null);
                                 break;
                             case HIDE_AND_REMOVE:
                                 notificationView.fireEvent(new InfoCenterEvent(InfoCenterEvent.HIDE));
-                                transitionBetweenStandardViewAndGroupView(null);
+                                infoCenterView.setShowAllGroup(null);
                                 notification.remove();
                                 break;
                         }

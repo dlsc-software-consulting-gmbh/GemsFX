@@ -44,6 +44,10 @@ public class InfoCenterApp extends Application {
         calendarGroup.setSortOrder(1);
         mailGroup.setSortOrder(2);
 
+        slackGroup.maximumNumberOfNotificationsProperty().bind(Bindings.createIntegerBinding(() -> slackGroup.isPinned() ? 3 : 10, slackGroup.pinnedProperty()));
+        calendarGroup.maximumNumberOfNotificationsProperty().bind(Bindings.createIntegerBinding(() -> calendarGroup.isPinned() ? 3 : 10, calendarGroup.pinnedProperty()));
+        mailGroup.maximumNumberOfNotificationsProperty().bind(Bindings.createIntegerBinding(() -> mailGroup.isPinned() ? 3 : 10, mailGroup.pinnedProperty()));
+
         slackGroup.setViewFactory(n -> {
             NotificationView<Object, SlackNotification> view = new NotificationView<>(n);
             view.setGraphic(createImageView(new Image(InfoCenterApp.class.getResourceAsStream("notification/slack.png"))));
@@ -185,7 +189,7 @@ public class InfoCenterApp extends Application {
     }
 
     private MailNotification createMailNotification() {
-        Mail mail = new Mail("Purchase Order #8774911", "Dear Mr. Smith, the following order has been\nreceived by our service counter.", ZonedDateTime.now());
+        Mail mail = new Mail("Purchase Order #8774911", "Dear Mr. Smith, the following order has been received by our service counter.", ZonedDateTime.now());
         MailNotification mailNotification = new MailNotification(mail);
 
         NotificationAction<Mail> openMailAction = new NotificationAction<>("Open", (notification) -> {
