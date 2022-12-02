@@ -99,7 +99,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
 
     @Override
     protected double computePrefHeight(double width) {
-        double h = contentPane.prefHeight(width);
+        double h = contentPane.prefHeight(width - getInsets().getLeft() - getInsets().getRight());
 
         if (stackNotification1.isVisible()) {
             h += 5;
@@ -114,7 +114,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
 
     @Override
     protected void layoutChildren() {
-        double width = getWidth();
+        double width = getWidth() - getInsets().getLeft() - getInsets().getRight();
         double ph = contentPane.prefHeight(width);
         contentPane.resizeRelocate(getInsets().getLeft(), getInsets().getTop(), width, ph);
 
@@ -257,38 +257,10 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             HBox titleTimeBox = new HBox(titleLabel, upperRightPane);
             titleTimeBox.getStyleClass().add("title-time-box");
 
-            Label descriptionLabel = new Label() {
-                @Override
-                protected double computePrefHeight(double width) {
-                    if (notification.getClass().getSimpleName().equals("MailNotification")) {
-                        System.out.println("pref width: " + width);
-                        if (width > 400) {
-                           // Thread.dumpStack();
-                        }
-                    }
-                    return super.computePrefHeight(width);
-                }
-                @Override
-                protected double computeMinHeight(double width) {
-                    if (notification.getClass().getSimpleName().equals("MailNotification")) {
-                        System.out.println("min width: " + width);
-                    }
-                    return super.computeMinHeight(width);
-                }
-                @Override
-                protected double computeMaxHeight(double width) {
-                    if (notification.getClass().getSimpleName().equals("MailNotification")) {
-                        System.out.println("max width: " + width);
-                    }
-                    return super.computeMaxHeight(width);
-                }
-            };
-
+            Label descriptionLabel = new Label();
             descriptionLabel.textProperty().bind(notification.summaryProperty());
             descriptionLabel.getStyleClass().add("description-label");
             descriptionLabel.setWrapText(true);
-
-//            descriptionLabel.setMaxWidth(Double.MAX_VALUE);
 
             HBox actionsBox = new HBox();
             actionsBox.getStyleClass().add("actions-box");
