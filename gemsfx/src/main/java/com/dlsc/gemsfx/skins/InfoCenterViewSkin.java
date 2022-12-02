@@ -75,6 +75,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
     };
 
     private final WeakInvalidationListener weakListItemsListener = new WeakInvalidationListener(listItemsListener);
+    private final VBox mainPane;
 
     private VBox unpinnedGroupsContainer = new VBox();
 
@@ -253,7 +254,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         singleGroupContainer.getStyleClass().addAll("wrapper", "single-group-wrapper");
         VBox.setVgrow(singleGroupContainer, Priority.ALWAYS);
 
-        VBox mainPane = new VBox(allGroupsContainer, singleGroupContainer);
+        mainPane = new VBox(allGroupsContainer, singleGroupContainer);
         mainPane.setMinHeight(0);
         mainPane.setMaxHeight(Double.MAX_VALUE);
         mainPane.getStyleClass().add("main-pane");
@@ -711,6 +712,18 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
                 evt.consume();
             }
         });
+    }
+
+    @Override protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return mainPane.prefHeight(width - leftInset - rightInset) + topInset + bottomInset;
+    }
+
+    @Override protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return mainPane.minHeight(width - leftInset - rightInset) + topInset + bottomInset;
+    }
+
+    @Override protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return mainPane.maxHeight(width - leftInset - rightInset) + topInset + bottomInset;
     }
 
     private class NotificationListCell extends ListCell<Notification<?>> {
