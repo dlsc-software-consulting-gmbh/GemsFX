@@ -35,7 +35,17 @@ public class StageManager {
      * width is 850 and for the minimum height is 600.
      */
     public static void install(Stage stage, String preferencesPath) {
-        install(stage, preferencesPath, 850, 600);
+        install(stage, Preferences.userRoot().node(preferencesPath));
+    }
+    
+    /**
+     * Installs a new manager for the given stage. The location and dimension
+     * information will be stored in the given preferences. The
+     * default values for the minimum width is 850 and for the minimum height is
+     * 600.
+     */
+    public static void install(Stage stage, Preferences preferences) {
+        install(stage, preferences, 850, 600);
     }
 
     /**
@@ -48,13 +58,26 @@ public class StageManager {
      * @param minHeight the minimum height that will be used for the stage
      */
     public static void install(Stage stage, String preferencesPath, double minWidth, double minHeight) {
-        new StageManager(stage, preferencesPath, minWidth, minHeight);
+        install(stage, Preferences.userRoot().node(preferencesPath), minWidth, minHeight);
     }
 
+    /**
+     * Installs a new manager for the given stage. The location and dimension information will
+     * be stored in the user preferences at the given path.
+     *
+     * @param stage the stage to persist and restore
+     * @param preferences the java.util preferences used for storing the information
+     * @param minWidth the minimum width that will be used for the stage
+     * @param minHeight the minimum height that will be used for the stage
+     */
+    public static void install(Stage stage, Preferences preferences, double minWidth, double minHeight) {
+        new StageManager(stage, preferences, minWidth, minHeight);
+    }
+       
     /*
      * Constructs a new stage manager.
      */
-    private StageManager(Stage stage, String preferencesPath, double minWidth, double minHeight) {
+    private StageManager(Stage stage, Preferences preferences, double minWidth, double minHeight) {
         if (minWidth <= 0) {
             throw new IllegalArgumentException("min width must be larger than 0");
         }
@@ -63,10 +86,9 @@ public class StageManager {
         }
 
         this.stage = stage;
+        this.preferences = preferences;
         this.minWidth = minWidth;
         this.minHeight = minHeight;
-
-        preferences = Preferences.userRoot().node(preferencesPath);
 
         restoreStage();
 
