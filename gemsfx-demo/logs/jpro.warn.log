@@ -12988,3 +12988,5 @@ Caused by: java.lang.NoClassDefFoundError: Could not initialize class com.jpro.i
 2022-12-02 12:54:45,860 [WARN] from controllers.jpro in application-akka.actor.default-dispatcher-10 - jpro.plainFile - Couldn't get resource for: 'jpro/html/apple-touch-icon-precomposed.png'
 2022-12-02 12:54:45,876 [WARN] from controllers.jpro in application-akka.actor.default-dispatcher-11 - jpro.plainFile - Couldn't get resource for: 'jpro/html/apple-touch-icon.png'
 2022-12-02 12:55:36,153 [WARN] from controllers.jpro in application-akka.actor.default-dispatcher-4 - jpro.plainFile - Couldn't get resource for: 'jpro/html/favicon.ico'
+2022-12-02 17:07:13,389 [WARN] from javafx in application-akka.actor.default-dispatcher-4 - Unsupported JavaFX configuration: classes were loaded from 'unnamed module @3e881068'
+2022-12-02 17:08:48,209 [WARN] from javafx in application-akka.actor.default-dispatcher-7 - Unsupported JavaFX configuration: classes were loaded from 'unnamed module @22bcc896'
