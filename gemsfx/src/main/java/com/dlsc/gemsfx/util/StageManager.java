@@ -105,16 +105,24 @@ public class StageManager {
         stage.widthProperty().addListener(stageListener);
         stage.heightProperty().addListener(stageListener);
         stage.iconifiedProperty().addListener(stageListener);
+        stage.maximizedProperty().addListener(stageListener);
     }
 
     private void saveStage() throws SecurityException {
-        LOG.fine(MessageFormat.format("saving stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}", stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight(), stage.isIconified()));
-
-        preferences.putDouble("x", stage.getX());
-        preferences.putDouble("y", stage.getY());
-        preferences.putDouble("width", stage.getWidth());
-        preferences.putDouble("height", stage.getHeight());
+        if (stage.isMaximized()) {
+            LOG.fine(MessageFormat.format("saving stage, iconified = {1}, maximized = {2}, fullscreen = {3}", stage.isIconified(), stage.isMaximized(), stage.isFullScreen()));
+        } else {
+            LOG.fine(MessageFormat.format("saving stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}, maximized = {5}, fullscreen = {6}", stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight(), stage.isIconified(), stage.isMaximized(), stage.isFullScreen()));
+        }
+        if (!stage.isMaximized() && !stage.isFullScreen()) {
+            preferences.putDouble("x", stage.getX());
+            preferences.putDouble("y", stage.getY());
+            preferences.putDouble("width", stage.getWidth());
+            preferences.putDouble("height", stage.getHeight());
+        }
         preferences.putBoolean("iconified", stage.isIconified());
+        preferences.putBoolean("maximized", stage.isMaximized());
+        preferences.putBoolean("fullscreen", stage.isFullScreen());
     }
 
     private void restoreStage() throws SecurityException {
@@ -123,8 +131,10 @@ public class StageManager {
         double w = preferences.getDouble("width", stage.getWidth());
         double h = preferences.getDouble("height", stage.getHeight());
         boolean iconified = preferences.getBoolean("iconified", false);
+        boolean maximized = preferences.getBoolean("maximized", false);
+        boolean fullscreen = preferences.getBoolean("fullscreen", false);
 
-        LOG.fine(MessageFormat.format("loading stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}", x, y, w, h, iconified));
+        LOG.fine(MessageFormat.format("loading stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}, maximized = {5}, fullscreen = {6}", x, y, w, h, iconified, maximized, fullscreen));
 
         if (x == -1 && y == -1) {
             stage.centerOnScreen();
@@ -138,6 +148,8 @@ public class StageManager {
 
         Platform.runLater(() -> {
             stage.setIconified(iconified);
+            stage.setMaximized(maximized);
+            stage.setFullScreen(fullscreen);
 
             if (isWindowIsOutOfBounds()) {
                 LOG.fine("stage is out of bounds, moving it to primary screen");
