@@ -1,0 +1,42 @@
+.root {
+    -slate-green: #63946a;
+    -yellowish-orange: #ffa208;
+    -tomato: #e94b35;
+    -blue: #4a90e2;
+}
+
+.issue-list-cell {
+    -fx-background-color: transparent;
+    -fx-pref-height: 135px;
+    -fx-padding: 10px;
+}
+
+.issue-list-cell .content {
+    -fx-background-color: #e0e0e0;
+    -fx-shadow: dropshadow(gaussian, rgba(255, 0, 0, .26), 10, 0.12, -1, 2);
+    -fx-background-radius: 4px;
+}
+
+.issue-list-cell.todo .content {
+    -fx-background-color: -blue;
+}
+
+.issue-list-cell.in-progress .content {
+    -fx-background-color: -yellowish-orange;
+}
+
+.issue-list-cell.done .content {
+    -fx-background-color: -slate-green;
+}
+
+.issue-list-cell .label {
+    -fx-font-size: 1.5em;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.issue-list-cell .placeholder {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 2px;
+    -fx-border-style: dashed;
+}

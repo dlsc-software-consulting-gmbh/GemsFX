@@ -1,5 +1,6 @@
-package com.dlsc.gemsfx;
+package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.MultiColumnListView;
 import com.dlsc.gemsfx.MultiColumnListView.ColumnListCell;
 import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
 import javafx.beans.Observable;
@@ -104,13 +105,11 @@ public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>>
 
     private void initPlaceholder(ListView listView, Node placeholder) {
         placeholder.setOnDragOver(event -> {
-            System.out.println("drag over on placeholder");
             event.consume();
             event.acceptTransferModes(TransferMode.MOVE);
         });
 
         placeholder.setOnDragDropped(event -> {
-            System.out.println("drag dropped");
             listView.getItems().add(getSkinnable().getDraggedItem());
             event.setDropCompleted(true);
             event.consume();

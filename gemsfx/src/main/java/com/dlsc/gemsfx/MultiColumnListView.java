@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.skins.MultiColumnListViewSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -22,6 +23,7 @@ import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 public class MultiColumnListView<T> extends Control {
 
@@ -39,7 +41,7 @@ public class MultiColumnListView<T> extends Control {
         return MultiColumnListView.class.getResource("multi-column-list-view.css").toExternalForm();
     }
 
-    private final ObjectProperty<Callback<MultiColumnListView<T>, ListView<T>>> listViewFactory = new SimpleObjectProperty<>(this, "listViewFactory", m -> new ListView<>());
+    private final ObjectProperty<Callback<MultiColumnListView<T>, ListView<T>>> listViewFactory = new SimpleObjectProperty<>(this, "listViewFactory", m -> new AutoscrollListView<>());
 
     public Callback<MultiColumnListView<T>, ListView<T>> getListViewFactory() {
         return listViewFactory.get();
@@ -168,6 +170,10 @@ public class MultiColumnListView<T> extends Control {
         this.placeholderTo.set(placeholderTo);
     }
 
+    private void log(String text) {
+        System.out.println(text);
+    }
+
     public static class ColumnListCell<T> extends ListCell<T> {
 
         private final MultiColumnListView<T> multiColumnListView;
@@ -183,7 +189,7 @@ public class MultiColumnListView<T> extends Control {
             itemProperty().addListener(updateDraggedPseudoStateListener);
 
             setOnDragDetected(event -> {
-                System.out.println("drag detected");
+                log("drag detected");
                 if (isEmpty() || getItem() == null) {
                     return;
                 }
@@ -211,41 +217,52 @@ public class MultiColumnListView<T> extends Control {
             });
 
             setOnDragOver(event -> {
-                System.out.println("drag over");
-                if (event.getGestureSource() != this && multiColumnListView.getPlaceholderFrom() != getItem() && multiColumnListView.getPlaceholderTo() != getItem()) {
-                    System.out.println("accepting, " + hashCode() + ", txt: " + getText());
-                    update(event);
+                log("drag over");
+                if (event.getGestureSource() != this && multiColumnListView.getPlaceholderFrom() != getItem()) {
+                    log("   accepting, " + hashCode() + ", txt: " + getText());
+                    updateItems(event);
                     event.consume();
+                    event.acceptTransferModes(TransferMode.MOVE);
+                } else {
+                    log("   not accepting drag");
+                    event.acceptTransferModes(TransferMode.NONE);
                 }
-                event.acceptTransferModes(TransferMode.MOVE);
             });
 
             setOnDragEntered(event -> {
-                System.out.println("drag entered");
-                //update(event);
+                log("drag entered");
             });
 
             setOnDragExited(event -> {
-                System.out.println("drag exited");
-//                if (event.getGestureSource() != this) {
-                    getListView().getItems().remove(multiColumnListView.getPlaceholderTo());
-//                }
+                log("drag exited");
+                getListView().getItems().remove(multiColumnListView.getPlaceholderTo());
             });
 
             setOnDragDropped(event -> {
-                System.out.println("drag dropped");
+                log("drag dropped");
 
-                update(event);
+                if (multiColumnListView.getPlaceholderFrom() == getItem()) {
+                    log("   not performing drop, drop happened on 'from' placeholder");
+                    return;
+                }
 
-                getListView().getItems().remove(multiColumnListView.getPlaceholderFrom());
+                log("   performing drop");
 
-                getListView().getItems().replaceAll(item -> {
+                ListView<T> listView = getListView();
+                ObservableList<T> items = listView.getItems();
+
+                items.remove(multiColumnListView.getPlaceholderFrom());
+
+                T draggedItem = multiColumnListView.getDraggedItem();
+                items.replaceAll(item -> {
                     if (item == multiColumnListView.getPlaceholderTo()) {
-                        return multiColumnListView.getDraggedItem();
+                        return draggedItem;
                     }
 
                     return item;
                 });
+
+                listView.getSelectionModel().select(draggedItem);
 
                 event.setDropCompleted(true);
 
@@ -253,42 +270,87 @@ public class MultiColumnListView<T> extends Control {
             });
 
             setOnDragDone(evt -> {
-                System.out.println("drag done");
-                evt.consume();
-                getListView().getItems().removeIf(item -> item == multiColumnListView.getPlaceholderFrom());
+                log("drag done");
+                if (Objects.equals(evt.getAcceptedTransferMode(), TransferMode.MOVE)) {
+                    log("   drop was completed, removing the 'from' placeholder");
+                    getListView().getItems().removeIf(item -> item == multiColumnListView.getPlaceholderFrom());
+                } else {
+                    log("   drop was not completed, replacing placeholder with dragged item");
+                    getListView().getItems().replaceAll(item -> {
+                        if (item == multiColumnListView.getPlaceholderFrom()) {
+                            return multiColumnListView.getDraggedItem();
+                        }
+                        return item;
+                    });
+                }
+
                 multiColumnListView.setDraggedItem(null);
+                evt.consume();
             });
         }
 
-        private void update(DragEvent event) {
-            if (event.getGestureSource() != this) {
-                int index = getIndex();
+        public final MultiColumnListView<T> getMultiColumnListView() {
+            return multiColumnListView;
+        }
 
+        private void updateItems(DragEvent event) {
+            if (event.getGestureSource() != this) {
+                int toIndex = getIndex();
+
+                T fromItem = multiColumnListView.getPlaceholderFrom();
                 T toItem = multiColumnListView.getPlaceholderTo();
+
+                int fromIndex = getListView().getItems().indexOf(fromItem);
+
                 ObservableList<T> items = getListView().getItems();
-                System.out.println("item count: " + items.size());
+                log("item count: " + items.size());
                 items.remove(toItem);
-                System.out.println("item count now: " + items.size());
+                log("item count now: " + items.size());
 
                 if (event.getY() < getHeight() / 2) {
-                    System.out.println("   attempt to add ABOVE");
-                    if (index > 0) {
-                        System.out.println("      adding dragged item at index " + index);
-                        items.add(Math.min(index, items.size()), toItem);
+                    log("   attempt to add ABOVE");
+                    if (toIndex > 0) {
+                        int finalToIndex = Math.min(toIndex, items.size());
+                        if (notNextToEachOther(fromIndex, finalToIndex)) {
+                            log("      adding 'to' placeholder at index " + toIndex);
+                            items.add(finalToIndex, toItem);
+                        }
                     } else {
-                        System.out.println("      adding dragged item at index 0");
-                        items.add(0, toItem);
+                        if (notNextToEachOther(fromIndex, 0)) {
+                            log("      adding 'to' placeholder at index 0");
+                            items.add(0, toItem);
+                        }
                     }
                 } else {
-                    System.out.println("   attempt to add BELOW");
-                    if (index < items.size() - 1) {
-                        System.out.println("      adding placeholder at index + index");
-                        items.add(index, toItem);
+                    log("   attempt to add BELOW");
+                    if (toIndex < items.size() - 1) {
+                        int finalToIndex = toIndex + 1;
+                        if (notNextToEachOther(fromIndex, finalToIndex)) {
+                            log("      adding 'to' placeholder at index " + finalToIndex);
+                            items.add(finalToIndex, toItem);
+                        }
                     } else {
-                        items.add(toItem);
+                        if (notNextToEachOther(fromIndex, items.size() - 1)) {
+                            items.add(toItem);
+                        }
                     }
                 }
             }
+        }
+
+        private boolean notNextToEachOther(int fromIndex, int toIndex) {
+            // Only if both indices are not -1 are both placeholders in the same list and need
+            // special checks.
+            System.out.println("from / to index: " + fromIndex + " / " + toIndex);
+            if (fromIndex != -1 && toIndex != -1) {
+                if (fromIndex < toIndex) {
+                    return Math.abs(fromIndex - toIndex) > 1;
+                } else {
+                    return Math.abs(fromIndex - toIndex) > 0;
+                }
+            }
+
+            return true;
         }
 
         private void updateDraggedPseudoState() {
@@ -314,6 +376,10 @@ public class MultiColumnListView<T> extends Control {
             } else {
                 setText("");
             }
+        }
+
+        private void log(String text) {
+            System.out.println(text);
         }
     }
 }

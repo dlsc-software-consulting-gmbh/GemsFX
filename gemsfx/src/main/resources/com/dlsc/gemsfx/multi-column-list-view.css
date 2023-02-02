@@ -11,12 +11,11 @@
 }
 
 .multi-column-list-view .column-list-cell:dragged {
-    -fx-border-color: grey;
-    -fx-border-width: 5px;
-    -fx-border-style: dashed;
-    -fx-border-insets: 10px;
 }
 
 .multi-column-list-view .list-view .placeholder:drag-over {
-    -fx-background-color: orange;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 2px;
+    -fx-border-style: dashed;
+    -fx-border-insets: 15px;
 }
