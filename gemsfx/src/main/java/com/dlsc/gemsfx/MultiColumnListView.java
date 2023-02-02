@@ -2,8 +2,10 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.MultiColumnListViewSkin;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -25,8 +27,18 @@ import javafx.util.Callback;
 import java.util.Comparator;
 import java.util.Objects;
 
+/**<
+ * A view for displaying multiple columns where each column consists of a header
+ * control and a {@link ListView}. The control allows the user to rearrange the items in each
+ * {@link ListView} and also to drag and drop items from one column to another.
+ *
+ * @param <T> the item types, e.g. "Issues" or "Tickets"
+ */
 public class MultiColumnListView<T> extends Control {
 
+    /**
+     * Constructs a new view.
+     */
     public MultiColumnListView() {
         getStyleClass().add("multi-column-list-view");
     }
@@ -41,17 +53,42 @@ public class MultiColumnListView<T> extends Control {
         return MultiColumnListView.class.getResource("multi-column-list-view.css").toExternalForm();
     }
 
+    private final BooleanProperty showHeaders = new SimpleBooleanProperty(this, "showHeaders", true);
+
+    public final boolean isShowHeaders() {
+        return showHeaders.get();
+    }
+
+    /**
+     * Determines whether the headers will be shown or not. Toggling this property will trigger
+     * a rebuild of the view.
+     *
+     * @return true if the headers should be shown
+     */
+    public final BooleanProperty showHeadersProperty() {
+        return showHeaders;
+    }
+
+    public final void setShowHeaders(boolean showHeaders) {
+        this.showHeaders.set(showHeaders);
+    }
+
     private final ObjectProperty<Callback<MultiColumnListView<T>, ListView<T>>> listViewFactory = new SimpleObjectProperty<>(this, "listViewFactory", m -> new AutoscrollListView<>());
 
-    public Callback<MultiColumnListView<T>, ListView<T>> getListViewFactory() {
+    public final Callback<MultiColumnListView<T>, ListView<T>> getListViewFactory() {
         return listViewFactory.get();
     }
 
-    public ObjectProperty<Callback<MultiColumnListView<T>, ListView<T>>> listViewFactoryProperty() {
+    /**
+     * Stores the callback that will be invoked to produce new {@link ListView} instances.
+     *
+     * @return the factory for creating the required list views, one for each column
+     */
+    public final ObjectProperty<Callback<MultiColumnListView<T>, ListView<T>>> listViewFactoryProperty() {
         return listViewFactory;
     }
 
-    public void setListViewFactory(Callback<MultiColumnListView<T>, ListView<T>> listViewFactory) {
+    public final void setListViewFactory(Callback<MultiColumnListView<T>, ListView<T>> listViewFactory) {
         this.listViewFactory.set(listViewFactory);
     }
 
@@ -61,6 +98,13 @@ public class MultiColumnListView<T> extends Control {
         return columns.get();
     }
 
+    /**
+     * A list of columns that define how many columns will be shown inside the view.
+     * The model objects in this list also store the header and the data for each
+     * column.
+     *
+     * @return the list of columns
+     */
     public final ListProperty<ListViewColumn<T>> columnsProperty() {
         return columns;
     }
@@ -75,6 +119,11 @@ public class MultiColumnListView<T> extends Control {
         return cellFactory.get();
     }
 
+    /**
+     * The cell factory that will be used for each one of the {@link ListView} instances.
+     *
+     * @return the cell factory
+     */
     public final ObjectProperty<Callback<MultiColumnListView<T>, ColumnListCell<T>>> cellFactoryProperty() {
         return cellFactory;
     }
@@ -83,47 +132,50 @@ public class MultiColumnListView<T> extends Control {
         this.cellFactory.set(cellFactory);
     }
 
+    /**
+     * The model object representing a single column. The type of the items in all columns must be the
+     * same.
+     *
+     * @param <T> the type of items shown by the column
+     */
     public static class ListViewColumn<T> {
 
-        private final ListProperty<T> items = new SimpleListProperty<>(this, "items", FXCollections.observableArrayList());
+        private final ObservableList<T> items = FXCollections.observableArrayList();
 
-        public ObservableList<T> getItems() {
-            return items.get();
-        }
-
-        public ListProperty<T> itemsProperty() {
+        /**
+         * The data shown in the column.
+         *
+         * @return the model for this column
+         */
+        public final ObservableList<T> getItems() {
             return items;
         }
 
-        public void setItems(ObservableList<T> items) {
-            this.items.set(items);
-        }
+        private final ObjectProperty<Node> header = new SimpleObjectProperty<>(this, "header", new Label("Column Header"));
 
-        private final ObjectProperty<Node> header = new SimpleObjectProperty<>(this, "header", new Label("Column"));
-
-        public Node getHeader() {
+        public final Node getHeader() {
             return header.get();
         }
 
-        public ObjectProperty<Node> headerProperty() {
+        public final ObjectProperty<Node> headerProperty() {
             return header;
         }
 
-        public void setHeader(Node header) {
+        public final void setHeader(Node header) {
             this.header.set(header);
         }
 
         private final ObjectProperty<Comparator<T>> comparator = new SimpleObjectProperty<>(this, "comparator", Comparator.comparing(Object::toString));
 
-        public Comparator getComparator() {
+        public final Comparator getComparator() {
             return comparator.get();
         }
 
-        public ObjectProperty<Comparator<T>> comparatorProperty() {
+        public final ObjectProperty<Comparator<T>> comparatorProperty() {
             return comparator;
         }
 
-        public void setComparator(Comparator comparator) {
+        public final void setComparator(Comparator comparator) {
             this.comparator.set(comparator);
         }
     }
@@ -140,6 +192,12 @@ public class MultiColumnListView<T> extends Control {
 
     public final void setDraggedItem(T draggedItem) {
         this.draggedItem.set(draggedItem);
+    }
+
+    private final ObservableList<T> draggedItems = FXCollections.observableArrayList();
+
+    public final ObservableList<T> getDraggedItems() {
+        return draggedItems;
     }
 
     private final ObjectProperty<T> placeholderFrom = new SimpleObjectProperty<>(this, "placeholderFrom");
@@ -170,14 +228,22 @@ public class MultiColumnListView<T> extends Control {
         this.placeholderTo.set(placeholderTo);
     }
 
-    private void log(String text) {
-        System.out.println(text);
-    }
-
+    /**
+     * A special list cell to be used in combination with the {@link MultiColumnListView} control.
+     * The cell adds drag and drop support for re-arranging list cells and for dragging them from
+     * one column to another.
+     *
+     * @param <T> the type of items in the list
+     */
     public static class ColumnListCell<T> extends ListCell<T> {
 
         private final MultiColumnListView<T> multiColumnListView;
 
+        /**
+         * Creates a new list cell.
+         *
+         * @param multiColumnListView reference to the {@link MultiColumnListView} control where the cell is being used
+         */
         public ColumnListCell(MultiColumnListView<T> multiColumnListView) {
             this.multiColumnListView = multiColumnListView;
 
@@ -206,6 +272,8 @@ public class MultiColumnListView<T> extends Control {
                 event.consume();
 
                 multiColumnListView.setDraggedItem(getItem());
+
+                multiColumnListView.getDraggedItems().setAll(getListView().getSelectionModel().getSelectedItems());
 
                 getListView().getItems().replaceAll(item -> {
                     if (item == getItem()) {
@@ -289,6 +357,12 @@ public class MultiColumnListView<T> extends Control {
             });
         }
 
+        /**
+         * Returns the {@link MultiColumnListView} control where the cell is being
+         * used.
+         *
+         * @return the parent control
+         */
         public final MultiColumnListView<T> getMultiColumnListView() {
             return multiColumnListView;
         }
@@ -378,8 +452,9 @@ public class MultiColumnListView<T> extends Control {
             }
         }
 
+        // for quick and dirty logging / debugging
         private void log(String text) {
-            System.out.println(text);
+            // System.out.println(text);
         }
     }
 }

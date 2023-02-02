@@ -10,8 +10,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -27,12 +29,16 @@ public class MultiColumnListViewApp extends Application {
         multiColumnListView.getColumns().setAll(createColumns());
         multiColumnListView.setPlaceholderFrom(new Issue(""));
         multiColumnListView.setPlaceholderTo(new Issue(""));
+        VBox.setVgrow(multiColumnListView, Priority.ALWAYS);
 
-        StackPane stackPane = new StackPane(multiColumnListView);
-        stackPane.setPadding(new Insets(20));
-        stackPane.setAlignment(Pos.CENTER);
+        CheckBox showHeaders = new CheckBox("Show Headers");
+        showHeaders.selectedProperty().bindBidirectional(multiColumnListView.showHeadersProperty());
 
-        Scene scene = new Scene(stackPane);
+        VBox vbox = new VBox(10, multiColumnListView, showHeaders);
+        vbox.setAlignment(Pos.TOP_RIGHT);
+        vbox.setPadding(new Insets(20));
+
+        Scene scene = new Scene(vbox);
         scene.getStylesheets().add(MultiColumnListViewApp.class.getResource("multi-column-app.css").toExternalForm());
 
         CSSFX.start();

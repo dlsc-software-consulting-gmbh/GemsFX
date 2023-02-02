@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.MultiColumnListView;
 import com.dlsc.gemsfx.MultiColumnListView.ColumnListCell;
 import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -27,10 +28,19 @@ public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>>
     public MultiColumnListViewSkin(MultiColumnListView<T> view) {
         super(view);
 
-        view.columnsProperty().addListener((Observable it) -> updateView());
+        InvalidationListener updateListener = (Observable it) -> updateView();
+        view.columnsProperty().addListener(updateListener);
+        view.showHeadersProperty().addListener(updateListener);
         updateView();
 
         gridPane.getStyleClass().add("grid-pane");
+
+        getChildren().setAll(gridPane);
+    }
+
+    private void updateView() {
+        gridPane.getChildren().clear();
+        gridPane.getColumnConstraints().clear();
 
         RowConstraints row1 = new RowConstraints();
         row1.setVgrow(Priority.NEVER);
@@ -40,16 +50,13 @@ public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>>
         row2.setVgrow(Priority.ALWAYS);
         row2.setFillHeight(true);
 
-        gridPane.getRowConstraints().setAll(row1, row2);
-
-        getChildren().setAll(gridPane);
-    }
-
-    private void updateView() {
-        gridPane.getChildren().clear();
-        gridPane.getColumnConstraints().clear();
-
         MultiColumnListView<T> view = getSkinnable();
+
+        if (view.isShowHeaders()) {
+            gridPane.getRowConstraints().setAll(row1, row2);
+        } else {
+            gridPane.getRowConstraints().setAll(row2);
+        }
 
         ObservableList<ListViewColumn<T>> columns = view.getColumns();
         int numberOfColumns = columns.size();
@@ -83,15 +90,19 @@ public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>>
                 initPlaceholder(listView, listView.getPlaceholder());
             });
 
-            listView.itemsProperty().bind(column.itemsProperty());
+            listView.setItems(column.getItems());
 
             listView.cellFactoryProperty().bind(Bindings.createObjectBinding(() -> lv -> {
                 Callback<MultiColumnListView<T>, ColumnListCell<T>> cellFactory = view.getCellFactory();
                 return cellFactory.call(view);
             }, view.cellFactoryProperty()));
 
-            gridPane.add(header, i, 0);
-            gridPane.add(listView, i, 1);
+            if (view.isShowHeaders()) {
+                gridPane.add(header, i, 0);
+                gridPane.add(listView, i, 1);
+            } else {
+                gridPane.add(listView, i, 0);
+            }
         }
     }
 
