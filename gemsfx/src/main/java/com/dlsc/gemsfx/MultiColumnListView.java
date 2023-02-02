@@ -415,7 +415,7 @@ public class MultiColumnListView<T> extends Control {
         private boolean notNextToEachOther(int fromIndex, int toIndex) {
             // Only if both indices are not -1 are both placeholders in the same list and need
             // special checks.
-            System.out.println("from / to index: " + fromIndex + " / " + toIndex);
+            log("from / to index: " + fromIndex + " / " + toIndex);
             if (fromIndex != -1 && toIndex != -1) {
                 if (fromIndex < toIndex) {
                     return Math.abs(fromIndex - toIndex) > 1;
