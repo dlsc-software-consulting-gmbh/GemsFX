@@ -7,10 +7,12 @@
 }
 
 .multi-column-list-view .column-list-cell {
-    -fx-pref-height: 100px;
 }
 
-.multi-column-list-view .column-list-cell:dragged {
+.multi-column-list-view .column-list-cell:from {
+}
+
+.multi-column-list-view .column-list-cell:to {
 }
 
 .multi-column-list-view .list-view .placeholder:drag-over {

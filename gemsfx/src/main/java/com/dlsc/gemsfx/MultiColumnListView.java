@@ -5,6 +5,8 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -249,6 +251,10 @@ public class MultiColumnListView<T> extends Control {
 
             getStyleClass().add("column-list-cell");
 
+            fromPlaceholder.bind(itemProperty().isEqualTo(multiColumnListView.placeholderFromProperty()));
+            toPlaceholder.bind(itemProperty().isEqualTo(multiColumnListView.placeholderToProperty()));
+            placeholder.bind(fromPlaceholder.or(toPlaceholder));
+
             InvalidationListener updateDraggedPseudoStateListener = it -> updateDraggedPseudoState();
 
             multiColumnListView.draggedItemProperty().addListener(updateDraggedPseudoStateListener);
@@ -268,6 +274,8 @@ public class MultiColumnListView<T> extends Control {
                 Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
                 dragboard.setContent(content);
                 dragboard.setDragView(snapshot);
+                dragboard.setDragViewOffsetX(snapshot.getWidth() / 2);
+                dragboard.setDragViewOffsetY(-snapshot.getHeight() / 2);
 
                 event.consume();
 
@@ -429,8 +437,10 @@ public class MultiColumnListView<T> extends Control {
 
         private void updateDraggedPseudoState() {
             T from = multiColumnListView.getPlaceholderFrom();
+            pseudoClassStateChanged(PseudoClass.getPseudoClass("from"), from != null && from == getItem());
+
             T to = multiColumnListView.getPlaceholderTo();
-            pseudoClassStateChanged(PseudoClass.getPseudoClass("dragged"), (from != null && from == getItem()) || to != null && to == getItem());
+            pseudoClassStateChanged(PseudoClass.getPseudoClass("to"), to != null && to == getItem());
         }
 
         @Override
@@ -450,6 +460,55 @@ public class MultiColumnListView<T> extends Control {
             } else {
                 setText("");
             }
+        }
+
+        private final ReadOnlyBooleanWrapper placeholder = new ReadOnlyBooleanWrapper(this, "placeholder");
+
+        public final boolean isPlaceholder() {
+            return placeholder.get();
+        }
+
+        /**
+         * A read-only property that is being set to true if the item in the cell is currently
+         * either one of the two placeholder items (see {@link MultiColumnListView#placeholderFromProperty()}
+         * or {@link MultiColumnListView#placeholderToProperty()}).
+         *
+         * @return true if the currently shown item is either the "from" or the "to" placeholder object
+         */
+        public final ReadOnlyBooleanWrapper placeholderProperty() {
+            return placeholder;
+        }
+
+        private final ReadOnlyBooleanWrapper fromPlaceholder = new ReadOnlyBooleanWrapper(this, "fromPlaceholder");
+
+        public final boolean isFromPlaceholder() {
+            return fromPlaceholder.get();
+        }
+
+        /**
+         * A read-only property that is being set to true if the item in the cell is currently
+         * the "from" placeholder item (see {@link MultiColumnListView#placeholderFromProperty()}).
+         *
+         * @return true if the currently shown item is the "from" placeholder object
+         */
+        public final ReadOnlyBooleanProperty fromPlaceholderProperty() {
+            return fromPlaceholder.getReadOnlyProperty();
+        }
+
+        private final ReadOnlyBooleanWrapper toPlaceholder = new ReadOnlyBooleanWrapper(this, "toPlaceholder");
+
+        public final boolean isToPlaceholder() {
+            return toPlaceholder.get();
+        }
+
+        /**
+         * A read-only property that is being set to true if the item in the cell is currently
+         * the "to" placeholder item (see {@link MultiColumnListView#placeholderToProperty()}).
+         *
+         * @return true if the currently shown item is the "to" placeholder object
+         */
+        public final ReadOnlyBooleanProperty toPlaceholderProperty() {
+            return toPlaceholder.getReadOnlyProperty();
         }
 
         // for quick and dirty logging / debugging

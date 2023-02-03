@@ -40,3 +40,9 @@
     -fx-border-width: 2px;
     -fx-border-style: dashed;
 }
+
+.issue-list-cell:from {
+}
+
+.issue-list-cell:to {
+}
