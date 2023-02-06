@@ -9,14 +9,17 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.util.List;
 
@@ -34,7 +37,20 @@ public class MultiColumnListViewApp extends Application {
         CheckBox showHeaders = new CheckBox("Show Headers");
         showHeaders.selectedProperty().bindBidirectional(multiColumnListView.showHeadersProperty());
 
-        VBox vbox = new VBox(10, multiColumnListView, showHeaders);
+        Callback<Integer, Node> separatorFactory = multiColumnListView.getSeparatorFactory();
+
+        CheckBox separators = new CheckBox("Use Separators");
+        separators.selectedProperty().addListener(it -> {
+            if (separators.isSelected()) {
+                multiColumnListView.setSeparatorFactory(separatorFactory);
+            } else {
+                multiColumnListView.setSeparatorFactory(null);
+            }
+        });
+
+        HBox optionsBox = new HBox(10, separators, showHeaders);
+        optionsBox.setAlignment(Pos.CENTER_RIGHT);
+        VBox vbox = new VBox(10, multiColumnListView, optionsBox);
         vbox.setAlignment(Pos.TOP_RIGHT);
         vbox.setPadding(new Insets(20));
 

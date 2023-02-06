@@ -8,6 +8,7 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -31,6 +32,8 @@ public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>>
         InvalidationListener updateListener = (Observable it) -> updateView();
         view.columnsProperty().addListener(updateListener);
         view.showHeadersProperty().addListener(updateListener);
+        view.separatorFactoryProperty().addListener(updateListener);
+        view.listViewFactoryProperty().addListener(updateListener);
         updateView();
 
         gridPane.getStyleClass().add("grid-pane");
@@ -61,16 +64,28 @@ public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>>
         ObservableList<ListViewColumn<T>> columns = view.getColumns();
         int numberOfColumns = columns.size();
 
+        Callback<Integer, Node> separatorFactory = view.getSeparatorFactory();
+
         for (int i = 0; i < numberOfColumns; i++) {
             ColumnConstraints columnConstraints = new ColumnConstraints();
-            columnConstraints.setPercentWidth(100d / (double) numberOfColumns);
             columnConstraints.setHgrow(Priority.ALWAYS);
             columnConstraints.setFillWidth(true);
+            columnConstraints.setPrefWidth(1); // make sure all columns have the same width
             gridPane.getColumnConstraints().add(columnConstraints);
+
+            if (separatorFactory != null && i < numberOfColumns - 1) {
+                columnConstraints = new ColumnConstraints();
+                columnConstraints.setHgrow(Priority.NEVER);
+                columnConstraints.setHalignment(HPos.CENTER);
+                gridPane.getColumnConstraints().add(columnConstraints);
+            }
         }
 
-        for (int i = 0; i < columns.size(); i++) {
-            ListViewColumn<T> column = columns.get(i);
+        int columnIndex = 0;
+        int col = 0;
+
+        do {
+            ListViewColumn<T> column = columns.get(columnIndex);
 
             Node header = column.getHeader();
             if (header instanceof Region) {
@@ -98,12 +113,25 @@ public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>>
             }, view.cellFactoryProperty()));
 
             if (view.isShowHeaders()) {
-                gridPane.add(header, i, 0);
-                gridPane.add(listView, i, 1);
+                gridPane.add(header, col, 0);
+                gridPane.add(listView, col, 1);
             } else {
-                gridPane.add(listView, i, 0);
+                gridPane.add(listView, col, 0);
             }
-        }
+
+            if (separatorFactory != null && columnIndex < numberOfColumns - 1) {
+                Node separator = separatorFactory.call(columnIndex);
+                col++;
+                gridPane.add(separator, col, 0);
+                GridPane.setFillHeight(separator, true);
+                if (view.isShowHeaders()) {
+                    GridPane.setRowSpan(separator, 2);
+                }
+            }
+
+            col++;
+            columnIndex++;
+        } while (columnIndex < numberOfColumns);
     }
 
     private void createPlaceholder(ListView<T> listView) {

@@ -24,12 +24,13 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Region;
 import javafx.util.Callback;
 
-import java.util.Comparator;
 import java.util.Objects;
 
-/**<
+/**
+ * <
  * A view for displaying multiple columns where each column consists of a header
  * control and a {@link ListView}. The control allows the user to rearrange the items in each
  * {@link ListView} and also to drag and drop items from one column to another.
@@ -134,6 +135,31 @@ public class MultiColumnListView<T> extends Control {
         this.cellFactory.set(cellFactory);
     }
 
+    private final ObjectProperty<Callback<Integer, Node>> separatorFactory = new SimpleObjectProperty<>(this, "separatorFactory", index -> {
+        Region separator = new Region();
+        separator.getStyleClass().add("column-separator");
+        return separator;
+    });
+
+    public final Callback<Integer, Node> getSeparatorFactory() {
+        return separatorFactory.get();
+    }
+
+    /**
+     * An optional factory for creating separators that will be placed between columns. The default implementation
+     * creates a region and adds the style class "column-separator". No separators will be added to the view when
+     * the factory is being set to null.
+     *
+     * @return a separator node
+     */
+    public final ObjectProperty<Callback<Integer, Node>> separatorFactoryProperty() {
+        return separatorFactory;
+    }
+
+    public final void setSeparatorFactory(Callback<Integer, Node> separatorFactory) {
+        this.separatorFactory.set(separatorFactory);
+    }
+
     /**
      * The model object representing a single column. The type of the items in all columns must be the
      * same.
@@ -159,26 +185,17 @@ public class MultiColumnListView<T> extends Control {
             return header.get();
         }
 
+        /**
+         * An optional node that will serve as the column's header. It will be shown above the column.
+         *
+         * @return the header node / header UI
+         */
         public final ObjectProperty<Node> headerProperty() {
             return header;
         }
 
         public final void setHeader(Node header) {
             this.header.set(header);
-        }
-
-        private final ObjectProperty<Comparator<T>> comparator = new SimpleObjectProperty<>(this, "comparator", Comparator.comparing(Object::toString));
-
-        public final Comparator getComparator() {
-            return comparator.get();
-        }
-
-        public final ObjectProperty<Comparator<T>> comparatorProperty() {
-            return comparator;
-        }
-
-        public final void setComparator(Comparator comparator) {
-            this.comparator.set(comparator);
         }
     }
 
@@ -204,29 +221,39 @@ public class MultiColumnListView<T> extends Control {
 
     private final ObjectProperty<T> placeholderFrom = new SimpleObjectProperty<>(this, "placeholderFrom");
 
-    public T getPlaceholderFrom() {
+    public final T getPlaceholderFrom() {
         return placeholderFrom.get();
     }
 
-    public ObjectProperty<T> placeholderFromProperty() {
+    /**
+     * A model item that represents the "from" location during drag and drop operations.
+     *
+     * @return the placeholder model item for the "from" location
+     */
+    public final ObjectProperty<T> placeholderFromProperty() {
         return placeholderFrom;
     }
 
-    public void setPlaceholderFrom(T placeholderFrom) {
+    public final void setPlaceholderFrom(T placeholderFrom) {
         this.placeholderFrom.set(placeholderFrom);
     }
 
     private final ObjectProperty<T> placeholderTo = new SimpleObjectProperty<>(this, "placeholderTo");
 
-    public T getPlaceholderTo() {
+    public final T getPlaceholderTo() {
         return placeholderTo.get();
     }
 
-    public ObjectProperty<T> placeholderToProperty() {
+    /**
+     * A model item that represents the "to" location during drag and drop operations.
+     *
+     * @return the placeholder model item for the "to" location
+     */
+    public final ObjectProperty<T> placeholderToProperty() {
         return placeholderTo;
     }
 
-    public void setPlaceholderTo(T placeholderTo) {
+    public final void setPlaceholderTo(T placeholderTo) {
         this.placeholderTo.set(placeholderTo);
     }
 
