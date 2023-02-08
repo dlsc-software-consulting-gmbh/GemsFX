@@ -160,6 +160,25 @@ public class MultiColumnListView<T> extends Control {
         this.separatorFactory.set(separatorFactory);
     }
 
+    private final BooleanProperty disableDragAndDrop = new SimpleBooleanProperty(this, "disableDragAndDrop");
+
+    public final boolean isDisableDragAndDrop() {
+        return disableDragAndDrop.get();
+    }
+
+    /**
+     * Controls whether the user can rearrange items via drag and drop or not.
+     *
+     * @return "true" if the control allows rearranging items via drag and drop
+     */
+    public final BooleanProperty disableDragAndDropProperty() {
+        return disableDragAndDrop;
+    }
+
+    public final void setDisableDragAndDrop(boolean disableDragAndDrop) {
+        this.disableDragAndDrop.set(disableDragAndDrop);
+    }
+
     /**
      * The model object representing a single column. The type of the items in all columns must be the
      * same.
@@ -168,15 +187,23 @@ public class MultiColumnListView<T> extends Control {
      */
     public static class ListViewColumn<T> {
 
-        private final ObservableList<T> items = FXCollections.observableArrayList();
+        private final ListProperty<T> items = new SimpleListProperty<>(this, "items", FXCollections.observableArrayList());
+
+        public final ObservableList getItems() {
+            return items.get();
+        }
 
         /**
          * The data shown in the column.
          *
          * @return the model for this column
          */
-        public final ObservableList<T> getItems() {
+        public final ListProperty<T> itemsProperty() {
             return items;
+        }
+
+        public final void setItems(ObservableList items) {
+            this.items.set(items);
         }
 
         private final ObjectProperty<Node> header = new SimpleObjectProperty<>(this, "header", new Label("Column Header"));
@@ -288,6 +315,10 @@ public class MultiColumnListView<T> extends Control {
             itemProperty().addListener(updateDraggedPseudoStateListener);
 
             setOnDragDetected(event -> {
+                if (multiColumnListView.isDisableDragAndDrop()) {
+                    return;
+                }
+
                 log("drag detected");
                 if (isEmpty() || getItem() == null) {
                     return;

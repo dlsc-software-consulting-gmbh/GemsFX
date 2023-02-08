@@ -29,13 +29,15 @@ public class StageManager {
     private double minWidth;
     private double minHeight;
 
+    private boolean supportFullScreenAndMaximized;
+
     /**
      * Installs a new manager for the given stage. The location and dimension information will
      * be stored in the user preferences at the given path. The default values for the minimum
      * width is 850 and for the minimum height is 600.
      */
-    public static void install(Stage stage, String preferencesPath) {
-        install(stage, Preferences.userRoot().node(preferencesPath));
+    public static StageManager install(Stage stage, String preferencesPath) {
+        return install(stage, Preferences.userRoot().node(preferencesPath));
     }
     
     /**
@@ -44,8 +46,8 @@ public class StageManager {
      * default values for the minimum width is 850 and for the minimum height is
      * 600.
      */
-    public static void install(Stage stage, Preferences preferences) {
-        install(stage, preferences, 850, 600);
+    public static StageManager install(Stage stage, Preferences preferences) {
+        return install(stage, preferences, 850, 600);
     }
 
     /**
@@ -57,8 +59,8 @@ public class StageManager {
      * @param minWidth the minimum width that will be used for the stage
      * @param minHeight the minimum height that will be used for the stage
      */
-    public static void install(Stage stage, String preferencesPath, double minWidth, double minHeight) {
-        install(stage, Preferences.userRoot().node(preferencesPath), minWidth, minHeight);
+    public static StageManager install(Stage stage, String preferencesPath, double minWidth, double minHeight) {
+        return install(stage, Preferences.userRoot().node(preferencesPath), minWidth, minHeight);
     }
 
     /**
@@ -70,8 +72,8 @@ public class StageManager {
      * @param minWidth the minimum width that will be used for the stage
      * @param minHeight the minimum height that will be used for the stage
      */
-    public static void install(Stage stage, Preferences preferences, double minWidth, double minHeight) {
-        new StageManager(stage, preferences, minWidth, minHeight);
+    public static StageManager install(Stage stage, Preferences preferences, double minWidth, double minHeight) {
+        return new StageManager(stage, preferences, minWidth, minHeight);
     }
        
     /*
@@ -108,18 +110,28 @@ public class StageManager {
         stage.maximizedProperty().addListener(stageListener);
     }
 
+    public final void setSupportFullScreenAndMaximized(boolean supportFullScreenAndMaximized) {
+        this.supportFullScreenAndMaximized = supportFullScreenAndMaximized;
+    }
+
+    public final boolean isSupportFullScreenAndMaximized() {
+        return supportFullScreenAndMaximized;
+    }
+
     private void saveStage() throws SecurityException {
-        if (stage.isMaximized()) {
+        if (supportFullScreenAndMaximized && stage.isMaximized()) {
             LOG.fine(MessageFormat.format("saving stage, iconified = {1}, maximized = {2}, fullscreen = {3}", stage.isIconified(), stage.isMaximized(), stage.isFullScreen()));
         } else {
             LOG.fine(MessageFormat.format("saving stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}, maximized = {5}, fullscreen = {6}", stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight(), stage.isIconified(), stage.isMaximized(), stage.isFullScreen()));
         }
-        if (!stage.isMaximized() && !stage.isFullScreen()) {
+
+        if (!supportFullScreenAndMaximized || (!stage.isMaximized() && !stage.isFullScreen())) {
             preferences.putDouble("x", stage.getX());
             preferences.putDouble("y", stage.getY());
             preferences.putDouble("width", stage.getWidth());
             preferences.putDouble("height", stage.getHeight());
         }
+
         preferences.putBoolean("iconified", stage.isIconified());
         preferences.putBoolean("maximized", stage.isMaximized());
         preferences.putBoolean("fullscreen", stage.isFullScreen());
@@ -130,11 +142,16 @@ public class StageManager {
         double y = preferences.getDouble("y", -1);
         double w = preferences.getDouble("width", stage.getWidth());
         double h = preferences.getDouble("height", stage.getHeight());
+
         boolean iconified = preferences.getBoolean("iconified", false);
         boolean maximized = preferences.getBoolean("maximized", false);
         boolean fullscreen = preferences.getBoolean("fullscreen", false);
 
-        LOG.fine(MessageFormat.format("loading stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}, maximized = {5}, fullscreen = {6}", x, y, w, h, iconified, maximized, fullscreen));
+        if (supportFullScreenAndMaximized) {
+            LOG.fine(MessageFormat.format("loading stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}, maximized = {5}, fullscreen = {6}", x, y, w, h, iconified, maximized, fullscreen));
+        } else {
+            LOG.fine(MessageFormat.format("loading stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}", x, y, w, h, iconified));
+        }
 
         if (x == -1 && y == -1) {
             stage.centerOnScreen();
@@ -148,8 +165,11 @@ public class StageManager {
 
         Platform.runLater(() -> {
             stage.setIconified(iconified);
-            stage.setMaximized(maximized);
-            stage.setFullScreen(fullscreen);
+
+            if (supportFullScreenAndMaximized) {
+                stage.setMaximized(maximized);
+                stage.setFullScreen(fullscreen);
+            }
 
             if (isWindowIsOutOfBounds()) {
                 LOG.fine("stage is out of bounds, moving it to primary screen");

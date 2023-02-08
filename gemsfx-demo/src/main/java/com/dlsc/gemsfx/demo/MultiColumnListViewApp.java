@@ -37,9 +37,13 @@ public class MultiColumnListViewApp extends Application {
         CheckBox showHeaders = new CheckBox("Show Headers");
         showHeaders.selectedProperty().bindBidirectional(multiColumnListView.showHeadersProperty());
 
+        CheckBox disableDragAndDrop = new CheckBox("Disable Editing");
+        disableDragAndDrop.selectedProperty().bindBidirectional(multiColumnListView.disableDragAndDropProperty());
+
         Callback<Integer, Node> separatorFactory = multiColumnListView.getSeparatorFactory();
 
         CheckBox separators = new CheckBox("Use Separators");
+        separators.setSelected(true);
         separators.selectedProperty().addListener(it -> {
             if (separators.isSelected()) {
                 multiColumnListView.setSeparatorFactory(separatorFactory);
@@ -48,7 +52,7 @@ public class MultiColumnListViewApp extends Application {
             }
         });
 
-        HBox optionsBox = new HBox(10, separators, showHeaders);
+        HBox optionsBox = new HBox(10, separators, showHeaders, disableDragAndDrop);
         optionsBox.setAlignment(Pos.CENTER_RIGHT);
         VBox vbox = new VBox(10, multiColumnListView, optionsBox);
         vbox.setAlignment(Pos.TOP_RIGHT);

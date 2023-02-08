@@ -105,7 +105,7 @@ public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>>
                 initPlaceholder(listView, listView.getPlaceholder());
             });
 
-            listView.setItems(column.getItems());
+            listView.itemsProperty().bind(column.itemsProperty());
 
             listView.cellFactoryProperty().bind(Bindings.createObjectBinding(() -> lv -> {
                 Callback<MultiColumnListView<T>, ColumnListCell<T>> cellFactory = view.getCellFactory();
