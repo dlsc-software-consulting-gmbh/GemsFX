@@ -31,7 +31,7 @@ public class SearchTextField extends CustomTextField {
 
         setLeft(searchIconWrapper);
 
-        FontIcon clearIcon = new FontIcon(MaterialDesign.MDI_DELETE);
+        FontIcon clearIcon = new FontIcon(MaterialDesign.MDI_CLOSE);
         clearIcon.getStyleClass().add("clear-icon");
         clearIcon.setCursor(Cursor.DEFAULT);
         clearIcon.setOnMouseClicked(evt -> setText(""));
