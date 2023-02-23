@@ -94,6 +94,14 @@
       "project": "GemsFX",
       "preview": "/preview-info-center.png",
       "classname": "com.dlsc.gemsfx.demo.InfoCenterApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Strip View",
+      "desc": "A horizontal layout container with clipping and scrolling support.",
+      "project": "GemsFX",
+      "preview": "/preview-strip-view.png",
+      "classname": "com.dlsc.gemsfx.demo.StripViewApp"
     }
   ]
 }

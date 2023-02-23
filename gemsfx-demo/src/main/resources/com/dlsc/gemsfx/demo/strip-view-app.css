@@ -1,0 +1,66 @@
+.weather-summary-pane {
+    -fx-background-color: -white-three;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+}
+
+.weather-summary-pane:focused,
+.weather-summary-pane:hover,
+.weather-summary-pane:pressed {
+    -fx-background-color: rgba(213, 213, 213, 0.3);
+}
+
+.weather-summary-pane:selected {
+    -fx-background-color: #d7d7d7;
+}
+
+.weather-summary-pane .label {
+    -fx-font-family: "Rubik Medium";
+    -fx-font-weight: bold;
+}
+
+.strip-view.weather-demo {
+    -fx-pref-height: 180px;
+}
+
+.strip-view {
+}
+
+.strip-view .left {
+    -fx-translate-x: 10px;
+}
+
+.strip-view .right {
+    -fx-translate-x: -10px;
+}
+
+.strip-view .left,
+.strip-view .right {
+    -fx-background-color: grey;
+    -fx-pref-width: 48px;
+    -fx-pref-height: 48px;
+    -fx-shape: "M9.6,8.9l3.1,3.1l-3.1,3.1l1.4,1.4l4.5-4.5L11,7.5L9.6,8.9z M2,12c0,5.5,4.5,10,10,10s10-4.5,10-10S17.5,2,12,2S2,6.5,2,12z   M20,12c0,4.4-3.6,8-8,8s-8-3.6-8-8c0-4.4,3.6-8,8-8C16.4,4,20,7.6,20,12z";
+}
+
+.strip-view.string-demo .left,
+.strip-view.string-demo .right {
+    -fx-pref-width: 32px;
+    -fx-pref-height: 32px;
+}
+
+.strip-view .left:hover,
+.strip-view .right:hover {
+    -fx-background-color: black;
+}
+
+.strip-cell:selected {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.title {
+    -fx-padding: 20px 0px 0px 0px;
+    -fx-font-family: "Rubik Medium";
+    -fx-font-size: 24px;
+}

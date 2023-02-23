@@ -4,6 +4,16 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 
+## StripView
+
+A view for horizontally positioning a number of nodes, one for each item added to the view's model. Scroll buttons will
+become visible on either side of the view if the available width is not sufficient to show all items / nodes. Scrolling
+is animated (can be turned off). The nodes on either side are fading out so that the scroll controls are completely 
+visible. The view also supports the single selection of an item.
+
+![StripView](gemsfx/docs/strip-view.png)
+
+
 ## InfoCenterPane
 
 A view for displaying (groups of) notifications. Incoming / new notifications slide-in via an animation. Each group can have its own factory for the creation of notification views. A group with multiple notifications can be shown stacked or expanded. A threshold can be defined to determine the maximum number of notifications that  can be shown. If the notifcation count is higher than the threshold then the user can switch to a list view showing them all. Groups can be pinned so that they always stay in the top position without being scrolled out of view.

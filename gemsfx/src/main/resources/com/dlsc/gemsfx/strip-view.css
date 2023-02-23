@@ -1,0 +1,30 @@
+.strip-view {
+    -fx-background-color: -fx-base;
+}
+
+.strip-view .strip-cell {
+    -fx-padding: 10 5 10 5;
+}
+
+.strip-view .strip-cell:selected {
+    -fx-background-color: -fx-selection-bar;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.strip-view .scroller {
+    -fx-pref-width: 20;
+    -fx-pref-height: 20;
+    -fx-background-insets: 5;
+    -fx-background-color: gray;
+    -fx-padding: 0.25em;
+    -fx-shape: "M 0 -3.5 v 7 l 4 -3.5 z";
+    -fx-cursor: hand;
+}
+
+.strip-view .scroller.left {
+    -fx-rotate: 180;
+}
+
+.strip-view .scroller.right {
+    -fx-rotate: 0;
+}
