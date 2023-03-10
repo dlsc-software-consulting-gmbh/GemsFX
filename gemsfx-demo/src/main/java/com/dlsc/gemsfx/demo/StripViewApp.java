@@ -15,6 +15,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -101,10 +102,21 @@ public class StripViewApp extends Application {
         valueLabel.textProperty().bind(Bindings.createStringBinding(() -> Double.toString(slider.getValue()), slider.valueProperty()));
 
         CheckBox centerCheckBox = new CheckBox("Always center");
+        centerCheckBox.setTooltip(new Tooltip("Always scroll newly selected items into the center"));
         centerCheckBox.selectedProperty().bindBidirectional(textView.alwaysCenterProperty());
         centerCheckBox.selectedProperty().bindBidirectional(weatherView.alwaysCenterProperty());
 
-        HBox box = new HBox(10, new Label("Fading size"), slider, valueLabel, centerCheckBox);
+        CheckBox autoScrollingCheckBox = new CheckBox("Auto scrolling");
+        autoScrollingCheckBox.setTooltip(new Tooltip("Automatically scroll newly selected items into the un-faded area (if possible)"));
+        autoScrollingCheckBox.selectedProperty().bindBidirectional(textView.autoScrollingProperty());
+        autoScrollingCheckBox.selectedProperty().bindBidirectional(weatherView.autoScrollingProperty());
+
+        CheckBox animateScrollingCheckBox = new CheckBox("Animate scrolling");
+        animateScrollingCheckBox.setTooltip(new Tooltip("Use animation when scrolling to the newly selected item"));
+        animateScrollingCheckBox.selectedProperty().bindBidirectional(textView.animateScrollingProperty());
+        animateScrollingCheckBox.selectedProperty().bindBidirectional(weatherView.animateScrollingProperty());
+
+        HBox box = new HBox(10, new Label("Fading size"), slider, valueLabel, centerCheckBox, autoScrollingCheckBox, animateScrollingCheckBox);
         box.setAlignment(Pos.CENTER_LEFT);
         VBox.setMargin(box, new Insets(50, 0, 0, 0));
 
