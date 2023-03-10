@@ -37,6 +37,7 @@ public class MaskedViewSkin extends SkinBase<MaskedView> {
         Group group = new Group(leftClip, centerClip, rightClip);
 
         stackPane = new StackPane();
+        stackPane.getStyleClass().add("container");
         stackPane.setManaged(false);
         stackPane.setClip(group);
 

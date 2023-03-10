@@ -55,6 +55,7 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
         super(strip);
 
         content = new HBox();
+        content.getStyleClass().add("container");
         content.setMinWidth(Region.USE_PREF_SIZE);
         content.setMaxWidth(Region.USE_PREF_SIZE);
         content.setAlignment(Pos.CENTER_LEFT);
