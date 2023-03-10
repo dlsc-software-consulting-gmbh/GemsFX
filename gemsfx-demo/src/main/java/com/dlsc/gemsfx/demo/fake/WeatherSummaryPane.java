@@ -7,7 +7,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -19,39 +18,36 @@ import java.util.Locale;
 public class WeatherSummaryPane extends Label {
 
     private final Label dateLabel;
-    private final ImageView imageView;
     private final Label windLabel;
     private final Label accurateLabel;
 
-    public WeatherSummaryPane(WeatherData weatherSummary) {
-        this();
-        setWeatherSummary(weatherSummary);
-    }
+    private final ImageView imageView;
 
     public WeatherSummaryPane() {
+        getStyleClass().add("weather-summary-pane");
+
         StackPane pane = new StackPane();
         dateLabel = new Label();
-        dateLabel.getStyleClass().addAll("font21", "charcoal-medium-label");
+
         imageView = new ImageView();
         imageView.setFitWidth(52);
         imageView.setFitHeight(40);
         imageView.setPreserveRatio(true);
         VBox.setMargin(imageView, new Insets(16, 0, 12, 0));
+
         windLabel = new Label();
         windLabel.getStyleClass().add("wind-label");
-        Region windShape = new Region();
-        windShape.getStyleClass().add("wind-region");
-        windLabel.setGraphic(windShape);
+
         accurateLabel = new Label();
-        accurateLabel.getStyleClass().addAll("accurate-label", "steel-medium-label");
+
         VBox box = new VBox(8);
         box.setPrefWidth(88);
         box.setAlignment(Pos.TOP_LEFT);
         box.getChildren().addAll(dateLabel, imageView, windLabel, accurateLabel);
+
         pane.getChildren().add(box);
         pane.setPadding(new Insets(10, 20, 10, 20));
         pane.getStyleClass().add("ws-content-pane");
-        getStyleClass().add("weather-summary-pane");
         setGraphic(pane);
         setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 

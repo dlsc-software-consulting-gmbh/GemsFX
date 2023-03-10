@@ -7,16 +7,6 @@
     -fx-border-style: dashed;
 }
 
-.weather-summary-pane:focused,
-.weather-summary-pane:hover,
-.weather-summary-pane:pressed {
-    -fx-background-color: rgba(213, 213, 213, 0.3);
-}
-
-.weather-summary-pane:selected {
-    -fx-background-color: #d7d7d7;
-}
-
 .weather-summary-pane .label {
     -fx-font-family: "Rubik Medium";
     -fx-font-weight: bold;
@@ -56,9 +46,14 @@
     -fx-background-color: black;
 }
 
+.strip-cell:hover {
+    -fx-background-color: #e0e0e0;
+    -fx-background-radius: 10px;
+}
+
 .strip-cell:selected {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
+    -fx-background-color: lightgrey;
+    -fx-background-radius: 10px;
 }
 
 .title {

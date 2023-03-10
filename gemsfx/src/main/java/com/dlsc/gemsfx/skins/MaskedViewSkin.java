@@ -51,6 +51,21 @@ public class MaskedViewSkin extends SkinBase<MaskedView> {
         view.fadingSizeProperty().addListener(it -> updateClip());
     }
 
+    @Override
+    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return stackPane.prefHeight(width);
+    }
+
+    @Override
+    protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return stackPane.minHeight(width);
+    }
+
+    @Override
+    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return stackPane.maxHeight(width);
+    }
+
     private final InvalidationListener translateXListener = it -> updateClip();
 
     private final WeakInvalidationListener weakTranslateXListener = new WeakInvalidationListener(translateXListener);
