@@ -47,11 +47,13 @@
 }
 
 .strip-cell:hover {
+    -fx-background-insets: 10px 5px;
     -fx-background-color: #e0e0e0;
     -fx-background-radius: 10px;
 }
 
 .strip-cell:selected {
+    -fx-background-insets: 10px 5px;
     -fx-background-color: lightgrey;
     -fx-background-radius: 10px;
 }

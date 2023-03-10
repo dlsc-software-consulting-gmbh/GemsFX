@@ -11,6 +11,7 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -99,7 +100,11 @@ public class StripViewApp extends Application {
         Label valueLabel = new Label();
         valueLabel.textProperty().bind(Bindings.createStringBinding(() -> Double.toString(slider.getValue()), slider.valueProperty()));
 
-        HBox box = new HBox(10, new Label("Fading size"), slider, valueLabel);
+        CheckBox centerCheckBox = new CheckBox("Always center");
+        centerCheckBox.selectedProperty().bindBidirectional(textView.alwaysCenterProperty());
+        centerCheckBox.selectedProperty().bindBidirectional(weatherView.alwaysCenterProperty());
+
+        HBox box = new HBox(10, new Label("Fading size"), slider, valueLabel, centerCheckBox);
         box.setAlignment(Pos.CENTER_LEFT);
         VBox.setMargin(box, new Insets(50, 0, 0, 0));
 
