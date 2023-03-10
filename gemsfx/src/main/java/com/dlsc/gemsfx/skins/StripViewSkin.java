@@ -143,6 +143,21 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
         strip.requestLayout();
     }
 
+    @Override
+    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return maskedView.prefHeight(width);
+    }
+
+    @Override
+    protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return maskedView.minHeight(width);
+    }
+
+    @Override
+    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return maskedView.maxHeight(width);
+    }
+
     private void setupListeners() {
         translateX.addListener(it -> content.setTranslateX(translateX.get()));
         getSkinnable().widthProperty().addListener(it -> fixTranslate());
