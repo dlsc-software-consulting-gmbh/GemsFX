@@ -5,6 +5,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.css.PseudoClass;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
@@ -16,30 +17,51 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
+/**
+ * A control for quickly selecting the month of a year. The format used for the
+ * month depends on the {@link #converterProperty()}. The default converter produces
+ * and expects the full month name, e.g. "January", "February", etc. An invalid text
+ * resets the value of the picker to null.
+ */
 public class YearMonthPicker extends Control {
 
-    private TextField editor = new TextField();
+    private final TextField editor = new TextField();
 
+    /**
+     * Constructs a new picker.
+     */
     public YearMonthPicker() {
         super();
 
         getStyleClass().addAll("year-month-picker", "text-input");
 
+        setFocusTraversable(false);
+
         valueProperty().addListener(it -> updateText());
 
+        editor.setPromptText("Example: March 2023");
         editor.editableProperty().bind(editableProperty());
         editor.setOnAction(evt -> commitValue());
         editor.focusedProperty().addListener(it -> {
             if (!editor.isFocused()) {
                 commitValue();
             }
+            pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), editor.isFocused());
         });
+
         editor.addEventHandler(KeyEvent.ANY, evt -> {
             if (evt.getCode().equals(KeyCode.DOWN)) {
                 setValue(getValue().plusMonths(1));
             } else if (evt.getCode().equals(KeyCode.UP)) {
                 setValue(getValue().minusMonths(1));
+            }
+        });
+
+        converterProperty().addListener((obs, oldConverter, newConverter) -> {
+            if (newConverter == null) {
+                setConverter(oldConverter);
             }
         });
 
@@ -57,16 +79,27 @@ public class YearMonthPicker extends Control {
         return YearMonthView.class.getResource("year-month-picker.css").toExternalForm();
     }
 
+    /*
+     * Performs the work of actually creating and setting a new month value.
+     */
     private void commitValue() {
         String text = editor.getText();
         if (StringUtils.isNotBlank(text)) {
             StringConverter<YearMonth> converter = getConverter();
             if (converter != null) {
-                setValue(converter.fromString(text));
+                YearMonth value = converter.fromString(text);
+                if (value != null) {
+                    setValue(value);
+                } else {
+                    setValue(null);
+                }
             }
         }
     }
 
+    /*
+     * Updates the text of the text field based on the current value / month.
+     */
     private void updateText() {
         YearMonth value = getValue();
         if (value != null && getConverter() != null) {
@@ -77,6 +110,11 @@ public class YearMonthPicker extends Control {
         editor.positionCaret(editor.getText().length());
     }
 
+    /**
+     * Returns the text field control used for manual input.
+     *
+     * @return the editor / text field
+     */
     public final TextField getEditor() {
         return editor;
     }
@@ -92,7 +130,11 @@ public class YearMonthPicker extends Control {
 
         @Override
         public YearMonth fromString(String string) {
-            return DateTimeFormatter.ofPattern("MMMM yyyy").parse(string, YearMonth::from);
+            try {
+                return DateTimeFormatter.ofPattern("MMMM yyyy").parse(string, YearMonth::from);
+            } catch (DateTimeParseException ex) {
+                return null;
+            }
         }
     });
 
@@ -100,6 +142,12 @@ public class YearMonthPicker extends Control {
         return converter.get();
     }
 
+    /**
+     * A converter used to translate a text into a YearMonth object and vice
+     * versa.
+     *
+     * @return the converter object
+     */
     public final ObjectProperty<StringConverter<YearMonth>> converterProperty() {
         return converter;
     }
@@ -110,15 +158,20 @@ public class YearMonthPicker extends Control {
 
     private final ObjectProperty<YearMonth> value = new SimpleObjectProperty<>(this, "value", YearMonth.now());
 
-    public YearMonth getValue() {
+    public final YearMonth getValue() {
         return value.get();
     }
 
-    public ObjectProperty<YearMonth> valueProperty() {
+    /**
+     * Stores the current value / the currently selected month.
+     *
+     * @return the current value / currently selected month
+     */
+    public final ObjectProperty<YearMonth> valueProperty() {
         return value;
     }
 
-    public void setValue(YearMonth value) {
+    public final void setValue(YearMonth value) {
         this.value.set(value);
     }
 
@@ -128,6 +181,11 @@ public class YearMonthPicker extends Control {
         return editable.get();
     }
 
+    /**
+     * Controls whether the text field inside this control can be edited or not.
+     *
+     * @return true if the field can be edited
+     */
     public final BooleanProperty editableProperty() {
         return editable;
     }
