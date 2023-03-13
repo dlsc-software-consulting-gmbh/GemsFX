@@ -102,6 +102,14 @@
       "project": "GemsFX",
       "preview": "/preview-strip-view.png",
       "classname": "com.dlsc.gemsfx.demo.StripViewApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Year Month Picker",
+      "desc": "A picker for selecting a month of a year",
+      "project": "GemsFX",
+      "preview": "/preview-year-month-picker.png",
+      "classname": "com.dlsc.gemsfx.demo.YearMonthPickerApp"
     }
   ]
 }
