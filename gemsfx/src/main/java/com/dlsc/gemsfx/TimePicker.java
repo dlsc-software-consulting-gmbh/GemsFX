@@ -36,6 +36,12 @@ public class TimePicker extends Control {
         TWENTY_FOUR_HOUR_CLOCK,
         TWELVE_HOUR_CLOCK
     }
+    
+    public enum TimeUnit {
+        SECONDS,
+        MILLISECONDS,
+        MINUTES
+    }
 
     /**
      * Constructs a new time picker.
@@ -55,7 +61,15 @@ public class TimePicker extends Control {
 
         Label label = new Label(":");
         label.getStyleClass().add("separator");
-        setSeparator(label);
+        setHoursSeparator(label);
+        
+        label = new Label(":");
+        label.getStyleClass().add("separator");
+        setMinutesSeparator(label);
+        
+        label = new Label(".");
+        label.getStyleClass().add("separator");
+        setSecondsSeparator(label);
 
         setTime(LocalTime.now());
 
@@ -129,7 +143,7 @@ public class TimePicker extends Control {
                 adjusted.set(false);
             }
         });
-
+        
         setOnShowPopup(picker -> show());
     }
 
@@ -224,25 +238,47 @@ public class TimePicker extends Control {
         this.latestTime.set(latestTime);
     }
 
-    private final ObjectProperty<Node> separator = new SimpleObjectProperty<>(this, "separator");
+    private final ObjectProperty<Node> hoursSeparator = new SimpleObjectProperty<>(this, "separator");
 
+    @Deprecated
     public final Node getSeparator() {
-        return separator.get();
+        return hoursSeparator.get();
     }
 
     /**
      * The node that will be placed between the hours and the minutes field. The
      * default separator is a label with text ":".
      *
-     * @return a node used as a separator
+     * @return a node used as a hoursSeparator
      */
+    @Deprecated
     public final ObjectProperty<Node> separatorProperty() {
-        return separator;
+        return hoursSeparator;
     }
 
+    @Deprecated
     public final void setSeparator(Node separator) {
-        this.separator.set(separator);
+        this.hoursSeparator.set(separator);
     }
+    
+    public final Node getHoursSeparator() {
+        return hoursSeparator.get();
+    }
+
+    /**
+     * The node that will be placed between the hours and the minutes field. The
+     * default separator is a label with text ":".
+     *
+     * @return a node used as a hoursSeparator
+     */
+    public final ObjectProperty<Node> setHoursSeparatorProperty() {
+        return hoursSeparator;
+    }
+
+    public final void setHoursSeparator(Node separator) {
+        this.hoursSeparator.set(separator);
+    }
+    
 
     private final BooleanProperty showPopupTriggerButton = new SimpleBooleanProperty(this, "showPopupTriggerButton", true);
 
@@ -489,5 +525,55 @@ public class TimePicker extends Control {
 
     public final void setOnShowPopup(Consumer<TimePicker> onShowPopup) {
         this.onShowPopup.set(onShowPopup);
+    }
+    
+    private final ObjectProperty<TimeUnit> timeUnit = new SimpleObjectProperty<>(this, "timeUnitProperty", TimeUnit.MINUTES);
+    
+    public final ObjectProperty<TimeUnit> timeUnitProperty() {
+        return timeUnit;
+    }
+    
+    public final void setTimeUnitProperty(TimeUnit timeUnit) {
+        this.timeUnit.set(timeUnit);
+    }
+    
+    private final ObjectProperty<Node> minutesSeparator = new SimpleObjectProperty<>(this, "minuteSeparator");
+
+    public final Node getMinutesSeparator() {
+        return minutesSeparator.get();
+    }
+
+    /**
+     * The node that will be placed between the minutes and the seconds field. The
+     * default separator is a label with text ":".
+     *
+     * @return a node used as a hoursSeparator
+     */
+    public final ObjectProperty<Node> minutesSeparatorProperty() {
+        return minutesSeparator;
+    }
+
+    public final void setMinutesSeparator(Node separator) {
+        this.minutesSeparator.set(separator);
+    }
+    
+    private final ObjectProperty<Node> secondsSeparator = new SimpleObjectProperty<>(this, "secondsSeparator");
+
+    public final Node getSecondsSeparator() {
+        return secondsSeparator.get();
+    }
+
+    /**
+     * The node that will be placed between the seconds and the milliseconds field. The
+     * default separator is a label with text ".".
+     *
+     * @return a node used as a hoursSeparator
+     */
+    public final ObjectProperty<Node> secondsSeparatorProperty() {
+        return secondsSeparator;
+    }
+
+    public final void setSecondsSeparator(Node separator) {
+        this.secondsSeparator.set(separator);
     }
 }

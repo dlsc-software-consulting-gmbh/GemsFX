@@ -49,7 +49,7 @@
 }
 
 .time-picker > .box > .fields-box > .time-field {
-    -fx-pref-width: 1.6em;
+    -fx-pref-width: 2.0em;
 }
 
 .time-picker > .box > .fields-box > .time-field:empty {
@@ -63,12 +63,22 @@
 }
 
 .time-picker > .box > .fields-box > .time-field.hour {
-    -fx-padding: 0px 2px;
+    -fx-padding: 0px 0px;
     -fx-alignment: center-right;
 }
 
 .time-picker > .box > .fields-box > .time-field.minute {
-    -fx-padding: 0px 2px;
+    -fx-padding: 0px 0px;
+    -fx-alignment: center-right;
+}
+
+.time-picker > .box > .fields-box > .time-field.second {
+    -fx-padding: 0px 0px;
+    -fx-alignment: center-right;
+}
+
+.time-picker > .box > .fields-box > .time-field.millisecond {
+    -fx-padding: 0px 0px;
     -fx-alignment: center-left;
 }
 

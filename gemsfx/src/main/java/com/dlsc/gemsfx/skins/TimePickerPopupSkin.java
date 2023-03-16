@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.TimePicker.TimeUnit;
 import java.time.LocalTime;
 
 import javafx.application.Platform;
@@ -20,6 +21,9 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
     private final HBox box;
     private final ListView<Integer> hourListView = new ListView<>();
     private final ListView<Integer> minuteListView = new ListView<>();
+    private final ListView<Integer> secondListView = new ListView<>();
+    private final ListView<Integer> millisecondListView = new ListView<>();
+    private TimeUnit timeUnit = TimeUnit.MINUTES;
 
     public TimePickerPopupSkin(TimePickerPopup popup) {
         this.popup = popup;
@@ -31,9 +35,9 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
             if (newHour != null) {
                 LocalTime time = popup.getTime();
                 if (time != null) {
-                    popup.setTime(LocalTime.of(newHour, time.getMinute()));
+                    popup.setTime(LocalTime.of(newHour, time.getMinute(), time.getSecond(), time.getNano()));
                 } else {
-                    popup.setTime(LocalTime.of(newHour, 0));
+                    popup.setTime(LocalTime.of(newHour, 0, 0, 0));
                 }
             }
         });
@@ -45,12 +49,40 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
             if (newMinute != null) {
                 LocalTime time = popup.getTime();
                 if (time != null) {
-                    popup.setTime(LocalTime.of(time.getHour(), newMinute));
+                    popup.setTime(LocalTime.of(time.getHour(), newMinute, time.getSecond(), time.getNano()));
                 } else {
-                    popup.setTime(LocalTime.of(0, newMinute));
+                    popup.setTime(LocalTime.of(0, newMinute, 0, 0));
                 }
             }
         });
+        
+        secondListView.getStyleClass().addAll("time-list-view", "second-list");
+        secondListView.setCellFactory(view -> new SecondCell());
+        secondListView.getSelectionModel().selectedItemProperty().addListener(it -> {
+            Integer newSecond = secondListView.getSelectionModel().getSelectedItem();
+            if (newSecond != null) {
+                LocalTime time = popup.getTime();
+                if (time != null) {
+                    popup.setTime(LocalTime.of(time.getHour(), time.getMinute(), newSecond, time.getNano()));
+                } else {
+                    popup.setTime(LocalTime.of(0, 0, newSecond, 0));
+                }
+            }
+        });   
+        
+        millisecondListView.getStyleClass().addAll("time-list-view", "millisecond-list");
+        millisecondListView.setCellFactory(view -> new MillisecondCell());
+        millisecondListView.getSelectionModel().selectedItemProperty().addListener(it -> {
+            Integer newMillisecond = millisecondListView.getSelectionModel().getSelectedItem();
+            if (newMillisecond != null) {
+                LocalTime time = popup.getTime();
+                if (time != null) {
+                    popup.setTime(LocalTime.of(time.getHour(), time.getMinute(), time.getSecond(), newMillisecond*1_000_000));
+                } else {
+                    popup.setTime(LocalTime.of(0, 0, 0, newMillisecond*1_000_000));
+                }
+            }
+        });   
 
         popup.timeProperty().addListener(it -> updateListViewSelection());
 
@@ -70,7 +102,22 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
             updateListViewSelection();
             hourListView.scrollTo(hourListView.getSelectionModel().getSelectedIndex());
             minuteListView.scrollTo(minuteListView.getSelectionModel().getSelectedIndex());
+            secondListView.scrollTo(secondListView.getSelectionModel().getSelectedIndex());
+            millisecondListView.scrollTo(millisecondListView.getSelectionModel().getSelectedIndex());
         }));
+        
+        popup.timeUnitProperty().addListener(it -> {
+            timeUnit = popup.timeUnitProperty().get();
+            if (timeUnit == TimeUnit.MINUTES) {
+                box.getChildren().removeAll(secondListView, millisecondListView);
+            } else if (timeUnit == TimeUnit.SECONDS) {
+                box.getChildren().add(secondListView);
+                box.getChildren().remove(millisecondListView);
+            } else {
+                System.out.println("adding second and millisecond");
+                box.getChildren().addAll(secondListView, millisecondListView); 
+            }
+        });
     }
 
     private void updateListViewSelection() {
@@ -78,16 +125,22 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
         if (time != null) {
             hourListView.getSelectionModel().select(Integer.valueOf(time.getHour()));
             minuteListView.getSelectionModel().select(Integer.valueOf(time.getMinute()));
+            secondListView.getSelectionModel().select(Integer.valueOf(time.getSecond()));
+            millisecondListView.getSelectionModel().select(Integer.valueOf(time.getNano()/1_000_000));
         } else {
             hourListView.getSelectionModel().clearSelection();
             minuteListView.getSelectionModel().clearSelection();
+            secondListView.getSelectionModel().clearSelection();
+            millisecondListView.getSelectionModel().clearSelection();
         }
     }
 
     private void updateLists() {
         hourListView.getItems().clear();
         minuteListView.getItems().clear();
-
+        secondListView.getItems().clear();
+        millisecondListView.getItems().clear();
+               
 
         // TODO: add am / pm support
         for (int hour = getSkinnable().getEarliestTime().getHour(); hour <= getSkinnable().getLatestTime().getHour(); hour++) {
@@ -96,7 +149,16 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
 
         for (int minute = 0; minute < 60; minute = minute + getSkinnable().getStepRateInMinutes()) {
             minuteListView.getItems().add(minute);
+            secondListView.getItems().add(minute);
         }
+        
+        for (int second = 0; second < 60; second++) {
+            secondListView.getItems().add(second);
+        }    
+        
+        for (int milli = 0; milli < 1000; milli++) {
+            millisecondListView.getItems().add(milli);
+        }            
     }
 
     @Override
@@ -112,6 +174,21 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
     @Override
     public void dispose() {
     }
+    
+    private boolean shouldDisable(Integer hour, Integer minute, Integer second, Integer millisecond) {
+            if (hour != null && minute != null) {
+                    LocalTime time = LocalTime.of(hour, minute);
+                    if (second != null) {
+                        time = time.plusSeconds(second);
+                    }
+                    if (millisecond != null) {
+                        time = time.plusNanos(millisecond * 1_000_000);
+                    }
+                    return time.isAfter(getSkinnable().getLatestTime()) || time.isBefore(getSkinnable().getEarliestTime());
+                }
+
+                return false;
+        }    
 
     public abstract static class TimeCell extends ListCell<Integer> {
 
@@ -145,21 +222,83 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
             }
         }
     }
-
+    
     private class MinuteCell extends TimeCell {
 
         public MinuteCell() {
             getStyleClass().add("minute-cell");
-
+           
             disableProperty().bind(Bindings.createBooleanBinding(() -> {
                 Integer hour = hourListView.getSelectionModel().getSelectedItem();
                 Integer minute = getItem();
-                if (hour != null && minute != null) {
-                    LocalTime time = LocalTime.of(hour, minute);
-                    return time.isAfter(getSkinnable().getLatestTime()) || time.isBefore(getSkinnable().getEarliestTime());
-                }
+                Integer second = secondListView.getSelectionModel().getSelectedItem();
+                Integer millisecond = millisecondListView.getSelectionModel().getSelectedItem();
 
-                return false;
+                return shouldDisable(hour, minute, second, millisecond);
+            }, hourListView.getSelectionModel().selectedItemProperty(), getSkinnable().earliestTimeProperty(), getSkinnable().latestTimeProperty(), itemProperty()));
+
+        }
+
+        @Override
+        protected void updateItem(Integer item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (!empty && item != null) {
+                if (item < 10) {
+                    setText("0" + item);
+                } else {
+                    setText(Integer.toString(item));
+                }
+            } else {
+                setText("");
+            }
+        }
+    }    
+    
+    private class SecondCell extends TimeCell {
+
+        public SecondCell() {
+            getStyleClass().add("second-cell");
+            
+            disableProperty().bind(Bindings.createBooleanBinding(() -> {
+                Integer hour = hourListView.getSelectionModel().getSelectedItem();
+                Integer minute = minuteListView.getSelectionModel().getSelectedItem();
+                Integer second = getItem();
+                Integer millisecond = millisecondListView.getSelectionModel().getSelectedItem();
+
+                return shouldDisable(hour, minute, second, millisecond);
+            }, hourListView.getSelectionModel().selectedItemProperty(), getSkinnable().earliestTimeProperty(), getSkinnable().latestTimeProperty(), itemProperty()));
+            
+        }
+
+        @Override
+        protected void updateItem(Integer item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (!empty && item != null) {
+                if (item < 10) {
+                    setText("0" + item);
+                } else {
+                    setText(Integer.toString(item));
+                }
+            } else {
+                setText("");
+            }
+        }
+    }        
+
+    private class MillisecondCell extends TimeCell {
+
+        public MillisecondCell() {
+            getStyleClass().add("millisecond-cell");
+
+            disableProperty().bind(Bindings.createBooleanBinding(() -> {
+                Integer hour = hourListView.getSelectionModel().getSelectedItem();
+                Integer minute = minuteListView.getSelectionModel().getSelectedItem();
+                Integer second = secondListView.getSelectionModel().getSelectedItem();
+                Integer millisecond = getItem();
+
+                return shouldDisable(hour, minute, second, millisecond);
             }, hourListView.getSelectionModel().selectedItemProperty(), getSkinnable().earliestTimeProperty(), getSkinnable().latestTimeProperty(), itemProperty()));
         }
 
@@ -169,6 +308,8 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
 
             if (!empty && item != null) {
                 if (item < 10) {
+                    setText("00" + item);
+                } if (item < 100) {
                     setText("0" + item);
                 } else {
                     setText(Integer.toString(item));

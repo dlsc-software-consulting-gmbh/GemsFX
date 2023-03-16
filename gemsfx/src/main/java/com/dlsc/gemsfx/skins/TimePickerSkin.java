@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TimePicker;
+import com.dlsc.gemsfx.TimePicker.TimeUnit;
 
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -20,6 +21,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
+import static com.dlsc.gemsfx.TimePicker.TimeUnit.MILLISECONDS;
+import static com.dlsc.gemsfx.TimePicker.TimeUnit.SECONDS;
+
 public class TimePickerSkin extends SkinBase<TimePicker> {
 
     private static final PseudoClass EMPTY_PSEUDO_CLASS = PseudoClass.getPseudoClass("empty");
@@ -27,19 +31,34 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
     private final HourField hourField;
 
     private final MinuteField minuteField;
+    
+    private final SecondField secondField;
+    
+    private final MillisecondField millisecondField;
 
     private final Button editButton = new Button();
 
     private final TimePickerPopup popup;
+    
+    private final TimeUnit timeUnit;
+    
+    private final HBox fieldsBox = new HBox();
 
     public TimePickerSkin(TimePicker picker) {
         super(picker);
+        timeUnit = picker.timeUnitProperty().get();
 
         hourField = new HourField(picker);
         minuteField = new MinuteField(picker);
+        secondField = new SecondField(picker);
+        millisecondField = new MillisecondField(picker);
 
         hourField.setNextField(minuteField);
+        minuteField.setNextField(secondField);
         minuteField.setPreviousField(hourField);
+        secondField.setNextField(millisecondField);
+        secondField.setPreviousField(minuteField);
+        millisecondField.setPreviousField(secondField);
 
         editButton.getStyleClass().add("edit-button");
         editButton.setOnAction(evt -> picker.getOnShowPopup().accept(picker));
@@ -55,6 +74,8 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
 
         hourField.focusedProperty().addListener(updateFocusListener);
         minuteField.focusedProperty().addListener(updateFocusListener);
+        secondField.focusedProperty().addListener(updateFocusListener);
+        millisecondField.focusedProperty().addListener(updateFocusListener);
         editButton.focusedProperty().addListener(updateFocusListener);
 
         popup = new TimePickerPopup();
@@ -63,6 +84,7 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
         popup.clockTypeProperty().bind(picker.clockTypeProperty());
         popup.earliestTimeProperty().bind(picker.earliestTimeProperty());
         popup.latestTimeProperty().bind(picker.latestTimeProperty());
+        popup.timeUnitProperty().bind(picker.timeUnitProperty());
 
         picker.separatorProperty().addListener(it -> buildView());
         buildView();
@@ -75,6 +97,19 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
                 showPopup();
             } else {
                 popup.hide();
+            }
+        });
+        
+        picker.timeUnitProperty().addListener(cl -> {
+            if (picker.timeUnitProperty().get() == TimeUnit.SECONDS) {
+                fieldsBox.getChildren().addAll(getSkinnable().getMinutesSeparator(), secondField);
+                fieldsBox.getChildren().remove(millisecondField);
+            } else if (picker.timeUnitProperty().get() == TimeUnit.MILLISECONDS) {
+                fieldsBox.getChildren().addAll(getSkinnable().getMinutesSeparator(), secondField);
+                fieldsBox.getChildren().addAll(getSkinnable().getSecondsSeparator(), millisecondField);              
+            } else {
+                fieldsBox.getChildren().remove(secondField);
+                fieldsBox.getChildren().remove(millisecondField);                
             }
         });
 
@@ -91,7 +126,11 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
     private void updateEmptyPseudoClass() {
         hourField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
         minuteField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
-        getSkinnable().getSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
+        secondField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
+        millisecondField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
+        getSkinnable().getHoursSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
+        getSkinnable().getMinutesSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
+        getSkinnable().getSecondsSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
     }
 
     private void showPopup() {
@@ -112,17 +151,20 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
             getSkinnable().getProperties().put("CLEAR_ADJUSTED_TIME", "CLEAR_ADJUSTED_TIME");
         }
 
-        getSkinnable().pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), minuteField.isFocused() || hourField.isFocused());
+        getSkinnable().pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), minuteField.isFocused() || hourField.isFocused() ||
+                                                secondField.isFocused() || millisecondField.isFocused());
     }
 
     private void buildView() {
-        Node separator = getSkinnable().getSeparator();
+        Node hoursSeparator = getSkinnable().getHoursSeparator();
+        Node minutesSeparator = getSkinnable().getMinutesSeparator();
+        Node secondsSeparator = getSkinnable().getSecondsSeparator();
 
         Region spacer = new Region();
         spacer.getStyleClass().add("spacer");
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox fieldsBox = new HBox(hourField, separator, minuteField);
+        fieldsBox.getChildren().addAll(hourField, hoursSeparator, minuteField);
         fieldsBox.setFillHeight(true);
         fieldsBox.setAlignment(Pos.CENTER_LEFT);
         fieldsBox.getStyleClass().add("fields-box");
@@ -132,7 +174,9 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
         box.getStyleClass().add("box");
         box.setAlignment(Pos.CENTER_LEFT);
 
-        separator.setOnMouseClicked(evt -> minuteField.requestFocus());
+        hoursSeparator.setOnMouseClicked(evt -> minuteField.requestFocus());
+        minutesSeparator.setOnMouseClicked(evt -> secondField.requestFocus());
+        secondsSeparator.setOnMouseClicked(evt -> millisecondField.requestFocus());
 
         getChildren().add(box);
     }
@@ -144,9 +188,13 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
         if (time != null) {
             hourField.setValue(time.getHour());
             minuteField.setValue(time.getMinute());
+            secondField.setValue(time.getSecond());
+            millisecondField.setValue(time.getNano()/1000000);
         } else {
             hourField.setValue(null);
             minuteField.setValue(null);
+            secondField.setValue(null);
+            millisecondField.setValue(null);
         }
 
         updateEmptyPseudoClass();
@@ -176,9 +224,9 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
                     value = Math.min(value, getMaximumValue());
                     LocalTime time = getSkinnable().getTime();
                     if (time != null) {
-                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(value, time.getMinute()));
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(value, time.getMinute(), time.getSecond(), time.getNano()));
                     } else {
-                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(value, 0));
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(value, 0, 0, 0));
                     }
                 }
             });
@@ -208,12 +256,76 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
                     value = Math.min(value, getMaximumValue());
                     LocalTime time = getSkinnable().getTime();
                     if (time != null) {
-                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(time.getHour(), value));
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(time.getHour(), value, time.getSecond(), time.getNano()));
                     } else {
-                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(0, value));
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(0, value, 0, 0));
                     }
                 }
             });
         }
     }
+    
+    private class SecondField extends DigitsField {
+
+        public SecondField(TimePicker picker) {
+            super(picker, true);
+
+            getStyleClass().add("second");
+
+            setMaximumValue(59);
+
+            addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+                if (evt.getCode().equals(KeyCode.LEFT)) {
+                    minuteField.requestFocus();
+                    evt.consume();
+                }
+            });
+
+            valueProperty().addListener(it -> {
+                Integer value = getValue();
+                if (value != null) {
+                    // constrain value
+                    value = Math.min(value, getMaximumValue());
+                    LocalTime time = getSkinnable().getTime();
+                    if (time != null) {
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(time.getHour(), time.getMinute(), value, time.getNano()));
+                    } else {
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(0, 0, value, 0));
+                    }
+                }
+            });
+        }
+    }    
+    
+    private class MillisecondField extends DigitsField {
+
+        public MillisecondField(TimePicker picker) {
+            super(picker, true, 3);
+
+            getStyleClass().add("millisecond");
+
+            setMaximumValue(999);
+
+            addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+                if (evt.getCode().equals(KeyCode.LEFT)) {
+                    secondField.requestFocus();
+                    evt.consume();
+                }
+            });
+
+            valueProperty().addListener(it -> {
+                Integer value = getValue();
+                if (value != null) {
+                    // constrain value
+                    value = Math.min(value, getMaximumValue());
+                    LocalTime time = getSkinnable().getTime();
+                    if (time != null) {
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(time.getHour(), time.getMinute(), time.getSecond(), value * 1000000));
+                    } else {
+                        getSkinnable().getProperties().put("NEW_TIME", LocalTime.of(0, 0, 0, value));
+                    }
+                }
+            });
+        }
+    }    
 }
