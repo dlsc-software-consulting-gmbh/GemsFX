@@ -4,6 +4,13 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 
+## YearMonthPicker
+
+A control for specifying the month of a year (see time API class "YearMonth"). It is very similar to the standard date picker class
+and actually inherits a lot of styling attributes from it.
+
+![YearMonthPicker](gemsfx/docs/year-month-picker.png)
+
 ## StripView
 
 A view for horizontally positioning a number of nodes, one for each item added to the view's model. Scroll buttons will

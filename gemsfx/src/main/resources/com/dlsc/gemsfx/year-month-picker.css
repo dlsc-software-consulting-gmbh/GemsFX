@@ -1,0 +1,45 @@
+.year-month-picker {
+    -fx-padding: 0px;
+    -fx-pref-height: 2.1em;
+}
+
+.year-month-picker .year-month-view {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
+}
+
+.year-month-picker > .box {
+    -fx-alignment: center;
+    -fx-spacing: 0px;
+}
+
+.year-month-picker > .box > .spacer {
+    -fx-pref-width: 0px;
+}
+
+.year-month-picker > .box > .edit-button {
+    -fx-pref-width: 27px;
+    -fx-padding: 5px 5px;
+    -fx-cursor: arrow;
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 1 1 1 0, 1, 2;
+    -fx-background-radius: 0 3 3 0, 0 2 2 0, 0 1 1 0;
+}
+
+.year-month-picker:focused > .box > .edit-button {
+    -fx-background-color: -fx-focus-color, -fx-inner-border, -fx-body-color, -fx-faint-focus-color, -fx-body-color;
+    -fx-background-insets: 0, 1, 2, 1, 2.6;
+    -fx-background-radius: 0 2 2 0, 0 1 1 0, 0 1 1 0, 0 1 1 0;
+    -fx-border-color: -fx-faint-focus-color;
+    -fx-border-width: 0 0 0 1;
+    -fx-border-insets: 0 0 0 -1;
+}
+
+.year-month-picker > .box > .edit-button > .ikonli-font-icon {
+    -fx-icon-code: mdi-calendar;
+    -fx-icon-size: 14px;
+    -fx-icon-color: -fx-mark-color;
+}
+
+.year-month-picker > .box > .text-field {
+    -fx-background-color: null;
+}

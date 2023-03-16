@@ -55,6 +55,7 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
         super(strip);
 
         content = new HBox();
+        content.getStyleClass().add("container");
         content.setMinWidth(Region.USE_PREF_SIZE);
         content.setMaxWidth(Region.USE_PREF_SIZE);
         content.setAlignment(Pos.CENTER_LEFT);
@@ -140,6 +141,21 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
         }).collect(Collectors.toList()));
 
         strip.requestLayout();
+    }
+
+    @Override
+    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return maskedView.prefHeight(width);
+    }
+
+    @Override
+    protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return maskedView.minHeight(width);
+    }
+
+    @Override
+    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return maskedView.maxHeight(width);
     }
 
     private void setupListeners() {
