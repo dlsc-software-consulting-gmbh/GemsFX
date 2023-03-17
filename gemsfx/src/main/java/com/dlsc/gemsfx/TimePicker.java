@@ -527,7 +527,7 @@ public class TimePicker extends Control {
         this.onShowPopup.set(onShowPopup);
     }
     
-    private final ObjectProperty<TimeUnit> timeUnit = new SimpleObjectProperty<>(this, "timeUnitProperty", TimeUnit.MINUTES);
+    private final ObjectProperty<TimeUnit> timeUnit = new SimpleObjectProperty<>(this, "timeUnit", TimeUnit.MINUTES);
     
     public final ObjectProperty<TimeUnit> timeUnitProperty() {
         return timeUnit;

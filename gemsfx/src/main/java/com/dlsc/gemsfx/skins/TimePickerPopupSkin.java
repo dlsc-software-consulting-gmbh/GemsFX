@@ -56,6 +56,8 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
             }
         });
         
+        secondListView.setVisible(false);
+        secondListView.setManaged(false);
         secondListView.getStyleClass().addAll("time-list-view", "second-list");
         secondListView.setCellFactory(view -> new SecondCell());
         secondListView.getSelectionModel().selectedItemProperty().addListener(it -> {
@@ -70,6 +72,8 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
             }
         });   
         
+        millisecondListView.setVisible(false);
+        millisecondListView.setManaged(false);
         millisecondListView.getStyleClass().addAll("time-list-view", "millisecond-list");
         millisecondListView.setCellFactory(view -> new MillisecondCell());
         millisecondListView.getSelectionModel().selectedItemProperty().addListener(it -> {
@@ -86,7 +90,7 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
 
         popup.timeProperty().addListener(it -> updateListViewSelection());
 
-        box = new HBox(hourListView, minuteListView);
+        box = new HBox(hourListView, minuteListView, secondListView, millisecondListView);
         box.getStyleClass().add("box");
         box.setMaxWidth(Region.USE_PREF_SIZE);
 
@@ -99,25 +103,37 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
         updateLists();
 
         popup.showingProperty().addListener(it -> Platform.runLater(() -> {
+            //updateTimeUnit();
             updateListViewSelection();
             hourListView.scrollTo(hourListView.getSelectionModel().getSelectedIndex());
             minuteListView.scrollTo(minuteListView.getSelectionModel().getSelectedIndex());
             secondListView.scrollTo(secondListView.getSelectionModel().getSelectedIndex());
             millisecondListView.scrollTo(millisecondListView.getSelectionModel().getSelectedIndex());
         }));
-        
+        updateTimeUnit();
         popup.timeUnitProperty().addListener(it -> {
-            timeUnit = popup.timeUnitProperty().get();
-            if (timeUnit == TimeUnit.MINUTES) {
-                box.getChildren().removeAll(secondListView, millisecondListView);
-            } else if (timeUnit == TimeUnit.SECONDS) {
-                box.getChildren().add(secondListView);
-                box.getChildren().remove(millisecondListView);
-            } else {
-                System.out.println("adding second and millisecond");
-                box.getChildren().addAll(secondListView, millisecondListView); 
-            }
+            updateTimeUnit();
         });
+    }
+    
+    private void updateTimeUnit() {
+        timeUnit = popup.timeUnitProperty().get();
+        System.out.println("time unit " + timeUnit);
+
+        if (timeUnit == TimeUnit.MINUTES) {
+            updateSecondMillisecondView(false, false);
+        } else if (timeUnit == TimeUnit.SECONDS) {
+            updateSecondMillisecondView(true, false);
+        } else {
+            updateSecondMillisecondView(true, true);
+        }
+    }
+    
+    private void updateSecondMillisecondView(boolean secondVisible, boolean millisecondVisible) {
+        secondListView.setVisible(secondVisible);
+        secondListView.setManaged(secondVisible);
+        millisecondListView.setVisible(millisecondVisible);
+        millisecondListView.setManaged(millisecondVisible);
     }
 
     private void updateListViewSelection() {
