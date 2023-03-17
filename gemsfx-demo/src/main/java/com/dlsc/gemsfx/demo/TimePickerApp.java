@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TimePicker;
+import com.dlsc.gemsfx.TimePicker.TimeUnit;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +35,13 @@ public class TimePickerApp extends Application {
     public void start(Stage primaryStage) {
         TimePicker timePicker = new TimePicker();
 
+        ComboBox<TimeUnit> timeUnitCombo = new ComboBox();
+        timeUnitCombo.getItems().add(TimeUnit.MINUTES);
+        timeUnitCombo.getItems().add(TimeUnit.SECONDS);
+        timeUnitCombo.getItems().add(TimeUnit.MILLISECONDS);
+        timeUnitCombo.setOnAction(event -> timePicker.timeUnitProperty().set(timeUnitCombo.getSelectionModel().getSelectedItem()));
+        timeUnitCombo.getSelectionModel().select(TimeUnit.MINUTES);
+        
         CheckBox rollOverBox = new CheckBox("Rollover");
         rollOverBox.selectedProperty().bindBidirectional(timePicker.rolloverProperty());
 
@@ -86,11 +94,6 @@ public class TimePickerApp extends Application {
         Button nullButton = new Button("Set 'null'");
         nullButton.setOnAction(evt -> timePicker.setTime(null));
         
-        Button showMillis = new Button("Show Millis");
-        showMillis.setOnAction(evt -> {
-            timePicker.timeUnitProperty().set(TimePicker.TimeUnit.MILLISECONDS);
-        });
-
         ComboBox<Integer> stepRateBox = new ComboBox<>();
         stepRateBox.getItems().addAll(1, 5, 10, 15, 30);
         stepRateBox.valueProperty().addListener(it -> timePicker.setStepRateInMinutes(stepRateBox.getValue()));
@@ -129,12 +132,14 @@ public class TimePickerApp extends Application {
         gridPane.add(new Label("Earliest time:"), 0, 1);
         gridPane.add(earliestTimeBox, 1, 1);
         gridPane.add(new Label("Latest time:"), 0, 2);
-        gridPane.add(latestTimeBox, 1, 02);
+        gridPane.add(latestTimeBox, 1, 2);
+        gridPane.add(new Label("TimeUnit"), 0, 3);
+        gridPane.add(timeUnitCombo, 1, 3);
 
         VBox box0 = new VBox(20, timePicker, valueLabel);
         VBox box1 = new VBox(20, datePicker, textField);
         VBox box2 = new VBox(20, fullWidth, showPopupButtonBox, linkFieldsBox, rollOverBox, gridPane);
-        HBox box3 = new HBox(20, showOrHidePopupButton, updateButton, nullButton, showMillis);
+        HBox box3 = new HBox(20, showOrHidePopupButton, updateButton, nullButton);
 
         box1.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-background-radius: 2px; -fx-border-color: gray; -fx-border-radius: 2px;");
         box2.setStyle(box1.getStyle()); // same style
