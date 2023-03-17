@@ -30,7 +30,7 @@
     </scm>
 
     <properties>
-        <main.class>com.dlsc.gemsfx.demo.InfoCenterApp</main.class>
+        <main.class>com.dlsc.gemsfx.demo.TimePickerApp</main.class>
     </properties>
 
     <repositories>
@@ -57,6 +57,52 @@
                 <configuration>
                     <mainClass>${main.class}</mainClass>
                 </configuration>
+                <executions>
+                    <execution>
+                        <!-- Default configuration for running -->
+                        <!-- Usage: mvn clean javafx:run -->
+                        <id>default-cli</id>
+                        <configuration>
+                            <options>
+                                <option>--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
+                            </options>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- Configuration for manual attach debugging -->
+                        <!-- Usage: mvn clean javafx:run@debug -->
+                        <id>debug</id>
+                        <configuration>
+                            <options>
+                                <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:8000</option>
+                                <option>--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
+                            </options>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- Configuration for automatic IDE debugging -->
+                        <id>ide-debug</id>
+                        <configuration>
+                            <options>
+                                <option>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>
+                                <option>--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
+                            </options>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- Configuration for automatic IDE profiling -->
+                        <id>ide-profile</id>
+                        <configuration>
+                            <options>
+                                <option>${profiler.jvmargs.arg1}</option>
+                                <option>${profiler.jvmargs.arg2}</option>
+                                <option>${profiler.jvmargs.arg3}</option>
+                                <option>${profiler.jvmargs.arg4}</option>
+                                <option>${profiler.jvmargs.arg5}</option>
+                            </options>
+                        </configuration>
+                    </execution>                           
+                </executions>
             </plugin>
 
             <plugin>
