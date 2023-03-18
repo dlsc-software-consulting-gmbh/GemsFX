@@ -363,6 +363,38 @@ public class CalendarView extends Control {
         return cellFactoryProperty().get();
     }
 
+    private final BooleanProperty showMonth = new SimpleBooleanProperty(this, "showMonth", true);
+
+    public boolean isShowMonth() {
+        return showMonth.get();
+    }
+
+    public BooleanProperty showMonthProperty() {
+        return showMonth;
+    }
+
+    public void setShowMonth(boolean showMonth) {
+        this.showMonth.set(showMonth);
+    }
+
+    private final BooleanProperty showYear = new SimpleBooleanProperty(this, "showYear", true);
+
+    public final boolean isShowYear() {
+        return showYear.get();
+    }
+
+    /**
+     * Show or hide the year in the header.
+     *
+     * @return true if the year is shown in the header
+     */
+    public final BooleanProperty showYearProperty() {
+        return showYear;
+    }
+
+    public final void setShowYear(boolean showYear) {
+        this.showYear.set(showYear);
+    }
 
     private final BooleanProperty showYearSpinner = new SimpleBooleanProperty(this, "showYearSpinner", true);
 

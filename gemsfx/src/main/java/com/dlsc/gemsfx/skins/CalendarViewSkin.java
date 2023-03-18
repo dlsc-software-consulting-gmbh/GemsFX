@@ -19,15 +19,16 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.DateCell;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
@@ -82,19 +83,46 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         bodyGridPane = new GridPane();
         bodyGridPane.setAlignment(CENTER);
-        bodyGridPane.getStyleClass().add("grid-pane");
+        bodyGridPane.getStyleClass().addAll("grid-pane", "body-grid-pane");
 
         weekdayGridPane = new GridPane();
         weekdayGridPane.setAlignment(CENTER);
-        weekdayGridPane.getStyleClass().add("weekday-grid-pane");
+        weekdayGridPane.getStyleClass().addAll("grid-pane", "weekday-grid-pane");
 
         monthLabel = new Label();
         monthLabel.getStyleClass().add("month-label");
+        monthLabel.setMinWidth(Region.USE_PREF_SIZE);
+        monthLabel.textProperty().bind(Bindings.createStringBinding(() -> view.getYearMonth() != null ? view.getYearMonth().getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()) : "", view.yearMonthProperty()));
+        monthLabel.visibleProperty().bind(view.showMonthProperty());
+        monthLabel.managedProperty().bind(view.showMonthProperty());
 
         yearLabel = new Label();
         yearLabel.getStyleClass().add("year-label");
+        yearLabel.textProperty().bind(Bindings.createStringBinding(() -> view.getYearMonth() != null ? Integer.toString(view.getYearMonth().getYear()) : "", view.yearMonthProperty()));
+        yearLabel.visibleProperty().bind(view.showYearProperty());
+        yearLabel.managedProperty().bind(view.showYearProperty());
 
-        BorderPane header = new BorderPane();
+        StackPane yearUpArrow = new StackPane();
+        yearUpArrow.getStyleClass().add("increment-arrow");
+
+        StackPane yearUpButton = new StackPane(yearUpArrow);
+        yearUpButton.getStyleClass().addAll("year-button", "increment-arrow-button");
+        yearUpButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().plusYears(1)));
+
+        StackPane yearDownArrow = new StackPane();
+        yearDownArrow.getStyleClass().add("decrement-arrow");
+
+        StackPane yearDownButton = new StackPane(yearDownArrow);
+        yearDownButton.getStyleClass().addAll("year-button", "decrement-arrow-button");
+        yearDownButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().minusYears(1)));
+
+        VBox yearArrowBox = new VBox(yearUpButton, yearDownButton);
+        yearArrowBox.getStyleClass().add("year-arrow-box");
+        yearArrowBox.setMaxWidth(Region.USE_PREF_SIZE);
+        yearArrowBox.visibleProperty().bind(view.showYearProperty().and(view.showYearSpinnerProperty()));
+        yearArrowBox.managedProperty().bind(view.showYearProperty().and(view.showYearSpinnerProperty()));
+
+        HBox header = new HBox();
         header.getStyleClass().add("header");
         header.visibleProperty().bind(view.showHeaderProperty());
         header.managedProperty().bind(view.showHeaderProperty());
@@ -103,19 +131,25 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         StackPane previousArrowButton = new StackPane(previousArrowIcon);
         previousArrowButton.getStyleClass().addAll("arrow-button", "previous-button");
         previousArrowButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().minusMonths(1)));
-        previousArrowButton.visibleProperty().bind(view.showMonthArrowsProperty());
-        previousArrowButton.managedProperty().bind(view.showMonthArrowsProperty());
+        previousArrowButton.visibleProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
+        previousArrowButton.managedProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
 
         FontIcon nextArrowIcon = new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT);
         StackPane nextArrowButton = new StackPane(nextArrowIcon);
         nextArrowButton.getStyleClass().addAll("arrow-button", "next-button");
         nextArrowButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().plusMonths(1)));
-        nextArrowButton.visibleProperty().bind(view.showMonthArrowsProperty());
-        nextArrowButton.managedProperty().bind(view.showMonthArrowsProperty());
+        nextArrowButton.visibleProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
+        nextArrowButton.managedProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
 
-        header.setCenter(monthLabel);
-        header.setLeft(previousArrowButton);
-        header.setRight(nextArrowButton);
+        Region leftSpacer = new Region();
+        leftSpacer.getStyleClass().addAll("spacer", "left");
+        HBox.setHgrow(leftSpacer, ALWAYS);
+
+        Region rightSpacer = new Region();
+        rightSpacer.getStyleClass().addAll("spacer", "right");
+        HBox.setHgrow(rightSpacer, ALWAYS);
+
+        header.getChildren().setAll(previousArrowButton, leftSpacer, monthLabel, yearLabel, yearArrowBox, rightSpacer, nextArrowButton);
 
         InvalidationListener updateViewListener = evt -> updateView();
         view.yearMonthProperty().addListener(evt -> {
@@ -155,7 +189,8 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         view.showWeekNumbersProperty().addListener(it -> updateBodyConstraints());
         updateBodyConstraints();
 
-        header.setViewOrder(-1000);
+        header.setViewOrder(-2000);
+        weekdayGridPane.setViewOrder(-1000);
 
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(vBox.widthProperty());
@@ -170,34 +205,48 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         weekdayGridPane.getRowConstraints().clear();
         weekdayGridPane.getColumnConstraints().clear();
 
-        weekdayGridPane.getRowConstraints().add(createRowConstraints());
+        weekdayGridPane.getRowConstraints().add(createRowConstraints(-1));
 
         for (int row = 0; row < 6; row++) {
-            bodyGridPane.getRowConstraints().add(createRowConstraints());
+            bodyGridPane.getRowConstraints().add(createRowConstraints(row));
         }
 
+        int numberOfColumns = getSkinnable().isShowWeekNumbers() ? 8 : 7;
+
         if (getSkinnable().isShowWeekNumbers()) {
-            bodyGridPane.getColumnConstraints().add(createColumnConstraints());
-            weekdayGridPane.getColumnConstraints().add(createColumnConstraints());
+            bodyGridPane.getColumnConstraints().add(createColumnConstraints(numberOfColumns, -1));
+            weekdayGridPane.getColumnConstraints().add(createColumnConstraints(numberOfColumns, -1));
         }
 
         for (int col = 0; col < 7; col++) {
-            bodyGridPane.getColumnConstraints().add(createColumnConstraints());
-            weekdayGridPane.getColumnConstraints().add(createColumnConstraints());
+            bodyGridPane.getColumnConstraints().add(createColumnConstraints(numberOfColumns, col));
+            weekdayGridPane.getColumnConstraints().add(createColumnConstraints(numberOfColumns, col));
         }
     }
 
-    private ColumnConstraints createColumnConstraints() {
+    /**
+     * Creates the constraints for the given column. The total number of columns can vary,
+     * depending on whether the week number column is shown or not.
+     *
+     * @param numberOfColumns the number of total columns (either 7 or 8)
+     * @param column          the index of the column for which to create the constraints, -1 indicates the column used for showing the "week of year" numbers
+     * @return the column constraints for the given column
+     */
+    protected ColumnConstraints createColumnConstraints(int numberOfColumns, int column) {
         ColumnConstraints weekColumn = new ColumnConstraints();
         weekColumn.setHalignment(HPos.CENTER);
-        weekColumn.setMaxWidth(Region.USE_PREF_SIZE);
-        weekColumn.setMinWidth(Region.USE_PREF_SIZE);
-        weekColumn.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        weekColumn.setPercentWidth(100d / numberOfColumns);
         weekColumn.setFillWidth(true);
         return weekColumn;
     }
 
-    private RowConstraints createRowConstraints() {
+    /**
+     * Creates the constraints for the given row.
+     *
+     * @param row the index of the row for which to create constraints, -1 indicates the row used for showing the "weekday name"
+     * @return the row constraints for the given row
+     */
+    protected RowConstraints createRowConstraints(int row) {
         RowConstraints rowConstraints = new RowConstraints();
         rowConstraints.setFillHeight(true);
         rowConstraints.setMinHeight(Region.USE_PREF_SIZE);
@@ -218,6 +267,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         if (showWeekNumbers) {
             Label label = new Label();
+            label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             label.getStyleClass().addAll("corner", WEEKDAY_NAME);
             weekdayGridPane.add(label, 0, 0);
         }
@@ -275,9 +325,6 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         YearMonth yearMonth = view.getYearMonth();
 
         displayedYearMonth = yearMonth;
-
-        monthLabel.setText(yearMonth.getMonth().getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()));
-        yearLabel.setText(Integer.toString(yearMonth.getYear()));
 
         // update the days (1 to 31) plus padding days
 

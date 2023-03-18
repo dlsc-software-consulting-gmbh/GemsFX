@@ -1,8 +1,20 @@
+/*
+ * Note: this calendar view uses two grid panes, one for displaying the
+ * names of the weekdays (e.g. "M", "T", "W", etc....) and one for showing
+ * the date cells. To keep their alignment in sync we are using variables
+ * on the top-level class "calendar-view", e.g. "-fx-vertical-grid-gap".
+ * One also has to make sure that the left and right padding values of both
+ * grid panes are the same.
+ */
 .calendar-view {
     -fx-background: -fx-control-inner-background;
     -fx-background-color: #e0e0e0, -fx-background;
     -fx-background-insets: 0px, 1px;
     -fx-padding: 1px;
+
+    /* global variables for the two grid panes */
+    -fx-vertical-grid-gap: 2px;
+    -fx-horizontal-grid-gap: 2px;
 }
 
 .calendar-view > .container {
@@ -11,25 +23,68 @@
 }
 
 .calendar-view > .container > .footer {
+    -fx-background: -fx-control-inner-background-alt;
+    -fx-background-color: -fx-background;
     -fx-padding: 0px 10px 10px 10px;
 }
 
 .calendar-view > .container > .header {
-    -fx-background: rgb(245, 245, 245);
+    -fx-background: -fx-control-inner-background;
     -fx-background-color: -fx-background;
-    -fx-padding: 10px 10px 0px 10px;
+    -fx-padding: 5px;
+    -fx-alignment: center;
 }
 
 .calendar-view > .container > .header > .month-label {
-    -fx-font-size: 1.2em;
+    -fx-font-weight: bold;
 }
 
 .calendar-view > .container > .header > .year-label {
-    -fx-font-size: 1.2em;
+    -fx-padding: 0px 5px 0px 5px;
+}
+
+.calendar-view > .container > .header > .arrow-button {
+    -fx-padding: 2px;
 }
 
 .calendar-view > .container > .header > .arrow-button .ikonli-font-icon {
+    -fx-icon-color: -fx-text-background-color;
     -fx-icon-size: 20px;
+}
+
+.calendar-view > .container > .header > .year-arrow-box {
+    -fx-alignment: center;
+}
+
+.calendar-view > .container > .header > .year-arrow-box > .year-button {
+}
+
+.calendar-view > .container > .header > .year-arrow-box > .year-button.up {
+}
+
+.calendar-view > .container > .header > .year-arrow-box > .increment-arrow-button {
+    -fx-padding: 2px;  /* 5 8 3 8 */
+}
+
+.calendar-view > .container > .header > .year-arrow-box > .decrement-arrow-button {
+    -fx-padding: 2px;  /* 3 8 5 8 */
+}
+
+.calendar-view > .container > .header > .year-arrow-box > .increment-arrow-button > .increment-arrow  {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 0 0 -1 0, 0;
+    -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em;  /* 2 4 2 4 */
+    -fx-shape: "M 0 4 h 7 l -3.5 -4 z";
+}
+
+.calendar-view > .container > .header > .year-arrow-box > .decrement-arrow-button > .decrement-arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 0 0 -1 0, 0;
+    -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
+    -fx-shape: "M 0 0 h 7 l -3.5 4 z";
+}
+
+.calendar-view > .container > .header > .year-arrow-box > .year-button.down {
 }
 
 .calendar-view > .container > .header > .previous-button,
@@ -51,11 +106,17 @@
 }
 
 .calendar-view > .container > .weekday-grid-pane {
-    -fx-background: rgb(245, 245, 245);
+    -fx-background: -fx-control-inner-background;
     -fx-background-color: -fx-background;
-    -fx-padding: 10px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 10, 0.12, -1, 2);
-    -fx-grid-lines-visible: true;
+    -fx-grid-lines-visible: false;
+    -fx-hgap: -fx-horizontal-grid-gap;
+    -fx-padding: 0px 10px 10px 10px;
+}
+
+.calendar-view > .container > .weekday-grid-pane > .corner {
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-background;
 }
 
 .calendar-view > .container > .weekday-grid-pane > .weekday-name {
@@ -64,56 +125,63 @@
     -fx-pref-height: -size;
     -fx-min-width: -size;
     -fx-min-height: -size;
-    -fx-max-width: -size;
-    -fx-max-height: -size;
     -fx-text-fill: gray;
-    -fx-padding: 0px 0px 0px 0px;
+    -fx-font-size: .8em;
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-background;
+    -fx-alignment: center;
 }
 
-.calendar-view > .container > .grid-pane {
+.calendar-view > .container > .body-grid-pane {
     -fx-padding: 10px;
-    -fx-grid-lines-visible: true;
+    -fx-grid-lines-visible: false;
+    -fx-background: -fx-control-inner-background-alt;
+    -fx-background-color: -fx-background;
+    -fx-hgap: -fx-horizontal-grid-gap;
+    -fx-vgap: -fx-vertical-grid-gap;
 }
 
-.calendar-view > .container > .grid-pane > .week-number-label {
+.calendar-view > .container > .body-grid-pane > .week-number-label {
     -fx-font-size: 10px;
     -fx-text-fill: -fx-accent;
     -fx-padding: 0.0 2.0 0.0 0.0;
-    -fx-min-width: 2.0em;
-    -fx-min-height: 2.0em;
+    -fx-min-width: 2.5em;
+    -fx-min-height: 2.5em;
 }
 
-.calendar-view > .container > .grid-pane > .date-cell {
-    -size: 2em;
+.calendar-view > .container > .body-grid-pane > .date-cell {
+    -fx-background: -fx-background-alt;
+    -fx-background-color: -fx-background;
+    -size: 2.5em;
     -fx-pref-width: -size;
     -fx-pref-height: -size;
     -fx-min-width: -size;
     -fx-min-height: -size;
     -fx-max-width: -size;
     -fx-max-height: -size;
-    -fx-background: -fx-control-inner-background;
-    -fx-background-color: -fx-background;
 }
 
-.calendar-view > .container > .grid-pane > .date-cell.previous-month {
-    -fx-background: lightgrey;
+.calendar-view > .container > .body-grid-pane > .date-cell.previous-month {
+    -fx-background: rgb(230,231,233);
+    -fx-text-fill: grey;
 }
 
-.calendar-view > .container > .grid-pane > .date-cell.next-month {
-    -fx-background: lightgrey;
+.calendar-view > .container > .body-grid-pane > .date-cell.next-month {
+    -fx-background: rgb(230,231,233);
+    -fx-text-fill: grey;
 }
 
-.calendar-view > .container > .grid-pane > .weekend-day {
+.calendar-view > .container > .body-grid-pane > .weekend-day {
     -fx-background-color: -fx-control-background-alt;
 }
 
-.calendar-view > .container > .grid-pane > .selected-month-date {
+.calendar-view > .container > .body-grid-pane > .selected-month-date {
     -fx-background-color: lightgray;
     -fx-text-fill: black;
     -fx-font-weight: bold;
 }
 
-.calendar-view > .container > .grid-pane > .today {
+.calendar-view > .container > .body-grid-pane > .today {
     -fx-background: -fx-accent;
     -fx-background-color: -fx-background;
 }

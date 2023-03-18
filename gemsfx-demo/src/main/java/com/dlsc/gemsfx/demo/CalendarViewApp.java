@@ -26,6 +26,8 @@ public class CalendarViewApp extends Application {
         options.getChildren().add(createOption("Show header", calendarView.showHeaderProperty()));
         options.getChildren().add(createOption("Show today", calendarView.showTodayProperty()));
         options.getChildren().add(createOption("Show today button", calendarView.showTodayButtonProperty()));
+        options.getChildren().add(createOption("Show month", calendarView.showMonthProperty()));
+        options.getChildren().add(createOption("Show year", calendarView.showYearProperty()));
         options.getChildren().add(createOption("Show year spinner", calendarView.showYearSpinnerProperty()));
         options.getChildren().add(createOption("Show month arrows", calendarView.showMonthArrowsProperty()));
         options.getChildren().add(createOption("Show week numbers", calendarView.showWeekNumbersProperty()));
@@ -39,8 +41,7 @@ public class CalendarViewApp extends Application {
         Scene scene = new Scene(stackPane);
         stage.setTitle("CalendarView");
         stage.setScene(scene);
-        stage.setWidth(500);
-        stage.setHeight(400);
+        stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
     }
