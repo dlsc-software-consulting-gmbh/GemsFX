@@ -1,0 +1,119 @@
+.calendar-view {
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: #e0e0e0, -fx-background;
+    -fx-background-insets: 0px, 1px;
+    -fx-padding: 1px;
+}
+
+.calendar-view > .container {
+    -fx-alignment: center;
+    -fx-fill-width: true;
+}
+
+.calendar-view > .container > .footer {
+    -fx-padding: 0px 10px 10px 10px;
+}
+
+.calendar-view > .container > .header {
+    -fx-background: rgb(245, 245, 245);
+    -fx-background-color: -fx-background;
+    -fx-padding: 10px 10px 0px 10px;
+}
+
+.calendar-view > .container > .header > .month-label {
+    -fx-font-size: 1.2em;
+}
+
+.calendar-view > .container > .header > .year-label {
+    -fx-font-size: 1.2em;
+}
+
+.calendar-view > .container > .header > .arrow-button .ikonli-font-icon {
+    -fx-icon-size: 20px;
+}
+
+.calendar-view > .container > .header > .previous-button,
+.calendar-view > .container > .header > .next-button {
+}
+
+.calendar-view > .container > .header > .previous-button:hover,
+.calendar-view > .container > .header > .next-button:hover {
+}
+
+.calendar-view > .container > .header > .previous-button:pressed,
+.calendar-view > .container > .header > .next-button:pressed {
+}
+
+.calendar-view > .container > .header > .previous-button {
+}
+
+.calendar-view > .container > .header > .next-button {
+}
+
+.calendar-view > .container > .weekday-grid-pane {
+    -fx-background: rgb(245, 245, 245);
+    -fx-background-color: -fx-background;
+    -fx-padding: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 10, 0.12, -1, 2);
+    -fx-grid-lines-visible: true;
+}
+
+.calendar-view > .container > .weekday-grid-pane > .weekday-name {
+    -size: 2em;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+    -fx-text-fill: gray;
+    -fx-padding: 0px 0px 0px 0px;
+}
+
+.calendar-view > .container > .grid-pane {
+    -fx-padding: 10px;
+    -fx-grid-lines-visible: true;
+}
+
+.calendar-view > .container > .grid-pane > .week-number-label {
+    -fx-font-size: 10px;
+    -fx-text-fill: -fx-accent;
+    -fx-padding: 0.0 2.0 0.0 0.0;
+    -fx-min-width: 2.0em;
+    -fx-min-height: 2.0em;
+}
+
+.calendar-view > .container > .grid-pane > .date-cell {
+    -size: 2em;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-background;
+}
+
+.calendar-view > .container > .grid-pane > .date-cell.previous-month {
+    -fx-background: lightgrey;
+}
+
+.calendar-view > .container > .grid-pane > .date-cell.next-month {
+    -fx-background: lightgrey;
+}
+
+.calendar-view > .container > .grid-pane > .weekend-day {
+    -fx-background-color: -fx-control-background-alt;
+}
+
+.calendar-view > .container > .grid-pane > .selected-month-date {
+    -fx-background-color: lightgray;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+}
+
+.calendar-view > .container > .grid-pane > .today {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-background;
+}
