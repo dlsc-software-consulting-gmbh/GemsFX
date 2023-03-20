@@ -437,14 +437,20 @@ public class TimePicker extends Control {
     }
 
     public final void setTime(LocalTime time) {
-        if (this.timeUnit.get() == TimeUnit.MINUTES) {
-            var adjusted = time.withSecond(0);
-            adjusted = adjusted.withNano(0);
-            this.time.set(adjusted);
-        } else if (this.timeUnit.get() == TimeUnit.SECONDS) {
-            this.time.set(time.withNano(0));
-        } else {
+        if (null == this.timeUnit.get() || time == null) {
             this.time.set(time);
+        } else switch (this.timeUnit.get()) {
+            case MINUTES:
+                var adj = time.withSecond(0);
+                adj = adj.withNano(0);
+                this.time.set(adj);
+                break;
+            case SECONDS:
+                this.time.set(time.withNano(0));
+                break;
+            default:
+                this.time.set(time);
+                break;
         }
     }
 
