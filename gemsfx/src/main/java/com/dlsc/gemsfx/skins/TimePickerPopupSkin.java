@@ -81,9 +81,9 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
             if (newMillisecond != null) {
                 LocalTime time = popup.getTime();
                 if (time != null) {
-                    popup.setTime(LocalTime.of(time.getHour(), time.getMinute(), time.getSecond(), newMillisecond*1_000_000));
+                    popup.setTime(LocalTime.of(time.getHour(), time.getMinute(), time.getSecond(), millisecondToNano(newMillisecond)));
                 } else {
-                    popup.setTime(LocalTime.of(0, 0, 0, newMillisecond*1_000_000));
+                    popup.setTime(LocalTime.of(0, 0, 0, millisecondToNano(newMillisecond)));
                 }
             }
         });   
@@ -103,7 +103,6 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
         updateLists();
 
         popup.showingProperty().addListener(it -> Platform.runLater(() -> {
-            //updateTimeUnit();
             updateListViewSelection();
             hourListView.scrollTo(hourListView.getSelectionModel().getSelectedIndex());
             minuteListView.scrollTo(minuteListView.getSelectionModel().getSelectedIndex());
@@ -130,10 +129,18 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
     }
     
     private void updateSecondMillisecondView(boolean secondVisible, boolean millisecondVisible) {
-        secondListView.setVisible(secondVisible);
         secondListView.setManaged(secondVisible);
-        millisecondListView.setVisible(millisecondVisible);
+        secondListView.setVisible(secondVisible);
         millisecondListView.setManaged(millisecondVisible);
+        millisecondListView.setVisible(millisecondVisible);
+    }
+    
+    private int nanoToMillisecond(int nano) {
+        return Long.valueOf(java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(nano)).intValue();
+    }
+    
+    private int millisecondToNano(int millisecond) {
+        return Long.valueOf(java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(millisecond)).intValue();
     }
 
     private void updateListViewSelection() {
@@ -142,7 +149,7 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
             hourListView.getSelectionModel().select(Integer.valueOf(time.getHour()));
             minuteListView.getSelectionModel().select(Integer.valueOf(time.getMinute()));
             secondListView.getSelectionModel().select(Integer.valueOf(time.getSecond()));
-            millisecondListView.getSelectionModel().select(Integer.valueOf(time.getNano()/1_000_000));
+            millisecondListView.getSelectionModel().select(nanoToMillisecond(time.getNano()));
         } else {
             hourListView.getSelectionModel().clearSelection();
             minuteListView.getSelectionModel().clearSelection();
@@ -165,7 +172,6 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
 
         for (int minute = 0; minute < 60; minute = minute + getSkinnable().getStepRateInMinutes()) {
             minuteListView.getItems().add(minute);
-            secondListView.getItems().add(minute);
         }
         
         for (int second = 0; second < 60; second++) {
@@ -198,7 +204,7 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
                         time = time.plusSeconds(second);
                     }
                     if (millisecond != null) {
-                        time = time.plusNanos(millisecond * 1_000_000);
+                        time = time.plusNanos(millisecondToNano(millisecond));
                     }
                     return time.isAfter(getSkinnable().getLatestTime()) || time.isBefore(getSkinnable().getEarliestTime());
                 }
@@ -307,7 +313,6 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
 
         public MillisecondCell() {
             getStyleClass().add("millisecond-cell");
-
             disableProperty().bind(Bindings.createBooleanBinding(() -> {
                 Integer hour = hourListView.getSelectionModel().getSelectedItem();
                 Integer minute = minuteListView.getSelectionModel().getSelectedItem();
