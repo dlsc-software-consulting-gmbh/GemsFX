@@ -330,8 +330,10 @@ public class TimePicker extends Control {
 
             int hour = time.getHour();
             int minute = time.getMinute();
+            int second = time.getSecond();
+            int nano = time.getNano();
 
-            LocalTime newTime = LocalTime.of(hour, minute);
+            LocalTime newTime = LocalTime.of(hour, minute, second, nano);
 
             if (time.isBefore(earliestTime)) {
 
@@ -340,9 +342,15 @@ public class TimePicker extends Control {
                     newTime = newTime.withHour(earliestTime.getHour());
                 }
 
-                // still too early? adjust minutes
+                // still too early? adjust lower time unites (minutes, seconds, nano)
                 if (newTime.isBefore(earliestTime)) {
                     newTime = newTime.withMinute(earliestTime.getMinute());
+                }
+                if (newTime.isBefore(latestTime)) {
+                    newTime = newTime.withSecond(earliestTime.getSecond());
+                }
+                if (newTime.isBefore(latestTime)) {
+                    newTime = newTime.withNano(earliestTime.getNano());
                 }
 
             } else if (time.isAfter(latestTime)) {
@@ -352,14 +360,23 @@ public class TimePicker extends Control {
                     newTime = newTime.withHour(latestTime.getHour());
                 }
 
-                // still too early? adjust minutes
+                // still too early? adjust lower time units (minutes, seconds, nano)
                 if (newTime.isAfter(latestTime)) {
                     newTime = newTime.withMinute(latestTime.getMinute());
+                }
+                if (newTime.isAfter(latestTime)) {
+                    newTime = newTime.withSecond(latestTime.getSecond());
+                }
+                if (newTime.isAfter(latestTime)) {
+                    newTime = newTime.withNano(latestTime.getNano());
                 }
 
             }
 
-            boolean adjusted = newTime.getHour() != time.getHour() || newTime.getMinute() != time.getMinute();
+            boolean adjusted = newTime.getHour() != time.getHour() 
+                                || newTime.getMinute() != time.getMinute()
+                                || newTime.getSecond() != time.getSecond()
+                                || newTime.getNano() != time.getNano();
 
             if (adjusted) {
                 setTime(newTime);
@@ -420,7 +437,15 @@ public class TimePicker extends Control {
     }
 
     public final void setTime(LocalTime time) {
-        this.time.set(time);
+        if (this.timeUnit.get() == TimeUnit.MINUTES) {
+            var adjusted = time.withSecond(0);
+            adjusted = adjusted.withNano(0);
+            this.time.set(adjusted);
+        } else if (this.timeUnit.get() == TimeUnit.SECONDS) {
+            this.time.set(time.withNano(0));
+        } else {
+            this.time.set(time);
+        }
     }
 
     private final IntegerProperty stepRateInMinutes = new SimpleIntegerProperty(this, "stepRateInMinutes", 1);
