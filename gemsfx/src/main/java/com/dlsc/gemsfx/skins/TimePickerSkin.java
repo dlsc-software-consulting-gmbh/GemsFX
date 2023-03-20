@@ -103,7 +103,6 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
         });
         
         picker.timeUnitProperty().addListener(cl -> Platform.runLater(() -> {
-            System.out.println("in TimePickerSkin time unit listener.");
             if (null == picker.timeUnitProperty().get()) {
                 updateSecondsMillisecondsViewable(false, false);
             } else switch (picker.timeUnitProperty().get()) {

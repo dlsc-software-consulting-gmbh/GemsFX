@@ -117,7 +117,6 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
     
     private void updateTimeUnit() {
         timeUnit = popup.timeUnitProperty().get();
-        System.out.println("time unit " + timeUnit);
 
         if (timeUnit == TimeUnit.MINUTES) {
             updateSecondMillisecondView(false, false);
