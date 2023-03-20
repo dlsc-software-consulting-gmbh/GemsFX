@@ -198,8 +198,8 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
     }
     
     private boolean shouldDisable(Integer hour, Integer minute, Integer second, Integer millisecond) {
-            if (hour != null && minute != null) {
-                    LocalTime time = LocalTime.of(hour, minute);
+            if (hour != null && minute != null && second != null && millisecond != null) {
+                    LocalTime time = LocalTime.of(hour, minute, second, millisecondToNano(millisecond));
                     if (second != null) {
                         time = time.plusSeconds(second);
                     }
