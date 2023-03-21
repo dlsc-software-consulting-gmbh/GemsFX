@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.CalendarView;
+import com.dlsc.gemsfx.CalendarView.SelectionModel.SelectionMode;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Insets;
@@ -8,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -31,6 +33,11 @@ public class CalendarViewApp extends Application {
         options.getChildren().add(createOption("Show year spinner", calendarView.showYearSpinnerProperty()));
         options.getChildren().add(createOption("Show month arrows", calendarView.showMonthArrowsProperty()));
         options.getChildren().add(createOption("Show week numbers", calendarView.showWeekNumbersProperty()));
+
+        ComboBox<SelectionMode> selectionModeComboBox = new ComboBox<>();
+        selectionModeComboBox.getItems().setAll(SelectionMode.values());
+        selectionModeComboBox.valueProperty().bindBidirectional(calendarView.getSelectionModel().selectionModeProperty());
+        options.getChildren().add(selectionModeComboBox);
 
         HBox box = new HBox(50, calendarView, options);
         box.setPadding(new Insets(50));

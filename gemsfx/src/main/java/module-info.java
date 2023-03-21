@@ -1,6 +1,7 @@
 module com.dlsc.gemsfx {
     requires javafx.base;
     requires transitive javafx.controls;
+    requires javafx.graphics;
     requires javafx.swing;
 
     requires jpro.utils.treeshowing;

@@ -18,13 +18,15 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.DateCell;
+import com.dlsc.gemsfx.CalendarView.SelectionModel;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -45,10 +47,10 @@ import java.time.format.TextStyle;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import static javafx.geometry.Pos.CENTER;
-import static javafx.scene.control.SelectionMode.SINGLE;
 import static javafx.scene.layout.Priority.ALWAYS;
 
 public class CalendarViewSkin extends SkinBase<CalendarView> {
@@ -59,6 +61,9 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
     private static final String NEXT_MONTH = "next-month";
     private static final String WEEKEND_DAY = "weekend-day";
     private static final String SELECTED = "selected";
+    private static final String RANGE_START_DATE = "range-start";
+    private static final String RANGE_END_DATE = "range-end";
+    private static final String RANGE_DATE = "range-date";
 
     private final GridPane bodyGridPane;
 
@@ -75,6 +80,10 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
     private final Label[] dayOfWeekLabels = new Label[7];
 
     private final Label[] weekNumberLabels = new Label[6];
+
+    private final InvalidationListener updateViewListener = (Observable it) -> updateView();
+
+    private final WeakInvalidationListener weakUpdateViewListener = new WeakInvalidationListener(updateViewListener);
 
     private YearMonth displayedYearMonth;
 
@@ -117,7 +126,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         yearDownButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().minusYears(1)));
 
         VBox yearArrowBox = new VBox(yearUpButton, yearDownButton);
-        yearArrowBox.getStyleClass().add("year-arrow-box");
+        yearArrowBox.getStyleClass().add("year-spinner");
         yearArrowBox.setMaxWidth(Region.USE_PREF_SIZE);
         yearArrowBox.visibleProperty().bind(view.showYearProperty().and(view.showYearSpinnerProperty()));
         yearArrowBox.managedProperty().bind(view.showYearProperty().and(view.showYearSpinnerProperty()));
@@ -133,6 +142,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         previousArrowButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().minusMonths(1)));
         previousArrowButton.visibleProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
         previousArrowButton.managedProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
+        previousArrowButton.disableProperty().bind(view.disablePreviousMonthButtonProperty());
 
         FontIcon nextArrowIcon = new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT);
         StackPane nextArrowButton = new StackPane(nextArrowIcon);
@@ -140,6 +150,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         nextArrowButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().plusMonths(1)));
         nextArrowButton.visibleProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
         nextArrowButton.managedProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
+        nextArrowButton.disableProperty().bind(view.disableNextMonthButtonProperty());
 
         Region leftSpacer = new Region();
         leftSpacer.getStyleClass().addAll("spacer", "left");
@@ -160,8 +171,6 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         InvalidationListener buildViewListener = evt -> buildView();
 
-        view.getSelectedDates().addListener(updateViewListener);
-
         view.showHeaderProperty().addListener(buildViewListener);
         view.showWeekNumbersProperty().addListener(buildViewListener);
         view.showMonthArrowsProperty().addListener(buildViewListener);
@@ -169,7 +178,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         view.cellFactoryProperty().addListener(buildViewListener);
         view.weekFieldsProperty().addListener(buildViewListener);
 
-        view.showTodayProperty().addListener(it -> updateView());
+        view.showTodayProperty().addListener(updateViewListener);
 
         Button todayButton = new Button("Today");
         todayButton.setOnAction(evt -> view.setYearMonth(YearMonth.from(view.getToday())));
@@ -196,6 +205,16 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         clip.widthProperty().bind(vBox.widthProperty());
         clip.heightProperty().bind(vBox.heightProperty());
         vBox.setClip(clip);
+
+        view.selectionModelProperty().addListener(it -> bindSelectionModel(view.getSelectionModel()));
+        bindSelectionModel(view.getSelectionModel());
+    }
+
+    private void bindSelectionModel(SelectionModel model) {
+        model.selectionModeProperty().addListener(weakUpdateViewListener);
+        model.selectedDateProperty().addListener(weakUpdateViewListener);
+        model.selectedEndDateProperty().addListener(weakUpdateViewListener);
+        model.selectedDatesProperty().addListener(weakUpdateViewListener);
     }
 
     private void updateBodyConstraints() {
@@ -255,8 +274,6 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         return rowConstraints;
     }
 
-    private LocalDate lastSelectedDate;
-
     private void buildView() {
         bodyGridPane.getChildren().clear();
         weekdayGridPane.getChildren().clear();
@@ -299,13 +316,17 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         for (int row = 0; row < numberOfRows; row++) {
             for (int col = 0; col < 7; col++) {
+
                 Callback<CalendarView, DateCell> cellFactory = view.getCellFactory();
                 DateCell cell = cellFactory.call(view);
                 GridPane.setHgrow(cell, ALWAYS);
                 GridPane.setVgrow(cell, ALWAYS);
-                cell.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> handleMouseClick(evt, cell.getDate()));
                 cellsMap.put(getKey(row, col), cell);
+
                 bodyGridPane.add(cell, showWeekNumbers ? col + 1 : col, row);
+
+                installSelectionSupport(cell);
+
                 date = date.plusDays(1);
             }
         }
@@ -314,13 +335,48 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         updateView();
     }
 
+    private void installSelectionSupport(DateCell cell) {
+        cell.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+            SelectionModel selectionModel = getSkinnable().getSelectionModel();
+
+            switch (selectionModel.getSelectionMode()) {
+                case SINGLE_DATE:
+                    selectionModel.select(cell.getDate());
+                    break;
+                case MULTIPLE_DATES:
+                    if (selectionModel.isSelected(cell.getDate())) {
+                        selectionModel.clearSelection(cell.getDate());
+                    } else {
+                        selectionModel.select(cell.getDate());
+                    }
+                    break;
+                case DATE_RANGE:
+                    if (selectionModel.getSelectedDate() != null && selectionModel.getSelectedEndDate() != null) {
+                        selectionModel.clearSelection();
+                    }
+
+                    if (selectionModel.getSelectedDate() == null) {
+                        selectionModel.select(cell.getDate());
+                    } else {
+                        if (cell.getDate().isBefore(selectionModel.getSelectedDate())) {
+                            // swap the dates, as the new end date is BEFORE the current start date
+                            LocalDate endDate = selectionModel.getSelectedDate();
+                            selectionModel.clearAndSelect(cell.getDate());
+                            selectionModel.setSelectedEndDate(endDate);
+                        } else {
+                            selectionModel.setSelectedEndDate(cell.getDate());
+                        }
+                    }
+                    break;
+            }
+        });
+    }
+
     private String getKey(int row, int col) {
         return row + "/" + col;
     }
 
     private void updateView() {
-        lastSelectedDate = null;
-
         CalendarView view = getSkinnable();
         YearMonth yearMonth = view.getYearMonth();
 
@@ -346,12 +402,8 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
                 LocalDate localDate = LocalDate.from(date);
 
                 DateCell cell = cellsMap.get(getKey(row, col));
-                cell.setDate(localDate);
-                cell.getStyleClass().removeAll(TODAY, PREVIOUS_MONTH, NEXT_MONTH, WEEKEND_DAY, SELECTED);
-
-                if (view.getSelectedDates().contains(date)) {
-                    cell.getStyleClass().add(SELECTED);
-                }
+                cell.updateItem(localDate, false);
+                cell.getStyleClass().removeAll(TODAY, PREVIOUS_MONTH, NEXT_MONTH, WEEKEND_DAY, SELECTED, RANGE_START_DATE, RANGE_END_DATE, RANGE_DATE);
 
                 if (view.isShowToday() && date.equals(view.getToday())) {
                     cell.getStyleClass().add(TODAY);
@@ -365,6 +417,21 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
                 if (view.getWeekendDays().contains(date.getDayOfWeek())) {
                     cell.getStyleClass().add(WEEKEND_DAY);
+                }
+
+                if (view.getSelectionModel().isSelected(localDate)) {
+                    cell.getStyleClass().add(SELECTED);
+
+                    if (Objects.equals(view.getSelectionModel().getSelectionMode(), SelectionModel.SelectionMode.DATE_RANGE)) {
+
+                        if (Objects.equals(view.getSelectionModel().getSelectedDate(), localDate)) {
+                            cell.getStyleClass().add(RANGE_START_DATE);
+                        } else if (Objects.equals(view.getSelectionModel().getSelectedEndDate(), localDate)) {
+                            cell.getStyleClass().add(RANGE_END_DATE);
+                        } else {
+                            cell.getStyleClass().add(RANGE_DATE);
+                        }
+                    }
                 }
 
                 date = date.plusDays(1);
@@ -386,50 +453,5 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         }
 
         return newDate;
-    }
-
-    private void handleMouseClick(MouseEvent evt, LocalDate date) {
-        if (evt.getButton() != MouseButton.PRIMARY || evt.getClickCount() != 1) {
-            return;
-        }
-
-        CalendarView view = getSkinnable();
-
-        boolean multiSelect = evt.isShiftDown() || evt.isShortcutDown();
-        if (!multiSelect || (view.getSelectionMode().equals(SINGLE) && !evt.isControlDown())) {
-            view.getSelectedDates().clear();
-        }
-
-        if (evt.isShiftDown()) {
-            if (lastSelectedDate != null) {
-                LocalDate st = lastSelectedDate;
-                LocalDate et = date;
-                if (date.isBefore(st)) {
-                    st = date;
-                    et = lastSelectedDate;
-                }
-
-                do {
-                    view.getSelectedDates().add(st);
-                    st = st.plusDays(1);
-                } while (!et.isBefore(st));
-            } else {
-                view.getSelectedDates().clear();
-                view.getSelectedDates().add(date);
-            }
-        } else {
-            if (view.getSelectedDates().contains(date)) {
-                view.getSelectedDates().remove(date);
-            } else {
-                view.getSelectedDates().add(date);
-            }
-        }
-
-        lastSelectedDate = date;
-
-        if (!date.getMonth().equals(view.getYearMonth().getMonth())) {
-            view.setYearMonth(YearMonth.from(date));
-        }
-
     }
 }

@@ -17,15 +17,18 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.CalendarViewSkin;
+import com.dlsc.gemsfx.skins.DateCellSkin;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
+import javafx.scene.control.Cell;
 import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
@@ -35,6 +38,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
+import java.util.Objects;
 
 import static java.lang.Double.MAX_VALUE;
 import static java.util.Objects.requireNonNull;
@@ -120,7 +124,7 @@ public class CalendarView extends Control {
         return weekendDays;
     }
 
-    private final BooleanProperty showWeeks = new SimpleBooleanProperty(this, "showWeeks", true);
+    private final BooleanProperty showWeekNumbers = new SimpleBooleanProperty(this, "showWeekNumbers");
 
     /**
      * Controls whether the view will show week numbers.
@@ -128,7 +132,7 @@ public class CalendarView extends Control {
      * @return true if week numbers are shown
      */
     public final BooleanProperty showWeekNumbersProperty() {
-        return showWeeks;
+        return showWeekNumbers;
     }
 
     /**
@@ -194,17 +198,6 @@ public class CalendarView extends Control {
         return getWeekFields().getFirstDayOfWeek();
     }
 
-    private final ObservableSet<LocalDate> selectedDates = FXCollections.observableSet();
-
-    /**
-     * The selected dates.
-     *
-     * @return the selected dates
-     */
-    public final ObservableSet<LocalDate> getSelectedDates() {
-        return selectedDates;
-    }
-
     private final BooleanProperty showToday = new SimpleBooleanProperty(this, "showToday", true);
 
     private final ObjectProperty<LocalDate> today = new SimpleObjectProperty<>(this, "today", LocalDate.now());
@@ -268,36 +261,48 @@ public class CalendarView extends Control {
         showTodayProperty().set(show);
     }
 
-    private final ObjectProperty<SelectionMode> selectionMode = new SimpleObjectProperty<>(this, "selectionMode", SelectionMode.MULTIPLE);
+    private final BooleanProperty disablePreviousMonthButton = new SimpleBooleanProperty(this, "disablePreviousMonth");
 
-    /**
-     * Stores the selection mode. All date controls support single and multiple
-     * selections.
-     *
-     * @return the selection mode
-     * @see SelectionMode
-     */
-    public final ObjectProperty<SelectionMode> selectionModeProperty() {
-        return selectionMode;
+    public final boolean isDisablePreviousMonthButton() {
+        return disablePreviousMonthButton.get();
     }
 
     /**
-     * Sets the value of {@link #selectionModeProperty()}.
+     * A property to control whether the "show previous month" button will be disabled or not.
+     * This property can be very useful when working with (for example) two calendars used
+     * for selecting a date range. Then the second calendar should never show a month that
+     * is earlier than the first calendar.
      *
-     * @param mode the selection mode (single, multiple)
+     * @return true if the button used for going to the next month is currently disabled
      */
-    public final void setSelectionMode(SelectionMode mode) {
-        requireNonNull(mode);
-        selectionModeProperty().set(mode);
+    public final BooleanProperty disablePreviousMonthButtonProperty() {
+        return disablePreviousMonthButton;
+    }
+
+    public final void setDisablePreviousMonthButton(boolean disablePreviousMonthButton) {
+        this.disablePreviousMonthButton.set(disablePreviousMonthButton);
+    }
+
+    private final BooleanProperty disableNextMonthButton = new SimpleBooleanProperty(this, "disablePreviousMonth");
+
+    public final  boolean isDisableNextMonthButton() {
+        return disableNextMonthButton.get();
     }
 
     /**
-     * Returns the value of {@link #selectionModeProperty()}.
+     * A property to control whether the "show next month" button will be disabled or not.
+     * This property can be very useful when working with (for example) two calendars used
+     * for selecting a date range. Then the first calendar should never show a month that
+     * is later than the second calendar.
      *
-     * @return the selection mode (single, multiple)
+     * @return true if the button used for going to the next month is currently disabled
      */
-    public final SelectionMode getSelectionMode() {
-        return selectionModeProperty().get();
+    public final BooleanProperty disableNextMonthButtonProperty() {
+        return disableNextMonthButton;
+    }
+
+    public final void setDisableNextMonthButton(boolean disableNextMonthButton) {
+        this.disableNextMonthButton.set(disableNextMonthButton);
     }
 
     /**
@@ -305,9 +310,7 @@ public class CalendarView extends Control {
      *
      * @see #setCellFactory(Callback)
      */
-    public static class DateCell extends Label {
-
-        private LocalDate date;
+    public static class DateCell extends Cell<LocalDate> {
 
         public DateCell() {
             getStyleClass().add("date-cell");
@@ -315,17 +318,22 @@ public class CalendarView extends Control {
             setAlignment(CENTER);
         }
 
-        public final void setDate(LocalDate date) {
-            this.date = date;
-            update(date);
+        @Override
+        protected Skin<?> createDefaultSkin() {
+            return new DateCellSkin(this);
         }
 
         public final LocalDate getDate() {
-            return date;
+            return getItem();
         }
 
-        protected void update(LocalDate date) {
-            setText(Integer.toString(date.getDayOfMonth()));
+        @Override
+        public void updateItem(LocalDate date, boolean empty) {
+            super.updateItem(date, empty);
+
+            if (date != null) {
+                setText(Integer.toString(date.getDayOfMonth()));
+            }
         }
     }
 
@@ -425,7 +433,7 @@ public class CalendarView extends Control {
         return showYearSpinnerProperty().get();
     }
 
-    private final BooleanProperty showTodayButton = new SimpleBooleanProperty(this, "showTodayButton", true);
+    private final BooleanProperty showTodayButton = new SimpleBooleanProperty(this, "showTodayButton");
 
     /**
      * Show or hide a button to quickly go to today's date.
@@ -500,5 +508,167 @@ public class CalendarView extends Control {
 
     public final boolean isShowHeader() {
         return showHeaderProperty().get();
+    }
+
+    private final ObjectProperty<SelectionModel> selectionModel = new SimpleObjectProperty<>(this, "selectionModel", new SelectionModel());
+
+    public final SelectionModel getSelectionModel() {
+        return selectionModel.get();
+    }
+
+    public final ObjectProperty<SelectionModel> selectionModelProperty() {
+        return selectionModel;
+    }
+
+    public final void setSelectionModel(SelectionModel selectionModel) {
+        this.selectionModel.set(selectionModel);
+    }
+
+    public static class SelectionModel {
+
+        public enum SelectionMode {
+            SINGLE_DATE,
+            MULTIPLE_DATES,
+            DATE_RANGE
+        }
+
+        public SelectionModel() {
+            selectionMode.addListener(it -> clearSelection());
+        }
+
+        public final void clearSelection() {
+            setSelectedDate(null);
+            setSelectedEndDate(null);
+            getSelectedDates().clear();
+        }
+
+        private final ObjectProperty<SelectionMode> selectionMode = new SimpleObjectProperty<>(this, "selectionMode", SelectionMode.SINGLE_DATE);
+
+        public final SelectionMode getSelectionMode() {
+            return selectionMode.get();
+        }
+
+        public final ObjectProperty<SelectionMode> selectionModeProperty() {
+            return selectionMode;
+        }
+
+        public final void setSelectionMode(SelectionMode selectionMode) {
+            this.selectionMode.set(selectionMode);
+        }
+
+        public void clearAndSelect(LocalDate date) {
+            clearSelection();
+            select(date);
+        }
+
+
+        public void select(LocalDate date) {
+            if (date == null) {
+                return;
+            }
+
+            switch (getSelectionMode()) {
+                case SINGLE_DATE:
+                    setSelectedDate(date);
+                    break;
+                case MULTIPLE_DATES:
+                    getSelectedDates().add(date);
+                    break;
+                case DATE_RANGE:
+                    if (getSelectedDate() == null) {
+                        setSelectedDate(date);
+                    } else {
+                        setSelectedEndDate(date);
+                    }
+                    break;
+            }
+        }
+
+        public void clearSelection(LocalDate date) {
+            switch (getSelectionMode()) {
+                case SINGLE_DATE:
+                    clearSelection();
+                    break;
+                case MULTIPLE_DATES:
+                    getSelectedDates().remove(date);
+                    break;
+                case DATE_RANGE:
+                    if (Objects.equals(getSelectedDate(), date)) {
+                        setSelectedDate(null);
+                    } else if (Objects.equals(getSelectedEndDate(), date)) {
+                        setSelectedEndDate(null);
+                    }
+                    break;
+            }
+        }
+
+        public boolean isSelected(LocalDate date) {
+            if (date == null) {
+                return false;
+            }
+
+            LocalDate selectedDate = getSelectedDate();
+            switch (getSelectionMode()) {
+                case SINGLE_DATE:
+                    return Objects.equals(selectedDate, date);
+                case MULTIPLE_DATES:
+                    return getSelectedDates().contains(date);
+                case DATE_RANGE:
+                    LocalDate selectedEndDate = getSelectedEndDate();
+                    if (selectedDate == null && selectedEndDate == null) {
+                        return false;
+                    } else if (selectedDate != null && Objects.equals(selectedDate, date)) {
+                        return true;
+                    } else if (selectedDate != null && selectedEndDate != null) {
+                        return !(date.isBefore(selectedDate) || date.isAfter(selectedEndDate));
+                    }
+
+                    return false;
+            }
+
+            return false;
+        }
+
+        private final ObjectProperty<LocalDate> selectedDate = new SimpleObjectProperty<>(this, "selectedDate");
+
+        public final LocalDate getSelectedDate() {
+            return selectedDate.get();
+        }
+
+        public final ObjectProperty<LocalDate> selectedDateProperty() {
+            return selectedDate;
+        }
+
+        public final void setSelectedDate(LocalDate selectedDate) {
+            this.selectedDate.set(selectedDate);
+        }
+
+        private final ObjectProperty<LocalDate> selectedEndDate = new SimpleObjectProperty<>(this, "endDate");
+
+        public final LocalDate getSelectedEndDate() {
+            return selectedEndDate.get();
+        }
+
+        public final ObjectProperty<LocalDate> selectedEndDateProperty() {
+            return selectedEndDate;
+        }
+
+        public final void setSelectedEndDate(LocalDate selectedEndDate) {
+            this.selectedEndDate.set(selectedEndDate);
+        }
+
+        private final ListProperty<LocalDate> selectedDates = new SimpleListProperty<>(this, "selectedDates", FXCollections.observableArrayList());
+
+        public final ObservableList<LocalDate> getSelectedDates() {
+            return selectedDates.get();
+        }
+
+        public final ListProperty<LocalDate> selectedDatesProperty() {
+            return selectedDates;
+        }
+
+        public final void setSelectedDates(ObservableList<LocalDate> selectedDates) {
+            this.selectedDates.set(selectedDates);
+        }
     }
 }
