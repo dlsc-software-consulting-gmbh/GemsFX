@@ -1,10 +1,6 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.TimePickerSkin;
-
-import java.time.LocalTime;
-import java.util.function.Consumer;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -20,6 +16,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Region;
+
+import java.time.LocalTime;
+import java.util.function.Consumer;
 
 /**
  * A control for letting the user enter a time of day (see {@link LocalTime}). The control
@@ -246,7 +245,7 @@ public class TimePicker extends Control {
 
     private final BooleanProperty showPopupTriggerButton = new SimpleBooleanProperty(this, "showPopupTriggerButton", true);
 
-    public final boolean getShowPopupTriggerButton() {
+    public final boolean isShowPopupTriggerButton() {
         return showPopupTriggerButton.get();
     }
 

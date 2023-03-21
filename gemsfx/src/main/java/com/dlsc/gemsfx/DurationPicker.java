@@ -1,11 +1,6 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.DurationPickerSkin;
-
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.function.Consumer;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -25,6 +20,10 @@ import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
 import javafx.util.Pair;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.function.Consumer;
 
 public class DurationPicker extends Control {
 
@@ -267,7 +266,7 @@ public class DurationPicker extends Control {
 
     private final BooleanProperty showPopupTriggerButton = new SimpleBooleanProperty(this, "showPopupTriggerButton", true);
 
-    public final boolean getShowPopupTriggerButton() {
+    public final boolean isShowPopupTriggerButton() {
         return showPopupTriggerButton.get();
     }
 
