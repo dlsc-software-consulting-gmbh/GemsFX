@@ -7,13 +7,13 @@
     <parent>
         <groupId>com.dlsc.gemsfx</groupId>
         <artifactId>parent</artifactId>
-        <version>1.67.0</version>
+        <version>1.68.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.dlsc.gemsfx</groupId>
     <artifactId>gemsfx</artifactId>
-    <version>1.67.0</version>
+    <version>1.68.0</version>
     <packaging>jar</packaging>
 
     <name>GemsFX</name>
