@@ -33,6 +33,7 @@ public class CalendarViewApp extends Application {
         options.getChildren().add(createOption("Show year spinner", calendarView.showYearSpinnerProperty()));
         options.getChildren().add(createOption("Show month arrows", calendarView.showMonthArrowsProperty()));
         options.getChildren().add(createOption("Show week numbers", calendarView.showWeekNumbersProperty()));
+        options.getChildren().add(createOption("Show days of other months", calendarView.showDaysOfPreviousOrNextMonthProperty()));
 
         ComboBox<SelectionMode> selectionModeComboBox = new ComboBox<>();
         selectionModeComboBox.getItems().setAll(SelectionMode.values());

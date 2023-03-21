@@ -21,9 +21,11 @@ public class CalendarView2App extends Application {
         CalendarView calendarView1 = new CalendarView();
         CalendarView calendarView2 = new CalendarView();
 
+        calendarView1.setShowDaysOfPreviousOrNextMonth(false);
         calendarView1.getSelectionModel().setSelectionMode(SelectionMode.DATE_RANGE);
         calendarView1.disableNextMonthButtonProperty().bind(Bindings.createBooleanBinding(() -> calendarView1.getYearMonth().equals(calendarView2.getYearMonth().minusMonths(1)), calendarView1.yearMonthProperty(), calendarView2.yearMonthProperty()));
 
+        calendarView2.setShowDaysOfPreviousOrNextMonth(false);
         calendarView2.setYearMonth(YearMonth.now().plusMonths(1));
         calendarView2.disablePreviousMonthButtonProperty().bind(Bindings.createBooleanBinding(() -> calendarView1.getYearMonth().equals(calendarView2.getYearMonth().minusMonths(1)), calendarView1.yearMonthProperty(), calendarView2.yearMonthProperty()));
 

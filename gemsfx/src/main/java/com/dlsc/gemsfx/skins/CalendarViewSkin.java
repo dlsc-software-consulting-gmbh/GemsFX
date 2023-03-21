@@ -314,14 +314,17 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
             }
         }
 
+        Callback<CalendarView, DateCell> cellFactory = view.getCellFactory();
+
         for (int row = 0; row < numberOfRows; row++) {
             for (int col = 0; col < 7; col++) {
 
-                Callback<CalendarView, DateCell> cellFactory = view.getCellFactory();
                 DateCell cell = cellFactory.call(view);
                 GridPane.setHgrow(cell, ALWAYS);
                 GridPane.setVgrow(cell, ALWAYS);
                 cellsMap.put(getKey(row, col), cell);
+
+                cell.visibleProperty().bind(Bindings.createBooleanBinding(() -> view.isShowDaysOfPreviousOrNextMonth() || cell.getDate() != null && YearMonth.from(cell.getDate()).equals(view.getYearMonth()), cell.itemProperty(), view.showDaysOfPreviousOrNextMonthProperty()));
 
                 bodyGridPane.add(cell, showWeekNumbers ? col + 1 : col, row);
 

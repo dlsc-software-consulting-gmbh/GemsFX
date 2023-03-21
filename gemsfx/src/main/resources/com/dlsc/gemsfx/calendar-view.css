@@ -176,15 +176,18 @@
 }
 
 .calendar-view > .container > .body-grid-pane > .date-cell.today {
+    -fx-border-color: -fx-accent;
+    -fx-border-radius: 2.5em;
+}
+
+.calendar-view > .container > .body-grid-pane > .date-cell.selected {
     -fx-background: -fx-accent;
     -fx-background-color: -fx-background;
 }
 
-.calendar-view > .container > .body-grid-pane > .date-cell.selected {
-    -fx-background: derive(-fx-accent, +50%);
-    -fx-background-color: -fx-accent, -fx-background;
-    -fx-background-insets: 2px, 3px;
-    -fx-background-radius: 1000px;
+.calendar-view > .container > .body-grid-pane > .date-cell.selected.next-month,
+.calendar-view > .container > .body-grid-pane > .date-cell.selected.previous-month {
+    -fx-text-fill: -fx-text-background-color;
 }
 
 .calendar-view > .container > .body-grid-pane > .date-cell.selected.range-start {

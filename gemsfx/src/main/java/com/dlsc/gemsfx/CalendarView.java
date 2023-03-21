@@ -153,6 +153,26 @@ public class CalendarView extends Control {
         return showWeekNumbersProperty().get();
     }
 
+    private final BooleanProperty showDaysOfPreviousOrNextMonth = new SimpleBooleanProperty(this, "showDaysOfPreviousOrNextMonth", true);
+
+    public final boolean isShowDaysOfPreviousOrNextMonth() {
+        return showDaysOfPreviousOrNextMonth.get();
+    }
+
+    /**
+     * By default, the calendar for a given month might also show some days of the previous
+     * and the next month. This property allows applications to hide them if needed.
+     *
+     * @return true if the calendar will be filled up with days of the previous and the next month
+     */
+    public final BooleanProperty showDaysOfPreviousOrNextMonthProperty() {
+        return showDaysOfPreviousOrNextMonth;
+    }
+
+    public final void setShowDaysOfPreviousOrNextMonth(boolean showDaysOfPreviousOrNextMonth) {
+        this.showDaysOfPreviousOrNextMonth.set(showDaysOfPreviousOrNextMonth);
+    }
+
     private final ObjectProperty<WeekFields> weekFields = new SimpleObjectProperty<>(this, "weekFields", WeekFields.of(Locale.getDefault()));
 
     /**
