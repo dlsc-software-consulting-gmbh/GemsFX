@@ -44,6 +44,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
+import java.time.temporal.WeekFields;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -111,21 +112,23 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         yearLabel.visibleProperty().bind(view.showYearProperty());
         yearLabel.managedProperty().bind(view.showYearProperty());
 
-        StackPane yearUpArrow = new StackPane();
-        yearUpArrow.getStyleClass().add("increment-arrow");
+        StackPane incrementYearArrow = new StackPane();
+        incrementYearArrow.getStyleClass().add("arrow");
 
-        StackPane yearUpButton = new StackPane(yearUpArrow);
-        yearUpButton.getStyleClass().addAll("year-button", "increment-arrow-button");
-        yearUpButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().plusYears(1)));
+        StackPane incrementYearButton = new StackPane(incrementYearArrow);
+        incrementYearButton.getStyleClass().add("increment-year-button");
+        incrementYearButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().plusYears(1)));
+        incrementYearButton.disableProperty().bind(view.disableNextYearButtonProperty());
 
-        StackPane yearDownArrow = new StackPane();
-        yearDownArrow.getStyleClass().add("decrement-arrow");
+        StackPane decrementYearArrow = new StackPane();
+        decrementYearArrow.getStyleClass().add("arrow");
 
-        StackPane yearDownButton = new StackPane(yearDownArrow);
-        yearDownButton.getStyleClass().addAll("year-button", "decrement-arrow-button");
-        yearDownButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().minusYears(1)));
+        StackPane decrementYearButton = new StackPane(decrementYearArrow);
+        decrementYearButton.getStyleClass().add("decrement-year-button");
+        decrementYearButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().minusYears(1)));
+        decrementYearButton.disableProperty().bind(view.disablePreviousYearButtonProperty());
 
-        VBox yearArrowBox = new VBox(yearUpButton, yearDownButton);
+        VBox yearArrowBox = new VBox(incrementYearButton, decrementYearButton);
         yearArrowBox.getStyleClass().add("year-spinner");
         yearArrowBox.setMaxWidth(Region.USE_PREF_SIZE);
         yearArrowBox.visibleProperty().bind(view.showYearProperty().and(view.showYearSpinnerProperty()));
@@ -138,7 +141,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         FontIcon previousArrowIcon = new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT);
         StackPane previousArrowButton = new StackPane(previousArrowIcon);
-        previousArrowButton.getStyleClass().addAll("arrow-button", "previous-button");
+        previousArrowButton.getStyleClass().add("previous-month-button");
         previousArrowButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().minusMonths(1)));
         previousArrowButton.visibleProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
         previousArrowButton.managedProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
@@ -146,7 +149,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         FontIcon nextArrowIcon = new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT);
         StackPane nextArrowButton = new StackPane(nextArrowIcon);
-        nextArrowButton.getStyleClass().addAll("arrow-button", "next-button");
+        nextArrowButton.getStyleClass().add("next-month-button");
         nextArrowButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().plusMonths(1)));
         nextArrowButton.visibleProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
         nextArrowButton.managedProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
@@ -176,7 +179,6 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         view.showMonthArrowsProperty().addListener(buildViewListener);
         view.showYearSpinnerProperty().addListener(buildViewListener);
         view.cellFactoryProperty().addListener(buildViewListener);
-        view.weekFieldsProperty().addListener(buildViewListener);
 
         view.showTodayProperty().addListener(updateViewListener);
 
@@ -289,7 +291,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
             weekdayGridPane.add(label, 0, 0);
         }
 
-        DayOfWeek dayOfWeek = view.getFirstDayOfWeek();
+        DayOfWeek dayOfWeek = getFirstDayOfWeek();
         for (int i = 0; i < 7; i++) {
             dayOfWeekLabels[i] = new Label(dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.getDefault()));
             dayOfWeekLabels[i].setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -391,7 +393,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         if (view.isShowWeekNumbers()) {
             for (int i = 0; i < 6; i++) {
-                int weekOfYear = date.get(view.getWeekFields().weekOfYear());
+                int weekOfYear = date.get(getWeekFields().weekOfYear());
                 weekNumberLabels[i].setText(Integer.toString(weekOfYear));
                 date = date.plusWeeks(1);
             }
@@ -442,11 +444,17 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         }
     }
 
+    private DayOfWeek getFirstDayOfWeek() {
+        return getWeekFields().getFirstDayOfWeek();
+    }
+
+    private WeekFields getWeekFields() {
+        return WeekFields.of(Locale.getDefault());
+    }
+
     private LocalDate getStartDate() {
         YearMonth yearMonth = getSkinnable().getYearMonth();
-        return adjustToFirstDayOfWeek(
-                LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1),
-                getSkinnable().getFirstDayOfWeek());
+        return adjustToFirstDayOfWeek(LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1), getFirstDayOfWeek());
     }
 
     private LocalDate adjustToFirstDayOfWeek(LocalDate date, DayOfWeek firstDayOfWeek) {

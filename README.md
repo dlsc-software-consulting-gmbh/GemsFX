@@ -4,6 +4,12 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 
+## CalendarView
+
+A nice UI for displaying the month of a year.
+
+![CalendarView](gemsfx/docs/calendar-view.png)
+
 ## YearMonthPicker
 
 A control for specifying the month of a year (see time API class "YearMonth"). It is very similar to the standard date picker class

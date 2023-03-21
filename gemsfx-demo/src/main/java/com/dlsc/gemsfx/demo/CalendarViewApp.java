@@ -23,24 +23,30 @@ public class CalendarViewApp extends Application {
         CalendarView calendarView = new CalendarView();
         HBox.setHgrow(calendarView, Priority.ALWAYS);
 
-        VBox options = new VBox(10);
+        VBox options1 = new VBox(10);
 
-        options.getChildren().add(createOption("Show header", calendarView.showHeaderProperty()));
-        options.getChildren().add(createOption("Show today", calendarView.showTodayProperty()));
-        options.getChildren().add(createOption("Show today button", calendarView.showTodayButtonProperty()));
-        options.getChildren().add(createOption("Show month", calendarView.showMonthProperty()));
-        options.getChildren().add(createOption("Show year", calendarView.showYearProperty()));
-        options.getChildren().add(createOption("Show year spinner", calendarView.showYearSpinnerProperty()));
-        options.getChildren().add(createOption("Show month arrows", calendarView.showMonthArrowsProperty()));
-        options.getChildren().add(createOption("Show week numbers", calendarView.showWeekNumbersProperty()));
-        options.getChildren().add(createOption("Show days of other months", calendarView.showDaysOfPreviousOrNextMonthProperty()));
+        options1.getChildren().add(createOption("Show header", calendarView.showHeaderProperty()));
+        options1.getChildren().add(createOption("Show today", calendarView.showTodayProperty()));
+        options1.getChildren().add(createOption("Show today button", calendarView.showTodayButtonProperty()));
+        options1.getChildren().add(createOption("Show month", calendarView.showMonthProperty()));
+        options1.getChildren().add(createOption("Show year", calendarView.showYearProperty()));
+        options1.getChildren().add(createOption("Show year spinner", calendarView.showYearSpinnerProperty()));
+        options1.getChildren().add(createOption("Show month arrows", calendarView.showMonthArrowsProperty()));
+        options1.getChildren().add(createOption("Show week numbers", calendarView.showWeekNumbersProperty()));
+        options1.getChildren().add(createOption("Show days of other months", calendarView.showDaysOfPreviousOrNextMonthProperty()));
 
         ComboBox<SelectionMode> selectionModeComboBox = new ComboBox<>();
         selectionModeComboBox.getItems().setAll(SelectionMode.values());
         selectionModeComboBox.valueProperty().bindBidirectional(calendarView.getSelectionModel().selectionModeProperty());
-        options.getChildren().add(selectionModeComboBox);
+        options1.getChildren().add(selectionModeComboBox);
 
-        HBox box = new HBox(50, calendarView, options);
+        VBox options2 = new VBox(10);
+        options2.getChildren().add(createOption("Disable previous month", calendarView.disablePreviousMonthButtonProperty()));
+        options2.getChildren().add(createOption("Disable next month", calendarView.disableNextMonthButtonProperty()));
+        options2.getChildren().add(createOption("Disable previous year", calendarView.disablePreviousYearButtonProperty()));
+        options2.getChildren().add(createOption("Disable next year", calendarView.disableNextYearButtonProperty()));
+
+        HBox box = new HBox(50, calendarView, options1, options2);
         box.setPadding(new Insets(50));
         box.setAlignment(Pos.CENTER);
 

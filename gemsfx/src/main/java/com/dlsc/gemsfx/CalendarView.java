@@ -36,8 +36,6 @@ import javafx.util.Callback;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.temporal.WeekFields;
-import java.util.Locale;
 import java.util.Objects;
 
 import static java.lang.Double.MAX_VALUE;
@@ -173,51 +171,6 @@ public class CalendarView extends Control {
         this.showDaysOfPreviousOrNextMonth.set(showDaysOfPreviousOrNextMonth);
     }
 
-    private final ObjectProperty<WeekFields> weekFields = new SimpleObjectProperty<>(this, "weekFields", WeekFields.of(Locale.getDefault()));
-
-    /**
-     * Week fields are used to determine the first day of a week (e.g. "Monday"
-     * in Germany or "Sunday" in the US). It is also used to calculate the week
-     * number as the week fields determine how many days are needed in the first
-     * week of a year. This property is initialized with {@link WeekFields#ISO}.
-     *
-     * @return the week fields
-     */
-    public final ObjectProperty<WeekFields> weekFieldsProperty() {
-        return weekFields;
-    }
-
-    /**
-     * Sets the value of {@link #weekFieldsProperty()}.
-     *
-     * @param weekFields the new week fields
-     */
-    public final void setWeekFields(WeekFields weekFields) {
-        requireNonNull(weekFields);
-        weekFieldsProperty().set(weekFields);
-    }
-
-    /**
-     * Returns the value of {@link #weekFieldsProperty()}.
-     *
-     * @return the week fields
-     */
-    public final WeekFields getWeekFields() {
-        return weekFieldsProperty().get();
-    }
-
-    /**
-     * A convenience method to look up the first day of the week ("Monday" in
-     * Germany, "Sunday" in the US). This method delegates to
-     * {@link WeekFields#getFirstDayOfWeek()}.
-     *
-     * @return the first day of the week
-     * @see #weekFieldsProperty()
-     */
-    public final DayOfWeek getFirstDayOfWeek() {
-        return getWeekFields().getFirstDayOfWeek();
-    }
-
     private final BooleanProperty showToday = new SimpleBooleanProperty(this, "showToday", true);
 
     private final ObjectProperty<LocalDate> today = new SimpleObjectProperty<>(this, "today", LocalDate.now());
@@ -323,6 +276,50 @@ public class CalendarView extends Control {
 
     public final void setDisableNextMonthButton(boolean disableNextMonthButton) {
         this.disableNextMonthButton.set(disableNextMonthButton);
+    }
+
+    private final BooleanProperty disableNextYearButton = new SimpleBooleanProperty(this, "disableNextYearButton");
+
+    public final boolean isDisableNextYearButton() {
+        return disableNextYearButton.get();
+    }
+
+    /**
+     * A property to control whether the "show next year" button will be disabled or not.
+     * This property can be very useful when working with (for example) two calendars used
+     * for selecting a date range. Then the first calendar should never show a year that
+     * is later than the second calendar.
+     *
+     * @return true if the button used for going to the next year is currently disabled
+     */
+    public final BooleanProperty disableNextYearButtonProperty() {
+        return disableNextYearButton;
+    }
+
+    public final void setDisableNextYearButton(boolean disableNextYearButton) {
+        this.disableNextYearButton.set(disableNextYearButton);
+    }
+
+    private final BooleanProperty disablePreviousYearButton = new SimpleBooleanProperty(this, "disablePreviousYearButton");
+
+    public final boolean isDisablePreviousYearButton() {
+        return disablePreviousYearButton.get();
+    }
+
+    /**
+     * A property to control whether the "show previous year" button will be disabled or not.
+     * This property can be very useful when working with (for example) two calendars used
+     * for selecting a date range. Then the second calendar should never show a year that
+     * is earlier than the first calendar.
+     *
+     * @return true if the button used for going to the next year is currently disabled
+     */
+    public final BooleanProperty disablePreviousYearButtonProperty() {
+        return disablePreviousYearButton;
+    }
+
+    public final void setDisablePreviousYearButton(boolean disablePreviousYearButton) {
+        this.disablePreviousYearButton.set(disablePreviousYearButton);
     }
 
     /**

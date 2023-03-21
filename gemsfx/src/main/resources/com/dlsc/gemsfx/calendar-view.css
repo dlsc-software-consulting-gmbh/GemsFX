@@ -56,58 +56,52 @@
     -fx-alignment: center;
 }
 
-.calendar-view > .container > .header > .year-spinner > .year-button {
-}
-
-.calendar-view > .container > .header > .year-spinner > .year-button.up {
-}
-
-.calendar-view > .container > .header > .year-spinner > .increment-arrow-button {
+.calendar-view > .container > .header > .year-spinner > .decrement-year-button,
+.calendar-view > .container > .header > .year-spinner > .increment-year-button {
     -fx-padding: 2px; /* 5 8 3 8 */
 }
 
-.calendar-view > .container > .header > .year-spinner > .decrement-arrow-button {
-    -fx-padding: 2px; /* 3 8 5 8 */
+.calendar-view > .container > .header > .year-spinner > .decrement-year-button:disabled,
+.calendar-view > .container > .header > .year-spinner > .increment-year-button:disabled {
+    -fx-opacity: 0.4;
 }
 
-.calendar-view > .container > .header > .year-spinner > .increment-arrow-button > .increment-arrow {
+.calendar-view > .container > .header > .year-spinner > .increment-year-button > .arrow {
     -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
     -fx-background-insets: 0 0 -1 0, 0;
     -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
     -fx-shape: "M 0 4 h 7 l -3.5 -4 z";
 }
 
-.calendar-view > .container > .header > .year-spinner > .decrement-arrow-button > .decrement-arrow {
+.calendar-view > .container > .header > .year-spinner > .decrement-year-button > .arrow {
     -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
     -fx-background-insets: 0 0 -1 0, 0;
     -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
     -fx-shape: "M 0 0 h 7 l -3.5 4 z";
 }
 
-.calendar-view > .container > .header > .year-spinner > .year-button.down {
+.calendar-view > .container > .header > .previous-month-button,
+.calendar-view > .container > .header > .next-month-button {
 }
 
-.calendar-view > .container > .header > .previous-button,
-.calendar-view > .container > .header > .next-button {
+.calendar-view > .container > .header > .previous-month-button:hover,
+.calendar-view > .container > .header > .next-month-button:hover {
+    -fx-background: -fx-control-inner-background-alt;
 }
 
-.calendar-view > .container > .header > .previous-button:hover,
-.calendar-view > .container > .header > .next-button:hover {
+.calendar-view > .container > .header > .previous-month-button:pressed,
+.calendar-view > .container > .header > .next-month-button:pressed {
 }
 
-.calendar-view > .container > .header > .previous-button:pressed,
-.calendar-view > .container > .header > .next-button:pressed {
+.calendar-view > .container > .header > .previous-month-button:disabled,
+.calendar-view > .container > .header > .next-month-button:disabled {
+    -fx-opacity: 0.4;
 }
 
-.calendar-view > .container > .header > .previous-button:disabled,
-.calendar-view > .container > .header > .next-button:disabled {
-    -fx-opacity: 0;
+.calendar-view > .container > .header > .previous-month-button {
 }
 
-.calendar-view > .container > .header > .previous-button {
-}
-
-.calendar-view > .container > .header > .next-button {
+.calendar-view > .container > .header > .next-month-button {
 }
 
 .calendar-view > .container > .weekday-grid-pane {
@@ -178,6 +172,7 @@
 .calendar-view > .container > .body-grid-pane > .date-cell.today {
     -fx-border-color: -fx-accent;
     -fx-border-radius: 2.5em;
+    -fx-border-insets: 2px;
 }
 
 .calendar-view > .container > .body-grid-pane > .date-cell.selected {
