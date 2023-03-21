@@ -164,7 +164,7 @@
 }
 
 .calendar-view > .container > .body-grid-pane > .date-cell {
-    -fx-background: -fx-control-background-alt;
+    -fx-background: -fx-control-inner-background-alt;
     -fx-background-color: -fx-background;
     -fx-text-fill: -fx-text-background-color;
     -fx-cell-size: 2.5em;
@@ -181,7 +181,7 @@
 }
 
 .calendar-view > .container > .body-grid-pane > .date-cell.weekend-day {
-    -fx-background-color: -fx-control-background-alt;
+    -fx-background-color: -fx-control-inner-background-alt;
 }
 
 .calendar-view > .container > .body-grid-pane > .date-cell.today {
