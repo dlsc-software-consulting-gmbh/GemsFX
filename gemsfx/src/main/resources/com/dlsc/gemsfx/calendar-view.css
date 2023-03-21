@@ -119,7 +119,6 @@
     -fx-scale-shape: true;
 }
 
-
 .calendar-view > .container > .weekday-grid-pane {
     -fx-background: -fx-control-inner-background;
     -fx-background-color: -fx-background;
