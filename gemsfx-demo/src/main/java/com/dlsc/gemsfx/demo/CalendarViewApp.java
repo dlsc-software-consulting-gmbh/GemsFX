@@ -25,7 +25,6 @@ public class CalendarViewApp extends Application {
 
         VBox options1 = new VBox(10);
 
-        options1.getChildren().add(createOption("Show header", calendarView.showHeaderProperty()));
         options1.getChildren().add(createOption("Show today", calendarView.showTodayProperty()));
         options1.getChildren().add(createOption("Show today button", calendarView.showTodayButtonProperty()));
         options1.getChildren().add(createOption("Show month", calendarView.showMonthProperty()));

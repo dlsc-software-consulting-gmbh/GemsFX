@@ -508,25 +508,6 @@ public class CalendarView extends Control {
         return showMonthArrowsProperty().get();
     }
 
-    private final BooleanProperty showHeader = new SimpleBooleanProperty(this, "showHeader", true);
-
-    /**
-     * Shows or hides the header where the user can change the current month.
-     *
-     * @return true if the header will be shown
-     */
-    public final BooleanProperty showHeaderProperty() {
-        return showHeader;
-    }
-
-    public final void setShowHeader(boolean show) {
-        showHeaderProperty().set(show);
-    }
-
-    public final boolean isShowHeader() {
-        return showHeaderProperty().get();
-    }
-
     private final ObjectProperty<SelectionModel> selectionModel = new SimpleObjectProperty<>(this, "selectionModel", new SelectionModel());
 
     public final SelectionModel getSelectionModel() {

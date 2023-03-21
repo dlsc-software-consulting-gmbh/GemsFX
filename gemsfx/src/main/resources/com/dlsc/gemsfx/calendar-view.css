@@ -98,11 +98,27 @@
     -fx-opacity: 0.4;
 }
 
-.calendar-view > .container > .header > .previous-month-button {
+.calendar-view > .container > .header > .previous-month-button,
+.calendar-view > .container > .header > .next-month-button {
+    -fx-padding: 0.333333em 0.166667em;
 }
 
-.calendar-view > .container > .header > .next-month-button {
+.calendar-view > .container > .header > .previous-month-button > .arrow {
+    -fx-background-color: -fx-mark-highlight-color, derive(-fx-base,-45%);
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.333333em 0.25em 0.333333em 0.166667em; /* 4 3 4 2 */
+    -fx-shape: "M5.997,5.072L5.995,6.501l-2.998-4l2.998-4l0.002,1.43l-1.976,2.57L5.997,5.072z";
+    -fx-scale-shape: true;
 }
+
+.calendar-view > .container > .header > .next-month-button > .arrow {
+    -fx-background-color: -fx-mark-highlight-color, derive(-fx-base,-45%);
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.333333em 0.25em 0.333333em 0.166667em; /* 4 3 4 2 */
+    -fx-shape: "M2.998-0.07L3-1.499l2.998,4L3,6.501l-0.002-1.43l1.976-2.57L2.998-0.07z";
+    -fx-scale-shape: true;
+}
+
 
 .calendar-view > .container > .weekday-grid-pane {
     -fx-background: -fx-control-inner-background;

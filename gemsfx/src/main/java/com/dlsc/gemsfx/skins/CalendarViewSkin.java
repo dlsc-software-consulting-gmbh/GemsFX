@@ -37,8 +37,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Callback;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -136,19 +134,21 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         HBox header = new HBox();
         header.getStyleClass().add("header");
-        header.visibleProperty().bind(view.showHeaderProperty());
-        header.managedProperty().bind(view.showHeaderProperty());
 
-        FontIcon previousArrowIcon = new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT);
-        StackPane previousArrowButton = new StackPane(previousArrowIcon);
+        StackPane previousMonthArrow = new StackPane();
+        previousMonthArrow.getStyleClass().add("arrow");
+
+        StackPane previousArrowButton = new StackPane(previousMonthArrow);
         previousArrowButton.getStyleClass().add("previous-month-button");
         previousArrowButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().minusMonths(1)));
         previousArrowButton.visibleProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
         previousArrowButton.managedProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
         previousArrowButton.disableProperty().bind(view.disablePreviousMonthButtonProperty());
 
-        FontIcon nextArrowIcon = new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT);
-        StackPane nextArrowButton = new StackPane(nextArrowIcon);
+        StackPane nextMonthArrow = new StackPane();
+        nextMonthArrow.getStyleClass().add("arrow");
+
+        StackPane nextArrowButton = new StackPane(nextMonthArrow);
         nextArrowButton.getStyleClass().add("next-month-button");
         nextArrowButton.setOnMouseClicked(evt -> view.setYearMonth(view.getYearMonth().plusMonths(1)));
         nextArrowButton.visibleProperty().bind(view.showMonthArrowsProperty().and(view.showMonthProperty()));
@@ -174,7 +174,6 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         InvalidationListener buildViewListener = evt -> buildView();
 
-        view.showHeaderProperty().addListener(buildViewListener);
         view.showWeekNumbersProperty().addListener(buildViewListener);
         view.showMonthArrowsProperty().addListener(buildViewListener);
         view.showYearSpinnerProperty().addListener(buildViewListener);

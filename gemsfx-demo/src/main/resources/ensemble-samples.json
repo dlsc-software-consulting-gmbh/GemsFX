@@ -110,6 +110,14 @@
       "project": "GemsFX",
       "preview": "/preview-year-month-picker.png",
       "classname": "com.dlsc.gemsfx.demo.YearMonthPickerApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Calendar View",
+      "desc": "A calendar view showing a single month",
+      "project": "GemsFX",
+      "preview": "/preview-calendar-view.png",
+      "classname": "com.dlsc.gemsfx.demo.CalendarViewApp"
     }
   ]
 }
