@@ -1,16 +1,13 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TimePicker;
-import com.dlsc.gemsfx.TimePicker.Format;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
-import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.SkinBase;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -20,7 +17,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.time.LocalTime;
 
-public class TimePickerSkin extends SkinBase<TimePicker> {
+public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
 
     private static final PseudoClass EMPTY_PSEUDO_CLASS = PseudoClass.getPseudoClass("empty");
 
@@ -34,15 +31,12 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
 
     private final Button editButton = new Button();
 
-    private final TimePickerPopup popup;
-
-    private final Format timeUnit;
-
     private final HBox fieldsBox = new HBox();
+
+    private TimePickerPopup popup;
 
     public TimePickerSkin(TimePicker picker) {
         super(picker);
-        timeUnit = picker.formatProperty().get();
 
         hourField = new HourField(picker);
         minuteField = new MinuteField(picker);
@@ -75,27 +69,16 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
         millisecondField.focusedProperty().addListener(updateFocusListener);
         editButton.focusedProperty().addListener(updateFocusListener);
 
-        popup = new TimePickerPopup();
-        popup.timeProperty().bindBidirectional(picker.timeProperty());
-        popup.stepRateInMinutesProperty().bind(picker.stepRateInMinutesProperty());
-        popup.clockTypeProperty().bind(picker.clockTypeProperty());
-        popup.earliestTimeProperty().bind(picker.earliestTimeProperty());
-        popup.latestTimeProperty().bind(picker.latestTimeProperty());
-        popup.timeUnitProperty().bind(picker.formatProperty());
+        InvalidationListener buildViewListener = it -> buildView();
 
-        picker.separatorProperty().addListener(it -> buildView());
+        picker.hoursSeparatorProperty().addListener(buildViewListener);
+        picker.minutesSeparatorProperty().addListener(buildViewListener);
+        picker.secondsSeparatorProperty().addListener(buildViewListener);
+
         buildView();
 
         picker.timeProperty().addListener(it -> updateFieldValues());
         updateFieldValues();
-
-        picker.showingProperty().addListener(it -> {
-            if (picker.isShowing()) {
-                showPopup();
-            } else {
-                popup.hide();
-            }
-        });
 
         picker.formatProperty().addListener(cl -> Platform.runLater(() -> {
             if (null == picker.formatProperty().get()) {
@@ -113,24 +96,40 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
             }
         }));
 
-        popup.setOnHidden(evt -> picker.getProperties().put("TIME_PICKER_POPUP", "TIME_PICKER_POPUP"));
-        popup.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
-            if (evt.getCode().equals(KeyCode.ESCAPE)) {
-                popup.hide();
+        updateEmptyPseudoClass();
+
+        picker.showingProperty().addListener(it -> {
+            if (picker.isShowing()) {
+                System.out.println("shwowing");
+                show();
+            } else {
+                System.out.println("hiding");
+                hide();
             }
         });
+    }
 
-        updateEmptyPseudoClass();
+    @Override
+    protected Node getPopupContent() {
+        if (popup == null) {
+            popup = new TimePickerPopup(getSkinnable());
+        }
+
+        return popup;
     }
 
     private void updateSecondsMillisecondsViewable(boolean secondsVisible, boolean millisecondsVisible) {
-        getSkinnable().getMinutesSeparator().setVisible(secondsVisible);
-        getSkinnable().getMinutesSeparator().setManaged(secondsVisible);
+        TimePicker timePicker = getSkinnable();
+
+        Node minutesSeparator = timePicker.getMinutesSeparator();
+        minutesSeparator.setVisible(secondsVisible);
+        minutesSeparator.setManaged(secondsVisible);
         secondField.setVisible(secondsVisible);
         secondField.setManaged(secondsVisible);
 
-        getSkinnable().getSecondsSeparator().setVisible(millisecondsVisible);
-        getSkinnable().getSecondsSeparator().setManaged(millisecondsVisible);
+        Node secondsSeparator = timePicker.getSecondsSeparator();
+        secondsSeparator.setVisible(millisecondsVisible);
+        secondsSeparator.setManaged(millisecondsVisible);
         millisecondField.setVisible(millisecondsVisible);
         millisecondField.setManaged(millisecondsVisible);
     }
@@ -143,18 +142,6 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
         getSkinnable().getHoursSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
         getSkinnable().getMinutesSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
         getSkinnable().getSecondsSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
-    }
-
-    private void showPopup() {
-        TimePicker picker = getSkinnable();
-        Bounds bounds = picker.getBoundsInLocal();
-        Bounds screenBounds = picker.localToScreen(bounds);
-
-        int x = (int) screenBounds.getMinX();
-        int y = (int) screenBounds.getMinY();
-        int height = (int) screenBounds.getHeight();
-
-        popup.show(picker, x, y + height);
     }
 
     private void updateFocus() {

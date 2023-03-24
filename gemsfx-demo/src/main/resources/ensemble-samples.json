@@ -118,6 +118,14 @@
       "project": "GemsFX",
       "preview": "/preview-calendar-view.png",
       "classname": "com.dlsc.gemsfx.demo.CalendarViewApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Calendar View Picker",
+      "desc": "A picker for picking a date (using GemsFX CalendarView)",
+      "project": "GemsFX",
+      "preview": "/preview-calendar-picker.png",
+      "classname": "com.dlsc.gemsfx.demo.CalendarPickerApp"
     }
   ]
 }

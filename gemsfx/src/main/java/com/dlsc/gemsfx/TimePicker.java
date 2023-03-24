@@ -11,7 +11,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.MapChangeListener;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
+import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.input.KeyCode;
@@ -26,7 +26,7 @@ import java.util.function.Consumer;
  * to show hours and minutes, or hours and minutes and seconds, or hours and minutes and seconds
  * and milliseconds (see {@link #formatProperty()})
  */
-public class TimePicker extends Control {
+public class TimePicker extends ComboBoxBase<LocalTime> {
 
     /**
      * The time picker control supports 12 and 24 hour times. 12 hour times
@@ -51,7 +51,7 @@ public class TimePicker extends Control {
      * Constructs a new time picker.
      */
     public TimePicker() {
-        getStyleClass().addAll("time-picker", "text-input");
+        getStyleClass().setAll("time-picker", "text-input");
 
         setFocusTraversable(false);
 
@@ -132,10 +132,7 @@ public class TimePicker extends Control {
 
         MapChangeListener<? super Object, ? super Object> propertiesListener = change -> {
             if (change.wasAdded()) {
-                if (change.getKey().equals("TIME_PICKER_POPUP")) {
-                    setShowing(!isShowing());
-                    getProperties().remove("TIME_PICKER_POPUP");
-                } else if (change.getKey().equals("ADJUST_TIME")) {
+                if (change.getKey().equals("ADJUST_TIME")) {
                     adjust();
                     getProperties().remove("ADJUST_TIME");
                 } else if (change.getKey().equals("CLEAR_ADJUSTED_TIME")) {
@@ -161,39 +158,6 @@ public class TimePicker extends Control {
         });
 
         setOnShowPopup(picker -> show());
-    }
-
-    private final ReadOnlyBooleanWrapper showing = new ReadOnlyBooleanWrapper(this, "showing", false);
-
-    public final boolean isShowing() {
-        return showing.get();
-    }
-
-    /**
-     * A flag used to signal whether the popup should be showing itself or not.
-     *
-     * @return true if the popup should be showing
-     */
-    public final ReadOnlyBooleanProperty showingProperty() {
-        return showing.getReadOnlyProperty();
-    }
-
-    private void setShowing(boolean showing) {
-        this.showing.set(showing);
-    }
-
-    /**
-     * Forces the popup for hour and minute selection to show itself.
-     */
-    public final void show() {
-        setShowing(true);
-    }
-
-    /**
-     * Forces the popup for hour and minute selection to hide itself.
-     */
-    public final void hide() {
-        setShowing(false);
     }
 
     private final ReadOnlyBooleanWrapper adjusted = new ReadOnlyBooleanWrapper(this, "adjusted");

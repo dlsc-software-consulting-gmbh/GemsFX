@@ -224,8 +224,6 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
             throw new IllegalStateException("Popup node is null");
         }
 
-        if (getPopup().isShowing()) return;
-
         positionAndShowPopup();
     }
 

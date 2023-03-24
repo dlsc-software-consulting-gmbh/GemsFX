@@ -86,7 +86,7 @@
 /* --------------------------------------------------------------
  * TimePickerPopup
  */
-.time-picker .time-picker-popup .box {
+.time-picker .time-picker-popup {
     -fx-spacing: 5px;
     -fx-pref-height: 210px;
     -fx-background-color: -fx-box-border, white;
@@ -95,16 +95,15 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
 }
 
-
-.time-picker .time-picker-popup .box .time-list-view {
+.time-picker .time-picker-popup .time-list-view {
 }
 
-.time-picker .time-picker-popup .box .time-list-view .list-cell {
+.time-picker .time-picker-popup .time-list-view .list-cell {
     -fx-alignment: center;
     -fx-background-color: white;
 }
 
-.time-picker .time-picker-popup .box .time-list-view .list-cell .time-label {
+.time-picker .time-picker-popup .time-list-view .list-cell .time-label {
     -fx-padding: .5em 0em;
     -fx-alignment: center;
     -fx-font-weight: bold;
@@ -114,32 +113,32 @@
     -fx-text-fill: white;
 }
 
-.time-picker .time-picker-popup .box .time-list-view .list-cell:hover .time-label {
+.time-picker .time-picker-popup .time-list-view .list-cell:hover .time-label {
     -fx-background-color: lightgray;
     -fx-background-insets: 0;
     -fx-text-fill: black;
 }
 
-.time-picker .time-picker-popup .box .time-list-view .list-cell:selected .time-label {
+.time-picker .time-picker-popup .time-list-view .list-cell:selected .time-label {
     -fx-background-insets: 0;
     -fx-background-color: -fx-accent;
     -fx-text-fill: white;
 }
 
-.time-picker .time-picker-popup .box .time-list-view .vertical-scroll-bar {
+.time-picker .time-picker-popup .time-list-view .vertical-scroll-bar {
     -fx-pref-width: 0;
 }
 
-.time-picker .time-picker-popup .box .time-list-view {
+.time-picker .time-picker-popup .time-list-view {
     -fx-background-insets: 0px;
     -fx-pref-width: 70px;
 }
 
-.time-picker .time-picker-popup .box .time-list-view > .virtual-flow > .scroll-bar,
-.time-picker .time-picker-popup .box .time-list-view > .virtual-flow > .scroll-bar .decrement-arrow,
-.time-picker .time-picker-popup .box .time-list-view > .virtual-flow > .scroll-bar .increment-arrow,
-.time-picker .time-picker-popup .box .time-list-view > .virtual-flow > .scroll-bar .decrement-button,
-.time-picker .time-picker-popup .box .time-list-view > .virtual-flow > .scroll-bar .increment-button {
+.time-picker .time-picker-popup .time-list-view > .virtual-flow > .scroll-bar,
+.time-picker .time-picker-popup .time-list-view > .virtual-flow > .scroll-bar .decrement-arrow,
+.time-picker .time-picker-popup .time-list-view > .virtual-flow > .scroll-bar .increment-arrow,
+.time-picker .time-picker-popup .time-list-view > .virtual-flow > .scroll-bar .decrement-button,
+.time-picker .time-picker-popup .time-list-view > .virtual-flow > .scroll-bar .increment-button {
     -fx-pref-width: 0;
     -fx-pref-height: 0;
 }
