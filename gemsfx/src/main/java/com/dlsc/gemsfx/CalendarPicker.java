@@ -1,6 +1,6 @@
 package com.dlsc.gemsfx;
 
-import com.dlsc.gemsfx.skins.YearMonthPickerSkin;
+import com.dlsc.gemsfx.skins.CalendarPickerSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
@@ -13,9 +13,10 @@ import javafx.scene.layout.Region;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
 
-import java.time.YearMonth;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
 
 /**
  * A control for quickly selecting the month of a year. The format used for the
@@ -23,29 +24,28 @@ import java.time.format.DateTimeParseException;
  * and expects the full month name, e.g. "January", "February", etc. An invalid text
  * resets the value of the picker to null.
  */
-public class YearMonthPicker extends ComboBoxBase<YearMonth> {
+public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
     private final TextField editor = new TextField();
 
     /**
      * Constructs a new picker.
      */
-    public YearMonthPicker() {
+    public CalendarPicker() {
         super();
 
-        getStyleClass().setAll("year-month-picker", "text-input");
+        getStyleClass().setAll("calendar-picker", "text-input");
 
-        setValue(YearMonth.now());
         setFocusTraversable(false);
 
         valueProperty().addListener(it -> updateText());
 
-        editor.setPromptText("Example: March 2023");
+        editor.promptTextProperty().bindBidirectional(promptTextProperty());
         editor.editableProperty().bind(editableProperty());
-        editor.setOnAction(evt -> commit());
+        editor.setOnAction(evt -> commitValue());
         editor.focusedProperty().addListener(it -> {
             if (!editor.isFocused()) {
-                commit();
+                commitValue();
             }
             pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), editor.isFocused());
         });
@@ -70,23 +70,23 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new YearMonthPickerSkin(this);
+        return new CalendarPickerSkin(this);
     }
 
     @Override
     public String getUserAgentStylesheet() {
-        return YearMonthView.class.getResource("year-month-picker.css").toExternalForm();
+        return CalendarPicker.class.getResource("calendar-picker.css").toExternalForm();
     }
 
     /*
      * Performs the work of actually creating and setting a new month value.
      */
-    public void commit() {
+    private void commitValue() {
         String text = editor.getText();
         if (StringUtils.isNotBlank(text)) {
-            StringConverter<YearMonth> converter = getConverter();
+            StringConverter<LocalDate> converter = getConverter();
             if (converter != null) {
-                YearMonth value = converter.fromString(text);
+                LocalDate value = converter.fromString(text);
                 if (value != null) {
                     setValue(value);
                 } else {
@@ -100,7 +100,7 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
      * Updates the text of the text field based on the current value / month.
      */
     private void updateText() {
-        YearMonth value = getValue();
+        LocalDate value = getValue();
         if (value != null && getConverter() != null) {
             editor.setText(getConverter().toString(value));
         } else {
@@ -118,26 +118,26 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
         return editor;
     }
 
-    private final ObjectProperty<StringConverter<YearMonth>> converter = new SimpleObjectProperty<>(this, "value", new StringConverter<>() {
+    private final ObjectProperty<StringConverter<LocalDate>> converter = new SimpleObjectProperty<>(this, "value", new StringConverter<>() {
         @Override
-        public String toString(YearMonth object) {
+        public String toString(LocalDate object) {
             if (object != null) {
-                return DateTimeFormatter.ofPattern("MMMM yyyy").format(object);
+                return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).format(object);
             }
             return null;
         }
 
         @Override
-        public YearMonth fromString(String string) {
+        public LocalDate fromString(String string) {
             try {
-                return DateTimeFormatter.ofPattern("MMMM yyyy").parse(string, YearMonth::from);
+                return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).parse(string, LocalDate::from);
             } catch (DateTimeParseException ex) {
                 return null;
             }
         }
     });
 
-    public final StringConverter<YearMonth> getConverter() {
+    public final StringConverter<LocalDate> getConverter() {
         return converter.get();
     }
 
@@ -147,11 +147,11 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
      *
      * @return the converter object
      */
-    public final ObjectProperty<StringConverter<YearMonth>> converterProperty() {
+    public final ObjectProperty<StringConverter<LocalDate>> converterProperty() {
         return converter;
     }
 
-    public final void setConverter(StringConverter<YearMonth> converter) {
+    public final void setConverter(StringConverter<LocalDate> converter) {
         this.converter.set(converter);
     }
 }
