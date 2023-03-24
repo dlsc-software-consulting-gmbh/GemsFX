@@ -1,7 +1,16 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.DurationPicker;
-
+import javafx.beans.InvalidationListener;
+import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.util.Callback;
+import javafx.util.Pair;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.time.Duration;
@@ -9,26 +18,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.InvalidationListener;
-import javafx.collections.ObservableList;
-import javafx.geometry.Bounds;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.SkinBase;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.util.Callback;
-import javafx.util.Pair;
-
-public class DurationPickerSkin extends SkinBase<DurationPicker> {
+public class DurationPickerSkin extends CustomComboBoxSkinBase<DurationPicker> {
 
     private final HBox innerBox = new HBox();
-    private final DurationPickerPopup popup;
     private final List<DurationUnitField> durationUnitFields = new ArrayList<>();
+
+    private Node popupContent;
 
     public DurationPickerSkin(DurationPicker picker) {
         super(picker);
@@ -42,26 +37,15 @@ public class DurationPickerSkin extends SkinBase<DurationPicker> {
         editButton.visibleProperty().bind(picker.showPopupTriggerButtonProperty());
         editButton.managedProperty().bind(picker.showPopupTriggerButtonProperty());
 
-        popup = new DurationPickerPopup();
-        popup.durationProperty().bindBidirectional(picker.durationProperty());
-        popup.minimumDurationProperty().bind(picker.minimumDurationProperty());
-        popup.maximumDurationProperty().bind(picker.maximumDurationProperty());
-        popup.fieldsProperty().bind(picker.fieldsProperty());
 
         picker.showingProperty().addListener(it -> {
             if (picker.isShowing()) {
-                showPopup();
+                show();
             } else {
-                popup.hide();
+                hide();
             }
         });
 
-        popup.setOnHidden(evt -> picker.getProperties().put("TIME_PICKER_POPUP", "TIME_PICKER_POPUP"));
-        popup.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
-            if (evt.getCode().equals(KeyCode.ESCAPE)) {
-                popup.hide();
-            }
-        });
         InvalidationListener updateListener = it -> buildView();
         picker.fieldsProperty().addListener(updateListener);
 
@@ -81,16 +65,20 @@ public class DurationPickerSkin extends SkinBase<DurationPicker> {
         buildView();
     }
 
-    private void showPopup() {
-        DurationPicker picker = getSkinnable();
-        Bounds bounds = picker.getBoundsInLocal();
-        Bounds screenBounds = picker.localToScreen(bounds);
+    @Override
+    protected Node getPopupContent() {
+        if (popupContent == null) {
+            DurationPicker skinnable = getSkinnable();
+            com.dlsc.pickerfx.DurationPicker durationPicker = new com.dlsc.pickerfx.DurationPicker();
+            durationPicker.valueProperty().bindBidirectional(skinnable.durationProperty());
+            durationPicker.maximumDurationProperty().bind(skinnable.maximumDurationProperty());
+            durationPicker.minimumDurationProperty().bind(skinnable.minimumDurationProperty());
+            durationPicker.fieldsProperty().bind(skinnable.fieldsProperty());
+            popupContent = new HBox(durationPicker);
+            popupContent.getStyleClass().add("popup");
+        }
 
-        int x = (int) screenBounds.getMinX();
-        int y = (int) screenBounds.getMinY();
-        int height = (int) screenBounds.getHeight();
-
-        popup.show(picker, x, y + height);
+        return popupContent;
     }
 
     private void buildView() {

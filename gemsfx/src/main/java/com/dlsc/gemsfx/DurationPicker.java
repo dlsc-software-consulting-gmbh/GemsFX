@@ -5,8 +5,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -14,7 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
+import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
@@ -25,10 +23,10 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Consumer;
 
-public class DurationPicker extends Control {
+public class DurationPicker extends ComboBoxBase<Duration> {
 
     public DurationPicker() {
-        getStyleClass().addAll("duration-picker", "text-input");
+        getStyleClass().setAll("duration-picker", "text-input");
 
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
@@ -61,10 +59,7 @@ public class DurationPicker extends Control {
 
         MapChangeListener<? super Object, ? super Object> propertiesListener = change -> {
             if (change.wasAdded()) {
-                if (change.getKey().equals("TIME_PICKER_POPUP")) {
-                    setShowing(!isShowing());
-                    getProperties().remove("TIME_PICKER_POPUP");
-                } else if (change.getKey().equals("NEW_DURATION")) {
+                if (change.getKey().equals("NEW_DURATION")) {
                     setDuration((Duration) change.getValueAdded());
                     getProperties().remove("NEW_DURATION");
                 }
@@ -103,39 +98,6 @@ public class DurationPicker extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new DurationPickerSkin(this);
-    }
-
-    private final ReadOnlyBooleanWrapper showing = new ReadOnlyBooleanWrapper(this, "showing", false);
-
-    public final boolean isShowing() {
-        return showing.get();
-    }
-
-    /**
-     * A flag used to signal whether the popup should be showing itself or not.
-     *
-     * @return true if the popup should be showing
-     */
-    public final ReadOnlyBooleanProperty showingProperty() {
-        return showing.getReadOnlyProperty();
-    }
-
-    private void setShowing(boolean showing) {
-        this.showing.set(showing);
-    }
-
-    /**
-     * Forces the popup for hour and minute selection to show itself.
-     */
-    public final void show() {
-        setShowing(true);
-    }
-
-    /**
-     * Forces the popup for hour and minute selection to hide itself.
-     */
-    public final void hide() {
-        setShowing(false);
     }
 
     private final ObjectProperty<Callback<Pair<ChronoUnit, ChronoUnit>, Node>> separatorFactory = new SimpleObjectProperty<>(this, "separatorFactory");
