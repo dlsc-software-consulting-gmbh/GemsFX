@@ -1,6 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.TimePicker.TimeUnit;
+import com.dlsc.gemsfx.TimePicker.Format;
 import java.time.LocalTime;
 
 import javafx.application.Platform;
@@ -23,7 +23,7 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
     private final ListView<Integer> minuteListView = new ListView<>();
     private final ListView<Integer> secondListView = new ListView<>();
     private final ListView<Integer> millisecondListView = new ListView<>();
-    private TimeUnit timeUnit = TimeUnit.MINUTES;
+    private Format timeUnit = Format.HOURS_MINUTES;
 
     public TimePickerPopupSkin(TimePickerPopup popup) {
         this.popup = popup;
@@ -118,9 +118,9 @@ public class TimePickerPopupSkin implements Skin<TimePickerPopup> {
     private void updateTimeUnit() {
         timeUnit = popup.timeUnitProperty().get();
 
-        if (timeUnit == TimeUnit.MINUTES) {
+        if (timeUnit == Format.HOURS_MINUTES) {
             updateSecondMillisecondView(false, false);
-        } else if (timeUnit == TimeUnit.SECONDS) {
+        } else if (timeUnit == Format.HOURS_MINUTES_SECONDS) {
             updateSecondMillisecondView(true, false);
         } else {
             updateSecondMillisecondView(true, true);

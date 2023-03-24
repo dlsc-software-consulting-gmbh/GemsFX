@@ -2,7 +2,7 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.TimePicker.ClockType;
-import com.dlsc.gemsfx.TimePicker.TimeUnit;
+import com.dlsc.gemsfx.TimePicker.Format;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -106,17 +106,17 @@ public class TimePickerPopup extends PopupControl {
         this.latestTime.set(latestTime);
     }
     
-    private final ObjectProperty<TimeUnit> timeUnit = new SimpleObjectProperty<>(this, "timeUnitProperty", TimeUnit.MINUTES);
+    private final ObjectProperty<Format> timeUnit = new SimpleObjectProperty<>(this, "timeUnitProperty", Format.HOURS_MINUTES);
     
-    public final ObjectProperty<TimeUnit> timeUnitProperty() {
+    public final ObjectProperty<Format> timeUnitProperty() {
         return timeUnit;
     }
     
-    public final void setTimeUnitProperty(TimeUnit timeUnit) {
+    public final void setTimeUnitProperty(Format timeUnit) {
         this.timeUnit.set(timeUnit);
     }
     
-    public final void setTimeUnit(TimeUnit timeUnit) {
+    public final void setTimeUnit(Format timeUnit) {
        this.timeUnit.set(timeUnit);
     }
 }

@@ -1,12 +1,8 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TimePicker;
-import com.dlsc.gemsfx.TimePicker.TimeUnit;
-
-import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.time.LocalTime;
-
+import com.dlsc.gemsfx.TimePicker.Format;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
@@ -20,10 +16,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import org.kordamp.ikonli.javafx.FontIcon;
 
-import static com.dlsc.gemsfx.TimePicker.TimeUnit.MILLISECONDS;
-import static com.dlsc.gemsfx.TimePicker.TimeUnit.SECONDS;
-import javafx.application.Platform;
+import java.time.LocalTime;
 
 public class TimePickerSkin extends SkinBase<TimePicker> {
 
@@ -32,22 +27,22 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
     private final HourField hourField;
 
     private final MinuteField minuteField;
-    
+
     private final SecondField secondField;
-    
+
     private final MillisecondField millisecondField;
 
     private final Button editButton = new Button();
 
     private final TimePickerPopup popup;
-    
-    private final TimeUnit timeUnit;
-    
+
+    private final Format timeUnit;
+
     private final HBox fieldsBox = new HBox();
 
     public TimePickerSkin(TimePicker picker) {
         super(picker);
-        timeUnit = picker.timeUnitProperty().get();
+        timeUnit = picker.formatProperty().get();
 
         hourField = new HourField(picker);
         minuteField = new MinuteField(picker);
@@ -86,7 +81,7 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
         popup.clockTypeProperty().bind(picker.clockTypeProperty());
         popup.earliestTimeProperty().bind(picker.earliestTimeProperty());
         popup.latestTimeProperty().bind(picker.latestTimeProperty());
-        popup.timeUnitProperty().bind(picker.timeUnitProperty());
+        popup.timeUnitProperty().bind(picker.formatProperty());
 
         picker.separatorProperty().addListener(it -> buildView());
         buildView();
@@ -101,15 +96,15 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
                 popup.hide();
             }
         });
-        
-        picker.timeUnitProperty().addListener(cl -> Platform.runLater(() -> {
-            if (null == picker.timeUnitProperty().get()) {
+
+        picker.formatProperty().addListener(cl -> Platform.runLater(() -> {
+            if (null == picker.formatProperty().get()) {
                 updateSecondsMillisecondsViewable(false, false);
-            } else switch (picker.timeUnitProperty().get()) {
-                case SECONDS:
-                    updateSecondsMillisecondsViewable(true, false);                    
+            } else switch (picker.formatProperty().get()) {
+                case HOURS_MINUTES_SECONDS:
+                    updateSecondsMillisecondsViewable(true, false);
                     break;
-                case MILLISECONDS:
+                case HOURS_MINUTES_SECONDS_MILLIS:
                     updateSecondsMillisecondsViewable(true, true);
                     break;
                 default:
@@ -127,18 +122,17 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
 
         updateEmptyPseudoClass();
     }
-    
+
     private void updateSecondsMillisecondsViewable(boolean secondsVisible, boolean millisecondsVisible) {
         getSkinnable().getMinutesSeparator().setVisible(secondsVisible);
         getSkinnable().getMinutesSeparator().setManaged(secondsVisible);
         secondField.setVisible(secondsVisible);
         secondField.setManaged(secondsVisible);
-        
+
         getSkinnable().getSecondsSeparator().setVisible(millisecondsVisible);
         getSkinnable().getSecondsSeparator().setManaged(millisecondsVisible);
         millisecondField.setVisible(millisecondsVisible);
         millisecondField.setManaged(millisecondsVisible);
-
     }
 
     private void updateEmptyPseudoClass() {
@@ -169,8 +163,7 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
             getSkinnable().getProperties().put("CLEAR_ADJUSTED_TIME", "CLEAR_ADJUSTED_TIME");
         }
 
-        getSkinnable().pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), minuteField.isFocused() || hourField.isFocused() ||
-                                                secondField.isFocused() || millisecondField.isFocused());
+        getSkinnable().pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), minuteField.isFocused() || hourField.isFocused() || secondField.isFocused() || millisecondField.isFocused());
     }
 
     private void buildView() {
@@ -207,7 +200,7 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
             hourField.setValue(time.getHour());
             minuteField.setValue(time.getMinute());
             secondField.setValue(time.getSecond());
-            millisecondField.setValue(time.getNano()/1000000);
+            millisecondField.setValue(time.getNano() / 1000000);
         } else {
             hourField.setValue(null);
             minuteField.setValue(null);
@@ -282,7 +275,7 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
             });
         }
     }
-    
+
     private class SecondField extends DigitsField {
 
         public SecondField(TimePicker picker) {
@@ -313,8 +306,8 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
                 }
             });
         }
-    }    
-    
+    }
+
     private class MillisecondField extends DigitsField {
 
         public MillisecondField(TimePicker picker) {
@@ -345,5 +338,5 @@ public class TimePickerSkin extends SkinBase<TimePicker> {
                 }
             });
         }
-    }    
+    }
 }

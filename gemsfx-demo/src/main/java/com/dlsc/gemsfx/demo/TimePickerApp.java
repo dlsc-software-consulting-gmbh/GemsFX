@@ -1,13 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TimePicker;
-import com.dlsc.gemsfx.TimePicker.TimeUnit;
-
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.format.FormatStyle;
-
+import com.dlsc.gemsfx.TimePicker.Format;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -29,18 +23,23 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
+
 public class TimePickerApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
         TimePicker timePicker = new TimePicker();
 
-        ComboBox<TimeUnit> timeUnitCombo = new ComboBox();
-        timeUnitCombo.getItems().add(TimeUnit.MINUTES);
-        timeUnitCombo.getItems().add(TimeUnit.SECONDS);
-        timeUnitCombo.getItems().add(TimeUnit.MILLISECONDS);
-        timeUnitCombo.setOnAction(event -> timePicker.timeUnitProperty().set(timeUnitCombo.getSelectionModel().getSelectedItem()));
-        timeUnitCombo.getSelectionModel().select(TimeUnit.MINUTES);
+        ComboBox<Format> formatComboBox = new ComboBox();
+        formatComboBox.getItems().add(Format.HOURS_MINUTES);
+        formatComboBox.getItems().add(Format.HOURS_MINUTES_SECONDS);
+        formatComboBox.getItems().add(Format.HOURS_MINUTES_SECONDS_MILLIS);
+        formatComboBox.setOnAction(event -> timePicker.formatProperty().set(formatComboBox.getSelectionModel().getSelectedItem()));
+        formatComboBox.getSelectionModel().select(Format.HOURS_MINUTES);
         
         CheckBox rollOverBox = new CheckBox("Rollover");
         rollOverBox.selectedProperty().bindBidirectional(timePicker.rolloverProperty());
@@ -133,8 +132,8 @@ public class TimePickerApp extends Application {
         gridPane.add(earliestTimeBox, 1, 1);
         gridPane.add(new Label("Latest time:"), 0, 2);
         gridPane.add(latestTimeBox, 1, 2);
-        gridPane.add(new Label("TimeUnit"), 0, 3);
-        gridPane.add(timeUnitCombo, 1, 3);
+        gridPane.add(new Label("Format"), 0, 3);
+        gridPane.add(formatComboBox, 1, 3);
 
         VBox box0 = new VBox(20, timePicker, valueLabel);
         VBox box1 = new VBox(20, datePicker, textField);
