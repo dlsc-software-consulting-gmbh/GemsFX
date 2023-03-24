@@ -63,13 +63,24 @@
 }
 
 .time-picker > .box > .fields-box > .time-field.hour {
-    -fx-padding: 0px 2px;
-    -fx-alignment: center-right;
+    -fx-padding: 0px 0px;
+    -fx-alignment: center;
 }
 
 .time-picker > .box > .fields-box > .time-field.minute {
-    -fx-padding: 0px 2px;
-    -fx-alignment: center-left;
+    -fx-padding: 0px 0px;
+    -fx-alignment: center;
+}
+
+.time-picker > .box > .fields-box > .time-field.second {
+    -fx-padding: 0px 0px;
+    -fx-alignment: center;
+}
+
+.time-picker > .box > .fields-box > .time-field.millisecond {
+    -fx-pref-width: 2.0em;
+    -fx-padding: 0px 0px;
+    -fx-alignment: center;
 }
 
 /* --------------------------------------------------------------

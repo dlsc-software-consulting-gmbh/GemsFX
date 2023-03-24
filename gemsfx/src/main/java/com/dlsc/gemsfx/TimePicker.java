@@ -22,7 +22,9 @@ import java.util.function.Consumer;
 
 /**
  * A control for letting the user enter a time of day (see {@link LocalTime}). The control
- * can be configured to only enter a time within a given time range.
+ * can be configured to only enter a time within a given time range. It can also be configured
+ * to show hours and minutes, or hours and minutes and seconds, or hours and minutes and seconds
+ * and milliseconds (see {@link #formatProperty()})
  */
 public class TimePicker extends Control {
 
@@ -37,6 +39,15 @@ public class TimePicker extends Control {
     }
 
     /**
+     * An enum for supported time units. See {@link #formatProperty()}
+     */
+    public enum Format {
+        HOURS_MINUTES,
+        HOURS_MINUTES_SECONDS,
+        HOURS_MINUTES_SECONDS_MILLIS
+    }
+
+    /**
      * Constructs a new time picker.
      */
     public TimePicker() {
@@ -46,15 +57,35 @@ public class TimePicker extends Control {
 
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
-        separatorProperty().addListener(it -> {
-            if (getSeparator() == null) {
-                throw new IllegalArgumentException("separator can not be null");
+        hoursSeparatorProperty().addListener(it -> {
+            if (getHoursSeparator() == null) {
+                throw new IllegalArgumentException("hour separator can not be null");
             }
         });
 
-        Label label = new Label(":");
-        label.getStyleClass().add("separator");
-        setSeparator(label);
+        minutesSeparatorProperty().addListener(it -> {
+            if (getMinutesSeparator() == null) {
+                throw new IllegalArgumentException("minutes separator can not be null");
+            }
+        });
+
+        secondsSeparatorProperty().addListener(it -> {
+            if (getSecondsSeparator() == null) {
+                throw new IllegalArgumentException("seconds separator can not be null");
+            }
+        });
+
+        Label hourSeparator = new Label(":");
+        hourSeparator.getStyleClass().add("separator");
+        setHoursSeparator(hourSeparator);
+
+        Label minutesSeparator = new Label(":");
+        minutesSeparator.getStyleClass().add("separator");
+        setMinutesSeparator(minutesSeparator);
+
+        Label secondsSeparator = new Label(".");
+        secondsSeparator.getStyleClass().add("separator");
+        setSecondsSeparator(secondsSeparator);
 
         setTime(LocalTime.now());
 
@@ -223,24 +254,46 @@ public class TimePicker extends Control {
         this.latestTime.set(latestTime);
     }
 
-    private final ObjectProperty<Node> separator = new SimpleObjectProperty<>(this, "separator");
+    private final ObjectProperty<Node> hoursSeparator = new SimpleObjectProperty<>(this, "separator");
 
+    @Deprecated
     public final Node getSeparator() {
-        return separator.get();
+        return hoursSeparator.get();
     }
 
     /**
      * The node that will be placed between the hours and the minutes field. The
      * default separator is a label with text ":".
      *
-     * @return a node used as a separator
+     * @return a node used as a hoursSeparator
+     * @depracated we now have more than just one separator, hence use {@link #hoursSeparatorProperty()} etc...
      */
+    @Deprecated
     public final ObjectProperty<Node> separatorProperty() {
-        return separator;
+        return hoursSeparator;
     }
 
+    @Deprecated
     public final void setSeparator(Node separator) {
-        this.separator.set(separator);
+        this.hoursSeparator.set(separator);
+    }
+
+    public final Node getHoursSeparator() {
+        return hoursSeparator.get();
+    }
+
+    /**
+     * The node that will be placed between the hours and the minutes field. The
+     * default separator is a label with text ":".
+     *
+     * @return a node used as a hoursSeparator
+     */
+    public final ObjectProperty<Node> hoursSeparatorProperty() {
+        return hoursSeparator;
+    }
+
+    public final void setHoursSeparator(Node separator) {
+        this.hoursSeparator.set(separator);
     }
 
     private final BooleanProperty showPopupTriggerButton = new SimpleBooleanProperty(this, "showPopupTriggerButton", true);
@@ -293,8 +346,10 @@ public class TimePicker extends Control {
 
             int hour = time.getHour();
             int minute = time.getMinute();
+            int second = time.getSecond();
+            int nano = time.getNano();
 
-            LocalTime newTime = LocalTime.of(hour, minute);
+            LocalTime newTime = LocalTime.of(hour, minute, second, nano);
 
             if (time.isBefore(earliestTime)) {
 
@@ -303,9 +358,17 @@ public class TimePicker extends Control {
                     newTime = newTime.withHour(earliestTime.getHour());
                 }
 
-                // still too early? adjust minutes
+                // still too early? adjust lower time unites (minutes, seconds, nano)
                 if (newTime.isBefore(earliestTime)) {
                     newTime = newTime.withMinute(earliestTime.getMinute());
+                }
+
+                if (newTime.isBefore(latestTime)) {
+                    newTime = newTime.withSecond(earliestTime.getSecond());
+                }
+
+                if (newTime.isBefore(latestTime)) {
+                    newTime = newTime.withNano(earliestTime.getNano());
                 }
 
             } else if (time.isAfter(latestTime)) {
@@ -315,14 +378,24 @@ public class TimePicker extends Control {
                     newTime = newTime.withHour(latestTime.getHour());
                 }
 
-                // still too early? adjust minutes
+                // still too early? adjust lower time units (minutes, seconds, nano)
                 if (newTime.isAfter(latestTime)) {
                     newTime = newTime.withMinute(latestTime.getMinute());
                 }
 
+                if (newTime.isAfter(latestTime)) {
+                    newTime = newTime.withSecond(latestTime.getSecond());
+                }
+
+                if (newTime.isAfter(latestTime)) {
+                    newTime = newTime.withNano(latestTime.getNano());
+                }
             }
 
-            boolean adjusted = newTime.getHour() != time.getHour() || newTime.getMinute() != time.getMinute();
+            boolean adjusted = newTime.getHour() != time.getHour()
+                    || newTime.getMinute() != time.getMinute()
+                    || newTime.getSecond() != time.getSecond()
+                    || newTime.getNano() != time.getNano();
 
             if (adjusted) {
                 setTime(newTime);
@@ -383,7 +456,23 @@ public class TimePicker extends Control {
     }
 
     public final void setTime(LocalTime time) {
-        this.time.set(time);
+        if (null == getFormat() || time == null) {
+            this.time.set(time);
+        } else {
+            switch (getFormat()) {
+                case HOURS_MINUTES:
+                    var adj = time.withSecond(0);
+                    adj = adj.withNano(0);
+                    this.time.set(adj);
+                    break;
+                case HOURS_MINUTES_SECONDS:
+                    this.time.set(time.withNano(0));
+                    break;
+                default:
+                    this.time.set(time);
+                    break;
+            }
+        }
     }
 
     private final IntegerProperty stepRateInMinutes = new SimpleIntegerProperty(this, "stepRateInMinutes", 1);
@@ -488,5 +577,64 @@ public class TimePicker extends Control {
 
     public final void setOnShowPopup(Consumer<TimePicker> onShowPopup) {
         this.onShowPopup.set(onShowPopup);
+    }
+
+    private final ObjectProperty<Format> format = new SimpleObjectProperty<>(this, "format", Format.HOURS_MINUTES);
+
+    /**
+     * The format used by the picker, e.g. "hours and minutes", or "hours, minutes, and seconds".
+     *
+     * @return the time unit
+     */
+    public final ObjectProperty<Format> formatProperty() {
+        return format;
+    }
+
+    public final Format getFormat() {
+        return format.get();
+    }
+
+    public final void setFormat(Format timeUnit) {
+        this.format.set(timeUnit);
+    }
+
+    private final ObjectProperty<Node> minutesSeparator = new SimpleObjectProperty<>(this, "minuteSeparator");
+
+    public final Node getMinutesSeparator() {
+        return minutesSeparator.get();
+    }
+
+    /**
+     * The node that will be placed between the minutes and the seconds field. The
+     * default separator is a label with text ":".
+     *
+     * @return a node used as a hoursSeparator
+     */
+    public final ObjectProperty<Node> minutesSeparatorProperty() {
+        return minutesSeparator;
+    }
+
+    public final void setMinutesSeparator(Node separator) {
+        this.minutesSeparator.set(separator);
+    }
+
+    private final ObjectProperty<Node> secondsSeparator = new SimpleObjectProperty<>(this, "secondsSeparator");
+
+    public final Node getSecondsSeparator() {
+        return secondsSeparator.get();
+    }
+
+    /**
+     * The node that will be placed between the seconds and the milliseconds field. The
+     * default separator is a label with text ".".
+     *
+     * @return a node used as a hoursSeparator
+     */
+    public final ObjectProperty<Node> secondsSeparatorProperty() {
+        return secondsSeparator;
+    }
+
+    public final void setSecondsSeparator(Node separator) {
+        this.secondsSeparator.set(separator);
     }
 }
