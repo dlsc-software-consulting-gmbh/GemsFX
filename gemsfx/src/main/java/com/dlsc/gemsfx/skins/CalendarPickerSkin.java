@@ -13,6 +13,7 @@ import javafx.scene.layout.StackPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Objects;
 
 public class CalendarPickerSkin extends CustomComboBoxSkinBase<CalendarPicker> {
@@ -23,6 +24,11 @@ public class CalendarPickerSkin extends CustomComboBoxSkinBase<CalendarPicker> {
         super(picker);
 
         picker.setOnMouseClicked(evt -> picker.show());
+        picker.valueProperty().addListener(it -> {
+            if (view != null) {
+                view.setYearMonth(YearMonth.from(picker.getValue()));
+            }
+        });
 
         FontIcon calendarIcon = new FontIcon();
         calendarIcon.getStyleClass().add("edit-icon"); // using styles similar to combobox, for consistency
