@@ -42,7 +42,6 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
         minuteField = new MinuteField(picker);
         secondField = new SecondField(picker);
         millisecondField = new MillisecondField(picker);
-        updateSecondsMillisecondsViewable(false, false);
 
         hourField.setNextField(minuteField);
         minuteField.setNextField(secondField);
@@ -80,7 +79,7 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
         picker.timeProperty().addListener(it -> updateFieldValues());
         updateFieldValues();
 
-        picker.formatProperty().addListener(cl -> Platform.runLater(() -> {
+        picker.formatProperty().addListener(cl ->  {
             if (null == picker.formatProperty().get()) {
                 updateSecondsMillisecondsViewable(false, false);
             } else switch (picker.formatProperty().get()) {
@@ -94,7 +93,16 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
                     updateSecondsMillisecondsViewable(false, false);
                     break;
             }
-        }));
+        });
+        secondField.visibleProperty().bindBidirectional(picker.secondFieldVisibleProperty());
+        secondField.managedProperty().bindBidirectional(picker.secondFieldVisibleProperty());
+        picker.getMinutesSeparator().visibleProperty().bindBidirectional(picker.secondFieldVisibleProperty());
+        picker.getMinutesSeparator().managedProperty().bindBidirectional(picker.secondFieldVisibleProperty());
+        
+        millisecondField.visibleProperty().bindBidirectional(picker.millisecondFieldVisibleProperty());
+        millisecondField.managedProperty().bindBidirectional(picker.millisecondFieldVisibleProperty());
+        picker.getSecondsSeparator().visibleProperty().bindBidirectional(picker.millisecondFieldVisibleProperty());
+        picker.getSecondsSeparator().managedProperty().bindBidirectional(picker.millisecondFieldVisibleProperty());
 
         updateEmptyPseudoClass();
 
@@ -121,17 +129,8 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
     private void updateSecondsMillisecondsViewable(boolean secondsVisible, boolean millisecondsVisible) {
         TimePicker timePicker = getSkinnable();
 
-        Node minutesSeparator = timePicker.getMinutesSeparator();
-        minutesSeparator.setVisible(secondsVisible);
-        minutesSeparator.setManaged(secondsVisible);
-        secondField.setVisible(secondsVisible);
-        secondField.setManaged(secondsVisible);
-
-        Node secondsSeparator = timePicker.getSecondsSeparator();
-        secondsSeparator.setVisible(millisecondsVisible);
-        secondsSeparator.setManaged(millisecondsVisible);
-        millisecondField.setVisible(millisecondsVisible);
-        millisecondField.setManaged(millisecondsVisible);
+        timePicker.secondFieldVisibleProperty().set(secondsVisible);
+        timePicker.millisecondFieldVisibleProperty().set(millisecondsVisible);
     }
 
     private void updateEmptyPseudoClass() {
