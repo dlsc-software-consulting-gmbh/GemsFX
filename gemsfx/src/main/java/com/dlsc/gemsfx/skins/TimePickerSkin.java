@@ -106,15 +106,6 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
 
         updateEmptyPseudoClass();
 
-        picker.showingProperty().addListener(it -> {
-            if (picker.isShowing()) {
-                System.out.println("shwowing");
-                show();
-            } else {
-                System.out.println("hiding");
-                hide();
-            }
-        });
     }
 
     @Override
