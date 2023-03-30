@@ -113,13 +113,7 @@ public class InfoCenterApp extends Application {
 
         ToggleButton transparentButton = new ToggleButton("Make Transparent");
         transparentButton.setMaxWidth(Double.MAX_VALUE);
-        transparentButton.selectedProperty().addListener(it -> {
-            if (transparentButton.isSelected()) {
-                infoCenterView.getStyleClass().add("transparent");
-            } else {
-                infoCenterView.getStyleClass().remove("transparent");
-            }
-        });
+        transparentButton.selectedProperty().bindBidirectional(infoCenterView.transparentProperty());
 
         Label counterLabel = new Label();
         counterLabel.setStyle("-fx-text-fill: white;");
