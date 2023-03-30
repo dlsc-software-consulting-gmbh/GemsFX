@@ -252,6 +252,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             arrowPane.visibleProperty().bind(showArrowBinding);
 
             StackPane upperRightPane = new StackPane(timeLabel, arrowPane);
+            upperRightPane.getStyleClass().add("upper-right-pane");
             upperRightPane.setAlignment(Pos.TOP_RIGHT);
 
             HBox titleTimeBox = new HBox(titleLabel, upperRightPane);

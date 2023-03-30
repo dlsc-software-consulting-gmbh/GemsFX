@@ -6,3 +6,5 @@ com.dlsc.gemsfx.incubator.templatepane
 com.dlsc.gemsfx.infocenter
 com.dlsc.gemsfx.skins
 com.dlsc.gemsfx.util
+module:com.dlsc.gemsfx.demo
+com.dlsc.gemsfx.demo

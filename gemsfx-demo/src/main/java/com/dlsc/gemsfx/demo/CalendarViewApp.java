@@ -16,11 +16,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.time.LocalDate;
+
 public class CalendarViewApp extends Application {
 
     @Override
     public void start(Stage stage) {
         CalendarView calendarView = new CalendarView();
+        calendarView.getSelectionModel().setSelectedDate(LocalDate.now().minusWeeks(1));
         HBox.setHgrow(calendarView, Priority.ALWAYS);
 
         VBox options1 = new VBox(10);

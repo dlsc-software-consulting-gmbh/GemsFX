@@ -23,6 +23,7 @@
 
     <description>Parent project of GemsFX
     </description>
+
     <url>https://github.com/dlemmermann/GemsFX</url>
     <licenses>
         <license>
@@ -135,7 +136,6 @@
             </dependency>
 
         </dependencies>
-
     </dependencyManagement>
 
     <build>
