@@ -1,0 +1,50 @@
+.date-range-picker {
+    -fx-padding: 10 20 10 20;
+    -fx-border-color: #e0e0e0;
+    -fx-effect: -shadow;
+    -fx-background-color: -white-three;
+}
+
+.date-range-picker:hover {
+    -fx-background-color: -white-three;
+}
+
+.date-range-picker .inner-range-container {
+    -fx-spacing: 2;
+}
+
+.date-range-picker .inner-range-container.small {
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+.date-range-picker .inner-range-container.small .divider {
+    -fx-pref-width: 1px;
+    -fx-background-color: #e0e0e0;
+}
+
+.date-range-picker .outer-range-container {
+    -fx-spacing: 20;
+    -fx-alignment: center-left;
+}
+
+.date-range-picker .ikonli-font-icon {
+    -fx-icon-color: -charcoal-grey-two;
+    -fx-icon-size: 16px;
+}
+
+.date-range-picker .title-label {
+    -fx-text-fill: -charcoal-grey-two;
+    -fx-font-family: "Rubik Medium";
+    -fx-font-size: 16px;
+}
+
+.date-range-picker .range-label {
+    -fx-text-fill: -steel;
+    -fx-font-size: 14px;
+}
+
+.date-range-picker .range-label .ikonli-font-icon {
+    -fx-icon-color: -steel;
+    -fx-icon-size: 12px;
+}

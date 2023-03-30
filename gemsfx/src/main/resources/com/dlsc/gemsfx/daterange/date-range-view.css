@@ -1,0 +1,56 @@
+.date-range-view {
+    -fx-padding: 10;
+    -fx-background-color: #e0e0e0, -fx-control-inner-background;
+    -fx-background-insets: 0px, 1px;
+}
+
+.date-range-view .range-view-container {
+    -fx-spacing: 25;
+}
+
+.date-range-view .months-box {
+    -fx-spacing: 15px;
+}
+
+.date-range-view .center-piece {
+    -size: 34px;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+
+    -fx-background-color: -fx-box-border, white;
+    -fx-background-insets: 0px, 1px;
+    -fx-background-radius: 1000px, 1000px;
+    -fx-padding: 5px;
+
+    -fx-alignment: center;
+}
+
+.date-range-view .quick-select-box {
+    -fx-spacing: 10;
+}
+
+.date-range-view .quick-select-box .button {
+    -fx-pref-width: 250px;
+}
+
+.date-range-view .quick-select-box .preset-label {
+    -fx-padding: 0 0 0 15;
+    -fx-text-fill: -fx-accent;
+}
+
+.date-range-view .quick-select-box .quick-select-title {
+    -fx-font-size: 14px;
+    -fx-padding: 0 0 15 15;
+}
+
+.date-range-view .quick-select-box .separator .line {
+    -fx-border-color: lightgrey transparent transparent transparent;
+}
+
+.date-range-view .calendar-view {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
+}

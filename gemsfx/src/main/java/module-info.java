@@ -24,6 +24,7 @@ module com.dlsc.gemsfx {
     requires com.dlsc.pickerfx;
 
     exports com.dlsc.gemsfx;
+    exports com.dlsc.gemsfx.daterange;
     exports com.dlsc.gemsfx.incubator;
     exports com.dlsc.gemsfx.incubator.columnbrowser;
     exports com.dlsc.gemsfx.incubator.templatepane;
