@@ -57,7 +57,7 @@ public class InfoCenterPane extends Control {
      * Constructs a new pane with the given content node.
      */
     public InfoCenterPane(Node content) {
-        getStyleClass().add("notification-pane");
+        getStyleClass().add("info-center-pane");
 
         infoCenterView.showAllGroupProperty().addListener(it -> requestLayout());
 
