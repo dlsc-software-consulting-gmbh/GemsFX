@@ -20,12 +20,12 @@
     -fx-pref-height: 1px;
 }
 
-.info-center-view .scroll-pane {
+.info-center-view > .main-pane > .top-level-container .scroll-pane {
     -fx-background-color: transparent;
     -fx-border-width: 0px;
 }
 
-.info-center-view .scroll-pane .viewport {
+.info-center-view > .main-pane > .top-level-container .scroll-pane .viewport {
     -fx-background-color: transparent;
 }
 
@@ -179,8 +179,11 @@
     -fx-background-color: transparent;
 }
 
-.info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view .notification-list-cell {
-    -fx-background-color: transparent !important;
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view .notification-list-cell,
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view .notification-list-cell:focused,
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view .notification-list-cell:selected,
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view .notification-list-cell:hover {
+    -fx-background-color: transparent;
     -fx-padding: 5px 15px 5px 15px;
 }
 
@@ -298,8 +301,6 @@
 /* ----------------------------------------------------------------------------
  * ScrollPane
  */
-
-
 .info-center-view > .main-pane > .top-level-container .scroll-bar {
     -fx-background-color: transparent;
     -fx-padding: 0;
@@ -328,7 +329,7 @@
     -fx-background-insets: 0;
 }
 
-.info-center-view > .main-pane > .top-level-container.scroll-bar:horizontal .thumb {
+.info-center-view > .main-pane > .top-level-container .scroll-bar:horizontal .thumb {
     -fx-background-insets: 0;
 }
 
@@ -336,7 +337,7 @@
 .info-center-view > .main-pane > .top-level-container .scroll-bar .increment-arrow,
 .info-center-view > .main-pane > .top-level-container .scroll-bar .decrement-button,
 .info-center-view > .main-pane > .top-level-container .scroll-bar .decrement-arrow {
-    -fx-pref-width: 0 !important;
-    -fx-pref-height: 0 !important;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
 }
 
