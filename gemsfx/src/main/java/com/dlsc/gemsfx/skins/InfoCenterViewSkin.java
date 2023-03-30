@@ -94,7 +94,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         BooleanBinding pinnedNotificationsExist = Bindings.isNotEmpty(view.getUnmodifiablePinnedNotifications());
         BooleanBinding unpinnedNotificationsExist = Bindings.isNotEmpty(view.getUnmodifiableUnpinnedNotifications());
 
-        pinnedGroupsContainer.getStyleClass().addAll("pinned", "container", "wrapper");
+        pinnedGroupsContainer.getStyleClass().addAll("pinned", "groups-container", "wrapper");
         pinnedGroupsContainer.visibleProperty().bind(pinnedNotificationsExist);
         pinnedGroupsContainer.managedProperty().bind(pinnedNotificationsExist);
         pinnedGroupsContainer.setMinHeight(Region.USE_PREF_SIZE);
@@ -104,7 +104,9 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         separator.visibleProperty().bind(pinnedNotificationsExist.and(unpinnedNotificationsExist));
         separator.managedProperty().bind(pinnedNotificationsExist.and(unpinnedNotificationsExist));
 
-        unpinnedGroupsContainer.getStyleClass().add("container");
+        singleGroupListView.getStyleClass().add("single-group-list-view");
+
+        unpinnedGroupsContainer.getStyleClass().add("groups-container");
         unpinnedGroupsContainer.setMinHeight(Region.USE_PREF_SIZE);
 
         ScrollPane scrollPane = new ScrollPane(unpinnedGroupsContainer) {
@@ -128,7 +130,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         scrollPane.getStyleClass().add("wrapper");
 
         allGroupsContainer = new VBox(pinnedGroupsContainer, separator, scrollPane);
-        allGroupsContainer.getStyleClass().add("all-groups-container");
+        allGroupsContainer.getStyleClass().addAll("top-level-container", "all-groups-container");
 
         singleGroupListView.setCellFactory(lv -> new NotificationListCell());
         singleGroupListView.setSelectionModel(new MultipleSelectionModel<>() {
@@ -251,7 +253,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         singleGroupHeader.getStyleClass().add("single-group-header");
 
         singleGroupContainer = new VBox(singleGroupHeader, singleGroupListView);
-        singleGroupContainer.getStyleClass().addAll("wrapper", "single-group-wrapper");
+        singleGroupContainer.getStyleClass().addAll("top-level-container", "single-group-wrapper", "wrapper");
         VBox.setVgrow(singleGroupContainer, Priority.ALWAYS);
 
         mainPane = new VBox(allGroupsContainer, singleGroupContainer);
