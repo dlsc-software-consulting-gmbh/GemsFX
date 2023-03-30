@@ -21,7 +21,6 @@
 }
 
 .info-center-view > .main-pane > .top-level-container .scroll-pane {
-    -fx-background-color: transparent;
     -fx-border-width: 0px;
 }
 
@@ -236,7 +235,7 @@
 }
 
 .info-center-view .notification-view > .content > .close-icon-wrapper > .label {
-    visibility: false;
+    visibility: hidden;
 }
 
 .info-center-view .notification-view > .content > .close-icon-wrapper.stack:hover {
@@ -249,11 +248,11 @@
 }
 
 .info-center-view .notification-view > .content > .close-icon-wrapper.stack:hover > .label {
-    visibility: true;
+    visibility: visible;
 }
 
 .info-center-view .notification-view > .content > .close-icon-wrapper.stack:hover > .ikonli-font-icon {
-    visibility: false;
+    visibility: hidden;
 }
 
 .info-center-view .notification-view > .content {
