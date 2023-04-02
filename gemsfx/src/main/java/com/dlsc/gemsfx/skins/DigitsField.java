@@ -96,11 +96,6 @@ public abstract class DigitsField extends TimeField {
                     setTypedText(text);
                 }
             } else {
-                if (getValue() == null) {
-                    Integer minimumValue = getMinimumValue();
-                    setValue(minimumValue);
-                }
-
                 constrainValue();
             }
         });

@@ -143,6 +143,7 @@ public class TimePicker extends ComboBoxBase<LocalTime> {
                     try {
                         setTime((LocalTime) change.getValueAdded());
                     } finally {
+                        getProperties().remove("NEW_TIME");
                         adjustmentInProgress = false;
                     }
                 }
