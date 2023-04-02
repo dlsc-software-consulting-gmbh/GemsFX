@@ -602,48 +602,4 @@ public class TimePicker extends ComboBoxBase<LocalTime> {
     public final void setSecondsSeparator(Node separator) {
         this.secondsSeparator.set(separator);
     }
-    
-    private final BooleanProperty secondFieldVisible = new SimpleBooleanProperty(this, "secondFieldVisible", false);
-
-    /**
-     * Toggle if the seconds are visible or not. This is a convenience
-     * property for SceneBuilder that allows user to show or hide the 
-     * seconds. Setting the format property will also show hide this field
-     * base on the format chosen.
-     *
-     * @return the time unit
-     */
-    public final BooleanProperty secondFieldVisibleProperty() {
-        return secondFieldVisible;
     }
-    
-    public boolean getSecondFieldVisible() {
-        return secondFieldVisible.get();
-    }
-    
-    public void setSecondFieldVisible(boolean visable) {
-        secondFieldVisible.set(visable);
-    }
-    
-    private final BooleanProperty millisecondFieldVisible = new SimpleBooleanProperty(this, "millisecondFieldVisible", false);
-
-     /**
-     * Toggle if the millisecond are visible or not. This is a convenience
-     * property for SceneBuilder that allows user to show or hide the 
-     * milliseconds. Setting the format property will also show hide this field
-     * base on the format chosen.
-     *
-     * @return the time unit
-     */
-    public final BooleanProperty millisecondFieldVisibleProperty() {
-        return millisecondFieldVisible;
-    }
-    
-    public boolean getMillisecondFieldVisible() {
-        return millisecondFieldVisible.get();
-    }
-    
-    public void setMillisecondFieldVisible(boolean visible) {
-        millisecondFieldVisible.set(visible);
-    }    
-}

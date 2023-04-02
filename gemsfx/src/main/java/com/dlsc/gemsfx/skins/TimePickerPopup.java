@@ -108,11 +108,22 @@ public class TimePickerPopup extends HBox {
             millisecondListView.scrollTo(millisecondListView.getSelectionModel().getSelectedIndex());
         }));
 
-        secondListView.visibleProperty().bind(timePicker.secondFieldVisibleProperty());
-        secondListView.managedProperty().bind(timePicker.secondFieldVisibleProperty());
-        millisecondListView.visibleProperty().bind(timePicker.millisecondFieldVisibleProperty());
-        millisecondListView.managedProperty().bind(timePicker.millisecondFieldVisibleProperty());
+        updateTimeUnit();
         
+        timePicker.formatProperty().addListener(it -> {
+            updateTimeUnit();
+        });
+    }
+
+    private void updateTimeUnit() {
+        Format format = timePicker.formatProperty().get();
+        if (format == Format.HOURS_MINUTES) {
+            updateSecondMillisecondView(false, false);
+        } else if (format == Format.HOURS_MINUTES_SECONDS) {
+            updateSecondMillisecondView(true, false);
+        } else {
+            updateSecondMillisecondView(true, true);
+        }
     }
 
     private void updateSecondMillisecondView(boolean secondVisible, boolean millisecondVisible) {
