@@ -30,7 +30,6 @@ import javafx.util.Callback;
 import java.util.Objects;
 
 /**
- * <
  * A view for displaying multiple columns where each column consists of a header
  * control and a {@link ListView}. The control allows the user to rearrange the items in each
  * {@link ListView} and also to drag and drop items from one column to another.
