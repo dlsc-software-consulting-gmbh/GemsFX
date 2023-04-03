@@ -87,6 +87,14 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
         
         updateEmptyPseudoClass();
         updateFormat();
+        
+        picker.showingProperty().addListener(it -> {
+            if (picker.isShowing()) {
+                show();
+            } else {
+                hide();
+            }
+        });
     }
     
     private void updateFormat() {
