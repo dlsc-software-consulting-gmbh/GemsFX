@@ -89,8 +89,8 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
         updateFormat();
     }
     
-    public void updateFormat() {
-        var picker = getSkinnable();
+    private void updateFormat() {
+        TimePicker picker = getSkinnable();
         if (null == picker.formatProperty().get()) {
                 updateSecondsMillisecondsViewable(false, false);
             } else switch (picker.formatProperty().get()) {
