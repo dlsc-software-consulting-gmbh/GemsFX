@@ -1,9 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TimePicker;
-import static com.dlsc.gemsfx.TimePicker.Format.HOURS_MINUTES_SECONDS;
-import static com.dlsc.gemsfx.TimePicker.Format.HOURS_MINUTES_SECONDS_MILLIS;
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
@@ -81,13 +78,13 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
         picker.timeProperty().addListener(it -> updateFieldValues());
         updateFieldValues();
 
-        picker.formatProperty().addListener(cl ->  {
+        picker.formatProperty().addListener(cl -> {
             updateFormat();
         });
-        
+
         updateEmptyPseudoClass();
         updateFormat();
-        
+
         picker.showingProperty().addListener(it -> {
             if (picker.isShowing()) {
                 show();
@@ -96,22 +93,22 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
             }
         });
     }
-    
+
     private void updateFormat() {
         TimePicker picker = getSkinnable();
         if (null == picker.formatProperty().get()) {
+            updateSecondsMillisecondsViewable(false, false);
+        } else switch (picker.formatProperty().get()) {
+            case HOURS_MINUTES_SECONDS:
+                updateSecondsMillisecondsViewable(true, false);
+                break;
+            case HOURS_MINUTES_SECONDS_MILLIS:
+                updateSecondsMillisecondsViewable(true, true);
+                break;
+            default:
                 updateSecondsMillisecondsViewable(false, false);
-            } else switch (picker.formatProperty().get()) {
-                case HOURS_MINUTES_SECONDS:
-                    updateSecondsMillisecondsViewable(true, false);
-                    break;
-                case HOURS_MINUTES_SECONDS_MILLIS:
-                    updateSecondsMillisecondsViewable(true, true);
-                    break;
-                default:
-                    updateSecondsMillisecondsViewable(false, false);
-                    break;
-            }
+                break;
+        }
     }
 
     @Override
