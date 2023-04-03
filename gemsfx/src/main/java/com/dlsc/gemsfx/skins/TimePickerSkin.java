@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TimePicker;
+import static com.dlsc.gemsfx.TimePicker.Format.HOURS_MINUTES_SECONDS;
+import static com.dlsc.gemsfx.TimePicker.Format.HOURS_MINUTES_SECONDS_MILLIS;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -42,7 +44,6 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
         minuteField = new MinuteField(picker);
         secondField = new SecondField(picker);
         millisecondField = new MillisecondField(picker);
-        updateSecondsMillisecondsViewable(false, false);
 
         hourField.setNextField(minuteField);
         minuteField.setNextField(secondField);
@@ -80,8 +81,25 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
         picker.timeProperty().addListener(it -> updateFieldValues());
         updateFieldValues();
 
-        picker.formatProperty().addListener(cl -> Platform.runLater(() -> {
-            if (null == picker.formatProperty().get()) {
+        picker.formatProperty().addListener(cl ->  {
+            updateFormat();
+        });
+        
+        updateEmptyPseudoClass();
+        updateFormat();
+        
+        picker.showingProperty().addListener(it -> {
+            if (picker.isShowing()) {
+                show();
+            } else {
+                hide();
+            }
+        });
+    }
+    
+    private void updateFormat() {
+        TimePicker picker = getSkinnable();
+        if (null == picker.formatProperty().get()) {
                 updateSecondsMillisecondsViewable(false, false);
             } else switch (picker.formatProperty().get()) {
                 case HOURS_MINUTES_SECONDS:
@@ -94,19 +112,6 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
                     updateSecondsMillisecondsViewable(false, false);
                     break;
             }
-        }));
-
-        updateEmptyPseudoClass();
-
-        picker.showingProperty().addListener(it -> {
-            if (picker.isShowing()) {
-                System.out.println("shwowing");
-                show();
-            } else {
-                System.out.println("hiding");
-                hide();
-            }
-        });
     }
 
     @Override

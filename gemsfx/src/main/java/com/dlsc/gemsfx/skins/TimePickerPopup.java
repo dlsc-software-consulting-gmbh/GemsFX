@@ -109,7 +109,7 @@ public class TimePickerPopup extends HBox {
         }));
 
         updateTimeUnit();
-
+        
         timePicker.formatProperty().addListener(it -> {
             updateTimeUnit();
         });
