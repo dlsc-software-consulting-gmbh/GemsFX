@@ -29,9 +29,11 @@ public class SearchFieldPopup<T> extends PopupControl {
         this.searchField = Objects.requireNonNull(searchField);
 
         minWidthProperty().bind(searchField.widthProperty());
+
         setAutoFix(true);
         setAutoHide(true);
         setHideOnEscape(true);
+
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
         searchField.addEventHandler(SearchField.SearchEvent.SEARCH_FINISHED, evt -> {
@@ -82,6 +84,8 @@ public class SearchFieldPopup<T> extends PopupControl {
             } else {
                 setAnchorLocation(AnchorLocation.CONTENT_TOP_LEFT);
             }
+
+            double pw = prefWidth(getHeight());
 
             show(parent, parent.getX() + node.localToScene(0.0D, 0.0D).getX() + node.getScene().getX(), parent.getY() + node.localToScene(0.0D, 0.0D).getY() + node.getScene().getY() + node.getBoundsInParent().getHeight());
         } else {

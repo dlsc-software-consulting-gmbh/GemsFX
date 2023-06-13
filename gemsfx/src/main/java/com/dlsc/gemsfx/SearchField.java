@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.skins.SearchFieldPopup;
 import com.dlsc.gemsfx.skins.SearchFieldSkin;
+import javafx.animation.Animation;
 import javafx.animation.RotateTransition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -29,6 +31,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 /**
@@ -63,6 +66,8 @@ public class SearchField<T> extends Control {
 
     private TextField editor = new TextField();
 
+    private final SearchFieldPopup<T> popup;
+
     /**
      * Constructs a new spotlight field. The field will set defaults for the
      * matcher, the converter, the cell factory, and the comparator. It will
@@ -72,6 +77,8 @@ public class SearchField<T> extends Control {
      */
     public SearchField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+
+        popup = new SearchFieldPopup<>(this);
 
         editor.textProperty().bindBidirectional(textProperty());
         editor.promptTextProperty().bindBidirectional(promptTextProperty());
@@ -121,7 +128,7 @@ public class SearchField<T> extends Control {
             }
         });
 
-        setCellFactory(view -> new SearchFieldListCell(this));
+        setCellFactory(view -> new SearchFieldListCell<>(this));
 
         setComparator(Comparator.comparing(Object::toString));
 
@@ -186,7 +193,7 @@ public class SearchField<T> extends Control {
 
         RotateTransition rotateTransition = new RotateTransition();
         rotateTransition.nodeProperty().bind(busyGraphicProperty());
-        rotateTransition.setCycleCount(RotateTransition.INDEFINITE);
+        rotateTransition.setCycleCount(Animation.INDEFINITE);
         rotateTransition.setByAngle(360);
         rotateTransition.setDuration(Duration.millis(500));
 
@@ -245,7 +252,7 @@ public class SearchField<T> extends Control {
 
         private final EventType<SearchEvent> eventType;
 
-        public SearchEventHandlerProperty(final String name, final EventType<SearchEvent> eventType) {
+        public SearchEventHandlerProperty(String name, EventType<SearchEvent> eventType) {
             super(SearchField.this, name);
             this.eventType = eventType;
         }
@@ -499,12 +506,12 @@ public class SearchField<T> extends Control {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new SearchFieldSkin(this);
+        return new SearchFieldSkin<>(this);
     }
 
     @Override
     public String getUserAgentStylesheet() {
-        return SearchField.class.getResource("search-field.css").toExternalForm();
+        return Objects.requireNonNull(SearchField.class.getResource("search-field.css")).toExternalForm();
     }
 
     /**
@@ -934,7 +941,7 @@ public class SearchField<T> extends Control {
     public static class SearchFieldListCell<T> extends ListCell<T> {
 
         private SearchField<T> searchField;
-        private TextFlow textFlow = new TextFlow();
+
         private Text text1 = new Text();
         private Text text2 = new Text();
         private Text text3 = new Text();
@@ -944,12 +951,13 @@ public class SearchField<T> extends Control {
 
             getStyleClass().add("search-field-list-cell");
 
+            TextFlow textFlow = new TextFlow();
             textFlow.getChildren().setAll(text1, text2, text3);
+
             text1.getStyleClass().addAll("text", "start");
             text2.getStyleClass().addAll("text", "middle");
             text3.getStyleClass().addAll("text", "end");
 
-            setPrefWidth(0);
             setGraphic(textFlow);
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         }
@@ -977,5 +985,9 @@ public class SearchField<T> extends Control {
                 text3.setText("");
             }
         }
+    }
+
+    public final SearchFieldPopup<T> getPopup() {
+        return popup;
     }
 }

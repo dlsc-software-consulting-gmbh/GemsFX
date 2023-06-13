@@ -81,6 +81,7 @@ public class SearchFieldApp extends Application {
 
         Scene scene = new Scene(vbox);
         scene.focusOwnerProperty().addListener(it -> System.out.println("focus owner: " + scene.getFocusOwner()));
+
         primaryStage.setTitle("Search Field");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
@@ -118,7 +119,8 @@ public class SearchFieldApp extends Application {
         }
     }
 
-    public class Country {
+    public static class Country {
+
         private final String name;
 
         public Country(String name) {

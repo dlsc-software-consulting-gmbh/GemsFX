@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class SearchFieldEditorSkin<T> extends TextFieldSkin {
+
     private static final PseudoClass HAS_NO_SIDE_NODE = PseudoClass.getPseudoClass("no-side-nodes"); //$NON-NLS-1$
     private static final PseudoClass HAS_LEFT_NODE = PseudoClass.getPseudoClass("left-node-visible"); //$NON-NLS-1$
     private static final PseudoClass HAS_RIGHT_NODE = PseudoClass.getPseudoClass("right-node-visible"); //$NON-NLS-1$
@@ -23,9 +24,7 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
     private final StackPane searchGraphicWrapper = new StackPane();
     private final Label autoCompletedTextLabel = new Label();
     private final SearchField<T> searchField;
-    private Node left;
     private StackPane leftPane;
-    private Node right;
     private StackPane rightPane;
 
     public SearchFieldEditorSkin(SearchField<T> searchField) {
@@ -55,7 +54,7 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
 
         getChildren().addAll(autoCompletedTextLabel, graphicWrapper, searchGraphicWrapper);
 
-        SearchFieldPopup<T> autoCompletionPopup = new SearchFieldPopup<>(searchField);
+        SearchFieldPopup<T> autoCompletionPopup = searchField.getPopup();
         autoCompletionPopup.autoHideProperty().bind(searchField.placeholderProperty().isNull());
 
         registerChangeListener(searchField.leftProperty(), e -> updateChildren());
@@ -70,6 +69,7 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
 
         // remove left pane in any case
         getChildren().remove(leftPane);
+        Node left;
         if (newLeft != null) {
             leftPane = new StackPane(newLeft);
             leftPane.setManaged(false);
@@ -86,6 +86,7 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
 
         // remove rightPane in any case
         getChildren().remove(rightPane);
+        Node right;
         if (newRight != null) {
             rightPane = new StackPane(newRight);
             rightPane.setManaged(false);
@@ -119,12 +120,12 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
 
     @Override
     protected void layoutChildren(double x, double y, double w, double h) {
-        final double fullHeight = h + snappedTopInset() + snappedBottomInset();
+        double fullHeight = h + snappedTopInset() + snappedBottomInset();
 
-        final double leftWidth = leftPane == null ? 0.0 : snapSizeX(leftPane.prefWidth(fullHeight));
-        final double rightWidth = rightPane == null ? 0.0 : snapSizeX(rightPane.prefWidth(fullHeight));
+        double leftWidth = leftPane == null ? 0.0 : snapSizeX(leftPane.prefWidth(fullHeight));
+        double rightWidth = rightPane == null ? 0.0 : snapSizeX(rightPane.prefWidth(fullHeight));
 
-        final double textFieldStartX = snapPositionX(x) + snapSizeX(leftWidth);
+        double textFieldStartX = snapPositionX(x) + snapSizeX(leftWidth);
 
         // standard graphic
         double iconWidthA = 0;
@@ -147,7 +148,7 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
 
         double maxIconWidth = Math.max(iconWidthA, iconWidthB);
 
-        final double textFieldWidth = w - snapSizeX(leftWidth) - snapSizeX(rightWidth) - maxIconWidth;
+        double textFieldWidth = w - snapSizeX(leftWidth) - snapSizeX(rightWidth) - maxIconWidth;
 
         super.layoutChildren(textFieldStartX, 0, textFieldWidth, fullHeight);
 
