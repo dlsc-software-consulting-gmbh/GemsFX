@@ -85,9 +85,7 @@ public class SearchFieldPopup<T> extends PopupControl {
                 setAnchorLocation(AnchorLocation.CONTENT_TOP_LEFT);
             }
 
-            double pw = prefWidth(getHeight());
-
-            show(parent, parent.getX() + node.localToScene(0.0D, 0.0D).getX() + node.getScene().getX(), parent.getY() + node.localToScene(0.0D, 0.0D).getY() + node.getScene().getY() + node.getBoundsInParent().getHeight());
+            show(node, parent.getX() + node.localToScene(0.0D, 0.0D).getX() + node.getScene().getX(), parent.getY() + node.localToScene(0.0D, 0.0D).getY() + node.getScene().getY() + node.getBoundsInParent().getHeight());
         } else {
             throw new IllegalStateException("Can not show popup. The node must be attached to a scene/window.");
         }
