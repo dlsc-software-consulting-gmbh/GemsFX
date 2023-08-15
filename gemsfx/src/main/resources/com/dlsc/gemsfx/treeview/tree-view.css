@@ -1,0 +1,57 @@
+/** ------
+ * TreeNodeCell
+ */
+.tree-node-cell {
+    -fx-content-display: right;
+    -fx-border-color: gray;
+}
+
+.tree-node-cell > .tree-node-cell-label {
+    -fx-alignment: center;
+}
+
+.tree-node-cell > .arrow-wrapper {
+    -fx-padding: 6px;
+    -fx-cursor: hand;
+}
+
+.tree-node-cell > .arrow-wrapper > .disclosure-arrow {
+    -fx-shape: "M36,17.2L23.5,29.8L11,17.2H36z";
+    -fx-background-color: -fx-mark-color;
+    -fx-min-width: 12px;
+    -fx-min-height: 6px;
+    -fx-pref-width: 12px;
+    -fx-pref-height: 6px;
+    -fx-max-width: 12px;
+    -fx-max-height: 6px;
+}
+
+.tree-node-cell > .arrow-wrapper:hover > .disclosure-arrow,
+.tree-node-cell > .arrow-wrapper:pressed > .disclosure-arrow,
+.tree-node-cell > .arrow-wrapper:hover:pressed > .disclosure-arrow {
+    -fx-background-color: #457bb0;
+}
+
+.tree-node-cell:collapsed > .arrow-wrapper > .disclosure-arrow {
+    -fx-rotate: 180;
+}
+
+/** ------
+ * TreeNodeView
+ */
+.tree-node-view > .tree-content > .link-arrow {
+    -fx-shape: "M0,-5L10,0L0,5";
+    -fx-background-color: -fx-mark-color;
+}
+
+.tree-node-view > .tree-content > .link-line,
+.tree-node-view > .tree-content > .link-path,
+.tree-node-view > .tree-content > .link-curve {
+    -fx-stroke: -fx-mark-color;
+    -fx-fill: transparent;
+}
+
+.tree-node-view > .tree-content > .link-circle {
+    -fx-stroke: -fx-mark-color;
+    -fx-fill: -fx-mark-color;
+}
