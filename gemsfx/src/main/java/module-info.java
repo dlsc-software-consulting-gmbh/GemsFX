@@ -31,4 +31,6 @@ module com.dlsc.gemsfx {
     exports com.dlsc.gemsfx.util;
     exports com.dlsc.gemsfx.skins;
     exports com.dlsc.gemsfx.infocenter;
+    exports com.dlsc.gemsfx.treeview;
+    exports com.dlsc.gemsfx.treeview.link;
 }
