@@ -43,6 +43,9 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
     private final Map<Integer, Double> levelToMaxDimensionMap = new HashMap<>();
 
     private final List<TreeNode<T>> currentLevelNodesCache = new ArrayList<>();
+
+    private List<Node> additionalLinkedNodeList = new ArrayList<>();
+
     private final Group contentGroup = new Group();
 
     public TreeNodeViewSkin(TreeNodeView<T> view) {
@@ -89,11 +92,14 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
         node.getChildren().addListener(invalidationListener);
         node.widthProperty().addListener(invalidationListener);
         node.heightProperty().addListener(invalidationListener);
+        node.getLinkedNodes().addListener(invalidationListener);
 
         // Add listeners to the new nodes (if any) and remove listeners from removed nodes (if any) when they are added/removed to/from the children list.
         ListChangeListener<TreeNode<T>> nodeListChangeListener = createNodeListChangeListener();
         childrenListListenerMap.put(node, nodeListChangeListener);
         node.getChildren().addListener(nodeListChangeListener);
+        node.getLinkedNodes().addListener(nodeListChangeListener);
+
     }
 
     private void removeListenersFromNode(TreeNode<T> removedNode) {
@@ -107,11 +113,13 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
             removedNode.getChildren().removeListener(invalidationListener);
             removedNode.widthProperty().removeListener(invalidationListener);
             removedNode.heightProperty().removeListener(invalidationListener);
+            removedNode.getLinkedNodes().removeListener(invalidationListener);
         }
 
         ListChangeListener<TreeNode<T>> nodeListChangeListener = childrenListListenerMap.remove(removedNode);
         if (nodeListChangeListener != null) {
             removedNode.getChildren().removeListener(nodeListChangeListener);
+            removedNode.getLinkedNodes().removeListener(nodeListChangeListener);
         }
 
         nodeToComponentsMap.remove(removedNode);
@@ -157,6 +165,7 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
         if (root != null) {
             calculatePositions(root);
             drawNode(root);
+            drawAdditionalLinkedNodes();
         } else {
             contentGroup.getChildren().setAll(getSkinnable().getPlaceholder());
         }
@@ -261,6 +270,10 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
                 return;
             }
             List<Node> nodes = view.getLinkStrategy().drawNodeLink(getSkinnable().getLayoutDirection(), levelToMaxDimensionMap.get(node.getLevel()), parent, parentPoint, computeNodeWidth(parent), computeNodeHeight(parent), node, point, computeNodeWidth(node), computeNodeHeight(node), view.getNodeLineGap(), view.getVgap(), view.getHgap());
+            if (parent.getName() != null && node.getName() != null) {
+                nodes.forEach(n -> n.getStyleClass().add("link-" + parent.getName() + "-" + node.getName()));
+            }
+
             contentGroup.getChildren().addAll(nodes);
             nodes.add(cell);
             nodeToComponentsMap.put(node, nodes);
@@ -696,6 +709,29 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
         if (root != null) {
             calculatePositions(root);
             drawNode(root);
+            drawAdditionalLinkedNodes();
+        }
+    }
+
+    private void drawAdditionalLinkedNodes() {
+        TreeNode<T> root = getSkinnable().getRoot();
+        if (root != null) {
+            root.stream().forEach(this::drawLinksForNode);
+        }
+    }
+
+    private void drawLinksForNode(TreeNode<T> node) {
+        Point2D sourcePosition = nodeToPositionMap.get(node);
+        for (TreeNode<T> linkedNode : node.getLinkedNodes()) {
+            Point2D targetPosition = nodeToPositionMap.get(linkedNode);
+            if (sourcePosition != null && targetPosition != null) {
+                List<Node> nodes = getSkinnable().getLinkStrategy().drawNodeLink(getSkinnable().getLayoutDirection(), levelToMaxDimensionMap.get(node.getLevel()), node, sourcePosition, computeNodeWidth(node), computeNodeHeight(node), linkedNode, targetPosition, computeNodeWidth(linkedNode), computeNodeHeight(linkedNode), getSkinnable().getNodeLineGap(), getSkinnable().getVgap(), getSkinnable().getHgap());
+                if (node.getName() != null && linkedNode.getName() != null) {
+                    nodes.forEach(n -> n.getStyleClass().add("link-extra-" + node.getName() + "-" + linkedNode.getName()));
+                }
+                contentGroup.getChildren().addAll(nodes);
+                additionalLinkedNodeList.addAll(nodes);
+            }
         }
     }
 
@@ -704,6 +740,7 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
      */
     private void clearMapsForUpdate() {
         nodeToComponentsMap.clear();
+        additionalLinkedNodeList.clear();
         nodeToPositionMap.clear();
         nodeTotalDimensionMap.clear();
         levelToMaxDimensionMap.clear();
