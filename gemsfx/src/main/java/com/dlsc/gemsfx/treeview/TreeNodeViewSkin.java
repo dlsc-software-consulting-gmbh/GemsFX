@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.treeview;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.HPos;
 import javafx.geometry.Point2D;
@@ -56,17 +57,19 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
         initTree();
         view.rootProperty().addListener((ob, ov, newRoot) -> initTree());
 
-        view.layoutTypeProperty().addListener((ob, ov, nv) -> buildTree());
-        view.cellFactoryProperty().addListener((ob, ov, nv) -> buildTree());
-        view.cellWidthProperty().addListener((ob, ov, nv) -> buildTree());
-        view.cellHeightProperty().addListener((ob, ov, nv) -> buildTree());
-        view.vgapProperty().addListener((ob, ov, nv) -> buildTree());
-        view.hgapProperty().addListener((ob, ov, nv) -> buildTree());
-        view.nodeLineGapProperty().addListener((ob, ov, nv) -> buildTree());
-        view.rowAlignmentProperty().addListener((ob, ov, nv) -> buildTree());
-        view.columnAlignmentProperty().addListener((ob, ov, nv) -> buildTree());
-        view.linkStrategyProperty().addListener((ob, ov, nv) -> buildTree());
-        view.layoutDirectionProperty().addListener((ob, ov, nv) -> buildTree());
+        ChangeListener<Object> buildTreeListener = (ob, ov, nv) -> buildTree();
+
+        view.layoutTypeProperty().addListener(buildTreeListener);
+        view.cellFactoryProperty().addListener(buildTreeListener);
+        view.cellWidthProperty().addListener(buildTreeListener);
+        view.cellHeightProperty().addListener(buildTreeListener);
+        view.vgapProperty().addListener(buildTreeListener);
+        view.hgapProperty().addListener(buildTreeListener);
+        view.nodeLineGapProperty().addListener(buildTreeListener);
+        view.rowAlignmentProperty().addListener(buildTreeListener);
+        view.columnAlignmentProperty().addListener(buildTreeListener);
+        view.linkStrategyProperty().addListener(buildTreeListener);
+        view.layoutDirectionProperty().addListener(buildTreeListener);
         view.placeholderProperty().addListener((ob, ov, nv) -> {
             if (view.getRoot() == null) {
                 contentGroup.getChildren().setAll(nv);
@@ -80,7 +83,7 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
     }
 
     private void addListenersToNode(TreeNode<T> node) {
-        // Create and store the expand listener
+        // Create and store the expansion listener
         InvalidationListener expandListener = createExpandListener(node);
         expandListenerMap.put(node, expandListener);
         node.expandedProperty().addListener(expandListener);
@@ -736,7 +739,7 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
     }
 
     /**
-     * Clear the positions information of the nodes; do not clear the listeners
+     * Clear the position information of the nodes; do not clear the listeners
      */
     private void clearMapsForUpdate() {
         nodeToComponentsMap.clear();
@@ -777,12 +780,12 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
 
     @Override
     protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return this.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
+        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
     }
 
     @Override
     protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return this.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
+        return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
     }
 
     public void refresh() {

@@ -28,6 +28,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
+import java.util.List;
+
 public class TreeNodeViewApp extends Application {
 
     @Override
@@ -42,7 +44,7 @@ public class TreeNodeViewApp extends Application {
         BorderPane parent = new BorderPane(new ScrollPane(treePane));
 
         ComboBox<LinkStrategy<String>> linkStrategyComboBox = new ComboBox<>();
-        linkStrategyComboBox.getItems().addAll(
+        linkStrategyComboBox.getItems().addAll(List.of(
                 new CurvedLineLink<>(),
                 new QuadCurveLink<>(),
                 new LogarithmicLink<>(),
@@ -50,7 +52,8 @@ public class TreeNodeViewApp extends Application {
                 new SimpleCatmullRomLink<>(),
                 new ClockHandLinkStrategy<>(),
                 new PolyLineLink<>(),
-                new StraightLineLink<>());
+                new StraightLineLink<>()));
+
         linkStrategyComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(LinkStrategy<String> object) {
@@ -179,7 +182,7 @@ public class TreeNodeViewApp extends Application {
         return box;
     }
 
-    public static TreeNode<String> createTree() {
+    public TreeNode<String> createTree() {
         TreeNode<String> treeRoot = new TreeNode<>("root");
         treeRoot.setWidth(180);
         //treeRoot.setHeight(60);
