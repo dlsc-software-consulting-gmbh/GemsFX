@@ -43,6 +43,33 @@ public class TreeNode<T> {
         setValue(value);
     }
 
+    /**
+     * Represents the name identifier for this node.
+     * ------------------------------------------------
+     * The primary purpose of the 'name' is to assist in determining the style of the node and its links.
+     * For instance:
+     * 1. If the node's name is 'n', then the style class for the node would be 'node-n'.
+     * 2. For a regular parent-child relationship, if a node with name 'n' has a parent named 'm',
+     *    the link connecting them will have a style class 'link-m-n'.
+     * 3. For any extra links, say from node 'p' to node 'n', the style class for the link would be 'link-extra-p-n'.
+     * ------------------------------------------------
+     * Important considerations:
+     * - If the 'name' is null, all the above rules become invalid.
+     * - Both the relevant node and the current node must possess non-null 'name' values for these styling rules to apply.
+     * ------------------------------------------------
+     * This naming convention aids in providing a systematic approach for styling, making it directly
+     * relatable to the node's relationship and connection type.
+     */
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     private final ReadOnlyObjectWrapper<TreeNode<T>> parent = new ReadOnlyObjectWrapper<>(this, "parent", null);
 
     public ReadOnlyObjectProperty<TreeNode<T>> parentProperty() {

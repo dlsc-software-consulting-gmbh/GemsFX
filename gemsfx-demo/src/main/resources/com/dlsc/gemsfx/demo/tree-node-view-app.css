@@ -1,0 +1,11 @@
+.tree-node-view .tree-content > .link-mop-agent.link-path,
+.tree-node-view .tree-content > .link-extra-da-agent.link-line,
+.tree-node-view .tree-content > .link-extra-dc-agent.link-line {
+    -fx-stroke: #DB5852;
+}
+
+.tree-node-view .tree-content > .link-mop-agent.link-arrow,
+.tree-node-view .tree-content > .link-extra-da-agent.link-arrow,
+.tree-node-view .tree-content > .link-extra-dc-agent.link-arrow {
+    -fx-background-color: #DB5852;
+}

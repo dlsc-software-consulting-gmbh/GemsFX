@@ -146,7 +146,9 @@ public class TreeNodeViewApp extends Application {
         scrollPane.setPrefWidth(220);
         scrollPane.setFitToWidth(true);
         parent.setRight(scrollPane);
-        primaryStage.setScene(new Scene(parent, 1280, 800));
+        Scene scene = new Scene(parent, 1280, 800);
+        scene.getStylesheets().add(TreeNodeViewApp.class.getResource("tree-node-view-app.css").toExternalForm());
+        primaryStage.setScene(scene);
         primaryStage.show();
         CSSFX.start();
 
@@ -244,16 +246,19 @@ public class TreeNodeViewApp extends Application {
         TreeNode<String> root = new TreeNode<>("DO155 for DO");
 
         TreeNode<String> node1 = new TreeNode<>("DO153 for DO");
-        node1.setExpanded(false);
+        //node1.setExpanded(false);
         TreeNode<String> node2 = new TreeNode<>("DO155 for MOP");
-        node2.setExpanded(false);
+        //node2.setExpanded(false);
         TreeNode<String> node3 = new TreeNode<>("DO155 for DC");
-        node3.setExpanded(false);
+        //node3.setExpanded(false);
         root.getChildren().addAll(node1, node2, node3);
 
         TreeNode<String> node11 = new TreeNode<>("D0011 from DA");
+        node11.setName("da");
         TreeNode<String> node12 = new TreeNode<>("D0011 from MOP");
+        node12.setName("mop");
         TreeNode<String> node13 = new TreeNode<>("D0011 from DC");
+        node13.setName("dc");
 
         node1.getChildren().add(node11);
         node2.getChildren().add(node12);
@@ -261,8 +266,13 @@ public class TreeNodeViewApp extends Application {
 
 
         TreeNode<String> node121 = new TreeNode<>("Agent Concensus");
-        node121.setExpanded(false);
+        node121.setName("agent");
+        //node121.setExpanded(false);
         node12.getChildren().add(node121);
+
+        node11.getLinkedNodes().addAll(node121);
+        node13.getLinkedNodes().add(node121);
+
 
         TreeNode<String> node1211 = new TreeNode<>("D0148  for MOP");
         TreeNode<String> node1212 = new TreeNode<>("D0148 for DC");
