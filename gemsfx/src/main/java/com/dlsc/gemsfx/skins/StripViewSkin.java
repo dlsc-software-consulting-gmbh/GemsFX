@@ -94,8 +94,10 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
     }
 
     private void handleKeyPress(KeyEvent event) {
-        List<T> itemsList = getSkinnable().getItems();
-        T currentSelectedItem = getSkinnable().getSelectedItem();
+        StripView<T> strip = getSkinnable();
+
+        List<T> itemsList = strip.getItems();
+        T currentSelectedItem = strip.getSelectedItem();
         int index = itemsList.indexOf(currentSelectedItem);
         int itemCount = itemsList.size();
 
@@ -103,21 +105,21 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
             case RIGHT:
             case ENTER:
                 // Check if loop selection is enabled or if we haven't reached the last item yet
-                if (getSkinnable().isLoopSelection() || index < itemCount - 1) {
+                if (strip.isLoopSelection() || index < itemCount - 1) {
                     // Calculate the next index. If loop selection is off, due to the above check,
                     // this won't exceed the bounds.
                     index = (index + 1) % itemCount;
-                    getSkinnable().setSelectedItem(itemsList.get(index));
+                    strip.setSelectedItem(itemsList.get(index));
                     event.consume();
                 }
                 break;
             case LEFT:
                 // Check if loop selection is enabled or if we haven't reached the first item yet
-                if (getSkinnable().isLoopSelection() || index > 0) {
+                if (strip.isLoopSelection() || index > 0) {
                     // Calculate the previous index. If loop selection is off, due to the above check,
                     // this won't go negative.
                     index = (index - 1 + itemCount) % itemCount;
-                    getSkinnable().setSelectedItem(itemsList.get(index));
+                    strip.setSelectedItem(itemsList.get(index));
                     event.consume();
                 }
                 break;
@@ -125,9 +127,9 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
                 // If it's the last item and loop selection is off, don't consume the event
                 // so that focus can move to the next focusable component.
                 // Otherwise, select the next item.
-                if (index != itemCount - 1 || getSkinnable().isLoopSelection()) {
+                if (index < itemCount - 1 || strip.isLoopSelection()) {
                     index = (index + 1) % itemCount;
-                    getSkinnable().setSelectedItem(itemsList.get(index));
+                    strip.setSelectedItem(itemsList.get(index));
                     event.consume();
                 }
                 break;
@@ -136,7 +138,6 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
                 break;
         }
     }
-
 
     private void scrollTo(T item) {
         Node node = nodeMap.get(item);

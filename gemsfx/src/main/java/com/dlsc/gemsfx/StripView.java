@@ -232,10 +232,6 @@ public class StripView<T> extends Control {
         getProperties().put("scroll.to", item);
     }
 
-    /**
-     * Property to determine whether the selection should loop from the end to the start and vice versa.
-     * true means that the selection will loop.
-     */
     private final BooleanProperty loopSelection = new SimpleBooleanProperty(this, "loopSelection", true);
 
     public final boolean isLoopSelection() {
@@ -246,6 +242,10 @@ public class StripView<T> extends Control {
         loopSelection.set(value);
     }
 
+    /**
+     * Property to determine whether the selection should loop from the end to the start and vice versa.
+     * true means that the selection will loop.
+     */
     public final BooleanProperty loopSelectionProperty() {
         return loopSelection;
     }
