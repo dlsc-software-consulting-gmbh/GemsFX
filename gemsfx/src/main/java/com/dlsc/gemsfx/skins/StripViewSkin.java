@@ -21,6 +21,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -31,6 +32,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -87,13 +89,60 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
 
         strip.itemsProperty().addListener((Observable it) -> buildContent());
         buildContent();
+
+        strip.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
     }
+
+    private void handleKeyPress(KeyEvent event) {
+        List<T> itemsList = getSkinnable().getItems();
+        T currentSelectedItem = getSkinnable().getSelectedItem();
+        int index = itemsList.indexOf(currentSelectedItem);
+        int itemCount = itemsList.size();
+
+        switch (event.getCode()) {
+            case RIGHT:
+            case ENTER:
+                // Check if loop selection is enabled or if we haven't reached the last item yet
+                if (getSkinnable().isLoopSelection() || index < itemCount - 1) {
+                    // Calculate the next index. If loop selection is off, due to the above check,
+                    // this won't exceed the bounds.
+                    index = (index + 1) % itemCount;
+                    getSkinnable().setSelectedItem(itemsList.get(index));
+                    event.consume();
+                }
+                break;
+            case LEFT:
+                // Check if loop selection is enabled or if we haven't reached the first item yet
+                if (getSkinnable().isLoopSelection() || index > 0) {
+                    // Calculate the previous index. If loop selection is off, due to the above check,
+                    // this won't go negative.
+                    index = (index - 1 + itemCount) % itemCount;
+                    getSkinnable().setSelectedItem(itemsList.get(index));
+                    event.consume();
+                }
+                break;
+            case TAB:
+                // If it's the last item and loop selection is off, don't consume the event
+                // so that focus can move to the next focusable component.
+                // Otherwise, select the next item.
+                if (index != itemCount - 1 || getSkinnable().isLoopSelection()) {
+                    index = (index + 1) % itemCount;
+                    getSkinnable().setSelectedItem(itemsList.get(index));
+                    event.consume();
+                }
+                break;
+            default:
+                // For any other key press, do nothing.
+                break;
+        }
+    }
+
 
     private void scrollTo(T item) {
         Node node = nodeMap.get(item);
 
         if (node != null) {
-            StripView strip = getSkinnable();
+            StripView<T> strip = getSkinnable();
 
             strip.getProperties().remove(SCROLL_TO_KEY);
 
@@ -126,6 +175,7 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
             nodeMap.put(item, cell);
             cell.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
                 if (!evt.isConsumed() && evt.getClickCount() == 1 && evt.getButton() == MouseButton.PRIMARY) {
+                    cell.requestFocus();
                     boolean wasSelected = item == getSkinnable().getSelectedItem();
                     strip.setSelectedItem(item);
                     strip.scrollTo(item);
@@ -170,7 +220,7 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
     private void fadeSupport(Boolean newShow, Region button) {
         if (getSkinnable().isAnimateScrolling()) {
             if (newShow) {
-               createFadeTransition(button, 0, 1).play();
+                createFadeTransition(button, 0, 1).play();
             } else {
                 createFadeTransition(button, 1, 0).play();
             }
