@@ -232,6 +232,24 @@ public class StripView<T> extends Control {
         getProperties().put("scroll.to", item);
     }
 
+    private final BooleanProperty loopSelection = new SimpleBooleanProperty(this, "loopSelection", true);
+
+    public final boolean isLoopSelection() {
+        return loopSelection.get();
+    }
+
+    public final void setLoopSelection(boolean value) {
+        loopSelection.set(value);
+    }
+
+    /**
+     * Property to determine whether the selection should loop from the end to the start and vice versa.
+     * true means that the selection will loop.
+     */
+    public final BooleanProperty loopSelectionProperty() {
+        return loopSelection;
+    }
+
     /**
      * A strip cell is being used by cell factories of the {@link StripView} control.
      *
