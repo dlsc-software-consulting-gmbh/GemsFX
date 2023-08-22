@@ -34,13 +34,7 @@ import java.util.List;
 public class Spacer extends Region {
 
     public Spacer() {
-        this(true);
-    }
-
-    public Spacer(boolean active) {
         getStyleClass().add("spacer");
-
-        setActive(active);
 
         managedProperty().bind(visibleProperty());
         visibleProperty().bind(activeProperty());
@@ -49,7 +43,7 @@ public class Spacer extends Region {
         HBox.setHgrow(this, Priority.ALWAYS);
     }
 
-    private final BooleanProperty active = new StyleableBooleanProperty(false) {
+    private final BooleanProperty active = new StyleableBooleanProperty(true) {
         @Override
         public Object getBean() {
             return Spacer.this;
@@ -74,7 +68,7 @@ public class Spacer extends Region {
         active.set(value);
     }
 
-    public BooleanProperty activeProperty() {
+    public final BooleanProperty activeProperty() {
         return active;
     }
 
