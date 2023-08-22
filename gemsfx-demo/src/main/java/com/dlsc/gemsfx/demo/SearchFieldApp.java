@@ -33,6 +33,9 @@ public class SearchFieldApp extends Application {
 
         CountriesSearchField field = new CountriesSearchField();
         field.getEditor().setPrefColumnCount(30);
+        field.addEventHandler(SearchField.SearchEvent.SUGGESTION_SELECTED, event -> {
+            System.out.println("A suggestion was selected! => " + event.getSelectedSuggestion());
+        });
 
         Region regionLeft = new Region();
         regionLeft.setPrefWidth(30);

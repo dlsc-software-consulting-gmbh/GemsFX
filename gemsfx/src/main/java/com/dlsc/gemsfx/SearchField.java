@@ -68,6 +68,8 @@ public class SearchField<T> extends Control {
 
     private final SearchFieldPopup<T> popup;
 
+    private BooleanProperty shouldCommitProperty = new SimpleBooleanProperty(this, "shouldCommit", false);
+
     /**
      * Constructs a new spotlight field. The field will set defaults for the
      * matcher, the converter, the cell factory, and the comparator. It will
@@ -78,7 +80,7 @@ public class SearchField<T> extends Control {
     public SearchField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
-        popup = new SearchFieldPopup<>(this);
+        popup = new SearchFieldPopup<>(this, shouldCommitProperty);
 
         editor.textProperty().bindBidirectional(textProperty());
         editor.promptTextProperty().bindBidirectional(promptTextProperty());
@@ -211,11 +213,11 @@ public class SearchField<T> extends Control {
             }
         });
 
-        searchService.setOnRunning(evt -> fireEvent(new SearchEvent(SearchEvent.SEARCH_STARTED, searchService.getText())));
+        searchService.setOnRunning(evt -> fireEvent(SearchEvent.createEventForText(SearchEvent.SEARCH_STARTED, searchService.getText())));
 
         searchService.setOnSucceeded(evt -> {
             update(searchService.getValue());
-            fireEvent(new SearchEvent(SearchEvent.SEARCH_FINISHED, searchService.getText()));
+            fireEvent(SearchEvent.createEventForText(SearchEvent.SEARCH_FINISHED, searchService.getText()));
         });
 
         searching.bind(searchService.runningProperty());
@@ -229,22 +231,25 @@ public class SearchField<T> extends Control {
      * item.
      */
     public void commit() {
-        committing = true;
-        try {
-            T selectedItem = getSelectedItem();
-            if (selectedItem != null) {
-                String text = getConverter().toString(selectedItem);
-                if (text != null) {
-                    editor.setText(text);
-                    editor.positionCaret(text.length());
+        if (shouldCommitProperty.get()) {
+            committing = true;
+            try {
+                T selectedItem = getSelectedItem();
+                if (selectedItem != null) {
+                    String text = getConverter().toString(selectedItem);
+                    if (text != null) {
+                        editor.setText(text);
+                        editor.positionCaret(text.length());
+                    } else {
+                        clear();
+                    }
                 } else {
                     clear();
                 }
-            } else {
-                clear();
+            } finally {
+                committing = false;
             }
-        } finally {
-            committing = false;
+            shouldCommitProperty.set(false);
         }
     }
 
@@ -289,7 +294,6 @@ public class SearchField<T> extends Control {
     }
 
     private SearchEventHandlerProperty onSearchFinished;
-
 
     /**
      * An event handler that can be used to get informed whenever the field finishes a search.
@@ -850,15 +854,34 @@ public class SearchField<T> extends Control {
          */
         public static final EventType<SearchEvent> SEARCH_FINISHED = new EventType<>(Event.ANY, "SEARCH_FINISHED");
 
-        private String text;
+        /**
+         * An event that gets fired when the user selects a suggestion.
+         */
+        public static final EventType<SearchEvent> SUGGESTION_SELECTED = new EventType<>(Event.ANY, "SUGGESTION_SELECTED");
 
-        public SearchEvent(EventType<? extends SearchEvent> eventType, String text) {
+        private final Object selectedSuggestion;
+        private final String text;
+
+        public static SearchEvent createEventForText(EventType<? extends SearchEvent> eventType, String text) {
+            return new SearchEvent(eventType, text, null);
+        }
+
+        public static SearchEvent createEventForSuggestion(Object suggestion) {
+            return new SearchEvent(SUGGESTION_SELECTED, null, suggestion);
+        }
+
+        private SearchEvent(EventType<? extends SearchEvent> eventType, String text, Object suggestion) {
             super(eventType);
             this.text = text;
+            this.selectedSuggestion = suggestion;
         }
 
         public String getText() {
             return text;
+        }
+
+        public Object getSelectedSuggestion() {
+            return selectedSuggestion;
         }
 
         @Override
@@ -868,6 +891,7 @@ public class SearchField<T> extends Control {
                     .append("target", target)
                     .append("consumed", consumed)
                     .append("text", text)
+                    .append("selectedSuggestion", selectedSuggestion)
                     .toString();
         }
     }

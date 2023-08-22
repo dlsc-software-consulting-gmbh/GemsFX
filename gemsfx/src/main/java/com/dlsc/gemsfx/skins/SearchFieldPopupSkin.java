@@ -6,10 +6,13 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.SearchField;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.util.StringConverter;
 
@@ -20,9 +23,10 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
     private final SearchFieldPopup<T> control;
     private final ListView<T> suggestionList;
     private final SearchField<T> searchField;
-
-    public SearchFieldPopupSkin(SearchFieldPopup<T> control) {
+    private BooleanProperty shouldCommit;
+    public SearchFieldPopupSkin(SearchFieldPopup<T> control, BooleanProperty shouldCommit) {
         this.control = control;
+        this.shouldCommit = shouldCommit;
 
         searchField = control.getSearchField();
 
@@ -88,9 +92,23 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
     }
 
     private void registerEventListener() {
+        suggestionList.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            shouldCommit.set(true);
+            if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.TAB) {
+                fireSuggestionSelected();
+            }
+        });
+
         suggestionList.setOnMouseClicked((me) -> {
             if (me.getButton() == MouseButton.PRIMARY) {
-                selectItem();
+                if (me.getClickCount() == 2) {
+                    // hide the popup on double click
+                    control.hide();
+                } else if (me.getClickCount() == 1) {
+                    shouldCommit.set(true);
+                    selectItem();
+                    fireSuggestionSelected();
+                }
             }
         });
 
@@ -114,6 +132,14 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
             }
         });
 
+    }
+
+    private void fireSuggestionSelected() {
+        Object selectedSuggestion = suggestionList.getSelectionModel().getSelectedItem();
+        if (selectedSuggestion != null) {
+            SearchField.SearchEvent searchEvent = SearchField.SearchEvent.createEventForSuggestion(selectedSuggestion);
+            searchField.fireEvent(searchEvent);
+        }
     }
 
     private void selectItem() {
