@@ -30,30 +30,23 @@ import java.util.List;
  *
  * The active state of the Spacer can also be controlled through CSS with the
  * "-fx-active" property.
- *
  */
 public class Spacer extends Region {
+
     public Spacer() {
         this(true);
     }
 
     public Spacer(boolean active) {
         getStyleClass().add("spacer");
+
         setActive(active);
+
         managedProperty().bind(visibleProperty());
         visibleProperty().bind(activeProperty());
-        parentProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue instanceof HBox) {
-                VBox.setVgrow(this, Priority.NEVER);
-                HBox.setHgrow(this, Priority.ALWAYS);
-            } else if (newValue instanceof VBox) {
-                VBox.setVgrow(this, Priority.ALWAYS);
-                HBox.setHgrow(this, Priority.NEVER);
-            } else {
-                VBox.setVgrow(this, Priority.NEVER);
-                HBox.setHgrow(this, Priority.NEVER);
-            }
-        });
+
+        VBox.setVgrow(this, Priority.ALWAYS);
+        HBox.setHgrow(this, Priority.ALWAYS);
     }
 
     private final BooleanProperty active = new StyleableBooleanProperty(false) {
