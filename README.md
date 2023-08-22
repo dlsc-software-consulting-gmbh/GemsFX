@@ -24,6 +24,12 @@ and actually inherits a lot of styling attributes from it.
 
 ![YearMonthPicker](gemsfx/docs/year-month-picker.png)
 
+## Spacer
+
+Spacer extends Region and is designed to create flexible spaces in container layouts, especially in HBox and VBox. Within an HBox, the Spacer grows horizontally. Within a VBox, it grows vertically. When the activeProperty is set to false, the Spacer will not grow.
+
+![Spacer](gemsfx/docs/spacer.png)
+
 ## StripView
 
 A view for horizontally positioning a number of nodes, one for each item added to the view's model. Scroll buttons will
