@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.SearchField;
-import com.dlsc.gemsfx.SearchField.SearchFieldListCell;
 import javafx.scene.control.SkinBase;
 
 public class SearchFieldSkin<T> extends SkinBase<SearchField<T>> {

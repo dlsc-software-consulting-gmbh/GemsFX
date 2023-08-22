@@ -6,6 +6,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.SearchField;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.NodeOrientation;
@@ -25,8 +26,11 @@ public class SearchFieldPopup<T> extends PopupControl {
 
     public static final String DEFAULT_STYLE_CLASS = "search-field-popup";
 
-    public SearchFieldPopup(SearchField<T> searchField) {
+    private final BooleanProperty shouldCommitProperty;
+
+    public SearchFieldPopup(SearchField<T> searchField, BooleanProperty shouldCommitProperty) {
         this.searchField = Objects.requireNonNull(searchField);
+        this.shouldCommitProperty = shouldCommitProperty;
 
         minWidthProperty().bind(searchField.widthProperty());
 
@@ -104,6 +108,6 @@ public class SearchFieldPopup<T> extends PopupControl {
     }
 
     protected Skin<?> createDefaultSkin() {
-        return new SearchFieldPopupSkin(this);
+        return new SearchFieldPopupSkin(this, shouldCommitProperty);
     }
 }
