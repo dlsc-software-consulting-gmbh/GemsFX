@@ -97,7 +97,7 @@ public class SearchField<T> extends Control {
             }
         });
 
-        addEventFilter(KeyEvent.ANY, evt -> {
+        addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
             if (evt.getCode().equals(KeyCode.RIGHT) || evt.getCode().equals(KeyCode.ENTER)) {
                 commit();
                 evt.consume();
