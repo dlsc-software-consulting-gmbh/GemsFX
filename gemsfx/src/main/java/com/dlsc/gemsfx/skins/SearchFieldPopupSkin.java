@@ -23,7 +23,8 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
     private final SearchFieldPopup<T> control;
     private final ListView<T> suggestionList;
     private final SearchField<T> searchField;
-    private BooleanProperty shouldCommit;
+    private final BooleanProperty shouldCommit;
+
     public SearchFieldPopupSkin(SearchFieldPopup<T> control, BooleanProperty shouldCommit) {
         this.control = control;
         this.shouldCommit = shouldCommit;

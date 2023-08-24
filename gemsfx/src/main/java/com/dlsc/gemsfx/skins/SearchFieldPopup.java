@@ -26,11 +26,11 @@ public class SearchFieldPopup<T> extends PopupControl {
 
     public static final String DEFAULT_STYLE_CLASS = "search-field-popup";
 
-    private final BooleanProperty shouldCommitProperty;
+    private final BooleanProperty shouldCommit;
 
-    public SearchFieldPopup(SearchField<T> searchField, BooleanProperty shouldCommitProperty) {
+    public SearchFieldPopup(SearchField<T> searchField, BooleanProperty shouldCommit) {
         this.searchField = Objects.requireNonNull(searchField);
-        this.shouldCommitProperty = shouldCommitProperty;
+        this.shouldCommit = Objects.requireNonNull(shouldCommit);
 
         minWidthProperty().bind(searchField.widthProperty());
 
@@ -108,6 +108,6 @@ public class SearchFieldPopup<T> extends PopupControl {
     }
 
     protected Skin<?> createDefaultSkin() {
-        return new SearchFieldPopupSkin(this, shouldCommitProperty);
+        return new SearchFieldPopupSkin<>(this, shouldCommit);
     }
 }

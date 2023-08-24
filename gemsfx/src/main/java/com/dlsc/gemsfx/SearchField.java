@@ -68,7 +68,7 @@ public class SearchField<T> extends Control {
 
     private final SearchFieldPopup<T> popup;
 
-    private BooleanProperty shouldCommitProperty = new SimpleBooleanProperty(this, "shouldCommit", false);
+    private final BooleanProperty shouldCommit = new SimpleBooleanProperty(this, "shouldCommit", false);
 
     /**
      * Constructs a new spotlight field. The field will set defaults for the
@@ -80,7 +80,7 @@ public class SearchField<T> extends Control {
     public SearchField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
-        popup = new SearchFieldPopup<>(this, shouldCommitProperty);
+        popup = new SearchFieldPopup<>(this, shouldCommit);
 
         editor.textProperty().bindBidirectional(textProperty());
         editor.promptTextProperty().bindBidirectional(promptTextProperty());
@@ -97,7 +97,7 @@ public class SearchField<T> extends Control {
             }
         });
 
-        addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+        addEventFilter(KeyEvent.ANY, evt -> {
             if (evt.getCode().equals(KeyCode.RIGHT) || evt.getCode().equals(KeyCode.ENTER)) {
                 commit();
                 evt.consume();
@@ -231,7 +231,8 @@ public class SearchField<T> extends Control {
      * item.
      */
     public void commit() {
-        if (shouldCommitProperty.get()) {
+        if (shouldCommit.get()) {
+            System.out.println("committing");
             committing = true;
             try {
                 T selectedItem = getSelectedItem();
@@ -249,7 +250,7 @@ public class SearchField<T> extends Control {
             } finally {
                 committing = false;
             }
-            shouldCommitProperty.set(false);
+            shouldCommit.set(false);
         }
     }
 
@@ -860,6 +861,7 @@ public class SearchField<T> extends Control {
         public static final EventType<SearchEvent> SUGGESTION_SELECTED = new EventType<>(Event.ANY, "SUGGESTION_SELECTED");
 
         private final Object selectedSuggestion;
+
         private final String text;
 
         public static SearchEvent createEventForText(EventType<? extends SearchEvent> eventType, String text) {
@@ -873,7 +875,7 @@ public class SearchField<T> extends Control {
         private SearchEvent(EventType<? extends SearchEvent> eventType, String text, Object suggestion) {
             super(eventType);
             this.text = text;
-            this.selectedSuggestion = suggestion;
+            selectedSuggestion = suggestion;
         }
 
         public String getText() {
