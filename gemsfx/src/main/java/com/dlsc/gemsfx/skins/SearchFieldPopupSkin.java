@@ -6,45 +6,42 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.SearchField;
-import javafx.beans.property.BooleanProperty;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.util.StringConverter;
 
 import java.util.Comparator;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
 
     private final SearchFieldPopup<T> control;
-    private final ListView<T> suggestionList;
+    private final ListView<T> listView;
     private final SearchField<T> searchField;
-    private final BooleanProperty shouldCommit;
 
-    public SearchFieldPopupSkin(SearchFieldPopup<T> control, BooleanProperty shouldCommit) {
+    public SearchFieldPopupSkin(SearchFieldPopup<T> control) {
         this.control = control;
-        this.shouldCommit = shouldCommit;
 
         searchField = control.getSearchField();
 
         SortedList<T> sortedList = new SortedList<>(searchField.getSuggestions(), createInnerComparator());
 
-        suggestionList = new ListView<>(sortedList);
-        suggestionList.getStyleClass().add("search-field-list-view");
-        suggestionList.getStylesheets().add(SearchField.class.getResource("search-field.css").toExternalForm());
-        suggestionList.cellFactoryProperty().bind(searchField.cellFactoryProperty());
+        listView = new ListView<>(sortedList);
+        listView.getStyleClass().add("search-field-list-view");
+        listView.getStylesheets().add(Objects.requireNonNull(SearchField.class.getResource("search-field.css")).toExternalForm());
+        listView.cellFactoryProperty().bind(searchField.cellFactoryProperty());
 
-        suggestionList.prefWidthProperty().bind(control.prefWidthProperty());
-        suggestionList.maxWidthProperty().bind(control.maxWidthProperty());
-        suggestionList.minWidthProperty().bind(control.minWidthProperty());
+        listView.prefWidthProperty().bind(control.prefWidthProperty());
+        listView.maxWidthProperty().bind(control.maxWidthProperty());
+        listView.minWidthProperty().bind(control.minWidthProperty());
 
-        suggestionList.placeholderProperty().bind(searchField.placeholderProperty());
+        listView.placeholderProperty().bind(searchField.placeholderProperty());
 
-        suggestionList.getSelectionModel().selectedItemProperty().addListener(it -> control.getSearchField().setSelectedItem(suggestionList.getSelectionModel().getSelectedItem()));
+        listView.getSelectionModel().selectedItemProperty().addListener(it -> control.getSearchField().setSelectedItem(listView.getSelectionModel().getSelectedItem()));
         registerEventListener();
     }
 
@@ -93,66 +90,35 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
     }
 
     private void registerEventListener() {
-        suggestionList.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            shouldCommit.set(true);
-            if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.TAB) {
-                fireSuggestionSelected();
-            }
-        });
-
-        suggestionList.setOnMouseClicked((me) -> {
+        listView.setOnMouseClicked((me) -> {
             if (me.getButton() == MouseButton.PRIMARY) {
-                if (me.getClickCount() == 2) {
-                    // hide the popup on double click
-                    control.hide();
-                } else if (me.getClickCount() == 1) {
-                    shouldCommit.set(true);
+                if (me.getClickCount() == 1) {
                     selectItem();
-                    fireSuggestionSelected();
                 }
             }
         });
 
-        suggestionList.setOnKeyPressed((ke) -> {
-            switch (ke.getCode()) {
-                case TAB:
-                case ENTER:
-                    selectItem();
-                    control.hide();
-                    break;
-                case ESCAPE:
-                    if (control.isHideOnEscape()) {
-                        control.hide();
-                    }
-            }
-        });
-
-        control.getSearchField().getEditor().focusedProperty().addListener((it, oldFocused, newFocused) -> {
-            if (!newFocused) {
-                control.hide();
-            }
-        });
-
-    }
-
-    private void fireSuggestionSelected() {
-        Object selectedSuggestion = suggestionList.getSelectionModel().getSelectedItem();
-        if (selectedSuggestion != null) {
-            SearchField.SearchEvent searchEvent = SearchField.SearchEvent.createEventForSuggestion(selectedSuggestion);
-            searchField.fireEvent(searchEvent);
-        }
+//        control.getSearchField().getEditor().focusedProperty().addListener((it, oldFocused, newFocused) -> {
+//            if (!newFocused) {
+//                control.hide();
+//            }
+//        });
     }
 
     private void selectItem() {
-        T selectedItem = suggestionList.getSelectionModel().getSelectedItem();
+        T selectedItem = listView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
             searchField.select(selectedItem);
             searchField.commit();
+            Consumer<T> onCommit = searchField.getOnCommit();
+            if (onCommit != null) {
+                onCommit.accept(selectedItem);
+            }
         }
     }
 
     public Node getNode() {
-        return suggestionList;
+        return listView;
     }
 
     public SearchFieldPopup<T> getSkinnable() {

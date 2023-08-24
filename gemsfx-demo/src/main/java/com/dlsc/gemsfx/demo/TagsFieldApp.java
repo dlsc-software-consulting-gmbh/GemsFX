@@ -148,7 +148,6 @@ public class TagsFieldApp extends Application {
         CSSFX.start();
 
         Scene scene = new Scene(vbox);
-        scene.focusOwnerProperty().addListener(it -> System.out.println("focus owner: " + scene.getFocusOwner()));
         primaryStage.setTitle("Tags Field");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();

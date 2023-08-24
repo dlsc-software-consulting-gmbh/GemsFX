@@ -6,8 +6,8 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.SearchField;
-import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
@@ -26,11 +26,8 @@ public class SearchFieldPopup<T> extends PopupControl {
 
     public static final String DEFAULT_STYLE_CLASS = "search-field-popup";
 
-    private final BooleanProperty shouldCommit;
-
-    public SearchFieldPopup(SearchField<T> searchField, BooleanProperty shouldCommit) {
+    public SearchFieldPopup(SearchField<T> searchField) {
         this.searchField = Objects.requireNonNull(searchField);
-        this.shouldCommit = Objects.requireNonNull(shouldCommit);
 
         minWidthProperty().bind(searchField.widthProperty());
 
@@ -39,6 +36,18 @@ public class SearchFieldPopup<T> extends PopupControl {
         setHideOnEscape(true);
 
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+
+        MapChangeListener<? super Object, ? super Object> l = change -> {
+            if (change.wasAdded()) {
+                if (change.getKey().equals("committed") || change.getKey().equals("cancelled")) {
+                    hide();
+                    searchField.getProperties().remove("committed");
+                    searchField.getProperties().remove("cancelled");
+                }
+            }
+        };
+
+        searchField.getProperties().addListener(l);
 
         searchField.addEventHandler(SearchField.SearchEvent.SEARCH_FINISHED, evt -> {
             if ((!searchField.getSuggestions().isEmpty() || searchField.getPlaceholder() != null) && StringUtils.isNotBlank(searchField.getEditor().getText())) {
@@ -108,6 +117,6 @@ public class SearchFieldPopup<T> extends PopupControl {
     }
 
     protected Skin<?> createDefaultSkin() {
-        return new SearchFieldPopupSkin<>(this, shouldCommit);
+        return new SearchFieldPopupSkin<>(this);
     }
 }

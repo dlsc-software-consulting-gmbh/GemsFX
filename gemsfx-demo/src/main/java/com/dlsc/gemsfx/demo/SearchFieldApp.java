@@ -33,9 +33,7 @@ public class SearchFieldApp extends Application {
 
         CountriesSearchField field = new CountriesSearchField();
         field.getEditor().setPrefColumnCount(30);
-        field.addEventHandler(SearchField.SearchEvent.SUGGESTION_SELECTED, event -> {
-            System.out.println("A suggestion was selected! => " + event.getSelectedSuggestion());
-        });
+        field.setOnCommit(country-> System.out.println("on commit listener in demo was invoked, country = " + country));
 
         Region regionLeft = new Region();
         regionLeft.setPrefWidth(30);
@@ -83,7 +81,6 @@ public class SearchFieldApp extends Application {
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);
-        scene.focusOwnerProperty().addListener(it -> System.out.println("focus owner: " + scene.getFocusOwner()));
 
         primaryStage.setTitle("Search Field");
         primaryStage.setScene(scene);

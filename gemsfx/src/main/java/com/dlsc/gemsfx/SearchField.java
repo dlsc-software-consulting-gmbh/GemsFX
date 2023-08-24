@@ -5,7 +5,20 @@ import com.dlsc.gemsfx.skins.SearchFieldSkin;
 import javafx.animation.Animation;
 import javafx.animation.RotateTransition;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -14,7 +27,13 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Skin;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
@@ -33,6 +52,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 /**
  * The search field is a standard text field with auto suggest capabilities
@@ -50,7 +70,6 @@ import java.util.function.BiFunction;
  * <h3>Matcher</h3>
  *
  * @param <T> the type of objects to work on
- *
  * @see #setSuggestionProvider(Callback)
  * @see #setConverter(StringConverter)
  * @see #setCellFactory(Callback)
@@ -68,8 +87,6 @@ public class SearchField<T> extends Control {
 
     private final SearchFieldPopup<T> popup;
 
-    private final BooleanProperty shouldCommit = new SimpleBooleanProperty(this, "shouldCommit", false);
-
     /**
      * Constructs a new spotlight field. The field will set defaults for the
      * matcher, the converter, the cell factory, and the comparator. It will
@@ -80,7 +97,7 @@ public class SearchField<T> extends Control {
     public SearchField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
-        popup = new SearchFieldPopup<>(this, shouldCommit);
+        popup = new SearchFieldPopup<>(this);
 
         editor.textProperty().bindBidirectional(textProperty());
         editor.promptTextProperty().bindBidirectional(promptTextProperty());
@@ -93,14 +110,17 @@ public class SearchField<T> extends Control {
                 commit();
                 if (getSelectedItem() == null) {
                     editor.setText("");
+                } else {
+                    invokeCommitHandler();
                 }
             }
         });
 
-        addEventFilter(KeyEvent.ANY, evt -> {
+        addEventFilter(KeyEvent.KEY_RELEASED, evt -> {
             if (evt.getCode().equals(KeyCode.RIGHT) || evt.getCode().equals(KeyCode.ENTER)) {
                 commit();
                 evt.consume();
+                invokeCommitHandler();
             } else if (evt.getCode().equals(KeyCode.LEFT)) {
                 editor.positionCaret(Math.max(0, editor.getCaretPosition() - 1));
             } else if (evt.getCode().equals(KeyCode.ESCAPE)) {
@@ -213,45 +233,75 @@ public class SearchField<T> extends Control {
             }
         });
 
-        searchService.setOnRunning(evt -> fireEvent(SearchEvent.createEventForText(SearchEvent.SEARCH_STARTED, searchService.getText())));
+        searchService.setOnRunning(evt -> fireEvent(new SearchEvent(SearchEvent.SEARCH_STARTED, searchService.getText())));
 
         searchService.setOnSucceeded(evt -> {
             update(searchService.getValue());
-            fireEvent(SearchEvent.createEventForText(SearchEvent.SEARCH_FINISHED, searchService.getText()));
+            fireEvent(new SearchEvent(SearchEvent.SEARCH_FINISHED, searchService.getText()));
         });
 
         searching.bind(searchService.runningProperty());
     }
 
+    private void invokeCommitHandler() {
+        T selectedItem = getSelectedItem();
+        if (selectedItem != null) {
+            Consumer<T> onCommit = getOnCommit();
+            if (onCommit != null) {
+                onCommit.accept(selectedItem);
+            }
+        }
+    }
+
     private boolean committing;
 
     /**
-     * Makes the field commit to the currently selected item and updates
-     * the field to show the full text provided by the converter for the
-     * item.
+     * Makes the field commit to the currently selected item and updates the
+     * field to show the full text provided by the converter for the item.
+     * This method can be called multiple times. For a single event
+     * when the user explicitly commits to a value use the {@link #onCommitProperty()}.
      */
     public void commit() {
-        if (shouldCommit.get()) {
-            System.out.println("committing");
-            committing = true;
-            try {
-                T selectedItem = getSelectedItem();
-                if (selectedItem != null) {
-                    String text = getConverter().toString(selectedItem);
-                    if (text != null) {
-                        editor.setText(text);
-                        editor.positionCaret(text.length());
-                    } else {
-                        clear();
-                    }
+        committing = true;
+        try {
+            T selectedItem = getSelectedItem();
+            if (selectedItem != null) {
+                String text = getConverter().toString(selectedItem);
+                if (text != null) {
+                    editor.setText(text);
+                    editor.positionCaret(text.length());
                 } else {
                     clear();
                 }
-            } finally {
-                committing = false;
+            } else {
+                clear();
             }
-            shouldCommit.set(false);
+
+            getProperties().put("committed", "");
+        } finally {
+            committing = false;
         }
+    }
+
+    private final ObjectProperty<Consumer<T>> onCommit = new SimpleObjectProperty<>(this, "onCommit");
+
+    public final Consumer<T> getOnCommit() {
+        return onCommit.get();
+    }
+
+    /**
+     * A callback that gets invoked when the user has committed to the selected
+     * value. "Committing" means that the user has hit the ENTER key, or the RIGHT arrow,
+     * or the field has lost its focus.
+     *
+     * @return the commit handler
+     */
+    public final ObjectProperty<Consumer<T>> onCommitProperty() {
+        return onCommit;
+    }
+
+    public void setOnCommit(Consumer<T> onCommit) {
+        this.onCommit.set(onCommit);
     }
 
     private class SearchEventHandlerProperty extends SimpleObjectProperty<EventHandler<SearchEvent>> {
@@ -462,6 +512,9 @@ public class SearchField<T> extends Control {
      */
     public final void cancel() {
         searchService.cancel();
+        getProperties().put("cancelled", "");
+        setSelectedItem(null);
+        setText("");
     }
 
     /**
@@ -723,9 +776,8 @@ public class SearchField<T> extends Control {
      * with exactly the text typed by the user. Auto selection will cause the field to automatically complete
      * the text typed by the user with the name of the match.
      *
-     * @see #converterProperty()
-     *
      * @return the function used for determining the best match in the suggestion list
+     * @see #converterProperty()
      */
     public final ObjectProperty<BiFunction<T, String, Boolean>> matcherProperty() {
         return matcher;
@@ -855,35 +907,15 @@ public class SearchField<T> extends Control {
          */
         public static final EventType<SearchEvent> SEARCH_FINISHED = new EventType<>(Event.ANY, "SEARCH_FINISHED");
 
-        /**
-         * An event that gets fired when the user selects a suggestion.
-         */
-        public static final EventType<SearchEvent> SUGGESTION_SELECTED = new EventType<>(Event.ANY, "SUGGESTION_SELECTED");
-
-        private final Object selectedSuggestion;
-
         private final String text;
 
-        public static SearchEvent createEventForText(EventType<? extends SearchEvent> eventType, String text) {
-            return new SearchEvent(eventType, text, null);
-        }
-
-        public static SearchEvent createEventForSuggestion(Object suggestion) {
-            return new SearchEvent(SUGGESTION_SELECTED, null, suggestion);
-        }
-
-        private SearchEvent(EventType<? extends SearchEvent> eventType, String text, Object suggestion) {
+        public SearchEvent(EventType<? extends SearchEvent> eventType, String text) {
             super(eventType);
             this.text = text;
-            selectedSuggestion = suggestion;
         }
 
         public String getText() {
             return text;
-        }
-
-        public Object getSelectedSuggestion() {
-            return selectedSuggestion;
         }
 
         @Override
@@ -893,7 +925,6 @@ public class SearchField<T> extends Control {
                     .append("target", target)
                     .append("consumed", consumed)
                     .append("text", text)
-                    .append("selectedSuggestion", selectedSuggestion)
                     .toString();
         }
     }
@@ -1011,6 +1042,7 @@ public class SearchField<T> extends Control {
                 text3.setText("");
             }
         }
+
     }
 
     public final SearchFieldPopup<T> getPopup() {

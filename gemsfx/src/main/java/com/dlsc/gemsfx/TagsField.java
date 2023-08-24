@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This field is a specialisation of the {@link SearchField} control and supports
+ * This field is a specialization of the {@link SearchField} control and supports
  * the additional feature of using the selected object as a tag. Tags are shown in front
  * of the text input field. The control provides an observable list of the currently
  * added tags. In addition, the field also allows the user to select one or more of
@@ -106,7 +106,7 @@ public class TagsField<T> extends SearchField<T> {
 
     @Override
     public String getUserAgentStylesheet() {
-        return TagsField.class.getResource("tags-field.css").toExternalForm();
+        return Objects.requireNonNull(TagsField.class.getResource("tags-field.css")).toExternalForm();
     }
 
     /**
@@ -120,6 +120,7 @@ public class TagsField<T> extends SearchField<T> {
             addTags(selectedItem);
             clear();
         }
+        getProperties().put("committed", "");
     }
 
     /**
@@ -160,6 +161,7 @@ public class TagsField<T> extends SearchField<T> {
      *
      * @param values the value to add as a tag
      */
+    @SafeVarargs
     public final void addTags(T... values) {
         execute(new AddTagCommand(values));
     }
@@ -169,6 +171,7 @@ public class TagsField<T> extends SearchField<T> {
      *
      * @param values the tags to add
      */
+    @SafeVarargs
     public final void removeTags(T... values) {
         execute(new RemoveTagCommand(values));
     }
@@ -229,6 +232,7 @@ public class TagsField<T> extends SearchField<T> {
 
         private T[] tags;
 
+        @SafeVarargs
         public AddTagCommand(T... tags) {
             this.tags = tags;
         }
@@ -252,6 +256,7 @@ public class TagsField<T> extends SearchField<T> {
 
         private T[] tags;
 
+        @SafeVarargs
         public RemoveTagCommand(T... tags) {
             this.tags = tags;
         }
