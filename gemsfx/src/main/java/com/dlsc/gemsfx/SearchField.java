@@ -291,8 +291,10 @@ public class SearchField<T> extends Control {
 
     /**
      * A callback that gets invoked when the user has committed to the selected
-     * value. "Committing" means that the user has hit the ENTER key, or the RIGHT arrow,
+     * value.
+     * "Committing" means that the user has hit the ENTER key, or the RIGHT arrow,
      * or the field has lost its focus.
+     * Or the user has clicked on one of the suggestions in the popup window.
      *
      * @return the commit handler
      */
