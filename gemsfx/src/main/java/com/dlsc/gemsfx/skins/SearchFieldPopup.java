@@ -56,12 +56,7 @@ public class SearchFieldPopup<T> extends PopupControl {
                 boolean showIt = false;
                 if (searchField.getSuggestions().size() == 1) {
                     if (!searchField.isHidePopupWithSingleChoice() || !searchField.getMatcher().apply(searchField.getSuggestions().get(0), evt.getText())) {
-
-                        // code said "show it" even with only a single suggestion
-                        // but let's see if the suggestion is identical to the typed text, then we really do not want to show it
-                        if (!searchField.getConverter().toString(searchField.getSuggestions().get(0)).equalsIgnoreCase(searchField.getText())) {
-                            showIt = true;
-                        }
+                        showIt = true;
                     }
                 } else {
                     // more than one suggested item, definitely show the popup
