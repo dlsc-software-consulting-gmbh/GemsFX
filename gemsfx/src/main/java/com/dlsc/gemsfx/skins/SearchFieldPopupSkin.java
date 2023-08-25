@@ -97,12 +97,6 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
                 }
             }
         });
-
-//        control.getSearchField().getEditor().focusedProperty().addListener((it, oldFocused, newFocused) -> {
-//            if (!newFocused) {
-//                control.hide();
-//            }
-//        });
     }
 
     private void selectItem() {
