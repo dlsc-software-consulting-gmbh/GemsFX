@@ -17,8 +17,14 @@
     -fx-cursor: hand;
 }
 
-.year-view > .grid-pane > .year.current-year {
-    -fx-underline: true;
+.year-view > .grid-pane > .year.selected {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-background;
+}
+
+.year-view > .grid-pane > .year.current {
+    -fx-border-color: -fx-accent;
+    -fx-border-width: 1px;
 }
 
 .year-view > .header {

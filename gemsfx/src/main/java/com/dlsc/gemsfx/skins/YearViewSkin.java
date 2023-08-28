@@ -84,31 +84,36 @@ public class YearViewSkin extends SkinBase<YearView> {
 
     private void buildGrid() {
         final int visibleYears = ROWS * COLUMNS;
-        Integer currentValue = getSkinnable().getValue();
-        int currentYear = ObjectUtils.firstNonNull(currentValue, LocalDate.now().getYear());
-        int initialYear = ((currentYear / visibleYears) * visibleYears) + (offset * visibleYears);
+
+        Integer selectedYear = getSkinnable().getValue();
+        int currentYear = LocalDate.now().getYear();
+        int firstYear = ((ObjectUtils.firstNonNull(selectedYear, currentYear) / visibleYears) * visibleYears) + (offset * visibleYears);
 
         gridPane.getChildren().clear();
-        yearRangeLabel.setText(initialYear + "-" + (initialYear + visibleYears - 1));
+        yearRangeLabel.setText(firstYear + "-" + (firstYear + visibleYears - 1));
 
         for (int row = 0; row < ROWS; row++) {
             for (int column = 0; column < COLUMNS; column++) {
-                int year = initialYear;
+                final int finalYear = firstYear;
 
                 Label yearLabel = new Label();
                 yearLabel.getStyleClass().add("year");
-                yearLabel.setText(String.valueOf(year));
+                yearLabel.setText(String.valueOf(firstYear));
                 yearLabel.setOnMouseClicked(evt -> {
                     offset = 0;
-                    getSkinnable().setValue(year);
+                    getSkinnable().setValue(finalYear);
                 });
 
-                if (currentValue != null && year == currentValue) {
-                    yearLabel.getStyleClass().add("current-year");
+                if (selectedYear != null && firstYear == selectedYear) {
+                    yearLabel.getStyleClass().add("selected");
+                }
+
+                if (firstYear == currentYear) {
+                    yearLabel.getStyleClass().add("current");
                 }
 
                 gridPane.add(yearLabel, column, row);
-                initialYear++;
+                firstYear++;
             }
         }
 
