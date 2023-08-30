@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.YearPickerSkin;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.css.PseudoClass;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Skin;
@@ -14,10 +16,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
-import java.time.LocalDate;
+import java.time.Year;
 import java.util.function.UnaryOperator;
 
-public class YearPicker extends ComboBoxBase<Integer> {
+public class YearPicker extends ComboBoxBase<Year> {
 
     private final TextField editor = new TextField();
     private final NumberStringFilteredConverter converter = new NumberStringFilteredConverter();
@@ -25,10 +27,12 @@ public class YearPicker extends ComboBoxBase<Integer> {
     public YearPicker() {
         getStyleClass().setAll("year-picker", "text-input");
 
-        setValue(LocalDate.now().getYear());
         setFocusTraversable(false);
 
-        valueProperty().addListener(it -> updateText());
+        valueProperty().addListener((obs, oldV, newV) -> {
+            updateText(newV);
+            year.set(newV == null ? null : newV.getValue());
+        });
 
         editor.setTextFormatter(new TextFormatter<>(converter, null, converter.getFilter()));
         editor.editableProperty().bind(editableProperty());
@@ -40,16 +44,19 @@ public class YearPicker extends ComboBoxBase<Integer> {
             pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), editor.isFocused());
         });
 
-        editor.addEventHandler(KeyEvent.ANY, evt -> {
-            if (evt.getCode().equals(KeyCode.DOWN)) {
-                setValue(getValue() + 1);
-            } else if (evt.getCode().equals(KeyCode.UP)) {
-                setValue(getValue() - 1);
+        editor.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+            Year value = getValue();
+            if (value != null) {
+                if (evt.getCode().equals(KeyCode.DOWN)) {
+                    setValue(value.plusYears(1));
+                } else if (evt.getCode().equals(KeyCode.UP)) {
+                    setValue(value.minusYears(1));
+                }
             }
         });
 
         setMaxWidth(Region.USE_PREF_SIZE);
-        updateText();
+        updateText(null);
     }
 
     /**
@@ -71,22 +78,31 @@ public class YearPicker extends ComboBoxBase<Integer> {
         return YearMonthView.class.getResource("year-picker.css").toExternalForm();
     }
 
+    private final ReadOnlyObjectWrapper<Integer> year = new ReadOnlyObjectWrapper<>(this, "wrapper");
+
+    public final ReadOnlyObjectProperty<Integer> yearProperty() {
+        return year.getReadOnlyProperty();
+    }
+
+    public final Integer getYear() {
+        return year.get();
+    }
+
     private void commit() {
         String text = editor.getText();
         if (StringUtils.isNotBlank(text)) {
             Number value = converter.fromString(text);
             if (value != null) {
-                setValue(value.intValue());
+                setValue(Year.of(value.intValue()));
             } else {
                 setValue(null);
             }
         }
     }
 
-    private void updateText() {
-        Integer value = getValue();
+    private void updateText(Year value) {
         if (value != null) {
-            editor.setText("" + value);
+            editor.setText(String.valueOf(value.getValue()));
         } else {
             editor.setText("");
         }
@@ -101,7 +117,6 @@ public class YearPicker extends ComboBoxBase<Integer> {
 
         UnaryOperator<TextFormatter.Change> getFilter() {
             return change -> {
-                System.out.println(change);
                 String newText = change.getControlNewText();
 
                 if (!newText.isEmpty()) {

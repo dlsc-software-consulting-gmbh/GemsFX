@@ -6,6 +6,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
+import java.time.Year;
+
 public class YearView extends Control {
 
     public YearView() {
@@ -22,17 +24,17 @@ public class YearView extends Control {
         return YearView.class.getResource("year-view.css").toExternalForm();
     }
 
-    private final ObjectProperty<Integer> value = new SimpleObjectProperty<>(this, "value");
+    private final ObjectProperty<Year> value = new SimpleObjectProperty<>(this, "value");
 
-    public Integer getValue() {
+    public Year getValue() {
         return value.get();
     }
 
-    public ObjectProperty<Integer> valueProperty() {
+    public ObjectProperty<Year> valueProperty() {
         return value;
     }
 
-    public void setValue(Integer value) {
+    public void setValue(Year value) {
         this.value.set(value);
     }
 

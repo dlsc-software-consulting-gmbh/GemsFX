@@ -19,7 +19,7 @@ public class YearPickerApp extends Application {
         YearPicker yearPicker = new YearPicker();
 
         Label valueLabel = new Label();
-        valueLabel.textProperty().bind(Bindings.convert(yearPicker.valueProperty()));
+        valueLabel.textProperty().bind(Bindings.convert(yearPicker.yearProperty()));
 
         CheckBox editable = new CheckBox("Editable");
         editable.selectedProperty().bindBidirectional(yearPicker.editableProperty());

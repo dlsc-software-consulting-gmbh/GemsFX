@@ -9,9 +9,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import org.apache.commons.lang3.ObjectUtils;
 
 import java.time.LocalDate;
+import java.time.Year;
+import java.util.Optional;
 
 public class YearViewSkin extends SkinBase<YearView> {
 
@@ -85,9 +86,9 @@ public class YearViewSkin extends SkinBase<YearView> {
     private void buildGrid() {
         final int visibleYears = ROWS * COLUMNS;
 
-        Integer selectedYear = getSkinnable().getValue();
+        Year selectedYear = getSkinnable().getValue();
         int currentYear = LocalDate.now().getYear();
-        int firstYear = ((ObjectUtils.firstNonNull(selectedYear, currentYear) / visibleYears) * visibleYears) + (offset * visibleYears);
+        int firstYear = ((Optional.ofNullable(selectedYear).map(Year::getValue).orElse(currentYear) / visibleYears) * visibleYears) + (offset * visibleYears);
 
         gridPane.getChildren().clear();
         yearRangeLabel.setText(firstYear + "-" + (firstYear + visibleYears - 1));
@@ -101,10 +102,10 @@ public class YearViewSkin extends SkinBase<YearView> {
                 yearLabel.setText(String.valueOf(firstYear));
                 yearLabel.setOnMouseClicked(evt -> {
                     offset = 0;
-                    getSkinnable().setValue(finalYear);
+                    getSkinnable().setValue(Year.of(finalYear));
                 });
 
-                if (selectedYear != null && firstYear == selectedYear) {
+                if (selectedYear != null && firstYear == selectedYear.getValue()) {
                     yearLabel.getStyleClass().add("selected");
                 }
 
