@@ -161,7 +161,7 @@ public class TreeNodeCell<T> extends BorderPane {
 
     @Override
     public String getUserAgentStylesheet() {
-        return getClass().getResource("tree-view.css").toExternalForm();
+        return TreeNodeCell.class.getResource("tree-view.css").toExternalForm();
     }
 
 }
