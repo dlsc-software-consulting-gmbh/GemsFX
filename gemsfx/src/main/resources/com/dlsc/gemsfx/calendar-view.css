@@ -210,7 +210,3 @@
     -fx-background: derive(-fx-accent, +80%);
 }
 
-.calendar-view > .container > .year-view > .container > .header {
-    -fx-background: -fx-control-inner-background;
-    -fx-background-color: -fx-background;
-}

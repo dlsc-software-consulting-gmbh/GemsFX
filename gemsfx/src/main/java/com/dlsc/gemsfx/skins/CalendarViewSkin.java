@@ -27,6 +27,7 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -79,10 +80,6 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
     private final GridPane weekdayGridPane;
 
     private final VBox container;
-
-    private final StackPane footer;
-
-    private final HBox header;
 
     private final YearMonthView yearMonthView;
 
@@ -150,7 +147,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         yearArrowBox.visibleProperty().bind(view.showYearProperty().and(view.showYearSpinnerProperty()));
         yearArrowBox.managedProperty().bind(view.showYearProperty().and(view.showYearSpinnerProperty()));
 
-        header = new HBox();
+        HBox header = new HBox();
         header.getStyleClass().add("header");
 
         StackPane previousMonthArrow = new StackPane();
@@ -202,31 +199,19 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         Button todayButton = new Button("Today");
         todayButton.setOnAction(evt -> view.setYearMonth(YearMonth.from(view.getToday())));
 
-        footer = new StackPane(todayButton);
+        StackPane footer = new StackPane(todayButton);
         footer.visibleProperty().bind(view.showTodayButtonProperty());
         footer.managedProperty().bind(view.showTodayButtonProperty());
         footer.getStyleClass().add("footer");
 
-        container = new VBox();
+        container = new VBox(header, weekdayGridPane, bodyGridPane, footer);
         container.getStyleClass().add("container");
 
         yearMonthView = new YearMonthView();
-        yearMonthView.valueProperty().addListener((obs, oldV, newV) -> {
-            view.setYearMonth(newV);
-            viewMode.set(ViewMode.DATE);
-        });
-
         yearView = new YearView();
-        yearView.valueProperty().addListener((obs, oldV, newV) -> {
-            YearMonth yearMonth = Optional.ofNullable(view.getYearMonth()).orElse(YearMonth.now());
-            view.setYearMonth(newV.atMonth(yearMonth.getMonth()));
-            viewMode.set(ViewMode.DATE);
-        });
 
         viewMode.addListener(obs -> updateViewMode());
         updateViewMode();
-
-        getChildren().add(container);
 
         buildView();
 
@@ -414,18 +399,34 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         return row + "/" + col;
     }
 
+    private final ChangeListener<YearMonth> yearMonthChangeListener = (obs, oldV, newV) -> {
+        getSkinnable().setYearMonth(newV);
+        viewMode.set(ViewMode.DATE);
+    };
+
+    private final ChangeListener<Year> yearChangeListener = (obs, oldV, newV) -> {
+        YearMonth yearMonth = Optional.ofNullable(getSkinnable().getYearMonth()).orElse(YearMonth.now());
+        getSkinnable().setYearMonth(newV.atMonth(yearMonth.getMonth()));
+        viewMode.set(ViewMode.DATE);
+    };
+
     private void updateViewMode() {
+        yearMonthView.valueProperty().removeListener(yearMonthChangeListener);
+        yearView.valueProperty().removeListener(yearChangeListener);
+
         if (viewMode.get() == ViewMode.DATE) {
-            container.getChildren().setAll(header, weekdayGridPane, bodyGridPane, footer);
+            getChildren().setAll(container);
         }
         else if (viewMode.get() == ViewMode.MONTH) {
             yearMonthView.setValue(getSkinnable().getYearMonth());
-            container.getChildren().setAll(yearMonthView);
+            yearMonthView.valueProperty().addListener(yearMonthChangeListener);
+            getChildren().setAll(yearMonthView);
         }
         else if (viewMode.get() == ViewMode.YEAR) {
             YearMonth yearMonth = Optional.ofNullable(getSkinnable().getYearMonth()).orElse(YearMonth.now());
             yearView.setValue(Year.of(yearMonth.getYear()));
-            container.getChildren().setAll(yearView);
+            yearView.valueProperty().addListener(yearChangeListener);
+            getChildren().setAll(yearView);
         }
     }
 
