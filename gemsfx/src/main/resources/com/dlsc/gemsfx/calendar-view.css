@@ -209,3 +209,4 @@
 .calendar-view > .container > .body-grid-pane > .date-cell.selected.range-date {
     -fx-background: derive(-fx-accent, +80%);
 }
+

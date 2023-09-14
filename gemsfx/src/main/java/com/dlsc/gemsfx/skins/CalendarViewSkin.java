@@ -19,10 +19,15 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.DateCell;
 import com.dlsc.gemsfx.CalendarView.SelectionModel;
+import com.dlsc.gemsfx.YearMonthView;
+import com.dlsc.gemsfx.YearView;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -40,6 +45,7 @@ import javafx.util.Callback;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.time.temporal.WeekFields;
@@ -47,6 +53,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import static javafx.geometry.Pos.CENTER;
@@ -64,15 +71,19 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
     private static final String RANGE_END_DATE = "range-end";
     private static final String RANGE_DATE = "range-date";
 
+    private enum ViewMode {
+        DATE, MONTH, YEAR
+    }
+
     private final GridPane bodyGridPane;
 
     private final GridPane weekdayGridPane;
 
-    private final VBox vBox;
+    private final VBox container;
 
-    private final Label monthLabel;
+    private final YearMonthView yearMonthView;
 
-    private final Label yearLabel;
+    private final YearView yearView;
 
     private final Map<String, DateCell> cellsMap = new HashMap<>();
 
@@ -83,6 +94,8 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
     private final InvalidationListener updateViewListener = (Observable it) -> updateView();
 
     private final WeakInvalidationListener weakUpdateViewListener = new WeakInvalidationListener(updateViewListener);
+
+    private final ObjectProperty<ViewMode> viewMode = new SimpleObjectProperty<>(this, "viewMode", ViewMode.DATE);
 
     private YearMonth displayedYearMonth;
 
@@ -97,18 +110,20 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         weekdayGridPane.setAlignment(CENTER);
         weekdayGridPane.getStyleClass().addAll("grid-pane", "weekday-grid-pane");
 
-        monthLabel = new Label();
+        Label monthLabel = new Label();
         monthLabel.getStyleClass().add("month-label");
         monthLabel.setMinWidth(Region.USE_PREF_SIZE);
         monthLabel.textProperty().bind(Bindings.createStringBinding(() -> view.getYearMonth() != null ? view.getYearMonth().getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()) : "", view.yearMonthProperty()));
         monthLabel.visibleProperty().bind(view.showMonthProperty());
         monthLabel.managedProperty().bind(view.showMonthProperty());
+        monthLabel.setOnMouseClicked(evt -> viewMode.set(ViewMode.MONTH));
 
-        yearLabel = new Label();
+        Label yearLabel = new Label();
         yearLabel.getStyleClass().add("year-label");
         yearLabel.textProperty().bind(Bindings.createStringBinding(() -> view.getYearMonth() != null ? Integer.toString(view.getYearMonth().getYear()) : "", view.yearMonthProperty()));
         yearLabel.visibleProperty().bind(view.showYearProperty());
         yearLabel.managedProperty().bind(view.showYearProperty());
+        yearLabel.setOnMouseClicked(evt -> viewMode.set(ViewMode.YEAR));
 
         StackPane incrementYearArrow = new StackPane();
         incrementYearArrow.getStyleClass().add("arrow");
@@ -189,10 +204,14 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         footer.managedProperty().bind(view.showTodayButtonProperty());
         footer.getStyleClass().add("footer");
 
-        vBox = new VBox(header, weekdayGridPane, bodyGridPane, footer);
-        vBox.getStyleClass().add("container");
+        container = new VBox(header, weekdayGridPane, bodyGridPane, footer);
+        container.getStyleClass().add("container");
 
-        getChildren().add(vBox);
+        yearMonthView = new YearMonthView();
+        yearView = new YearView();
+
+        viewMode.addListener(obs -> updateViewMode());
+        updateViewMode();
 
         buildView();
 
@@ -203,9 +222,9 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         weekdayGridPane.setViewOrder(-1000);
 
         Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(vBox.widthProperty());
-        clip.heightProperty().bind(vBox.heightProperty());
-        vBox.setClip(clip);
+        clip.widthProperty().bind(container.widthProperty());
+        clip.heightProperty().bind(container.heightProperty());
+        container.setClip(clip);
 
         view.selectionModelProperty().addListener(it -> bindSelectionModel(view.getSelectionModel()));
         bindSelectionModel(view.getSelectionModel());
@@ -378,6 +397,37 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
     private String getKey(int row, int col) {
         return row + "/" + col;
+    }
+
+    private final ChangeListener<YearMonth> yearMonthChangeListener = (obs, oldV, newV) -> {
+        getSkinnable().setYearMonth(newV);
+        viewMode.set(ViewMode.DATE);
+    };
+
+    private final ChangeListener<Year> yearChangeListener = (obs, oldV, newV) -> {
+        YearMonth yearMonth = Optional.ofNullable(getSkinnable().getYearMonth()).orElse(YearMonth.now());
+        getSkinnable().setYearMonth(newV.atMonth(yearMonth.getMonth()));
+        viewMode.set(ViewMode.DATE);
+    };
+
+    private void updateViewMode() {
+        yearMonthView.valueProperty().removeListener(yearMonthChangeListener);
+        yearView.valueProperty().removeListener(yearChangeListener);
+
+        if (viewMode.get() == ViewMode.DATE) {
+            getChildren().setAll(container);
+        }
+        else if (viewMode.get() == ViewMode.MONTH) {
+            yearMonthView.setValue(getSkinnable().getYearMonth());
+            yearMonthView.valueProperty().addListener(yearMonthChangeListener);
+            getChildren().setAll(yearMonthView);
+        }
+        else if (viewMode.get() == ViewMode.YEAR) {
+            YearMonth yearMonth = Optional.ofNullable(getSkinnable().getYearMonth()).orElse(YearMonth.now());
+            yearView.setValue(Year.of(yearMonth.getYear()));
+            yearView.valueProperty().addListener(yearChangeListener);
+            getChildren().setAll(yearView);
+        }
     }
 
     private void updateView() {
