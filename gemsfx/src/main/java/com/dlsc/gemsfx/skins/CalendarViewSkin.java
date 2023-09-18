@@ -28,11 +28,14 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.HPos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -41,6 +44,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Window;
 import javafx.util.Callback;
 
 import java.time.DayOfWeek;
@@ -99,8 +103,20 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
     private YearMonth displayedYearMonth;
 
+    private final ChangeListener<Boolean> windowShowingListener = (obs, oldShowing, newShowing) -> {
+        if (!newShowing) {
+            viewMode.set(ViewMode.DATE);
+        }
+    };
+
+    private final WeakChangeListener weakWindowShowingListener = new WeakChangeListener(windowShowingListener);
+
     public CalendarViewSkin(CalendarView view) {
         super(view);
+
+        Scene scene = view.getScene();
+        Window window = scene.getWindow();
+        window.showingProperty().addListener(weakWindowShowingListener);
 
         bodyGridPane = new GridPane();
         bodyGridPane.setAlignment(CENTER);
@@ -197,6 +213,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         view.showTodayProperty().addListener(updateViewListener);
 
         Button todayButton = new Button("Today");
+        todayButton.getStyleClass().add("today-button");
         todayButton.setOnAction(evt -> view.setYearMonth(YearMonth.from(view.getToday())));
 
         StackPane footer = new StackPane(todayButton);
@@ -208,6 +225,11 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         container.getStyleClass().add("container");
 
         yearMonthView = new YearMonthView();
+        yearMonthView.getStyleClass().add("inner-year-month-view");
+        yearMonthView.setShowYear(false);
+        yearMonthView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> viewMode.set(ViewMode.DATE));
+        yearMonthView.addEventHandler(TouchEvent.TOUCH_PRESSED, evt -> viewMode.set(ViewMode.DATE));
+
         yearView = new YearView();
 
         viewMode.addListener(obs -> updateViewMode());
@@ -228,6 +250,11 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         view.selectionModelProperty().addListener(it -> bindSelectionModel(view.getSelectionModel()));
         bindSelectionModel(view.getSelectionModel());
+
+        StackPane stackPane = new StackPane(yearView, yearMonthView, container);
+        stackPane.getStyleClass().add("stack-pane");
+        getChildren().setAll(stackPane);
+        updateView();
     }
 
     private void bindSelectionModel(SelectionModel model) {
@@ -354,7 +381,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
             }
         }
 
-        // after a build we always have to update the view
+        // after a build, we always have to update the view
         updateView();
     }
 
@@ -414,19 +441,24 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         yearMonthView.valueProperty().removeListener(yearMonthChangeListener);
         yearView.valueProperty().removeListener(yearChangeListener);
 
+        container.setVisible(false);
+        yearMonthView.setVisible(false);
+        yearView.setVisible(false);
+
         if (viewMode.get() == ViewMode.DATE) {
-            getChildren().setAll(container);
-        }
-        else if (viewMode.get() == ViewMode.MONTH) {
+            container.toFront();
+            container.setVisible(true);
+        } else if (viewMode.get() == ViewMode.MONTH) {
+            yearMonthView.toFront();
+            yearMonthView.setVisible(true);
             yearMonthView.setValue(getSkinnable().getYearMonth());
             yearMonthView.valueProperty().addListener(yearMonthChangeListener);
-            getChildren().setAll(yearMonthView);
-        }
-        else if (viewMode.get() == ViewMode.YEAR) {
+        } else if (viewMode.get() == ViewMode.YEAR) {
+            yearView.toFront();
+            yearView.setVisible(true);
             YearMonth yearMonth = Optional.ofNullable(getSkinnable().getYearMonth()).orElse(YearMonth.now());
             yearView.setValue(Year.of(yearMonth.getYear()));
             yearView.valueProperty().addListener(yearChangeListener);
-            getChildren().setAll(yearView);
         }
     }
 

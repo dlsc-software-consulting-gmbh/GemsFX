@@ -15,6 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -55,6 +56,8 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
 
         HBox header = new HBox(leftArrowButton, yearLabel, rightArrowButton);
         header.getStyleClass().add("header");
+        header.visibleProperty().bind(control.showYearProperty());
+        header.managedProperty().bind(control.showYearProperty());
 
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-pane");
@@ -91,6 +94,12 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
         col3.setHalignment(HPos.CENTER);
 
         gridPane.getColumnConstraints().setAll(col1, col2, col3);
+
+        for (int i = 0; i < 5; i++) {
+            RowConstraints row = new RowConstraints();
+            row.setVgrow(Priority.ALWAYS);
+            gridPane.getRowConstraints().add(row);
+        }
 
         VBox container = new VBox(header, gridPane);
         container.getStyleClass().add("container");

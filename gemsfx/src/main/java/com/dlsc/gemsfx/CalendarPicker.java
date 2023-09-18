@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
+import java.util.Objects;
 
 /**
  * A control for quickly selecting the month of a year. The format used for the
@@ -28,6 +29,8 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
     private final TextField editor = new TextField();
 
+    private final CalendarView calendarView = new CalendarView();
+
     /**
      * Constructs a new picker.
      */
@@ -35,6 +38,9 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
         super();
 
         getStyleClass().setAll("calendar-picker", "text-input");
+
+        calendarView.setShowToday(true);
+        calendarView.setShowTodayButton(true);
 
         setFocusTraversable(false);
 
@@ -75,7 +81,16 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
     @Override
     public String getUserAgentStylesheet() {
-        return CalendarPicker.class.getResource("calendar-picker.css").toExternalForm();
+        return Objects.requireNonNull(CalendarPicker.class.getResource("calendar-picker.css")).toExternalForm();
+    }
+
+    /**
+     * Returns the view used to display dates when the picker is opening up.
+     *
+     * @return the calendar view for picking a date
+     */
+    public final CalendarView getCalendarView() {
+        return calendarView;
     }
 
     /*

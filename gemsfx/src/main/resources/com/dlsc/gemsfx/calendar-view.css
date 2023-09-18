@@ -22,104 +22,104 @@
     -fx-fill-width: true;
 }
 
-.calendar-view > .container > .footer {
+.calendar-view > .stack-pane > .container > .footer {
     -fx-background: -fx-control-inner-background-alt;
     -fx-background-color: -fx-background;
     -fx-padding: 0px 10px 10px 10px;
 }
 
-.calendar-view > .container > .header {
+.calendar-view > .stack-pane > .container > .header {
     -fx-background: -fx-control-inner-background;
     -fx-background-color: -fx-background;
     -fx-padding: 5px;
     -fx-alignment: center;
 }
 
-.calendar-view > .container > .header > .month-label {
+.calendar-view > .stack-pane > .container > .header > .month-label {
     -fx-font-weight: bold;
 }
 
-.calendar-view > .container > .header > .year-label {
+.calendar-view > .stack-pane > .container > .header > .year-label {
     -fx-padding: 0px 5px 0px 5px;
 }
 
-.calendar-view > .container > .header > .arrow-button {
+.calendar-view > .stack-pane > .container > .header > .arrow-button {
     -fx-padding: 2px;
 }
 
-.calendar-view > .container > .header > .arrow-button .ikonli-font-icon {
+.calendar-view > .stack-pane > .container > .header > .arrow-button .ikonli-font-icon {
     -fx-icon-color: -fx-text-background-color;
     -fx-icon-size: 20px;
 }
 
-.calendar-view > .container > .header > .year-spinner {
+.calendar-view > .stack-pane > .container > .header > .year-spinner {
     -fx-alignment: center;
 }
 
-.calendar-view > .container > .header > .year-spinner > .decrement-year-button,
-.calendar-view > .container > .header > .year-spinner > .increment-year-button {
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .decrement-year-button,
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .increment-year-button {
     -fx-padding: 2px; /* 5 8 3 8 */
 }
 
-.calendar-view > .container > .header > .year-spinner > .decrement-year-button:disabled,
-.calendar-view > .container > .header > .year-spinner > .increment-year-button:disabled {
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .decrement-year-button:disabled,
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .increment-year-button:disabled {
     -fx-opacity: 0.4;
 }
 
-.calendar-view > .container > .header > .year-spinner > .increment-year-button > .arrow {
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .increment-year-button > .arrow {
     -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
     -fx-background-insets: 0 0 -1 0, 0;
     -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
     -fx-shape: "M 0 4 h 7 l -3.5 -4 z";
 }
 
-.calendar-view > .container > .header > .year-spinner > .decrement-year-button > .arrow {
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .decrement-year-button > .arrow {
     -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
     -fx-background-insets: 0 0 -1 0, 0;
     -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
     -fx-shape: "M 0 0 h 7 l -3.5 4 z";
 }
 
-.calendar-view > .container > .header > .previous-month-button,
-.calendar-view > .container > .header > .next-month-button {
+.calendar-view > .stack-pane > .container > .header > .previous-month-button,
+.calendar-view > .stack-pane > .container > .header > .next-month-button {
 }
 
-.calendar-view > .container > .header > .previous-month-button:hover,
-.calendar-view > .container > .header > .next-month-button:hover {
+.calendar-view > .stack-pane > .container > .header > .previous-month-button:hover,
+.calendar-view > .stack-pane > .container > .header > .next-month-button:hover {
     -fx-background: -fx-control-inner-background-alt;
 }
 
-.calendar-view > .container > .header > .previous-month-button:pressed,
-.calendar-view > .container > .header > .next-month-button:pressed {
+.calendar-view > .stack-pane > .container > .header > .previous-month-button:pressed,
+.calendar-view > .stack-pane > .container > .header > .next-month-button:pressed {
 }
 
-.calendar-view > .container > .header > .previous-month-button:disabled,
-.calendar-view > .container > .header > .next-month-button:disabled {
+.calendar-view > .stack-pane > .container > .header > .previous-month-button:disabled,
+.calendar-view > .stack-pane > .container > .header > .next-month-button:disabled {
     -fx-opacity: 0.4;
 }
 
-.calendar-view > .container > .header > .previous-month-button,
-.calendar-view > .container > .header > .next-month-button {
+.calendar-view > .stack-pane > .container > .header > .previous-month-button,
+.calendar-view > .stack-pane > .container > .header > .next-month-button {
     -fx-padding: 0.333333em 0.166667em;
 }
 
-.calendar-view > .container > .header > .previous-month-button > .arrow {
-    -fx-background-color: -fx-mark-highlight-color, derive(-fx-base,-45%);
+.calendar-view > .stack-pane > .container > .header > .previous-month-button > .arrow {
+    -fx-background-color: -fx-mark-highlight-color, derive(-fx-base, -45%);
     -fx-background-insets: 1 0 -1 0, 0;
     -fx-padding: 0.333333em 0.25em 0.333333em 0.166667em; /* 4 3 4 2 */
     -fx-shape: "M5.997,5.072L5.995,6.501l-2.998-4l2.998-4l0.002,1.43l-1.976,2.57L5.997,5.072z";
     -fx-scale-shape: true;
 }
 
-.calendar-view > .container > .header > .next-month-button > .arrow {
-    -fx-background-color: -fx-mark-highlight-color, derive(-fx-base,-45%);
+.calendar-view > .stack-pane > .container > .header > .next-month-button > .arrow {
+    -fx-background-color: -fx-mark-highlight-color, derive(-fx-base, -45%);
     -fx-background-insets: 1 0 -1 0, 0;
     -fx-padding: 0.333333em 0.25em 0.333333em 0.166667em; /* 4 3 4 2 */
     -fx-shape: "M2.998-0.07L3-1.499l2.998,4L3,6.501l-0.002-1.43l1.976-2.57L2.998-0.07z";
     -fx-scale-shape: true;
 }
 
-.calendar-view > .container > .weekday-grid-pane {
+.calendar-view > .stack-pane > .container > .weekday-grid-pane {
     -fx-background: -fx-control-inner-background;
     -fx-background-color: -fx-background;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 10, 0.12, -1, 2);
@@ -128,25 +128,25 @@
     -fx-padding: 0px 10px 10px 10px;
 }
 
-.calendar-view > .container > .weekday-grid-pane > .corner {
+.calendar-view > .stack-pane > .container > .weekday-grid-pane > .corner {
     -fx-background: -fx-control-inner-background;
     -fx-background-color: -fx-background;
 }
 
-.calendar-view > .container > .weekday-grid-pane > .weekday-name {
+.calendar-view > .stack-pane > .container > .weekday-grid-pane > .weekday-name {
     -size: 2em;
     -fx-pref-width: -size;
     -fx-pref-height: -size;
     -fx-min-width: -size;
     -fx-min-height: -size;
-    -fx-text-fill: gray;
+    -fx-text-fill: grey;
     -fx-font-size: .8em;
     -fx-background: -fx-control-inner-background;
     -fx-background-color: -fx-background;
     -fx-alignment: center;
 }
 
-.calendar-view > .container > .body-grid-pane {
+.calendar-view > .stack-pane > .container > .body-grid-pane {
     -fx-padding: 10px;
     -fx-grid-lines-visible: false;
     -fx-background: -fx-control-inner-background-alt;
@@ -155,7 +155,7 @@
     -fx-vgap: -fx-vertical-grid-gap;
 }
 
-.calendar-view > .container > .body-grid-pane > .week-number-label {
+.calendar-view > .stack-pane > .container > .body-grid-pane > .week-number-label {
     -fx-font-size: 10px;
     -fx-text-fill: -fx-accent;
     -fx-padding: 0.0 2.0 0.0 0.0;
@@ -163,50 +163,59 @@
     -fx-min-height: 2.5em;
 }
 
-.calendar-view > .container > .body-grid-pane > .date-cell {
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell {
     -fx-background: -fx-control-inner-background-alt;
     -fx-background-color: -fx-background;
     -fx-text-fill: -fx-text-background-color;
-    -fx-cell-size: 2.5em;
+    -fx-min-width: 2.5em;
+    -fx-pref-width: 2.5em;
+    -fx-max-width: 2.5em;
+    -fx-min-height: 2.5em;
+    -fx-pref-height: 2.5em;
+    -fx-max-height: 2.5em;
 }
 
-.calendar-view > .container > .body-grid-pane > .date-cell.previous-month {
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.previous-month {
     -fx-background: rgb(230, 231, 233);
     -fx-text-fill: grey;
 }
 
-.calendar-view > .container > .body-grid-pane > .date-cell.next-month {
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.next-month {
     -fx-background: rgb(230, 231, 233);
     -fx-text-fill: grey;
 }
 
-.calendar-view > .container > .body-grid-pane > .date-cell.weekend-day {
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.weekend-day {
     -fx-background-color: -fx-control-inner-background-alt;
 }
 
-.calendar-view > .container > .body-grid-pane > .date-cell.today {
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.today {
     -fx-border-color: -fx-accent;
     -fx-border-radius: 2.5em;
     -fx-border-insets: 2px;
 }
 
-.calendar-view > .container > .body-grid-pane > .date-cell.selected {
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected {
     -fx-background: -fx-accent;
     -fx-background-color: -fx-background;
 }
 
-.calendar-view > .container > .body-grid-pane > .date-cell.selected.next-month,
-.calendar-view > .container > .body-grid-pane > .date-cell.selected.previous-month {
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected.next-month,
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected.previous-month {
     -fx-text-fill: -fx-text-background-color;
 }
 
-.calendar-view > .container > .body-grid-pane > .date-cell.selected.range-start {
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected.range-start {
 }
 
-.calendar-view > .container > .body-grid-pane > .date-cell.selected.range-end {
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected.range-end {
 }
 
-.calendar-view > .container > .body-grid-pane > .date-cell.selected.range-date {
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected.range-date {
     -fx-background: derive(-fx-accent, +80%);
+}
+
+.calendar-view > .stack-pane > .year-month-view {
+    -fx-border-color: red;
 }
 

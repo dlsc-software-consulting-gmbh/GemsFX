@@ -1,6 +1,5 @@
 .year-view {
     -fx-border-color: #e0e0e0;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
     -fx-pref-width: 240px;
 }
 

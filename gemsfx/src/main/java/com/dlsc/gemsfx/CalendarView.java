@@ -61,8 +61,7 @@ import static javafx.geometry.Pos.CENTER;
  * <li>Show details of the date (by default shows a popover with all entries on
  * that date)</li>
  * </ol>
- * The image below shows the visual apperance of this control:
- *
+ * The image below shows the visual appearance of this control:
  * <img src="doc-files/date-picker.png" alt="Date Picker">
  */
 public class CalendarView extends Control {
@@ -74,16 +73,13 @@ public class CalendarView extends Control {
         getStyleClass().add("calendar-view");
         setCellFactory(view -> new DateCell());
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        // have to add stylesheet like this or the overridden styles for the inner controls do not work
+        getStylesheets().add(requireNonNull(CalendarView.class.getResource("calendar-view.css")).toExternalForm());
     }
 
     @Override
     protected Skin<?> createDefaultSkin() {
         return new CalendarViewSkin(this);
-    }
-
-    @Override
-    public String getUserAgentStylesheet() {
-        return CalendarView.class.getResource("calendar-view.css").toExternalForm();
     }
 
     private final ObjectProperty<YearMonth> yearMonth = new SimpleObjectProperty<>(this, "yearMonth", YearMonth.now());

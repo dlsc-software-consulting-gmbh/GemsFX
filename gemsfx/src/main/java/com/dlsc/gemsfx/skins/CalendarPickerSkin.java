@@ -49,7 +49,7 @@ public class CalendarPickerSkin extends CustomComboBoxSkinBase<CalendarPicker> {
 
     protected Node getPopupContent() {
         if (view == null) {
-            view = new CalendarView();
+            view = getSkinnable().getCalendarView();
             view.selectionModelProperty().addListener((obs, oldModel, newModel) -> bindSelectionModel(oldModel, newModel));
             bindSelectionModel(null, view.getSelectionModel());
         }

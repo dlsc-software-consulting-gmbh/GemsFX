@@ -1,6 +1,5 @@
 .year-month-view {
     -fx-border-color: #e0e0e0;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
 }
 
 .year-month-view > .container > .grid-pane {
