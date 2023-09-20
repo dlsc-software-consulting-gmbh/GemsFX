@@ -100,18 +100,24 @@ public class TimePickerPopup extends HBox {
 
         updateLists();
 
-        timePicker.showingProperty().addListener(it -> Platform.runLater(() -> {
-            updateListViewSelection();
-            hourListView.scrollTo(hourListView.getSelectionModel().getSelectedIndex());
-            minuteListView.scrollTo(minuteListView.getSelectionModel().getSelectedIndex());
-            secondListView.scrollTo(secondListView.getSelectionModel().getSelectedIndex());
-            millisecondListView.scrollTo(millisecondListView.getSelectionModel().getSelectedIndex());
-        }));
+        timePicker.showingProperty().addListener(it -> initializePopupView());
 
         updateTimeUnit();
         
         timePicker.formatProperty().addListener(it -> {
             updateTimeUnit();
+        });
+
+        initializePopupView();
+    }
+
+    private void initializePopupView() {
+        Platform.runLater(() -> {
+            updateListViewSelection();
+            hourListView.scrollTo(hourListView.getSelectionModel().getSelectedIndex());
+            minuteListView.scrollTo(minuteListView.getSelectionModel().getSelectedIndex());
+            secondListView.scrollTo(secondListView.getSelectionModel().getSelectedIndex());
+            millisecondListView.scrollTo(millisecondListView.getSelectionModel().getSelectedIndex());
         });
     }
 
