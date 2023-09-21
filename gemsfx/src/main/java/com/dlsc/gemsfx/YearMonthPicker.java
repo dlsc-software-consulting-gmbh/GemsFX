@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Objects;
 
 /**
  * A control for quickly selecting the month of a year. The format used for the
@@ -26,6 +27,8 @@ import java.time.format.DateTimeParseException;
 public class YearMonthPicker extends ComboBoxBase<YearMonth> {
 
     private final TextField editor = new TextField();
+
+    private YearMonthView yearMonthView;
 
     /**
      * Constructs a new picker.
@@ -75,7 +78,14 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
 
     @Override
     public String getUserAgentStylesheet() {
-        return YearMonthView.class.getResource("year-month-picker.css").toExternalForm();
+        return Objects.requireNonNull(YearMonthView.class.getResource("year-month-picker.css")).toExternalForm();
+    }
+
+    public YearMonthView getYearMonthView() {
+        if (yearMonthView == null) {
+            yearMonthView = new YearMonthView();
+        }
+        return yearMonthView;
     }
 
     /*

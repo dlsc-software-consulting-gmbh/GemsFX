@@ -39,7 +39,7 @@ public class YearMonthPickerSkin extends CustomComboBoxSkinBase<YearMonthPicker>
 
     protected Node getPopupContent() {
         if (view == null) {
-            view = new YearMonthView();
+            view = getSkinnable().getYearMonthView();
             view.valueProperty().bindBidirectional(getSkinnable().valueProperty());
             view.valueProperty().addListener((obs, oldValue, newValue) -> {
                 if (!Objects.equals(oldValue, newValue)) {

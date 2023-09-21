@@ -24,6 +24,8 @@ public class YearPicker extends ComboBoxBase<Year> {
     private final TextField editor = new TextField();
     private final NumberStringFilteredConverter converter = new NumberStringFilteredConverter();
 
+    private YearView yearView;
+
     public YearPicker() {
         getStyleClass().setAll("year-picker", "text-input");
 
@@ -71,6 +73,19 @@ public class YearPicker extends ComboBoxBase<Year> {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new YearPickerSkin(this);
+    }
+
+    /**
+     * Returns the view that is being used by the picker to let the user chose
+     * a year.
+     *
+     * @return the view showing the years
+     */
+    public YearView getYearView() {
+        if (yearView == null) {
+            yearView = new YearView();
+        }
+        return yearView;
     }
 
     @Override

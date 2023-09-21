@@ -40,7 +40,7 @@ public class YearPickerSkin extends CustomComboBoxSkinBase<YearPicker> {
     @Override
     protected Node getPopupContent() {
         if (yearView == null) {
-            yearView = new YearView();
+            yearView = getSkinnable().getYearView();
             yearView.valueProperty().bindBidirectional(getSkinnable().valueProperty());
             yearView.valueProperty().addListener((obs, oldValue, newValue) -> {
                 if (!Objects.equals(oldValue, newValue)) {
@@ -50,5 +50,4 @@ public class YearPickerSkin extends CustomComboBoxSkinBase<YearPicker> {
         }
         return yearView;
     }
-
 }
