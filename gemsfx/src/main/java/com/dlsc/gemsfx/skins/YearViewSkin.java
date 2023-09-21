@@ -3,11 +3,13 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.YearView;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 
@@ -45,6 +47,7 @@ public class YearViewSkin extends SkinBase<YearView> {
         leftArrowButton.setOnMouseClicked(evt -> {
             offset--;
             buildGrid();
+            evt.consume();
         });
 
         StackPane rightArrowButton = new StackPane(rightArrow);
@@ -52,9 +55,11 @@ public class YearViewSkin extends SkinBase<YearView> {
         rightArrowButton.setOnMouseClicked(evt -> {
             offset++;
             buildGrid();
+            evt.consume();
         });
 
         header = new HBox(leftArrowButton, yearRangeLabel, rightArrowButton);
+        header.addEventHandler(MouseEvent.MOUSE_CLICKED, Event::consume);
         header.getStyleClass().add("header");
         header.setViewOrder(Double.NEGATIVE_INFINITY);
         header.setFillHeight(true);

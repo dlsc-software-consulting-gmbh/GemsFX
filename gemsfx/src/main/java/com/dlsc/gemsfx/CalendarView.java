@@ -18,12 +18,7 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.CalendarViewSkin;
 import com.dlsc.gemsfx.skins.DateCellSkin;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -355,6 +350,44 @@ public class CalendarView extends Control {
         this.disablePreviousYearButton.set(disablePreviousYearButton);
     }
 
+    public final BooleanProperty disableMonthDropdownButton = new SimpleBooleanProperty(this, "disableMonthDropdownButton", false);
+
+    public final boolean isDisableMonthDropdownButton() {
+        return disableMonthDropdownButton.get();
+    }
+
+    /**
+     * A property to control whether the "show month view" button will be disabled or not.
+     *
+     * @return true if the button used for showing the month selection view should be disabled
+     */
+    public final BooleanProperty disableMonthDropdownButtonProperty() {
+        return disableMonthDropdownButton;
+    }
+
+    public final void setDisableMonthDropdownButton(boolean disableMonthDropdownButton) {
+        this.disableMonthDropdownButton.set(disableMonthDropdownButton);
+    }
+
+    public final BooleanProperty disableYearDropdownButton = new SimpleBooleanProperty(this, "disableYearDropdownButton", false);
+
+    public final boolean isDisableYearDropdownButton() {
+        return disableYearDropdownButton.get();
+    }
+
+    /**
+     * A property to control whether the "show year view" button will be disabled or not.
+     *
+     * @return true if the button used for showing the year selection view should be disabled
+     */
+    public final BooleanProperty disableYearDropdownButtonProperty() {
+        return disableYearDropdownButton;
+    }
+
+    public final void setDisableYearDropdownButton(boolean disableYearDropdownButton) {
+        this.disableYearDropdownButton.set(disableYearDropdownButton);
+    }
+
     /**
      * The base date cell implementation for month views.
      *
@@ -421,6 +454,48 @@ public class CalendarView extends Control {
         return cellFactoryProperty().get();
     }
 
+    private final BooleanProperty monthSelectionViewEnabled = new SimpleBooleanProperty(this, "monthSelectionViewEnabled", true);
+
+    public final boolean isMonthSelectionViewEnabled() {
+        return monthSelectionViewEnabled.get();
+    }
+
+    /**
+     * Determines whether the control offers the option to the user to pick a different
+     * month directly via a designated month selection view.
+     *
+     * @see YearMonthView
+     * @return true if the user can pick a month directly
+     */
+    public final BooleanProperty monthSelectionViewEnabledProperty() {
+        return monthSelectionViewEnabled;
+    }
+
+    private final BooleanProperty yearSelectionViewEnabled = new SimpleBooleanProperty(this, "yearSelectionViewEnabled", true);
+
+    public final boolean isYearSelectionViewEnabled() {
+        return yearSelectionViewEnabled.get();
+    }
+
+    /**
+     * Determines whether the control offers the option to the user to pick a different
+     * year directly via a designated year selection view.
+     *
+     * @see YearView
+     * @return true if the user can pick a month directly
+     */
+    public final BooleanProperty yearSelectionViewEnabledProperty() {
+        return yearSelectionViewEnabled;
+    }
+
+    public final void setYearSelectionViewEnabled(boolean yearSelectionViewEnabled) {
+        this.yearSelectionViewEnabled.set(yearSelectionViewEnabled);
+    }
+
+    public final void setMonthSelectionViewEnabled(boolean monthSelectionViewEnabled) {
+        this.monthSelectionViewEnabled.set(monthSelectionViewEnabled);
+    }
+
     private final BooleanProperty showMonth = new SimpleBooleanProperty(this, "showMonth", true);
 
     public boolean isShowMonth() {
@@ -452,6 +527,46 @@ public class CalendarView extends Control {
 
     public final void setShowYear(boolean showYear) {
         this.showYear.set(showYear);
+    }
+
+    private final BooleanProperty showMonthDropdown = new SimpleBooleanProperty(this, "showMonthDropdown", true);
+
+    public final boolean isShowMonthDropdown() {
+        return showMonthDropdown.get();
+    }
+
+    /**
+     * Show or hide a dropdown icon next to the label that displays
+     * the currently selected month.
+     *
+     * @return show / hide month dropdown
+     */
+    public final BooleanProperty showMonthDropdownProperty() {
+        return showMonthDropdown;
+    }
+
+    public final void setShowMonthDropdown(boolean showMonthDropdown) {
+        this.showMonthDropdown.set(showMonthDropdown);
+    }
+
+    private final BooleanProperty showYearDropdown = new SimpleBooleanProperty(this, "showYearDropdown", true);
+
+    public final boolean isShowYearDropdown() {
+        return showYearDropdown.get();
+    }
+
+    /**
+     * Show or hide a dropdown icon next to the label that displays
+     * the currently selected year.
+     *
+     * @return show / hide year dropdown
+     */
+    public final BooleanProperty showYearDropdownProperty() {
+        return showYearDropdown;
+    }
+
+    public final void setShowYearDropdown(boolean showYearDropdown) {
+        this.showYearDropdown.set(showYearDropdown);
     }
 
     private final BooleanProperty showYearSpinner = new SimpleBooleanProperty(this, "showYearSpinner", true);
@@ -553,6 +668,59 @@ public class CalendarView extends Control {
 
     public final void setSelectionModel(SelectionModel selectionModel) {
         this.selectionModel.set(selectionModel);
+    }
+
+    private final DoubleProperty weekNumberColumnWidth = new SimpleDoubleProperty(this, "weekNumberColumnWidth", 16);
+
+    public final double getWeekNumberColumnWidth() {
+        return weekNumberColumnWidth.get();
+    }
+
+    public final DoubleProperty weekNumberColumnWidthProperty() {
+        return weekNumberColumnWidth;
+    }
+
+    public final void setWeekNumberColumnWidth(double weekNumberColumnWidth) {
+        this.weekNumberColumnWidth.set(weekNumberColumnWidth);
+    }
+
+    /**
+     * Different layouts that can be used to position the month, the year, and
+     * the various navigation elements in the header of the view.
+     */
+    public enum HeaderLayout {
+
+        /**
+         * Centers the month and year in the middle. The previous / next month
+         * buttons will be on the left and right.
+         */
+        CENTER,
+
+        /**
+         * Positions the month and the year on the left side. The previous / next month
+         * buttons will both be on the right side.
+         */
+        LEFT,
+
+        /**
+         * Positions the month and the year on the right side. The previous / next month
+         * buttons will both be on the left side.
+         */
+        RIGHT
+    }
+
+    private final ObjectProperty<HeaderLayout> headerLayout = new SimpleObjectProperty<>(this, "headerLayout", HeaderLayout.RIGHT);
+
+    public final HeaderLayout getHeaderLayout() {
+        return headerLayout.get();
+    }
+
+    public final ObjectProperty<HeaderLayout> headerLayoutProperty() {
+        return headerLayout;
+    }
+
+    public final void setHeaderLayout(HeaderLayout headerLayout) {
+        this.headerLayout.set(headerLayout);
     }
 
     public static class SelectionModel {

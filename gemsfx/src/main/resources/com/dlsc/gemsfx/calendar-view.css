@@ -37,32 +37,58 @@
     -fx-background-color: -fx-background;
     -fx-padding: 5px;
     -fx-alignment: center;
+    -fx-spacing: 5px;
 }
 
-.calendar-view > .stack-pane > .container > .header > .month-label {
+.calendar-view > .stack-pane > .container > .header > .date-label {
     -fx-font-weight: bold;
+    -fx-content-display: right;
 }
 
-.calendar-view > .stack-pane > .container > .header > .year-label {
-    -fx-padding: 0px 5px 0px 5px;
+.calendar-view > .stack-pane > .container > .header > .date-label.dropdown:hover {
+    -fx-background-color: #eeeeee;
+    -fx-background-insets: 0px -2px;
+    -fx-background-radius: 2px;
 }
 
 .calendar-view > .stack-pane > .container > .header > .arrow-button {
     -fx-padding: 2px;
 }
 
-.calendar-view > .stack-pane > .container > .header > .arrow-button .ikonli-font-icon {
-    -fx-icon-color: -fx-text-background-color;
-    -fx-icon-size: 20px;
+.calendar-view > .stack-pane > .container > .header > .arrow-button:hover {
+    -fx-background-color: #eeeeee;
+    -fx-background-insets: 0px -2px;
+    -fx-background-radius: 2px;
+}
+
+.calendar-view > .stack-pane > .container > .header > .dropdown-button {
+    -fx-padding: 2px 2px 2px 5px;
+}
+
+.calendar-view > .stack-pane > .container > .header > .date-label > .dropdown-button > .arrow {
+    -fx-background-color: -fx-mark-color;
+    -fx-background-insets: 0;
+    -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
+    -fx-shape: "M 0 0 h 9 l -4.5 5 z";
+    -fx-scale-shape: false;
 }
 
 .calendar-view > .stack-pane > .container > .header > .year-spinner {
     -fx-alignment: center;
+    -fx-spacing: 2px;
 }
 
 .calendar-view > .stack-pane > .container > .header > .year-spinner > .decrement-year-button,
 .calendar-view > .stack-pane > .container > .header > .year-spinner > .increment-year-button {
-    -fx-padding: 2px; /* 5 8 3 8 */
+    -fx-padding: 0px; /* 5 8 3 8 */
+    -fx-cursor: hand;
+}
+
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .decrement-year-button:hover,
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .increment-year-button:hover {
+    -fx-background-color: #eeeeee;
+    -fx-background-insets: -2px;
+    -fx-background-radius: 2px;
 }
 
 .calendar-view > .stack-pane > .container > .header > .year-spinner > .decrement-year-button:disabled,
@@ -123,6 +149,11 @@
     -fx-scale-shape: true;
 }
 
+.calendar-view.show-grid-lines > .stack-pane > .container > .weekday-grid-pane,
+.calendar-view.show-grid-lines > .stack-pane > .container > .body-grid-pane {
+    -fx-grid-lines-visible: true;
+}
+
 .calendar-view > .stack-pane > .container > .weekday-grid-pane {
     -fx-background: -fx-control-inner-background;
     -fx-background-color: -fx-background;
@@ -162,9 +193,8 @@
 .calendar-view > .stack-pane > .container > .body-grid-pane > .week-number-label {
     -fx-font-size: 10px;
     -fx-text-fill: -fx-accent;
-    -fx-padding: 0.0 2.0 0.0 0.0;
-    -fx-min-width: 2.5em;
-    -fx-min-height: 2.5em;
+    -fx-alignment: top-right;
+    -fx-padding: 0px 2px 0px 0px;
 }
 
 .calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell {
