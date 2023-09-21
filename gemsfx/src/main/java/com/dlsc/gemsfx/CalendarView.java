@@ -686,7 +686,9 @@ public class CalendarView extends Control {
 
     /**
      * Different layouts that can be used to position the month, the year, and
-     * the various navigation elements in the header of the view.
+     * the various navigation elements in the header of the view. We are intentionally
+     * not using the {@link javafx.geometry.HPos} enumeration object as we have good
+     * reason to believe that additional layouts will be added in the future.
      */
     public enum HeaderLayout {
 
@@ -715,6 +717,12 @@ public class CalendarView extends Control {
         return headerLayout.get();
     }
 
+    /**
+     * The header layout value determines how the information and the navigation elements
+     * in the header will be laid out.
+     *
+     * @return the currently used layout used for the header
+     */
     public final ObjectProperty<HeaderLayout> headerLayoutProperty() {
         return headerLayout;
     }
