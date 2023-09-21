@@ -18,6 +18,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 
 import java.time.Month;
 import java.time.YearMonth;
@@ -106,6 +107,11 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
         container.getStyleClass().add("container");
 
         header.setViewOrder(Double.NEGATIVE_INFINITY);
+
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(container.widthProperty());
+        clip.heightProperty().bind(container.heightProperty());
+        container.setClip(clip);
 
         getChildren().add(container);
     }

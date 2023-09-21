@@ -23,7 +23,7 @@ public class YearMonthViewApp extends Application {
         vBox.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(vBox);
-        CSSFX.start();
+        CSSFX.start(scene);
 
         stage.setTitle("YearMonthView");
         stage.setScene(scene);

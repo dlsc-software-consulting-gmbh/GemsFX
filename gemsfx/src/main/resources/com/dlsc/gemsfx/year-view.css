@@ -39,25 +39,14 @@
 }
 
 .year-view > .header > .arrow-button {
-    -fx-padding: 5px;
     -fx-cursor: hand;
-}
-
-.year-view > .header > .arrow-button:focused {
+    -fx-padding: 0.333333em 0.166667em;
 }
 
 .year-view > .header > .arrow-button:hover {
-    -fx-color: -fx-hover-base;
-}
-
-.year-view > .header > .arrow-button:armed {
-    -fx-color: -fx-pressed-base;
-}
-
-.year-view > .header > .left-button {
-}
-
-.year-view > .header > .right-button {
+    -fx-background-color: #eeeeee;
+    -fx-background-insets: 0px -2px;
+    -fx-background-radius: 2px;
 }
 
 .year-view > .header > .arrow-button > .left-arrow,
@@ -68,23 +57,17 @@
     -fx-effect: dropshadow(two-pass-box, -fx-shadow-highlight-color, 1, 0.0, 0, 1.4);
 }
 
-.year-view > .header > .arrow-button:hover > .left-arrow,
-.year-view > .header > .arrow-button:hover > .right-arrow {
-    -fx-background-color: -fx-mark-highlight-color, derive(-fx-base, -50%);
-}
-
-.year-view > .header > .arrow-button:pressed > .left-arrow,
-.year-view > .header > .arrow-button:pressed > .right-arrow {
-    -fx-background-color: -fx-mark-highlight-color, derive(-fx-base, -55%);
-}
-
 .year-view > .header > .arrow-button > .left-arrow {
+    -fx-background-color: derive(-fx-base, -45%);
+    -fx-background-insets: 0;
     -fx-padding: 0.333333em 0.25em 0.333333em 0.166667em; /* 4 3 4 2 */
     -fx-shape: "M5.997,5.072L5.995,6.501l-2.998-4l2.998-4l0.002,1.43l-1.976,2.57L5.997,5.072z";
     -fx-scale-shape: true;
 }
 
 .year-view > .header > .arrow-button > .right-arrow {
+    -fx-background-color: derive(-fx-base, -45%);
+    -fx-background-insets: 0;
     -fx-padding: 0.333333em 0.25em 0.333333em 0.166667em; /* 4 3 4 2 */
     -fx-shape: "M2.998-0.07L3-1.499l2.998,4L3,6.501l-0.002-1.43l1.976-2.57L2.998-0.07z";
     -fx-scale-shape: true;

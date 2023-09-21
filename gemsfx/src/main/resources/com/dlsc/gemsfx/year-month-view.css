@@ -30,10 +30,11 @@
 
 .year-month-view > .container > .header {
     -fx-padding: 0.588883em 0.5em 0.666667em 0.5em; /* 7 6 8 6 */
-    -fx-background-color: derive(-fx-box-border,30%), linear-gradient(to bottom, derive(-fx-base,-3%), derive(-fx-base,5%) 50%, derive(-fx-base,-3%));
+    -fx-background-color: white;
     -fx-background-insets: 0 0 0 0, 0 0 1 0;
     -fx-alignment: center-left;
     -fx-fill-height: false;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 10, 0.12, -1, 2);
 }
 
 .year-month-view > .container > .header > .year-label {
@@ -41,32 +42,14 @@
 }
 
 .year-month-view > .container > .header > .arrow-button {
-    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
-    -fx-background-insets: 0, 1, 2;
-    -fx-color: transparent;
-    -fx-background-radius: 0;
-}
-
-.year-month-view > .container > .header > .arrow-button:focused {
-    -fx-background-color: -fx-focus-color, -fx-inner-border, -fx-body-color, -fx-faint-focus-color, -fx-body-color;
-    -fx-color: -fx-hover-base;
-    -fx-background-insets: -0.2, 1, 2, -1.4, 2.6;
+    -fx-cursor: hand;
+    -fx-padding: 0.333333em 0.166667em;
 }
 
 .year-month-view > .container > .header > .arrow-button:hover {
-    -fx-color: -fx-hover-base;
-}
-
-.year-month-view > .container > .header > .arrow-button:armed {
-    -fx-color: -fx-pressed-base;
-}
-
-.year-month-view > .container > .header > .left-button {
-    -fx-padding: 0 0.333333em 0 0.25em; /* 0 4 0 3 */
-}
-
-.year-month-view > .container > .header > .right-button {
-    -fx-padding: 0 0.25em 0 0.333333em; /* 0 3 0 4 */
+    -fx-background-color: #eeeeee;
+    -fx-background-insets: 0px -2px;
+    -fx-background-radius: 2px;
 }
 
 .year-month-view > .container > .header > .arrow-button > .left-arrow,
@@ -77,23 +60,17 @@
     -fx-effect: dropshadow(two-pass-box, -fx-shadow-highlight-color, 1, 0.0, 0, 1.4);
 }
 
-.year-month-view > .container > .header > .arrow-button:hover > .left-arrow,
-.year-month-view > .container > .header > .arrow-button:hover > .right-arrow {
-    -fx-background-color: -fx-mark-highlight-color, derive(-fx-base, -50%);
-}
-
-.year-month-view > .container > .header > .arrow-button:pressed > .left-arrow,
-.year-month-view > .container > .header > .arrow-button:pressed > .right-arrow {
-    -fx-background-color: -fx-mark-highlight-color, derive(-fx-base, -55%);
-}
-
 .year-month-view > .container > .header > .arrow-button > .left-arrow {
+    -fx-background-color: derive(-fx-base, -45%);
+    -fx-background-insets: 0;
     -fx-padding: 0.333333em 0.25em 0.333333em 0.166667em; /* 4 3 4 2 */
     -fx-shape: "M5.997,5.072L5.995,6.501l-2.998-4l2.998-4l0.002,1.43l-1.976,2.57L5.997,5.072z";
     -fx-scale-shape: true;
 }
 
 .year-month-view > .container > .header > .arrow-button > .right-arrow {
+    -fx-background-color: derive(-fx-base, -45%);
+    -fx-background-insets: 0;
     -fx-padding: 0.333333em 0.25em 0.333333em 0.166667em; /* 4 3 4 2 */
     -fx-shape: "M2.998-0.07L3-1.499l2.998,4L3,6.501l-0.002-1.43l1.976-2.57L2.998-0.07z";
     -fx-scale-shape: true;
