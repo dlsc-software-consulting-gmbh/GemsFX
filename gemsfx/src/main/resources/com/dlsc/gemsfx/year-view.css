@@ -35,6 +35,7 @@
 }
 
 .year-view > .header > .year-range-label {
+    -fx-font-size: 1.1em;
     -fx-alignment: center;
 }
 

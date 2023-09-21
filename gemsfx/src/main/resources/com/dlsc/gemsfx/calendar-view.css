@@ -43,6 +43,7 @@
 .calendar-view > .stack-pane > .container > .header > .date-label {
     -fx-font-weight: bold;
     -fx-content-display: right;
+    -fx-font-size: 1.1em;
 }
 
 .calendar-view > .stack-pane > .container > .header > .date-label.dropdown:hover {

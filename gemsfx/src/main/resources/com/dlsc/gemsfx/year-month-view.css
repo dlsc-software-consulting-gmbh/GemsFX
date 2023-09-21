@@ -38,6 +38,7 @@
 }
 
 .year-month-view > .container > .header > .year-label {
+    -fx-font-size: 1.1em;
     -fx-alignment: center;
 }
 
