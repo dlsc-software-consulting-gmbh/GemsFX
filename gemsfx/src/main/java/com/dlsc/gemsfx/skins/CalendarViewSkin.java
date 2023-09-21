@@ -34,6 +34,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.ColumnConstraints;
@@ -224,16 +226,19 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         container = new VBox(header, weekdayGridPane, bodyGridPane, footer);
         container.getStyleClass().add("container");
 
-        yearMonthView = new YearMonthView();
+        yearMonthView = view.getYearMonthView();
         yearMonthView.getStyleClass().add("inner-year-month-view");
         yearMonthView.setShowYear(false);
         yearMonthView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> viewMode.set(ViewMode.DATE));
         yearMonthView.addEventHandler(TouchEvent.TOUCH_PRESSED, evt -> viewMode.set(ViewMode.DATE));
 
-        yearView = new YearView();
+        view.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+            if (evt.getCode().equals(KeyCode.ESCAPE)) {
+                viewMode.set(ViewMode.DATE);
+            }
+        });
 
-        viewMode.addListener(obs -> updateViewMode());
-        updateViewMode();
+        yearView = view.getYearView();
 
         buildView();
 
@@ -255,6 +260,9 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         stackPane.getStyleClass().add("stack-pane");
         getChildren().setAll(stackPane);
         updateView();
+
+        viewMode.addListener(obs -> updateViewMode());
+        updateViewMode();
     }
 
     private void bindSelectionModel(SelectionModel model) {

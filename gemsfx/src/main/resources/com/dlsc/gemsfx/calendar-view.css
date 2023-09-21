@@ -17,6 +17,10 @@
     -fx-horizontal-grid-gap: 0px;
 }
 
+.calendar-view:focused {
+    -fx-background-color: -fx-accent, -fx-background;
+}
+
 .calendar-view > .container {
     -fx-alignment: center;
     -fx-fill-width: true;
@@ -216,6 +220,5 @@
 }
 
 .calendar-view > .stack-pane > .year-month-view {
-    -fx-border-color: red;
 }
 

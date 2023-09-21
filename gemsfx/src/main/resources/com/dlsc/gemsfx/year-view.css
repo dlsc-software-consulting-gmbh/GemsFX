@@ -1,6 +1,9 @@
 .year-view {
     -fx-border-color: #e0e0e0;
-    -fx-pref-width: 240px;
+}
+
+.year-view:focused {
+    -fx-border-color: -fx-accent;
 }
 
 .year-view > .grid-pane {
@@ -11,27 +14,24 @@
     -fx-padding: 10px;
 }
 
-.year-view > .grid-pane > .year {
-    -fx-padding: 7px;
+.year-view > .grid-pane > .year-box {
     -fx-cursor: hand;
+    -fx-padding: 5px 10px;
 }
 
-.year-view > .grid-pane > .year.selected {
-    -fx-background: -fx-accent;
-    -fx-background-color: -fx-background;
-}
-
-.year-view > .grid-pane > .year.current {
-    -fx-border-color: -fx-accent;
-    -fx-border-width: 1px;
+.year-view > .grid-pane > .year-box > .selection-indicator {
+    -fx-pref-height: 2px;
+    -fx-background-color: -fx-text-background-color;
+    -fx-background-insets: 0px -2px 0px -2px;
 }
 
 .year-view > .header {
     -fx-padding: 0.588883em 0.5em 0.666667em 0.5em; /* 7 6 8 6 */
-    -fx-background-color: derive(-fx-box-border,30%), linear-gradient(to bottom, derive(-fx-base,-3%), derive(-fx-base,5%) 50%, derive(-fx-base,-3%));
+    -fx-background-color: white;
     -fx-background-insets: 0 0 0 0, 0 0 1 0;
     -fx-alignment: center-left;
     -fx-fill-height: false;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 10, 0.12, -1, 2);
 }
 
 .year-view > .header > .year-range-label {
@@ -39,16 +39,11 @@
 }
 
 .year-view > .header > .arrow-button {
-    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
-    -fx-background-insets: 0, 1, 2;
-    -fx-color: transparent;
-    -fx-background-radius: 0;
+    -fx-padding: 5px;
+    -fx-cursor: hand;
 }
 
 .year-view > .header > .arrow-button:focused {
-    -fx-background-color: -fx-focus-color, -fx-inner-border, -fx-body-color, -fx-faint-focus-color, -fx-body-color;
-    -fx-color: -fx-hover-base;
-    -fx-background-insets: -0.2, 1, 2, -1.4, 2.6;
 }
 
 .year-view > .header > .arrow-button:hover {
@@ -60,11 +55,9 @@
 }
 
 .year-view > .header > .left-button {
-    -fx-padding: 0 0.333333em 0 0.25em; /* 0 4 0 3 */
 }
 
 .year-view > .header > .right-button {
-    -fx-padding: 0 0.25em 0 0.333333em; /* 0 3 0 4 */
 }
 
 .year-view > .header > .arrow-button > .left-arrow,

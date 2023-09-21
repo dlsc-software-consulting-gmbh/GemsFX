@@ -30,6 +30,8 @@ import javafx.collections.ObservableSet;
 import javafx.scene.control.Cell;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
 
@@ -66,11 +68,20 @@ import static javafx.geometry.Pos.CENTER;
  */
 public class CalendarView extends Control {
 
+    private YearMonthView yearMonthView;
+
+    private YearView yearView;
+
     /**
      * Constructs a new view.
      */
     public CalendarView() {
         getStyleClass().add("calendar-view");
+
+        addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> requestFocus());
+        addEventFilter(TouchEvent.TOUCH_PRESSED, evt -> requestFocus());
+
+        setFocusTraversable(true);
         setCellFactory(view -> new DateCell());
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         // have to add stylesheet like this or the overridden styles for the inner controls do not work
@@ -80,6 +91,32 @@ public class CalendarView extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new CalendarViewSkin(this);
+    }
+
+    /**
+     * Returns the view used to display a month selection to the user. Applications
+     * can choose to override this method and return their own custom view.
+     *
+     * @return the view used for showing and selecting a month
+     */
+    public YearMonthView getYearMonthView() {
+        if (yearMonthView == null) {
+            yearMonthView = new YearMonthView();
+        }
+        return yearMonthView;
+    }
+
+    /**
+     * Returns the view used to display a year selection to the user. Applications
+     * can choose to override this method and return their own custom view.
+     *
+     * @return the view used for showing and selecting a year
+     */
+    public YearView getYearView() {
+        if (yearView == null) {
+            yearView = new YearView();
+        }
+        return yearView;
     }
 
     private final ObjectProperty<YearMonth> yearMonth = new SimpleObjectProperty<>(this, "yearMonth", YearMonth.now());

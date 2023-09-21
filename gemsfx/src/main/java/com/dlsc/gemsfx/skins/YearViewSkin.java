@@ -1,23 +1,21 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.YearView;
+import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
 
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.Optional;
 
 public class YearViewSkin extends SkinBase<YearView> {
-
-    private static final int ROWS = 5;
-    private static final int COLUMNS = 4;
 
     private final Label yearRangeLabel;
     private final HBox header;
@@ -34,12 +32,15 @@ public class YearViewSkin extends SkinBase<YearView> {
         HBox.setHgrow(yearRangeLabel, Priority.ALWAYS);
 
         Region leftArrow = new Region();
+        leftArrow.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         leftArrow.getStyleClass().addAll("arrow", "left-arrow");
 
         Region rightArrow = new Region();
+        rightArrow.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         rightArrow.getStyleClass().addAll("arrow", "right-arrow");
 
         StackPane leftArrowButton = new StackPane(leftArrow);
+        leftArrowButton.setMaxHeight(Double.MAX_VALUE);
         leftArrowButton.getStyleClass().addAll("arrow-button", "left-button");
         leftArrowButton.setOnMouseClicked(evt -> {
             offset--;
@@ -56,23 +57,36 @@ public class YearViewSkin extends SkinBase<YearView> {
         header = new HBox(leftArrowButton, yearRangeLabel, rightArrowButton);
         header.getStyleClass().add("header");
         header.setViewOrder(Double.NEGATIVE_INFINITY);
-
-        ColumnConstraints col1 = new ColumnConstraints();
-        col1.setPercentWidth(25);
-        ColumnConstraints col2 = new ColumnConstraints();
-        col2.setPercentWidth(25);
-        ColumnConstraints col3 = new ColumnConstraints();
-        col3.setPercentWidth(25);
-        ColumnConstraints col4 = new ColumnConstraints();
-        col4.setPercentWidth(25);
+        header.setFillHeight(true);
 
         gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-pane");
-        gridPane.getColumnConstraints().addAll(col1, col2, col3, col4);
+
+        for (int i = 0; i < 4; i++) {
+            ColumnConstraints col1 = new ColumnConstraints();
+            col1.setPercentWidth(25);
+            gridPane.getColumnConstraints().add(col1);
+        }
+
+        int numberOfRows = 5;
+        for (int i = 0; i < numberOfRows; i++) {
+            RowConstraints row = new RowConstraints();
+            row.setPercentHeight(100d / numberOfRows);
+            gridPane.getRowConstraints().add(row);
+        }
 
         getChildren().addAll(header, gridPane);
 
-        yearView.valueProperty().addListener(obs -> buildGrid());
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(yearView.widthProperty());
+        clip.heightProperty().bind(yearView.heightProperty());
+        yearView.setClip(clip);
+
+        InvalidationListener buildGridListener = obs -> buildGrid();
+        yearView.valueProperty().addListener(buildGridListener);
+        yearView.rowsProperty().addListener(buildGridListener);
+        yearView.colsProperty().addListener(buildGridListener);
+
         buildGrid();
     }
 
@@ -84,40 +98,62 @@ public class YearViewSkin extends SkinBase<YearView> {
     }
 
     private void buildGrid() {
-        final int visibleYears = ROWS * COLUMNS;
+        YearView yearView = getSkinnable();
 
-        Year selectedYear = getSkinnable().getValue();
+        int rows = yearView.getRows();
+        int cols = yearView.getCols();
+
+        final int visibleYears = rows * cols;
+
+        Year selectedYear = yearView.getValue();
         int currentYear = LocalDate.now().getYear();
         int firstYear = ((Optional.ofNullable(selectedYear).map(Year::getValue).orElse(currentYear) / visibleYears) * visibleYears) + (offset * visibleYears);
 
         gridPane.getChildren().clear();
         yearRangeLabel.setText(firstYear + "-" + (firstYear + visibleYears - 1));
 
-        for (int row = 0; row < ROWS; row++) {
-            for (int column = 0; column < COLUMNS; column++) {
+        for (int row = 0; row < rows; row++) {
+            for (int column = 0; column < cols; column++) {
                 final int finalYear = firstYear;
 
-                Label yearLabel = new Label();
-                yearLabel.getStyleClass().add("year");
-                yearLabel.setText(String.valueOf(firstYear));
-                yearLabel.setOnMouseClicked(evt -> {
+                Node yearNode = createYearNode(finalYear);
+
+                yearNode.setOnMouseClicked(evt -> {
                     offset = 0;
-                    getSkinnable().setValue(Year.of(finalYear));
+                    yearView.setValue(Year.of(finalYear));
                 });
 
                 if (selectedYear != null && firstYear == selectedYear.getValue()) {
-                    yearLabel.getStyleClass().add("selected");
+                    yearNode.getStyleClass().add("selected");
                 }
 
                 if (firstYear == currentYear) {
-                    yearLabel.getStyleClass().add("current");
+                    yearNode.getStyleClass().add("current");
                 }
 
-                gridPane.add(yearLabel, column, row);
+                gridPane.add(yearNode, column, row);
                 firstYear++;
             }
         }
+    }
 
+    private Node createYearNode(int year) {
+        Label yearLabel = new Label(Integer.toString(year));
+        yearLabel.setMinWidth(Region.USE_PREF_SIZE);
+        yearLabel.getStyleClass().add("year-label");
+
+        YearView view = getSkinnable();
+
+        Region selectionIndicator = new Region();
+        selectionIndicator.visibleProperty().bind(Bindings.createBooleanBinding(() -> view.getYear() == year, view.valueProperty()));
+        selectionIndicator.getStyleClass().add("selection-indicator");
+
+        VBox box = new VBox(yearLabel, selectionIndicator);
+        box.setMaxWidth(Region.USE_PREF_SIZE);
+        box.setAlignment(Pos.CENTER);
+        box.getStyleClass().add("year-box");
+
+        return box;
     }
 
 }

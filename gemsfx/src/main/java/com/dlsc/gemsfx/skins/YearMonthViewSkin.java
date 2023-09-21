@@ -95,12 +95,13 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
 
         gridPane.getColumnConstraints().setAll(col1, col2, col3);
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             RowConstraints row = new RowConstraints();
             row.setVgrow(Priority.ALWAYS);
             gridPane.getRowConstraints().add(row);
         }
 
+        VBox.setVgrow(gridPane, Priority.ALWAYS);
         VBox container = new VBox(header, gridPane);
         container.getStyleClass().add("container");
 
@@ -110,7 +111,7 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
     }
 
     private Node createMonth(Month month) {
-        Label monthLabel = new Label(month.getDisplayName(TextStyle.FULL, Locale.getDefault()).toUpperCase());
+        Label monthLabel = new Label(month.getDisplayName(TextStyle.FULL, Locale.getDefault()));
         monthLabel.getStyleClass().add("month-label");
         monthLabel.setMinWidth(Region.USE_PREF_SIZE);
         monthLabel.setMaxWidth(Region.USE_PREF_SIZE);
@@ -128,16 +129,6 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
         box.setOnMouseClicked(evt -> view.setValue(YearMonth.of(year.get(), month.getValue())));
 
         GridPane.setMargin(box, new Insets(10, 30, 10, 30));
-
-        // extra padding for the months at the top of the view
-        if (month.equals(Month.JANUARY) || month.equals(Month.FEBRUARY)) {
-            GridPane.setMargin(box, new Insets(30, 30, 10, 30));
-        }
-
-        // extra padding for the months at the bottom of the view
-        if (month.equals(Month.NOVEMBER) || month.equals(Month.DECEMBER)) {
-            GridPane.setMargin(box, new Insets(10, 30, 30, 30));
-        }
 
         return box;
     }
