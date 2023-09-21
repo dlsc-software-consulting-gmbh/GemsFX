@@ -22,8 +22,6 @@ import javafx.scene.shape.Rectangle;
 
 import java.time.Month;
 import java.time.YearMonth;
-import java.time.format.TextStyle;
-import java.util.Locale;
 
 public class YearMonthViewSkin extends SkinBase<YearMonthView> {
 
@@ -117,7 +115,7 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
     }
 
     private Node createMonth(Month month) {
-        Label monthLabel = new Label(month.getDisplayName(TextStyle.FULL, Locale.getDefault()));
+        Label monthLabel = new Label(getSkinnable().getConverter().toString(month));
         monthLabel.getStyleClass().add("month-label");
         monthLabel.setMinWidth(Region.USE_PREF_SIZE);
         monthLabel.setMaxWidth(Region.USE_PREF_SIZE);

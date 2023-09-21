@@ -7,8 +7,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.util.StringConverter;
 
+import java.time.Month;
 import java.time.YearMonth;
+import java.time.format.TextStyle;
+import java.util.Locale;
 import java.util.Objects;
 
 public class YearMonthView extends Control {
@@ -61,5 +65,32 @@ public class YearMonthView extends Control {
 
     public final void setValue(YearMonth value) {
         this.value.set(value);
+    }
+
+    private final ObjectProperty<StringConverter<Month>> converter = new SimpleObjectProperty<>(this, "converter", new StringConverter<Month>() {
+        @Override
+        public String toString(Month month) {
+            if (month != null) {
+                return month.getDisplayName(TextStyle.FULL, Locale.getDefault());
+            }
+            return null;
+        }
+
+        @Override
+        public Month fromString(String s) {
+            return null;
+        }
+    });
+
+    public final StringConverter<Month> getConverter() {
+        return converter.get();
+    }
+
+    public final ObjectProperty<StringConverter<Month>> converterProperty() {
+        return converter;
+    }
+
+    public final void setConverter(StringConverter<Month> converter) {
+        this.converter.set(converter);
     }
 }
