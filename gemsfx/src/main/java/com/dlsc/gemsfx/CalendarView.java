@@ -711,7 +711,7 @@ public class CalendarView extends Control {
         RIGHT
     }
 
-    private final ObjectProperty<HeaderLayout> headerLayout = new SimpleObjectProperty<>(this, "headerLayout", HeaderLayout.RIGHT);
+    private final ObjectProperty<HeaderLayout> headerLayout = new SimpleObjectProperty<>(this, "headerLayout", HeaderLayout.CENTER);
 
     public final HeaderLayout getHeaderLayout() {
         return headerLayout.get();
