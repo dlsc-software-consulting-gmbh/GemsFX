@@ -256,7 +256,8 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         view.showTodayProperty().addListener(updateViewListener);
 
-        Button todayButton = new Button("Today");
+        Button todayButton = new Button();
+        todayButton.textProperty().bind(view.todayTextProperty());
         todayButton.getStyleClass().add("today-button");
         todayButton.setOnAction(evt -> view.setYearMonth(YearMonth.from(view.getToday())));
         todayButton.setMaxWidth(Double.MAX_VALUE);
@@ -285,7 +286,10 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         view.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
             if (evt.getCode().equals(KeyCode.ESCAPE)) {
-                viewMode.set(ViewMode.DATE);
+                if (!evt.isConsumed() && !viewMode.get().equals(ViewMode.DATE)) {
+                    viewMode.set(ViewMode.DATE);
+                    evt.consume();
+                }
             }
         });
 

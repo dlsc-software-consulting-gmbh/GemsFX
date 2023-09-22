@@ -731,6 +731,26 @@ public class CalendarView extends Control {
         this.headerLayout.set(headerLayout);
     }
 
+    private final StringProperty todayText = new SimpleStringProperty(this, "todayText", "Today");
+
+    public final String getTodayText() {
+        return todayText.get();
+    }
+
+    /**
+     * The text that will be shown on the button used for going to today's
+     * date.
+     *
+     * @return the today button text
+     */
+    public final StringProperty todayTextProperty() {
+        return todayText;
+    }
+
+    public final void setTodayText(String todayText) {
+        this.todayText.set(todayText);
+    }
+
     public static class SelectionModel {
 
         public enum SelectionMode {
