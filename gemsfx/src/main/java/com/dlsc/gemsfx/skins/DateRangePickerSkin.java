@@ -39,6 +39,11 @@ public class DateRangePickerSkin extends CustomComboBoxSkinBase<DateRangePicker>
     public DateRangePickerSkin(DateRangePicker picker) {
         super(picker);
 
+        view = picker.getDateRangeView();
+        view.setFocusTraversable(false); // keep the picker focused / blue border
+        view.valueProperty().bindBidirectional(getSkinnable().valueProperty());
+        view.setOnClose(this::hide);
+
         picker.setOnMouseClicked(evt -> picker.show());
         picker.setOnTouchPressed(evt -> picker.show());
 
@@ -63,13 +68,6 @@ public class DateRangePickerSkin extends CustomComboBoxSkinBase<DateRangePicker>
     }
 
     protected Node getPopupContent() {
-        if (view == null) {
-            view = getSkinnable().getDateRangeView();
-            view.setFocusTraversable(false); // keep the picker focused / blue border
-            view.valueProperty().bindBidirectional(getSkinnable().valueProperty());
-            view.setOnClose(this::hide);
-        }
-
         return view;
     }
 
