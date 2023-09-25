@@ -1,50 +1,63 @@
 .date-range-picker {
-    -fx-padding: 10 20 10 20;
-    -fx-border-color: #e0e0e0;
-    -fx-effect: -shadow;
-    -fx-background-color: -white-three;
+    -fx-padding: 0.333333em 0em 0.333333em 0.666667em;
 }
 
-.date-range-picker:hover {
-    -fx-background-color: -white-three;
+.date-range-picker .popup {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
 }
 
 .date-range-picker .inner-range-container {
-    -fx-spacing: 2;
+    -fx-spacing: 0.166667em;
 }
 
 .date-range-picker .inner-range-container.small {
-    -fx-spacing: 10px;
+    -fx-spacing: 0.833333em;
     -fx-alignment: center-left;
 }
 
-.date-range-picker .inner-range-container.small .divider {
-    -fx-pref-width: 1px;
-    -fx-background-color: #e0e0e0;
+.date-range-picker > .outer-range-container .divider {
+    -fx-pref-width: 0.083333em;
+    -fx-background-color: grey;
 }
 
-.date-range-picker .outer-range-container {
-    -fx-spacing: 20;
+.date-range-picker > .outer-range-container {
+    -fx-spacing: 1.666666em;
     -fx-alignment: center-left;
 }
 
-.date-range-picker .ikonli-font-icon {
-    -fx-icon-color: -charcoal-grey-two;
-    -fx-icon-size: 16px;
+.date-range-picker > .outer-range-container > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+    -fx-background-radius: 0 3 3 0, 0 2 2 0, 0 1 1 0;
+    -fx-padding: 0.5em 0.667em 0.5em 0.833333em; /* 6 8 6 10 */
+    -fx-text-fill: -fx-text-base-color;
+    -fx-alignment: CENTER;
+    -fx-content-display: LEFT;
 }
 
-.date-range-picker .title-label {
-    -fx-text-fill: -charcoal-grey-two;
-    -fx-font-family: "Rubik Medium";
-    -fx-font-size: 16px;
+.date-range-picker > .outer-range-container > .arrow-button > .arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 0 0 -1 0, 0;
+    -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
+    -fx-shape: "M 0 0 h 7 l -3.5 4 z";
+    -fx-scale-shape: true;
 }
 
-.date-range-picker .range-label {
-    -fx-text-fill: -steel;
-    -fx-font-size: 14px;
+.date-range-picker > .outer-range-container > .inner-range-container > .range-label > .icon-button {
+    -fx-padding: 0em; /* 6 8 6 10 */
 }
 
-.date-range-picker .range-label .ikonli-font-icon {
-    -fx-icon-color: -steel;
-    -fx-icon-size: 12px;
+.date-range-picker > .outer-range-container > .inner-range-container > .range-label > .icon-button > .icon {
+    -fx-shape: "M0,0v9h9V0H0z M2,8H1V7h1V8z M2,6H1V5h1V6z M2,4H1V3h1V4z M4,8H3V7h1V8z M4,6H3V5h1V6z M4,4H3V3h1V4z M6,8H5V7h1V8z M6,6H5 V5h1V6z M6,4H5V3h1V4z M8,8H7V7h1V8z M8,6H7V5h1V6z M8,4H7V3h1V4z";
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.416667em 0.416667em 0.333333em 0.333333em; /* 5 5 4 4 */
+    -fx-scale-shape: false;
+}
+
+.date-range-picker > .outer-range-container > .inner-range-container > .title-label {
+    -fx-font-weight: bold;
+}
+
+.date-range-picker > .outer-range-container > .inner-range-container > .range-label {
 }

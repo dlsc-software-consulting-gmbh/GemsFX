@@ -13,12 +13,8 @@
     -fx-padding: 1px;
 
     /* global variables for the two grid panes */
-    -fx-vertical-grid-gap: 0px;
-    -fx-horizontal-grid-gap: 0px;
-}
-
-.calendar-view:focused {
-    -fx-background-color: -fx-accent, -fx-background;
+    -fx-vertical-grid-gap: 1px;
+    -fx-horizontal-grid-gap: 1px;
 }
 
 .calendar-view > .container {
@@ -245,7 +241,3 @@
 .calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected.range-date {
     -fx-background: derive(-fx-accent, +80%);
 }
-
-.calendar-view > .stack-pane > .year-month-view {
-}
-

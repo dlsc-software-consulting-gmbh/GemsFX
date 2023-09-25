@@ -24,24 +24,24 @@ public class CalendarPickerSkin extends CustomComboBoxSkinBase<CalendarPicker> {
         super(picker);
 
         picker.setOnMouseClicked(evt -> picker.show());
+        picker.setOnTouchPressed(evt -> picker.show());
         picker.valueProperty().addListener(it -> {
             if (view != null) {
                 view.setYearMonth(YearMonth.from(picker.getValue()));
             }
         });
 
-        FontIcon calendarIcon = new FontIcon();
-        calendarIcon.getStyleClass().add("edit-icon"); // using styles similar to combobox, for consistency
+        Region arrow = new Region();
+        arrow.getStyleClass().add("arrow");
 
-        StackPane editButton = new StackPane(calendarIcon);
-        editButton.setFocusTraversable(false);
-        editButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        editButton.getStyleClass().add("edit-button"); // using styles similar to combobox, for consistency
-        editButton.setOnMouseClicked(evt -> picker.show());
-
+        StackPane arrowButton = new StackPane(arrow);
+        arrowButton.setFocusTraversable(false);
+        arrowButton.getStyleClass().add("arrow-button"); // using styles similar to combobox, for consistency
+        arrowButton.setOnMouseClicked(evt -> picker.show());
         HBox.setHgrow(picker.getEditor(), Priority.ALWAYS);
 
-        HBox box = new HBox(picker.getEditor(), editButton);
+        HBox box = new HBox(picker.getEditor(), arrowButton);
+        box.setFillHeight(true);
         box.getStyleClass().add("box");
 
         getChildren().add(box);
@@ -50,6 +50,7 @@ public class CalendarPickerSkin extends CustomComboBoxSkinBase<CalendarPicker> {
     protected Node getPopupContent() {
         if (view == null) {
             view = getSkinnable().getCalendarView();
+            view.setFocusTraversable(false); // keep the picker focused / blue border
             view.selectionModelProperty().addListener((obs, oldModel, newModel) -> bindSelectionModel(oldModel, newModel));
             bindSelectionModel(null, view.getSelectionModel());
         }

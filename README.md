@@ -18,6 +18,24 @@ A date picker control that uses the calendar view of GemsFX.
 
 ![CalendarPicker](gemsfx/docs/calendar-picker.png)
 
+## YearView
+
+A view for displaying a configurable number of columns and rows with years. The user can use the grid
+to quickly select a new year.
+
+![YearView](gemsfx/docs/year-view.png)
+
+## YearPicker
+
+A view for picking a year from a dropdown showing the year view control.
+
+![YearMonthPicker](gemsfx/docs/year-picker.png)
+
+## YearMonthView
+
+A view for displaying the months of a given year. The user can quickly switch between years.
+
+![YearMonthPicker](gemsfx/docs/year-month-view.png)
 
 ## YearMonthPicker
 
@@ -25,6 +43,26 @@ A control for specifying the month of a year (see time API class "YearMonth"). I
 and actually inherits a lot of styling attributes from it.
 
 ![YearMonthPicker](gemsfx/docs/year-month-picker.png)
+
+## Time Picker
+
+A small control used for entering a time. The control can be configured with a "step rate" for the minutes field (e.g. "15 minutes") that will be used when
+incrementing or decrementing the minutes field via the keyboard (arrow keys). The control can also be configured to only allow a time within the time range
+defined by an earliest and a latest time. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
+or not when they reach their minimum or maximum value. For example: the minute field shows 59 minutes and the user wants to increase it via the arrow key. Then
+the new value will be "0" when rollover is enabled. If not the value will remain at 59. Rollover combined with "linking fields" will cause the hours field to
+get increased when the minute field rolls over from 59 to 0 or decreased when the minute field rolls over from 0 to 59.
+
+![TimePicker](gemsfx/docs/time-picker.png)
+
+## Duration Picker
+
+A small control used for entering a duration. The control can be configured to only allow a duration within the range
+defined by a minimum and maximum duration. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
+or not when they reach their minimum or maximum value. The control supports similar features as the time picker: rollover fields, keyboard support, linking fields,
+filling fields with leading zeros, etc..
+
+![DurationPicker](gemsfx/docs/duration-picker.png)
 
 ## Spacer
 
@@ -112,26 +150,6 @@ A custom control that wraps a text area and adds a resize handle to the lower ri
 A customized text area that grows based on its text content. The text area will never show vertical or horizontal scrollbars.
 
 ![ExpandingTextArea](gemsfx/docs/expanding-text-area.png)
-
-## Time Picker
-
-A small control used for entering a time. The control can be configured with a "step rate" for the minutes field (e.g. "15 minutes") that will be used when
-incrementing or decrementing the minutes field via the keyboard (arrow keys). The control can also be configured to only allow a time within the time range
-defined by an earliest and a latest time. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
-or not when they reach their minimum or maximum value. For example: the minute field shows 59 minutes and the user wants to increase it via the arrow key. Then
-the new value will be "0" when rollover is enabled. If not the value will remain at 59. Rollover combined with "linking fields" will cause the hours field to 
-get increased when the minute field rolls over from 59 to 0 or decreased when the minute field rolls over from 0 to 59.
-
-![TimePicker](gemsfx/docs/time-picker.png)
-
-## Duration Picker
-
-A small control used for entering a duration. The control can be configured to only allow a duration within the range
-defined by a minimum and maximum duration. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
-or not when they reach their minimum or maximum value. The control supports similar features as the time picker: rollover fields, keyboard support, linking fields, 
-filling fields with leading zeros, etc..
-
-![DurationPicker](gemsfx/docs/duration-picker.png)
 
 ## Photo View
 
