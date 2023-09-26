@@ -36,10 +36,13 @@ public class DateRangeViewApp extends Application {
         CheckBox showButtons = new CheckBox("Show buttons");
         showButtons.selectedProperty().bindBidirectional(view.showCancelAndApplyButtonProperty());
 
+        CheckBox showPresets = new CheckBox("Show presets");
+        showPresets.selectedProperty().bindBidirectional(view.showPresetsProperty());
+
         TextField titleField = new TextField();
         titleField.textProperty().bindBidirectional(view.presetTitleProperty());
 
-        HBox optionsBox = new HBox(10, sideBox, orientationBox, scenicViewButton, titleField, showButtons);
+        HBox optionsBox = new HBox(10, sideBox, orientationBox, scenicViewButton, titleField, showButtons, showPresets);
         optionsBox.setAlignment(Pos.CENTER);
 
         VBox vBox = new VBox(20, view, optionsBox);

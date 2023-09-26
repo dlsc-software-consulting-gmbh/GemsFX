@@ -25,6 +25,7 @@
     -fx-background-insets: 0px, 1px;
     -fx-background-radius: 1000px, 1000px;
     -fx-padding: 5px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 10, 0.12, -1, 2);
 
     -fx-alignment: center;
 }

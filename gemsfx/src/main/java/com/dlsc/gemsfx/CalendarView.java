@@ -754,6 +754,44 @@ public class CalendarView extends Control {
         this.todayText.set(todayText);
     }
 
+    private final ObjectProperty<LocalDate> earliestDate = new SimpleObjectProperty<>(this, "earliestDay");
+
+    public final LocalDate getEarliestDate() {
+        return earliestDate.get();
+    }
+
+    /**
+     * The earliest day that can be selected in the view.
+     *
+     * @return the earliest possible date available for selection
+     */
+    public final ObjectProperty<LocalDate> earliestDateProperty() {
+        return earliestDate;
+    }
+
+    public final void setEarliestDate(LocalDate earliestDate) {
+        this.earliestDate.set(earliestDate);
+    }
+
+    private final ObjectProperty<LocalDate> latestDate = new SimpleObjectProperty<>(this, "latestDate");
+
+    public final LocalDate getLatestDate() {
+        return latestDate.get();
+    }
+
+    /**
+     * The latest day that can be selected in the view.
+     *
+     * @return the earliest possible date available for selection
+     */
+    public final ObjectProperty<LocalDate> latestDateProperty() {
+        return latestDate;
+    }
+
+    public final void setLatestDate(LocalDate latestDate) {
+        this.latestDate.set(latestDate);
+    }
+
     public static class SelectionModel {
 
         public enum SelectionMode {

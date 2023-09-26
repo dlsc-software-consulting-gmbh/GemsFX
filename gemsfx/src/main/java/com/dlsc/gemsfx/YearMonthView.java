@@ -93,4 +93,42 @@ public class YearMonthView extends Control {
     public final void setConverter(StringConverter<Month> converter) {
         this.converter.set(converter);
     }
+
+    private final ObjectProperty<YearMonth> earliestMonth = new SimpleObjectProperty<>(this, "earliestMonth");
+
+    public final YearMonth getEarliestMonth() {
+        return earliestMonth.get();
+    }
+
+    /**
+     * Determines the earliest month that the user can select in the view.
+     *
+     * @return the earliest selectable month
+     */
+    public final ObjectProperty<YearMonth> earliestMonthProperty() {
+        return earliestMonth;
+    }
+
+    public final void setEarliestMonth(YearMonth earliestMonth) {
+        this.earliestMonth.set(earliestMonth);
+    }
+
+    private final ObjectProperty<YearMonth> latestMonth = new SimpleObjectProperty<>(this, "latestMonth");
+
+    public final YearMonth getLatestMonth() {
+        return latestMonth.get();
+    }
+
+    /**
+     * Determines the latest month that the user can select in the view.
+     *
+     * @return the latest selectable month
+     */
+    public final ObjectProperty<YearMonth> latestMonthProperty() {
+        return latestMonth;
+    }
+
+    public final void setLatestMonth(YearMonth latestMonth) {
+        this.latestMonth.set(latestMonth);
+    }
 }

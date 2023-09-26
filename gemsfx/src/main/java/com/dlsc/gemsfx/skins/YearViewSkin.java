@@ -123,6 +123,18 @@ public class YearViewSkin extends SkinBase<YearView> {
 
                 Node yearNode = createYearNode(finalYear);
 
+                yearNode.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+                    Year earliestYear = yearView.getEarliestYear();
+                    if (earliestYear != null && Year.of(finalYear).isBefore(earliestYear)) {
+                        return true;
+                    }
+                    Year latestYear = yearView.getLatestYear();
+                    if (latestYear != null && Year.of(finalYear).isAfter(latestYear)) {
+                        return true;
+                    }
+                    return false;
+                }, yearView.earliestYearProperty(), yearView.latestYearProperty()));
+
                 yearNode.setOnMouseClicked(evt -> {
                     offset = 0;
                     yearView.setValue(Year.of(finalYear));

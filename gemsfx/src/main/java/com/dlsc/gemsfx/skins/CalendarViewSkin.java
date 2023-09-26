@@ -284,6 +284,9 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
             }
         });
 
+        yearMonthView.earliestMonthProperty().bind(Bindings.createObjectBinding(() -> view.getEarliestDate() != null ? YearMonth.from(view.getEarliestDate()) : null, view.earliestDateProperty()));
+        yearMonthView.latestMonthProperty().bind(Bindings.createObjectBinding(() -> view.getLatestDate() != null ? YearMonth.from(view.getLatestDate()) : null, view.latestDateProperty()));
+
         view.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
             if (evt.getCode().equals(KeyCode.ESCAPE)) {
                 if (!evt.isConsumed() && !viewMode.get().equals(ViewMode.DATE)) {
@@ -294,6 +297,8 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         });
 
         yearView = view.getYearView();
+        yearView.earliestYearProperty().bind(Bindings.createObjectBinding(() -> view.getEarliestDate() != null ? Year.from(view.getEarliestDate()) : null, view.earliestDateProperty()));
+        yearView.latestYearProperty().bind(Bindings.createObjectBinding(() -> view.getLatestDate() != null ? Year.from(view.getLatestDate()) : null, view.latestDateProperty()));
         yearView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             if (!evt.isConsumed()) {
                 viewMode.set(ViewMode.DATE);
@@ -478,6 +483,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         Callback<CalendarView, DateCell> cellFactory = view.getCellFactory();
 
+        final LocalDate finalDate = date;
         for (int row = 0; row < numberOfRows; row++) {
             for (int col = 0; col < 7; col++) {
 
@@ -487,6 +493,20 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
                 cellsMap.put(getKey(row, col), cell);
 
                 cell.visibleProperty().bind(Bindings.createBooleanBinding(() -> view.isShowDaysOfPreviousOrNextMonth() || cell.getDate() != null && YearMonth.from(cell.getDate()).equals(view.getYearMonth()), cell.itemProperty(), view.showDaysOfPreviousOrNextMonthProperty()));
+                cell.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+                    LocalDate cellDate = cell.getItem();
+                    if (cellDate != null) {
+                        LocalDate earliestDate = view.getEarliestDate();
+                        if (earliestDate != null && cellDate.isBefore(earliestDate)) {
+                            return true;
+                        }
+                        LocalDate latestDate = view.getLatestDate();
+                        if (latestDate != null && cellDate.isAfter(latestDate)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }, view.earliestDateProperty(), view.latestDateProperty(), cell.itemProperty()));
 
                 bodyGridPane.add(cell, showWeekNumbers ? col + 1 : col, row);
 

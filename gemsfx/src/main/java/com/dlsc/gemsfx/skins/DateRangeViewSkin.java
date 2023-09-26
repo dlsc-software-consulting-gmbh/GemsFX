@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.SelectionModel;
+import com.dlsc.gemsfx.YearMonthView;
 import com.dlsc.gemsfx.daterange.DateRange;
 import com.dlsc.gemsfx.daterange.DateRangePreset;
 import com.dlsc.gemsfx.daterange.DateRangeView;
@@ -42,6 +43,7 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
         toLabel = new Label();
         toLabel.textProperty().bind(view.toTextProperty());
         toLabel.getStyleClass().add("to-label");
+        toLabel.setMouseTransparent(true);
 
         startCalendarView = view.getStartCalendarView();
         startCalendarView.setSelectionModel(selectionModel);
@@ -57,8 +59,34 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
         endCalendarView.setShowToday(false);
         endCalendarView.setYearMonth(YearMonth.now().plusMonths(1));
 
+        startCalendarView.latestDateProperty().addListener(it -> System.out.println("start: latest: " + startCalendarView.getLatestDate()));
+        startCalendarView.latestDateProperty().bind(Bindings.createObjectBinding(() -> {
+            YearMonth month = endCalendarView.getYearMonth().minusMonths(1);
+            return month.atDay(month.lengthOfMonth());
+        }, endCalendarView.yearMonthProperty()));
+
+        endCalendarView.earliestDateProperty().addListener(it -> System.out.println("end: earliest: " + endCalendarView.getEarliestDate()));
+        endCalendarView.earliestDateProperty().bind(Bindings.createObjectBinding(() -> {
+            YearMonth month = startCalendarView.getYearMonth().plusMonths(1);
+            return month.atDay(1);
+        }, startCalendarView.yearMonthProperty()));
+
         startCalendarView.disableNextMonthButtonProperty().bind(Bindings.createBooleanBinding(() -> startCalendarView.getYearMonth().equals(endCalendarView.getYearMonth().minusMonths(1)), startCalendarView.yearMonthProperty(), endCalendarView.yearMonthProperty()));
         endCalendarView.disablePreviousMonthButtonProperty().bind(Bindings.createBooleanBinding(() -> startCalendarView.getYearMonth().equals(endCalendarView.getYearMonth().minusMonths(1)), startCalendarView.yearMonthProperty(), endCalendarView.yearMonthProperty()));
+
+        startCalendarView.yearMonthProperty().addListener((obs, oldStartMonth, newStartMonth) -> {
+            YearMonth endMonth = endCalendarView.getYearMonth();
+            if (!newStartMonth.isBefore(endMonth)) {
+                startCalendarView.setYearMonth(oldStartMonth);
+            }
+        });
+
+        endCalendarView.yearMonthProperty().addListener((obs, oldEndMonth, newEndMonth) -> {
+            YearMonth startMonth = startCalendarView.getYearMonth();
+            if (!newEndMonth.isAfter(startMonth)) {
+                endCalendarView.setYearMonth(oldEndMonth);
+            }
+        });
 
         presetsTitleLabel = new Label();
         presetsTitleLabel.textProperty().bind(view.presetTitleProperty());
