@@ -7,6 +7,7 @@ import com.dlsc.gemsfx.daterange.DateRangePreset;
 import com.dlsc.gemsfx.daterange.DateRangeView;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
@@ -29,11 +30,18 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
     private final VBox presetsBox;
     private final Button applyButton;
     private final Button cancelButton;
+    private final StackPane stackPane;
+    private final HBox container;
+    private final Label toLabel;
 
     public DateRangeViewSkin(DateRangeView view) {
         super(view);
 
         SelectionModel selectionModel = view.getSelectionModel();
+
+        toLabel = new Label();
+        toLabel.textProperty().bind(view.toTextProperty());
+        toLabel.getStyleClass().add("to-label");
 
         startCalendarView = view.getStartCalendarView();
         startCalendarView.setSelectionModel(selectionModel);
@@ -52,12 +60,18 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
         startCalendarView.disableNextMonthButtonProperty().bind(Bindings.createBooleanBinding(() -> startCalendarView.getYearMonth().equals(endCalendarView.getYearMonth().minusMonths(1)), startCalendarView.yearMonthProperty(), endCalendarView.yearMonthProperty()));
         endCalendarView.disablePreviousMonthButtonProperty().bind(Bindings.createBooleanBinding(() -> startCalendarView.getYearMonth().equals(endCalendarView.getYearMonth().minusMonths(1)), startCalendarView.yearMonthProperty(), endCalendarView.yearMonthProperty()));
 
-        presetsTitleLabel = new Label("PRESETS");
-        presetsTitleLabel.getStyleClass().add("quick-select-title");
+        presetsTitleLabel = new Label();
+        presetsTitleLabel.textProperty().bind(view.presetTitleProperty());
+        presetsTitleLabel.getStyleClass().add("presets-title");
         presetsTitleLabel.setMinWidth(Region.USE_PREF_SIZE);
+        presetsTitleLabel.visibleProperty().bind(presetsTitleLabel.textProperty().isNotEmpty());
+        presetsTitleLabel.managedProperty().bind(presetsTitleLabel.textProperty().isNotEmpty());
 
-        applyButton = new Button("APPLY");
+        applyButton = new Button();
+        applyButton.textProperty().bind(view.applyTextProperty());
+        applyButton.getStyleClass().add("apply-button");
         applyButton.setMinWidth(Region.USE_PREF_SIZE);
+        applyButton.setMaxWidth(Double.MAX_VALUE);
 
         applyButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
             if (!selectionModel.getSelectedDates().isEmpty() && !endCalendarView.getSelectionModel().getSelectedDates().isEmpty()) {
@@ -88,42 +102,30 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
             view.getOnClose().run();
         });
 
-        cancelButton = new Button("CANCEL");
+        cancelButton = new Button();
+        cancelButton.textProperty().bind(view.cancelTextProperty());
+        cancelButton.getStyleClass().add("cancel-button");
         cancelButton.setMinWidth(Region.USE_PREF_SIZE);
+        cancelButton.setMaxWidth(Double.MAX_VALUE);
         cancelButton.setOnAction(evt -> view.getOnClose().run());
 
-        applyButton.setMaxWidth(Double.MAX_VALUE);
-        cancelButton.setMaxWidth(Double.MAX_VALUE);
-
         presetsBox = new VBox();
-        presetsBox.getStyleClass().add("quick-select-box");
+        presetsBox.getStyleClass().add("presets-box");
         presetsBox.setFillWidth(true);
-        presetsBox.setPrefWidth(270);
         presetsBox.visibleProperty().bind(view.showPresetsProperty());
         presetsBox.managedProperty().bind(view.showPresetsProperty());
+        presetsBox.setMinWidth(Region.USE_PREF_SIZE);
 
-        HBox monthsBox = new HBox(startCalendarView, endCalendarView);
-        monthsBox.getStyleClass().add("months-box");
-
-        Label centerPiece = new Label("TO");
-        centerPiece.getStyleClass().add("center-piece");
-
-        StackPane stackPane = new StackPane(monthsBox, centerPiece);
+        stackPane = new StackPane();
         stackPane.getStyleClass().add("stack-pane");
 
-        HBox hBox = new HBox();
-
-        view.presetsLocationProperty().addListener(it -> updateLayout(hBox, stackPane, presetsBox));
-        updateLayout(hBox, stackPane, presetsBox);
-
-        hBox.getStyleClass().add("range-view-container");
-        hBox.setFillHeight(true);
+        container = new HBox();
+        container.getStyleClass().add("range-view-container");
+        container.setFillHeight(true);
 
         HBox.setHgrow(startCalendarView, Priority.ALWAYS);
         HBox.setHgrow(endCalendarView, Priority.ALWAYS);
         HBox.setHgrow(presetsBox, Priority.ALWAYS);
-
-        HBox.setMargin(presetsBox, new Insets(0, 0, 0, 10));
 
         view.valueProperty().addListener((obs, oldRange, newRange) -> {
             if (newRange != null) {
@@ -135,18 +137,38 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
         });
 
         view.getPresets().addListener((Observable it) -> updatePresetsView());
+        view.orientationProperty().addListener(it -> updateCalendarLayout());
+        view.presetsLocationProperty().addListener(it -> updateLayout());
 
-        getChildren().add(hBox);
+        getChildren().add(container);
+
         updatePresetsView();
+        updateCalendarLayout();
+        updateLayout();
+
         applyRangeToMonthViews(view.getValue());
     }
 
-    private void updateLayout(HBox hBox, StackPane stackPane, VBox quickSelectBox) {
+    private void updateLayout() {
         Side quickSelectPosition = getSkinnable().getPresetsLocation();
         if (quickSelectPosition.equals(Side.LEFT)) {
-            hBox.getChildren().setAll(quickSelectBox, stackPane);
+            container.getChildren().setAll(presetsBox, stackPane);
         } else {
-            hBox.getChildren().setAll(stackPane, quickSelectBox);
+            container.getChildren().setAll(stackPane, presetsBox);
+        }
+    }
+
+    private void updateCalendarLayout() {
+        DateRangeView view  = getSkinnable();
+
+        if (view.getOrientation().equals(Orientation.HORIZONTAL)) {
+            HBox monthsBox = new HBox(startCalendarView, endCalendarView);
+            monthsBox.getStyleClass().add("months-box");
+            stackPane.getChildren().setAll(monthsBox, toLabel);
+        } else {
+            VBox monthsBox = new VBox(startCalendarView, endCalendarView);
+            monthsBox.getStyleClass().add("months-box");
+            stackPane.getChildren().setAll(monthsBox, toLabel);
         }
     }
 
@@ -175,15 +197,19 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
         presetsBox.getChildren().clear();
         presetsBox.getChildren().add(presetsTitleLabel);
 
-        view.getPresets().forEach(rangePreset -> {
+        ObservableList<DateRangePreset> presets = view.getPresets();
+        for (int i = 0; i < presets.size(); i++) {
+            DateRangePreset rangePreset = presets.get(i);
             Label l = new Label(rangePreset.getTitle());
-            l.getStyleClass().add("preset-label");
+            l.getStyleClass().add("preset-name-label");
             l.setOnMouseClicked(evt -> applyRangeToMonthViews(rangePreset));
             presetsBox.getChildren().add(l);
 
-            Separator separator = new Separator(Orientation.HORIZONTAL);
-            presetsBox.getChildren().add(separator);
-        });
+            if (i < presets.size() - 1) {
+                Separator separator = new Separator(Orientation.HORIZONTAL);
+                presetsBox.getChildren().add(separator);
+            }
+        }
 
         Region filler = new Region();
         VBox.setVgrow(filler, Priority.ALWAYS);
@@ -191,18 +217,18 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
         presetsBox.getChildren().add(filler);
 
         applyButton.setMaxWidth(Double.MAX_VALUE);
+        applyButton.setMinWidth(Region.USE_PREF_SIZE);
+
         cancelButton.setMaxWidth(Double.MAX_VALUE);
+        cancelButton.setMinWidth(Region.USE_PREF_SIZE);
 
         HBox.setHgrow(applyButton, Priority.ALWAYS);
         HBox.setHgrow(cancelButton, Priority.ALWAYS);
 
-        ButtonBar.setButtonData(applyButton, ButtonBar.ButtonData.APPLY);
-        ButtonBar.setButtonData(cancelButton, ButtonBar.ButtonData.CANCEL_CLOSE);
-        ButtonBar.setButtonUniformSize(applyButton, true);
-        ButtonBar.setButtonUniformSize(cancelButton, true);
-
-        ButtonBar buttonBar = new ButtonBar();
-        buttonBar.getButtons().setAll(applyButton, cancelButton);
+        HBox buttonBar = new HBox(applyButton, cancelButton);
+        buttonBar.visibleProperty().bind(view.showCancelAndApplyButtonProperty());
+        buttonBar.managedProperty().bind(view.showCancelAndApplyButtonProperty());
+        buttonBar.getStyleClass().add("buttons-box");
 
         presetsBox.getChildren().add(buttonBar);
     }

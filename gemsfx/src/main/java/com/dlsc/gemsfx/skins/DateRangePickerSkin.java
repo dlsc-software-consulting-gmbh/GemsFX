@@ -134,7 +134,7 @@ public class DateRangePickerSkin extends CustomComboBoxSkinBase<DateRangePicker>
                 DateRangePreset preset = (DateRangePreset) dateRange;
                 titleLabel.setText(preset.getTitle());
             } else {
-                titleLabel.setText("Custom range");
+                titleLabel.setText(getSkinnable().getCustomRangeText());
             }
             rangeLabel.setText(toString(dateRange));
         } else {

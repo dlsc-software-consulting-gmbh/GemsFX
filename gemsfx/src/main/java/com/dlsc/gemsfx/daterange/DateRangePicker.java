@@ -141,4 +141,24 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
     public final void setFormatter(DateTimeFormatter formatter) {
         this.formatter.set(formatter);
     }
+
+    private final StringProperty customRangeText = new SimpleStringProperty(this, "customRangeText", "Date Range");
+
+    public final String getCustomRangeText() {
+        return customRangeText.get();
+    }
+
+    /**
+     * Stores the text shown when a custom date range has been selected by the user instead of
+     * a preset range.
+     *
+     * @return the text to show when a custom range has been selected
+     */
+    public final StringProperty customRangeTextProperty() {
+        return customRangeText;
+    }
+
+    public final void setCustomRangeText(String customRangeText) {
+        this.customRangeText.set(customRangeText);
+    }
 }

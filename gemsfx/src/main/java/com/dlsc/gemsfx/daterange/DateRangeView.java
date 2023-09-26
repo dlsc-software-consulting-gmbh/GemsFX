@@ -4,20 +4,28 @@ import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.SelectionModel;
 import com.dlsc.gemsfx.skins.DateRangeViewSkin;
 import javafx.beans.property.*;
+import javafx.beans.value.WritableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.*;
+import javafx.css.converter.EnumConverter;
+import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.control.SplitPane;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 public class DateRangeView extends Control {
+
+    private static final PseudoClass VERTICAL_PSEUDOCLASS_STATE = PseudoClass.getPseudoClass("vertical");
+
+    private static final PseudoClass HORIZONTAL_PSEUDOCLASS_STATE = PseudoClass.getPseudoClass("horizontal");
 
     private CalendarView startCalendarView;
 
@@ -44,6 +52,51 @@ public class DateRangeView extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(DateRangeView.class.getResource("date-range-view.css")).toExternalForm();
+    }
+
+    private ObjectProperty<Orientation> orientation;
+
+    /**
+     * Determines how the start and end calendars will be laid out, either next to each
+     * other (horizontal), or one on top of the other (vertical).
+     *
+     * @return the layout orientation of the two calendar views
+     */
+    public final void setOrientation(Orientation value) {
+        orientationProperty().set(value);
+    }
+
+    public final Orientation getOrientation() {
+        return orientation == null ? Orientation.HORIZONTAL : orientation.get();
+    }
+
+    public final ObjectProperty<Orientation> orientationProperty() {
+        if (orientation == null) {
+            orientation = new StyleableObjectProperty<>(Orientation.HORIZONTAL) {
+                @Override
+                public void invalidated() {
+                    final boolean isVertical = (get() == Orientation.VERTICAL);
+                    pseudoClassStateChanged(VERTICAL_PSEUDOCLASS_STATE, isVertical);
+                    pseudoClassStateChanged(HORIZONTAL_PSEUDOCLASS_STATE, !isVertical);
+                }
+
+                @Override
+                public CssMetaData<DateRangeView, Orientation> getCssMetaData() {
+                    return DateRangeView.StyleableProperties.ORIENTATION;
+                }
+
+                @Override
+                public Object getBean() {
+                    return DateRangeView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "orientation";
+                }
+            };
+        }
+        return orientation;
     }
 
     /**
@@ -81,6 +134,63 @@ public class DateRangeView extends Control {
             endCalendarView = new CalendarView();
         }
         return endCalendarView;
+    }
+
+    private final StringProperty toText = new SimpleStringProperty(this, "toText", "TO");
+
+    public final String getToText() {
+        return toText.get();
+    }
+
+    /**
+     * The text shown on the label between the two calendar views.
+     *
+     * @return the text for the "to" label
+     */
+    public final StringProperty toTextProperty() {
+        return toText;
+    }
+
+    public final void setToText(String toText) {
+        this.toText.set(toText);
+    }
+
+    private final StringProperty cancelText = new SimpleStringProperty(this, "cancelText", "CANCEL");
+
+    public final String getCancelText() {
+        return cancelText.get();
+    }
+
+    /**
+     * The text used for the cancel button.
+     *
+     * @return the text for the cancel button
+     */
+    public final StringProperty cancelTextProperty() {
+        return cancelText;
+    }
+
+    public final void setCancelText(String cancelText) {
+        this.cancelText.set(cancelText);
+    }
+
+    private final StringProperty applyText = new SimpleStringProperty(this, "cancelText", "APPLY");
+
+    public final String getApplyText() {
+        return applyText.get();
+    }
+
+    /**
+     * The text used for the apply button.
+     *
+     * @return the text for the apply button
+     */
+    public final StringProperty applyTextProperty() {
+        return applyText;
+    }
+
+    public final void setApplyText(String applyText) {
+        this.applyText.set(applyText);
     }
 
     private final StringProperty presetTitle = new SimpleStringProperty(this, "presetsTitle", "QUICK SELECT");
@@ -163,6 +273,25 @@ public class DateRangeView extends Control {
         this.value.set(value);
     }
 
+    private final BooleanProperty showCancelAndApplyButton = new SimpleBooleanProperty(this, "showCancelAndApplyButton", true);
+
+    public final boolean isShowCancelAndApplyButton() {
+        return showCancelAndApplyButton.get();
+    }
+
+    /**
+     * Shows or hides the cancel and the apply buttons.
+     *
+     * @return true if the buttons will be shown
+     */
+    public final BooleanProperty showCancelAndApplyButtonProperty() {
+        return showCancelAndApplyButton;
+    }
+
+    public final void setShowCancelAndApplyButton(boolean showCancelAndApplyButton) {
+        this.showCancelAndApplyButton.set(showCancelAndApplyButton);
+    }
+
     // presets
 
     private final ObservableList<DateRangePreset> presets = FXCollections.observableArrayList();
@@ -197,4 +326,58 @@ public class DateRangeView extends Control {
         LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
         return new DateRangePreset("Last Month", start, end);
     }
+
+    private static class StyleableProperties {
+        private static final CssMetaData<DateRangeView, Orientation> ORIENTATION =
+                new CssMetaData<>("-fx-orientation",
+                        new EnumConverter<>(Orientation.class),
+                        Orientation.HORIZONTAL) {
+
+                    @Override
+                    public Orientation getInitialValue(DateRangeView node) {
+                        return node.getOrientation();
+                    }
+
+                    @Override
+                    public boolean isSettable(DateRangeView n) {
+                        return n.orientation == null || !n.orientation.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Orientation> getStyleableProperty(DateRangeView n) {
+                        return (StyleableProperty<Orientation>) (WritableValue<Orientation>) n.orientationProperty();
+                    }
+                };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables =
+                    new ArrayList<CssMetaData<? extends Styleable, ?>>(Control.getClassCssMetaData());
+            styleables.add(ORIENTATION);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    /**
+     * Gets the {@code CssMetaData} associated with this class, which may include the
+     * {@code CssMetaData} of its superclasses.
+     *
+     * @return the {@code CssMetaData}
+     * @since JavaFX 8.0
+     */
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return DateRangeView.StyleableProperties.STYLEABLES;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since JavaFX 8.0
+     */
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
 }

@@ -25,7 +25,7 @@ public class DateRangePickerApp extends Application {
     @Override
     public void start(Stage stage) {
         DateRangePicker picker = new DateRangePicker();
-        picker.setValue(new DateRangePreset("My Preset", LocalDate.now(), LocalDate.now().plusDays(8)));
+        picker.setValue(new DateRangePreset("Initial Range", LocalDate.now(), LocalDate.now().plusDays(8)));
 
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.setEditable(false);
