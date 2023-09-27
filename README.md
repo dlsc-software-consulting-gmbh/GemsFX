@@ -8,15 +8,39 @@
 
 ## CalendarView
 
-A nice UI for displaying the month of a year.
+A nice UI for displaying the month of a year. The view is highly configurable and allows specifying
+a latest and an earliest date for selection purposes. The days of the previous or the next month can either
+be shown or hidden. When clicking on the month the user will be presented with a custom view for quickly
+selecting a different month. The same happens when clicking on the year. The calendar view uses a 
+selection model which can work in three ways: single date selection, multiple date selection, or date range
+selection. Last but not least, the layout of the header can be changed, so that the month and year labels
+are either left, center, or right aligned.
 
 ![CalendarView](gemsfx/docs/calendar-view.png)
 
 ## CalendarPicker
 
-A date picker control that uses the calendar view of GemsFX.
+A date picker control that uses the calendar view of GemsFX. The field is editable to the
+user can also enter the date via keyboard.
 
 ![CalendarPicker](gemsfx/docs/calendar-picker.png)
+
+## DateRangeView
+
+A view that allows the user to specify a date range. The view supports defining a couple of presets
+for quick range selection, e.g. "last week".
+
+![DateRangeView](gemsfx/docs/date-range-view.png)
+
+## DateRangePicker
+
+A picker that allows the user to specify a date range via the date range view. The picker supports
+two different layouts (small, big). The picker shows the selected range and also a name for the range, 
+which is either derived from the name of a selected preset or simply says something like "custom range".
+
+![DateRangePicker](gemsfx/docs/date-range-picker-small.png)
+![DateRangePicker](gemsfx/docs/date-range-picker-big.png)
+![DateRangePicker](gemsfx/docs/date-range-picker-expanded.png)
 
 ## YearView
 
