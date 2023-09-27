@@ -46,18 +46,7 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
         toLabel.setMouseTransparent(true);
 
         startCalendarView = view.getStartCalendarView();
-        startCalendarView.setSelectionModel(selectionModel);
-        startCalendarView.setShowDaysOfPreviousOrNextMonth(true);
-        startCalendarView.setYearMonth(YearMonth.now().minusMonths(1));
-        startCalendarView.setShowToday(false);
-        startCalendarView.setYearMonth(YearMonth.now());
-
         endCalendarView = view.getEndCalendarView();
-        endCalendarView.setSelectionModel(selectionModel);
-        endCalendarView.setShowDaysOfPreviousOrNextMonth(true);
-        endCalendarView.setYearMonth(YearMonth.now());
-        endCalendarView.setShowToday(false);
-        endCalendarView.setYearMonth(YearMonth.now().plusMonths(1));
 
         startCalendarView.latestDateProperty().addListener(it -> System.out.println("start: latest: " + startCalendarView.getLatestDate()));
         startCalendarView.latestDateProperty().bind(Bindings.createObjectBinding(() -> {

@@ -16,6 +16,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.SplitPane;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
@@ -38,6 +39,20 @@ public class DateRangeView extends Control {
 
         selectionModel = new SelectionModel();
         selectionModel.setSelectionMode(SelectionModel.SelectionMode.DATE_RANGE);
+
+        startCalendarView = getStartCalendarView();
+        startCalendarView.setSelectionModel(selectionModel);
+        startCalendarView.setShowDaysOfPreviousOrNextMonth(true);
+        startCalendarView.setYearMonth(YearMonth.now().minusMonths(1));
+        startCalendarView.setShowToday(false);
+        startCalendarView.setYearMonth(YearMonth.now());
+
+        endCalendarView = getEndCalendarView();
+        endCalendarView.setSelectionModel(selectionModel);
+        endCalendarView.setShowDaysOfPreviousOrNextMonth(true);
+        endCalendarView.setYearMonth(YearMonth.now());
+        endCalendarView.setShowToday(false);
+        endCalendarView.setYearMonth(YearMonth.now().plusMonths(1));
 
         DateRangePreset todayRange = createTodayRange();
         getPresets().addAll(todayRange, createYesterdayPreset(), createThisWeekPreset(), createThisMonthPreset(), createLastMonthPreset());
