@@ -28,7 +28,9 @@ user can also enter the date via keyboard.
 ## DateRangeView
 
 A view that allows the user to specify a date range. The view supports defining a couple of presets
-for quick range selection, e.g. "last week".
+for quick range selection, e.g. "last week". The left and right month views are bound so that the
+right calendar will never allow the user to specify a date that is earlier than those dates shown in 
+the left month view.
 
 ![DateRangeView](gemsfx/docs/date-range-view.png)
 
@@ -45,7 +47,8 @@ which is either derived from the name of a selected preset or simply says someth
 ## YearView
 
 A view for displaying a configurable number of columns and rows with years. The user can use the grid
-to quickly select a new year.
+to quickly select a new year. Properties are available to restrict the earliest and the latest year that
+is selectable.
 
 ![YearView](gemsfx/docs/year-view.png)
 
@@ -57,7 +60,8 @@ A view for picking a year from a dropdown showing the year view control.
 
 ## YearMonthView
 
-A view for displaying the months of a given year. The user can quickly switch between years.
+A view for displaying the months of a given year. The user can quickly switch between years. Properties
+are available to restrict the selection to an earliest and a latest month.
 
 ![YearMonthPicker](gemsfx/docs/year-month-view.png)
 
