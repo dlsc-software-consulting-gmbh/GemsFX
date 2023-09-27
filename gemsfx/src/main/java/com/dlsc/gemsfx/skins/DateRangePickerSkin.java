@@ -33,7 +33,7 @@ public class DateRangePickerSkin extends CustomComboBoxSkinBase<DateRangePicker>
     private Label titleLabel;
     private Label rangeLabel;
 
-    private DateRangeView view;
+    private final DateRangeView view;
     private HBox hBox;
 
     public DateRangePickerSkin(DateRangePicker picker) {

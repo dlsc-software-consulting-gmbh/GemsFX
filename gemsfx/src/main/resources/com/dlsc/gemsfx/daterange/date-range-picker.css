@@ -1,5 +1,6 @@
 .date-range-picker {
     -fx-padding: 0.333333em 0em 0.333333em 0.666667em;
+    -fx-max-height: infinity;
 }
 
 .date-range-picker .popup {
