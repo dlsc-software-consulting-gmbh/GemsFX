@@ -24,7 +24,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
     public PhoneNumberFieldSkin(PhoneNumberField control) {
         super(control);
 
-        PhoneNumberFieldEditor editor = new PhoneNumberFieldEditor();
+        PhoneNumberEditor editor = new PhoneNumberEditor();
 
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.setMouseTransparent(true);// Disable all mouse events on the combo box
@@ -41,9 +41,9 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
                 comboBox.hide();
             }
             else {
-                Bounds selectorBounds = editor.countrySelector.getBoundsInParent();
-                if (selectorBounds.contains(evt.getX(), evt.getY())) {
-                    editor.countrySelector.requestFocus();
+                Bounds buttonBounds = editor.buttonBox.getBoundsInParent();
+                if (buttonBounds.contains(evt.getX(), evt.getY())) {
+                    editor.buttonBox.requestFocus();
                     comboBox.show();
                 }
                 else {
@@ -56,15 +56,16 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
         getChildren().addAll(comboBox);
     }
 
-    private class PhoneNumberFieldEditor extends ListCell<String> {
+    private static class PhoneNumberEditor extends ListCell<String> {
 
         private final TextField textField = new TextField();
-        private final HBox countrySelector = new HBox();
+        private final Label maskLabel = new Label();
+        private final HBox buttonBox = new HBox();
 
-        public PhoneNumberFieldEditor() {
+        public PhoneNumberEditor() {
             getStyleClass().add("editor");
 
-            Label countryCode = new Label("(+##)");
+            Label countryCode = new Label("(+###)");
             countryCode.getStyleClass().add("country-code");
 
             Region arrow = new Region();
@@ -74,14 +75,22 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             arrowButton.getStyleClass().add("arrow-button");
             arrowButton.getChildren().add(arrow);
 
-            countrySelector.getStyleClass().add("country-selector");
-            countrySelector.getChildren().addAll(countryCode, arrowButton);
+            buttonBox.getStyleClass().add("button-box");
+            buttonBox.getChildren().addAll(countryCode, arrowButton);
 
-            textField.textProperty().bindBidirectional(PhoneNumberFieldSkin.this.getSkinnable().phoneNumberProperty());
+            maskLabel.setText("(###) ###-####");
+            maskLabel.getStyleClass().add("text-mask");
+
             textField.setTextFormatter(new TextFormatter<>(change -> {
                 if (change.isAdded()) {
                     String text = change.getText();
                     if (!text.matches("[0-9]")) {
+                        return null;
+                    }
+                }
+                else if (change.isContentChange()) {
+                    String text = change.getControlNewText();
+                    if (text.length() > 10) {
                         return null;
                     }
                 }
@@ -91,33 +100,25 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
         @Override
         protected Skin<?> createDefaultSkin() {
-            return new PhoneNumberFieldEditorSkin(this);
-        }
+            return new SkinBase<>(this) {
+                {
+                    getChildren().addAll(buttonBox, textField, maskLabel);
+                }
 
-    }
+                @Override
+                protected void layoutChildren(double x, double y, double w, double h) {
+                    final double buttonWidth = snapSizeX(buttonBox.prefWidth(-1));
+                    buttonBox.resizeRelocate(x, y, buttonWidth, h);
 
-    private class PhoneNumberFieldEditorSkin extends SkinBase<PhoneNumberFieldEditor> {
+                    final double textFieldX = snapPositionX(x + buttonWidth);
+                    textField.resizeRelocate(textFieldX, y, w - buttonWidth, h);
 
-        private final Label maskLabel = new Label("(###) ###-####");
-
-        protected PhoneNumberFieldEditorSkin(PhoneNumberFieldEditor control) {
-            super(control);
-            maskLabel.getStyleClass().add("text-field-mask");
-            getChildren().addAll(control.countrySelector, control.textField, maskLabel);
-        }
-
-        @Override
-        protected void layoutChildren(double x, double y, double w, double h) {
-            final double arrowWidth = snapSizeX(getSkinnable().countrySelector.prefWidth(-1));
-            getSkinnable().countrySelector.resizeRelocate(x, y, arrowWidth, h);
-
-            final double textFieldX = snapPositionX(x + arrowWidth);
-            getSkinnable().textField.resizeRelocate(textFieldX, y, w - arrowWidth, h);
-
-            final Node textNode = getSkinnable().textField.lookup(".text");
-            final double maskX = snapPositionX(textFieldX + textNode.getLayoutBounds().getWidth());
-            final double maskWidth = snapSizeX(Math.max(0, Math.min(maskLabel.prefWidth(-1), w - maskX)));
-            maskLabel.resizeRelocate(maskX, y, maskWidth, h);
+                    final Node textNode = textField.lookup(".text");
+                    final double maskX = snapPositionX(textFieldX + textNode.getLayoutBounds().getWidth());
+                    final double maskWidth = snapSizeX(Math.max(0, Math.min(maskLabel.prefWidth(-1), w - maskX)));
+                    maskLabel.resizeRelocate(maskX, y, maskWidth, h);
+                }
+            };
         }
 
     }

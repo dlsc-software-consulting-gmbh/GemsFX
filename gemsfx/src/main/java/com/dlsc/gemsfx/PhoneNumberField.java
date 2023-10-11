@@ -1,8 +1,6 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.PhoneNumberFieldSkin;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Control;
@@ -29,33 +27,18 @@ public class PhoneNumberField extends Control {
     }
 
     // VALUE
-    private final StringProperty phoneNumber = new SimpleStringProperty(this, "phoneNumber");
+    private final StringProperty value = new SimpleStringProperty(this, "value");
 
-    public final StringProperty phoneNumberProperty() {
-        return phoneNumber;
+    public final StringProperty valueProperty() {
+        return value;
     }
 
-    public final String getPhoneNumber() {
-        return phoneNumberProperty().get();
+    public final String getValue() {
+        return valueProperty().get();
     }
 
-    public final void setPhoneNumber(String phoneNumber) {
-        phoneNumberProperty().set(phoneNumber);
-    }
-
-    // COUNTRY
-    private final IntegerProperty countryCode = new SimpleIntegerProperty(this, "countryCode");
-
-    public final IntegerProperty countryCodeProperty() {
-        return countryCode;
-    }
-
-    public final int getCountryCode() {
-        return countryCodeProperty().get();
-    }
-
-    public final void setCountryCode(int countryCode) {
-        countryCodeProperty().set(countryCode);
+    public final void setValue(String value) {
+        valueProperty().set(value);
     }
 
 }

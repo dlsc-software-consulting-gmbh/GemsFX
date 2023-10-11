@@ -31,20 +31,20 @@
     -fx-padding: 0px;
 }
 
-.phone-number-field > .combo-box > .editor > .text-field-mask {
+.phone-number-field > .combo-box > .editor > .text-mask {
     -fx-text-fill: rgb(0, 0, 0, .4);
 }
 
-.phone-number-field > .combo-box > .editor > .country-selector {
+.phone-number-field > .combo-box > .editor > .button-box {
     -fx-alignment: center;
 }
 
-.phone-number-field > .combo-box > .editor > .country-selector > .arrow-button {
+.phone-number-field > .combo-box > .editor > .button-box > .arrow-button {
     -fx-min-width: 10px;
-    -fx-padding: 10px;
+    -fx-padding: 10px 5px;
 }
 
-.phone-number-field > .combo-box > .editor > .country-selector > .arrow-button > .arrow {
+.phone-number-field > .combo-box > .editor > .button-box > .arrow-button > .arrow {
     -fx-background-color: -fx-mark-color;
     -fx-background-insets: 0;
     -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
@@ -52,7 +52,7 @@
     -fx-scale-shape: false;
 }
 
-.phone-number-field > .combo-box > .editor > .country-selector > .country-code {
+.phone-number-field > .combo-box > .editor > .button-box > .country-code {
     -fx-text-fill: rgb(0, 0, 0, .4);
 }
 
