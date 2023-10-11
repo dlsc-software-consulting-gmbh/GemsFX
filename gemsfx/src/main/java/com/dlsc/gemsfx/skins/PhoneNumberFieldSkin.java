@@ -88,12 +88,6 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
                         return null;
                     }
                 }
-                else if (change.isContentChange()) {
-                    String text = change.getControlNewText();
-                    if (text.length() > 10) {
-                        return null;
-                    }
-                }
                 return change;
             }));
         }
