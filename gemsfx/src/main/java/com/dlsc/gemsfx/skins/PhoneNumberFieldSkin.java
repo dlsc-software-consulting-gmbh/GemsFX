@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.PhoneNumberField;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
@@ -10,28 +11,38 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
 import java.util.Arrays;
-import java.util.Locale;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
+
+    private static final Image WORLD_ICON = new Image(Objects.requireNonNull(PhoneNumberField.class.getResource("countryflags/world.png")).toExternalForm());
+    private static final Map<PhoneNumberField.CountryCallingCode, Image> FLAGS = new HashMap<>();
+
+    static {
+        Arrays.stream(PhoneNumberField.DefaultCountryCallingCodes.values()).forEach(c -> FLAGS.put(c, new Image(Objects.requireNonNull(PhoneNumberField.class.getResource("countryflags/20x13/" + c.getIso2Code().toLowerCase() + ".png")).toExternalForm())));
+    }
 
     public PhoneNumberFieldSkin(PhoneNumberField control) {
         super(control);
 
         PhoneNumberEditor editor = new PhoneNumberEditor();
 
-        ComboBox<String> comboBox = new ComboBox<>();
+        ComboBox<PhoneNumberField.CountryCallingCode> comboBox = new ComboBox<>();
         comboBox.setMouseTransparent(true);// Disable all mouse events on the combo box
         comboBox.setButtonCell(editor);
-        comboBox.getItems().setAll(Arrays.stream(Locale.getISOCountries())
-            .map(c -> new Locale("", c).getDisplayCountry())
-            .collect(Collectors.toList()));
+        comboBox.setCellFactory(lv -> new CountryCallingCodeCell());
+        comboBox.getItems().setAll(PhoneNumberField.DefaultCountryCallingCodes.values());
+        comboBox.valueProperty().bindBidirectional(control.countryCallingCodeProperty());
 
         // Manually handle mouse pressed over either the text field or the country selector
         control.addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> {
@@ -56,7 +67,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
         getChildren().addAll(comboBox);
     }
 
-    private static class PhoneNumberEditor extends ListCell<String> {
+    private final class PhoneNumberEditor extends ListCell<PhoneNumberField.CountryCallingCode> {
 
         private final TextField textField = new TextField();
         private final Label maskLabel = new Label();
@@ -65,8 +76,20 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
         public PhoneNumberEditor() {
             getStyleClass().add("editor");
 
-            Label countryCode = new Label("(+###)");
-            countryCode.getStyleClass().add("country-code");
+            StackPane flagBox = new StackPane();
+            flagBox.getStyleClass().add("flag-box");
+
+            InvalidationListener updateFlag = it -> {
+                PhoneNumberField.CountryCallingCode callingCode = PhoneNumberFieldSkin.this.getSkinnable().getCountryCallingCode();
+                Image icon = WORLD_ICON;
+                if (callingCode != null) {
+                    icon = FLAGS.get(callingCode);
+                }
+                flagBox.getChildren().setAll(new ImageView(icon));
+            };
+
+            PhoneNumberFieldSkin.this.getSkinnable().countryCallingCodeProperty().addListener(updateFlag);
+            updateFlag.invalidated(null);
 
             Region arrow = new Region();
             arrow.getStyleClass().add("arrow");
@@ -76,7 +99,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             arrowButton.getChildren().add(arrow);
 
             buttonBox.getStyleClass().add("button-box");
-            buttonBox.getChildren().addAll(countryCode, arrowButton);
+            buttonBox.getChildren().addAll(flagBox, arrowButton);
 
             maskLabel.setText("(###) ###-####");
             maskLabel.getStyleClass().add("text-mask");
@@ -113,6 +136,29 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
                     maskLabel.resizeRelocate(maskX, y, maskWidth, h);
                 }
             };
+        }
+
+    }
+
+    private static class CountryCallingCodeCell extends ListCell<PhoneNumberField.CountryCallingCode> {
+
+        CountryCallingCodeCell() {
+            getStyleClass().add("country-calling-code-cell");
+        }
+
+        @Override
+        protected void updateItem(PhoneNumberField.CountryCallingCode item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item != null && !empty) {
+                StackPane flagView = new StackPane();
+                flagView.getStyleClass().add("flag-icon");
+                flagView.getChildren().add(new ImageView(FLAGS.get(item)));
+                setText("(+" + item.getCountryCode() + ") " + item.getCountryName("en"));
+                setGraphic(flagView);
+            } else {
+                setText(null);
+                setGraphic(null);
+            }
         }
 
     }
