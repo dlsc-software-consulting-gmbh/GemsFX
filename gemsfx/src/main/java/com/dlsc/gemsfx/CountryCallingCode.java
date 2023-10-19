@@ -10,13 +10,15 @@ import java.util.Optional;
 
 public interface CountryCallingCode {
 
-    int getCountryCode();
+    int countryCode();
 
-    String getCountryName(String language);
+    int[] areaCodes();
 
-    Node getFlagView();
+    String displayName(String language);
 
-    static CountryCallingCode[] defaults() {
+    Node flagView();
+
+    static CountryCallingCode[] defaultValues() {
         return Defaults.values();
     }
 
@@ -267,30 +269,35 @@ public interface CountryCallingCode {
         ZIMBABWE(263, "ZW")
         ;
 
-        private final int countryCode;
+        private final int code;
         private final String iso2Code;
         private final int[] areaCodes;
         private final Image flagImage;
 
-        Defaults(int countryCode, String iso2Code, int... areaCodes) {
-            this.countryCode = countryCode;
+        Defaults(int code, String iso2Code, int... areaCodes) {
+            this.code = code;
             this.iso2Code = iso2Code;
             this.areaCodes = Optional.ofNullable(areaCodes).orElse(new int[0]);
             this.flagImage = new Image(Objects.requireNonNull(PhoneNumberField.class.getResource("phonenumberfield/country-flags/20x13/" + iso2Code.toLowerCase() + ".png")).toExternalForm());
         }
 
         @Override
-        public int getCountryCode() {
-            return countryCode;
+        public int countryCode() {
+            return code;
         }
 
         @Override
-        public String getCountryName(String language) {
+        public int[] areaCodes() {
+            return areaCodes;
+        }
+
+        @Override
+        public String displayName(String language) {
             return new Locale(language, iso2Code).getDisplayCountry();
         }
 
         @Override
-        public Node getFlagView() {
+        public Node flagView() {
             return new ImageView(flagImage);
         }
 

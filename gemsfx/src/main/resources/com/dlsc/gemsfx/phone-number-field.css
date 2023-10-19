@@ -52,4 +52,18 @@
     -fx-scale-shape: false;
 }
 
+.phone-number-field > .combo-box > .editor > .button-box > .flag-box {
+    -fx-pref-width: 20px;
+    -fx-alignment: center;
+}
+
+.country-calling-code-cell {
+
+}
+
+.country-calling-code-cell.preferred.last {
+    -fx-border-width: 0px 0px 2px 0px;
+    -fx-border-color: -fx-box-border;
+}
+
 
