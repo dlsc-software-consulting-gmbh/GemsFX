@@ -52,8 +52,4 @@
     -fx-scale-shape: false;
 }
 
-.phone-number-field > .combo-box > .editor > .button-box > .country-code {
-    -fx-text-fill: rgb(0, 0, 0, .4);
-}
-
 

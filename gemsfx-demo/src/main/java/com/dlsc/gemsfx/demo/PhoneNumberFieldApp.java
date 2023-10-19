@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PhoneNumberField;
-import com.dlsc.gemsfx.YearMonthView;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.Insets;
