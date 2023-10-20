@@ -7,35 +7,39 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.controlsfx.control.CheckComboBox;
 
 import java.util.function.Function;
 
 public class PhoneNumberFieldApp extends Application {
 
+    private static final Function<Object, String> COUNTRY_CODE_CONVERTER = c -> {
+        if (c == null) {
+            return null;
+        }
+        CountryCallingCode code = (CountryCallingCode) c;
+        return "(+" + code.countryCode() + ") " + code.displayName("en");
+    };
+
     @Override
     public void start(Stage stage) throws Exception {
         PhoneNumberField view = new PhoneNumberField();
-        view.setDefaultCountryCode(CountryCallingCode.Defaults.GERMANY);
-        view.getPreferredCountryCodes().add(CountryCallingCode.Defaults.COLOMBIA);
-        view.getPreferredCountryCodes().add(CountryCallingCode.Defaults.SWITZERLAND);
 
         VBox controls = new VBox(10);
-        controls.setPadding(new Insets(20));
+        controls.getChildren().add(defaultCountrySelector(view));
+        controls.getChildren().add(preferredCountriesSelector(view));
 
         VBox fields = new VBox(10);
-        addField(fields, "Value", view.phoneNumberProperty());
-        addField(fields, "Country Code", view.countryCodeProperty(), code -> {
-            if (code == null) {
-                return null;
-            }
-            return "(+" + ((CountryCallingCode) code).countryCode() + ") " + ((CountryCallingCode) code).displayName("en");
-        });
+        addField(fields, "Number", view.phoneNumberProperty());
+        addField(fields, "Country", view.countryCodeProperty(), COUNTRY_CODE_CONVERTER);
         addField(fields, "Local Number", view.localPhoneNumberProperty());
 
         VBox vBox = new VBox(20);
@@ -43,13 +47,33 @@ public class PhoneNumberFieldApp extends Application {
         vBox.setAlignment(Pos.CENTER);
         vBox.getChildren().addAll(controls, new Separator(), view, new Separator(), fields);
 
-        Scene scene = new Scene(vBox, 500, 500);
+        Scene scene = new Scene(vBox, 500, 400);
 
         stage.setTitle("PhoneNumberField");
         stage.setScene(scene);
         stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
+    }
+
+    private Node defaultCountrySelector(PhoneNumberField view) {
+        ComboBox<CountryCallingCode> comboBox = new ComboBox<>();
+        comboBox.getItems().addAll(CountryCallingCode.defaultValues());
+        comboBox.valueProperty().bindBidirectional(view.defaultCountryCodeProperty());
+        HBox hBox = new HBox(10);
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        hBox.getChildren().addAll(new Label("Default Country: "), comboBox);
+        return hBox;
+    }
+
+    private Node preferredCountriesSelector(PhoneNumberField view) {
+        CheckComboBox<CountryCallingCode> comboBox = new CheckComboBox<>();
+        comboBox.getItems().addAll(CountryCallingCode.defaultValues());
+        Bindings.bindContent(view.getPreferredCountryCodes(), comboBox.getCheckModel().getCheckedItems());
+        HBox hBox = new HBox(10);
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        hBox.getChildren().addAll(new Label("Preferred Countries: "), comboBox);
+        return hBox;
     }
 
     private void addField(VBox fields, String label, ObservableValue property) {

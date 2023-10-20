@@ -29,7 +29,8 @@ public class PhoneNumberField extends Control {
     public PhoneNumberField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         getAvailableCountryCodes().setAll(CountryCallingCode.defaultValues());
-        ChangeListener<String> phoneNumberListener = new ChangeListener<>() {
+
+        phoneNumberProperty().addListener(new ChangeListener<>() {
             class CountryCallingCodeScore implements Comparable<CountryCallingCodeScore> {
                 int score;
                 String localPhoneNumber;
@@ -54,6 +55,7 @@ public class PhoneNumberField extends Control {
 
                 if (higher != null) {
                     CountryCallingCodeScore score = higher.getKey();
+                    // For now just picking the last one, but we could also check if there are multiple
                     CountryCallingCode code = higher.getValue().get(higher.getValue().size() - 1);
                     countryCode.set(code);
                     localPhoneNumber.set(score.localPhoneNumber);
@@ -95,9 +97,8 @@ public class PhoneNumberField extends Control {
 
                 return score;
             }
-        };
+        });
 
-        phoneNumberProperty().addListener(phoneNumberListener);
         defaultCountryCodeProperty().addListener((obs, oldCode, newCode) -> {
             if (countryCode.get() == null && newCode != null) {
                 countryCode.set(newCode);
