@@ -1,6 +1,5 @@
 package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.CountryCallingCode;
 import com.dlsc.gemsfx.PhoneNumberField;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
@@ -21,10 +20,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
@@ -33,15 +32,21 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
     public PhoneNumberFieldSkin(PhoneNumberField field) {
         super(field);
 
-        ObservableList<CountryCallingCode> callingCodes = FXCollections.observableArrayList();
+        ObservableList<PhoneNumberField.CountryCallingCode> callingCodes = FXCollections.observableArrayList();
         InvalidationListener callingCodesUpdater = obs -> {
-            List<CountryCallingCode> temp = new ArrayList<>(getSkinnable().getPreferredCountryCodes());
-            getSkinnable().getAvailableCountryCodes().forEach(code -> {
-                if (!temp.contains(code)) {
+            Set<PhoneNumberField.CountryCallingCode> temp = new LinkedHashSet<>();
+            getSkinnable().getPreferredCountryCodes().forEach(code -> {
+                if (getSkinnable().getAvailableCountryCodes().contains(code)) {
                     temp.add(code);
                 }
             });
+            temp.addAll(getSkinnable().getAvailableCountryCodes());
             callingCodes.setAll(temp);
+
+            if (getSkinnable().getCountryCode() != null && !temp.contains(getSkinnable().getCountryCode())) {
+                // Clear up the value in case the country code is not available anymore
+                getSkinnable().setPhoneNumber(null);
+            }
         };
 
         getSkinnable().getAvailableCountryCodes().addListener(callingCodesUpdater);
@@ -50,7 +55,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
         PhoneNumberEditor editor = new PhoneNumberEditor();
 
-        ComboBox<CountryCallingCode> comboBox = new ComboBox<>();
+        ComboBox<PhoneNumberField.CountryCallingCode> comboBox = new ComboBox<>();
         comboBox.setButtonCell(editor);
         comboBox.setCellFactory(lv -> new CountryCallingCodeCell());
         comboBox.setItems(callingCodes);
@@ -58,18 +63,15 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
         comboBox.setMaxHeight(Double.MAX_VALUE);
         comboBox.setFocusTraversable(false);
 
-        comboBox.valueProperty().addListener((obs, oldCode, newCode) -> {
-            if (newCode != null) {
-                field.setPhoneNumber(newCode.phonePrefix());
-            } else {
-                field.setPhoneNumber(null);
-            }
-        });
+        comboBox.valueProperty().addListener((obs, oldCode, newCode) -> getSkinnable()
+            .setPhoneNumber(Optional.ofNullable(newCode)
+                .map(PhoneNumberField.CountryCallingCode::defaultPhonePrefix)
+                .orElse(null)));
 
-        // Manually handle mouse event over either the text field or the trigger button box
+        // Manually handle mouse event either on the text field or the trigger button box
         field.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
             Bounds buttonBounds = editor.buttonBox.getBoundsInParent();
-            if (buttonBounds.contains(evt.getX(), evt.getY())) {
+            if (!getSkinnable().isForceLocalPhoneNumber() && buttonBounds.contains(evt.getX(), evt.getY())) {
                 editor.buttonBox.requestFocus();
                 if (!comboBox.isShowing()) {
                     comboBox.show();
@@ -93,7 +95,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
         getChildren().addAll(comboBox);
     }
 
-    private final class PhoneNumberEditor extends ListCell<CountryCallingCode> {
+    private final class PhoneNumberEditor extends ListCell<PhoneNumberField.CountryCallingCode> {
 
         final TextField textField = new TextField();
         final Label maskLabel = new Label();
@@ -107,7 +109,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
             InvalidationListener updateFlag = it -> flagBox.getChildren()
                 .setAll(Optional.ofNullable(getSkinnable().getCountryCode())
-                    .map(CountryCallingCode::flagView)
+                    .map(PhoneNumberField.CountryCallingCode::flagView)
                     .orElse(new ImageView(WORLD_ICON)));
 
             getSkinnable().countryCodeProperty().addListener(updateFlag);
@@ -122,6 +124,8 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
             buttonBox.getStyleClass().add("button-box");
             buttonBox.getChildren().addAll(flagBox, arrowButton);
+            buttonBox.managedProperty().bind(buttonBox.visibleProperty());
+            buttonBox.visibleProperty().bind(getSkinnable().forceLocalPhoneNumberProperty().not());
 
             maskLabel.getStyleClass().add("text-mask");
 
@@ -147,8 +151,13 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
                 @Override
                 protected void layoutChildren(double x, double y, double w, double h) {
-                    final double buttonWidth = snapSizeX(buttonBox.prefWidth(-1));
-                    buttonBox.resizeRelocate(x, y, buttonWidth, h);
+                    final double buttonWidth;
+                    if (PhoneNumberFieldSkin.this.getSkinnable().isForceLocalPhoneNumber()) {
+                        buttonWidth = 0;
+                    } else {
+                        buttonWidth = snapSizeX(buttonBox.prefWidth(-1));
+                        buttonBox.resizeRelocate(x, y, buttonWidth, h);
+                    }
 
                     final double textFieldX = snapPositionX(x + buttonWidth);
                     textField.resizeRelocate(textFieldX, y, w - buttonWidth, h);
@@ -163,7 +172,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
     }
 
-    private final class CountryCallingCodeCell extends ListCell<CountryCallingCode> {
+    private final class CountryCallingCodeCell extends ListCell<PhoneNumberField.CountryCallingCode> {
 
         private CountryCallingCodeCell() {
             getStyleClass().add("country-calling-code-cell");
@@ -176,7 +185,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
         }
 
         @Override
-        protected void updateItem(CountryCallingCode item, boolean empty) {
+        protected void updateItem(PhoneNumberField.CountryCallingCode item, boolean empty) {
             super.updateItem(item, empty);
 
             int index = -1;
