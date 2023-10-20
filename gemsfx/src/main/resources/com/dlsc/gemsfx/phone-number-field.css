@@ -1,0 +1,69 @@
+.phone-number-field {
+
+}
+
+.phone-number-field > .combo-box {
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-box-border, -fx-background;
+    -fx-background-insets: 0px, 1px;
+    -fx-padding: 4px 6px;
+}
+
+.phone-number-field > .combo-box > .arrow-button {
+    -fx-opacity: 1;
+    -fx-managed: true;
+    -fx-max-width: 0px;
+    -fx-pref-width: 0px;
+    -fx-min-width: 0px;
+    -fx-padding: 0px;
+}
+
+.phone-number-field > .combo-box > .arrow-button > .arrow {
+    -fx-padding: 0px;
+}
+
+.phone-number-field > .combo-box > .editor {
+    -fx-padding: 0px;
+}
+
+.phone-number-field > .combo-box > .editor > .text-field {
+    -fx-background-color: transparent;
+    -fx-padding: 0px;
+}
+
+.phone-number-field > .combo-box > .editor > .text-mask {
+    -fx-text-fill: rgb(0, 0, 0, .4);
+}
+
+.phone-number-field > .combo-box > .editor > .button-box {
+    -fx-alignment: center;
+}
+
+.phone-number-field > .combo-box > .editor > .button-box > .arrow-button {
+    -fx-min-width: 10px;
+    -fx-padding: 10px 5px;
+}
+
+.phone-number-field > .combo-box > .editor > .button-box > .arrow-button > .arrow {
+    -fx-background-color: -fx-mark-color;
+    -fx-background-insets: 0;
+    -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
+    -fx-shape: "M 0 0 h 9 l -4.5 5 z";
+    -fx-scale-shape: false;
+}
+
+.phone-number-field > .combo-box > .editor > .button-box > .flag-box {
+    -fx-pref-width: 20px;
+    -fx-alignment: center;
+}
+
+.country-calling-code-cell {
+
+}
+
+.country-calling-code-cell.preferred.last {
+    -fx-border-width: 0px 0px 2px 0px;
+    -fx-border-color: -fx-box-border;
+}
+
+
