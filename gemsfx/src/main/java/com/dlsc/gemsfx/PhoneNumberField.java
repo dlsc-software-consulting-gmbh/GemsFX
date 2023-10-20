@@ -1,10 +1,12 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.PhoneNumberFieldSkin;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -94,7 +96,14 @@ public class PhoneNumberField extends Control {
                 return score;
             }
         };
+
         phoneNumberProperty().addListener(phoneNumberListener);
+        defaultCountryCodeProperty().addListener((obs, oldCode, newCode) -> {
+            if (countryCode.get() == null && newCode != null) {
+                countryCode.set(newCode);
+                setPhoneNumber(newCode.phonePrefix());
+            }
+        });
     }
 
     @Override
@@ -143,6 +152,21 @@ public class PhoneNumberField extends Control {
     }
 
     // SETTINGS
+
+    private final ObjectProperty<CountryCallingCode> defaultCountryCode = new SimpleObjectProperty<>(this, "defaultCountryCode");
+
+    public final ObjectProperty<CountryCallingCode> defaultCountryCodeProperty() {
+        return defaultCountryCode;
+    }
+
+    public final CountryCallingCode getDefaultCountryCode() {
+        return defaultCountryCode.get();
+    }
+
+    public final void setDefaultCountryCode(CountryCallingCode defaultCountryCode) {
+        this.defaultCountryCode.set(defaultCountryCode);
+    }
+
     private final ObservableList<CountryCallingCode> availableCountryCodes = FXCollections.observableArrayList();
 
     public final ObservableList<CountryCallingCode> getAvailableCountryCodes() {

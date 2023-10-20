@@ -60,12 +60,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
         comboBox.valueProperty().addListener((obs, oldCode, newCode) -> {
             if (newCode != null) {
-                StringBuilder value = new StringBuilder();
-                value.append(newCode.countryCode());
-                if (newCode.areaCodes().length > 0) {
-                    value.append(newCode.areaCodes()[0]);
-                }
-                field.setPhoneNumber(value.toString());
+                field.setPhoneNumber(newCode.phonePrefix());
             } else {
                 field.setPhoneNumber(null);
             }

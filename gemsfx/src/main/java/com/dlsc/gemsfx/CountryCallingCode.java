@@ -14,6 +14,15 @@ public interface CountryCallingCode {
 
     int[] areaCodes();
 
+    default String phonePrefix() {
+        StringBuilder value = new StringBuilder();
+        value.append(countryCode());
+        if (areaCodes().length > 0) {
+            value.append(areaCodes()[0]);
+        }
+        return value.toString();
+    }
+
     String displayName(String language);
 
     Node flagView();

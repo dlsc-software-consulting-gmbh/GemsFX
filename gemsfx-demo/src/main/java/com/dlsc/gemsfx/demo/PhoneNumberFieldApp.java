@@ -21,6 +21,7 @@ public class PhoneNumberFieldApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         PhoneNumberField view = new PhoneNumberField();
+        view.setDefaultCountryCode(CountryCallingCode.Defaults.GERMANY);
         view.getPreferredCountryCodes().add(CountryCallingCode.Defaults.COLOMBIA);
         view.getPreferredCountryCodes().add(CountryCallingCode.Defaults.SWITZERLAND);
 
