@@ -40,12 +40,13 @@ public class PhoneNumberFieldApp extends Application {
         addControl("Default Country", defaultCountrySelector(field), controls);
         addControl("Available Countries", availableCountriesSelector(field), controls);
         addControl("Preferred Countries", preferredCountriesSelector(field), controls);
-        addControl("Force Local Phone", useLocalPhoneNumberCheck(field), controls);
+        addControl("Force Local Phone", forceLocalPhoneNumberCheck(field), controls);
+        addControl("Fixed Country", fixedCountrySelector(field), controls);
         addControl("Mask", maskInputField(field), controls);
 
         VBox fields = new VBox(10);
-        addField(fields, "Country", field.countryCodeProperty(), COUNTRY_CODE_CONVERTER);
-        addField(fields, "Number", field.phoneNumberProperty());
+        addField(fields, "Country Code", field.countryCodeProperty(), COUNTRY_CODE_CONVERTER);
+        addField(fields, "Phone Number", field.phoneNumberProperty());
         addField(fields, "Local Number", field.localPhoneNumberProperty());
 
         VBox vBox = new VBox(20);
@@ -64,7 +65,8 @@ public class PhoneNumberFieldApp extends Application {
 
     private Node defaultCountrySelector(PhoneNumberField view) {
         ComboBox<PhoneNumberField.CountryCallingCode> comboBox = new ComboBox<>();
-        comboBox.getItems().addAll(PhoneNumberField.CountryCallingCode.defaultValues());
+        comboBox.getItems().add(null);
+        comboBox.getItems().addAll(PhoneNumberField.CountryCallingCode.Defaults.values());
         comboBox.valueProperty().bindBidirectional(view.defaultCountryCodeProperty());
         return comboBox;
     }
@@ -73,7 +75,7 @@ public class PhoneNumberFieldApp extends Application {
         CheckBox allCountries = new CheckBox("All");
 
         CheckComboBox<PhoneNumberField.CountryCallingCode> comboBox = new CheckComboBox<>();
-        comboBox.getItems().addAll(PhoneNumberField.CountryCallingCode.defaultValues());
+        comboBox.getItems().addAll(PhoneNumberField.CountryCallingCode.Defaults.values());
         comboBox.setPrefWidth(250);
         comboBox.getCheckModel().getCheckedItems().addListener((InvalidationListener) observable -> field.getAvailableCountryCodes().setAll(comboBox.getCheckModel().getCheckedItems()));
         comboBox.getCheckModel().checkAll();
@@ -98,7 +100,7 @@ public class PhoneNumberFieldApp extends Application {
 
     private Node preferredCountriesSelector(PhoneNumberField view) {
         CheckComboBox<PhoneNumberField.CountryCallingCode> comboBox = new CheckComboBox<>();
-        comboBox.getItems().addAll(PhoneNumberField.CountryCallingCode.defaultValues());
+        comboBox.getItems().addAll(PhoneNumberField.CountryCallingCode.Defaults.values());
         comboBox.setPrefWidth(300);
         Bindings.bindContent(view.getPreferredCountryCodes(), comboBox.getCheckModel().getCheckedItems());
         return comboBox;
@@ -110,10 +112,18 @@ public class PhoneNumberFieldApp extends Application {
         return mask;
     }
 
-    private Node useLocalPhoneNumberCheck(PhoneNumberField field) {
+    private Node forceLocalPhoneNumberCheck(PhoneNumberField field) {
         CheckBox localCheck = new CheckBox();
         localCheck.selectedProperty().bindBidirectional(field.forceLocalPhoneNumberProperty());
         return localCheck;
+    }
+
+    private Node fixedCountrySelector(PhoneNumberField view) {
+        ComboBox<PhoneNumberField.CountryCallingCode> comboBox = new ComboBox<>();
+        comboBox.getItems().add(null);
+        comboBox.getItems().addAll(PhoneNumberField.CountryCallingCode.Defaults.values());
+        comboBox.valueProperty().bindBidirectional(view.fixedCountryCodeProperty());
+        return comboBox;
     }
 
     private void addControl(String name, Node control, VBox controls) {

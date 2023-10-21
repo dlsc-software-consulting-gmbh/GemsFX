@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.PhoneNumberField;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
@@ -12,7 +13,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -29,11 +29,11 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
     private static final Image WORLD_ICON = new Image(Objects.requireNonNull(PhoneNumberField.class.getResource("phonenumberfield/world.png")).toExternalForm());
 
-    public PhoneNumberFieldSkin(PhoneNumberField field) {
+    public PhoneNumberFieldSkin(PhoneNumberField field, ReadOnlyObjectWrapper<PhoneNumberField.CountryCallingCode> countryCode) {
         super(field);
 
         ObservableList<PhoneNumberField.CountryCallingCode> callingCodes = FXCollections.observableArrayList();
-        InvalidationListener callingCodesUpdater = obs -> {
+        Runnable callingCodesUpdater = () -> {
             Set<PhoneNumberField.CountryCallingCode> temp = new LinkedHashSet<>();
             getSkinnable().getPreferredCountryCodes().forEach(code -> {
                 if (getSkinnable().getAvailableCountryCodes().contains(code)) {
@@ -49,9 +49,9 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             }
         };
 
-        getSkinnable().getAvailableCountryCodes().addListener(callingCodesUpdater);
-        getSkinnable().getPreferredCountryCodes().addListener(callingCodesUpdater);
-        callingCodesUpdater.invalidated(null);
+        getSkinnable().getAvailableCountryCodes().addListener((InvalidationListener) obs -> callingCodesUpdater.run());
+        getSkinnable().getPreferredCountryCodes().addListener((InvalidationListener) obs -> callingCodesUpdater.run());
+        callingCodesUpdater.run();
 
         PhoneNumberEditor editor = new PhoneNumberEditor();
 
@@ -62,19 +62,17 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
         comboBox.setMaxWidth(Double.MAX_VALUE);
         comboBox.setMaxHeight(Double.MAX_VALUE);
         comboBox.setFocusTraversable(false);
-
-        comboBox.valueProperty().addListener((obs, oldCode, newCode) -> getSkinnable()
-            .setPhoneNumber(Optional.ofNullable(newCode)
-                .map(PhoneNumberField.CountryCallingCode::defaultPhonePrefix)
-                .orElse(null)));
+        comboBox.valueProperty().bindBidirectional(countryCode);
 
         // Manually handle mouse event either on the text field or the trigger button box
         field.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
             Bounds buttonBounds = editor.buttonBox.getBoundsInParent();
             if (!getSkinnable().isForceLocalPhoneNumber() && buttonBounds.contains(evt.getX(), evt.getY())) {
-                editor.buttonBox.requestFocus();
-                if (!comboBox.isShowing()) {
-                    comboBox.show();
+                if (!editor.buttonBox.isDisabled()) {
+                    editor.buttonBox.requestFocus();
+                    if (!comboBox.isShowing()) {
+                        comboBox.show();
+                    }
                 }
             }
             else {
@@ -97,7 +95,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
     private final class PhoneNumberEditor extends ListCell<PhoneNumberField.CountryCallingCode> {
 
-        final TextField textField = new TextField();
+        final TextField textField = getSkinnable().getTextField();
         final Label maskLabel = new Label();
         final HBox buttonBox = new HBox();
 
@@ -107,13 +105,12 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             StackPane flagBox = new StackPane();
             flagBox.getStyleClass().add("flag-box");
 
-            InvalidationListener updateFlag = it -> flagBox.getChildren()
-                .setAll(Optional.ofNullable(getSkinnable().getCountryCode())
-                    .map(PhoneNumberField.CountryCallingCode::flagView)
-                    .orElse(new ImageView(WORLD_ICON)));
+            Runnable flagUpdater = () -> flagBox.getChildren().setAll(Optional.ofNullable(getSkinnable().getCountryCode())
+                .map(PhoneNumberField.CountryCallingCode::flagView)
+                .orElse(new ImageView(WORLD_ICON)));
 
-            getSkinnable().countryCodeProperty().addListener(updateFlag);
-            updateFlag.invalidated(null);
+            getSkinnable().countryCodeProperty().addListener(obs -> flagUpdater.run());
+            flagUpdater.run();
 
             Region arrow = new Region();
             arrow.getStyleClass().add("arrow");
@@ -126,20 +123,9 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             buttonBox.getChildren().addAll(flagBox, arrowButton);
             buttonBox.managedProperty().bind(buttonBox.visibleProperty());
             buttonBox.visibleProperty().bind(getSkinnable().forceLocalPhoneNumberProperty().not());
+            buttonBox.disableProperty().bind(getSkinnable().fixedCountryCodeProperty().isNotNull());
 
             maskLabel.getStyleClass().add("text-mask");
-
-            textField.setTextFormatter(new TextFormatter<>(change -> {
-                if (change.isAdded() || change.isReplaced()) {
-                    String text = change.getText();
-                    if (!text.matches("[0-9]+")) {
-                        return null;
-                    }
-                }
-                return change;
-            }));
-
-            textField.textProperty().bindBidirectional(getSkinnable().phoneNumberProperty());
         }
 
         @Override

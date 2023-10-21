@@ -24,6 +24,8 @@
 
 .phone-number-field > .combo-box > .editor {
     -fx-padding: 0px;
+    -fx-min-height: 25px;
+    -fx-pref-height: 25px;
 }
 
 .phone-number-field > .combo-box > .editor > .text-field {
@@ -37,6 +39,10 @@
 
 .phone-number-field > .combo-box > .editor > .button-box {
     -fx-alignment: center;
+}
+
+.phone-number-field > .combo-box > .editor > .button-box:disabled {
+    -fx-opacity: 0.5;
 }
 
 .phone-number-field > .combo-box > .editor > .button-box > .arrow-button {
@@ -62,8 +68,8 @@
 }
 
 .country-calling-code-cell.preferred.last {
-    -fx-border-width: 0px 0px 2px 0px;
-    -fx-border-color: -fx-box-border;
+    -fx-border-width: 0px 0px 5px 0px;
+    -fx-border-color: blue;
 }
 
 
