@@ -20,7 +20,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -28,6 +31,14 @@ import java.util.Set;
 public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
     private static final Image WORLD_ICON = new Image(Objects.requireNonNull(PhoneNumberField.class.getResource("phonenumberfield/world.png")).toExternalForm());
+
+    private static final Map<PhoneNumberField.CountryCallingCode, Image> FLAG_IMAGES = new HashMap<>();
+
+    static {
+        for (PhoneNumberField.CountryCallingCode code : PhoneNumberField.CountryCallingCode.Defaults.values()) {
+            FLAG_IMAGES.put(code, new Image(Objects.requireNonNull(PhoneNumberField.class.getResource("phonenumberfield/country-flags/20x13/" + code.iso2Code().toLowerCase() + ".png")).toExternalForm()));
+        }
+    }
 
     public PhoneNumberFieldSkin(PhoneNumberField field, ReadOnlyObjectWrapper<PhoneNumberField.CountryCallingCode> countryCode) {
         super(field);
@@ -49,8 +60,10 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             }
         };
 
-        getSkinnable().getAvailableCountryCodes().addListener((InvalidationListener) obs -> callingCodesUpdater.run());
-        getSkinnable().getPreferredCountryCodes().addListener((InvalidationListener) obs -> callingCodesUpdater.run());
+        InvalidationListener listener = obs -> callingCodesUpdater.run();
+        getSkinnable().getAvailableCountryCodes().addListener(listener);
+        getSkinnable().getPreferredCountryCodes().addListener(listener);
+        getSkinnable().countryCodeViewFactoryProperty().addListener(listener);
         callingCodesUpdater.run();
 
         PhoneNumberEditor editor = new PhoneNumberEditor();
@@ -105,11 +118,9 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             StackPane flagBox = new StackPane();
             flagBox.getStyleClass().add("flag-box");
 
-            Runnable flagUpdater = () -> flagBox.getChildren().setAll(Optional.ofNullable(getSkinnable().getCountryCode())
-                .map(PhoneNumberField.CountryCallingCode::flagView)
-                .orElse(new ImageView(WORLD_ICON)));
-
+            Runnable flagUpdater = () -> flagBox.getChildren().setAll(getCountryCodeFlagView(getSkinnable().getCountryCode()));
             getSkinnable().countryCodeProperty().addListener(obs -> flagUpdater.run());
+            getSkinnable().countryCodeViewFactoryProperty().addListener(obs -> flagUpdater.run());
             flagUpdater.run();
 
             Region arrow = new Region();
@@ -177,8 +188,8 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             int index = -1;
 
             if (item != null && !empty) {
-                setText("(+" + item.countryCode() + ") " + item.displayName("en"));
-                setGraphic(item.flagView());
+                setText("(+" + item.countryCode() + ") " + new Locale("en", item.iso2Code()).getDisplayCountry());
+                setGraphic(getCountryCodeFlagView(item));
                 index = getSkinnable().getPreferredCountryCodes().indexOf(item);
             } else {
                 setText(null);
@@ -198,6 +209,20 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             }
         }
 
+    }
+
+    private Node getCountryCodeFlagView(PhoneNumberField.CountryCallingCode code) {
+        Node flagView;
+        if (code != null) {
+            if (getSkinnable().getCountryCodeViewFactory() != null) {
+                flagView = getSkinnable().getCountryCodeViewFactory().call(code);
+            } else {
+                flagView = new ImageView(Optional.ofNullable(FLAG_IMAGES.get(code)).orElse(WORLD_ICON));
+            }
+        } else {
+            flagView = new ImageView(WORLD_ICON);
+        }
+        return flagView;
     }
 
 }
