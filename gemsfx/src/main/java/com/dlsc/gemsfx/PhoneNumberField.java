@@ -18,15 +18,13 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.util.Callback;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,6 +34,7 @@ import java.util.function.UnaryOperator;
 public class PhoneNumberField extends Control {
 
     public static final String DEFAULT_STYLE_CLASS = "phone-number-field";
+    public static final String DEFAULT_MASK = "(###) ###-##-##";
 
     private final TextField textField = new TextField();
 
@@ -141,6 +140,8 @@ public class PhoneNumberField extends Control {
                 setPhoneNumber(Optional.ofNullable(countryCallingCode)
                     .map(CountryCallingCode::defaultPhonePrefix)
                     .orElse(null));
+
+                Optional.ofNullable(getMaskProvider()).ifPresent(m -> setMask(m.call(countryCallingCode)));
 
             } finally {
                 selfUpdate = false;
@@ -252,18 +253,53 @@ public class PhoneNumberField extends Control {
         forceLocalPhoneNumberProperty().set(forceLocalPhoneNumber);
     }
 
-    private final StringProperty mask = new SimpleStringProperty(this, "mask");
+    private final ObjectProperty<Callback<CountryCallingCode, String>> maskProvider = new SimpleObjectProperty<>(this, "maskProvider", code ->
+        Optional.ofNullable(code).map(CountryCallingCode::mask).orElse(null)) {
+        @Override
+        public void set(Callback<CountryCallingCode, String> newMaskProvider) {
+            super.set(newMaskProvider);
+            setMask(Optional.ofNullable(newMaskProvider).map(p -> p.call(getCountryCode())).orElse(null));
+        }
+    };
 
-    public final StringProperty maskProperty() {
-        return mask;
+    public final ObjectProperty<Callback<CountryCallingCode, String>> maskProviderProperty() {
+        return maskProvider;
+    }
+
+    public final Callback<CountryCallingCode, String> getMaskProvider() {
+        return maskProviderProperty().get();
+    }
+
+    public final void setMaskProvider(Callback<CountryCallingCode, String> mask) {
+        maskProviderProperty().set(mask);
+    }
+
+    private final ReadOnlyStringWrapper mask = new ReadOnlyStringWrapper(this, "mask");
+
+    public final ReadOnlyStringProperty maskProperty() {
+        return mask.getReadOnlyProperty();
     }
 
     public final String getMask() {
-        return maskProperty().get();
+        return mask.get();
     }
 
-    public final void setMask(String mask) {
-        maskProperty().set(mask);
+    private void setMask(String mask) {
+        this.mask.set(mask);
+    }
+
+    private final ObjectProperty<Callback<CountryCallingCode, Node>> countryCodeViewFactory = new SimpleObjectProperty<>(this, "countryCodeViewFactory");
+
+    public final ObjectProperty<Callback<CountryCallingCode, Node>> countryCodeViewFactoryProperty() {
+        return countryCodeViewFactory;
+    }
+
+    public final Callback<CountryCallingCode, Node> getCountryCodeViewFactory() {
+        return countryCodeViewFactoryProperty().get();
+    }
+
+    public final void setCountryCodeViewFactory(Callback<CountryCallingCode, Node> countryCodeViewFactory) {
+        countryCodeViewFactoryProperty().set(countryCodeViewFactory);
     }
 
     public interface CountryCallingCode {
@@ -272,9 +308,9 @@ public class PhoneNumberField extends Control {
 
         int[] areaCodes();
 
-        String displayName(String language);
+        String iso2Code();
 
-        Node flagView();
+        String mask();
 
         default Integer defaultAreaCode() {
             return areaCodes().length > 0 ? areaCodes()[0] : null;
@@ -540,13 +576,17 @@ public class PhoneNumberField extends Control {
             private final int code;
             private final String iso2Code;
             private final int[] areaCodes;
-            private final Image flagImage;
+            private final String mask;
 
             Defaults(int code, String iso2Code, int... areaCodes) {
+                this(code, iso2Code, DEFAULT_MASK, areaCodes);
+            }
+
+            Defaults(int code, String iso2Code, String mask, int... areaCodes) {
                 this.code = code;
                 this.iso2Code = iso2Code;
+                this.mask = mask;
                 this.areaCodes = Optional.ofNullable(areaCodes).orElse(new int[0]);
-                this.flagImage = new Image(Objects.requireNonNull(PhoneNumberField.class.getResource("phonenumberfield/country-flags/20x13/" + iso2Code.toLowerCase() + ".png")).toExternalForm());
             }
 
             @Override
@@ -560,13 +600,13 @@ public class PhoneNumberField extends Control {
             }
 
             @Override
-            public String displayName(String language) {
-                return new Locale(language, iso2Code).getDisplayCountry();
+            public String iso2Code() {
+                return iso2Code;
             }
 
             @Override
-            public Node flagView() {
-                return new ImageView(flagImage);
+            public String mask() {
+                return mask;
             }
 
         }
@@ -642,6 +682,13 @@ public class PhoneNumberField extends Control {
     }
 
     private final class PhoneNumberFormatter implements UnaryOperator<TextFormatter.Change> {
+
+        private PhoneNumberFormatter() {
+            maskProperty().addListener((observable, oldMask, newMask) -> {
+
+            });
+        }
+
         @Override
         public TextFormatter.Change apply(TextFormatter.Change change) {
             if (change.isAdded() || change.isReplaced()) {
@@ -660,6 +707,7 @@ public class PhoneNumberField extends Control {
                     }
                 }
             }
+
             return change;
         }
     }

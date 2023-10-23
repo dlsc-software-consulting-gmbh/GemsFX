@@ -13,7 +13,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -29,7 +28,7 @@ public class PhoneNumberFieldApp extends Application {
             return null;
         }
         PhoneNumberField.CountryCallingCode code = (PhoneNumberField.CountryCallingCode) c;
-        return "(+" + code.countryCode() + ") " + code.displayName("en");
+        return "(+" + code.countryCode() + ") " + code;
     };
 
     @Override
@@ -42,12 +41,12 @@ public class PhoneNumberFieldApp extends Application {
         addControl("Preferred Countries", preferredCountriesSelector(field), controls);
         addControl("Force Local Phone", forceLocalPhoneNumberCheck(field), controls);
         addControl("Fixed Country", fixedCountrySelector(field), controls);
-        addControl("Mask", maskInputField(field), controls);
 
         VBox fields = new VBox(10);
         addField(fields, "Country Code", field.countryCodeProperty(), COUNTRY_CODE_CONVERTER);
         addField(fields, "Phone Number", field.phoneNumberProperty());
         addField(fields, "Local Number", field.localPhoneNumberProperty());
+        addField(fields, "Mask", field.maskProperty());
 
         VBox vBox = new VBox(20);
         vBox.setPadding(new Insets(20));
@@ -104,12 +103,6 @@ public class PhoneNumberFieldApp extends Application {
         comboBox.setPrefWidth(300);
         Bindings.bindContent(view.getPreferredCountryCodes(), comboBox.getCheckModel().getCheckedItems());
         return comboBox;
-    }
-
-    private Node maskInputField(PhoneNumberField field) {
-        TextField mask = new TextField();
-        mask.textProperty().bindBidirectional(field.maskProperty());
-        return mask;
     }
 
     private Node forceLocalPhoneNumberCheck(PhoneNumberField field) {
