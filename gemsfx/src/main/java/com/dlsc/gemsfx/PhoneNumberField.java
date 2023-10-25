@@ -3,8 +3,6 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.skins.PhoneNumberFieldSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,10 +17,9 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.util.Callback;
-import javafx.util.Pair;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,19 +31,18 @@ import java.util.function.UnaryOperator;
 public class PhoneNumberField extends Control {
 
     public static final String DEFAULT_STYLE_CLASS = "phone-number-field";
-    public static final String DEFAULT_MASK = "(###) ###-##-##";
+    public static final String DEFAULT_MASK = "(___) ___-____";
+    public static final char DEFAULT_MASK_DIGIT = '_';
+    public static final List<Character> DEFAULT_SUPPORTED_CHARS_IN_MASK = Arrays.asList(DEFAULT_MASK_DIGIT, '-', '(', ')', ' ');
 
-    private final TextField textField = new TextField();
+    private final PhoneNumberParser parser;
+    private final PhoneNumberFormatter formatter;
 
     public PhoneNumberField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         getAvailableCountryCodes().setAll(CountryCallingCode.Defaults.values());
-        textField.setTextFormatter(new TextFormatter<>(new PhoneNumberFormatter()));
-        textField.textProperty().bindBidirectional(phoneNumberProperty());
-    }
-
-    public final TextField getTextField() {
-        return textField;
+        parser = new PhoneNumberParser();
+        formatter = new PhoneNumberFormatter();
     }
 
     @Override
@@ -56,14 +52,14 @@ public class PhoneNumberField extends Control {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new PhoneNumberFieldSkin(this, countryCode);
+        return new PhoneNumberFieldSkin(this, formatter.textField);
     }
 
     // VALUES
     private final StringProperty phoneNumber = new SimpleStringProperty(this, "phoneNumber") {
         private boolean selfUpdate;
         @Override
-        public void set(String newPhone) {
+        public void set(String newPhoneNumber) {
             if (selfUpdate) {
                 return;
             }
@@ -71,24 +67,33 @@ public class PhoneNumberField extends Control {
             try {
                 selfUpdate = true;
 
-                // Set the value first, so that the binding will be triggered
-                super.set(newPhone);
+                // Make sure the phone number is valid
+                if (parser.isInvalid(newPhoneNumber)) {
+                    newPhoneNumber = null;
+                }
 
-                if (isForceLocalPhoneNumber()) {
+                // Set the value first, so that the binding will be triggered
+                super.set(newPhoneNumber);
+
+                if (isForceLocalNumber()) {
                     // No need to infer the country code, just use the local phone number
-                    setCountryCode(null);
-                    setLocalPhoneNumber(newPhone);
+                    setCountryCallingCode(null);
+                    setLocalPhoneNumber(newPhoneNumber);
+                    formatter.updateFormattedLocalPhoneNumber(newPhoneNumber);
                     return;
                 }
 
-                // Update country code and local phone
-                Pair<CountryCallingCode, String> parsedNumber = PhoneNumberParser.parse(newPhone, getAvailableCountryCodes());
-                if (parsedNumber != null) {
-                    setCountryCode(parsedNumber.getKey());
-                    setLocalPhoneNumber(parsedNumber.getValue());
-                } else {
-                    setCountryCode(null);
+                // Set depending fields here
+                PhoneNumber parsedNumber = parser.call(newPhoneNumber);
+
+                if (parsedNumber == null) {
+                    setCountryCallingCode(null);
                     setLocalPhoneNumber(null);
+                    formatter.updateFormattedLocalPhoneNumber(null);
+                } else {
+                    setCountryCallingCode(parsedNumber.countryCallingCode);
+                    setLocalPhoneNumber(parsedNumber.localPhoneNumber);
+                    formatter.updateFormattedLocalPhoneNumber(parsedNumber.localPhoneNumber);
                 }
             }
             finally {
@@ -109,6 +114,52 @@ public class PhoneNumberField extends Control {
         phoneNumberProperty().set(phoneNumber);
     }
 
+    private final ObjectProperty<CountryCallingCode> countryCallingCode = new SimpleObjectProperty<>(this, "countryCallingCode") {
+        private boolean selfUpdate;
+        @Override
+        public void set(CountryCallingCode newCountryCallingCode) {
+            if (selfUpdate) {
+                return;
+            }
+
+            try {
+                selfUpdate = true;
+
+                // Set the value first, so that the binding will be triggered
+                super.set(newCountryCallingCode);
+
+                // For now replace the entire text, it might be good to preserve the local number and just change the country code
+                if (isForceLocalNumber()) {
+                    setPhoneNumber(null);
+                } else {
+                    setPhoneNumber(Optional.ofNullable(newCountryCallingCode)
+                        .map(CountryCallingCode::phonePrefix)
+                        .map(String::valueOf)
+                        .orElse(null));
+                }
+
+                if (getMaskProvider() != null) {
+                    setMask(getMaskProvider().call(newCountryCallingCode));
+                }
+
+            } finally {
+                selfUpdate = false;
+            }
+        }
+    };
+
+    public final ObjectProperty<CountryCallingCode> countryCallingCodeProperty() {
+        return countryCallingCode;
+    }
+
+    public final CountryCallingCode getCountryCallingCode() {
+        return countryCallingCodeProperty().get();
+    }
+
+    private void setCountryCallingCode(CountryCallingCode countryCallingCode) {
+        countryCallingCodeProperty().set(countryCallingCode);
+    }
+
     private final ReadOnlyStringWrapper localPhoneNumber = new ReadOnlyStringWrapper(this, "localPhoneNumber");
 
     public final ReadOnlyStringProperty localPhoneNumberProperty() {
@@ -123,42 +174,14 @@ public class PhoneNumberField extends Control {
         this.localPhoneNumber.set(localPhoneNumber);
     }
 
-    private final ReadOnlyObjectWrapper<CountryCallingCode> countryCode = new ReadOnlyObjectWrapper<>(this, "countryCode") {
-        private boolean selfUpdate;
-        @Override
-        public void set(CountryCallingCode countryCallingCode) {
-            if (selfUpdate) {
-                return;
-            }
-            try {
-                selfUpdate = true;
+    private final ReadOnlyStringWrapper formattedLocalPhoneNumber = new ReadOnlyStringWrapper(this, "formattedLocalPhoneNumber");
 
-                // Set the value first, so that the binding will be triggered
-                super.set(countryCallingCode);
-
-                // For now replace the entire text, it might be good to preserve the local number and just change the country code
-                setPhoneNumber(Optional.ofNullable(countryCallingCode)
-                    .map(CountryCallingCode::defaultPhonePrefix)
-                    .orElse(null));
-
-                Optional.ofNullable(getMaskProvider()).ifPresent(m -> setMask(m.call(countryCallingCode)));
-
-            } finally {
-                selfUpdate = false;
-            }
-        }
-    };
-
-    public final ReadOnlyObjectProperty<CountryCallingCode> countryCodeProperty() {
-        return countryCode.getReadOnlyProperty();
+    public final ReadOnlyStringProperty formattedLocalPhoneNumberProperty() {
+        return formattedLocalPhoneNumber.getReadOnlyProperty();
     }
 
-    public final CountryCallingCode getCountryCode() {
-        return countryCode.get();
-    }
-
-    private void setCountryCode(CountryCallingCode countryCode) {
-        this.countryCode.set(countryCode);
+    public final String getFormattedLocalPhoneNumber() {
+        return formattedLocalPhoneNumber.get();
     }
 
     // SETTINGS
@@ -175,117 +198,54 @@ public class PhoneNumberField extends Control {
         return preferredCountryCodes;
     }
 
-    private final ObjectProperty<CountryCallingCode> defaultCountryCode = new SimpleObjectProperty<>(this, "defaultCountryCode") {
+    private final BooleanProperty disableCountryCode = new SimpleBooleanProperty(this, "disableCountryCode");
+
+    public final BooleanProperty disableCountryCodeProperty() {
+        return disableCountryCode;
+    }
+
+    public final boolean isDisableCountryCode() {
+        return disableCountryCodeProperty().get();
+    }
+
+    public final void setDisableCountryCode(boolean disableCountryCode) {
+        disableCountryCodeProperty().set(disableCountryCode);
+    }
+
+    private final BooleanProperty forceLocalNumber = new SimpleBooleanProperty(this, "forceLocalNumber") {
+        private CountryCallingCode lastCountryCallingCode;
         @Override
-        public void set(CountryCallingCode countryCallingCode) {
-            super.set(countryCallingCode);
-            if (getCountryCode() == null) {
-                setCountryCode(countryCallingCode);
-            }
-        }
-    };
-
-    public final ObjectProperty<CountryCallingCode> defaultCountryCodeProperty() {
-        return defaultCountryCode;
-    }
-
-    public final CountryCallingCode getDefaultCountryCode() {
-        return defaultCountryCodeProperty().get();
-    }
-
-    public final void setDefaultCountryCode(CountryCallingCode defaultCountryCode) {
-        defaultCountryCodeProperty().set(defaultCountryCode);
-    }
-
-    private final ObjectProperty<CountryCallingCode> fixedCountryCode = new SimpleObjectProperty<>(this, "fixedCountryCode") {
-        @Override
-        public void set(CountryCallingCode countryCallingCode) {
-            super.set(countryCallingCode);
-            if (countryCallingCode != null && !isForceLocalPhoneNumber()) {
-                setCountryCode(countryCallingCode);
-            }
-        }
-    };
-
-    public final ObjectProperty<CountryCallingCode> fixedCountryCodeProperty() {
-        return fixedCountryCode;
-    }
-
-    public final CountryCallingCode getFixedCountryCode() {
-        return fixedCountryCodeProperty().get();
-    }
-
-    public final void setFixedCountryCode(CountryCallingCode fixedCountryCode) {
-        fixedCountryCodeProperty().set(fixedCountryCode);
-    }
-
-    private final BooleanProperty forceLocalPhoneNumber = new SimpleBooleanProperty(this, "forceLocalPhoneNumber") {
-        private CountryCallingCode lastCountryCode;
-        @Override
-        public void set(boolean forceLocal) {
-            super.set(forceLocal);
+        public void set(boolean newForceLocal) {
+            super.set(newForceLocal);
 
             final String localPhone = Optional.ofNullable(getLocalPhoneNumber()).orElse("");
 
-            if (forceLocal) {
-                lastCountryCode = getCountryCode();
-                setCountryCode(null);
+            if (newForceLocal) {
+                lastCountryCallingCode = getCountryCallingCode();
                 setPhoneNumber(localPhone);
-            } else if (getFixedCountryCode() != null) {
-                setPhoneNumber(getFixedCountryCode().defaultPhonePrefix() + localPhone);
-            } else if (lastCountryCode != null) {
-                setPhoneNumber(lastCountryCode.defaultPhonePrefix() + localPhone);
+            } else if (lastCountryCallingCode != null) {
+                String prefix = String.valueOf(lastCountryCallingCode.phonePrefix());
+                if ((lastCountryCallingCode.countryCode() + localPhone).equals(prefix)) {
+                    setPhoneNumber(prefix);
+                } else {
+                    setPhoneNumber(lastCountryCallingCode.countryCode() + localPhone);
+                }
             } else {
                 setPhoneNumber(localPhone);
             }
         }
     };
 
-    public final BooleanProperty forceLocalPhoneNumberProperty() {
-        return forceLocalPhoneNumber;
+    public final BooleanProperty forceLocalNumberProperty() {
+        return forceLocalNumber;
     }
 
-    public final boolean isForceLocalPhoneNumber() {
-        return forceLocalPhoneNumberProperty().get();
+    public final boolean isForceLocalNumber() {
+        return forceLocalNumberProperty().get();
     }
 
-    public final void setForceLocalPhoneNumber(boolean forceLocalPhoneNumber) {
-        forceLocalPhoneNumberProperty().set(forceLocalPhoneNumber);
-    }
-
-    private final ObjectProperty<Callback<CountryCallingCode, String>> maskProvider = new SimpleObjectProperty<>(this, "maskProvider", code ->
-        Optional.ofNullable(code).map(CountryCallingCode::mask).orElse(null)) {
-        @Override
-        public void set(Callback<CountryCallingCode, String> newMaskProvider) {
-            super.set(newMaskProvider);
-            setMask(Optional.ofNullable(newMaskProvider).map(p -> p.call(getCountryCode())).orElse(null));
-        }
-    };
-
-    public final ObjectProperty<Callback<CountryCallingCode, String>> maskProviderProperty() {
-        return maskProvider;
-    }
-
-    public final Callback<CountryCallingCode, String> getMaskProvider() {
-        return maskProviderProperty().get();
-    }
-
-    public final void setMaskProvider(Callback<CountryCallingCode, String> mask) {
-        maskProviderProperty().set(mask);
-    }
-
-    private final ReadOnlyStringWrapper mask = new ReadOnlyStringWrapper(this, "mask");
-
-    public final ReadOnlyStringProperty maskProperty() {
-        return mask.getReadOnlyProperty();
-    }
-
-    public final String getMask() {
-        return mask.get();
-    }
-
-    private void setMask(String mask) {
-        this.mask.set(mask);
+    public final void setForceLocalNumber(boolean forceLocalNumber) {
+        forceLocalNumberProperty().set(forceLocalNumber);
     }
 
     private final ObjectProperty<Callback<CountryCallingCode, Node>> countryCodeViewFactory = new SimpleObjectProperty<>(this, "countryCodeViewFactory");
@@ -302,6 +262,48 @@ public class PhoneNumberField extends Control {
         countryCodeViewFactoryProperty().set(countryCodeViewFactory);
     }
 
+    private final ReadOnlyStringWrapper mask = new ReadOnlyStringWrapper(this, "mask", DEFAULT_MASK);
+
+    public final ReadOnlyStringProperty maskProperty() {
+        return mask.getReadOnlyProperty();
+    }
+
+    public final String getMask() {
+        return mask.get();
+    }
+
+    private void setMask(String mask) {
+        this.mask.set(mask);
+    }
+
+    private final ReadOnlyStringWrapper maskRemaining = new ReadOnlyStringWrapper(this, "maskRemaining");
+
+    public final ReadOnlyStringProperty maskRemainingProperty() {
+        return maskRemaining.getReadOnlyProperty();
+    }
+
+    public final String getMaskRemaining() {
+        return maskRemaining.get();
+    }
+
+    private void setMaskRemaining(String mask) {
+        this.maskRemaining.set(mask);
+    }
+
+    private final ObjectProperty<Callback<CountryCallingCode, String>> maskProvider = new SimpleObjectProperty<>(this, "maskProvider");
+
+    public final ObjectProperty<Callback<CountryCallingCode, String>> maskProviderProperty() {
+        return maskProvider;
+    }
+
+    public final Callback<CountryCallingCode, String> getMaskProvider() {
+        return maskProviderProperty().get();
+    }
+
+    public final void setMaskProvider(Callback<CountryCallingCode, String> maskProvider) {
+        maskProviderProperty().set(maskProvider);
+    }
+
     public interface CountryCallingCode {
 
         int countryCode();
@@ -310,20 +312,18 @@ public class PhoneNumberField extends Control {
 
         String iso2Code();
 
-        String mask();
-
         default Integer defaultAreaCode() {
             return areaCodes().length > 0 ? areaCodes()[0] : null;
         }
 
-        default String defaultPhonePrefix() {
+        default int phonePrefix() {
             StringBuilder value = new StringBuilder();
             value.append(countryCode());
             Integer defaultAreaCode = defaultAreaCode();
             if (defaultAreaCode != null) {
                 value.append(defaultAreaCode);
             }
-            return value.toString();
+            return Integer.parseInt(value.toString());
         }
 
         enum Defaults implements CountryCallingCode {
@@ -573,25 +573,19 @@ public class PhoneNumberField extends Control {
             ZIMBABWE(263, "ZW")
             ;
 
-            private final int code;
+            private final int countryCode;
             private final String iso2Code;
             private final int[] areaCodes;
-            private final String mask;
 
-            Defaults(int code, String iso2Code, int... areaCodes) {
-                this(code, iso2Code, DEFAULT_MASK, areaCodes);
-            }
-
-            Defaults(int code, String iso2Code, String mask, int... areaCodes) {
-                this.code = code;
+            Defaults(int countryCode, String iso2Code, int... areaCodes) {
+                this.countryCode = countryCode;
                 this.iso2Code = iso2Code;
-                this.mask = mask;
                 this.areaCodes = Optional.ofNullable(areaCodes).orElse(new int[0]);
             }
 
             @Override
             public int countryCode() {
-                return code;
+                return countryCode;
             }
 
             @Override
@@ -604,55 +598,51 @@ public class PhoneNumberField extends Control {
                 return iso2Code;
             }
 
-            @Override
-            public String mask() {
-                return mask;
-            }
-
         }
 
     }
 
-    private static final class PhoneNumberParser {
+    private final class PhoneNumberParser implements Callback<String, PhoneNumber> {
 
-        static Pair<CountryCallingCode, String> parse(String phoneNumber, Collection<CountryCallingCode> availableCountryCodes) {
-            Map<CountryCallingCode, String> localNumbers = new HashMap<>();
+        @Override
+        public PhoneNumber call(String phoneNumber) {
+            Map<CountryCallingCode, String> localPhoneNumbers = new HashMap<>();
             TreeMap<Integer, List<CountryCallingCode>> scores = new TreeMap<>();
 
-            for (CountryCallingCode code : availableCountryCodes) {
-                Pair<Integer, String> score = scoreAndLocalNumber(code, phoneNumber);
-                if (score.getKey() > 0) {
-                    scores.computeIfAbsent(score.getKey(), s -> new ArrayList<>()).add(code);
-                    localNumbers.put(code, score.getValue());
+            for (CountryCallingCode code : getAvailableCountryCodes()) {
+                CountryCallingCodeScore score = rankAndSplit(code, phoneNumber);
+                if (score.rank > 0) {
+                    scores.computeIfAbsent(score.rank, s -> new ArrayList<>()).add(code);
+                    localPhoneNumbers.put(code, score.localPhoneNumber);
                 }
             }
 
-            return inferBestMatch(scores.lastEntry(), localNumbers);
-        }
-
-        private static Pair<CountryCallingCode, String> inferBestMatch(
-            Map.Entry<Integer, List<CountryCallingCode>> highestScore,
-            Map<CountryCallingCode, String> localNumbers) {
-
+            Map.Entry<Integer, List<CountryCallingCode>> highestScore = scores.lastEntry();
             if (highestScore == null) {
                 return null;
             }
 
-            List<CountryCallingCode> matchingCodes = highestScore.getValue();
+            // Need to pick from the list the one that best matches
+            CountryCallingCode code = inferBestMatch(highestScore.getValue());
+            String localPhoneNumber = localPhoneNumbers.get(code);
 
+            return new PhoneNumber(code, localPhoneNumber);
+        }
+
+        private CountryCallingCode inferBestMatch(List<CountryCallingCode> matchingCodes) {
             CountryCallingCode code;
             if (matchingCodes.size() > 1) {
-                // Here there will be some ambiguity since two countries have same score
-                // TODO we need some sort of logic here, for now using the last one.
+                // TODO Here there will be some ambiguity since two countries have same score
+                // we need some sort of logic here, for now using the last one.
                 code = matchingCodes.get(matchingCodes.size() - 1);
             } else {
                 code = matchingCodes.get(0);
             }
 
-            return new Pair<>(code, localNumbers.get(code));
+            return code;
         }
 
-        private static Pair<Integer, String> scoreAndLocalNumber(CountryCallingCode code, String phoneNumber) {
+        private CountryCallingCodeScore rankAndSplit(CountryCallingCode code, String phoneNumber) {
             if (phoneNumber != null && !phoneNumber.isEmpty()) {
                 String countryPrefix = String.valueOf(code.countryCode());
 
@@ -661,7 +651,7 @@ public class PhoneNumberField extends Control {
                         String localNumber = phoneNumber.length() > countryPrefix.length() ?
                             phoneNumber.substring(countryPrefix.length()) :
                             null;
-                        return new Pair<>(1, localNumber);
+                        return new CountryCallingCodeScore(1, localNumber);
                     }
                 } else {
                     for (int areaCode : code.areaCodes()) {
@@ -670,45 +660,256 @@ public class PhoneNumberField extends Control {
                             String localNumber = phoneNumber.length() > areaCodePrefix.length() ?
                                 phoneNumber.substring(areaCodePrefix.length()) :
                                 phoneNumber.substring(countryPrefix.length());
-                            return new Pair<>(2, localNumber);
+                            return new CountryCallingCodeScore(2, localNumber);
                         }
                     }
                 }
             }
 
-            return new Pair<>(0, null);
+            return new CountryCallingCodeScore(0, null);
         }
 
+        private boolean isInvalid(String newPhoneNumber) {
+            if (newPhoneNumber != null && !newPhoneNumber.isEmpty()) {
+                for (char c : newPhoneNumber.toCharArray()) {
+                    if (!Character.isDigit(c)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
     private final class PhoneNumberFormatter implements UnaryOperator<TextFormatter.Change> {
 
-        private PhoneNumberFormatter() {
-            maskProperty().addListener((observable, oldMask, newMask) -> {
+        private boolean selfUpdate;
+        private final TextField textField;
 
-            });
+        private PhoneNumberFormatter() {
+            textField = new TextField();
+            textField.setTextFormatter(new TextFormatter<>(this));
+            formattedLocalPhoneNumber.bind(textField.textProperty());
+            maskProperty().addListener(obs -> compileMask(getMask()));
+            compileMask(getMask());
         }
 
         @Override
         public TextFormatter.Change apply(TextFormatter.Change change) {
-            if (change.isAdded() || change.isReplaced()) {
-                String text = change.getText();
-                if (!text.matches("[0-9]+")) {
+            if (selfUpdate) {
+                return change;
+            }
+
+            try {
+                selfUpdate = true;
+
+                if (getCountryCallingCode() == null && !isForceLocalNumber()) {
                     return null;
                 }
 
-                // TODO Apply the mask here
-
-            } else if (change.isDeleted()) {
-                if (getFixedCountryCode() != null && !isForceLocalPhoneNumber()) {
-                    String newText = change.getControlNewText();
-                    if (!newText.startsWith(getFixedCountryCode().defaultPhonePrefix())) {
+                if (change.isAdded() || change.isReplaced()) {
+                    String text = change.getText();
+                    if (!text.matches("[0-9]+")) {
                         return null;
+                    }
+                }
+
+                if (change.isAdded()) {
+                    change = added(change);
+                } else if (change.isReplaced()) {
+                    return null;
+                } else if (change.isDeleted()) {
+                    change = removed(change);
+                }
+
+            } finally {
+                selfUpdate = false;
+            }
+
+
+            return change;
+        }
+
+        private void updateFormattedLocalPhoneNumber(String newPhoneNumber) {
+            if (selfUpdate) {
+                // Ignore when I'm the one who initiated the update
+                return;
+            }
+
+            try {
+                selfUpdate = true;
+                String formattedLocalPhoneNumber = doFormat(newPhoneNumber);
+                textField.setText(formattedLocalPhoneNumber);
+                updateMaskRemaining(formattedLocalPhoneNumber);
+            } finally {
+                selfUpdate = false;
+            }
+        }
+
+        private void compileMask(String mask) {
+            if (mask != null && !mask.isEmpty()) {
+                for (char c : mask.toCharArray()) {
+                    if (!DEFAULT_SUPPORTED_CHARS_IN_MASK.contains(c)) {
+                        throw new IllegalArgumentException("Mask contains unsupported character: " + c);
+                    }
+                }
+                maskRemaining.set(mask);
+            } else {
+                maskRemaining.set("");
+            }
+        }
+
+        private boolean isUnMasked() {
+            return getMask() == null || getMask().isEmpty();
+        }
+
+        private TextFormatter.Change added(TextFormatter.Change change) {
+            if (isUnMasked()) {
+                return change;
+            }
+
+            String remainingMask = getMaskRemaining();
+            String originalText = change.getText();
+            StringBuilder newText = new StringBuilder();
+
+            for (char number : originalText.toCharArray()) {
+                if (remainingMask.isEmpty()) {
+                    newText.append(number);
+                    continue;
+                }
+
+                char maskC;
+
+                do {
+                    maskC = remainingMask.charAt(0);
+                    remainingMask = remainingMask.substring(1);
+                    if (maskC == DEFAULT_MASK_DIGIT) {
+                        newText.append(number);
+                    } else {
+                        newText.append(maskC);
+                    }
+                } while (maskC != DEFAULT_MASK_DIGIT && !remainingMask.isEmpty());
+            }
+
+            change.setText(newText.toString());
+            change.setCaretPosition(change.getCaretPosition() + newText.length() - originalText.length());
+            change.setAnchor(change.getCaretPosition());
+
+            setMaskRemaining(remainingMask);
+            setPhoneNumber(undoFormat(change.getControlNewText()));
+
+            return change;
+        }
+
+        private TextFormatter.Change removed(TextFormatter.Change change) {
+            if (isUnMasked()) {
+                return change;
+            }
+
+            String originalText = change.getControlNewText();
+            int start = change.getRangeStart();
+
+            for (int i = originalText.length() - 1; i > 0; i--) {
+                char c = originalText.charAt(i);
+                if (!Character.isDigit(c)) {
+                    start--;
+                } else {
+                    break;
+                }
+            }
+
+            change.setRange(start, change.getRangeEnd());
+
+            String formattedPhone = change.getControlNewText();
+            setPhoneNumber(undoFormat(formattedPhone));
+            updateMaskRemaining(formattedPhone);
+
+            return change;
+        }
+
+        private String undoFormat(String formattedPhoneNumber) {
+            StringBuilder phoneNumber = new StringBuilder();
+            phoneNumber.append(getCountryCallingCode().countryCode());
+
+            if (formattedPhoneNumber != null && !formattedPhoneNumber.isEmpty()) {
+                for (char  c: formattedPhoneNumber.toCharArray()) {
+                    if (Character.isDigit(c)) {
+                        phoneNumber.append(c);
                     }
                 }
             }
 
-            return change;
+            return phoneNumber.toString();
+        }
+
+        private String doFormat(String phoneNumber) {
+            if (phoneNumber == null || phoneNumber.isEmpty()) {
+                return phoneNumber;
+            }
+
+            if (isUnMasked()) {
+                return phoneNumber;
+            }
+
+            StringBuilder formattedPhoneNumber = new StringBuilder();
+
+            for (char maskChar : getMask().toCharArray()) {
+                if (phoneNumber.isEmpty()) {
+                    if (maskChar == DEFAULT_MASK_DIGIT) {
+                        break;
+                    }
+                    formattedPhoneNumber.append(maskChar);
+
+                } else {
+                    char numberChar = phoneNumber.charAt(0);
+
+                    if (maskChar == DEFAULT_MASK_DIGIT) {
+                        formattedPhoneNumber.append(numberChar);
+                        phoneNumber = phoneNumber.substring(1);
+                    } else {
+                        formattedPhoneNumber.append(maskChar);
+                        if (numberChar == maskChar) {
+                            phoneNumber = phoneNumber.substring(1);
+                        }
+                    }
+                }
+            }
+
+            formattedPhoneNumber.append(phoneNumber);
+
+            return formattedPhoneNumber.toString();
+        }
+
+        private void updateMaskRemaining(String formattedPhoneNumber) {
+            if (isUnMasked()) {
+                setMaskRemaining("");
+            } else {
+                if (formattedPhoneNumber == null || formattedPhoneNumber.isEmpty()) {
+                    setMaskRemaining(getMask());
+                } else if (formattedPhoneNumber.length() > getMask().length()) {
+                    setMaskRemaining("");
+                } else {
+                    setMaskRemaining(getMask().substring(formattedPhoneNumber.length()));
+                }
+            }
+        }
+    }
+
+    private static class PhoneNumber {
+        CountryCallingCode countryCallingCode;
+        String localPhoneNumber;
+        PhoneNumber(CountryCallingCode countryCallingCode, String localPhoneNumber) {
+            this.countryCallingCode = countryCallingCode;
+            this.localPhoneNumber = localPhoneNumber;
+        }
+    }
+
+    private static class CountryCallingCodeScore {
+        int rank;
+        String localPhoneNumber;
+        CountryCallingCodeScore(int rank, String localPhoneNumber) {
+            this.rank = rank;
+            this.localPhoneNumber = localPhoneNumber;
         }
     }
 
