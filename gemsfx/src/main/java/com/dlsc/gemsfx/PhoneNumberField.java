@@ -41,6 +41,12 @@ public class PhoneNumberField extends Control {
     public PhoneNumberField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         getAvailableCountryCodes().setAll(CountryCallingCode.Defaults.values());
+        setMaskProvider(code -> {
+            if (isForceLocalNumber()) {
+                return DEFAULT_MASK;
+            }
+            return Optional.ofNullable(code).map(CountryCallingCode::localNumberMask).orElse("");
+        });
         parser = new PhoneNumberParser();
         formatter = new PhoneNumberFormatter();
     }
@@ -128,6 +134,9 @@ public class PhoneNumberField extends Control {
                 // Set the value first, so that the binding will be triggered
                 super.set(newCountryCallingCode);
 
+                // Set the mask first
+                setMask(getMaskProvider().call(newCountryCallingCode));
+
                 // For now replace the entire text, it might be good to preserve the local number and just change the country code
                 if (isForceLocalNumber()) {
                     setPhoneNumber(null);
@@ -136,10 +145,6 @@ public class PhoneNumberField extends Control {
                         .map(CountryCallingCode::phonePrefix)
                         .map(String::valueOf)
                         .orElse(null));
-                }
-
-                if (getMaskProvider() != null) {
-                    setMask(getMaskProvider().call(newCountryCallingCode));
                 }
 
             } finally {
@@ -262,7 +267,7 @@ public class PhoneNumberField extends Control {
         countryCodeViewFactoryProperty().set(countryCodeViewFactory);
     }
 
-    private final ReadOnlyStringWrapper mask = new ReadOnlyStringWrapper(this, "mask", DEFAULT_MASK);
+    private final ReadOnlyStringWrapper mask = new ReadOnlyStringWrapper(this, "mask");
 
     public final ReadOnlyStringProperty maskProperty() {
         return mask.getReadOnlyProperty();
@@ -290,7 +295,12 @@ public class PhoneNumberField extends Control {
         this.maskRemaining.set(mask);
     }
 
-    private final ObjectProperty<Callback<CountryCallingCode, String>> maskProvider = new SimpleObjectProperty<>(this, "maskProvider");
+    private final ObjectProperty<Callback<CountryCallingCode, String>> maskProvider = new SimpleObjectProperty<>(this, "maskProvider") {
+        @Override
+        public void set(Callback<CountryCallingCode, String> maskProvider) {
+            super.set(Objects.requireNonNull(maskProvider));
+        }
+    };
 
     public final ObjectProperty<Callback<CountryCallingCode, String>> maskProviderProperty() {
         return maskProvider;
@@ -311,6 +321,8 @@ public class PhoneNumberField extends Control {
         int[] areaCodes();
 
         String iso2Code();
+
+        String localNumberMask();
 
         default Integer defaultAreaCode() {
             return areaCodes().length > 0 ? areaCodes()[0] : null;
@@ -374,8 +386,8 @@ public class PhoneNumberField extends Control {
             CHAD(235, "TD"),
             CHILE(56, "CL"),
             CHINA(86, "CN"),
-            CHRISTMAS_ISLAND(61, "CX", 89164),
-            COCOS_ISLANDS(61, "CC", 89162),
+            CHRISTMAS_ISLAND(61, "CX", "(_____) _____", 89164),
+            COCOS_ISLANDS(61, "CC", "(_____) _____", 89162),
             COLOMBIA(57, "CO"),
             COMOROS(269, "KM"),
             CONGO(242, "CG"),
@@ -418,7 +430,7 @@ public class PhoneNumberField extends Control {
             GUADELOUPE(590, "GP"),
             GUAM(1, "GU", 671),
             GUATEMALA(502, "GT"),
-            GUERNSEY(44, "GG", 1481, 7781, 7839, 7911),
+            GUERNSEY(44, "GG", "(____) ______", 1481, 7781, 7839, 7911),
             GUINEA(224, "GN"),
             GUINEA_BISSAU(245, "GW"),
             GUYANA(592, "GY"),
@@ -432,14 +444,14 @@ public class PhoneNumberField extends Control {
             IRAN(98, "IR"),
             IRAQ(964, "IQ"),
             IRELAND(353, "IE"),
-            ISLE_OF_MAN(44, "IM", 1624, 7524, 7624, 7924),
+            ISLE_OF_MAN(44, "IM", "(____) ______", 1624, 7524, 7624, 7924),
             ISRAEL(972, "IL"),
             ITALY(39, "IT"),
             IVORY_COAST(225, "CI"),
             JAMAICA(1, "JM", 658, 876),
             JAN_MAYEN(47, "SJ", 79),
             JAPAN(81, "JP"),
-            JERSEY(44, "JE", 1534),
+            JERSEY(44, "JE", "(____) ______", 1534),
             JORDAN(962, "JO"),
             KAZAKHSTAN(7, "KZ", 6, 7),
             KENYA(254, "KE"),
@@ -576,11 +588,17 @@ public class PhoneNumberField extends Control {
             private final int countryCode;
             private final String iso2Code;
             private final int[] areaCodes;
+            private final String localNumberMask;
 
             Defaults(int countryCode, String iso2Code, int... areaCodes) {
+                this(countryCode, iso2Code, DEFAULT_MASK, areaCodes);
+            }
+
+            Defaults(int countryCode, String iso2Code, String localNumberMask, int... areaCodes) {
                 this.countryCode = countryCode;
                 this.iso2Code = iso2Code;
                 this.areaCodes = Optional.ofNullable(areaCodes).orElse(new int[0]);
+                this.localNumberMask = localNumberMask;
             }
 
             @Override
@@ -598,6 +616,10 @@ public class PhoneNumberField extends Control {
                 return iso2Code;
             }
 
+            @Override
+            public String localNumberMask() {
+                return localNumberMask;
+            }
         }
 
     }
@@ -707,19 +729,22 @@ public class PhoneNumberField extends Control {
                     return null;
                 }
 
-                if (change.isAdded() || change.isReplaced()) {
-                    String text = change.getText();
-                    if (!text.matches("[0-9]+")) {
-                        return null;
+                if (change.isAdded() || change.isDeleted() || change.isReplaced()) {
+                    if (change.isAdded() || change.isReplaced()) {
+                        String text = change.getText();
+                        if (!text.matches("[0-9]+")) {
+                            return null;
+                        }
                     }
+
                 }
 
                 if (change.isAdded()) {
-                    change = added(change);
+                    change = numbersAdded(change);
                 } else if (change.isReplaced()) {
                     return null;
                 } else if (change.isDeleted()) {
-                    change = removed(change);
+                    change = numbersRemoved(change);
                 }
 
             } finally {
@@ -763,7 +788,7 @@ public class PhoneNumberField extends Control {
             return getMask() == null || getMask().isEmpty();
         }
 
-        private TextFormatter.Change added(TextFormatter.Change change) {
+        private TextFormatter.Change numbersAdded(TextFormatter.Change change) {
             if (isUnMasked()) {
                 return change;
             }
@@ -801,7 +826,7 @@ public class PhoneNumberField extends Control {
             return change;
         }
 
-        private TextFormatter.Change removed(TextFormatter.Change change) {
+        private TextFormatter.Change numbersRemoved(TextFormatter.Change change) {
             if (isUnMasked()) {
                 return change;
             }
@@ -829,7 +854,10 @@ public class PhoneNumberField extends Control {
 
         private String undoFormat(String formattedPhoneNumber) {
             StringBuilder phoneNumber = new StringBuilder();
-            phoneNumber.append(getCountryCallingCode().countryCode());
+
+            if (getCountryCallingCode() != null) {
+                phoneNumber.append(getCountryCallingCode().countryCode());
+            }
 
             if (formattedPhoneNumber != null && !formattedPhoneNumber.isEmpty()) {
                 for (char  c: formattedPhoneNumber.toCharArray()) {

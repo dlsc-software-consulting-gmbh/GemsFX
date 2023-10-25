@@ -34,6 +34,7 @@ public class PhoneNumberFieldApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         PhoneNumberField field = new PhoneNumberField();
+        field.setPhoneNumber("573003767182");
 
         VBox controls = new VBox(10);
         addControl("Available Countries", availableCountriesSelector(field), controls);
