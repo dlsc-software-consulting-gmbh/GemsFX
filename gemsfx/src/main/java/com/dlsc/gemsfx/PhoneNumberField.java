@@ -29,9 +29,17 @@ import java.util.TreeMap;
 import java.util.function.UnaryOperator;
 
 /**
- * A control for entering phone numbers. The control supports a list of available country codes and works based on the
- * {@link CountryCallingCode CountryCallingCode} interface. This interface allows customizing the country codes and their
+ * <p>A control for entering phone numbers. By default, the phone numbers are expressed in international format and will be
+ * delivered via the {@link #phoneNumberProperty() phone number} property, however, it would also be possible to enter local phone number by
+ * using {@link #forceLocalNumberProperty() force local} property.</p>
+ *
+ * <p>A masking technique was implemented to let the user know what is the
+ * expected format, you can control it by using a custom {@link #maskProviderProperty()}.</p>
+ *
+ * <p>The control supports a list of {@link #getAvailableCountryCodes() available country codes} and works based on
+ * the {@link CountryCallingCode CountryCallingCode} interface. This interface allows customizing the country codes and their
  * respective area codes, in case the default values are not sufficient or the numbers change.
+ * </p>
  */
 public class PhoneNumberField extends Control {
 
