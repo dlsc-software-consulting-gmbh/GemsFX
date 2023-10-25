@@ -58,6 +58,13 @@ public class PhoneNumberField extends Control {
      */
     public static final char DEFAULT_MASK_DIGIT_CHAR = '_';
 
+    public static final Callback<PhoneNumberField, String> DEFAULT_MASK_PROVIDER = field -> {
+        if (field.isForceLocalNumber()) {
+            return DEFAULT_MASK;
+        }
+        return Optional.ofNullable(field.getCountryCallingCode()).map(CountryCallingCode::localNumberMask).orElse("");
+    };
+
     /**
      * List of supported characters a mask can have.
      */
@@ -71,16 +78,11 @@ public class PhoneNumberField extends Control {
      * {@link CountryCallingCode.Defaults Defaults}.
      */
     public PhoneNumberField() {
-        getStyleClass().add(DEFAULT_STYLE_CLASS);
-        getAvailableCountryCodes().setAll(CountryCallingCode.Defaults.values());
-        setMaskProvider(code -> {
-            if (isForceLocalNumber()) {
-                return DEFAULT_MASK;
-            }
-            return Optional.ofNullable(code).map(CountryCallingCode::localNumberMask).orElse("");
-        });
         parser = new PhoneNumberParser();
         formatter = new PhoneNumberFormatter();
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
+        getAvailableCountryCodes().setAll(CountryCallingCode.Defaults.values());
+        setMaskProvider(DEFAULT_MASK_PROVIDER);
     }
 
     @Override
@@ -117,7 +119,7 @@ public class PhoneNumberField extends Control {
                     // No need to infer the country code, just use the local phone number
                     setCountryCallingCode(null);
                     setLocalPhoneNumber(newPhoneNumber);
-                    formatter.updateFormattedLocalPhoneNumber(newPhoneNumber);
+                    formatter.setFormattedLocalPhoneNumber(newPhoneNumber);
                     return;
                 }
 
@@ -127,11 +129,11 @@ public class PhoneNumberField extends Control {
                 if (parsedNumber == null) {
                     setCountryCallingCode(null);
                     setLocalPhoneNumber(null);
-                    formatter.updateFormattedLocalPhoneNumber(null);
+                    formatter.setFormattedLocalPhoneNumber(null);
                 } else {
                     setCountryCallingCode(parsedNumber.countryCallingCode);
                     setLocalPhoneNumber(parsedNumber.localPhoneNumber);
-                    formatter.updateFormattedLocalPhoneNumber(parsedNumber.localPhoneNumber);
+                    formatter.setFormattedLocalPhoneNumber(parsedNumber.localPhoneNumber);
                 }
             }
             finally {
@@ -171,7 +173,7 @@ public class PhoneNumberField extends Control {
                 super.set(newCountryCallingCode);
 
                 // Set the mask first
-                setMask(getMaskProvider().call(newCountryCallingCode));
+                setMask(Optional.ofNullable(getMaskProvider()).map(p -> p.call(PhoneNumberField.this)).orElse(null));
 
                 // For now replace the entire text, it might be good to preserve the local number and just change the country code
                 if (isForceLocalNumber()) {
@@ -233,6 +235,10 @@ public class PhoneNumberField extends Control {
 
     public final String getFormattedLocalPhoneNumber() {
         return formattedLocalPhoneNumber.get();
+    }
+
+    private void setFormattedLocalPhoneNumber(String formattedLocalPhoneNumber) {
+        this.formattedLocalPhoneNumber.set(formattedLocalPhoneNumber);
     }
 
     // SETTINGS
@@ -332,7 +338,21 @@ public class PhoneNumberField extends Control {
         countryCodeViewFactoryProperty().set(countryCodeViewFactory);
     }
 
-    private final ReadOnlyStringWrapper mask = new ReadOnlyStringWrapper(this, "mask");
+    private final ReadOnlyStringWrapper mask = new ReadOnlyStringWrapper(this, "mask") {
+        @Override
+        public void set(String newMask) {
+            if (newMask != null && !newMask.isEmpty()) {
+                for (char c : newMask.toCharArray()) {
+                    if (!DEFAULT_MASK_SUPPORTED_CHARS.contains(c)) {
+                        throw new IllegalArgumentException("Mask contains unsupported character: " + c);
+                    }
+                }
+            }
+
+            super.set(newMask);
+            formatter.setFormattedLocalPhoneNumber(getLocalPhoneNumber());
+        }
+    };
 
     /**
      * @return The mask the control will use to format phone numbers.
@@ -349,7 +369,7 @@ public class PhoneNumberField extends Control {
         this.mask.set(mask);
     }
 
-    private final ReadOnlyStringWrapper maskRemaining = new ReadOnlyStringWrapper(this, "maskRemaining");
+    private final ReadOnlyStringWrapper maskRemaining = new ReadOnlyStringWrapper(this, "maskRemaining", getMask());
 
     /**
      * @return A property that allows to know whether the mask is completed or not.
@@ -366,26 +386,45 @@ public class PhoneNumberField extends Control {
         this.maskRemaining.set(mask);
     }
 
-    private final ObjectProperty<Callback<CountryCallingCode, String>> maskProvider = new SimpleObjectProperty<>(this, "maskProvider") {
+    private final ObjectProperty<Callback<PhoneNumberField, String>> maskProvider = new SimpleObjectProperty<>(this, "maskProvider") {
         @Override
-        public void set(Callback<CountryCallingCode, String> maskProvider) {
-            super.set(Objects.requireNonNull(maskProvider));
+        public void set(Callback<PhoneNumberField, String> maskProvider) {
+            super.set(maskProvider);
+            setMask(Optional.ofNullable(maskProvider).map(p -> p.call(PhoneNumberField.this)).orElse(null));
         }
     };
 
     /**
-     * @return The mask provider used to determine the mask for a given country calling code.
+     * @return The mask provider used to determine the mask.
      */
-    public final ObjectProperty<Callback<CountryCallingCode, String>> maskProviderProperty() {
+    public final ObjectProperty<Callback<PhoneNumberField, String>> maskProviderProperty() {
         return maskProvider;
     }
 
-    public final Callback<CountryCallingCode, String> getMaskProvider() {
+    public final Callback<PhoneNumberField, String> getMaskProvider() {
         return maskProviderProperty().get();
     }
 
-    public final void setMaskProvider(Callback<CountryCallingCode, String> maskProvider) {
+    public final void setMaskProvider(Callback<PhoneNumberField, String> maskProvider) {
         maskProviderProperty().set(maskProvider);
+    }
+
+    private final BooleanProperty strictMode = new SimpleBooleanProperty(this, "strictMode");
+
+    /**
+     * @return Flag that defines the control to strictly follow the mask or not.  If set to true, the control will not allow to enter
+     * numbers beyond the mask definition. If set to false, you can enter any number of digits even thought they overrun the mask.
+     */
+    public final BooleanProperty strictModeProperty() {
+        return strictMode;
+    }
+
+    public final boolean isStrictMode() {
+        return strictModeProperty().get();
+    }
+
+    public final void setStrictMode(boolean strictMode) {
+        strictModeProperty().set(strictMode);
     }
 
     /**
@@ -818,9 +857,27 @@ public class PhoneNumberField extends Control {
         private PhoneNumberFormatter() {
             textField = new TextField();
             textField.setTextFormatter(new TextFormatter<>(this));
-            formattedLocalPhoneNumber.bind(textField.textProperty());
-            maskProperty().addListener(obs -> compileMask(getMask()));
-            compileMask(getMask());
+            formattedLocalPhoneNumber.bindBidirectional(textField.textProperty());
+        }
+
+        private void setFormattedLocalPhoneNumber(String newPhoneNumber) {
+            if (selfUpdate) {
+                // Ignore when I'm the one who initiated the update
+                return;
+            }
+
+            try {
+                selfUpdate = true;
+                String formattedLocalPhoneNumber = doFormat(newPhoneNumber);
+                PhoneNumberField.this.setFormattedLocalPhoneNumber(formattedLocalPhoneNumber);
+                updateMaskRemaining(formattedLocalPhoneNumber);
+            } finally {
+                selfUpdate = false;
+            }
+        }
+
+        private boolean isUnMasked() {
+            return getMask() == null || getMask().isEmpty();
         }
 
         @Override
@@ -832,72 +889,53 @@ public class PhoneNumberField extends Control {
             try {
                 selfUpdate = true;
 
-                if (getCountryCallingCode() == null && !isForceLocalNumber()) {
-                    return null;
-                }
-
-                if (change.isAdded() || change.isDeleted() || change.isReplaced()) {
-                    if (change.isAdded() || change.isReplaced()) {
-                        String text = change.getText();
-                        if (!text.matches("[0-9]+")) {
-                            return null;
-                        }
+                if (change.isAdded() || change.isReplaced()) {
+                    String text = change.getText();
+                    if (!text.matches("[0-9]+")) {
+                        return null;
                     }
-
                 }
 
-                if (change.isAdded()) {
-                    change = numbersAdded(change);
-                } else if (change.isReplaced()) {
-                    return null;
-                } else if (change.isDeleted()) {
-                    change = numbersRemoved(change);
+                if (getCountryCallingCode() == null && !isForceLocalNumber()) {
+                    resolveCountryCode(change);
+                } else {
+                    if (change.isAdded()) {
+                        numbersAdded(change);
+                    } else if (change.isReplaced()) {
+                        // Not allowed
+                        change = null;
+                    } else if (change.isDeleted()) {
+                        numbersRemoved(change);
+                    }
                 }
 
             } finally {
                 selfUpdate = false;
             }
-
 
             return change;
         }
 
-        private void updateFormattedLocalPhoneNumber(String newPhoneNumber) {
-            if (selfUpdate) {
-                // Ignore when I'm the one who initiated the update
-                return;
-            }
-
-            try {
-                selfUpdate = true;
-                String formattedLocalPhoneNumber = doFormat(newPhoneNumber);
-                textField.setText(formattedLocalPhoneNumber);
-                updateMaskRemaining(formattedLocalPhoneNumber);
-            } finally {
-                selfUpdate = false;
-            }
-        }
-
-        private void compileMask(String mask) {
-            if (mask != null && !mask.isEmpty()) {
-                for (char c : mask.toCharArray()) {
-                    if (!DEFAULT_MASK_SUPPORTED_CHARS.contains(c)) {
-                        throw new IllegalArgumentException("Mask contains unsupported character: " + c);
-                    }
-                }
-                maskRemaining.set(mask);
-            } else {
-                maskRemaining.set("");
+        private void resolveCountryCode(TextFormatter.Change change) {
+            String newText = change.getControlNewText();
+            PhoneNumber number = parser.call(newText);
+            if (number != null) {
+                // TODO this won't ever pick a sub country, since always top countries are resolved first.  Try to
+                // find a solution for this
+                setPhoneNumber(String.valueOf(number.countryCallingCode.phonePrefix()));
+                PhoneNumberField.this.setFormattedLocalPhoneNumber(number.localPhoneNumber);
+                updateMaskRemaining(number.localPhoneNumber);
+                change.setText("");
+                change.setCaretPosition(0);
+                change.setAnchor(0);
+                change.setRange(0, 0);
             }
         }
 
-        private boolean isUnMasked() {
-            return getMask() == null || getMask().isEmpty();
-        }
-
-        private TextFormatter.Change numbersAdded(TextFormatter.Change change) {
+        private void numbersAdded(TextFormatter.Change change) {
             if (isUnMasked()) {
-                return change;
+                setPhoneNumber(undoFormat(change.getControlNewText()));
+                return;
             }
 
             String remainingMask = getMaskRemaining();
@@ -906,6 +944,9 @@ public class PhoneNumberField extends Control {
 
             for (char number : originalText.toCharArray()) {
                 if (remainingMask.isEmpty()) {
+                    if (isStrictMode()) {
+                        break;
+                    }
                     newText.append(number);
                     continue;
                 }
@@ -929,13 +970,12 @@ public class PhoneNumberField extends Control {
 
             setMaskRemaining(remainingMask);
             setPhoneNumber(undoFormat(change.getControlNewText()));
-
-            return change;
         }
 
-        private TextFormatter.Change numbersRemoved(TextFormatter.Change change) {
+        private void numbersRemoved(TextFormatter.Change change) {
             if (isUnMasked()) {
-                return change;
+                setPhoneNumber(undoFormat(change.getControlNewText()));
+                return;
             }
 
             String originalText = change.getControlNewText();
@@ -955,8 +995,6 @@ public class PhoneNumberField extends Control {
             String formattedPhone = change.getControlNewText();
             setPhoneNumber(undoFormat(formattedPhone));
             updateMaskRemaining(formattedPhone);
-
-            return change;
         }
 
         private String undoFormat(String formattedPhoneNumber) {

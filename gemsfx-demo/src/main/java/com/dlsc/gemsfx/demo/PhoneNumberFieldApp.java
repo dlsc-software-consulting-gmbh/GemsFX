@@ -34,7 +34,6 @@ public class PhoneNumberFieldApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         PhoneNumberField field = new PhoneNumberField();
-        field.setPhoneNumber("573003767182");
 
         VBox controls = new VBox(10);
         addControl("Available Countries", availableCountriesSelector(field), controls);
@@ -42,6 +41,8 @@ public class PhoneNumberFieldApp extends Application {
         addControl("Default Country", defaultCountrySelector(field), controls);
         addControl("Disable Country", disableCountryCheck(field), controls);
         addControl("Force Local Phone", forceLocalPhoneNumberCheck(field), controls);
+        addControl("Strict Mode", strictModeCheck(field), controls);
+        addControl("Unmasked", unmaskedModeCheck(field), controls);
 
         VBox fields = new VBox(10);
         addField(fields, "Country Code", field.countryCallingCodeProperty(), COUNTRY_CODE_CONVERTER);
@@ -56,7 +57,7 @@ public class PhoneNumberFieldApp extends Application {
         vBox.getChildren().addAll(controls, new Separator(), field, new Separator(), fields);
 
         stage.setTitle("PhoneNumberField");
-        stage.setScene(new Scene(vBox, 500, 450));
+        stage.setScene(new Scene(vBox, 500, 500));
         stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
@@ -106,15 +107,33 @@ public class PhoneNumberFieldApp extends Application {
     }
 
     private Node disableCountryCheck(PhoneNumberField field) {
-        CheckBox localCheck = new CheckBox();
-        localCheck.selectedProperty().bindBidirectional(field.disableCountryCodeProperty());
-        return localCheck;
+        CheckBox check = new CheckBox();
+        check.selectedProperty().bindBidirectional(field.disableCountryCodeProperty());
+        return check;
     }
 
     private Node forceLocalPhoneNumberCheck(PhoneNumberField field) {
-        CheckBox localCheck = new CheckBox();
-        localCheck.selectedProperty().bindBidirectional(field.forceLocalNumberProperty());
-        return localCheck;
+        CheckBox check = new CheckBox();
+        check.selectedProperty().bindBidirectional(field.forceLocalNumberProperty());
+        return check;
+    }
+
+    private Node strictModeCheck(PhoneNumberField field) {
+        CheckBox check = new CheckBox();
+        check.selectedProperty().bindBidirectional(field.strictModeProperty());
+        return check;
+    }
+
+    private Node unmaskedModeCheck(PhoneNumberField field) {
+        CheckBox check = new CheckBox();
+        check.selectedProperty().addListener((obs, oldV, newV) -> {
+            if (newV) {
+                field.setMaskProvider(null);
+            } else {
+                field.setMaskProvider(PhoneNumberField.DEFAULT_MASK_PROVIDER);
+            }
+        });
+        return check;
     }
 
     private void addControl(String name, Node control, VBox controls) {
