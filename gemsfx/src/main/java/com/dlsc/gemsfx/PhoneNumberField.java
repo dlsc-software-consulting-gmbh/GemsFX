@@ -28,16 +28,40 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.UnaryOperator;
 
+/**
+ * A control for entering phone numbers. The control supports a list of available country codes and works based on the
+ * {@link CountryCallingCode CountryCallingCode} interface. This interface allows customizing the country codes and their
+ * respective area codes, in case the default values are not sufficient or the numbers change.
+ */
 public class PhoneNumberField extends Control {
 
+    /**
+     * Default style class for css styling.
+     */
     public static final String DEFAULT_STYLE_CLASS = "phone-number-field";
+
+    /**
+     * Default mask for the phone number field.
+     */
     public static final String DEFAULT_MASK = "(___) ___-____";
-    public static final char DEFAULT_MASK_DIGIT = '_';
-    public static final List<Character> DEFAULT_SUPPORTED_CHARS_IN_MASK = Arrays.asList(DEFAULT_MASK_DIGIT, '-', '(', ')', ' ');
+
+    /**
+     * Default character used to represent a digit in the mask.
+     */
+    public static final char DEFAULT_MASK_DIGIT_CHAR = '_';
+
+    /**
+     * List of supported characters a mask can have.
+     */
+    public static final List<Character> DEFAULT_MASK_SUPPORTED_CHARS = Arrays.asList(DEFAULT_MASK_DIGIT_CHAR, '-', '(', ')', ' ');
 
     private final PhoneNumberParser parser;
     private final PhoneNumberFormatter formatter;
 
+    /**
+     * Builds a new phone number field with the default settings. The available country calling codes is taken from
+     * {@link CountryCallingCode.Defaults Defaults}.
+     */
     public PhoneNumberField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         getAvailableCountryCodes().setAll(CountryCallingCode.Defaults.values());
@@ -108,6 +132,10 @@ public class PhoneNumberField extends Control {
         }
     };
 
+    /**
+     * @return The phone number property acting as main value for the control.  This is always represented international format
+     * without the (+) plus sign.
+     */
     public final StringProperty phoneNumberProperty() {
         return phoneNumber;
     }
@@ -153,6 +181,10 @@ public class PhoneNumberField extends Control {
         }
     };
 
+    /**
+     * @return The selected country calling code.  Use this property if you want to define a default (pre-selected) country.
+     * It can also be used in conjunction with {@link #disableCountryCodeProperty() disableCountryCode} to avoid changing the country part.
+     */
     public final ObjectProperty<CountryCallingCode> countryCallingCodeProperty() {
         return countryCallingCode;
     }
@@ -167,6 +199,9 @@ public class PhoneNumberField extends Control {
 
     private final ReadOnlyStringWrapper localPhoneNumber = new ReadOnlyStringWrapper(this, "localPhoneNumber");
 
+    /**
+     * @return Read only property that exposes the local part of the phone number.
+     */
     public final ReadOnlyStringProperty localPhoneNumberProperty() {
         return localPhoneNumber.getReadOnlyProperty();
     }
@@ -181,6 +216,9 @@ public class PhoneNumberField extends Control {
 
     private final ReadOnlyStringWrapper formattedLocalPhoneNumber = new ReadOnlyStringWrapper(this, "formattedLocalPhoneNumber");
 
+    /**
+     * @return Read only property that exposes the local phone number expressed as the mask format defines.
+     */
     public final ReadOnlyStringProperty formattedLocalPhoneNumberProperty() {
         return formattedLocalPhoneNumber.getReadOnlyProperty();
     }
@@ -193,18 +231,30 @@ public class PhoneNumberField extends Control {
 
     private final ObservableList<CountryCallingCode> availableCountryCodes = FXCollections.observableArrayList();
 
+    /**
+     * @return The list of available countries from which the user can select one and put it into the
+     * {@link #countryCallingCodeProperty() countryCallingCode}.
+     */
     public final ObservableList<CountryCallingCode> getAvailableCountryCodes() {
         return availableCountryCodes;
     }
 
     private final ObservableList<CountryCallingCode> preferredCountryCodes = FXCollections.observableArrayList();
 
+    /**
+     * @return The list of preferred countries that are shown first in the list of available countries.  If one country calling code
+     * is added to this list, but is not present in the {@link #getAvailableCountryCodes()} then it will be ignored and not shown.
+     */
     public final ObservableList<CountryCallingCode> getPreferredCountryCodes() {
         return preferredCountryCodes;
     }
 
     private final BooleanProperty disableCountryCode = new SimpleBooleanProperty(this, "disableCountryCode");
 
+    /**
+     * @return Flag to disable the country selector button.  This is useful if you want to force the user to enter a local number but
+     * make split reference that the {@link #phoneNumberProperty() phoneNumber} is still international.
+     */
     public final BooleanProperty disableCountryCodeProperty() {
         return disableCountryCode;
     }
@@ -241,6 +291,10 @@ public class PhoneNumberField extends Control {
         }
     };
 
+    /**
+     * @return Flag to force the user to enter a local number. This will change the default behaviour of the control and
+     * will have a local number on the {@link #phoneNumberProperty() phone number}.
+     */
     public final BooleanProperty forceLocalNumberProperty() {
         return forceLocalNumber;
     }
@@ -255,6 +309,9 @@ public class PhoneNumberField extends Control {
 
     private final ObjectProperty<Callback<CountryCallingCode, Node>> countryCodeViewFactory = new SimpleObjectProperty<>(this, "countryCodeViewFactory");
 
+    /**
+     * @return Factory that allows to replace the node used to graphically represent each country calling code.
+     */
     public final ObjectProperty<Callback<CountryCallingCode, Node>> countryCodeViewFactoryProperty() {
         return countryCodeViewFactory;
     }
@@ -269,6 +326,9 @@ public class PhoneNumberField extends Control {
 
     private final ReadOnlyStringWrapper mask = new ReadOnlyStringWrapper(this, "mask");
 
+    /**
+     * @return The mask the control will use to format phone numbers.
+     */
     public final ReadOnlyStringProperty maskProperty() {
         return mask.getReadOnlyProperty();
     }
@@ -283,6 +343,9 @@ public class PhoneNumberField extends Control {
 
     private final ReadOnlyStringWrapper maskRemaining = new ReadOnlyStringWrapper(this, "maskRemaining");
 
+    /**
+     * @return A property that allows to know whether the mask is completed or not.
+     */
     public final ReadOnlyStringProperty maskRemainingProperty() {
         return maskRemaining.getReadOnlyProperty();
     }
@@ -302,6 +365,9 @@ public class PhoneNumberField extends Control {
         }
     };
 
+    /**
+     * @return The mask provider used to determine the mask for a given country calling code.
+     */
     public final ObjectProperty<Callback<CountryCallingCode, String>> maskProviderProperty() {
         return maskProvider;
     }
@@ -314,20 +380,44 @@ public class PhoneNumberField extends Control {
         maskProviderProperty().set(maskProvider);
     }
 
+    /**
+     * Represents a country calling code. The country calling code is used to identify the country and the area code.  This ones
+     * should go according the ITU-T E.164 recommendation.
+     * <a href="https://en.wikipedia.org/wiki/List_of_country_calling_codes">List_of_country_calling_codes</a>.
+     */
     public interface CountryCallingCode {
 
+        /**
+         * @return The code assigned to the country.
+         */
         int countryCode();
 
+        /**
+         * @return Designated area codes within the country.
+         */
         int[] areaCodes();
 
+        /**
+         * @return The Alpha-2 code of the country as described in the ISO-3166 international standard.
+         */
         String iso2Code();
 
+        /**
+         * @return The default mask defined for the country.  This is arbitrary adopted by the control, but can be replaced by
+         * using a custom {@link #maskProviderProperty() maskProvider}.
+         */
         String localNumberMask();
 
+        /**
+         * @return The first area code if there is any in the country.
+         */
         default Integer defaultAreaCode() {
             return areaCodes().length > 0 ? areaCodes()[0] : null;
         }
 
+        /**
+         * @return The concatenation of country code and {@link #defaultAreaCode() default area code}.
+         */
         default int phonePrefix() {
             StringBuilder value = new StringBuilder();
             value.append(countryCode());
@@ -338,6 +428,9 @@ public class PhoneNumberField extends Control {
             return Integer.parseInt(value.toString());
         }
 
+        /**
+         * Default country calling codes offered by the control.
+         */
         enum Defaults implements CountryCallingCode {
 
             AFGHANISTAN(93, "AF"),
@@ -624,6 +717,9 @@ public class PhoneNumberField extends Control {
 
     }
 
+    /**
+     * For internal use only.
+     */
     private final class PhoneNumberParser implements Callback<String, PhoneNumber> {
 
         @Override
@@ -703,6 +799,9 @@ public class PhoneNumberField extends Control {
         }
     }
 
+    /**
+     * For internal use only.
+     */
     private final class PhoneNumberFormatter implements UnaryOperator<TextFormatter.Change> {
 
         private boolean selfUpdate;
@@ -774,7 +873,7 @@ public class PhoneNumberField extends Control {
         private void compileMask(String mask) {
             if (mask != null && !mask.isEmpty()) {
                 for (char c : mask.toCharArray()) {
-                    if (!DEFAULT_SUPPORTED_CHARS_IN_MASK.contains(c)) {
+                    if (!DEFAULT_MASK_SUPPORTED_CHARS.contains(c)) {
                         throw new IllegalArgumentException("Mask contains unsupported character: " + c);
                     }
                 }
@@ -808,12 +907,12 @@ public class PhoneNumberField extends Control {
                 do {
                     maskC = remainingMask.charAt(0);
                     remainingMask = remainingMask.substring(1);
-                    if (maskC == DEFAULT_MASK_DIGIT) {
+                    if (maskC == DEFAULT_MASK_DIGIT_CHAR) {
                         newText.append(number);
                     } else {
                         newText.append(maskC);
                     }
-                } while (maskC != DEFAULT_MASK_DIGIT && !remainingMask.isEmpty());
+                } while (maskC != DEFAULT_MASK_DIGIT_CHAR && !remainingMask.isEmpty());
             }
 
             change.setText(newText.toString());
@@ -883,7 +982,7 @@ public class PhoneNumberField extends Control {
 
             for (char maskChar : getMask().toCharArray()) {
                 if (phoneNumber.isEmpty()) {
-                    if (maskChar == DEFAULT_MASK_DIGIT) {
+                    if (maskChar == DEFAULT_MASK_DIGIT_CHAR) {
                         break;
                     }
                     formattedPhoneNumber.append(maskChar);
@@ -891,7 +990,7 @@ public class PhoneNumberField extends Control {
                 } else {
                     char numberChar = phoneNumber.charAt(0);
 
-                    if (maskChar == DEFAULT_MASK_DIGIT) {
+                    if (maskChar == DEFAULT_MASK_DIGIT_CHAR) {
                         formattedPhoneNumber.append(numberChar);
                         phoneNumber = phoneNumber.substring(1);
                     } else {
@@ -923,6 +1022,9 @@ public class PhoneNumberField extends Control {
         }
     }
 
+    /**
+     * For internal use only.
+     */
     private static class PhoneNumber {
         CountryCallingCode countryCallingCode;
         String localPhoneNumber;
@@ -932,6 +1034,9 @@ public class PhoneNumberField extends Control {
         }
     }
 
+    /**
+     * For internal use only.
+     */
     private static class CountryCallingCodeScore {
         int rank;
         String localPhoneNumber;
