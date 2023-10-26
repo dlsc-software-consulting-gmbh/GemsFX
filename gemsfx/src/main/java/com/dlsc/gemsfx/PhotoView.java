@@ -1,7 +1,14 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.PhotoViewSkin;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.MapChangeListener;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
@@ -20,11 +27,10 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -54,6 +60,8 @@ public class PhotoView extends Control {
     private final Logger LOG = Logger.getLogger(PhotoView.class.getName());
 
     private static final PseudoClass EMPTY_PSEUDO_CLASS = PseudoClass.getPseudoClass("empty");
+
+    private static final String[] SUPPORTED_EXTENSIONS = {".bmp", ".png", ".gif", ".jpg", ".jpeg"};
 
     public enum ClipShape {
         CIRCLE,
@@ -119,26 +127,38 @@ public class PhotoView extends Control {
         });
 
         setOnDragOver(evt -> {
-            if (isEditable()) {
-                evt.acceptTransferModes(TransferMode.ANY);
+            if (isEditable() && evt.getDragboard().hasFiles()) {
+                List<File> files = evt.getDragboard().getFiles();
+                if (files == null) {
+                    return;
+                }
+                // check if any of the files has a supported extension
+                boolean hasSupportedExtension = files.stream()
+                        .anyMatch(file -> Arrays.stream(SUPPORTED_EXTENSIONS)
+                                .anyMatch(extension -> file.getName().endsWith(extension)));
+                if (hasSupportedExtension) {
+                    evt.acceptTransferModes(TransferMode.ANY);
+                }
             }
         });
 
         setOnDragDropped(evt -> {
-            if (isEditable()) {
+            if (isEditable() && evt.getDragboard().hasFiles()) {
                 Dragboard dragboard = evt.getDragboard();
                 List<File> files = dragboard.getFiles();
 
                 if (files != null) {
-                    try {
-                        File file = files.get(0);
-                        BufferedImage image = ImageIO.read(file);
-                        if (image != null) {
-                            setPhoto(new Image(file.toURI().toURL().toExternalForm(), true));
-                        }
-                    } catch (IOException e) {
-                        LOG.log(Level.SEVERE, "error when trying to use dropped image file", e);
-                    }
+                    // find the first file that has a supported extension
+                    files.stream().filter(file -> Arrays.stream(SUPPORTED_EXTENSIONS)
+                            .anyMatch(extension -> file.getName().endsWith(extension)))
+                            .findFirst()
+                            .ifPresent(supportedFile -> {
+                                try {
+                                    setPhoto(new Image(supportedFile.toURI().toURL().toExternalForm(), true));
+                                } catch (IOException e) {
+                                    LOG.log(Level.SEVERE, "error when trying to use dropped image file", e);
+                                }
+                            });
                 }
             }
         });
