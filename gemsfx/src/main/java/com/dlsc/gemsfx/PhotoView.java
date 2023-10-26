@@ -152,13 +152,17 @@ public class PhotoView extends Control {
                     files.stream().filter(file -> Arrays.stream(SUPPORTED_EXTENSIONS)
                             .anyMatch(extension -> file.getName().endsWith(extension)))
                             .findFirst()
-                            .ifPresent(supportedFile -> {
+                            .ifPresentOrElse(supportedFile -> {
                                 try {
                                     setPhoto(new Image(supportedFile.toURI().toURL().toExternalForm(), true));
+                                    evt.setDropCompleted(true);
                                 } catch (IOException e) {
                                     LOG.log(Level.SEVERE, "error when trying to use dropped image file", e);
+                                    evt.setDropCompleted(false);
                                 }
-                            });
+                            }, () -> evt.setDropCompleted(false));
+                } else {
+                    evt.setDropCompleted(false);
                 }
             }
         });
