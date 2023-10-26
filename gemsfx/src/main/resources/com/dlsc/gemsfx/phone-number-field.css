@@ -64,12 +64,7 @@
 }
 
 .country-calling-code-cell {
-
-}
-
-.country-calling-code-cell.preferred.last {
-    -fx-border-width: 0px 0px 5px 0px;
-    -fx-border-color: blue;
+    -fx-padding: 5px;
 }
 
 

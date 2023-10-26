@@ -36,16 +36,19 @@ public class PhoneNumberFieldApp extends Application {
         PhoneNumberField field = new PhoneNumberField();
 
         VBox controls = new VBox(10);
-        addControl("Default Country", defaultCountrySelector(field), controls);
         addControl("Available Countries", availableCountriesSelector(field), controls);
         addControl("Preferred Countries", preferredCountriesSelector(field), controls);
+        addControl("Default Country", defaultCountrySelector(field), controls);
+        addControl("Disable Country", disableCountryCheck(field), controls);
         addControl("Force Local Phone", forceLocalPhoneNumberCheck(field), controls);
-        addControl("Fixed Country", fixedCountrySelector(field), controls);
+        addControl("Strict Mode", strictModeCheck(field), controls);
+        addControl("Unmasked", unmaskedModeCheck(field), controls);
 
         VBox fields = new VBox(10);
-        addField(fields, "Country Code", field.countryCodeProperty(), COUNTRY_CODE_CONVERTER);
+        addField(fields, "Country Code", field.countryCallingCodeProperty(), COUNTRY_CODE_CONVERTER);
         addField(fields, "Phone Number", field.phoneNumberProperty());
         addField(fields, "Local Number", field.localPhoneNumberProperty());
+        addField(fields, "Formatted Local Number", field.formattedLocalPhoneNumberProperty());
         addField(fields, "Mask", field.maskProperty());
 
         VBox vBox = new VBox(20);
@@ -53,21 +56,11 @@ public class PhoneNumberFieldApp extends Application {
         vBox.setAlignment(Pos.CENTER);
         vBox.getChildren().addAll(controls, new Separator(), field, new Separator(), fields);
 
-        Scene scene = new Scene(vBox, 500, 400);
-
         stage.setTitle("PhoneNumberField");
-        stage.setScene(scene);
+        stage.setScene(new Scene(vBox, 500, 500));
         stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
-    }
-
-    private Node defaultCountrySelector(PhoneNumberField view) {
-        ComboBox<PhoneNumberField.CountryCallingCode> comboBox = new ComboBox<>();
-        comboBox.getItems().add(null);
-        comboBox.getItems().addAll(PhoneNumberField.CountryCallingCode.Defaults.values());
-        comboBox.valueProperty().bindBidirectional(view.defaultCountryCodeProperty());
-        return comboBox;
     }
 
     private Node availableCountriesSelector(PhoneNumberField field) {
@@ -105,18 +98,42 @@ public class PhoneNumberFieldApp extends Application {
         return comboBox;
     }
 
-    private Node forceLocalPhoneNumberCheck(PhoneNumberField field) {
-        CheckBox localCheck = new CheckBox();
-        localCheck.selectedProperty().bindBidirectional(field.forceLocalPhoneNumberProperty());
-        return localCheck;
-    }
-
-    private Node fixedCountrySelector(PhoneNumberField view) {
+    private Node defaultCountrySelector(PhoneNumberField view) {
         ComboBox<PhoneNumberField.CountryCallingCode> comboBox = new ComboBox<>();
         comboBox.getItems().add(null);
         comboBox.getItems().addAll(PhoneNumberField.CountryCallingCode.Defaults.values());
-        comboBox.valueProperty().bindBidirectional(view.fixedCountryCodeProperty());
+        comboBox.valueProperty().bindBidirectional(view.countryCallingCodeProperty());
         return comboBox;
+    }
+
+    private Node disableCountryCheck(PhoneNumberField field) {
+        CheckBox check = new CheckBox();
+        check.selectedProperty().bindBidirectional(field.disableCountryCodeProperty());
+        return check;
+    }
+
+    private Node forceLocalPhoneNumberCheck(PhoneNumberField field) {
+        CheckBox check = new CheckBox();
+        check.selectedProperty().bindBidirectional(field.forceLocalNumberProperty());
+        return check;
+    }
+
+    private Node strictModeCheck(PhoneNumberField field) {
+        CheckBox check = new CheckBox();
+        check.selectedProperty().bindBidirectional(field.strictModeProperty());
+        return check;
+    }
+
+    private Node unmaskedModeCheck(PhoneNumberField field) {
+        CheckBox check = new CheckBox();
+        check.selectedProperty().addListener((obs, oldV, newV) -> {
+            if (newV) {
+                field.setMaskProvider(null);
+            } else {
+                field.setMaskProvider(PhoneNumberField.DEFAULT_MASK_PROVIDER);
+            }
+        });
+        return check;
     }
 
     private void addControl(String name, Node control, VBox controls) {
@@ -143,7 +160,7 @@ public class PhoneNumberFieldApp extends Application {
         }
 
         Label myLabel = new Label(label + ": ");
-        myLabel.setPrefWidth(100);
+        myLabel.setPrefWidth(150);
 
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
