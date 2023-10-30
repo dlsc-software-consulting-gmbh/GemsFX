@@ -3,6 +3,7 @@ module com.dlsc.gemsfx {
     requires transitive javafx.controls;
     requires javafx.graphics;
     requires javafx.swing;
+    requires com.github.weisj.jsvg;
 
     requires jpro.utils.treeshowing;
 
