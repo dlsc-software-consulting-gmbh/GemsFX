@@ -24,6 +24,7 @@ import javafx.util.Callback;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class TreeNodeView<T> extends Control {
     private static final int DEFAULT_CELL_WIDTH = 60;
@@ -65,7 +66,7 @@ public class TreeNodeView<T> extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return getClass().getResource("tree-view.css").toExternalForm();
+        return Objects.requireNonNull(getClass().getResource("tree-view.css")).toExternalForm();
     }
 
     private final ObjectProperty<Callback<T, TreeNodeCell<T>>> cellFactory = new SimpleObjectProperty<>(this, "cellFactory", TreeNodeCell::new);

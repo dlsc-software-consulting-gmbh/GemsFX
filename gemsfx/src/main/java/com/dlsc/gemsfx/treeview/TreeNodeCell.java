@@ -17,7 +17,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
+import java.util.Objects;
+
 public class TreeNodeCell<T> extends BorderPane {
+
     private static final boolean DEFAULT_EXPANDED = true;
 
     private static final String DEFAULT_STYLE_CLASS = "tree-node-cell";
@@ -161,7 +164,6 @@ public class TreeNodeCell<T> extends BorderPane {
 
     @Override
     public String getUserAgentStylesheet() {
-        return TreeNodeCell.class.getResource("tree-view.css").toExternalForm();
+        return Objects.requireNonNull(TreeNodeCell.class.getResource("tree-view.css")).toExternalForm();
     }
-
 }
