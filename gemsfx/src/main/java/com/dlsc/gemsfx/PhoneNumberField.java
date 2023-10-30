@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.PhoneNumberFieldSkin;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -62,7 +63,10 @@ public class PhoneNumberField extends Control {
         if (field.isForceLocalNumber()) {
             return DEFAULT_MASK;
         }
-        return Optional.ofNullable(field.getCountryCallingCode()).map(CountryCallingCode::localNumberMask).orElse("");
+        if (field.getCountryCallingCode() == null) {
+            return "";
+        }
+        return field.getCountryCallingCode().mask(field.getLocalPhoneNumber());
     };
 
     /**
@@ -82,7 +86,36 @@ public class PhoneNumberField extends Control {
         formatter = new PhoneNumberFormatter();
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         getAvailableCountryCodes().setAll(CountryCallingCode.Defaults.values());
+
+        Runnable maskUpdater = () -> setMask(Optional.ofNullable(getMaskProvider()).map(p -> p.call(PhoneNumberField.this)).orElse(""));
+        countryCallingCodeProperty().addListener((obs, oldV, newV) -> maskUpdater.run());
+        localPhoneNumberProperty().addListener((obs, oldV, newV) -> maskUpdater.run());
+        maskProviderProperty().addListener((obs, oldV, newV) -> maskUpdater.run());
         setMaskProvider(DEFAULT_MASK_PROVIDER);
+
+        Runnable maskListener = () -> {
+            String mask = getMask();
+            String formattedValue = getFormattedLocalPhoneNumber();
+            if (mask == null || mask.isEmpty()) {
+                setMaskRemaining("");
+            } else {
+                if (formattedValue == null || formattedValue.isEmpty()) {
+                    setMaskRemaining(mask);
+                } else if (formattedValue.length() > mask.length()) {
+                    setMaskRemaining("");
+                } else {
+                    setMaskRemaining(mask.substring(formattedValue.length()));
+                }
+            }
+        };
+
+        maskProperty().addListener((obs, oldV, newV) -> Platform.runLater(() -> {
+            // Needs to run after completed text input
+            formatter.setFormattedLocalPhoneNumber(getLocalPhoneNumber());
+            maskListener.run();
+        }));
+
+        formattedLocalPhoneNumberProperty().addListener((obs, oldV, newV) -> maskListener.run());
     }
 
     @Override
@@ -124,16 +157,16 @@ public class PhoneNumberField extends Control {
                 }
 
                 // Set depending fields here
-                PhoneNumber parsedNumber = parser.call(newPhoneNumber);
+                PhoneNumber phoneNumber = parser.call(newPhoneNumber);
 
-                if (parsedNumber == null) {
+                if (phoneNumber == null) {
                     setCountryCallingCode(null);
                     setLocalPhoneNumber(null);
                     formatter.setFormattedLocalPhoneNumber(null);
                 } else {
-                    setCountryCallingCode(parsedNumber.countryCallingCode);
-                    setLocalPhoneNumber(parsedNumber.localPhoneNumber);
-                    formatter.setFormattedLocalPhoneNumber(parsedNumber.localPhoneNumber);
+                    setCountryCallingCode(phoneNumber.countryCallingCode);
+                    setLocalPhoneNumber(phoneNumber.localPhoneNumber);
+                    formatter.setFormattedLocalPhoneNumber(phoneNumber.localPhoneNumber);
                 }
             }
             finally {
@@ -172,18 +205,12 @@ public class PhoneNumberField extends Control {
                 // Set the value first, so that the binding will be triggered
                 super.set(newCountryCallingCode);
 
-                // Set the mask first
-                setMask(Optional.ofNullable(getMaskProvider()).map(p -> p.call(PhoneNumberField.this)).orElse(null));
-
                 // For now replace the entire text, it might be good to preserve the local number and just change the country code
-                if (isForceLocalNumber()) {
-                    setPhoneNumber(null);
-                } else {
-                    setPhoneNumber(Optional.ofNullable(newCountryCallingCode)
+                setPhoneNumber(isForceLocalNumber() ?  null :
+                    Optional.ofNullable(newCountryCallingCode)
                         .map(CountryCallingCode::phonePrefix)
                         .map(String::valueOf)
                         .orElse(null));
-                }
 
             } finally {
                 selfUpdate = false;
@@ -235,10 +262,6 @@ public class PhoneNumberField extends Control {
 
     public final String getFormattedLocalPhoneNumber() {
         return formattedLocalPhoneNumber.get();
-    }
-
-    private void setFormattedLocalPhoneNumber(String formattedLocalPhoneNumber) {
-        this.formattedLocalPhoneNumber.set(formattedLocalPhoneNumber);
     }
 
     // SETTINGS
@@ -348,9 +371,7 @@ public class PhoneNumberField extends Control {
                     }
                 }
             }
-
             super.set(newMask);
-            formatter.setFormattedLocalPhoneNumber(getLocalPhoneNumber());
         }
     };
 
@@ -386,16 +407,9 @@ public class PhoneNumberField extends Control {
         this.maskRemaining.set(mask);
     }
 
-    private final ObjectProperty<Callback<PhoneNumberField, String>> maskProvider = new SimpleObjectProperty<>(this, "maskProvider") {
-        @Override
-        public void set(Callback<PhoneNumberField, String> maskProvider) {
-            super.set(maskProvider);
-            setMask(Optional.ofNullable(maskProvider).map(p -> p.call(PhoneNumberField.this)).orElse(null));
-        }
-    };
-
+    private final ObjectProperty<Callback<PhoneNumberField, String>> maskProvider = new SimpleObjectProperty<>(this, "maskProvider");
     /**
-     * @return The mask provider used to determine the mask.
+     * @return The callback used to determine the mask. This gets called everytime the phone number changes.
      */
     public final ObjectProperty<Callback<PhoneNumberField, String>> maskProviderProperty() {
         return maskProvider;
@@ -450,10 +464,11 @@ public class PhoneNumberField extends Control {
         String iso2Code();
 
         /**
-         * @return The default mask defined for the country.  This is arbitrary adopted by the control, but can be replaced by
-         * using a custom {@link #maskProviderProperty() maskProvider}.
+         * This is arbitrary adopted by the control, but can be replaced by using a custom {@link #maskProviderProperty() maskProvider}.
+         * @param localPhoneNumber The current local phone number.
+         * @return The default mask defined for the country according to the given local phone number.
          */
-        String localNumberMask();
+        String mask(String localPhoneNumber);
 
         /**
          * @return The first area code if there is any in the country.
@@ -561,7 +576,15 @@ public class PhoneNumberField extends Control {
             GABON(241, "GA"),
             GAMBIA(220, "GM"),
             GEORGIA(995, "GE"),
-            GERMANY(49, "DE"),
+            GERMANY(49, "DE", "(___) ______") {
+                @Override
+                public String mask(String localPhoneNumber) {
+                    if (localPhoneNumber != null && localPhoneNumber.startsWith("01522")) {
+                        return "(_____) _______";
+                    }
+                    return super.mask(localPhoneNumber);
+                }
+            },
             GHANA(233, "GH"),
             GIBRALTAR(350, "GI"),
             GREECE(30, "GR"),
@@ -757,7 +780,7 @@ public class PhoneNumberField extends Control {
             }
 
             @Override
-            public String localNumberMask() {
+            public String mask(String localPhoneNumber) {
                 return localNumberMask;
             }
         }
@@ -857,7 +880,7 @@ public class PhoneNumberField extends Control {
         private PhoneNumberFormatter() {
             textField = new TextField();
             textField.setTextFormatter(new TextFormatter<>(this));
-            formattedLocalPhoneNumber.bindBidirectional(textField.textProperty());
+            formattedLocalPhoneNumber.bind(textField.textProperty());
         }
 
         private void setFormattedLocalPhoneNumber(String newPhoneNumber) {
@@ -865,12 +888,11 @@ public class PhoneNumberField extends Control {
                 // Ignore when I'm the one who initiated the update
                 return;
             }
-
             try {
                 selfUpdate = true;
-                String formattedLocalPhoneNumber = doFormat(newPhoneNumber);
-                PhoneNumberField.this.setFormattedLocalPhoneNumber(formattedLocalPhoneNumber);
-                updateMaskRemaining(formattedLocalPhoneNumber);
+                String formattedPhoneNumber = doFormat(newPhoneNumber);
+                textField.setText(formattedPhoneNumber);
+                textField.positionCaret(formattedPhoneNumber == null ? 0 : formattedPhoneNumber.length());
             } finally {
                 selfUpdate = false;
             }
@@ -923,8 +945,7 @@ public class PhoneNumberField extends Control {
                 // TODO this won't ever pick a sub country, since always top countries are resolved first.  Try to
                 // find a solution for this
                 setPhoneNumber(String.valueOf(number.countryCallingCode.phonePrefix()));
-                PhoneNumberField.this.setFormattedLocalPhoneNumber(number.localPhoneNumber);
-                updateMaskRemaining(number.localPhoneNumber);
+                textField.setText(number.localPhoneNumber);
                 change.setText("");
                 change.setCaretPosition(0);
                 change.setAnchor(0);
@@ -938,7 +959,7 @@ public class PhoneNumberField extends Control {
                 return;
             }
 
-            String remainingMask = getMaskRemaining();
+            String remainingMask = Optional.ofNullable(getMaskRemaining()).orElse("");
             String originalText = change.getText();
             StringBuilder newText = new StringBuilder();
 
@@ -968,7 +989,6 @@ public class PhoneNumberField extends Control {
             change.setCaretPosition(change.getCaretPosition() + newText.length() - originalText.length());
             change.setAnchor(change.getCaretPosition());
 
-            setMaskRemaining(remainingMask);
             setPhoneNumber(undoFormat(change.getControlNewText()));
         }
 
@@ -981,7 +1001,7 @@ public class PhoneNumberField extends Control {
             String originalText = change.getControlNewText();
             int start = change.getRangeStart();
 
-            for (int i = originalText.length() - 1; i > 0; i--) {
+            for (int i = originalText.length() - 1; i >= 0; i--) {
                 char c = originalText.charAt(i);
                 if (!Character.isDigit(c)) {
                     start--;
@@ -991,10 +1011,7 @@ public class PhoneNumberField extends Control {
             }
 
             change.setRange(start, change.getRangeEnd());
-
-            String formattedPhone = change.getControlNewText();
-            setPhoneNumber(undoFormat(formattedPhone));
-            updateMaskRemaining(formattedPhone);
+            setPhoneNumber(undoFormat(change.getControlNewText()));
         }
 
         private String undoFormat(String formattedPhoneNumber) {
@@ -1053,19 +1070,6 @@ public class PhoneNumberField extends Control {
             return formattedPhoneNumber.toString();
         }
 
-        private void updateMaskRemaining(String formattedPhoneNumber) {
-            if (isUnMasked()) {
-                setMaskRemaining("");
-            } else {
-                if (formattedPhoneNumber == null || formattedPhoneNumber.isEmpty()) {
-                    setMaskRemaining(getMask());
-                } else if (formattedPhoneNumber.length() > getMask().length()) {
-                    setMaskRemaining("");
-                } else {
-                    setMaskRemaining(getMask().substring(formattedPhoneNumber.length()));
-                }
-            }
-        }
     }
 
     /**
