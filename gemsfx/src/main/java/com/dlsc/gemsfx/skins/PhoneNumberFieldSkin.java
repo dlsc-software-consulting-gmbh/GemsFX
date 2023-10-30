@@ -19,19 +19,28 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
     private static final Image WORLD_ICON = new Image(Objects.requireNonNull(PhoneNumberField.class.getResource("phonenumberfield/world.png")).toExternalForm());
 
     private static final Map<PhoneNumberField.CountryCallingCode, Image> FLAG_IMAGES = new HashMap<>();
+
+    private static final Comparator<PhoneNumberField.CountryCallingCode> NAME_SORT_ASC = (c1, c2) -> {
+        String c1Name = new Locale("en", c1.iso2Code()).getDisplayCountry();
+        String c2Name = new Locale("en", c2.iso2Code()).getDisplayCountry();
+        return c1Name.compareTo(c2Name);
+    };
 
     static {
         for (PhoneNumberField.CountryCallingCode code : PhoneNumberField.CountryCallingCode.Defaults.values()) {
@@ -44,25 +53,36 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
         ObservableList<PhoneNumberField.CountryCallingCode> callingCodes = FXCollections.observableArrayList();
         Runnable callingCodesUpdater = () -> {
-            Set<PhoneNumberField.CountryCallingCode> temp = new LinkedHashSet<>();
-            getSkinnable().getPreferredCountryCodes().forEach(code -> {
-                if (getSkinnable().getAvailableCountryCodes().contains(code)) {
-                    temp.add(code);
+            Set<PhoneNumberField.CountryCallingCode> temp1 = new TreeSet<>(NAME_SORT_ASC);
+            Set<PhoneNumberField.CountryCallingCode> temp2 = new TreeSet<>(NAME_SORT_ASC);
+
+            field.getAvailableCountryCodes().forEach(code -> {
+                if (!field.getPreferredCountryCodes().contains(code)) {
+                    temp2.add(code);
                 }
             });
-            temp.addAll(getSkinnable().getAvailableCountryCodes());
+
+            field.getPreferredCountryCodes().forEach(code -> {
+                if (field.getAvailableCountryCodes().contains(code)) {
+                    temp1.add(code);
+                }
+            });
+
+            List<PhoneNumberField.CountryCallingCode> temp = new ArrayList<>();
+            temp.addAll(temp1);
+            temp.addAll(temp2);
             callingCodes.setAll(temp);
 
-            if (getSkinnable().getCountryCallingCode() != null && !temp.contains(getSkinnable().getCountryCallingCode())) {
+            if (field.getCountryCallingCode() != null && !temp.contains(field.getCountryCallingCode())) {
                 // Clear up the value in case the country code is not available anymore
-                getSkinnable().setPhoneNumber(null);
+                field.setPhoneNumber(null);
             }
         };
 
         InvalidationListener listener = obs -> callingCodesUpdater.run();
-        getSkinnable().getAvailableCountryCodes().addListener(listener);
-        getSkinnable().getPreferredCountryCodes().addListener(listener);
-        getSkinnable().countryCodeViewFactoryProperty().addListener(listener);
+        field.getAvailableCountryCodes().addListener(listener);
+        field.getPreferredCountryCodes().addListener(listener);
+        field.countryCodeViewFactoryProperty().addListener(listener);
         callingCodesUpdater.run();
 
         PhoneNumberEditor editor = new PhoneNumberEditor(textField);
@@ -79,7 +99,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
         // Manually handle mouse event either on the text field or the trigger button box
         field.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
             Bounds buttonBounds = editor.buttonBox.getBoundsInParent();
-            if (!getSkinnable().isForceLocalNumber() && buttonBounds.contains(evt.getX(), evt.getY())) {
+            if (!field.isForceLocalNumber() && buttonBounds.contains(evt.getX(), evt.getY())) {
                 if (!editor.buttonBox.isDisabled()) {
                     editor.buttonBox.requestFocus();
                     if (!comboBox.isShowing()) {
