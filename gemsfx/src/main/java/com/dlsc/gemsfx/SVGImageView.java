@@ -20,7 +20,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/*
+/**
+ * A control which can display SVG images.
+ * <p>
+ * SVGImageView can display svg icons in high definition, and they won't become blurry even when zoomed in.
+ * <p/>
  * Note for SvgImageView:
  * Currently, due to the limitation that weisj can only render BufferedImage from SVG,
  * SvgImageView does not support usage in native packaging scenarios.
@@ -34,10 +38,18 @@ public class SVGImageView extends Control {
     private static final boolean DEFAULT_SMOOTH = true;
     private static final boolean DEFAULT_BACKGROUND_LOADING = false;
 
+    /**
+     * Constructs a new SVGImageView.
+     */
     public SVGImageView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
     }
 
+    /**
+     * Constructs a new SVGImageView with the given SVG url.
+     *
+     * @param url the url of the SVG image to be rendered
+     */
     public SVGImageView(String url) {
         this();
         setSvgUrl(url);
@@ -65,14 +77,33 @@ public class SVGImageView extends Control {
         }
     };
 
-    public double getFitWidth() {
+    /**
+     * Gets the value of the fitWidth property.
+     *
+     * @return The fit width value.
+     */
+    public final double getFitWidth() {
         return fitWidth.get();
     }
 
+    /**
+     * Defines the width of the box that the source svg image should fit into. If the
+     * value is <= 0, the svg image's intrinsic width will be used.
+     * <p>
+     * When preserveRatio is set to true, the actual displayed width of the image is constrained not only by fitWidth,
+     * but also by fitHeight, and it may not be the same as fitWidth.
+     * <p/>
+     * defaultValue 0
+     */
     public DoubleProperty fitWidthProperty() {
         return fitWidth;
     }
 
+    /**
+     * Sets the value of the fitWidth property.
+     *
+     * @param fitWidth The fit width value.
+     */
     public void setFitWidth(double fitWidth) {
         this.fitWidth.set(fitWidth);
     }
@@ -94,14 +125,33 @@ public class SVGImageView extends Control {
         }
     };
 
-    public double getFitHeight() {
+    /**
+     * Gets the value of the fitHeight property.
+     *
+     * @return The fit height value.
+     */
+    public final double getFitHeight() {
         return fitHeight.get();
     }
 
+    /**
+     * Defines the height of the box that the source SVG image should fit into. If the
+     * value is <= 0, the SVG image's intrinsic height will be used.
+     * <p>
+     * When preserveRatio is set to true, the actual displayed height of the image is constrained not only by fitHeight,
+     * but also by fitWidth, and it may not be the same as fitHeight.
+     * <p/>
+     * defaultValue 0
+     */
     public DoubleProperty fitHeightProperty() {
         return fitHeight;
     }
 
+    /**
+     * Sets the value of the fitHeight property.
+     *
+     * @param fitHeight The fit height value.
+     */
     public void setFitHeight(double fitHeight) {
         this.fitHeight.set(fitHeight);
     }
@@ -123,14 +173,31 @@ public class SVGImageView extends Control {
         }
     };
 
-    public boolean isPreserveRatio() {
+    /**
+     * Gets the value of the preserveRatio property.
+     *
+     * @return The preserve ratio value.
+     */
+    public final boolean isPreserveRatio() {
         return preserveRatio.get();
     }
 
+    /**
+     * A property that determines whether the image should maintain its aspect ratio or not.
+     * When set to true, the image will preserve its aspect ratio.
+     * When set to false, the image may be stretched or compressed to fit the specified dimensions, without preserving its aspect ratio.
+     * <p>
+     * defaultValue false
+     */
     public BooleanProperty preserveRatioProperty() {
         return preserveRatio;
     }
 
+    /**
+     * Sets the value of the preserveRatio property.
+     *
+     * @param preserveRatio The preserve ratio value.
+     */
     public void setPreserveRatio(boolean preserveRatio) {
         this.preserveRatio.set(preserveRatio);
     }
@@ -152,14 +219,31 @@ public class SVGImageView extends Control {
         }
     };
 
-    public boolean isSmooth() {
+    /**
+     * Gets the value of the smooth property.
+     *
+     * @return The smooth value.
+     */
+    public final boolean isSmooth() {
         return smooth.get();
     }
 
+    /**
+     * A property that determines whether the SVG image should be rendered using a
+     * smoothing algorithm. If true, the image will be rendered with smoothing
+     * applied, which can improve the visual quality but may reduce performance.
+     * <p>
+     * defaultValue true
+     */
     public BooleanProperty smoothProperty() {
         return smooth;
     }
 
+    /**
+     * Sets the value of the smooth property.
+     *
+     * @param smooth The smooth value.
+     */
     public void setSmooth(boolean smooth) {
         this.smooth.set(smooth);
     }
@@ -181,14 +265,30 @@ public class SVGImageView extends Control {
         }
     };
 
-    public String getSvgUrl() {
+    /**
+     * Gets the value of the svgUrl property.
+     *
+     * @return The svg url value.
+     */
+    public final String getSvgUrl() {
         return svgUrl.get();
     }
 
+    /**
+     * A property that holds the URL of the SVG image to be rendered.
+     * Changing the URL will result in loading and rendering the new SVG image.
+     * <p>
+     * defaultValue null
+     */
     public StringProperty svgUrlProperty() {
         return svgUrl;
     }
 
+    /**
+     * Sets the value of the svgUrl property.
+     *
+     * @param svgUrl The svg url value.
+     */
     public void setSvgUrl(String svgUrl) {
         this.svgUrl.set(svgUrl);
     }
@@ -210,14 +310,31 @@ public class SVGImageView extends Control {
         }
     };
 
-    public boolean isBackgroundLoading() {
+    /**
+     * Gets the value of the backgroundLoading property.
+     *
+     * @return The background loading value.
+     */
+    public final boolean isBackgroundLoading() {
         return backgroundLoading.get();
     }
 
+    /**
+     * A property that indicates whether the SVG image should be loaded in the background.
+     * When set to true, the image is loaded in a background thread, allowing for
+     * asynchronous loading of images.
+     * <p>
+     * defaultValue false
+     */
     public BooleanProperty backgroundLoadingProperty() {
         return backgroundLoading;
     }
 
+    /**
+     * Sets the value of the backgroundLoading property.
+     *
+     * @param backgroundLoading The background loading value.
+     */
     public void setBackgroundLoading(boolean backgroundLoading) {
         this.backgroundLoading.set(backgroundLoading);
     }
@@ -315,6 +432,11 @@ public class SVGImageView extends Control {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata associated with this class.
+     *
+     * @return A list of {@code CssMetaData} objects containing the CSS metadata.
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return SVGImageView.StyleableProperties.STYLEABLES;
     }

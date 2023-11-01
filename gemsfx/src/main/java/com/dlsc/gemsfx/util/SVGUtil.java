@@ -7,7 +7,8 @@ import com.github.weisj.jsvg.parser.SVGLoader;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -17,27 +18,57 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
+ * A utility class that provides methods for parsing SVG files and converting them to JavaFX Image objects.
+ * <p>
+ * This class provides methods for loading SVG documents from various sources, such as files, URLs, and input streams, and then rendering them to JavaFX Image objects.
+ * </p>
  * Note for SVGUtil:
  * Currently, due to the limitation that weisj can only render BufferedImage from SVG,
- * SVGUtil does not support usage in native packaging scenarios.
+ * SvgImageView does not support usage in native packaging scenarios.
  */
 public class SVGUtil {
 
     private SVGUtil() {
     }
 
+    /**
+     * Parses an SVG file from a given file path.
+     *
+     * @param svgFilePath the file path of the SVG file.
+     * @return an Image object representing the parsed SVG file.
+     */
     public static Image parserSVGFromFile(String svgFilePath) {
         return parserSVGFromFile(new File(svgFilePath));
     }
 
+    /**
+     * Parses an SVG file from a given File object.
+     *
+     * @param svgFile the File object representing the SVG file.
+     * @return an Image object representing the parsed SVG file.
+     */
     public static Image parserSVGFromFile(File svgFile) {
         return parserSVGFromFile(svgFile, -1, -1);
     }
 
+    /**
+     * Parses an SVG file from a given File object with the specified width and height.
+     *
+     * @param svgFile    the File object representing the SVG file.
+     * @param prefWidth  the preferred width of the Image.
+     * @param prefHeight the preferred height of the Image.
+     * @return an Image object representing the parsed SVG file.
+     */
     public static Image parserSVGFromFile(File svgFile, double prefWidth, double prefHeight) {
         return toImage(loadSVGDocument(svgFile), prefWidth, prefHeight, 1, 1);
     }
 
+    /**
+     * Parses an SVG file from a given URL string.
+     *
+     * @param urlString the URL string of the SVG file.
+     * @return an Image object representing the parsed SVG file.
+     */
     public static Image parserSVGFromUrl(String urlString) {
         try {
             URL url = new URI(urlString).toURL();
@@ -47,10 +78,24 @@ public class SVGUtil {
         }
     }
 
+    /**
+     * Parses an SVG file from a given URL object.
+     *
+     * @param url the URL object of the SVG file.
+     * @return an Image object representing the parsed SVG file.
+     */
     public static Image parserSVGFromUrl(URL url) {
         return parserSVGFromUrl(url, -1, -1);
     }
 
+    /**
+     * Parses an SVG file from a given URL object with the specified width and height.
+     *
+     * @param url        the URL object of the SVG file.
+     * @param prefWidth  the preferred width of the Image.
+     * @param prefHeight the preferred height of the Image.
+     * @return an Image object representing the parsed SVG file.
+     */
     public static Image parserSVGFromUrl(URL url, double prefWidth, double prefHeight) {
         return toImage(loadSVGDocument(url), prefWidth, prefHeight, 1, 1);
     }
@@ -75,14 +120,44 @@ public class SVGUtil {
         return loader.load(is);
     }
 
+    /**
+     * Converts an InputStream representing an SVG file to an Image object with the specified dimensions and scale factors.
+     *
+     * @param is              the InputStream of the SVG file.
+     * @param requestedWidth  the preferred width of the Image.
+     * @param requestedHeight the preferred height of the Image.
+     * @param outputScaleX    the horizontal scale factor.
+     * @param outputScaleY    the vertical scale factor.
+     * @return an Image object representing the SVG file.
+     */
     public static Image toImage(InputStream is, double requestedWidth, double requestedHeight, double outputScaleX, double outputScaleY) {
         return toImage(loadSVGDocument(is), requestedWidth, requestedHeight, outputScaleX, outputScaleY);
     }
 
+    /**
+     * Converts a URL representing an SVG file to an Image object with the specified dimensions and scale factors.
+     *
+     * @param url             the URL of the SVG file.
+     * @param requestedWidth  the preferred width of the Image.
+     * @param requestedHeight the preferred height of the Image.
+     * @param outputScaleX    the horizontal scale factor.
+     * @param outputScaleY    the vertical scale factor.
+     * @return an Image object representing the SVG file.
+     */
     public static Image toImage(URL url, double requestedWidth, double requestedHeight, double outputScaleX, double outputScaleY) {
         return toImage(loadSVGDocument(url), requestedWidth, requestedHeight, outputScaleX, outputScaleY);
     }
 
+    /**
+     * Converts a URL string representing an SVG file to an Image object with the specified dimensions and scale factors.
+     *
+     * @param urlStr          the URL string of the SVG file.
+     * @param requestedWidth  the preferred width of the Image.
+     * @param requestedHeight the preferred height of the Image.
+     * @param outputScaleX    the horizontal scale factor.
+     * @param outputScaleY    the vertical scale factor.
+     * @return an Image object representing the SVG file.
+     */
     public static Image toImage(String urlStr, double requestedWidth, double requestedHeight, double outputScaleX, double outputScaleY) {
         try {
             return toImage(new URI(urlStr).toURL(), requestedWidth, requestedHeight, outputScaleX, outputScaleY);

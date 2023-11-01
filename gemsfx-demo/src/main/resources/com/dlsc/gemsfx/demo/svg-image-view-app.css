@@ -13,6 +13,7 @@
 }
 
 .svg-image-view {
+    /* The following is an example of how to set the URL for the SVG file via CSS */
     /*-fx-svg-url: url("microphone.svg");*/
     -fx-border-color: grey;
     -fx-border-style: dashed;

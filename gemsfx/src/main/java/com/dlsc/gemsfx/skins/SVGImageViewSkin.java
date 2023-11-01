@@ -14,6 +14,7 @@ import javafx.scene.layout.Region;
 import java.net.URI;
 
 public class SVGImageViewSkin extends SkinBase<SVGImageView> {
+
     private Service<Image> imageService;
     private final ImageView imageView = new ImageView();
     private final InvalidationListener listener = it -> loadingImage();
@@ -56,15 +57,15 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
                 imageView.setImage(null);
             }
         } else {
-            imageService = createLoadingImageService(url);
-            imageService.setOnSucceeded(evt -> {
-                imageView.setImage(imageService.getValue());
-            });
-            imageService.start();
+            if (imageService == null) {
+                imageService = createLoadingImageService();
+            }
+            imageService.setOnSucceeded(evt -> imageView.setImage(imageService.getValue()));
+            imageService.restart();
         }
     }
 
-    private Service<Image> createLoadingImageService(String url) {
+    private Service<Image> createLoadingImageService() {
         SVGImageView skinnable = getSkinnable();
         return new Service<>() {
             @Override
@@ -72,8 +73,11 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
                 return new Task<>() {
                     @Override
                     protected Image call() {
+                        if (isCancelled()) {
+                            return null;
+                        }
                         try {
-                            return SVGUtil.parserSVGFromUrl(new URI(url).toURL(), skinnable.getFitWidth(), skinnable.getFitHeight());
+                            return SVGUtil.parserSVGFromUrl(new URI(skinnable.getSvgUrl()).toURL(), skinnable.getFitWidth(), skinnable.getFitHeight());
                         } catch (Exception e) {
                             return null;
                         }
