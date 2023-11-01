@@ -59,8 +59,8 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
         } else {
             if (imageService == null) {
                 imageService = createLoadingImageService();
+                imageService.setOnSucceeded(evt -> imageView.setImage(imageService.getValue()));
             }
-            imageService.setOnSucceeded(evt -> imageView.setImage(imageService.getValue()));
             imageService.restart();
         }
     }
