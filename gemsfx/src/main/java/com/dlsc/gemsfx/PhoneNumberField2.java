@@ -681,9 +681,7 @@ public class PhoneNumberField2 extends Control {
                     for (int areaCode : code.areaCodes()) {
                         String areaCodePrefix = countryPrefix + areaCode;
                         if (phoneNumber.startsWith(areaCodePrefix)) {
-                            String localNumber = phoneNumber.length() > areaCodePrefix.length() ?
-                                phoneNumber.substring(areaCodePrefix.length()) :
-                                phoneNumber.substring(countryPrefix.length());
+                            String localNumber = phoneNumber.substring(countryPrefix.length());
                             return new CountryCallingCodeScore(2, localNumber);
                         }
                     }
