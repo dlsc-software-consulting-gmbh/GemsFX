@@ -9,6 +9,7 @@ module com.dlsc.gemsfx.demo {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign;
     requires java.prefs;
+    requires libphonenumber;
 
     exports com.dlsc.gemsfx.demo;
 }
