@@ -31,7 +31,7 @@ public class PhoneNumberFieldApp2 extends Application {
             return null;
         }
         PhoneNumberField2.CountryCallingCode code = (PhoneNumberField2.CountryCallingCode) c;
-        return "(+" + code.countryCode() + ") " + code;
+        return "(+" + code.phonePrefix() + ") " + code;
     };
 
     @Override
