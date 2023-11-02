@@ -57,11 +57,14 @@ public class PhoneNumberField2 extends Control {
         textField = new TextField();
         textField.setTextFormatter(new TextFormatter<>(formatter));
 
-        localPhoneNumber.addListener((obs, oldV, newV) -> Platform.runLater(() -> formatter.setFormattedLocalPhoneNumber(newV)));
+        Runnable formatUpdater = () -> Platform.runLater(() -> formatter.setFormattedLocalPhoneNumber(getLocalPhoneNumber()));
+        localPhoneNumber.addListener((obs, oldV, newV) -> formatUpdater.run());
+        localPhoneNumberFormatter.addListener((obs, oldV, newV) -> formatUpdater.run());
 
-        Runnable validUpdater = () -> Platform.runLater(() -> setValid(Optional.ofNullable(getPhoneNumberValidator()).map(v -> v.call(this)).orElse(true)));
+        Runnable validUpdater = () -> Platform.runLater(() -> setValid(Optional.ofNullable(getLocalPhoneNumberValidator()).map(v -> v.call(this)).orElse(true)));
         phoneNumber.addListener((obs, oldV, newV) -> validUpdater.run());
-        phoneNumberValidator.addListener((obs, oldV, newV) -> validUpdater.run());
+        localPhoneNumberValidator.addListener((obs, oldV, newV) -> validUpdater.run());
+
         valid.addListener((obs, oldV, newV) -> pseudoClassStateChanged(ERROR_PSEUDO_CLASS, !newV));
         validUpdater.run();
     }
@@ -264,22 +267,22 @@ public class PhoneNumberField2 extends Control {
         localPhoneNumberFormatterProperty().set(localPhoneNumberFormatter);
     }
 
-    private final ObjectProperty<Callback<PhoneNumberField2, Boolean>> phoneNumberValidator = new SimpleObjectProperty<>(this, "phoneNumberValidator");
+    private final ObjectProperty<Callback<PhoneNumberField2, Boolean>> localPhoneNumberValidator = new SimpleObjectProperty<>(this, "localPhoneNumberValidator");
 
     /**
      * @return The validator used to determine whether the number is valid or not.
-     * This gets called everytime the {@link #phoneNumberProperty() phone number} changes.
+     * This gets called everytime the {@link #localPhoneNumberProperty() local phone number} changes.
      */
-    public final ObjectProperty<Callback<PhoneNumberField2, Boolean>> phoneNumberValidatorProperty() {
-        return phoneNumberValidator;
+    public final ObjectProperty<Callback<PhoneNumberField2, Boolean>> localPhoneNumberValidatorProperty() {
+        return localPhoneNumberValidator;
     }
 
-    public Callback<PhoneNumberField2, Boolean> getPhoneNumberValidator() {
-        return phoneNumberValidatorProperty().get();
+    public Callback<PhoneNumberField2, Boolean> getLocalPhoneNumberValidator() {
+        return localPhoneNumberValidatorProperty().get();
     }
 
-    public void setPhoneNumberValidator(Callback<PhoneNumberField2, Boolean> phoneNumberValidator) {
-        phoneNumberValidatorProperty().set(phoneNumberValidator);
+    public void setPhoneNumberValidator(Callback<PhoneNumberField2, Boolean> localPhoneNumberValidator) {
+        localPhoneNumberValidatorProperty().set(localPhoneNumberValidator);
     }
 
     private final ReadOnlyBooleanWrapper valid = new ReadOnlyBooleanWrapper(this, "valid");
