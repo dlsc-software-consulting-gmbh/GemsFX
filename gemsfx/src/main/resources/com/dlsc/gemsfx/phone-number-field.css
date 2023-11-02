@@ -33,8 +33,8 @@
     -fx-padding: 0px;
 }
 
-.phone-number-field > .combo-box > .editor > .text-mask {
-    -fx-text-fill: rgb(0, 0, 0, .4);
+.phone-number-field:error > .combo-box > .editor > .text-field {
+    -fx-text-fill: red;
 }
 
 .phone-number-field > .combo-box > .editor > .button-box {
