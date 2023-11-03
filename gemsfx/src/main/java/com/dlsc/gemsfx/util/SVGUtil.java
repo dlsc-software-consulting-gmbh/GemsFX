@@ -26,7 +26,7 @@ import java.net.URL;
  * Currently, due to the limitation that weisj can only render BufferedImage from SVG,
  * SvgImageView does not support usage in native packaging scenarios.
  */
-public class SVGUtil {
+public final class SVGUtil {
 
     private SVGUtil() {
     }
@@ -37,8 +37,8 @@ public class SVGUtil {
      * @param svgFilePath the file path of the SVG file.
      * @return an Image object representing the parsed SVG file.
      */
-    public static Image parserSVGFromFile(String svgFilePath) {
-        return parserSVGFromFile(new File(svgFilePath));
+    public static Image parseSVGFromFile(String svgFilePath) {
+        return parseSVGFromFile(new File(svgFilePath));
     }
 
     /**
@@ -47,8 +47,8 @@ public class SVGUtil {
      * @param svgFile the File object representing the SVG file.
      * @return an Image object representing the parsed SVG file.
      */
-    public static Image parserSVGFromFile(File svgFile) {
-        return parserSVGFromFile(svgFile, -1, -1);
+    public static Image parseSVGFromFile(File svgFile) {
+        return parseSVGFromFile(svgFile, -1, -1);
     }
 
     /**
@@ -59,7 +59,7 @@ public class SVGUtil {
      * @param prefHeight the preferred height of the Image.
      * @return an Image object representing the parsed SVG file.
      */
-    public static Image parserSVGFromFile(File svgFile, double prefWidth, double prefHeight) {
+    public static Image parseSVGFromFile(File svgFile, double prefWidth, double prefHeight) {
         return toImage(loadSVGDocument(svgFile), prefWidth, prefHeight, 1, 1);
     }
 
@@ -69,10 +69,10 @@ public class SVGUtil {
      * @param urlString the URL string of the SVG file.
      * @return an Image object representing the parsed SVG file.
      */
-    public static Image parserSVGFromUrl(String urlString) {
+    public static Image parseSVGFromUrl(String urlString) {
         try {
             URL url = new URI(urlString).toURL();
-            return parserSVGFromUrl(url);
+            return parseSVGFromUrl(url);
         } catch (MalformedURLException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -84,8 +84,8 @@ public class SVGUtil {
      * @param url the URL object of the SVG file.
      * @return an Image object representing the parsed SVG file.
      */
-    public static Image parserSVGFromUrl(URL url) {
-        return parserSVGFromUrl(url, -1, -1);
+    public static Image parseSVGFromUrl(URL url) {
+        return parseSVGFromUrl(url, -1, -1);
     }
 
     /**
@@ -96,7 +96,7 @@ public class SVGUtil {
      * @param prefHeight the preferred height of the Image.
      * @return an Image object representing the parsed SVG file.
      */
-    public static Image parserSVGFromUrl(URL url, double prefWidth, double prefHeight) {
+    public static Image parseSVGFromUrl(URL url, double prefWidth, double prefHeight) {
         return toImage(loadSVGDocument(url), prefWidth, prefHeight, 1, 1);
     }
 

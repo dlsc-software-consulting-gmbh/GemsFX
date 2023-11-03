@@ -22,6 +22,7 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
 
     public SVGImageViewSkin(SVGImageView svgImageView) {
         super(svgImageView);
+
         svgImageView.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
         imageView.fitWidthProperty().bind(svgImageView.fitWidthProperty());
@@ -51,7 +52,7 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
 
         if (!skinnable.isBackgroundLoading()) {
             try {
-                Image image = SVGUtil.parserSVGFromUrl(new URI(url).toURL(), skinnable.getFitWidth(), skinnable.getFitHeight());
+                Image image = SVGUtil.parseSVGFromUrl(new URI(url).toURL(), skinnable.getFitWidth(), skinnable.getFitHeight());
                 imageView.setImage(image);
             } catch (Exception e) {
                 imageView.setImage(null);
@@ -77,7 +78,7 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
                             return null;
                         }
                         try {
-                            return SVGUtil.parserSVGFromUrl(new URI(skinnable.getSvgUrl()).toURL(), skinnable.getFitWidth(), skinnable.getFitHeight());
+                            return SVGUtil.parseSVGFromUrl(new URI(skinnable.getSvgUrl()).toURL(), skinnable.getFitWidth(), skinnable.getFitHeight());
                         } catch (Exception e) {
                             return null;
                         }
@@ -86,5 +87,4 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
             }
         };
     }
-
 }

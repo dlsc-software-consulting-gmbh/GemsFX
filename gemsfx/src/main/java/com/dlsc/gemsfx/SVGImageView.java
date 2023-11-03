@@ -34,7 +34,7 @@ public class SVGImageView extends Control {
     private static final String DEFAULT_STYLE_CLASS = "svg-image-view";
     private static final double DEFAULT_FIT_WIDTH = 0;
     private static final double DEFAULT_FIT_HEIGHT = 0;
-    private static final boolean DEFAULT_PRESERVE_RATIO = false;
+    private static final boolean DEFAULT_PRESERVE_RATIO = true;
     private static final boolean DEFAULT_SMOOTH = true;
     private static final boolean DEFAULT_BACKGROUND_LOADING = false;
 
@@ -61,6 +61,7 @@ public class SVGImageView extends Control {
     }
 
     private final DoubleProperty fitWidth = new StyleableDoubleProperty(DEFAULT_FIT_WIDTH) {
+
         @Override
         public CssMetaData<? extends Styleable, Number> getCssMetaData() {
             return SVGImageView.StyleableProperties.FIT_WIDTH;
@@ -78,7 +79,7 @@ public class SVGImageView extends Control {
     };
 
     /**
-     * Gets the value of the fitWidth property.
+     * Gets the value of {@link #fitWidthProperty()}.
      *
      * @return The fit width value.
      */
@@ -90,22 +91,23 @@ public class SVGImageView extends Control {
      * Defines the width of the box that the source svg image should fit into. If the
      * value is <= 0, the svg image's intrinsic width will be used.
      * <p>
-     * When preserveRatio is set to true, the actual displayed width of the image is constrained not only by fitWidth,
-     * but also by fitHeight, and it may not be the same as fitWidth.
+     * When {@link #preserveRatioProperty()} is set to true, then the actual displayed
+     * width of the image is constrained not only by {@link #fitWidthProperty()}, but
+     * also by {@link #fitHeightProperty()}, and it may not be the same as fitWidth.
      * <p/>
-     * defaultValue 0
+     * The default value is 0.
      */
-    public DoubleProperty fitWidthProperty() {
+    public final DoubleProperty fitWidthProperty() {
         return fitWidth;
     }
 
     /**
-     * Sets the value of the fitWidth property.
+     * Sets the value of the {@link #fitWidthProperty()}.
      *
-     * @param fitWidth The fit width value.
+     * @param width the "fit width" value.
      */
-    public void setFitWidth(double fitWidth) {
-        this.fitWidth.set(fitWidth);
+    public final void setFitWidth(double width) {
+        this.fitWidth.set(width);
     }
 
     private final DoubleProperty fitHeight = new StyleableDoubleProperty(DEFAULT_FIT_HEIGHT) {
@@ -126,33 +128,34 @@ public class SVGImageView extends Control {
     };
 
     /**
-     * Gets the value of the fitHeight property.
+     * Gets the value of {@link #fitHeightProperty()}.
      *
-     * @return The fit height value.
+     * @return The fit height value
      */
     public final double getFitHeight() {
         return fitHeight.get();
     }
 
     /**
-     * Defines the height of the box that the source SVG image should fit into. If the
-     * value is <= 0, the SVG image's intrinsic height will be used.
+     * Defines the height of the box that the source svg image should fit into. If the
+     * value is <= 0, the svg image's intrinsic height will be used.
      * <p>
-     * When preserveRatio is set to true, the actual displayed height of the image is constrained not only by fitHeight,
-     * but also by fitWidth, and it may not be the same as fitHeight.
+     * When {@link #preserveRatioProperty()} is set to true, then the actual displayed
+     * height of the image is constrained not only by {@link #fitHeightProperty()}, but
+     * also by {@link #fitWidthProperty()}, and it may not be the same as fitHeight.
      * <p/>
-     * defaultValue 0
+     * The default value is 0.
      */
-    public DoubleProperty fitHeightProperty() {
+    public final DoubleProperty fitHeightProperty() {
         return fitHeight;
     }
 
     /**
-     * Sets the value of the fitHeight property.
+     * Sets the value of the {@link #fitHeightProperty()} property.
      *
-     * @param fitHeight The fit height value.
+     * @param fitHeight the "fit height" value
      */
-    public void setFitHeight(double fitHeight) {
+    public final void setFitHeight(double fitHeight) {
         this.fitHeight.set(fitHeight);
     }
 
@@ -174,7 +177,7 @@ public class SVGImageView extends Control {
     };
 
     /**
-     * Gets the value of the preserveRatio property.
+     * Gets the value of the {@link #preserveRatioProperty()} property.
      *
      * @return The preserve ratio value.
      */
@@ -185,24 +188,26 @@ public class SVGImageView extends Control {
     /**
      * A property that determines whether the image should maintain its aspect ratio or not.
      * When set to true, the image will preserve its aspect ratio.
-     * When set to false, the image may be stretched or compressed to fit the specified dimensions, without preserving its aspect ratio.
+     * When set to false, the image may be stretched or compressed to fit the specified dimensions,
+     * without preserving its aspect ratio.
      * <p>
-     * defaultValue false
+     * The default value is false
      */
-    public BooleanProperty preserveRatioProperty() {
+    public final BooleanProperty preserveRatioProperty() {
         return preserveRatio;
     }
 
     /**
      * Sets the value of the preserveRatio property.
      *
-     * @param preserveRatio The preserve ratio value.
+     * @param preserveRatio the preserve ratio value.
      */
-    public void setPreserveRatio(boolean preserveRatio) {
+    public final void setPreserveRatio(boolean preserveRatio) {
         this.preserveRatio.set(preserveRatio);
     }
 
     private final BooleanProperty smooth = new StyleableBooleanProperty(DEFAULT_SMOOTH) {
+
         @Override
         public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
             return SVGImageView.StyleableProperties.SMOOTH;
@@ -235,7 +240,7 @@ public class SVGImageView extends Control {
      * <p>
      * defaultValue true
      */
-    public BooleanProperty smoothProperty() {
+    public final BooleanProperty smoothProperty() {
         return smooth;
     }
 
@@ -244,7 +249,7 @@ public class SVGImageView extends Control {
      *
      * @param smooth The smooth value.
      */
-    public void setSmooth(boolean smooth) {
+    public final void setSmooth(boolean smooth) {
         this.smooth.set(smooth);
     }
 
@@ -280,7 +285,7 @@ public class SVGImageView extends Control {
      * <p>
      * defaultValue null
      */
-    public StringProperty svgUrlProperty() {
+    public final StringProperty svgUrlProperty() {
         return svgUrl;
     }
 
@@ -289,11 +294,12 @@ public class SVGImageView extends Control {
      *
      * @param svgUrl The svg url value.
      */
-    public void setSvgUrl(String svgUrl) {
+    public final void setSvgUrl(String svgUrl) {
         this.svgUrl.set(svgUrl);
     }
 
     private final BooleanProperty backgroundLoading = new StyleableBooleanProperty(DEFAULT_BACKGROUND_LOADING) {
+
         @Override
         public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
             return SVGImageView.StyleableProperties.BACKGROUND_LOADING;
@@ -326,7 +332,7 @@ public class SVGImageView extends Control {
      * <p>
      * defaultValue false
      */
-    public BooleanProperty backgroundLoadingProperty() {
+    public final BooleanProperty backgroundLoadingProperty() {
         return backgroundLoading;
     }
 
@@ -335,7 +341,7 @@ public class SVGImageView extends Control {
      *
      * @param backgroundLoading The background loading value.
      */
-    public void setBackgroundLoading(boolean backgroundLoading) {
+    public final void setBackgroundLoading(boolean backgroundLoading) {
         this.backgroundLoading.set(backgroundLoading);
     }
 
@@ -440,5 +446,4 @@ public class SVGImageView extends Control {
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return SVGImageView.StyleableProperties.STYLEABLES;
     }
-
 }
