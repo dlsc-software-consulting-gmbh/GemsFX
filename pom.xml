@@ -76,6 +76,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.github.weisj</groupId>
+                <artifactId>jsvg</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-graphics</artifactId>
                 <version>${javafx.version}</version>
