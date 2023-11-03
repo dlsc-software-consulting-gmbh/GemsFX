@@ -6,7 +6,13 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 
-## CalendarView
+## SVGImageView
+
+A control used for rendering SVG image files.
+
+![SVGImageView](gemsfx/docs/svg-image-view.png)
+
+## CalendarView 
 
 A nice UI for displaying the month of a year. The view is highly configurable and allows specifying
 a latest and an earliest date for selection purposes. The days of the previous or the next month can either
