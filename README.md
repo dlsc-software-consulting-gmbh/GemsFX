@@ -2,8 +2,6 @@
 
 # GemsFX
 
-*Requires **JDK 11** or higher.*
-
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 
 ## SVGImageView
@@ -15,7 +13,7 @@ A control used for rendering SVG image files.
 ## CalendarView 
 
 A nice UI for displaying the month of a year. The view is highly configurable and allows specifying
-a latest and an earliest date for selection purposes. The days of the previous or the next month can either
+latest and earliest date for selection purposes. The days of the previous or the next month can either
 be shown or hidden. When clicking on the month the user will be presented with a custom view for quickly
 selecting a different month. The same happens when clicking on the year. The calendar view uses a 
 selection model which can work in three ways: single date selection, multiple date selection, or date range
