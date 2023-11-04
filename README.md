@@ -1,12 +1,16 @@
 [![JFXCentral](https://img.shields.io/badge/Find_me_on-JFXCentral-blue?logo=googlechrome&logoColor=white)](https://www.jfx-central.com/libraries/gemsfx)
 
-# GemsFX
+# GemsFX`
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 
 ## SVGImageView
 
-A control used for rendering SVG image files.
+A control used for rendering SVG image files. Utilizing the [jsvg](https://github.com/weisJ/jsvg) library, ensuring high-definition quality even when scaled.
+
+- Packaging Note: Not suitable for native packaging yet due to AWT dependency.
+- Content Note: Static only for now; future jsvg updates may add animation.
+- Development Note: [jsvg](https://github.com/weisJ/jsvg) is evolving and does not yet support all features of the SVG specification.
 
 ![SVGImageView](gemsfx/docs/svg-image-view.png)
 
