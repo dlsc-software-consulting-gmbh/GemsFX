@@ -13,6 +13,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -31,7 +32,7 @@ public class PhoneNumberFieldApp2 extends Application {
             return null;
         }
         PhoneNumberField2.CountryCallingCode code = (PhoneNumberField2.CountryCallingCode) c;
-        return "(+" + code.phonePrefix() + ") " + code;
+        return "(" + code.phonePrefix() + ") " + code;
     };
 
     @Override
@@ -40,19 +41,15 @@ public class PhoneNumberFieldApp2 extends Application {
 
         PhoneNumberField2 field = new PhoneNumberField2();
 
-        field.setPhoneNumberValidator(f -> {
-            PhoneNumberField2.CountryCallingCode code = f.getCountryCallingCode();
-            if (code == null) {
-                return true;
-            }
-
-            String localPhoneNumber = f.getLocalPhoneNumber();
-            if (localPhoneNumber == null || localPhoneNumber.isEmpty()) {
+        field.setPhoneNumberValidator(phoneNumber -> {
+            if (field.getCountryCallingCode() == null ||
+                phoneNumber == null || phoneNumber.isEmpty() ||
+                field.getLocalPhoneNumber() == null || field.getLocalPhoneNumber().isEmpty()) {
                 return true;
             }
 
             try {
-                Phonenumber.PhoneNumber number = phoneUtil.parse(localPhoneNumber, code.iso2Code());
+                Phonenumber.PhoneNumber number = phoneUtil.parse(phoneNumber, field.getCountryCallingCode().iso2Code());
                 return phoneUtil.isValidNumber(number);
             } catch (NumberParseException e) {
                 System.err.println(e.getLocalizedMessage());
@@ -61,23 +58,16 @@ public class PhoneNumberFieldApp2 extends Application {
             return false;
         });
 
-        field.setLocalPhoneNumberFormatter(f -> {
-            PhoneNumberField2.CountryCallingCode code = f.getCountryCallingCode();
-            if (code == null) {
+        field.setPhoneNumberFormatter(phoneNumber -> {
+            if (phoneNumber == null || phoneNumber.isEmpty() || field.getCountryCallingCode() == null) {
                 return "";
             }
 
-            String localPhoneNumber = f.getLocalPhoneNumber();
-            if (localPhoneNumber == null || localPhoneNumber.isEmpty()) {
-                return "";
-            }
-
-            AsYouTypeFormatter formatter = phoneUtil.getAsYouTypeFormatter(code.iso2Code());
+            AsYouTypeFormatter formatter = phoneUtil.getAsYouTypeFormatter(field.getCountryCallingCode().iso2Code());
             String formatted = "";
-            for (char c : localPhoneNumber.toCharArray()) {
+            for (char c : phoneNumber.toCharArray()) {
                 formatted = formatter.inputDigit(c);
             }
-            System.out.println("Formatted: " + formatted);
             return formatted;
         });
 
@@ -85,6 +75,7 @@ public class PhoneNumberFieldApp2 extends Application {
         addControl("Available Countries", availableCountriesSelector(field), controls);
         addControl("Preferred Countries", preferredCountriesSelector(field), controls);
         addControl("Disable Country", disableCountryCheck(field), controls);
+        addControl("", clearButton(field), controls);
 
         VBox fields = new VBox(10);
         addField(fields, "Country Code", field.countryCallingCodeProperty(), COUNTRY_CODE_CONVERTER);
@@ -142,6 +133,12 @@ public class PhoneNumberFieldApp2 extends Application {
         CheckBox check = new CheckBox();
         check.selectedProperty().bindBidirectional(field.disableCountryCodeProperty());
         return check;
+    }
+
+    private Node clearButton(PhoneNumberField2 field) {
+        Button clear = new Button("Clear all");
+        clear.setOnAction(evt -> field.setPhoneNumber(null));
+        return clear;
     }
 
     private void addControl(String name, Node control, VBox controls) {
