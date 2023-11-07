@@ -7,7 +7,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
@@ -99,7 +98,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
         // Manually handle mouse event either on the text field or the trigger button box
         field.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
             Bounds buttonBounds = editor.buttonBox.getBoundsInParent();
-            if (!field.isForceLocalNumber() && buttonBounds.contains(evt.getX(), evt.getY())) {
+            if (buttonBounds.contains(evt.getX(), evt.getY())) {
                 if (!editor.buttonBox.isDisabled()) {
                     editor.buttonBox.requestFocus();
                     if (!comboBox.isShowing()) {
@@ -128,7 +127,6 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
     private final class PhoneNumberEditor extends ListCell<PhoneNumberField.CountryCallingCode> {
 
         final TextField textField;
-        final Label maskLabel = new Label();
         final HBox buttonBox = new HBox();
 
         public PhoneNumberEditor(TextField textField) {
@@ -154,37 +152,23 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             buttonBox.getStyleClass().add("button-box");
             buttonBox.getChildren().addAll(flagBox, arrowButton);
             buttonBox.managedProperty().bind(buttonBox.visibleProperty());
-            buttonBox.visibleProperty().bind(getSkinnable().forceLocalNumberProperty().not());
             buttonBox.disableProperty().bind(getSkinnable().disableCountryCodeProperty());
-
-            maskLabel.getStyleClass().add("text-mask");
-            maskLabel.textProperty().bind(getSkinnable().maskRemainingProperty());
         }
 
         @Override
         protected Skin<?> createDefaultSkin() {
             return new SkinBase<>(this) {
                 {
-                    getChildren().addAll(buttonBox, textField, maskLabel);
+                    getChildren().addAll(buttonBox, textField);
                 }
 
                 @Override
                 protected void layoutChildren(double x, double y, double w, double h) {
-                    final double buttonWidth;
-                    if (PhoneNumberFieldSkin.this.getSkinnable().isForceLocalNumber()) {
-                        buttonWidth = 0;
-                    } else {
-                        buttonWidth = snapSizeX(buttonBox.prefWidth(-1));
-                        buttonBox.resizeRelocate(x, y, buttonWidth, h);
-                    }
+                    final double buttonWidth = snapSizeX(buttonBox.prefWidth(-1));
+                    buttonBox.resizeRelocate(x, y, buttonWidth, h);
 
                     final double textFieldX = snapPositionX(x + buttonWidth);
                     textField.resizeRelocate(textFieldX, y, w - buttonWidth, h);
-
-                    final Node textNode = textField.lookup(".text");
-                    final double maskX = snapPositionX(textFieldX + textNode.getLayoutBounds().getWidth());
-                    final double maskWidth = snapSizeX(Math.max(0, Math.min(maskLabel.prefWidth(-1), w - maskX)));
-                    maskLabel.resizeRelocate(maskX, y, maskWidth, h);
                 }
             };
         }
@@ -210,7 +194,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             int index = -1;
 
             if (item != null && !empty) {
-                setText("(+" + item.countryCode() + ") " + new Locale("en", item.iso2Code()).getDisplayCountry());
+                setText("(" + item.phonePrefix() + ") " + new Locale("en", item.iso2Code()).getDisplayCountry());
                 setGraphic(getCountryCodeFlagView(item));
                 index = getSkinnable().getPreferredCountryCodes().indexOf(item);
             } else {
