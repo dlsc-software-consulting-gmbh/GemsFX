@@ -58,7 +58,6 @@ public class PhoneNumberField2 extends Control {
         parser = new PhoneNumberParser();
         formatter = new PhoneNumberFormatter(textField);
 
-
         Runnable formatUpdater = () -> Platform.runLater(() -> formatter.setFormattedLocalPhoneNumber(getLocalPhoneNumber()));
         phoneNumberFormatter.addListener((obs, oldV, newV) -> formatUpdater.run());
 
@@ -86,7 +85,9 @@ public class PhoneNumberField2 extends Control {
 
     // VALUES
     private final StringProperty phoneNumber = new SimpleStringProperty(this, "phoneNumber") {
+
         private boolean selfUpdate;
+
         @Override
         public void set(String newPhoneNumber) {
             if (selfUpdate) {
@@ -139,7 +140,9 @@ public class PhoneNumberField2 extends Control {
     }
 
     private final ObjectProperty<CountryCallingCode> countryCallingCode = new SimpleObjectProperty<>(this, "countryCallingCode") {
+
         private boolean selfUpdate;
+
         @Override
         public void set(CountryCallingCode newCountryCallingCode) {
             if (selfUpdate) {
@@ -182,7 +185,7 @@ public class PhoneNumberField2 extends Control {
     private final ReadOnlyStringWrapper localPhoneNumber = new ReadOnlyStringWrapper(this, "localPhoneNumber");
 
     /**
-     * @return Read only property that exposes the local part of the phone number.
+     * @return read-only property that exposes the local part of the phone number.
      */
     public final ReadOnlyStringProperty localPhoneNumberProperty() {
         return localPhoneNumber.getReadOnlyProperty();
@@ -281,18 +284,18 @@ public class PhoneNumberField2 extends Control {
         return phoneNumberValidator;
     }
 
-    public Callback<String, Boolean> getPhoneNumberValidator() {
+    public final Callback<String, Boolean> getPhoneNumberValidator() {
         return phoneNumberValidatorProperty().get();
     }
 
-    public void setPhoneNumberValidator(Callback<String, Boolean> phoneNumberValidator) {
+    public final void setPhoneNumberValidator(Callback<String, Boolean> phoneNumberValidator) {
         phoneNumberValidatorProperty().set(phoneNumberValidator);
     }
 
     private final ReadOnlyBooleanWrapper valid = new ReadOnlyBooleanWrapper(this, "valid");
 
     /**
-     * @return Read only property that indicates whether the phone number is valid or not.
+     * @return read-only property that indicates whether the phone number is valid or not.
      */
     public final ReadOnlyBooleanWrapper validProperty() {
         return valid;
@@ -302,7 +305,7 @@ public class PhoneNumberField2 extends Control {
         return valid.get();
     }
 
-    private void setValid(boolean valid) {
+    private final void setValid(boolean valid) {
         this.valid.set(valid);
     }
 
@@ -595,8 +598,7 @@ public class PhoneNumberField2 extends Control {
             YEMEN(967, "YE"),
             ZAMBIA(260, "ZM"),
             ZANZIBAR(255, "TZ"),
-            ZIMBABWE(263, "ZW")
-            ;
+            ZIMBABWE(263, "ZW");
 
             private final int countryCode;
             private final String iso2Code;
@@ -624,7 +626,6 @@ public class PhoneNumberField2 extends Control {
             }
 
         }
-
     }
 
     /**
@@ -838,7 +839,6 @@ public class PhoneNumberField2 extends Control {
                 selfUpdate = false;
             }
         }
-
     }
 
     /**
@@ -864,7 +864,6 @@ public class PhoneNumberField2 extends Control {
             this.localPhoneNumber = localPhoneNumber;
         }
     }
-
 }
 
 
