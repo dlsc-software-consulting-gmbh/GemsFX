@@ -23,9 +23,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.controlsfx.control.CheckComboBox;
 
+import java.util.Collections;
 import java.util.function.Function;
 
 public class PhoneNumberFieldApp2 extends Application {
+
+    private final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+
+    private final PhoneNumberField2 field = new PhoneNumberField2();
 
     private static final Function<Object, String> COUNTRY_CODE_CONVERTER = c -> {
         if (c == null) {
@@ -37,13 +42,8 @@ public class PhoneNumberFieldApp2 extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-
-        PhoneNumberField2 field = new PhoneNumberField2();
-
         field.setPhoneNumberValidator(phoneNumber -> {
-            if (field.getCountryCallingCode() == null ||
-                phoneNumber == null || phoneNumber.isEmpty() ||
+            if (field.getCountryCallingCode() == null || phoneNumber == null || phoneNumber.isEmpty() ||
                 field.getLocalPhoneNumber() == null || field.getLocalPhoneNumber().isEmpty()) {
                 return true;
             }
@@ -51,8 +51,7 @@ public class PhoneNumberFieldApp2 extends Application {
             try {
                 Phonenumber.PhoneNumber number = phoneUtil.parse(phoneNumber, field.getCountryCallingCode().iso2Code());
                 return phoneUtil.isValidNumber(number);
-            } catch (NumberParseException e) {
-                System.err.println(e.getLocalizedMessage());
+            } catch (NumberParseException ignored) {
             }
 
             return false;
@@ -64,10 +63,12 @@ public class PhoneNumberFieldApp2 extends Application {
             }
 
             AsYouTypeFormatter formatter = phoneUtil.getAsYouTypeFormatter(field.getCountryCallingCode().iso2Code());
+
             String formatted = "";
             for (char c : phoneNumber.toCharArray()) {
                 formatted = formatter.inputDigit(c);
             }
+
             return formatted;
         });
 
@@ -81,7 +82,7 @@ public class PhoneNumberFieldApp2 extends Application {
         addField(fields, "Country Code", field.countryCallingCodeProperty(), COUNTRY_CODE_CONVERTER);
         addField(fields, "Phone Number", field.phoneNumberProperty());
         addField(fields, "Local Number", field.localPhoneNumberProperty());
-
+        addField(fields, "E160 Number", Bindings.createStringBinding(() -> formatToE160(field.getLocalPhoneNumber()), field.localPhoneNumberProperty()));
         VBox vBox = new VBox(20);
         vBox.setPadding(new Insets(20));
         vBox.setAlignment(Pos.CENTER);
@@ -92,6 +93,21 @@ public class PhoneNumberFieldApp2 extends Application {
         stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
+    }
+
+    private String formatToE160(String phoneNumber) {
+        if (field.getCountryCallingCode() == null || phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            return "";
+        }
+
+        try {
+            System.out.println("parsing '" + phoneNumber + "'");
+            Phonenumber.PhoneNumber number = phoneUtil.parse(phoneNumber, field.getCountryCallingCode().iso2Code());
+            return phoneUtil.formatByPattern(number, PhoneNumberUtil.PhoneNumberFormat.E164, Collections.emptyList());
+        } catch (NumberParseException ignored) {
+        }
+
+        return "";
     }
 
     private Node availableCountriesSelector(PhoneNumberField2 field) {

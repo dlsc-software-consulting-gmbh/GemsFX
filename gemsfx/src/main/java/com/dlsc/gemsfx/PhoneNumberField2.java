@@ -84,6 +84,7 @@ public class PhoneNumberField2 extends Control {
     }
 
     // VALUES
+
     private final StringProperty phoneNumber = new SimpleStringProperty(this, "phoneNumber") {
 
         private boolean selfUpdate;
