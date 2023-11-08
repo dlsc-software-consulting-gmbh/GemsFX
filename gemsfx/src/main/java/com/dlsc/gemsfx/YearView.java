@@ -131,4 +131,42 @@ public class YearView extends Control {
     public final void setRows(int rows) {
         this.rows.set(rows);
     }
+
+    private final ObjectProperty<Year> earliestYear = new SimpleObjectProperty<>(this, "earliestYear");
+
+    public final Year getEarliestYear() {
+        return earliestYear.get();
+    }
+
+    /**
+     * The earliest year that the user will be able to select in the view.
+     *
+     * @return the earliest year
+     */
+    public final ObjectProperty<Year> earliestYearProperty() {
+        return earliestYear;
+    }
+
+    public final void setEarliestYear(Year earliestYear) {
+        this.earliestYear.set(earliestYear);
+    }
+
+    private final ObjectProperty<Year> latestYear = new SimpleObjectProperty<>(this, "latestYear");
+
+    public final Year getLatestYear() {
+        return latestYear.get();
+    }
+
+    /**
+     * The latest year that the user will be able to select in the view.
+     *
+     * @return the earliest year
+     */
+    public final ObjectProperty<Year> latestYearProperty() {
+        return latestYear;
+    }
+
+    public final void setLatestYear(Year latestYear) {
+        this.latestYear.set(latestYear);
+    }
 }

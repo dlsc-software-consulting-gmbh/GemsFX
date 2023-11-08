@@ -1,0 +1,27 @@
+.control-box {
+    -fx-alignment: top-center;
+    -fx-spacing: 10;
+    -fx-padding: 10px;
+    -fx-min-width: 185px;
+    -fx-max-width: 185px;
+}
+
+.control-box > .check-box,
+.control-box > .spinner,
+.control-box > .button{
+    -fx-pref-width: 165px;
+}
+
+.svg-image-view {
+    /* The following is an example of how to set the URL for the SVG file via CSS */
+    /*-fx-svg-url: url("microphone.svg");*/
+    -fx-border-color: grey;
+    -fx-border-style: dashed;
+    -fx-padding: 5px;
+}
+
+.image-wrapper {
+    -fx-background-color: white;
+    -fx-pref-width: 408px;
+    -fx-pref-height: 408px;
+}

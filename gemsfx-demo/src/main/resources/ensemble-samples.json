@@ -126,6 +126,14 @@
       "project": "GemsFX",
       "preview": "/preview-calendar-picker.png",
       "classname": "com.dlsc.gemsfx.demo.CalendarPickerApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Phone Number Field",
+      "desc": "A field for entering a phone number",
+      "project": "GemsFX",
+      "preview": "/preview-phone-number-field.png",
+      "classname": "com.dlsc.gemsfx.demo.PhoneNumberFieldApp"
     }
   ]
 }

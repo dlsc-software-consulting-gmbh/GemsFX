@@ -1,192 +1,252 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.CalendarView;
+import com.dlsc.gemsfx.CalendarView.SelectionModel;
+import com.dlsc.gemsfx.YearMonthView;
 import com.dlsc.gemsfx.daterange.DateRange;
-import com.dlsc.gemsfx.daterange.DateRangeControlBase;
+import com.dlsc.gemsfx.daterange.DateRangePreset;
 import com.dlsc.gemsfx.daterange.DateRangeView;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.SkinBase;
+import javafx.geometry.Side;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Objects;
 
 public class DateRangeViewSkin extends SkinBase<DateRangeView> {
 
-    private final CalendarView startMonth;
-    private final CalendarView endMonth;
-    private final Label quickSelectLabel;
-    private final VBox quickSelectBox;
+    private final CalendarView startCalendarView;
+    private final CalendarView endCalendarView;
+    private final Label presetsTitleLabel;
+    private final VBox presetsBox;
     private final Button applyButton;
     private final Button cancelButton;
+    private final StackPane stackPane;
+    private final HBox container;
+    private final Label toLabel;
 
     public DateRangeViewSkin(DateRangeView view) {
         super(view);
 
-        startMonth = createCalendarView();
-        startMonth.setShowDaysOfPreviousOrNextMonth(true);
-        startMonth.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        startMonth.getSelectionModel().setSelectionMode(CalendarView.SelectionModel.SelectionMode.DATE_RANGE);
-        startMonth.setYearMonth(YearMonth.now().minusMonths(1));
-        startMonth.setShowToday(false);
-        startMonth.getSelectionModel().setSelectionMode(CalendarView.SelectionModel.SelectionMode.DATE_RANGE);
+        SelectionModel selectionModel = view.getSelectionModel();
 
-        endMonth = createCalendarView();
-        endMonth.setShowDaysOfPreviousOrNextMonth(true);
-        endMonth.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        endMonth.setSelectionModel(startMonth.getSelectionModel());
-        endMonth.setYearMonth(YearMonth.now());
-        endMonth.setShowToday(false);
-        endMonth.setYearMonth(YearMonth.now().plusMonths(1));
+        toLabel = new Label();
+        toLabel.textProperty().bind(view.toTextProperty());
+        toLabel.getStyleClass().add("to-label");
+        toLabel.setMouseTransparent(true);
 
-        startMonth.disableNextMonthButtonProperty().bind(Bindings.createBooleanBinding(() -> startMonth.getYearMonth().equals(endMonth.getYearMonth().minusMonths(1)), startMonth.yearMonthProperty(), endMonth.yearMonthProperty()));
-        endMonth.disablePreviousMonthButtonProperty().bind(Bindings.createBooleanBinding(() -> startMonth.getYearMonth().equals(endMonth.getYearMonth().minusMonths(1)), startMonth.yearMonthProperty(), endMonth.yearMonthProperty()));
+        startCalendarView = view.getStartCalendarView();
+        endCalendarView = view.getEndCalendarView();
 
-//        startMonth.yearMonthProperty().addListener((obs, oldDate, newDate) -> {
-//            if (newDate.isAfter(endMonth.getYearMonth())) {
-//                startMonth.setDate(LocalDate.of(oldDate.getYear(), oldDate.getMonth(), 1));
-//            }
-//        });
-//
-//        endMonth.yearMonthProperty().addListener((obs, oldDate, newDate) -> {
-//            if (newDate.isBefore(startMonth.getYearMonth())) {
-//                endMonth.setDate(LocalDate.of(oldDate.getYear(), oldDate.getMonth(), 1));
-//            }
-//        });
+        startCalendarView.latestDateProperty().addListener(it -> System.out.println("start: latest: " + startCalendarView.getLatestDate()));
+        startCalendarView.latestDateProperty().bind(Bindings.createObjectBinding(() -> {
+            YearMonth month = endCalendarView.getYearMonth().minusMonths(1);
+            return month.atDay(month.lengthOfMonth());
+        }, endCalendarView.yearMonthProperty()));
 
-        quickSelectLabel = new Label("QUICK SELECT");
-        quickSelectLabel.getStyleClass().add("quick-select-title");
-        quickSelectLabel.setMinWidth(Region.USE_PREF_SIZE);
+        endCalendarView.earliestDateProperty().addListener(it -> System.out.println("end: earliest: " + endCalendarView.getEarliestDate()));
+        endCalendarView.earliestDateProperty().bind(Bindings.createObjectBinding(() -> {
+            YearMonth month = startCalendarView.getYearMonth().plusMonths(1);
+            return month.atDay(1);
+        }, startCalendarView.yearMonthProperty()));
 
-        applyButton = new Button("APPLY");
+        startCalendarView.disableNextMonthButtonProperty().bind(Bindings.createBooleanBinding(() -> startCalendarView.getYearMonth().equals(endCalendarView.getYearMonth().minusMonths(1)), startCalendarView.yearMonthProperty(), endCalendarView.yearMonthProperty()));
+        endCalendarView.disablePreviousMonthButtonProperty().bind(Bindings.createBooleanBinding(() -> startCalendarView.getYearMonth().equals(endCalendarView.getYearMonth().minusMonths(1)), startCalendarView.yearMonthProperty(), endCalendarView.yearMonthProperty()));
+
+        startCalendarView.yearMonthProperty().addListener((obs, oldStartMonth, newStartMonth) -> {
+            YearMonth endMonth = endCalendarView.getYearMonth();
+            if (!newStartMonth.isBefore(endMonth)) {
+                startCalendarView.setYearMonth(oldStartMonth);
+            }
+        });
+
+        endCalendarView.yearMonthProperty().addListener((obs, oldEndMonth, newEndMonth) -> {
+            YearMonth startMonth = startCalendarView.getYearMonth();
+            if (!newEndMonth.isAfter(startMonth)) {
+                endCalendarView.setYearMonth(oldEndMonth);
+            }
+        });
+
+        presetsTitleLabel = new Label();
+        presetsTitleLabel.textProperty().bind(view.presetTitleProperty());
+        presetsTitleLabel.getStyleClass().add("presets-title");
+        presetsTitleLabel.setMinWidth(Region.USE_PREF_SIZE);
+        presetsTitleLabel.visibleProperty().bind(presetsTitleLabel.textProperty().isNotEmpty());
+        presetsTitleLabel.managedProperty().bind(presetsTitleLabel.textProperty().isNotEmpty());
+
+        applyButton = new Button();
+        applyButton.textProperty().bind(view.applyTextProperty());
+        applyButton.getStyleClass().add("apply-button");
         applyButton.setMinWidth(Region.USE_PREF_SIZE);
+        applyButton.setMaxWidth(Double.MAX_VALUE);
 
-//        applyButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
-//            if (!startMonth.getSelectedDates().isEmpty() && !endMonth.getSelectedDates().isEmpty()) {
-//                LocalDate st = startMonth.getSelectedDates().iterator().next();
-//                LocalDate et = endMonth.getSelectedDates().iterator().next();
-//                return et.isBefore(st);
-//            }
-//            return false;
-//        }, startMonth.getSelectedDates(), endMonth.getSelectedDates()));
+        applyButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            if (!selectionModel.getSelectedDates().isEmpty() && !endCalendarView.getSelectionModel().getSelectedDates().isEmpty()) {
+                LocalDate st = selectionModel.getSelectedDate();
+                LocalDate et = selectionModel.getSelectedEndDate();
+                return et.isBefore(st);
+            }
+            return false;
+        }, selectionModel.getSelectedDates(), endCalendarView.getSelectionModel().getSelectedDates()));
 
-//        applyButton.setOnAction(evt -> {
-//            DateRange selectedDateRange = new DateRange(
-//                    startMonth.getSelectedDates().iterator().next(),
-//                    endMonth.getSelectedDates().iterator().next());
-//
-//            boolean foundPreset = false;
-//            for (DateRangePreset preset : view.getPresets()) {
-//                if (Objects.equals(preset.getStartDate(), selectedDateRange.getStartDate()) && Objects.equals(preset.getEndDate(), selectedDateRange.getEndDate())) {
-//                    view.setSelectedDateRange(preset);
-//                    foundPreset = true;
-//                }
-//            }
-//
-//            if (!foundPreset) {
-//                view.setSelectedDateRange(selectedDateRange);
-//            }
-//
-//            view.getOnClose().run();
-//        });
+        applyButton.setOnAction(evt -> {
+            DateRange selectedDateRange = new DateRange(
+                    selectionModel.getSelectedDate(),
+                    selectionModel.getSelectedEndDate());
 
-        cancelButton = new Button("CANCEL");
+            boolean foundPreset = false;
+            for (DateRangePreset preset : view.getPresets()) {
+                if (Objects.equals(preset.getStartDate(), selectedDateRange.getStartDate()) && Objects.equals(preset.getEndDate(), selectedDateRange.getEndDate())) {
+                    view.setValue(preset);
+                    foundPreset = true;
+                }
+            }
+
+            if (!foundPreset) {
+                view.setValue(selectedDateRange);
+            }
+
+            view.getOnClose().run();
+        });
+
+        cancelButton = new Button();
+        cancelButton.textProperty().bind(view.cancelTextProperty());
+        cancelButton.getStyleClass().add("cancel-button");
         cancelButton.setMinWidth(Region.USE_PREF_SIZE);
+        cancelButton.setMaxWidth(Double.MAX_VALUE);
         cancelButton.setOnAction(evt -> view.getOnClose().run());
 
-        applyButton.setMaxWidth(Double.MAX_VALUE);
-        cancelButton.setMaxWidth(Double.MAX_VALUE);
+        presetsBox = new VBox();
+        presetsBox.getStyleClass().add("presets-box");
+        presetsBox.setFillWidth(true);
+        presetsBox.visibleProperty().bind(view.showPresetsProperty());
+        presetsBox.managedProperty().bind(view.showPresetsProperty());
+        presetsBox.setMinWidth(Region.USE_PREF_SIZE);
 
-        quickSelectBox = new VBox();
-        quickSelectBox.getStyleClass().add("quick-select-box");
-        quickSelectBox.setFillWidth(true);
-        quickSelectBox.setPrefWidth(270);
-        quickSelectBox.visibleProperty().bind(view.modeProperty().isEqualTo(DateRangeControlBase.Mode.ADVANCED));
-        quickSelectBox.managedProperty().bind(view.modeProperty().isEqualTo(DateRangeControlBase.Mode.ADVANCED));
+        stackPane = new StackPane();
+        stackPane.getStyleClass().add("stack-pane");
 
-        HBox monthsBox = new HBox(startMonth, endMonth);
-        monthsBox.getStyleClass().add("months-box");
+        container = new HBox();
+        container.getStyleClass().add("range-view-container");
+        container.setFillHeight(true);
 
-        Label centerPiece = new Label("TO");
-        centerPiece.getStyleClass().add("center-piece");
+        HBox.setHgrow(startCalendarView, Priority.ALWAYS);
+        HBox.setHgrow(endCalendarView, Priority.ALWAYS);
+        HBox.setHgrow(presetsBox, Priority.ALWAYS);
 
-        StackPane stackPane = new StackPane(monthsBox, centerPiece);
-
-        HBox hBox = new HBox(stackPane, quickSelectBox);
-        hBox.getStyleClass().add("range-view-container");
-        hBox.setFillHeight(true);
-
-        HBox.setHgrow(startMonth, Priority.ALWAYS);
-        HBox.setHgrow(endMonth, Priority.ALWAYS);
-        HBox.setHgrow(quickSelectBox, Priority.ALWAYS);
-
-        HBox.setMargin(quickSelectBox, new Insets(0, 0, 0, 10));
-
-        view.selectedDateRangeProperty().addListener((obs, oldRange, newRange) -> {
+        view.valueProperty().addListener((obs, oldRange, newRange) -> {
             if (newRange != null) {
                 // the start and end dates can be visible in both month views
                 applyRangeToMonthViews(newRange);
             } else {
-                view.setSelectedDateRange(oldRange);
+                view.setValue(oldRange);
             }
         });
 
-        view.getPresets().addListener((Observable it) -> updateView());
+        view.getPresets().addListener((Observable it) -> updatePresetsView());
+        view.orientationProperty().addListener(it -> updateCalendarLayout());
+        view.presetsLocationProperty().addListener(it -> updateLayout());
 
-        getChildren().add(hBox);
-        updateView();
+        getChildren().add(container);
+
+        updatePresetsView();
+        updateCalendarLayout();
+        updateLayout();
+
+        applyRangeToMonthViews(view.getValue());
     }
 
-    protected CalendarView createCalendarView() {
-        return new CalendarView();
+    private void updateLayout() {
+        Side quickSelectPosition = getSkinnable().getPresetsLocation();
+        if (quickSelectPosition.equals(Side.LEFT)) {
+            container.getChildren().setAll(presetsBox, stackPane);
+        } else {
+            container.getChildren().setAll(stackPane, presetsBox);
+        }
+    }
+
+    private void updateCalendarLayout() {
+        DateRangeView view  = getSkinnable();
+
+        if (view.getOrientation().equals(Orientation.HORIZONTAL)) {
+            HBox monthsBox = new HBox(startCalendarView, endCalendarView);
+            monthsBox.getStyleClass().add("months-box");
+            stackPane.getChildren().setAll(monthsBox, toLabel);
+        } else {
+            VBox monthsBox = new VBox(startCalendarView, endCalendarView);
+            monthsBox.getStyleClass().add("months-box");
+            stackPane.getChildren().setAll(monthsBox, toLabel);
+        }
     }
 
     private void applyRangeToMonthViews(DateRange newRange) {
-//        startMonth.getSelectedDates().clear();
-//        startMonth.getSelectedDates().add(newRange.getStartDate());
-//        startMonth.setDate(newRange.getStartDate());
-//
-//        endMonth.getSelectedDates().clear();
-//        endMonth.getSelectedDates().add(newRange.getEndDate());
-//        endMonth.setDate(newRange.getEndDate());
+        SelectionModel selectionModel = getSkinnable().getSelectionModel();
+        selectionModel.clearSelection();
+        if (newRange != null) {
+            selectionModel.select(newRange.getStartDate());
+            selectionModel.select(newRange.getEndDate());
+
+            YearMonth fromMonth = YearMonth.from(newRange.getStartDate());
+            YearMonth toMonth = YearMonth.from(newRange.getEndDate());
+            if (fromMonth.isBefore(toMonth)) {
+                startCalendarView.setYearMonth(fromMonth);
+                endCalendarView.setYearMonth(toMonth);
+            } else {
+                startCalendarView.setYearMonth(fromMonth);
+                endCalendarView.setYearMonth(fromMonth.plusMonths(1));
+            }
+        }
     }
 
-    private void updateView() {
+    private void updatePresetsView() {
         DateRangeView view = getSkinnable();
-        DateRange range = view.getSelectedDateRange();
 
-        if (range != null) {
-//            startMonth.getSelectedDates().add(range.getStartDate());
-//            endMonth.getSelectedDates().add(range.getEndDate());
-        }
+        presetsBox.getChildren().clear();
+        presetsBox.getChildren().add(presetsTitleLabel);
 
-        quickSelectBox.getChildren().clear();
-        quickSelectBox.getChildren().add(quickSelectLabel);
-
-        view.getPresets().forEach(rangePreset -> {
+        ObservableList<DateRangePreset> presets = view.getPresets();
+        for (int i = 0; i < presets.size(); i++) {
+            DateRangePreset rangePreset = presets.get(i);
             Label l = new Label(rangePreset.getTitle());
-            l.getStyleClass().add("preset-label");
+            l.getStyleClass().add("preset-name-label");
             l.setOnMouseClicked(evt -> applyRangeToMonthViews(rangePreset));
-            quickSelectBox.getChildren().add(l);
+            presetsBox.getChildren().add(l);
 
-            Separator separator = new Separator(Orientation.HORIZONTAL);
-            quickSelectBox.getChildren().add(separator);
-        });
+            if (i < presets.size() - 1) {
+                Separator separator = new Separator(Orientation.HORIZONTAL);
+                presetsBox.getChildren().add(separator);
+            }
+        }
 
         Region filler = new Region();
         VBox.setVgrow(filler, Priority.ALWAYS);
 
-        quickSelectBox.getChildren().add(filler);
-        quickSelectBox.getChildren().add(applyButton);
-        quickSelectBox.getChildren().add(cancelButton);
+        presetsBox.getChildren().add(filler);
+
+        applyButton.setMaxWidth(Double.MAX_VALUE);
+        applyButton.setMinWidth(Region.USE_PREF_SIZE);
+
+        cancelButton.setMaxWidth(Double.MAX_VALUE);
+        cancelButton.setMinWidth(Region.USE_PREF_SIZE);
+
+        HBox.setHgrow(applyButton, Priority.ALWAYS);
+        HBox.setHgrow(cancelButton, Priority.ALWAYS);
+
+        HBox buttonBar = new HBox(applyButton, cancelButton);
+        buttonBar.visibleProperty().bind(view.showCancelAndApplyButtonProperty());
+        buttonBar.managedProperty().bind(view.showCancelAndApplyButtonProperty());
+        buttonBar.getStyleClass().add("buttons-box");
+
+        presetsBox.getChildren().add(buttonBar);
     }
 }

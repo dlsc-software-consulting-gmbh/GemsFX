@@ -19,53 +19,90 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.control.Skinnable;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.WindowEvent;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-public class DateRangePickerSkin extends SkinBase<DateRangePicker> {
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+
+public class DateRangePickerSkin extends CustomComboBoxSkinBase<DateRangePicker> {
 
     private Label titleLabel;
     private Label rangeLabel;
 
-    private DateRangeView view;
-    private boolean popupNeedsReconfiguring = true;
+    private final DateRangeView view;
+    private HBox hBox;
 
     public DateRangePickerSkin(DateRangePicker picker) {
         super(picker);
 
-        picker.selectedDateRangeProperty().addListener(it -> updateLabels());
-        picker.setOnMouseClicked(evt -> positionAndShowPopup());
-        picker.smallVersionProperty().addListener(it -> updateView());
+        view = picker.getDateRangeView();
+        view.setFocusTraversable(false); // keep the picker focused / blue border
+        view.valueProperty().bindBidirectional(getSkinnable().valueProperty());
+        view.setOnClose(this::hide);
+
+        picker.setOnMouseClicked(evt -> picker.show());
+        picker.setOnTouchPressed(evt -> picker.show());
+
+        InvalidationListener updateLabelsListener = it -> updateLabels();
+        picker.valueProperty().addListener(updateLabelsListener);
+        picker.formatterProperty().addListener(updateLabelsListener);
+
+        picker.valueProperty().addListener(it -> view.setValue(picker.getValue()));
+        picker.smallProperty().addListener(it -> updateView());
 
         updateView();
+        updateLabels();
+    }
+
+    @Override
+    protected double computePrefHeight(double width, double v1, double v2, double v3, double v4) {
+        return hBox.prefHeight(width);
+    }
+
+    protected double computeMaxHeight(double width, double v1, double v2, double v3, double v4) {
+        return hBox.prefHeight(width);
+    }
+
+    protected Node getPopupContent() {
+        return view;
     }
 
     private void updateView() {
+        DateRangePicker picker = getSkinnable();
+
         titleLabel = new Label();
         titleLabel.getStyleClass().add("title-label");
+
+        titleLabel.visibleProperty().bind(picker.showPresetTitleProperty());
+        titleLabel.managedProperty().bind(picker.showPresetTitleProperty());
 
         rangeLabel = new Label();
         rangeLabel.getStyleClass().add("range-label");
 
-        FontIcon calendarIcon = new FontIcon("fa-calendar");
-        rangeLabel.setGraphic(calendarIcon);
+        Region icon = new Region();
+        icon.getStyleClass().add("icon");
+
+        StackPane iconButton = new StackPane(icon);
+        iconButton.getStyleClass().add("icon-button");
+        iconButton.visibleProperty().bind(picker.showIconProperty());
+        iconButton.managedProperty().bind(picker.showIconProperty());
+
+        rangeLabel.setGraphic(iconButton);
 
         Pane pane;
 
-        if (!getSkinnable().isSmallVersion()) {
+        if (!picker.getSmall()) {
             pane = new VBox(titleLabel, rangeLabel);
             pane.getStyleClass().remove("small");
         } else {
             Region divider = new Region();
             divider.getStyleClass().add("divider");
+            divider.visibleProperty().bind(picker.showPresetTitleProperty());
+            divider.managedProperty().bind(picker.showPresetTitleProperty());
             pane = new HBox(titleLabel, divider, rangeLabel);
             pane.getStyleClass().add("small");
         }
@@ -73,10 +110,15 @@ public class DateRangePickerSkin extends SkinBase<DateRangePicker> {
         pane.getStyleClass().add("inner-range-container");
         pane.setMinWidth(Region.USE_PREF_SIZE);
 
-        FontIcon expandIcon = new FontIcon(MaterialDesign.MDI_CHEVRON_DOWN);
+        Region arrow = new Region();
+        arrow.getStyleClass().add("arrow");
+
+        StackPane arrowButton = new StackPane(arrow);
+        arrowButton.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        arrowButton.getStyleClass().add("arrow-button");
 
         HBox.setHgrow(pane, Priority.ALWAYS);
-        HBox hBox = new HBox(pane, expandIcon);
+        hBox = new HBox(pane, arrowButton);
         hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.getStyleClass().add("outer-range-container");
 
@@ -85,198 +127,29 @@ public class DateRangePickerSkin extends SkinBase<DateRangePicker> {
         getChildren().setAll(hBox);
     }
 
-    private PopupControl popup;
-
     private void updateLabels() {
-        DateRange dateRange = getSkinnable().getSelectedDateRange();
+        DateRange dateRange = getSkinnable().getValue();
         if (dateRange != null) {
             if (dateRange instanceof DateRangePreset) {
                 DateRangePreset preset = (DateRangePreset) dateRange;
                 titleLabel.setText(preset.getTitle());
             } else {
-                titleLabel.setText("Custom range");
+                titleLabel.setText(getSkinnable().getCustomRangeText());
             }
-            rangeLabel.setText(dateRange.toString());
-        }
-    }
-
-    PopupControl getPopup() {
-        if (popup == null) {
-            createPopup();
-        }
-        return popup;
-    }
-
-    private Node getPopupContent() {
-        if (view == null) {
-            view = new DateRangeView();
-            Bindings.bindContent(view.getPresets(), getSkinnable().getPresets());
-            view.selectedDateRangeProperty().bindBidirectional(getSkinnable().selectedDateRangeProperty());
-            view.defaultPresetProperty().bind(getSkinnable().defaultPresetProperty());
-            view.setOnClose(() -> popup.hide());
-        }
-
-        return view;
-    }
-
-    private void positionAndShowPopup() {
-        DateRangePicker picker = getSkinnable();
-        if (picker.getScene() == null) {
-            return;
-        }
-
-        getPopup();
-
-        popup.getScene().setNodeOrientation(getSkinnable().getEffectiveNodeOrientation());
-
-        Node popupContent = getPopupContent();
-        sizePopup();
-
-        Point2D p = getPrefPopupPosition();
-
-        popupNeedsReconfiguring = true;
-        reconfigurePopup();
-
-        popup.show(picker.getScene().getWindow(),
-                snapPositionX(p.getX()),
-                snapPositionY(p.getY()));
-
-        popupContent.requestFocus();
-
-        // second call to sizePopup here to enable proper sizing _after_ the popup
-        // has been displayed. See RT-37622 for more detail.
-        sizePopup();
-    }
-
-    private Point2D getPrefPopupPosition() {
-        return Utils.pointRelativeTo(getSkinnable(), getPopupContent(), HPos.CENTER, VPos.BOTTOM, 0, 0, true);
-    }
-
-    private void sizePopup() {
-        Node popupContent = getPopupContent();
-
-        if (popupContent instanceof Region) {
-            Region r = (Region) popupContent;
-
-            // 0 is used here for the width due to RT-46097
-            double prefHeight = snapSizeY(r.prefHeight(0));
-            double minHeight = snapSizeY(r.minHeight(0));
-            double maxHeight = snapSizeY(r.maxHeight(0));
-            double h = snapSizeY(Math.min(Math.max(prefHeight, minHeight), Math.max(minHeight, maxHeight)));
-
-            double prefWidth = snapSizeX(r.prefWidth(h));
-            double minWidth = snapSizeX(r.minWidth(h));
-            double maxWidth = snapSizeX(r.maxWidth(h));
-            double w = snapSizeX(Math.min(Math.max(prefWidth, minWidth), Math.max(minWidth, maxWidth)));
-
-            popupContent.resize(w, h);
+            rangeLabel.setText(toString(dateRange));
         } else {
-            popupContent.autosize();
+            titleLabel.setText("");
+            rangeLabel.setText("");
         }
     }
 
+    public String toString(DateRange range) {
+        DateTimeFormatter formatter = getSkinnable().getFormatter();
 
-    private void createPopup() {
-        popup = new PopupControl() {
-            @Override
-            public Styleable getStyleableParent() {
-                return getSkinnable();
-            }
-
-            {
-                setSkin(new Skin<>() {
-                    @Override
-                    public Skinnable getSkinnable() {
-                        return getSkinnable();
-                    }
-
-                    @Override
-                    public Node getNode() {
-                        return getPopupContent();
-                    }
-
-                    @Override
-                    public void dispose() {
-                    }
-                });
-            }
-        };
-
-        popup.setConsumeAutoHidingEvents(false);
-        popup.setAutoHide(true);
-        popup.setAutoFix(true);
-        popup.setHideOnEscape(true);
-        popup.addEventHandler(WindowEvent.WINDOW_HIDDEN, t -> {
-            // Make sure the accessibility focus returns to the combo box
-            // after the window closes.
-            getSkinnable().notifyAccessibleAttributeChanged(AccessibleAttribute.FOCUS_NODE);
-        });
-
-        // Fix for RT-21207
-        InvalidationListener layoutPosListener = o -> {
-            popupNeedsReconfiguring = true;
-            reconfigurePopup();
-        };
-        getSkinnable().layoutXProperty().addListener(layoutPosListener);
-        getSkinnable().layoutYProperty().addListener(layoutPosListener);
-        getSkinnable().widthProperty().addListener(layoutPosListener);
-        getSkinnable().heightProperty().addListener(layoutPosListener);
-
-        // RT-36966 - if skinnable's scene becomes null, ensure popup is closed
-        getSkinnable().sceneProperty().addListener(o -> {
-            if (((ObservableValue) o).getValue() == null) {
-                popup.hide();
-//            } else if (getSkinnable().isShowing()) {
-//                positionAndShowPopup();
-            }
-        });
-
-    }
-
-    void reconfigurePopup() {
-        // RT-26861. Don't call getPopup() here because it may cause the popup
-        // to be created too early, which leads to memory leaks like those noted
-        // in RT-32827.
-        if (popup == null) {
-            return;
+        if (range.getStartDate().equals(range.getEndDate())) {
+            return formatter.format(range.getStartDate());
         }
 
-        boolean isShowing = popup.isShowing();
-        if (!isShowing) {
-            return;
-        }
-
-        if (!popupNeedsReconfiguring) {
-            return;
-        }
-
-        popupNeedsReconfiguring = false;
-
-        Point2D p = getPrefPopupPosition();
-
-        Node popupContent = getPopupContent();
-        double minWidth = popupContent.prefWidth(Region.USE_COMPUTED_SIZE);
-        double minHeight = popupContent.prefHeight(Region.USE_COMPUTED_SIZE);
-
-        if (p.getX() > -1) popup.setAnchorX(p.getX());
-        if (p.getY() > -1) popup.setAnchorY(p.getY());
-        if (minWidth > -1) popup.setMinWidth(minWidth);
-        if (minHeight > -1) popup.setMinHeight(minHeight);
-
-        Bounds b = popupContent.getLayoutBounds();
-        double currentWidth = b.getWidth();
-        double currentHeight = b.getHeight();
-        double newWidth = currentWidth < minWidth ? minWidth : currentWidth;
-        double newHeight = currentHeight < minHeight ? minHeight : currentHeight;
-
-        if (newWidth != currentWidth || newHeight != currentHeight) {
-            // Resizing content to resolve issues such as RT-32582 and RT-33700
-            // (where RT-33700 was introduced due to a previous fix for RT-32582)
-            popupContent.resize(newWidth, newHeight);
-            if (popupContent instanceof Region) {
-                ((Region) popupContent).setMinSize(newWidth, newHeight);
-                ((Region) popupContent).setPrefSize(newWidth, newHeight);
-            }
-        }
+        return formatter.format(range.getStartDate()) + " - " + formatter.format(range.getEndDate());
     }
 }

@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class TreeNode<T> {
+
     private static final boolean DEFAULT_EXPANDED = true;
     public static final double USE_TREE_CELL_SIZE = Double.NEGATIVE_INFINITY;
     private static final double DEFAULT_WIDTH = USE_TREE_CELL_SIZE;

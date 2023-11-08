@@ -2,10 +2,7 @@ package com.dlsc.gemsfx;
 
 import javafx.animation.Animation.Status;
 import javafx.animation.FadeTransition;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -14,12 +11,22 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+/**
+ * A simple pane that can be used to overlay the UI with a semi-transparent color,
+ * indicating that input is blocked.
+ */
 public class GlassPane extends StackPane {
 
     private final FadeTransition fadeTransition = new FadeTransition();
 
     public GlassPane() {
         getStyleClass().add("glass-pane");
+
+        blockingOpacity.addListener((obs, oldValue, newValue) -> {
+            if (newValue.doubleValue() < 0d || newValue.doubleValue() > 1) {
+                setBlockingOpacity(oldValue.doubleValue());
+            }
+        });
 
         setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
         setMouseTransparent(false);
@@ -36,8 +43,8 @@ public class GlassPane extends StackPane {
             if (isFadeInOut()) {
                 setVisible(true);
 
-                fadeTransition.setFromValue(isHide() ? .5 : 0);
-                fadeTransition.setToValue(isHide() ? 0 : .5);
+                fadeTransition.setFromValue(isHide() ? getBlockingOpacity() : 0);
+                fadeTransition.setToValue(isHide() ? 0 : getBlockingOpacity());
                 fadeTransition.setOnFinished(evt -> {
                     if (newHide) {
                         setVisible(false);
@@ -51,17 +58,31 @@ public class GlassPane extends StackPane {
         });
     }
 
+    private final DoubleProperty blockingOpacity = new SimpleDoubleProperty(this, "blockingOpacity", .5);
+
+    public final double getBlockingOpacity() {
+        return blockingOpacity.get();
+    }
+
+    public final DoubleProperty blockingOpacityProperty() {
+        return blockingOpacity;
+    }
+
+    public final void setBlockingOpacity(double blockingOpacity) {
+        this.blockingOpacity.set(blockingOpacity);
+    }
+
     private final ObjectProperty<Duration> fadeInOutDuration = new SimpleObjectProperty<>(this, "fadeInOutDuration", Duration.millis(100));
 
-    public Duration getFadeInOutDuration() {
+    public final Duration getFadeInOutDuration() {
         return fadeInOutDuration.get();
     }
 
-    public ObjectProperty<Duration> fadeInOutDurationProperty() {
+    public final ObjectProperty<Duration> fadeInOutDurationProperty() {
         return fadeInOutDuration;
     }
 
-    public void setFadeInOutDuration(Duration fadeInOutDuration) {
+    public final void setFadeInOutDuration(Duration fadeInOutDuration) {
         this.fadeInOutDuration.set(fadeInOutDuration);
     }
 

@@ -79,13 +79,16 @@ public class CalendarView extends Control {
         setFocusTraversable(true);
         setCellFactory(view -> new DateCell());
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        // have to add stylesheet like this or the overridden styles for the inner controls do not work
-        getStylesheets().add(requireNonNull(CalendarView.class.getResource("calendar-view.css")).toExternalForm());
     }
 
     @Override
     protected Skin<?> createDefaultSkin() {
         return new CalendarViewSkin(this);
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return requireNonNull(CalendarView.class.getResource("calendar-view.css")).toExternalForm();
     }
 
     /**
@@ -529,7 +532,7 @@ public class CalendarView extends Control {
         this.showYear.set(showYear);
     }
 
-    private final BooleanProperty showMonthDropdown = new SimpleBooleanProperty(this, "showMonthDropdown", true);
+    private final BooleanProperty showMonthDropdown = new SimpleBooleanProperty(this, "showMonthDropdown", false);
 
     public final boolean isShowMonthDropdown() {
         return showMonthDropdown.get();
@@ -549,7 +552,7 @@ public class CalendarView extends Control {
         this.showMonthDropdown.set(showMonthDropdown);
     }
 
-    private final BooleanProperty showYearDropdown = new SimpleBooleanProperty(this, "showYearDropdown", true);
+    private final BooleanProperty showYearDropdown = new SimpleBooleanProperty(this, "showYearDropdown", false);
 
     public final boolean isShowYearDropdown() {
         return showYearDropdown.get();
@@ -569,7 +572,7 @@ public class CalendarView extends Control {
         this.showYearDropdown.set(showYearDropdown);
     }
 
-    private final BooleanProperty showYearSpinner = new SimpleBooleanProperty(this, "showYearSpinner", true);
+    private final BooleanProperty showYearSpinner = new SimpleBooleanProperty(this, "showYearSpinner", false);
 
     /**
      * Show or hide the year / month spinner.
@@ -749,6 +752,44 @@ public class CalendarView extends Control {
 
     public final void setTodayText(String todayText) {
         this.todayText.set(todayText);
+    }
+
+    private final ObjectProperty<LocalDate> earliestDate = new SimpleObjectProperty<>(this, "earliestDay");
+
+    public final LocalDate getEarliestDate() {
+        return earliestDate.get();
+    }
+
+    /**
+     * The earliest day that can be selected in the view.
+     *
+     * @return the earliest possible date available for selection
+     */
+    public final ObjectProperty<LocalDate> earliestDateProperty() {
+        return earliestDate;
+    }
+
+    public final void setEarliestDate(LocalDate earliestDate) {
+        this.earliestDate.set(earliestDate);
+    }
+
+    private final ObjectProperty<LocalDate> latestDate = new SimpleObjectProperty<>(this, "latestDate");
+
+    public final LocalDate getLatestDate() {
+        return latestDate.get();
+    }
+
+    /**
+     * The latest day that can be selected in the view.
+     *
+     * @return the earliest possible date available for selection
+     */
+    public final ObjectProperty<LocalDate> latestDateProperty() {
+        return latestDate;
+    }
+
+    public final void setLatestDate(LocalDate latestDate) {
+        this.latestDate.set(latestDate);
     }
 
     public static class SelectionModel {

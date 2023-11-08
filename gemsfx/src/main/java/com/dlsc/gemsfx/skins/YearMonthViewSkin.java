@@ -131,6 +131,17 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
         box.setAlignment(Pos.CENTER);
         box.getStyleClass().add("month-box");
         box.setOnMouseClicked(evt -> view.setValue(YearMonth.of(year.get(), month.getValue())));
+        box.disableProperty().bind(Bindings.createObjectBinding(() -> {
+            YearMonth earliestMonth = view.getEarliestMonth();
+            if (earliestMonth != null && YearMonth.of(view.getValue().getYear(), month.getValue()).isBefore(earliestMonth)) {
+                return true;
+            }
+            YearMonth latestMonth = view.getLatestMonth();
+            if (latestMonth != null && YearMonth.of(view.getValue().getYear(), month.getValue()).isAfter(latestMonth)) {
+                return true;
+            }
+            return false;
+        }, view.earliestMonthProperty(), view.latestMonthProperty(), view.valueProperty()));
 
         GridPane.setMargin(box, new Insets(10, 30, 10, 30));
 

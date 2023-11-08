@@ -1,23 +1,77 @@
 [![JFXCentral](https://img.shields.io/badge/Find_me_on-JFXCentral-blue?logo=googlechrome&logoColor=white)](https://www.jfx-central.com/libraries/gemsfx)
 
-# GemsFX
-
-*Requires **JDK 11** or higher.*
+# GemsFX`
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 
-## CalendarView
+## SVGImageView
 
-A nice UI for displaying the month of a year.
+A control used for rendering SVG image files. Utilizing the [jsvg](https://github.com/weisJ/jsvg) library, ensuring high-definition quality even when scaled.
+
+- Packaging Note: Not suitable for native packaging yet due to AWT dependency.
+- Content Note: Static only for now; future jsvg updates may add animation.
+- Development Note: [jsvg](https://github.com/weisJ/jsvg) is evolving and does not yet support all features of the SVG specification.
+
+![SVGImageView](gemsfx/docs/svg-image-view.png)
+
+## CalendarView 
+
+A nice UI for displaying the month of a year. The view is highly configurable and allows specifying
+latest and earliest date for selection purposes. The days of the previous or the next month can either
+be shown or hidden. When clicking on the month the user will be presented with a custom view for quickly
+selecting a different month. The same happens when clicking on the year. The calendar view uses a 
+selection model which can work in three ways: single date selection, multiple date selection, or date range
+selection. Last but not least, the layout of the header can be changed, so that the month and year labels
+are either left, center, or right aligned.
 
 ![CalendarView](gemsfx/docs/calendar-view.png)
 
 ## CalendarPicker
 
-A date picker control that uses the calendar view of GemsFX.
+A date picker control that uses the calendar view of GemsFX. The field is editable to the
+user can also enter the date via keyboard.
 
 ![CalendarPicker](gemsfx/docs/calendar-picker.png)
 
+## DateRangeView
+
+A view that allows the user to specify a date range. The view supports defining a couple of presets
+for quick range selection, e.g. "last week". The left and right month views are bound so that the
+right calendar will never allow the user to specify a date that is earlier than those dates shown in 
+the left month view.
+
+![DateRangeView](gemsfx/docs/date-range-view.png)
+
+## DateRangePicker
+
+A picker that allows the user to specify a date range via the date range view. The picker supports
+two different layouts (small, big). The picker shows the selected range and also a name for the range, 
+which is either derived from the name of a selected preset or simply says something like "custom range".
+
+![DateRangePicker](gemsfx/docs/date-range-picker-small.png)
+![DateRangePicker](gemsfx/docs/date-range-picker-big.png)
+![DateRangePicker](gemsfx/docs/date-range-picker-expanded.png)
+
+## YearView
+
+A view for displaying a configurable number of columns and rows with years. The user can use the grid
+to quickly select a new year. Properties are available to restrict the earliest and the latest year that
+is selectable.
+
+![YearView](gemsfx/docs/year-view.png)
+
+## YearPicker
+
+A view for picking a year from a dropdown showing the year view control.
+
+![YearMonthPicker](gemsfx/docs/year-picker.png)
+
+## YearMonthView
+
+A view for displaying the months of a given year. The user can quickly switch between years. Properties
+are available to restrict the selection to an earliest and a latest month.
+
+![YearMonthPicker](gemsfx/docs/year-month-view.png)
 
 ## YearMonthPicker
 
@@ -25,6 +79,26 @@ A control for specifying the month of a year (see time API class "YearMonth"). I
 and actually inherits a lot of styling attributes from it.
 
 ![YearMonthPicker](gemsfx/docs/year-month-picker.png)
+
+## Time Picker
+
+A small control used for entering a time. The control can be configured with a "step rate" for the minutes field (e.g. "15 minutes") that will be used when
+incrementing or decrementing the minutes field via the keyboard (arrow keys). The control can also be configured to only allow a time within the time range
+defined by an earliest and a latest time. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
+or not when they reach their minimum or maximum value. For example: the minute field shows 59 minutes and the user wants to increase it via the arrow key. Then
+the new value will be "0" when rollover is enabled. If not the value will remain at 59. Rollover combined with "linking fields" will cause the hours field to
+get increased when the minute field rolls over from 59 to 0 or decreased when the minute field rolls over from 0 to 59.
+
+![TimePicker](gemsfx/docs/time-picker.png)
+
+## Duration Picker
+
+A small control used for entering a duration. The control can be configured to only allow a duration within the range
+defined by a minimum and maximum duration. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
+or not when they reach their minimum or maximum value. The control supports similar features as the time picker: rollover fields, keyboard support, linking fields,
+filling fields with leading zeros, etc..
+
+![DurationPicker](gemsfx/docs/duration-picker.png)
 
 ## Spacer
 
@@ -112,26 +186,6 @@ A custom control that wraps a text area and adds a resize handle to the lower ri
 A customized text area that grows based on its text content. The text area will never show vertical or horizontal scrollbars.
 
 ![ExpandingTextArea](gemsfx/docs/expanding-text-area.png)
-
-## Time Picker
-
-A small control used for entering a time. The control can be configured with a "step rate" for the minutes field (e.g. "15 minutes") that will be used when
-incrementing or decrementing the minutes field via the keyboard (arrow keys). The control can also be configured to only allow a time within the time range
-defined by an earliest and a latest time. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
-or not when they reach their minimum or maximum value. For example: the minute field shows 59 minutes and the user wants to increase it via the arrow key. Then
-the new value will be "0" when rollover is enabled. If not the value will remain at 59. Rollover combined with "linking fields" will cause the hours field to 
-get increased when the minute field rolls over from 59 to 0 or decreased when the minute field rolls over from 0 to 59.
-
-![TimePicker](gemsfx/docs/time-picker.png)
-
-## Duration Picker
-
-A small control used for entering a duration. The control can be configured to only allow a duration within the range
-defined by a minimum and maximum duration. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
-or not when they reach their minimum or maximum value. The control supports similar features as the time picker: rollover fields, keyboard support, linking fields, 
-filling fields with leading zeros, etc..
-
-![DurationPicker](gemsfx/docs/duration-picker.png)
 
 ## Photo View
 
