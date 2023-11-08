@@ -1,16 +1,16 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.PhoneNumberFieldSkin;
+import com.google.i18n.phonenumbers.AsYouTypeFormatter;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
@@ -24,7 +24,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,9 +39,6 @@ import java.util.function.UnaryOperator;
  * the {@link CountryCallingCode CountryCallingCode} interface. This interface allows customizing the country codes and their
  * respective area codes, in case the default values are not sufficient or the numbers change.
  * </p>
- *
- * <p>Formatting of the phone number is possible via the {@link #phoneNumberFormatterProperty() phoneNumberFormatter} property.
- * </p>
  */
 public class PhoneNumberField extends Control {
 
@@ -53,9 +49,10 @@ public class PhoneNumberField extends Control {
      */
     public static final String DEFAULT_STYLE_CLASS = "phone-number-field";
 
-    private final PhoneNumberParser parser;
+    private final CountryCallingCodeResolver resolver;
     private final PhoneNumberFormatter formatter;
     private final TextField textField;
+    private final PhoneNumberUtil phoneNumberUtil;
 
     /**
      * Builds a new phone number field with the default settings. The available country calling codes is taken from
@@ -65,25 +62,25 @@ public class PhoneNumberField extends Control {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         getAvailableCountryCodes().setAll(CountryCallingCode.Defaults.values());
 
+        phoneNumberUtil = PhoneNumberUtil.getInstance();
         textField = new TextField();
-
-        parser = new PhoneNumberParser();
+        resolver = new CountryCallingCodeResolver();
         formatter = new PhoneNumberFormatter(textField);
 
-
-        Runnable formatUpdater = () -> Platform.runLater(() -> formatter.setFormattedLocalPhoneNumber(getLocalPhoneNumber()));
-        phoneNumberFormatter.addListener((obs, oldV, newV) -> formatUpdater.run());
-
-        Runnable validUpdater = () -> Platform.runLater(() -> setValid(Optional.ofNullable(getPhoneNumberValidator()).map(v -> v.call(getPhoneNumber())).orElse(true)));
-        phoneNumberValidator.addListener((obs, oldV, newV) -> validUpdater.run());
+        Runnable formatUpdater = () -> Platform.runLater(() -> formatter.setFormattedLocalPhoneNumber(getPhoneNumber()));
+        Runnable validUpdater = () -> Platform.runLater(() -> {
+            Phonenumber.PhoneNumber number = getPhoneNumber();
+            if (number == null) {
+                setValid(true);
+            } else {
+                setValid(phoneNumberUtil.isValidNumber(number));
+            }
+        });
 
         phoneNumber.addListener((obs, oldV, newV) -> {
             formatUpdater.run();
             validUpdater.run();
         });
-
-        valid.addListener((obs, oldV, newV) -> pseudoClassStateChanged(ERROR_PSEUDO_CLASS, !newV));
-        validUpdater.run();
     }
 
     @Override
@@ -97,10 +94,10 @@ public class PhoneNumberField extends Control {
     }
 
     // VALUES
-    private final StringProperty phoneNumber = new SimpleStringProperty(this, "phoneNumber") {
+    private final ObjectProperty<Phonenumber.PhoneNumber> phoneNumber = new SimpleObjectProperty<>(this, "phoneNumber") {
         private boolean selfUpdate;
         @Override
-        public void set(String newPhoneNumber) {
+        public void set(Phonenumber.PhoneNumber newPhoneNumber) {
             if (selfUpdate) {
                 return;
             }
@@ -108,25 +105,15 @@ public class PhoneNumberField extends Control {
             try {
                 selfUpdate = true;
 
-                // Make sure the phone number is valid
-                if (parser.isInvalid(newPhoneNumber)) {
-                    newPhoneNumber = null;
-                }
-
                 // Set the value first, so that the binding will be triggered
                 super.set(newPhoneNumber);
 
-                // Set depending fields here
-                PhoneNumber phoneNumber = parser.call(newPhoneNumber);
-
-                if (phoneNumber == null) {
+                if (newPhoneNumber == null) {
                     setCountryCallingCode(null);
-                    setLocalPhoneNumber(null);
                     formatter.setFormattedLocalPhoneNumber(null);
                 } else {
-                    setCountryCallingCode(phoneNumber.countryCallingCode);
-                    setLocalPhoneNumber(phoneNumber.localPhoneNumber);
-                    formatter.setFormattedLocalPhoneNumber(phoneNumber.localPhoneNumber);
+                    setCountryCallingCode(resolver.call(newPhoneNumber.getRawInput()));
+                    formatter.setFormattedLocalPhoneNumber(newPhoneNumber);
                 }
             } finally {
                 selfUpdate = false;
@@ -138,15 +125,15 @@ public class PhoneNumberField extends Control {
      * @return The phone number property acting as main value for the control.  This is always represented international format
      * without the (+) plus sign.
      */
-    public final StringProperty phoneNumberProperty() {
+    public final ObjectProperty<Phonenumber.PhoneNumber> phoneNumberProperty() {
         return phoneNumber;
     }
 
-    public final String getPhoneNumber() {
+    public final Phonenumber.PhoneNumber getPhoneNumber() {
         return phoneNumberProperty().get();
     }
 
-    public final void setPhoneNumber(String phoneNumber) {
+    public final void setPhoneNumber(Phonenumber.PhoneNumber phoneNumber) {
         phoneNumberProperty().set(phoneNumber);
     }
 
@@ -164,11 +151,13 @@ public class PhoneNumberField extends Control {
                 // Set the value first, so that the binding will be triggered
                 super.set(newCountryCallingCode);
 
-                // For now replace the entire text, it might be good to preserve the local number and just change the country code
-                setPhoneNumber(Optional.ofNullable(newCountryCallingCode)
-                        .map(CountryCallingCode::phonePrefix)
-                        .orElse(null));
-
+                if (newCountryCallingCode == null) {
+                    setPhoneNumber(null);
+                } else {
+                    setPhoneNumber(phoneNumberUtil.parseAndKeepRawInput(newCountryCallingCode.phonePrefix(), newCountryCallingCode.iso2Code()));
+                }
+            } catch (NumberParseException e) {
+                setPhoneNumber(null);
             } finally {
                 selfUpdate = false;
             }
@@ -189,23 +178,6 @@ public class PhoneNumberField extends Control {
 
     private void setCountryCallingCode(CountryCallingCode countryCallingCode) {
         countryCallingCodeProperty().set(countryCallingCode);
-    }
-
-    private final ReadOnlyStringWrapper localPhoneNumber = new ReadOnlyStringWrapper(this, "localPhoneNumber");
-
-    /**
-     * @return Read only property that exposes the local part of the phone number.
-     */
-    public final ReadOnlyStringProperty localPhoneNumberProperty() {
-        return localPhoneNumber.getReadOnlyProperty();
-    }
-
-    public final String getLocalPhoneNumber() {
-        return localPhoneNumber.get();
-    }
-
-    private void setLocalPhoneNumber(String localPhoneNumber) {
-        this.localPhoneNumber.set(localPhoneNumber);
     }
 
     // SETTINGS
@@ -265,43 +237,13 @@ public class PhoneNumberField extends Control {
         countryCodeViewFactoryProperty().set(countryCodeViewFactory);
     }
 
-    private final ObjectProperty<Callback<String, String>> phoneNumberFormatter = new SimpleObjectProperty<>(this, "phoneNumberFormatter");
-
-    /**
-     * @return The formatter that is used to format the phone number.
-     * This gets called whenever the {@link #phoneNumberProperty() phone number} changes.
-     */
-    public final ObjectProperty<Callback<String, String>> phoneNumberFormatterProperty() {
-        return phoneNumberFormatter;
-    }
-
-    public Callback<String, String> getPhoneNumberFormatter() {
-        return phoneNumberFormatterProperty().get();
-    }
-
-    public void setPhoneNumberFormatter(Callback<String, String> phoneNumberFormatter) {
-        phoneNumberFormatterProperty().set(phoneNumberFormatter);
-    }
-
-    private final ObjectProperty<Callback<String, Boolean>> phoneNumberValidator = new SimpleObjectProperty<>(this, "phoneNumberValidator");
-
-    /**
-     * @return The validator used to determine whether the phone number is valid or not.
-     * This gets called everytime the {@link #phoneNumberProperty() phone number} changes.
-     */
-    public final ObjectProperty<Callback<String, Boolean>> phoneNumberValidatorProperty() {
-        return phoneNumberValidator;
-    }
-
-    public Callback<String, Boolean> getPhoneNumberValidator() {
-        return phoneNumberValidatorProperty().get();
-    }
-
-    public void setPhoneNumberValidator(Callback<String, Boolean> phoneNumberValidator) {
-        phoneNumberValidatorProperty().set(phoneNumberValidator);
-    }
-
-    private final ReadOnlyBooleanWrapper valid = new ReadOnlyBooleanWrapper(this, "valid");
+    private final ReadOnlyBooleanWrapper valid = new ReadOnlyBooleanWrapper(this, "valid") {
+        @Override
+        public void set(boolean newValid) {
+            super.set(newValid);
+            pseudoClassStateChanged(ERROR_PSEUDO_CLASS, !newValid);
+        }
+    };
 
     /**
      * @return Read only property that indicates whether the phone number is valid or not.
@@ -331,14 +273,14 @@ public class PhoneNumberField extends Control {
         int countryCode();
 
         /**
-         * @return Designated area codes within the country.
-         */
-        int[] areaCodes();
-
-        /**
          * @return The Alpha-2 code of the country as described in the ISO-3166 international standard.
          */
         String iso2Code();
+
+        /**
+         * @return Designated area codes within the country.
+         */
+        int[] areaCodes();
 
         /**
          * @return The first area code if there is any in the country.
@@ -348,16 +290,10 @@ public class PhoneNumberField extends Control {
         }
 
         /**
-         * @return The concatenation of country code and {@link #defaultAreaCode() default area code}.
+         * @return The concatenation of country code and {@link #defaultAreaCode() default area code} without the plus sign.
          */
         default String phonePrefix() {
-            StringBuilder value = new StringBuilder("+");
-            value.append(countryCode());
-            Integer defaultAreaCode = defaultAreaCode();
-            if (defaultAreaCode != null) {
-                value.append(defaultAreaCode);
-            }
-            return value.toString();
+            return countryCode() + Optional.ofNullable(defaultAreaCode()).map(Object::toString).orElse("");
         }
 
         /**
@@ -642,95 +578,6 @@ public class PhoneNumberField extends Control {
     /**
      * For internal use only.
      */
-    private final class PhoneNumberParser implements Callback<String, PhoneNumber> {
-
-        @Override
-        public PhoneNumber call(String phoneNumber) {
-            Map<CountryCallingCode, String> localPhoneNumbers = new HashMap<>();
-            TreeMap<Integer, List<CountryCallingCode>> scores = new TreeMap<>();
-
-            for (CountryCallingCode code : getAvailableCountryCodes()) {
-                CountryCallingCodeScore score = rankAndSplit(code, phoneNumber);
-                if (score.rank > 0) {
-                    scores.computeIfAbsent(score.rank, s -> new ArrayList<>()).add(code);
-                    localPhoneNumbers.put(code, score.localPhoneNumber);
-                }
-            }
-
-            Map.Entry<Integer, List<CountryCallingCode>> highestScore = scores.lastEntry();
-            if (highestScore == null) {
-                return null;
-            }
-
-            // Need to pick from the list the one that best matches
-            CountryCallingCode code = inferBestMatch(highestScore.getValue());
-            String localPhoneNumber = localPhoneNumbers.get(code);
-
-            return new PhoneNumber(code, localPhoneNumber);
-        }
-
-        private CountryCallingCode inferBestMatch(List<CountryCallingCode> matchingCodes) {
-            CountryCallingCode code;
-            if (matchingCodes.size() > 1) {
-
-                // TODO Here there will be some ambiguity since two countries have same score
-                // we need some sort of logic here, for now using the last one.
-                code = matchingCodes.get(matchingCodes.size() - 1);
-            } else {
-                code = matchingCodes.get(0);
-            }
-
-            return code;
-        }
-
-        private CountryCallingCodeScore rankAndSplit(CountryCallingCode code, String phoneNumber) {
-            if (phoneNumber != null && !phoneNumber.isEmpty()) {
-                if (phoneNumber.startsWith("+")) {
-                    phoneNumber = phoneNumber.substring(1);
-                }
-
-                String countryPrefix = String.valueOf(code.countryCode());
-
-                if (code.areaCodes().length == 0) {
-                    if (phoneNumber.startsWith(countryPrefix)) {
-                        String localNumber = phoneNumber.length() > countryPrefix.length() ?
-                            phoneNumber.substring(countryPrefix.length()) :
-                            null;
-                        return new CountryCallingCodeScore(1, localNumber);
-                    }
-                } else {
-                    for (int areaCode : code.areaCodes()) {
-                        String areaCodePrefix = countryPrefix + areaCode;
-                        if (phoneNumber.startsWith(areaCodePrefix)) {
-                            String localNumber = phoneNumber.substring(countryPrefix.length());
-                            return new CountryCallingCodeScore(2, localNumber);
-                        }
-                    }
-                }
-            }
-
-            return new CountryCallingCodeScore(0, null);
-        }
-
-        private boolean isInvalid(String newPhoneNumber) {
-            if (newPhoneNumber != null && !newPhoneNumber.isEmpty()) {
-                if (newPhoneNumber.startsWith("+")) {
-                    newPhoneNumber = newPhoneNumber.substring(1);
-                }
-                for (char c : newPhoneNumber.toCharArray()) {
-                    if (!Character.isDigit(c)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-    }
-
-    /**
-     * For internal use only.
-     */
     private final class PhoneNumberFormatter implements UnaryOperator<TextFormatter.Change> {
 
         private PhoneNumberFormatter(TextField textField) {
@@ -774,12 +621,16 @@ public class PhoneNumberField extends Control {
                     if (getCountryCallingCode() == null) {
                         resolveCountryCode(change);
                     } else {
+                        CountryCallingCode code = getCountryCallingCode();
                         String newNationalNumber = undoFormat(change.getControlNewText());
-                        String newPhoneNumber = "+" + getCountryCallingCode().countryCode() + newNationalNumber;
-                        setPhoneNumber(newPhoneNumber);
+                        String newPhoneNumber = code.countryCode() + newNationalNumber;
+
+                        setPhoneNumber(phoneNumberUtil.parseAndKeepRawInput(newPhoneNumber, code.iso2Code()));
                     }
                 }
 
+            } catch (NumberParseException e) {
+                setPhoneNumber(null);
             } finally {
                 selfUpdate = false;
             }
@@ -789,10 +640,13 @@ public class PhoneNumberField extends Control {
 
         private void resolveCountryCode(TextFormatter.Change change) {
             String newText = change.getControlNewText();
-            PhoneNumber number = parser.call(newText);
-            if (number != null) {
-                setCountryCallingCode(number.countryCallingCode);
-                textField.setText(number.localPhoneNumber);
+
+            CountryCallingCode code = resolver.call(newText);
+            if (code != null) {
+                setCountryCallingCode(code);
+                if (code.defaultAreaCode() != null) {
+                    textField.setText(String.valueOf(code.defaultAreaCode()));
+                }
                 change.setText("");
                 change.setCaretPosition(0);
                 change.setAnchor(0);
@@ -800,24 +654,18 @@ public class PhoneNumberField extends Control {
             }
         }
 
-        private String doFormat(String localPhoneNumber) {
-            if (localPhoneNumber == null || localPhoneNumber.isEmpty()) {
-                return localPhoneNumber == null ? "" : localPhoneNumber;
+        private String doFormat(Phonenumber.PhoneNumber phoneNumber) {
+            if (phoneNumber == null) {
+                return "";
             }
 
-            if (getPhoneNumberFormatter() == null) {
-                return localPhoneNumber;
-            }
+            String prefix = String.valueOf(phoneNumber.getCountryCode());
+            String rawInput = phoneNumber.getRawInput();
+            AsYouTypeFormatter formatter = phoneNumberUtil.getAsYouTypeFormatter(getCountryCallingCode().iso2Code());
+            String formattedNumber = "";
 
-            String prefix = "+" + getCountryCallingCode().countryCode();
-            String formattedNumber = getPhoneNumberFormatter().call(prefix + localPhoneNumber);
-
-            if (formattedNumber == null) {
-                return localPhoneNumber;
-            }
-
-            if (!formattedNumber.startsWith(prefix)) {
-                return localPhoneNumber;
+            for (char c : rawInput.toCharArray()) {
+                formattedNumber = formatter.inputDigit(c);
             }
 
             return formattedNumber.substring(prefix.length());
@@ -837,14 +685,14 @@ public class PhoneNumberField extends Control {
             return phoneNumber.toString();
         }
 
-        private void setFormattedLocalPhoneNumber(String localPhoneNumber) {
+        private void setFormattedLocalPhoneNumber(Phonenumber.PhoneNumber phoneNumber) {
             if (selfUpdate) {
                 return; // Ignore when I'm the one who initiated the update
             }
 
             try {
                 selfUpdate = true;
-                String formattedPhoneNumber = doFormat(localPhoneNumber);
+                String formattedPhoneNumber = doFormat(phoneNumber);
                 textField.setText(formattedPhoneNumber);
                 textField.positionCaret(formattedPhoneNumber.length());
             } finally {
@@ -857,25 +705,72 @@ public class PhoneNumberField extends Control {
     /**
      * For internal use only.
      */
-    private static class PhoneNumber {
-        CountryCallingCode countryCallingCode;
-        String localPhoneNumber;
-        PhoneNumber(CountryCallingCode countryCallingCode, String localPhoneNumber) {
-            this.countryCallingCode = countryCallingCode;
-            this.localPhoneNumber = localPhoneNumber;
-        }
-    }
+    private final class CountryCallingCodeResolver implements Callback<String, CountryCallingCode> {
 
-    /**
-     * For internal use only.
-     */
-    private static class CountryCallingCodeScore {
-        int rank;
-        String localPhoneNumber;
-        CountryCallingCodeScore(int rank, String localPhoneNumber) {
-            this.rank = rank;
-            this.localPhoneNumber = localPhoneNumber;
+        @Override
+        public CountryCallingCode call(String phoneNumber) {
+            TreeMap<Integer, List<CountryCallingCode>> scores = new TreeMap<>();
+
+            for (CountryCallingCode code : getAvailableCountryCodes()) {
+                int score = calculateScore(code, phoneNumber);
+                if (score > 0) {
+                    scores.computeIfAbsent(score, s -> new ArrayList<>()).add(code);
+                }
+            }
+
+            Map.Entry<Integer, List<CountryCallingCode>> highestScore = scores.lastEntry();
+            if (highestScore == null) {
+                return null;
+            }
+
+            return inferBestMatch(highestScore.getValue());
         }
+
+        private int calculateScore(CountryCallingCode code, String phoneNumber) {
+            if (phoneNumber != null) {
+                if (phoneNumber.startsWith("+")) {
+                    phoneNumber = phoneNumber.substring(1);
+                }
+
+                String countryPrefix = String.valueOf(code.countryCode());
+
+                if (code.areaCodes().length == 0) {
+                    if (phoneNumber.startsWith(countryPrefix)) {
+                        return 1;
+                    }
+                } else {
+                    for (int areaCode : code.areaCodes()) {
+                        String areaCodePrefix = countryPrefix + areaCode;
+                        if (phoneNumber.startsWith(areaCodePrefix)) {
+                            return 2;
+                        }
+                    }
+                }
+            }
+
+            return 0;
+        }
+
+        private CountryCallingCode inferBestMatch(List<CountryCallingCode> matchingCodes) {
+            CountryCallingCode code = null;
+            if (matchingCodes.size() > 1) {
+                // Here pick the country code that is preferred
+                for (CountryCallingCode c : matchingCodes) {
+                    if (getPreferredCountryCodes().contains(c)) {
+                        code = c;
+                        break;
+                    }
+                }
+
+                if (code == null) {
+                    code = matchingCodes.get(matchingCodes.size() - 1);
+                }
+            } else {
+                code = matchingCodes.get(0);
+            }
+            return code;
+        }
+
     }
 
 }

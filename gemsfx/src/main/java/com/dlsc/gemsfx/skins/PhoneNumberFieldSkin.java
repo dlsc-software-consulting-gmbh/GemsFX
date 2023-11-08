@@ -194,7 +194,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             int index = -1;
 
             if (item != null && !empty) {
-                setText("(" + item.phonePrefix() + ") " + new Locale("en", item.iso2Code()).getDisplayCountry());
+                setText("(+" + item.phonePrefix() + ") " + new Locale("en", item.iso2Code()).getDisplayCountry());
                 setGraphic(getCountryCodeFlagView(item));
                 index = getSkinnable().getPreferredCountryCodes().indexOf(item);
             } else {

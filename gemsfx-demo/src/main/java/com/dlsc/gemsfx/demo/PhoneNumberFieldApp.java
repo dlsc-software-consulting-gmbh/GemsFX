@@ -1,9 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PhoneNumberField;
-import com.google.i18n.phonenumbers.AsYouTypeFormatter;
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
@@ -32,44 +29,20 @@ public class PhoneNumberFieldApp extends Application {
             return null;
         }
         PhoneNumberField.CountryCallingCode code = (PhoneNumberField.CountryCallingCode) c;
-        return "(" + code.phonePrefix() + ") " + code;
+        return "(+" + code.phonePrefix() + ") " + code;
+    };
+
+    private static final Function<Object, String> PHONE_NUMBER_CONVERTER = c -> {
+        if (c == null) {
+            return null;
+        }
+        Phonenumber.PhoneNumber number = (Phonenumber.PhoneNumber) c;
+        return number.getRawInput();
     };
 
     @Override
     public void start(Stage stage) throws Exception {
-        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-
         PhoneNumberField field = new PhoneNumberField();
-
-        field.setPhoneNumberValidator(phoneNumber -> {
-            if (field.getCountryCallingCode() == null ||
-                phoneNumber == null || phoneNumber.isEmpty() ||
-                field.getLocalPhoneNumber() == null || field.getLocalPhoneNumber().isEmpty()) {
-                return true;
-            }
-
-            try {
-                Phonenumber.PhoneNumber number = phoneUtil.parse(phoneNumber, field.getCountryCallingCode().iso2Code());
-                return phoneUtil.isValidNumber(number);
-            } catch (NumberParseException e) {
-                System.err.println(e.getLocalizedMessage());
-            }
-
-            return false;
-        });
-
-        field.setPhoneNumberFormatter(phoneNumber -> {
-            if (phoneNumber == null || phoneNumber.isEmpty() || field.getCountryCallingCode() == null) {
-                return "";
-            }
-
-            AsYouTypeFormatter formatter = phoneUtil.getAsYouTypeFormatter(field.getCountryCallingCode().iso2Code());
-            String formatted = "";
-            for (char c : phoneNumber.toCharArray()) {
-                formatted = formatter.inputDigit(c);
-            }
-            return formatted;
-        });
 
         VBox controls = new VBox(10);
         addControl("Available Countries", availableCountriesSelector(field), controls);
@@ -79,8 +52,7 @@ public class PhoneNumberFieldApp extends Application {
 
         VBox fields = new VBox(10);
         addField(fields, "Country Code", field.countryCallingCodeProperty(), COUNTRY_CODE_CONVERTER);
-        addField(fields, "Phone Number", field.phoneNumberProperty());
-        addField(fields, "Local Number", field.localPhoneNumberProperty());
+        addField(fields, "Phone Number", field.phoneNumberProperty(), PHONE_NUMBER_CONVERTER);
 
         VBox vBox = new VBox(20);
         vBox.setPadding(new Insets(20));
