@@ -24,8 +24,6 @@ module com.dlsc.gemsfx {
     requires java.desktop;
     requires com.dlsc.pickerfx;
 
-    requires libphonenumber;
-
     exports com.dlsc.gemsfx;
     exports com.dlsc.gemsfx.daterange;
     exports com.dlsc.gemsfx.incubator;
