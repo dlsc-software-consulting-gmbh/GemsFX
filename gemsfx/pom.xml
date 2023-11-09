@@ -149,6 +149,13 @@
             <version>0.2.2</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.googlecode.libphonenumber/libphonenumber -->
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>8.13.24</version>
+        </dependency>
+
         <!-- Testing -->
 
         <dependency>
