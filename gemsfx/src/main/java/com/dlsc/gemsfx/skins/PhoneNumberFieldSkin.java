@@ -73,8 +73,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             callingCodes.setAll(temp);
 
             if (field.getCountryCallingCode() != null && !temp.contains(field.getCountryCallingCode())) {
-                // Clear up the value in case the country code is not available anymore
-                field.setPhoneNumber(null);
+                field.setRawPhoneNumber(null); // Clear up the value in case the country code is not available anymore
             }
         };
 
@@ -194,7 +193,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             int index = -1;
 
             if (item != null && !empty) {
-                setText("(+" + item.phonePrefix() + ") " + new Locale("en", item.iso2Code()).getDisplayCountry());
+                setText("(" + item.phonePrefix() + ") " + new Locale("en", item.iso2Code()).getDisplayCountry());
                 setGraphic(getCountryCodeFlagView(item));
                 index = getSkinnable().getPreferredCountryCodes().indexOf(item);
             } else {
