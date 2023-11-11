@@ -17,6 +17,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import org.kordamp.ikonli.bootstrapicons.BootstrapIcons;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,21 +34,11 @@ import java.util.TreeSet;
 
 public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
 
-    private static final Image WORLD_ICON = new Image(Objects.requireNonNull(PhoneNumberField.class.getResource("phonenumberfield/world.png")).toExternalForm());
-
-    private static final Map<PhoneNumberField.CountryCallingCode, Image> FLAG_IMAGES = new HashMap<>();
-
     private static final Comparator<PhoneNumberField.CountryCallingCode> NAME_SORT_ASC = (c1, c2) -> {
         String c1Name = new Locale("en", c1.iso2Code()).getDisplayCountry();
         String c2Name = new Locale("en", c2.iso2Code()).getDisplayCountry();
         return c1Name.compareTo(c2Name);
     };
-
-    static {
-        for (PhoneNumberField.CountryCallingCode code : PhoneNumberField.CountryCallingCode.Defaults.values()) {
-            FLAG_IMAGES.put(code, new Image(Objects.requireNonNull(PhoneNumberField.class.getResource("phonenumberfield/country-flags/20x13/" + code.iso2Code().toLowerCase() + ".png")).toExternalForm()));
-        }
-    }
 
     public PhoneNumberFieldSkin(PhoneNumberField field, TextField textField) {
         super(field);
@@ -104,8 +97,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
                         comboBox.show();
                     }
                 }
-            }
-            else {
+            } else {
                 comboBox.hide();
                 Bounds textFieldBounds = editor.textField.getBoundsInParent();
                 if (textFieldBounds.contains(evt.getX(), evt.getY())) {
@@ -193,7 +185,7 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
             int index = -1;
 
             if (item != null && !empty) {
-                setText("(" + item.phonePrefix() + ") " + new Locale("en", item.iso2Code()).getDisplayCountry());
+                setText(new Locale("en", item.iso2Code()).getDisplayCountry());
                 setGraphic(getCountryCodeFlagView(item));
                 index = getSkinnable().getPreferredCountryCodes().indexOf(item);
             } else {
@@ -217,17 +209,6 @@ public class PhoneNumberFieldSkin extends SkinBase<PhoneNumberField> {
     }
 
     private Node getCountryCodeFlagView(PhoneNumberField.CountryCallingCode code) {
-        Node flagView;
-        if (code != null) {
-            if (getSkinnable().getCountryCodeViewFactory() != null) {
-                flagView = getSkinnable().getCountryCodeViewFactory().call(code);
-            } else {
-                flagView = new ImageView(Optional.ofNullable(FLAG_IMAGES.get(code)).orElse(WORLD_ICON));
-            }
-        } else {
-            flagView = new ImageView(WORLD_ICON);
-        }
-        return flagView;
+        return getSkinnable().getCountryCodeViewFactory().call(code);
     }
-
 }
