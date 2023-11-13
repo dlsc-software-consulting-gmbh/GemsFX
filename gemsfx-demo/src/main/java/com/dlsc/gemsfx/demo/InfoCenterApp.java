@@ -7,7 +7,6 @@ import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
 import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import com.dlsc.gemsfx.infocenter.NotificationView;
-import com.jpro.webapi.WebAPI;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
@@ -29,14 +28,15 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
 public class InfoCenterApp extends Application {
 
-    private NotificationGroup<Mail, MailNotification> mailGroup = new NotificationGroup<>("Mail");
-    private NotificationGroup<Object, SlackNotification> slackGroup = new NotificationGroup<>("Slack");
-    private NotificationGroup<Object, CalendarNotification> calendarGroup = new NotificationGroup<>("Calendar");
+    private final InfoCenterPane infoCenterPane = new InfoCenterPane();
 
-    private InfoCenterPane infoCenterPane = new InfoCenterPane();
+    private final NotificationGroup<Mail, MailNotification> mailGroup = new NotificationGroup<>("Mail");
+    private final NotificationGroup<Object, SlackNotification> slackGroup = new NotificationGroup<>("Slack");
+    private final NotificationGroup<Object, CalendarNotification> calendarGroup = new NotificationGroup<>("Calendar");
 
     @Override
     public void start(Stage stage) {
@@ -50,25 +50,25 @@ public class InfoCenterApp extends Application {
 
         slackGroup.setViewFactory(n -> {
             NotificationView<Object, SlackNotification> view = new NotificationView<>(n);
-            view.setGraphic(createImageView(new Image(InfoCenterApp.class.getResourceAsStream("notification/slack.png"))));
+            view.setGraphic(createImageView(new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/slack.png")))));
             return view;
         });
 
         calendarGroup.setViewFactory(n -> {
             NotificationView<Object, CalendarNotification> view = new NotificationView<>(n);
-            view.setGraphic(createImageView(new Image(InfoCenterApp.class.getResourceAsStream("notification/calendar.png"))));
+            view.setGraphic(createImageView(new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/calendar.png")))));
             Region region = new Region();
             region.setMinHeight(200);
-            region.setBackground(new Background(new BackgroundImage(new Image(CalendarNotification.class.getResource("notification/map.png").toExternalForm()), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(100, 100, true, true, false, true))));
+            region.setBackground(new Background(new BackgroundImage(new Image(Objects.requireNonNull(CalendarNotification.class.getResource("notification/map.png")).toExternalForm()), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(100, 100, true, true, false, true))));
             StackPane stackPane = new StackPane(region);
-            stackPane.setStyle("-fx-border-color: gray;");
+            stackPane.setStyle("-fx-border-color: grey;");
             view.setContent(stackPane);
             return view;
         });
 
         mailGroup.setViewFactory(n -> {
             NotificationView<Mail, MailNotification> view = new NotificationView<>(n);
-            view.setGraphic(createImageView(new Image(InfoCenterApp.class.getResourceAsStream("notification/mail.png"))));
+            view.setGraphic(createImageView(new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/mail.png")))));
             return view;
         });
 
@@ -130,15 +130,14 @@ public class InfoCenterApp extends Application {
         StackPane background = new StackPane(buttonBox);
         background.getStyleClass().add("background");
         infoCenterPane.setContent(background);
+        infoCenterPane.getStylesheets().add(Objects.requireNonNull(InfoCenterApp.class.getResource("notification/scene.css")).toExternalForm());
 
         Scene scene = new Scene(infoCenterPane);
-        infoCenterPane.getStylesheets().add(InfoCenterApp.class.getResource("notification/scene.css").toExternalForm());
+
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(800);
-        if(!WebAPI.isBrowser()) {
-            stage.centerOnScreen();
-        }
+        stage.centerOnScreen();
         stage.setTitle("InfoCenter");
         stage.show();
     }

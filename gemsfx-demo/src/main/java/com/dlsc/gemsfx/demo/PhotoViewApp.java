@@ -2,39 +2,29 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
-import com.jpro.webapi.JProApplication;
-import com.jpro.webapi.WebAPI.FileUploader;
-import javafx.application.Platform;
+import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import java.io.File;
-import java.net.MalformedURLException;
-
-public class PhotoViewApp extends JProApplication {
-
-    private FileUploader fileHandler;
-
-    private ProgressBar progressBar;
+public class PhotoViewApp extends Application {
 
     @Override
     public void start(Stage stage) {
         PhotoView photoView = new PhotoView();
 
         StackPane photoViewWrapper = new StackPane(photoView);
-        photoViewWrapper.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-border-color: gray;");
+        photoViewWrapper.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-border-color: grey;");
 
         VBox.setVgrow(photoViewWrapper, Priority.ALWAYS);
 
@@ -99,83 +89,7 @@ public class PhotoViewApp extends JProApplication {
         stage.setScene(scene);
         stage.sizeToScene();
         stage.centerOnScreen();
-
-        if (getWebAPI().isBrowser()) {
-
-
-            /*
-             * Replace the placeholder as the default placeholder also says that the
-             * user can "click" to add a new photo. In JPRO we can't support the click
-             * as otherwise the dragging of the photo won't work and instead the file
-             * chooser will keep showing up.
-             */
-            FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_UPLOAD);
-            fontIcon.getStyleClass().add("upload-icon");
-
-            Label placeholder = new Label("DROP IMAGE\nFILE HERE");
-            placeholder.setTextAlignment(TextAlignment.CENTER);
-            placeholder.setGraphic(fontIcon);
-            placeholder.setContentDisplay(ContentDisplay.TOP);
-            placeholder.getStyleClass().add("placeholder");
-            photoView.setPlaceholder(placeholder);
-
-            progressBar = new ProgressBar();
-            progressBar.setVisible(false);
-            progressBar.setMaxWidth(Double.MAX_VALUE);
-
-            photoView.setPhotoSupplier(() -> null);
-            leftSide.getChildren().add(progressBar);
-
-            fileHandler = getWebAPI().makeFileUploadNode(photoView);
-
-            fileHandler.setSelectFileOnClick(false);
-            fileHandler.setSelectFileOnDrop(true);
-            fileHandler.fileDragOverProperty().addListener((o, oldV, newV) -> {
-                if (newV) {
-                    photoView.getStyleClass().add("file-drag");
-                } else {
-                    photoView.getStyleClass().remove("file-drag");
-                }
-            });
-
-
-            fileHandler.setOnFileSelected((file) -> {
-                updateText();
-                fileHandler.uploadFile();
-            });
-
-            fileHandler.progressProperty().addListener((obs, oldV, newV) -> {
-                updateText();
-            });
-
-            fileHandler.uploadedFileProperty().addListener(it -> {
-                File uploadedFile = fileHandler.getUploadedFile();
-                if (uploadedFile != null) {
-                    try {
-                        photoView.setPhoto(new Image(uploadedFile.toURI().toURL().toExternalForm()));
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            progressBar.progressProperty().bind(fileHandler.progressProperty());
-        }
-
         stage.show();
-
-        Platform.runLater(() -> {
-            try {
-                photoView.setPhoto(new Image((new File("/Users/lemmi/Desktop/test.png").toURI().toURL().toExternalForm())));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    private void updateText() {
-        int percentages = (int) (fileHandler.getProgress() * 100);
-        progressBar.setVisible(percentages < 100);
     }
 
     public static void main(String[] args) {

@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TagsField;
-import com.jpro.webapi.WebAPI;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class TagsFieldApp extends Application {
 
-    private List<Country> countries = new ArrayList<>();
+    private final List<Country> countries = new ArrayList<>();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -119,14 +118,8 @@ public class TagsFieldApp extends Application {
         fieldsBox.setAlignment(Pos.TOP_LEFT);
         HBox.setHgrow(field, Priority.ALWAYS);
 
-//        ComboBox<String> comboBox = new ComboBox<>();
-//        comboBox.getItems().setAll("Dirk", "Katja", "Philip", "Jule", "Armin");
-//        comboBox.getSelectionModel().select(0);
-
         Button scenicViewButton = new Button("Scenic View");
         scenicViewButton.setOnAction(evt -> ScenicView.show(field.getScene()));
-        scenicViewButton.setVisible(!WebAPI.isBrowser());
-        scenicViewButton.setManaged(!WebAPI.isBrowser());
 
         Button generateButton = new Button("Generate Tags");
         generateButton.setOnAction(evt -> {
@@ -183,7 +176,7 @@ public class TagsFieldApp extends Application {
         }
     }
 
-    public class Country {
+    public static class Country {
         private final String name;
 
         public Country(String name) {

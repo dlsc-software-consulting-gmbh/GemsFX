@@ -33,20 +33,6 @@
         <main.class>com.dlsc.gemsfx.demo.TimePickerApp</main.class>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jpro - sandec repository</id>
-            <url>https://sandec.jfrog.io/artifactory/repo</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jpro - sandec repository</id>
-            <url>https://sandec.jfrog.io/artifactory/repo</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <build>
         <plugins>
             <plugin>
@@ -117,34 +103,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>com.sandec.jpro</groupId>
-                <artifactId>jpro-maven-plugin</artifactId>
-                <version>2022.1.8</version>
-                <configuration>
-                    <visible>false</visible>
-                    <mainClassName>
-                        com.dlsc.gemsfx.demo.InfoCenterApp
-                    </mainClassName>
-                    <openingPath>/</openingPath>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>create-jpro-release</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>release</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
     </build>
 
@@ -153,18 +111,6 @@
             <groupId>net.raumzeitfalle.fx</groupId>
             <artifactId>scenic-view</artifactId>
             <version>11.0.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sandec.jpro</groupId>
-            <artifactId>jpro-webapi</artifactId>
-            <version>2022.1.8</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.openjfx</groupId>
