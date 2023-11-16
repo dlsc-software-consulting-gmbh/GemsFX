@@ -51,9 +51,9 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
 
         getChildren().addAll(flowPane);
 
-        field.setCellFactory(view -> new SearchFieldListCell(field));
+        field.setCellFactory(view -> new SearchFieldListCell<>(field));
 
-        field.getTagSelectionModel().getSelectedItems().addListener((Observable it) -> tagViewMap.entrySet().forEach(entry -> entry.getValue().pseudoClassStateChanged(SELECTED, field.getTagSelectionModel().getSelectedItems().contains(entry.getKey()))));
+        field.getTagSelectionModel().getSelectedItems().addListener((Observable it) -> tagViewMap.forEach((key, value) -> value.pseudoClassStateChanged(SELECTED, field.getTagSelectionModel().getSelectedItems().contains(key))));
         field.getEditor().setOnMouseClicked(evt -> field.getTagSelectionModel().clearSelection());
 
         InvalidationListener updateViewListener = it -> updateView();

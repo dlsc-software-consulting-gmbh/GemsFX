@@ -20,6 +20,7 @@
     <description>Demos for GemsFX</description>
 
     <url>https://github.com/dlemmermann/GemsFX</url>
+
     <licenses>
         <license>
             <name>Apache 2.0</name>
@@ -107,6 +108,12 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>atlantafx-base</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
         <dependency>
             <groupId>net.raumzeitfalle.fx</groupId>
             <artifactId>scenic-view</artifactId>
