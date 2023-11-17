@@ -13,6 +13,7 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.FlowPane;
@@ -30,6 +31,8 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
     private final HBox filterGroupsPane = new HBox();
     private final FlowPane filtersPane = new FlowPane();
     private final HBox headerBox = new HBox();
+    private final ScrollPane scrollPane = new ScrollPane();
+    private final VBox container;
 
     public FilterViewSkin(FilterView<T> view) {
         super(view);
@@ -69,11 +72,20 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
         view.filterTextProperty().addListener(it -> updateFilters());
         view.textFilterProviderProperty().addListener(it -> updateFilters());
 
-        VBox vBox = new VBox(headerBox, filterGroupsPane, filtersPane);
-        vBox.getStyleClass().add("filter-container");
-        vBox.setFillWidth(true);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.managedProperty().bind(scrollPane.visibleProperty());
+        scrollPane.visibleProperty().bind(Bindings.isNotEmpty(filtersPane.getChildren()));
+        scrollPane.contentProperty().bind(
+                Bindings.when(Bindings.size(view.filtersProperty()).greaterThan(view.scrollThresholdProperty()))
+                        .then(filtersPane)
+                        .otherwise((FlowPane) null));
+        view.scrollThresholdProperty().addListener(it -> updateFilters());
 
-        getChildren().add(vBox);
+        container = new VBox(headerBox, filterGroupsPane, filtersPane);
+        container.getStyleClass().add("filter-container");
+        container.setFillWidth(true);
+        getChildren().add(container);
 
         updateGroups();
         updateFilters();
@@ -184,12 +196,15 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
 
         FilterView<T> filterView = getSkinnable();
 
-        if (!filterView.getFilters().isEmpty() || StringUtils.isNotBlank(filterView.getFilterText())) {
-            filterView.getFilters().forEach(f -> {
+        ObservableList<Filter<T>> filters = filterView.getFilters();
+        if (!filters.isEmpty() || StringUtils.isNotBlank(filterView.getFilterText())) {
+            updateFiltersWrapper();
+
+            filters.forEach(f -> {
                 ChipView<Filter> chipView = new ChipView<>();
                 chipView.setValue(f);
                 chipView.textProperty().bind(f.nameProperty());
-                chipView.setOnClose(filter -> filterView.getFilters().remove(filter));
+                chipView.setOnClose(filter -> filters.remove(filter));
                 filtersPane.getChildren().add(chipView);
             });
 
@@ -205,11 +220,28 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
             Label clearFilter = new Label("Clear Filter");
             clearFilter.getStyleClass().add("clear-filter-label");
             clearFilter.setOnMouseClicked(evt -> {
-                filterView.getFilters().clear();
+                filters.clear();
                 filterView.setFilterText(null);
             });
 
             filtersPane.getChildren().add(clearFilter);
         }
     }
+
+    private void updateFiltersWrapper() {
+        FilterView<T> filterView = getSkinnable();
+        // use scrollPane if there is too many filters
+        if (filterView.getFilters().size() > filterView.getScrollThreshold()) {
+            container.getChildren().remove(filtersPane);
+            if (!container.getChildren().contains(scrollPane)) {
+                container.getChildren().add(scrollPane);
+            }
+        } else {
+            container.getChildren().remove(scrollPane);
+            if (!container.getChildren().contains(filtersPane)) {
+                container.getChildren().add(filtersPane);
+            }
+        }
+    }
+
 }

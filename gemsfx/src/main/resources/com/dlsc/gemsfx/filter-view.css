@@ -52,6 +52,11 @@
     -fx-spacing: 25px;
 }
 
+.filter-view .filter-container .scroll-pane {
+    -fx-max-height: 380px;
+    -fx-padding: 2px;
+}
+
 .filter-view .filter-groups {
     -fx-pref-height: 40px;
     -fx-min-height: 40px;
