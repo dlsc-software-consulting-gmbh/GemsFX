@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.skins.FilterViewSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
@@ -11,6 +12,7 @@ import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -113,6 +115,23 @@ public class FilterView<T> extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new FilterViewSkin<>(this);
+    }
+
+    private final IntegerProperty scrollThreshold = new SimpleIntegerProperty(this, "scrollThreshold", 100);
+
+    public int getScrollThreshold() {
+        return scrollThreshold.get();
+    }
+    /**
+     * The threshold number of filters at which a ScrollPane is introduced to handle large number of elements.
+     * If the number of filters is equal to or exceeds this value, the filters will be displayed within a ScrollPane.
+     */
+    public IntegerProperty scrollThresholdProperty() {
+        return scrollThreshold;
+    }
+
+    public void setScrollThreshold(int scrollThreshold) {
+        this.scrollThreshold.set(scrollThreshold);
     }
 
     private final ObjectProperty<Label> titleLabel = new SimpleObjectProperty<>(this, "titleLabel", new Label());
@@ -396,7 +415,6 @@ public class FilterView<T> extends Control {
     public final ReadOnlyObjectProperty<Predicate<T>> filterPredicateProperty() {
         return filterPredicate.getReadOnlyProperty();
     }
-
 
     /**
      * A filter group consists of a group of filters and has a name. The name
