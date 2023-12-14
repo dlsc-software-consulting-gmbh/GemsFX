@@ -6,27 +6,31 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import org.controlsfx.control.textfield.CustomTextField;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 public class EmailFieldSkin extends SkinBase<EmailField> {
 
     public EmailFieldSkin(EmailField field) {
         super(field);
 
-        Region emailGraphic = new Region();
-        emailGraphic.getStyleClass().add("email-graphic");
-        StackPane emailGraphicWrapper = new StackPane(emailGraphic);
-        emailGraphicWrapper.getStyleClass().add("email-graphic-wrapper");
-
-        FontIcon validationIcon = new FontIcon();
-
-        StackPane validationIconWrapper = new StackPane(validationIcon);
-        validationIconWrapper.getStyleClass().add("icon-wrapper");
-        Tooltip.install(validationIconWrapper, new Tooltip("Email address is invalid"));
-        validationIconWrapper.visibleProperty().bind(field.validProperty().not());
-        validationIconWrapper.managedProperty().bind(field.validProperty().not());
-
         CustomTextField customTextField = field.getEditor();
+
+        Region mailIcon = new Region();
+        mailIcon.getStyleClass().add("mail-icon");
+        StackPane leftIconWrapper = new StackPane(mailIcon);
+        leftIconWrapper.getStyleClass().add("mail-icon-wrapper");
+        leftIconWrapper.managedProperty().bind(leftIconWrapper.visibleProperty());
+        leftIconWrapper.visibleProperty().bind(field.showMailIconProperty());
+        leftIconWrapper.visibleProperty().addListener(it -> customTextField.requestLayout());
+
+        Region rightIcon = new Region();
+        rightIcon.getStyleClass().add("validation-icon");
+        StackPane rightIconWrapper = new StackPane(rightIcon);
+        rightIconWrapper.getStyleClass().add("validation-icon-wrapper");
+        Tooltip.install(rightIconWrapper, new Tooltip("Email address is invalid"));
+        rightIconWrapper.managedProperty().bind(rightIconWrapper.visibleProperty());
+        rightIconWrapper.visibleProperty().bind(
+                field.showValidationIconProperty().and(field.validProperty().not()));
+        rightIconWrapper.visibleProperty().addListener(it -> customTextField.requestLayout());
 
         /*
          * Needed because custom text field brings its own user agent stylesheet. Not
@@ -35,8 +39,9 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         customTextField.getStylesheets().add(field.getUserAgentStylesheet());
         customTextField.textProperty().bindBidirectional(field.emailAddressProperty());
         customTextField.promptTextProperty().bind(field.promptTextProperty());
-        customTextField.setRight(validationIconWrapper);
-        customTextField.setLeft(emailGraphicWrapper);
+        customTextField.setLeft(leftIconWrapper);
+        customTextField.setRight(rightIconWrapper);
         getChildren().setAll(customTextField);
     }
+
 }

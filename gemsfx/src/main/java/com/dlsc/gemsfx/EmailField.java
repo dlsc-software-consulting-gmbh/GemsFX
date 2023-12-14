@@ -8,18 +8,32 @@ import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.css.CssMetaData;
+import javafx.css.PseudoClass;
+import javafx.css.SimpleStyleableBooleanProperty;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.controlsfx.control.textfield.CustomTextField;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * A specialized control for entering an email address. The control validates
  * the entered text whenever the text property changes.
  */
 public class EmailField extends Control {
-
+    private static final boolean DEFAULT_SHOW_MAIL_ICON = true;
+    private static final boolean DEFAULT_SHOW_VALIDATION_ICON = true;
+    private static final PseudoClass VALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("valid");
+    private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
     private static final EmailValidator emailValidator = EmailValidator.getInstance();
 
     private final CustomTextField editor = new CustomTextField();
@@ -35,6 +49,11 @@ public class EmailField extends Control {
             }
             return StringUtils.isBlank(getEmailAddress()) || emailValidator.isValid(getEmailAddress());
         }, emailAddressProperty(), requiredProperty()));
+
+        valid.getReadOnlyProperty().addListener((ob, ov, nv) -> {
+            pseudoClassStateChanged(VALID_PSEUDO_CLASS, nv);
+            pseudoClassStateChanged(INVALID_PSEUDO_CLASS, !nv);
+        });
     }
 
     @Override
@@ -109,5 +128,111 @@ public class EmailField extends Control {
 
     public final ReadOnlyBooleanProperty validProperty() {
         return valid.getReadOnlyProperty();
+    }
+
+    // Styleable property to control the visibility of the mail icon.
+    private final StyleableBooleanProperty showMailIcon = new SimpleStyleableBooleanProperty(
+            StyleableProperties.SHOW_MAIL_ICON, EmailField.this, "showMailIcon", DEFAULT_SHOW_MAIL_ICON);
+
+    /**
+     * Returns true if the mail icon is visible, otherwise false.
+     *
+     * @return The mail icon visibility
+     */
+    public final boolean isShowMailIcon() {
+        return showMailIcon.get();
+    }
+
+    /**
+     * Property for handling the mail icon visibility.
+     */
+    public final StyleableBooleanProperty showMailIconProperty() {
+        return showMailIcon;
+    }
+
+    /**
+     * Sets the visibility of the mail icon.
+     *
+     * @param showMailIcon true if the mail icon should be visible, otherwise false
+     */
+    public final void setShowMailIcon(boolean showMailIcon) {
+        this.showMailIcon.set(showMailIcon);
+    }
+
+    // Styleable property to control the visibility of the validation icon.
+    private final StyleableBooleanProperty showValidationIcon = new SimpleStyleableBooleanProperty(
+            StyleableProperties.SHOW_VALIDATION_ICON, EmailField.this, "showValidationIcon", DEFAULT_SHOW_VALIDATION_ICON);
+
+    /**
+     * Returns true if the validation icon is visible, otherwise false.
+     *
+     * @return The validation icon visibility
+     */
+    public final boolean isShowValidationIcon() {
+        return showValidationIcon.get();
+    }
+
+    /**
+     * Property for handling the validation icon visibility.
+     */
+    public final StyleableBooleanProperty showValidationIconProperty() {
+        return showValidationIcon;
+    }
+
+    /**
+     * Sets the visibility of the validation icon.
+     *
+     * @param showValidationIcon true if the validation icon should be visible, otherwise false
+     */
+    public final void setShowValidationIcon(boolean showValidationIcon) {
+        this.showValidationIcon.set(showValidationIcon);
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<EmailField, Boolean> SHOW_MAIL_ICON = new CssMetaData<>(
+                "-fx-show-mail-icon", BooleanConverter.getInstance(), DEFAULT_SHOW_MAIL_ICON) {
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(EmailField control) {
+                return control.showMailIconProperty();
+            }
+
+            @Override
+            public boolean isSettable(EmailField control) {
+                return !control.showMailIcon.isBound();
+            }
+        };
+
+        private static final CssMetaData<EmailField, Boolean> SHOW_VALIDATION_ICON = new CssMetaData<>(
+                "-fx-show-validation-icon", BooleanConverter.getInstance(), DEFAULT_SHOW_VALIDATION_ICON) {
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(EmailField control) {
+                return control.showMailIconProperty();
+            }
+
+            @Override
+            public boolean isSettable(EmailField control) {
+                return !control.showMailIcon.isBound();
+            }
+        };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            Collections.addAll(styleables, SHOW_MAIL_ICON, SHOW_VALIDATION_ICON);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    @Override
+    protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
     }
 }

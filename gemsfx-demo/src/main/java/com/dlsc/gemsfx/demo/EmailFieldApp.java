@@ -2,28 +2,40 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.EmailField;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.scenicview.ScenicView;
 
 public class EmailFieldApp extends Application {
 
     @Override
     public void start(Stage stage) {
         EmailField view = new EmailField();
-        CheckBox required = new CheckBox("Required");
 
+        CheckBox required = new CheckBox("Required");
         required.selectedProperty().bindBidirectional(view.requiredProperty());
 
-        VBox box = new VBox(20, required, view);
+        CheckBox showMailIcon = new CheckBox("Show Mail Icon");
+        showMailIcon.selectedProperty().bindBidirectional(view.showMailIconProperty());
 
-        Scene scene = new Scene(box);
+        CheckBox showValidationIcon = new CheckBox("Show Validation Icon");
+        showValidationIcon.selectedProperty().bindBidirectional(view.showValidationIconProperty());
+
+        VBox topBox = new VBox(10, required, showMailIcon, showValidationIcon);
+
+        VBox box = new VBox(20, topBox, view);
+        box.setPadding(new Insets(10));
+        Scene scene = new Scene(box, 320, 160);
         stage.setScene(scene);
         stage.sizeToScene();
         stage.centerOnScreen();
         stage.setTitle("Email Field");
         stage.show();
+
+        ScenicView.show(scene);
     }
 
     public static void main(String[] args) {
