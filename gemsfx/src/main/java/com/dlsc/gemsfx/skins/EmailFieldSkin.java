@@ -3,24 +3,40 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.EmailField;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.textfield.CustomTextField;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 public class EmailFieldSkin extends SkinBase<EmailField> {
 
     public EmailFieldSkin(EmailField field) {
         super(field);
 
-        FontIcon validationIcon = new FontIcon();
-
-        StackPane validationIconWrapper = new StackPane(validationIcon);
-        validationIconWrapper.getStyleClass().add("icon-wrapper");
-        Tooltip.install(validationIconWrapper, new Tooltip("Email address is invalid"));
-        validationIconWrapper.visibleProperty().bind(field.validProperty().not());
-        validationIconWrapper.managedProperty().bind(field.validProperty().not());
-
         CustomTextField customTextField = field.getEditor();
+
+        Region mailIcon = new Region();
+        mailIcon.getStyleClass().add("mail-icon");
+        StackPane leftIconWrapper = new StackPane(mailIcon);
+        leftIconWrapper.getStyleClass().add("mail-icon-wrapper");
+        leftIconWrapper.managedProperty().bind(leftIconWrapper.visibleProperty());
+        leftIconWrapper.visibleProperty().bind(field.showMailIconProperty());
+        leftIconWrapper.visibleProperty().addListener(it -> customTextField.requestLayout());
+
+        Region rightIcon = new Region();
+        rightIcon.getStyleClass().add("validation-icon");
+        StackPane rightIconWrapper = new StackPane(rightIcon);
+        rightIconWrapper.getStyleClass().add("validation-icon-wrapper");
+        rightIconWrapper.managedProperty().bind(rightIconWrapper.visibleProperty());
+        rightIconWrapper.visibleProperty().bind(
+                field.showValidationIconProperty().and(field.validProperty().not()));
+        rightIconWrapper.visibleProperty().addListener(it -> customTextField.requestLayout());
+
+        Tooltip invalidToolTip = new Tooltip();
+        invalidToolTip.textProperty().bind(field.invalidTextProperty());
+        updateTooltipVisibility(field.getInvalidText(), rightIconWrapper, invalidToolTip);
+        field.invalidTextProperty().addListener((ob, ov, newValue)
+                -> updateTooltipVisibility(newValue, rightIconWrapper, invalidToolTip));
 
         /*
          * Needed because custom text field brings its own user agent stylesheet. Not
@@ -29,7 +45,17 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         customTextField.getStylesheets().add(field.getUserAgentStylesheet());
         customTextField.textProperty().bindBidirectional(field.emailAddressProperty());
         customTextField.promptTextProperty().bind(field.promptTextProperty());
-        customTextField.setRight(validationIconWrapper);
+        customTextField.setLeft(leftIconWrapper);
+        customTextField.setRight(rightIconWrapper);
         getChildren().setAll(customTextField);
     }
+
+    private void updateTooltipVisibility(String invalidText, StackPane node, Tooltip invalidToolTip) {
+        if (StringUtils.isEmpty(invalidText)) {
+            Tooltip.uninstall(node, invalidToolTip);
+        } else {
+            Tooltip.install(node, invalidToolTip);
+        }
+    }
+
 }

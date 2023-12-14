@@ -1,12 +1,32 @@
 .email-field {
 }
 
-.email-field .icon-wrapper {
-    -fx-padding: 5;
+.email-field:valid {
 }
 
-.email-field .icon-wrapper .ikonli-font-icon {
-    -fx-icon-code: "mdi-alert";
-    -fx-icon-size: 16px;
-    -fx-icon-color: red;
+.email-field:invalid {
+}
+
+.email-field > .custom-text-field > .left-pane > .mail-icon-wrapper {
+    -fx-padding: 2px 0 2px 5px;
+}
+
+.email-field > .custom-text-field > .left-pane > .mail-icon-wrapper > .mail-icon {
+    -fx-min-width: 15px;
+    -fx-max-height: 12px;
+    -fx-background-color: #3b424c;
+    /* SVG Source: MaterialDesign/svg/email.svg [Apache 2.0] */
+    -fx-shape: "M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z";
+}
+
+.email-field > .custom-text-field > .right-pane > .validation-icon-wrapper {
+    -fx-padding: 2px 5px 2px 0;
+}
+
+.email-field > .custom-text-field > .right-pane > .validation-icon-wrapper > .validation-icon {
+    -fx-min-width: 12px;
+    -fx-max-height: 12px;
+    -fx-background-color: red;
+    /* SVG Source: MaterialDesign/svg/alert.svg [Apache 2.0] */
+    -fx-shape: "M13 14H11V9H13M13 18H11V16H13M1 21H23L12 2L1 21Z";
 }
