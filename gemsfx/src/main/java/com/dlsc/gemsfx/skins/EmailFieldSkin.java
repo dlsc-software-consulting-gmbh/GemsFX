@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.EmailField;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -11,6 +12,11 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
 
     public EmailFieldSkin(EmailField field) {
         super(field);
+
+        Region emailGraphic = new Region();
+        emailGraphic.getStyleClass().add("email-graphic");
+        StackPane emailGraphicWrapper = new StackPane(emailGraphic);
+        emailGraphicWrapper.getStyleClass().add("email-graphic-wrapper");
 
         FontIcon validationIcon = new FontIcon();
 
@@ -30,6 +36,7 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         customTextField.textProperty().bindBidirectional(field.emailAddressProperty());
         customTextField.promptTextProperty().bind(field.promptTextProperty());
         customTextField.setRight(validationIconWrapper);
+        customTextField.setLeft(emailGraphicWrapper);
         getChildren().setAll(customTextField);
     }
 }
