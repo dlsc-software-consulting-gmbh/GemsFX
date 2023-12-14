@@ -5,6 +5,7 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.textfield.CustomTextField;
 
 public class EmailFieldSkin extends SkinBase<EmailField> {
@@ -26,11 +27,16 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         rightIcon.getStyleClass().add("validation-icon");
         StackPane rightIconWrapper = new StackPane(rightIcon);
         rightIconWrapper.getStyleClass().add("validation-icon-wrapper");
-        Tooltip.install(rightIconWrapper, new Tooltip("Email address is invalid"));
         rightIconWrapper.managedProperty().bind(rightIconWrapper.visibleProperty());
         rightIconWrapper.visibleProperty().bind(
                 field.showValidationIconProperty().and(field.validProperty().not()));
         rightIconWrapper.visibleProperty().addListener(it -> customTextField.requestLayout());
+
+        Tooltip invalidToolTip = new Tooltip();
+        invalidToolTip.textProperty().bind(field.invalidTextProperty());
+        updateTooltipVisibility(field.getInvalidText(), rightIconWrapper, invalidToolTip);
+        field.invalidTextProperty().addListener((ob, ov, newValue)
+                -> updateTooltipVisibility(newValue, rightIconWrapper, invalidToolTip));
 
         /*
          * Needed because custom text field brings its own user agent stylesheet. Not
@@ -42,6 +48,14 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         customTextField.setLeft(leftIconWrapper);
         customTextField.setRight(rightIconWrapper);
         getChildren().setAll(customTextField);
+    }
+
+    private void updateTooltipVisibility(String invalidText, StackPane node, Tooltip invalidToolTip) {
+        if (StringUtils.isEmpty(invalidText)) {
+            Tooltip.uninstall(node, invalidToolTip);
+        } else {
+            Tooltip.install(node, invalidToolTip);
+        }
     }
 
 }

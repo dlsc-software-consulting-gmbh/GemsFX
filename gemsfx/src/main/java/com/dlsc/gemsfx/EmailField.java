@@ -50,10 +50,20 @@ public class EmailField extends Control {
             return StringUtils.isBlank(getEmailAddress()) || emailValidator.isValid(getEmailAddress());
         }, emailAddressProperty(), requiredProperty()));
 
-        valid.getReadOnlyProperty().addListener((ob, ov, nv) -> {
-            pseudoClassStateChanged(VALID_PSEUDO_CLASS, nv);
-            pseudoClassStateChanged(INVALID_PSEUDO_CLASS, !nv);
+        updateValidPseudoClass(false);
+        valid.getReadOnlyProperty().addListener((ob, ov, newValue) -> {
+            updateValidPseudoClass(newValue);
         });
+    }
+
+    public EmailField(String emailAddress) {
+        this();
+        setEmailAddress(emailAddress);
+    }
+
+    private void updateValidPseudoClass(Boolean isValid) {
+        pseudoClassStateChanged(VALID_PSEUDO_CLASS, isValid);
+        pseudoClassStateChanged(INVALID_PSEUDO_CLASS, !isValid);
     }
 
     @Override
@@ -130,6 +140,36 @@ public class EmailField extends Control {
         return valid.getReadOnlyProperty();
     }
 
+    // Property for the tooltip text displayed when hovering over the icon indicating an invalid email address.
+    private final StringProperty invalidText = new SimpleStringProperty(this, "invalidText", "Email address is invalid.");
+
+    /**
+     * Retrieves the tooltip text displayed when the email address validation fails and the user hovers over the invalid icon.
+     *
+     * @return Tooltip text for an invalid email address.
+     */
+    public final String getInvalidText() {
+        return invalidText.get();
+    }
+
+    /**
+     * Property for changing the tooltip text, which is displayed when hovering over the invalid icon after email address validation fails.
+     *
+     * @return The StringProperty for the tooltip text of an invalid email address.
+     */
+    public final StringProperty invalidTextProperty() {
+        return invalidText;
+    }
+
+    /**
+     * Sets the tooltip text that appears when the user hovers over the icon indicating the email address is invalid.
+     *
+     * @param invalidText The tooltip text to set for an invalid email address.
+     */
+    public final void setInvalidText(String invalidText) {
+        this.invalidText.set(invalidText);
+    }
+
     // Styleable property to control the visibility of the mail icon.
     private final StyleableBooleanProperty showMailIcon = new SimpleStyleableBooleanProperty(
             StyleableProperties.SHOW_MAIL_ICON, EmailField.this, "showMailIcon", DEFAULT_SHOW_MAIL_ICON);
@@ -146,7 +186,7 @@ public class EmailField extends Control {
     /**
      * Property for handling the mail icon visibility.
      */
-    public final StyleableBooleanProperty showMailIconProperty() {
+    public final BooleanProperty showMailIconProperty() {
         return showMailIcon;
     }
 
@@ -175,7 +215,7 @@ public class EmailField extends Control {
     /**
      * Property for handling the validation icon visibility.
      */
-    public final StyleableBooleanProperty showValidationIconProperty() {
+    public final BooleanProperty showValidationIconProperty() {
         return showValidationIcon;
     }
 
@@ -195,7 +235,7 @@ public class EmailField extends Control {
 
             @Override
             public StyleableProperty<Boolean> getStyleableProperty(EmailField control) {
-                return control.showMailIconProperty();
+                return (StyleableProperty<Boolean>) control.showMailIconProperty();
             }
 
             @Override
@@ -209,12 +249,12 @@ public class EmailField extends Control {
 
             @Override
             public StyleableProperty<Boolean> getStyleableProperty(EmailField control) {
-                return control.showMailIconProperty();
+                return (StyleableProperty<Boolean>) control.showValidationIconProperty();
             }
 
             @Override
             public boolean isSettable(EmailField control) {
-                return !control.showMailIcon.isBound();
+                return !control.showValidationIcon.isBound();
             }
         };
 
