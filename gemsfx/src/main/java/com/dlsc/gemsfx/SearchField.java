@@ -83,7 +83,7 @@ public class SearchField<T> extends Control {
 
     private final SearchService searchService = new SearchService();
 
-    private TextField editor = new TextField();
+    private final TextField editor = new TextField();
 
     private final SearchFieldPopup<T> popup;
 
