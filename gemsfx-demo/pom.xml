@@ -108,11 +108,6 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>io.github.mkpaz</groupId>
-            <artifactId>atlantafx-base</artifactId>
-            <version>2.0.1</version>
-        </dependency>
 
         <dependency>
             <groupId>net.raumzeitfalle.fx</groupId>
