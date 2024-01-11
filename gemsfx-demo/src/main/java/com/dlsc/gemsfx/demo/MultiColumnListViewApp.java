@@ -30,8 +30,8 @@ public class MultiColumnListViewApp extends Application {
         MultiColumnListView<Issue> multiColumnListView = new MultiColumnListView<>();
         multiColumnListView.setCellFactory(listView -> new IssueListCell(multiColumnListView));
         multiColumnListView.getColumns().setAll(createColumns());
-        multiColumnListView.setPlaceholderFrom(new Issue(""));
-        multiColumnListView.setPlaceholderTo(new Issue(""));
+        multiColumnListView.setPlaceholderFrom(new Issue("From"));
+        multiColumnListView.setPlaceholderTo(new Issue("To"));
         VBox.setVgrow(multiColumnListView, Priority.ALWAYS);
 
         CheckBox showHeaders = new CheckBox("Show Headers");
@@ -118,6 +118,8 @@ public class MultiColumnListViewApp extends Application {
 
     public class IssueListCell extends ColumnListCell<Issue> {
 
+        private final StackPane wrapper;
+
         public IssueListCell(MultiColumnListView<Issue> multiColumnListView) {
             super(multiColumnListView);
 
@@ -136,9 +138,14 @@ public class MultiColumnListViewApp extends Application {
             Label label = new Label();
             label.textProperty().bind(textProperty());
 
-            StackPane wrapper = new StackPane(content, contentPlaceholder, label);
+            wrapper = new StackPane(content, contentPlaceholder, label);
             setGraphic(wrapper);
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        }
+
+        @Override
+        protected Node getSnapshotNode() {
+            return wrapper;
         }
 
         private final BooleanProperty placeholder = new SimpleBooleanProperty(this, "placeholder", false);

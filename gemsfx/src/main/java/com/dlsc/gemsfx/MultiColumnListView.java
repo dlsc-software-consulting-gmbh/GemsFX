@@ -14,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -326,11 +327,12 @@ public class MultiColumnListView<T> extends Control {
                 ClipboardContent content = new ClipboardContent();
                 content.putString(Integer.toString(getIndex()));
 
-                WritableImage snapshot = snapshot(null, null);
+                WritableImage snapshot = getSnapshotNode().snapshot(null, null);
 
                 Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
                 dragboard.setContent(content);
                 dragboard.setDragView(snapshot);
+
                 dragboard.setDragViewOffsetX(snapshot.getWidth() / 2);
                 dragboard.setDragViewOffsetY(-snapshot.getHeight() / 2);
 
@@ -374,6 +376,10 @@ public class MultiColumnListView<T> extends Control {
             setOnDragDropped(event -> {
                 log("drag dropped");
 
+                if (!event.getAcceptedTransferMode().equals(TransferMode.MOVE)) {
+                    return;
+                }
+
                 if (multiColumnListView.getPlaceholderFrom() == getItem()) {
                     log("   not performing drop, drop happened on 'from' placeholder");
                     return;
@@ -395,6 +401,11 @@ public class MultiColumnListView<T> extends Control {
                     return item;
                 });
 
+                if (!items.contains(draggedItem)) {
+                    // probably dropped on same list view / same column (hence no "to" placeholder)
+                    items.add(draggedItem);
+                }
+
                 listView.getSelectionModel().select(draggedItem);
 
                 event.setDropCompleted(true);
@@ -403,12 +414,25 @@ public class MultiColumnListView<T> extends Control {
             });
 
             setOnDragDone(evt -> {
-                log("drag done");
-                if (Objects.equals(evt.getAcceptedTransferMode(), TransferMode.MOVE)) {
-                    log("   drop was completed, removing the 'from' placeholder");
-                    getListView().getItems().removeIf(item -> item == multiColumnListView.getPlaceholderFrom());
+                if (evt.isAccepted()) {
+                    log("drag done, accepted");
+                    if (Objects.equals(evt.getAcceptedTransferMode(), TransferMode.MOVE)) {
+                        log("   drop was completed, removing the 'from' placeholder");
+                        getListView().getItems().removeIf(item -> item == multiColumnListView.getPlaceholderFrom());
+                    } else {
+                        log("   drop was not completed, replacing placeholder with dragged item");
+                        getListView().getItems().replaceAll(item -> {
+                            if (item == multiColumnListView.getPlaceholderFrom()) {
+                                return multiColumnListView.getDraggedItem();
+                            }
+                            return item;
+                        });
+                    }
                 } else {
-                    log("   drop was not completed, replacing placeholder with dragged item");
+                    log("drag done, not accepted");
+
+                    // put the item back into the "from" location
+                    log("putting item back into 'from' location");
                     getListView().getItems().replaceAll(item -> {
                         if (item == multiColumnListView.getPlaceholderFrom()) {
                             return multiColumnListView.getDraggedItem();
@@ -420,6 +444,16 @@ public class MultiColumnListView<T> extends Control {
                 multiColumnListView.setDraggedItem(null);
                 evt.consume();
             });
+        }
+
+        /**
+         * Retrieves the node that will be used to create a drag image via the {@link Node#snapshot(SnapshotParameters, WritableImage)}
+         * method.
+         *
+         * @return the snapshot node
+         */
+        protected Node getSnapshotNode() {
+            return this;
         }
 
         /**
