@@ -26,6 +26,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 import java.util.Objects;
@@ -327,7 +328,9 @@ public class MultiColumnListView<T> extends Control {
                 ClipboardContent content = new ClipboardContent();
                 content.putString(Integer.toString(getIndex()));
 
-                WritableImage snapshot = getSnapshotNode().snapshot(null, null);
+                SnapshotParameters parameters = new SnapshotParameters();
+                parameters.setFill(Color.TRANSPARENT); // important or we get a white frame in many cases
+                WritableImage snapshot = getSnapshotNode().snapshot(parameters, null);
 
                 Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
                 dragboard.setContent(content);
