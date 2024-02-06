@@ -73,6 +73,7 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
         if (newLeft != null) {
             leftPane = new StackPane(newLeft);
             leftPane.setManaged(false);
+            leftPane.visibleProperty().bind(newLeft.visibleProperty());
             leftPane.setAlignment(Pos.CENTER_LEFT);
             leftPane.getStyleClass().add("left-pane"); //$NON-NLS-1$
             getChildren().add(leftPane);
@@ -91,6 +92,7 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
             rightPane = new StackPane(newRight);
             rightPane.setManaged(false);
             rightPane.setAlignment(Pos.CENTER_RIGHT);
+            rightPane.visibleProperty().bind(newRight.visibleProperty());
             rightPane.getStyleClass().add("right-pane"); //$NON-NLS-1$
             getChildren().add(rightPane);
             right = newRight;
@@ -136,7 +138,6 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
             graphicWrapper.resizeRelocate(x + w - iconWidthA, y + h / 2 - iconHeightA / 2, iconWidthA, iconHeightA);
         }
 
-
         // search / busy graphic
         double iconWidthB = 0;
 
@@ -152,11 +153,11 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
 
         super.layoutChildren(textFieldStartX, 0, textFieldWidth, fullHeight);
 
-        if (leftPane != null) {
+        if (leftPane != null && leftPane.isVisible() && searchField.getLeft().isManaged()) {
             leftPane.resizeRelocate(0, 0, leftWidth, fullHeight);
         }
 
-        if (rightPane != null) {
+        if (rightPane != null && rightPane.isVisible() && searchField.getRight().isManaged()) {
             double rightStartX = w - rightWidth + snappedLeftInset() + snappedRightInset() - maxIconWidth;
             if (searchField.isShowSearchIcon()) {
                 rightStartX -= snappedRightInset();
