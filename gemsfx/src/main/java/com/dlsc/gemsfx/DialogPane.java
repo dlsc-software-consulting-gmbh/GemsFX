@@ -834,7 +834,11 @@ public class DialogPane extends Pane {
 
         private final ChangeListener<Node> focusListener = (o, oldOwner, newOwner) -> {
             if (newOwner != null && !isInsideDialogPane(newOwner.getParent()) && getScene() != null) {
-                requestFocus();
+                if (oldOwner != null) {
+                    oldOwner.requestFocus();
+                } else {
+                    requestFocus();
+                }
             }
         };
 
@@ -842,6 +846,8 @@ public class DialogPane extends Pane {
 
         public ContentPane(Dialog<?> dialog) {
             this.dialog = Objects.requireNonNull(dialog);
+
+            setFocusTraversable(false);
 
             DialogPane shell = this.dialog.getDialogPane();
 
@@ -877,7 +883,8 @@ public class DialogPane extends Pane {
 
             dialogButtonBar.getStyleClass().add("button-bar");
             dialogButtonBar.managedProperty().bind(dialogButtonBar.visibleProperty());
-            dialogButtonBar.sceneProperty().addListener((obs, oldScene, newScene) -> {
+
+            sceneProperty().addListener((obs, oldScene, newScene) -> {
                 if (oldScene != null) {
                     oldScene.focusOwnerProperty().removeListener(weakFocusListener);
                 }
@@ -918,6 +925,7 @@ public class DialogPane extends Pane {
 
             Button closeButton = new Button();
             closeButton.setGraphic(fontIcon);
+            closeButton.setFocusTraversable(false);
             closeButton.setAlignment(Pos.CENTER);
             closeButton.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
             closeButton.getStyleClass().add("close-button");

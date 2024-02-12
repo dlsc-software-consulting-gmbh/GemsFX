@@ -160,6 +160,7 @@ public class DialogsApp extends Application {
         AnchorPane.setRightAnchor(stackPane, 0d);
 
         Scene scene = new Scene(anchorPane);
+        scene.focusOwnerProperty().addListener(it -> System.out.println("focus owner: " + scene.getFocusOwner()));
 
         CSSFX.start();
 
