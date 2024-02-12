@@ -2,16 +2,16 @@
     -fx-background-color: -fx-base;
 }
 
-.strip-view .strip-cell {
+.strip-view > .masked-view > .container > .strip-cell {
     -fx-padding: 10 5 10 5;
 }
 
-.strip-view .strip-cell:selected {
+.strip-view > .masked-view > .container > .strip-cell:selected {
     -fx-background-color: -fx-selection-bar;
     -fx-text-fill: -fx-selection-bar-text;
 }
 
-.strip-view .scroller {
+.strip-view > .scroller {
     -fx-pref-width: 20;
     -fx-pref-height: 20;
     -fx-background-insets: 5;
@@ -21,10 +21,10 @@
     -fx-cursor: hand;
 }
 
-.strip-view .scroller.left {
+.strip-view > .scroller.left {
     -fx-rotate: 180;
 }
 
-.strip-view .scroller.right {
+.strip-view > .scroller.right {
     -fx-rotate: 0;
 }
