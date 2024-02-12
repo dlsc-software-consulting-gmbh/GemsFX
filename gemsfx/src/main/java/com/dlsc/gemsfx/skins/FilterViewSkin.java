@@ -124,6 +124,8 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
         subtitleLabel.getStyleClass().add("subtitle");
 
         VBox titleAndSubtitleBox = new VBox(titleBox, subtitleLabel);
+        titleAndSubtitleBox.getStyleClass().add("title-subtitle-box");
+
         HBox.setHgrow(titleAndSubtitleBox, Priority.ALWAYS);
 
         if (view.getExtras() != null) {
