@@ -47,6 +47,8 @@ public class BeforeAfterView extends Control {
             }
         });
 
+        setFocusTraversable(false);
+
         orientationProperty().addListener(it -> updatePseudoClass());
         updatePseudoClass();
     }

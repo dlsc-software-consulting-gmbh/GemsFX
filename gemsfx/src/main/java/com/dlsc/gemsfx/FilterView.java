@@ -61,6 +61,8 @@ public class FilterView<T> extends Control {
     public FilterView() {
         getStyleClass().add("filter-view");
 
+        setFocusTraversable(false);
+
         InvalidationListener updatePredicateListener = (Observable it) -> {
 
             // first group the filters together according to the group to which they belong

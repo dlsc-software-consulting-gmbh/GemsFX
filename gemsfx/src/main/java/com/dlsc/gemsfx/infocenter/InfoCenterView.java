@@ -68,6 +68,8 @@ public class InfoCenterView extends Control {
 
         getGroups().addListener(groupListListener);
 
+        setFocusTraversable(false);
+
         transparentProperty().addListener(it -> updateStyle());
     }
 

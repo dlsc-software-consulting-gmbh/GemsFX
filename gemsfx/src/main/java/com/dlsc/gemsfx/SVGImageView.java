@@ -43,6 +43,7 @@ public class SVGImageView extends Control {
      */
     public SVGImageView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        setFocusTraversable(false);
     }
 
     /**

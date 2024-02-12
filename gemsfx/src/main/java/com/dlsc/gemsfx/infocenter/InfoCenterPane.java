@@ -51,6 +51,8 @@ public class InfoCenterPane extends Control {
      */
     public InfoCenterPane() {
         this(null);
+
+        setFocusTraversable(false);
     }
 
     /**

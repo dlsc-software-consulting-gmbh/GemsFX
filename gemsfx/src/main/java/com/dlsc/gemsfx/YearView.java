@@ -19,6 +19,8 @@ public class YearView extends Control {
     public YearView() {
         getStyleClass().add("year-view");
 
+        setFocusTraversable(false);
+
         year.bind(Bindings.createIntegerBinding(() -> {
             Year value = getValue();
             if (value != null) {

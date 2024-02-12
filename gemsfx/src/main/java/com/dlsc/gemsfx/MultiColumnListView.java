@@ -45,6 +45,7 @@ public class MultiColumnListView<T> extends Control {
      */
     public MultiColumnListView() {
         getStyleClass().add("multi-column-list-view");
+        setFocusTraversable(false);
     }
 
     @Override

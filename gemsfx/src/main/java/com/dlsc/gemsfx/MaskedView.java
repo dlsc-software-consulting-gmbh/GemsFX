@@ -23,6 +23,7 @@ public class MaskedView extends Control {
      */
     public MaskedView() {
         getStyleClass().add("masked-view");
+        setFocusTraversable(false);
     }
 
     /**

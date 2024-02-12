@@ -30,8 +30,10 @@ import java.util.List;
  * the entered text whenever the text property changes.
  */
 public class EmailField extends Control {
+
     private static final boolean DEFAULT_SHOW_MAIL_ICON = true;
     private static final boolean DEFAULT_SHOW_VALIDATION_ICON = true;
+
     private static final PseudoClass VALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("valid");
     private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
     private static final EmailValidator emailValidator = EmailValidator.getInstance();

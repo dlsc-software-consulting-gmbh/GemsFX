@@ -44,6 +44,7 @@ public class ScreensView extends Control {
     public ScreensView() {
         getStyleClass().add("screens-view");
         setWallpaperProvider(screen -> DEFAULT_WALLPAPER);
+        setFocusTraversable(false);
 
         DropShadow shadow = new DropShadow();
         shadow.setBlurType(BlurType.THREE_PASS_BOX);

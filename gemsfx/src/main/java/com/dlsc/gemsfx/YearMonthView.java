@@ -19,6 +19,7 @@ public class YearMonthView extends Control {
 
     public YearMonthView() {
         getStyleClass().add("year-month-view");
+        setFocusTraversable(false);
     }
 
     @Override

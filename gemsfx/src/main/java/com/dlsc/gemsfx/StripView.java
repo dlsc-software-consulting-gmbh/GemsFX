@@ -42,6 +42,7 @@ public class StripView<T> extends Control {
         setPrefWidth(400);
         setPrefHeight(50);
         setFadingSize(100);
+        setFocusTraversable(false);
 
         setCellFactory(strip -> new StripCell<>());
 
