@@ -106,7 +106,7 @@
  * BusyIndicator
  */
 
-.dialog-pane .busy-indicator {
+.dialog-pane > * > * > * > .dialog-pane-busy-indicator {
     -size: 100px;
     -fx-pref-width: -size;
     -fx-pref-height: -size;

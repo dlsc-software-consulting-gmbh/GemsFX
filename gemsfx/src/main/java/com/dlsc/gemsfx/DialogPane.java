@@ -834,7 +834,7 @@ public class DialogPane extends Pane {
 
         private final ChangeListener<Node> focusListener = (o, oldOwner, newOwner) -> {
             if (newOwner != null && !isInsideDialogPane(newOwner.getParent()) && getScene() != null) {
-                if (oldOwner != null) {
+                if (oldOwner != null && isInsideDialogPane(oldOwner.getParent())) {
                     oldOwner.requestFocus();
                 } else {
                     requestFocus();
@@ -1057,7 +1057,7 @@ public class DialogPane extends Pane {
     private class BusyIndicator extends CircularProgressIndicator {
 
         public BusyIndicator() {
-            getStyleClass().add("busy-indicator");
+            getStyleClass().add("dialog-pane-busy-indicator");
         }
 
         public void stop() {
