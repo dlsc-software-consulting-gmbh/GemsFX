@@ -19,6 +19,7 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.apache.commons.lang3.StringUtils;
 
@@ -60,6 +61,7 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
         filtersPane.prefWrapLengthProperty().bind(view.widthProperty());
         filtersPane.visibleProperty().bind(Bindings.isNotEmpty(filtersPane.getChildren()));
         filtersPane.managedProperty().bind(Bindings.isNotEmpty(filtersPane.getChildren()));
+        filtersPane.setMinHeight(Region.USE_PREF_SIZE);
 
         searchTextField.visibleProperty().bind(view.textFilterProviderProperty().isNotNull());
         searchTextField.managedProperty().bind(view.textFilterProviderProperty().isNotNull());
