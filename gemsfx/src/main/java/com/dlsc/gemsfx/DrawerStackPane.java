@@ -1,9 +1,6 @@
 package com.dlsc.gemsfx;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -63,6 +60,8 @@ public class DrawerStackPane extends StackPane {
     private double startY;
 
     private HBox headerBox;
+
+    private Timeline timeline;
 
     /**
      * Constructs a new drawer stack pane.
@@ -145,6 +144,8 @@ public class DrawerStackPane extends StackPane {
         setDrawerHeight(loadDrawerHeightFromUserPreferences());
 
         showDrawerProperty().addListener(it -> {
+            stopCurrentlyRunningTimeline();
+
             if (isShowDrawer()) {
                 showDrawer();
             } else {
@@ -623,11 +624,18 @@ public class DrawerStackPane extends StackPane {
             setDrawerHeight(0);
             KeyValue keyValue = new KeyValue(drawerHeightProperty(), loadDrawerHeightFromUserPreferences());
             KeyFrame keyFrame = new KeyFrame(Duration.millis(100), keyValue);
-            Timeline timeline = new Timeline(keyFrame);
+            timeline = new Timeline(keyFrame);
             timeline.setOnFinished(evt -> drawer.setCache(false));
             timeline.play();
         } else {
             setDrawerHeight(loadDrawerHeightFromUserPreferences());
+        }
+    }
+
+    private void stopCurrentlyRunningTimeline() {
+        if (timeline != null && timeline.getStatus().equals(Animation.Status.RUNNING)) {
+            // the timeline used for the last show / hide might still be running
+            timeline.stop();
         }
     }
 
@@ -656,7 +664,7 @@ public class DrawerStackPane extends StackPane {
         if (isAnimateDrawer()) {
             KeyValue keyValue = new KeyValue(drawerHeightProperty(), 0);
             KeyFrame keyFrame = new KeyFrame(Duration.millis(100), keyValue);
-            Timeline timeline = new Timeline(keyFrame);
+            timeline = new Timeline(keyFrame);
             timeline.setOnFinished(evt -> postHiding());
             timeline.play();
         } else {
