@@ -28,15 +28,13 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         StackPane rightIconWrapper = new StackPane(rightIcon);
         rightIconWrapper.getStyleClass().add("validation-icon-wrapper");
         rightIconWrapper.managedProperty().bind(rightIconWrapper.visibleProperty());
-        rightIconWrapper.visibleProperty().bind(
-                field.showValidationIconProperty().and(field.validProperty().not()));
+        rightIconWrapper.visibleProperty().bind(field.showValidationIconProperty().and(field.validProperty().not()));
         rightIconWrapper.visibleProperty().addListener(it -> customTextField.requestLayout());
 
         Tooltip invalidToolTip = new Tooltip();
         invalidToolTip.textProperty().bind(field.invalidTextProperty());
         updateTooltipVisibility(field.getInvalidText(), rightIconWrapper, invalidToolTip);
-        field.invalidTextProperty().addListener((ob, ov, newValue)
-                -> updateTooltipVisibility(newValue, rightIconWrapper, invalidToolTip));
+        field.invalidTextProperty().addListener((ob, ov, newValue) -> updateTooltipVisibility(newValue, rightIconWrapper, invalidToolTip));
 
         /*
          * Needed because custom text field brings its own user agent stylesheet. Not
@@ -47,6 +45,7 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         customTextField.promptTextProperty().bind(field.promptTextProperty());
         customTextField.setLeft(leftIconWrapper);
         customTextField.setRight(rightIconWrapper);
+
         getChildren().setAll(customTextField);
     }
 

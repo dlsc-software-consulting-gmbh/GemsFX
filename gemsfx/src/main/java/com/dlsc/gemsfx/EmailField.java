@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.EmailFieldSkin;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -24,6 +25,7 @@ import org.controlsfx.control.textfield.CustomTextField;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A specialized control for entering an email address. The control validates
@@ -45,6 +47,12 @@ public class EmailField extends Control {
 
         setFocusTraversable(false);
 
+        focusedProperty().addListener(it -> {
+            if (isFocused()) {
+               getEditor().requestFocus();
+            }
+        });
+
         valid.bind(Bindings.createBooleanBinding(() -> {
             if (isRequired()) {
                 return emailValidator.isValid(getEmailAddress());
@@ -53,9 +61,8 @@ public class EmailField extends Control {
         }, emailAddressProperty(), requiredProperty()));
 
         updateValidPseudoClass(false);
-        valid.getReadOnlyProperty().addListener((ob, ov, newValue) -> {
-            updateValidPseudoClass(newValue);
-        });
+
+        valid.getReadOnlyProperty().addListener((ob, ov, newValue) -> updateValidPseudoClass(newValue));
     }
 
     public EmailField(String emailAddress) {
@@ -75,7 +82,7 @@ public class EmailField extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return EmailField.class.getResource("email-field.css").toExternalForm();
+        return Objects.requireNonNull(EmailField.class.getResource("email-field.css")).toExternalForm();
     }
 
     public final CustomTextField getEditor() {
