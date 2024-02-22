@@ -10,7 +10,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -49,8 +48,11 @@ public class CalendarPickerSkin extends CustomComboBoxSkinBase<CalendarPicker> {
         if (view == null) {
             CalendarPicker picker = getSkinnable();
             view = picker.getCalendarView();
-            view.setYearMonth(YearMonth.from(picker.getValue()));
-            view.getSelectionModel().select(picker.getValue());
+            LocalDate pickerValue = picker.getValue();
+            if (pickerValue != null) {
+                view.setYearMonth(YearMonth.from(pickerValue));
+                view.getSelectionModel().select(pickerValue);
+            }
             view.setFocusTraversable(false); // keep the picker focused / blue border
             view.selectionModelProperty().addListener((obs, oldModel, newModel) -> bindSelectionModel(oldModel, newModel));
             bindSelectionModel(null, view.getSelectionModel());
