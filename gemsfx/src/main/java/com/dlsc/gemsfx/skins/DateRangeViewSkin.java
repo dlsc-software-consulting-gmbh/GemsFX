@@ -49,13 +49,11 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
         startCalendarView = view.getStartCalendarView();
         endCalendarView = view.getEndCalendarView();
 
-        startCalendarView.latestDateProperty().addListener(it -> System.out.println("start: latest: " + startCalendarView.getLatestDate()));
         startCalendarView.latestDateProperty().bind(Bindings.createObjectBinding(() -> {
             YearMonth month = endCalendarView.getYearMonth().minusMonths(1);
             return month.atDay(month.lengthOfMonth());
         }, endCalendarView.yearMonthProperty()));
 
-        endCalendarView.earliestDateProperty().addListener(it -> System.out.println("end: earliest: " + endCalendarView.getEarliestDate()));
         endCalendarView.earliestDateProperty().bind(Bindings.createObjectBinding(() -> {
             YearMonth month = startCalendarView.getYearMonth().plusMonths(1);
             return month.atDay(1);
