@@ -2,17 +2,18 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.SelectionModel;
-import com.dlsc.gemsfx.YearMonthView;
 import com.dlsc.gemsfx.daterange.DateRange;
 import com.dlsc.gemsfx.daterange.DateRangePreset;
 import com.dlsc.gemsfx.daterange.DateRangeView;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.SkinBase;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -99,9 +100,13 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
         }, selectionModel.getSelectedDates(), endCalendarView.getSelectionModel().getSelectedDates()));
 
         applyButton.setOnAction(evt -> {
-            DateRange selectedDateRange = new DateRange(
-                    selectionModel.getSelectedDate(),
-                    selectionModel.getSelectedEndDate());
+            LocalDate endDate = selectionModel.getSelectedEndDate();
+            DateRange selectedDateRange;
+            if (endDate == null) {
+                selectedDateRange = new DateRange(selectionModel.getSelectedDate());
+            } else {
+                selectedDateRange = new DateRange(selectionModel.getSelectedDate(), endDate);
+            }
 
             boolean foundPreset = false;
             for (DateRangePreset preset : view.getPresets()) {
