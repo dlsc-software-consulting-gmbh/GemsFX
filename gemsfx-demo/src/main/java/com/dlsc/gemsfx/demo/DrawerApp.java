@@ -40,11 +40,7 @@ public class DrawerApp extends Application {
         label.setWrapText(true);
         label.setPadding(new Insets(20));
 
-        PropertyView.StringItem item = new PropertyView.StringItem("Lorem", label.getText(), false);
-        PropertyView propertyView = new PropertyView();
-        propertyView.getItems().add(item);
-
-        ScrollPane scrollPane = new ScrollPane(propertyView);
+        ScrollPane scrollPane = new ScrollPane(label);
         scrollPane.setFitToWidth(true);
 
         drawerStackPane.setPreferredDrawerWidth(500);
