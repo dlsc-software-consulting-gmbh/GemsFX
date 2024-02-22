@@ -2,31 +2,20 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.daterange.DateRange;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
-import com.dlsc.gemsfx.daterange.DateRangePreset;
 import com.dlsc.gemsfx.daterange.DateRangeView;
-import com.dlsc.gemsfx.util.Utils;
 import javafx.beans.InvalidationListener;
-import javafx.beans.binding.Bindings;
-import javafx.beans.value.ObservableValue;
-import javafx.css.Styleable;
-import javafx.geometry.Bounds;
-import javafx.geometry.HPos;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
-import javafx.scene.AccessibleAttribute;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.PopupControl;
-import javafx.scene.control.Skin;
-import javafx.scene.control.Skinnable;
-import javafx.scene.layout.*;
-import javafx.stage.WindowEvent;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 
 public class DateRangePickerSkin extends CustomComboBoxSkinBase<DateRangePicker> {
 
@@ -130,9 +119,8 @@ public class DateRangePickerSkin extends CustomComboBoxSkinBase<DateRangePicker>
     private void updateLabels() {
         DateRange dateRange = getSkinnable().getValue();
         if (dateRange != null) {
-            if (dateRange instanceof DateRangePreset) {
-                DateRangePreset preset = (DateRangePreset) dateRange;
-                titleLabel.setText(preset.getTitle());
+            if (StringUtils.isNotBlank(dateRange.getTitle())) {
+                titleLabel.setText(dateRange.getTitle());
             } else {
                 titleLabel.setText(getSkinnable().getCustomRangeText());
             }

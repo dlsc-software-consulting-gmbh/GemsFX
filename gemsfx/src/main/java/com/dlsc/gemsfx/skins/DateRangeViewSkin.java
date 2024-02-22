@@ -106,8 +106,9 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
 
             boolean foundPreset = false;
             for (DateRangePreset preset : view.getPresets()) {
-                if (Objects.equals(preset.getStartDate(), selectedDateRange.getStartDate()) && Objects.equals(preset.getEndDate(), selectedDateRange.getEndDate())) {
-                    view.setValue(preset);
+                DateRange dateRange = preset.getDateRangeSupplier().get();
+                if (Objects.equals(dateRange.getStartDate(), selectedDateRange.getStartDate()) && Objects.equals(dateRange.getEndDate(), selectedDateRange.getEndDate())) {
+                    view.setValue(dateRange);
                     foundPreset = true;
                 }
             }
@@ -198,12 +199,16 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
 
             YearMonth fromMonth = YearMonth.from(newRange.getStartDate());
             YearMonth toMonth = YearMonth.from(newRange.getEndDate());
+
+            // update calendars in correct oder, or the validations will auto-correct the months
             if (fromMonth.isBefore(toMonth)) {
+                // the "from" month is BEFORE the end month, so change start calendar first
                 startCalendarView.setYearMonth(fromMonth);
                 endCalendarView.setYearMonth(toMonth);
             } else {
-                startCalendarView.setYearMonth(fromMonth);
+                // the "from" month is AFTER the end month, so change end calendar first
                 endCalendarView.setYearMonth(fromMonth.plusMonths(1));
+                startCalendarView.setYearMonth(fromMonth);
             }
         }
     }
@@ -219,7 +224,7 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
             DateRangePreset rangePreset = presets.get(i);
             Label l = new Label(rangePreset.getTitle());
             l.getStyleClass().add("preset-name-label");
-            l.setOnMouseClicked(evt -> applyRangeToMonthViews(rangePreset));
+            l.setOnMouseClicked(evt -> applyRangeToMonthViews(rangePreset.getDateRangeSupplier().get()));
             presetsBox.getChildren().add(l);
 
             if (i < presets.size() - 1) {

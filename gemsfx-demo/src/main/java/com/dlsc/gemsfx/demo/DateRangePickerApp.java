@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.CalendarPicker;
+import com.dlsc.gemsfx.daterange.DateRange;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.daterange.DateRangePreset;
 import com.dlsc.gemsfx.daterange.DateRangeView;
@@ -18,14 +19,18 @@ import org.scenicview.ScenicView;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.Date;
+import java.util.Locale;
 
 public class DateRangePickerApp extends Application {
 
     @Override
     public void start(Stage stage) {
         DateRangePicker picker = new DateRangePicker();
-        picker.setValue(new DateRangePreset("Initial Range", LocalDate.now(), LocalDate.now().plusDays(8)));
+        picker.setValue(new DateRange("Initial Range", LocalDate.now(), LocalDate.now().plusDays(8)));
 
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.setEditable(false);
@@ -66,11 +71,14 @@ public class DateRangePickerApp extends Application {
         Label comparisonLabel = new Label("Similar controls for comparison");
         Label optionsLabel = new Label("Options");
 
+        Button changePresetsButton = new Button("Change Presets");
+        changePresetsButton.setOnAction(evt -> picker.getDateRangeView().getPresets().setAll(createTodayRange(), createYesterdayPreset(), createThisWeekPreset()));
+
         VBox.setMargin(comparisonLabel, new Insets(20, 0, 0, 0));
         VBox.setMargin(optionsLabel, new Insets(20, 0, 0, 0));
         VBox.setMargin(scenicViewButton, new Insets(20, 0, 0, 0));
 
-        VBox vBox = new VBox(10, picker, comparisonLabel, comboBox, datePicker, choiceBox, calendarPicker, optionsLabel, smallBox, showPresetTitleCheckBox, showIconCheckBox, formattersBox, scenicViewButton);
+        VBox vBox = new VBox(10, picker, comparisonLabel, comboBox, datePicker, choiceBox, calendarPicker, optionsLabel, smallBox, showPresetTitleCheckBox, showIconCheckBox, formattersBox, changePresetsButton, scenicViewButton);
 
         vBox.setPadding(new Insets(20));
 
@@ -84,6 +92,21 @@ public class DateRangePickerApp extends Application {
         stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
+    }
+
+    private DateRangePreset createTodayRange() {
+        return new DateRangePreset("Today New", () -> new DateRange("Today", LocalDate.now()));
+    }
+
+    private DateRangePreset createYesterdayPreset() {
+        return new DateRangePreset("Yesterday New", () -> new DateRange("Yesterday", LocalDate.now().minusDays(1)));
+    }
+
+    private DateRangePreset createThisWeekPreset() {
+        return new DateRangePreset("This Week New", () -> {
+            TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
+            return new DateRange("This Week", LocalDate.now().with(fieldISO, 1), LocalDate.now().with(fieldISO, 1).plusDays(6));
+        });
     }
 
     public static void main(String[] args) {

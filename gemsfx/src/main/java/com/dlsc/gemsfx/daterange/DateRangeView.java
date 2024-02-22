@@ -37,6 +37,8 @@ public class DateRangeView extends Control {
     public DateRangeView() {
         getStyleClass().add("date-range-view");
 
+        setFocusTraversable(false);
+
         selectionModel = new SelectionModel();
         selectionModel.setSelectionMode(SelectionModel.SelectionMode.DATE_RANGE);
 
@@ -56,7 +58,7 @@ public class DateRangeView extends Control {
 
         DateRangePreset todayRange = createTodayRange();
         getPresets().addAll(todayRange, createYesterdayPreset(), createThisWeekPreset(), createThisMonthPreset(), createLastMonthPreset());
-        setValue(todayRange);
+        setValue(todayRange.getDateRangeSupplier().get());
     }
 
     @Override
@@ -316,30 +318,34 @@ public class DateRangeView extends Control {
     }
 
     private DateRangePreset createTodayRange() {
-        return new DateRangePreset("Today", LocalDate.now());
+        return new DateRangePreset("Today", () -> new DateRange("Today", LocalDate.now()));
     }
 
     private DateRangePreset createYesterdayPreset() {
-        return new DateRangePreset("Yesterday", LocalDate.now().minusDays(1));
+        return new DateRangePreset("Yesterday", () -> new DateRange("Yesterday", LocalDate.now().minusDays(1)));
     }
 
     private DateRangePreset createThisWeekPreset() {
-        TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
-        LocalDate start = LocalDate.now().with(fieldISO, 1);
-        LocalDate end = start.plusDays(6);
-        return new DateRangePreset("This Week", start, end);
+        return new DateRangePreset("This Week", () -> {
+            TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
+            return new DateRange("This Week", LocalDate.now().with(fieldISO, 1), LocalDate.now().with(fieldISO, 1).plusDays(6));
+        });
     }
 
     private DateRangePreset createThisMonthPreset() {
-        LocalDate start = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
-        return new DateRangePreset("This Month", start, end);
+        return new DateRangePreset("This Month", () -> {
+            LocalDate start = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+            LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
+            return new DateRange("This Month", start, end);
+        });
     }
 
     private DateRangePreset createLastMonthPreset() {
-        LocalDate start = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).minusMonths(1);
-        LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
-        return new DateRangePreset("Last Month", start, end);
+        return new DateRangePreset("Last Month", () -> {
+            LocalDate start = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).minusMonths(1);
+            LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
+            return new DateRange("Last Month", start, end);
+        });
     }
 
     private static class StyleableProperties {
