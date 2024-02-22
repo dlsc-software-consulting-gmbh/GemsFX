@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.YearPickerSkin;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.css.PseudoClass;
@@ -19,6 +20,10 @@ import java.text.ParsePosition;
 import java.time.Year;
 import java.util.function.UnaryOperator;
 
+/**
+ * A control for selecting a year. This class utilizes the {@link YearView} control inside of its
+ * popup.
+ */
 public class YearPicker extends ComboBoxBase<Year> {
 
     private final TextField editor = new TextField();
@@ -26,10 +31,17 @@ public class YearPicker extends ComboBoxBase<Year> {
 
     private YearView yearView;
 
+    /**
+     * Constructs a new year picker.
+     */
     public YearPicker() {
         getStyleClass().setAll("year-picker", "text-input");
 
         setFocusTraversable(false);
+        setEditable(true);
+
+        setOnMouseClicked(evt -> commitValueAndShow());
+        setOnTouchPressed(evt -> commitValueAndShow());
 
         valueProperty().addListener((obs, oldV, newV) -> {
             updateText(newV);
@@ -47,18 +59,25 @@ public class YearPicker extends ComboBoxBase<Year> {
         });
 
         editor.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
-            Year value = getValue();
-            if (value != null) {
-                if (evt.getCode().equals(KeyCode.DOWN)) {
-                    setValue(value.plusYears(1));
-                } else if (evt.getCode().equals(KeyCode.UP)) {
-                    setValue(value.minusYears(1));
-                }
+            if (evt.getCode().equals(KeyCode.UP)) {
+                setValue(getValue().minusYears(1));
+                placeCaretAtEnd();
+            } else if (evt.getCode().equals(KeyCode.DOWN)) {
+                setValue(getValue().plusYears(1));
+                placeCaretAtEnd();
+            } else if (evt.getCode().equals(KeyCode.LEFT) && !isEditable()) {
+                setValue(getValue().minusYears(1));
+                placeCaretAtEnd();
+            } else if (evt.getCode().equals(KeyCode.RIGHT) && !isEditable()) {
+                setValue(getValue().plusYears(1));
+                placeCaretAtEnd();
             }
         });
 
         setMaxWidth(Region.USE_PREF_SIZE);
-        updateText(null);
+
+        // call last
+        setValue(Year.now());
     }
 
     /**
@@ -73,6 +92,10 @@ public class YearPicker extends ComboBoxBase<Year> {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new YearPickerSkin(this);
+    }
+
+    private void placeCaretAtEnd() {
+        Platform.runLater(() -> getEditor().positionCaret(getEditor().textProperty().getValueSafe().length()));
     }
 
     /**
@@ -93,7 +116,7 @@ public class YearPicker extends ComboBoxBase<Year> {
         return YearMonthView.class.getResource("year-picker.css").toExternalForm();
     }
 
-    private final ReadOnlyObjectWrapper<Integer> year = new ReadOnlyObjectWrapper<>(this, "wrapper");
+    private final ReadOnlyObjectWrapper<Integer> year = new ReadOnlyObjectWrapper<>(this, "year");
 
     public final ReadOnlyObjectProperty<Integer> yearProperty() {
         return year.getReadOnlyProperty();
@@ -101,6 +124,11 @@ public class YearPicker extends ComboBoxBase<Year> {
 
     public final Integer getYear() {
         return year.get();
+    }
+
+    private void commitValueAndShow() {
+        commit();
+        show();
     }
 
     private void commit() {
@@ -154,7 +182,5 @@ public class YearPicker extends ComboBoxBase<Year> {
                 return change;
             };
         }
-
     }
-
 }

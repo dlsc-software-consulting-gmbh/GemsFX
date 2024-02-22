@@ -18,9 +18,6 @@ public class YearPickerSkin extends CustomComboBoxSkinBase<YearPicker> {
     public YearPickerSkin(YearPicker picker) {
         super(picker);
 
-        picker.setOnMouseClicked(evt -> picker.show());
-        picker.setOnTouchPressed(evt -> picker.show());
-
         FontIcon calendarIcon = new FontIcon();
         calendarIcon.getStyleClass().add("edit-icon"); // using styles similar to combobox, for consistency
 
