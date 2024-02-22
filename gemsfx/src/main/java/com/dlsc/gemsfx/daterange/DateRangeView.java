@@ -192,7 +192,7 @@ public class DateRangeView extends Control {
         this.cancelText.set(cancelText);
     }
 
-    private final StringProperty applyText = new SimpleStringProperty(this, "cancelText", "APPLY");
+    private final StringProperty applyText = new SimpleStringProperty(this, "applyText", "APPLY");
 
     public final String getApplyText() {
         return applyText.get();
