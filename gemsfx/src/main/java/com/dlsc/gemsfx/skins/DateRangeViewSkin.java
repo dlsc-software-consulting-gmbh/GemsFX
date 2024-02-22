@@ -34,6 +34,7 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
     private final StackPane stackPane;
     private final HBox container;
     private final Label toLabel;
+    private boolean updatingMonths;
 
     public DateRangeViewSkin(DateRangeView view) {
         super(view);
@@ -65,14 +66,14 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
 
         startCalendarView.yearMonthProperty().addListener((obs, oldStartMonth, newStartMonth) -> {
             YearMonth endMonth = endCalendarView.getYearMonth();
-            if (!newStartMonth.isBefore(endMonth)) {
+            if (!newStartMonth.isBefore(endMonth) && !updatingMonths) {
                 startCalendarView.setYearMonth(oldStartMonth);
             }
         });
 
         endCalendarView.yearMonthProperty().addListener((obs, oldEndMonth, newEndMonth) -> {
             YearMonth startMonth = startCalendarView.getYearMonth();
-            if (!newEndMonth.isAfter(startMonth)) {
+            if (!newEndMonth.isAfter(startMonth) && !updatingMonths) {
                 endCalendarView.setYearMonth(oldEndMonth);
             }
         });
@@ -200,15 +201,17 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
             YearMonth fromMonth = YearMonth.from(newRange.getStartDate());
             YearMonth toMonth = YearMonth.from(newRange.getEndDate());
 
-            // update calendars in correct oder, or the validations will auto-correct the months
-            if (fromMonth.isBefore(toMonth)) {
-                // the "from" month is BEFORE the end month, so change start calendar first
-                startCalendarView.setYearMonth(fromMonth);
-                endCalendarView.setYearMonth(toMonth);
-            } else {
-                // the "from" month is AFTER the end month, so change end calendar first
-                endCalendarView.setYearMonth(fromMonth.plusMonths(1));
-                startCalendarView.setYearMonth(fromMonth);
+            try {
+                updatingMonths = true;
+                if (fromMonth.isBefore(toMonth)) {
+                    startCalendarView.setYearMonth(fromMonth);
+                    endCalendarView.setYearMonth(toMonth);
+                } else {
+                    startCalendarView.setYearMonth(fromMonth);
+                    endCalendarView.setYearMonth(fromMonth.plusMonths(1));
+                }
+            } finally {
+                updatingMonths = false;
             }
         }
     }

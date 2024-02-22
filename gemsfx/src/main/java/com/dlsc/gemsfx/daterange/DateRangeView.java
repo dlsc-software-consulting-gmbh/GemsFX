@@ -44,17 +44,9 @@ public class DateRangeView extends Control {
 
         startCalendarView = getStartCalendarView();
         startCalendarView.setSelectionModel(selectionModel);
-        startCalendarView.setShowDaysOfPreviousOrNextMonth(true);
-        startCalendarView.setYearMonth(YearMonth.now().minusMonths(1));
-        startCalendarView.setShowToday(false);
-        startCalendarView.setYearMonth(YearMonth.now());
 
         endCalendarView = getEndCalendarView();
         endCalendarView.setSelectionModel(selectionModel);
-        endCalendarView.setShowDaysOfPreviousOrNextMonth(true);
-        endCalendarView.setYearMonth(YearMonth.now());
-        endCalendarView.setShowToday(false);
-        endCalendarView.setYearMonth(YearMonth.now().plusMonths(1));
 
         DateRangePreset todayRange = createTodayRange();
         getPresets().addAll(todayRange, createYesterdayPreset(), createThisWeekPreset(), createThisMonthPreset(), createLastMonthPreset());
@@ -136,6 +128,9 @@ public class DateRangeView extends Control {
     public CalendarView getStartCalendarView() {
         if (startCalendarView == null) {
             startCalendarView = new CalendarView();
+            startCalendarView.setShowDaysOfPreviousOrNextMonth(true);
+            startCalendarView.setShowToday(false);
+            startCalendarView.setYearMonth(YearMonth.now());
         }
         return startCalendarView;
     }
@@ -149,6 +144,9 @@ public class DateRangeView extends Control {
     public CalendarView getEndCalendarView() {
         if (endCalendarView == null) {
             endCalendarView = new CalendarView();
+            endCalendarView.setShowDaysOfPreviousOrNextMonth(true);
+            endCalendarView.setShowToday(false);
+            endCalendarView.setYearMonth(YearMonth.now().plusMonths(1));
         }
         return endCalendarView;
     }
