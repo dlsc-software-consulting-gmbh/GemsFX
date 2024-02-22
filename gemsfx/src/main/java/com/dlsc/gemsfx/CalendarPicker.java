@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.CalendarPickerSkin;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
@@ -11,6 +12,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.util.StringConverter;
+import javafx.util.converter.LocalDateStringConverter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
@@ -39,6 +41,11 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
         getStyleClass().setAll("calendar-picker", "text-input");
 
+        setEditable(true);
+
+        setOnMouseClicked(evt -> commitValueAndShow());
+        setOnTouchPressed(evt -> commitValueAndShow());
+
         calendarView.setShowToday(true);
         calendarView.setShowTodayButton(true);
 
@@ -56,11 +63,19 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
             pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), editor.isFocused());
         });
 
-        editor.addEventHandler(KeyEvent.ANY, evt -> {
-            if (evt.getCode().equals(KeyCode.DOWN)) {
-                setValue(getValue().plusMonths(1));
-            } else if (evt.getCode().equals(KeyCode.UP)) {
-                setValue(getValue().minusMonths(1));
+        editor.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+            if (evt.getCode().equals(KeyCode.UP)) {
+                setValue(getValue().minusDays(1));
+                placeCaretAtEnd();
+            } else if (evt.getCode().equals(KeyCode.DOWN)) {
+                setValue(getValue().plusDays(1));
+                placeCaretAtEnd();
+            } else if (evt.getCode().equals(KeyCode.LEFT) && !isEditable()) {
+                setValue(getValue().minusDays(1));
+                placeCaretAtEnd();
+            } else if (evt.getCode().equals(KeyCode.RIGHT) && !isEditable()) {
+                setValue(getValue().plusDays(1));
+                placeCaretAtEnd();
             }
         });
 
@@ -72,6 +87,15 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
         setMaxWidth(Region.USE_PREF_SIZE);
         updateText();
+    }
+
+    private void placeCaretAtEnd() {
+        Platform.runLater(() -> getEditor().positionCaret(getEditor().textProperty().getValueSafe().length()));
+    }
+
+    private void commitValueAndShow() {
+        commitValue();
+        show();
     }
 
     @Override
@@ -133,24 +157,7 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
         return editor;
     }
 
-    private final ObjectProperty<StringConverter<LocalDate>> converter = new SimpleObjectProperty<>(this, "value", new StringConverter<>() {
-        @Override
-        public String toString(LocalDate object) {
-            if (object != null) {
-                return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).format(object);
-            }
-            return null;
-        }
-
-        @Override
-        public LocalDate fromString(String string) {
-            try {
-                return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).parse(string, LocalDate::from);
-            } catch (DateTimeParseException ex) {
-                return null;
-            }
-        }
-    });
+    private final ObjectProperty<StringConverter<LocalDate>> converter = new SimpleObjectProperty<>(this, "value", new LocalDateStringConverter());
 
     public final StringConverter<LocalDate> getConverter() {
         return converter.get();

@@ -23,8 +23,6 @@ public class CalendarPickerSkin extends CustomComboBoxSkinBase<CalendarPicker> {
     public CalendarPickerSkin(CalendarPicker picker) {
         super(picker);
 
-        picker.setOnMouseClicked(evt -> picker.show());
-        picker.setOnTouchPressed(evt -> picker.show());
         picker.valueProperty().addListener(it -> {
             if (view != null) {
                 view.setYearMonth(YearMonth.from(picker.getValue()));
@@ -49,7 +47,10 @@ public class CalendarPickerSkin extends CustomComboBoxSkinBase<CalendarPicker> {
 
     protected Node getPopupContent() {
         if (view == null) {
-            view = getSkinnable().getCalendarView();
+            CalendarPicker picker = getSkinnable();
+            view = picker.getCalendarView();
+            view.setYearMonth(YearMonth.from(picker.getValue()));
+            view.getSelectionModel().select(picker.getValue());
             view.setFocusTraversable(false); // keep the picker focused / blue border
             view.selectionModelProperty().addListener((obs, oldModel, newModel) -> bindSelectionModel(oldModel, newModel));
             bindSelectionModel(null, view.getSelectionModel());
