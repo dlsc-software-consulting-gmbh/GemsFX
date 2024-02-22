@@ -182,6 +182,26 @@ public class CalendarView extends Control {
         return showWeekNumbersProperty().get();
     }
 
+    private final BooleanProperty markSelectedDaysOfPreviousOrNextMonth = new SimpleBooleanProperty(this, "markSelectedDaysOfPreviousOrNextMonth", true);
+
+    public final boolean isMarkSelectedDaysOfPreviousOrNextMonth() {
+        return markSelectedDaysOfPreviousOrNextMonth.get();
+    }
+
+    /**
+     * Determines whether selected dates will be marked as such when they are being displayed at the
+     * beginning of the next month or at the end of the previous month.
+     *
+     * @return true if days not belonging to the current month will be marked selected
+     */
+    public final BooleanProperty markSelectedDaysOfPreviousOrNextMonthProperty() {
+        return markSelectedDaysOfPreviousOrNextMonth;
+    }
+
+    public final void setMarkSelectedDaysOfPreviousOrNextMonth(boolean markSelectedDaysOfPreviousOrNextMonth) {
+        this.markSelectedDaysOfPreviousOrNextMonth.set(markSelectedDaysOfPreviousOrNextMonth);
+    }
+
     private final BooleanProperty showDaysOfPreviousOrNextMonth = new SimpleBooleanProperty(this, "showDaysOfPreviousOrNextMonth", true);
 
     public final boolean isShowDaysOfPreviousOrNextMonth() {

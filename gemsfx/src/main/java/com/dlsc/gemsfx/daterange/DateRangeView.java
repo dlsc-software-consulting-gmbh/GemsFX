@@ -13,7 +13,6 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import javafx.scene.control.SplitPane;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -127,9 +126,7 @@ public class DateRangeView extends Control {
      */
     public CalendarView getStartCalendarView() {
         if (startCalendarView == null) {
-            startCalendarView = new CalendarView();
-            startCalendarView.setShowDaysOfPreviousOrNextMonth(true);
-            startCalendarView.setShowToday(false);
+            startCalendarView = createCalendar();
             startCalendarView.setYearMonth(YearMonth.now());
         }
         return startCalendarView;
@@ -143,12 +140,18 @@ public class DateRangeView extends Control {
      */
     public CalendarView getEndCalendarView() {
         if (endCalendarView == null) {
-            endCalendarView = new CalendarView();
-            endCalendarView.setShowDaysOfPreviousOrNextMonth(true);
-            endCalendarView.setShowToday(false);
+            endCalendarView = createCalendar();
             endCalendarView.setYearMonth(YearMonth.now().plusMonths(1));
         }
         return endCalendarView;
+    }
+
+    private CalendarView createCalendar() {
+        CalendarView calendar = new CalendarView();
+        calendar.setShowDaysOfPreviousOrNextMonth(true);
+        calendar.setShowToday(false);
+        calendar.setMarkSelectedDaysOfPreviousOrNextMonth(false);
+        return calendar;
     }
 
     private final StringProperty toText = new SimpleStringProperty(this, "toText", "TO");

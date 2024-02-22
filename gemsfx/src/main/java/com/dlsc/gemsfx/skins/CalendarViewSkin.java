@@ -248,11 +248,11 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         });
 
         InvalidationListener buildViewListener = evt -> buildView();
-
         view.showWeekNumbersProperty().addListener(buildViewListener);
         view.showMonthArrowsProperty().addListener(buildViewListener);
         view.showYearSpinnerProperty().addListener(buildViewListener);
         view.cellFactoryProperty().addListener(buildViewListener);
+        view.markSelectedDaysOfPreviousOrNextMonthProperty().addListener(buildViewListener);
 
         view.showTodayProperty().addListener(updateViewListener);
 
@@ -640,7 +640,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
                     cell.getStyleClass().add(WEEKEND_DAY);
                 }
 
-                if (view.getSelectionModel().isSelected(localDate)) {
+                if (view.getSelectionModel().isSelected(localDate) && YearMonth.from(localDate).equals(displayedYearMonth)) {
                     cell.getStyleClass().add(SELECTED);
 
                     if (Objects.equals(view.getSelectionModel().getSelectionMode(), SelectionModel.SelectionMode.DATE_RANGE)) {

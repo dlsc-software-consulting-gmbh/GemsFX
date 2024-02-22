@@ -53,6 +53,7 @@ public class CalendarViewApp extends Application {
         options1.getChildren().add(createOption("Show month dropdown", calendarView.showMonthDropdownProperty()));
         options1.getChildren().add(createOption("Show week numbers", calendarView.showWeekNumbersProperty()));
         options1.getChildren().add(createOption("Show days of other months", calendarView.showDaysOfPreviousOrNextMonthProperty()));
+        options1.getChildren().add(createOption("Mark days of other months selected", calendarView.markSelectedDaysOfPreviousOrNextMonthProperty()));
         options1.getChildren().add(createOption("Show grid lines", showGridLines));
 
         ComboBox<SelectionMode> selectionModeComboBox = new ComboBox<>();
