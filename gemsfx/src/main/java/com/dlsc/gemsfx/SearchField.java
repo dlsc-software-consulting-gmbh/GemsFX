@@ -413,7 +413,7 @@ public class SearchField<T> extends Control {
         return searching.get();
     }
 
-    private final BooleanProperty hidePopupWithSingleChoice = new SimpleBooleanProperty(this, "", false);
+    private final BooleanProperty hidePopupWithSingleChoice = new SimpleBooleanProperty(this, "hidePopupWithSingleChoice", false);
 
     public final boolean isHidePopupWithSingleChoice() {
         return hidePopupWithSingleChoice.get();
@@ -729,7 +729,7 @@ public class SearchField<T> extends Control {
         this.text.set(text);
     }
 
-    private final StringProperty promptText = new SimpleStringProperty(this, "text", "");
+    private final StringProperty promptText = new SimpleStringProperty(this, "promptText", "");
 
     public final String getPromptText() {
         return promptText.get();
