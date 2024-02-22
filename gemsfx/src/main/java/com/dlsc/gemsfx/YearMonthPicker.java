@@ -38,8 +38,9 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
 
         getStyleClass().setAll("year-month-picker", "text-input");
 
-        setValue(YearMonth.now());
         setFocusTraversable(false);
+        setOnMouseClicked(evt -> commitValueAndShow());
+        setOnTouchPressed(evt -> commitValueAndShow());
 
         valueProperty().addListener(it -> updateText());
 
@@ -68,7 +69,8 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
         });
 
         setMaxWidth(Region.USE_PREF_SIZE);
-        updateText();
+
+        setValue(YearMonth.now());
     }
 
     @Override
@@ -86,6 +88,11 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
             yearMonthView = new YearMonthView();
         }
         return yearMonthView;
+    }
+
+    private void commitValueAndShow() {
+        commit();
+        show();
     }
 
     /*
