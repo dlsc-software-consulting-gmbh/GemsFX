@@ -1,20 +1,17 @@
 package com.dlsc.gemsfx.daterange;
 
 import com.dlsc.gemsfx.skins.DateRangePickerSkin;
-import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Side;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Skin;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
-import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -39,8 +36,6 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
 
         getStyleClass().add("date-range-picker");
         getStylesheets().add(getUserAgentStylesheet());
-
-        setOnMouseClicked(evt -> requestFocus());
     }
 
     @Override
