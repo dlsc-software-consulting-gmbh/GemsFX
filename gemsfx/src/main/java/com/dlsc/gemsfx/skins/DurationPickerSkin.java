@@ -30,7 +30,10 @@ public class DurationPickerSkin extends CustomComboBoxSkinBase<DurationPicker> {
 
         Button editButton = new Button();
         editButton.getStyleClass().add("edit-button");
-        editButton.setOnAction(evt -> picker.getOnShowPopup().accept(picker));
+        editButton.setOnAction(evt -> {
+            picker.requestFocus();
+            picker.getOnShowPopup().accept(picker);
+        });
         editButton.setMaxHeight(Double.MAX_VALUE);
         editButton.setGraphic(new FontIcon());
         editButton.setFocusTraversable(false);

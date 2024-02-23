@@ -25,7 +25,10 @@ public class YearPickerSkin extends CustomComboBoxSkinBase<YearPicker> {
         editButton.setFocusTraversable(false);
         editButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         editButton.getStyleClass().add("edit-button"); // using styles similar to combobox, for consistency
-        editButton.setOnMouseClicked(evt -> picker.show());
+        editButton.setOnMouseClicked(evt -> {
+            picker.requestFocus();
+            picker.show();
+        });
 
         HBox.setHgrow(picker.getEditor(), Priority.ALWAYS);
 
