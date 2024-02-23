@@ -34,7 +34,10 @@ public class CalendarPickerSkin extends CustomComboBoxSkinBase<CalendarPicker> {
         StackPane arrowButton = new StackPane(arrow);
         arrowButton.setFocusTraversable(false);
         arrowButton.getStyleClass().add("arrow-button"); // using styles similar to combobox, for consistency
-        arrowButton.setOnMouseClicked(evt -> picker.show());
+        arrowButton.setOnMouseClicked(evt -> {
+            picker.requestFocus();
+            picker.show();
+        });
         HBox.setHgrow(picker.getEditor(), Priority.ALWAYS);
 
         HBox box = new HBox(picker.getEditor(), arrowButton);
