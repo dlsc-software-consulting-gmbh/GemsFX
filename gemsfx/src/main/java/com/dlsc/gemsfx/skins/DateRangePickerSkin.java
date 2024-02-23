@@ -19,22 +19,23 @@ import java.time.format.DateTimeFormatter;
 
 public class DateRangePickerSkin extends CustomComboBoxSkinBase<DateRangePicker> {
 
+    private final DateRangePicker picker;
+    private final DateRangeView view;
     private Label titleLabel;
     private Label rangeLabel;
-
-    private final DateRangeView view;
     private HBox hBox;
 
     public DateRangePickerSkin(DateRangePicker picker) {
         super(picker);
+        this.picker = picker;
 
         view = picker.getDateRangeView();
         view.setFocusTraversable(false); // keep the picker focused / blue border
         view.valueProperty().bindBidirectional(getSkinnable().valueProperty());
         view.setOnClose(this::hide);
 
-        picker.setOnMouseClicked(evt -> picker.show());
-        picker.setOnTouchPressed(evt -> picker.show());
+        picker.setOnMouseClicked(evt -> showPicker());
+        picker.setOnTouchPressed(evt -> showPicker());
 
         InvalidationListener updateLabelsListener = it -> updateLabels();
         picker.valueProperty().addListener(updateLabelsListener);
@@ -45,6 +46,11 @@ public class DateRangePickerSkin extends CustomComboBoxSkinBase<DateRangePicker>
 
         updateView();
         updateLabels();
+    }
+
+    private void showPicker() {
+        picker.requestFocus();
+        picker.show();
     }
 
     @Override
