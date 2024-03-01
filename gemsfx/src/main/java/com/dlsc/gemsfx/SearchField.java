@@ -106,6 +106,13 @@ public class SearchField<T> extends Control {
         setPlaceholder(new Label("No items found"));
 
         editor.focusedProperty().addListener(it -> {
+            if (!isAutoSubmitOnBlur()) {
+                if (popup.isShowing()) {
+                    popup.hide();
+                }
+                return;
+            }
+
             if (!editor.isFocused()) {
                 commit();
                 if (getSelectedItem() == null) {
@@ -868,6 +875,39 @@ public class SearchField<T> extends Control {
 
     public final Node getPlaceholder() {
         return placeholder == null ? null : placeholder.get();
+    }
+
+    private BooleanProperty autoSubmitOnBlur;
+
+    /**
+     * Returns the BooleanProperty that indicates if text should auto-submit when the field loses focus.
+     * The property is lazy-initialized and defaults to true, enabling auto-submit by default.
+     *
+     * @return the BooleanProperty for autoSubmitOnBlur.
+     */
+    public final BooleanProperty autoSubmitOnBlurProperty() {
+        if (autoSubmitOnBlur == null) {
+            autoSubmitOnBlur = new SimpleBooleanProperty(this, "autoSubmitOnBlur", true);
+        }
+        return autoSubmitOnBlur;
+    }
+
+    /**
+     * Checks if the auto-submit on blur feature is enabled.
+     *
+     * @return true if auto-submit on blur is enabled, false otherwise.
+     */
+    public final boolean isAutoSubmitOnBlur() {
+        return autoSubmitOnBlur == null || autoSubmitOnBlur.get();
+    }
+
+    /**
+     * Sets the value of the autoSubmitOnBlur property.
+     *
+     * @param value if true, enables auto-submit on blur; if false, disables it.
+     */
+    public final void setAutoSubmitOnBlur(boolean value) {
+        autoSubmitOnBlurProperty().set(value);
     }
 
     /**

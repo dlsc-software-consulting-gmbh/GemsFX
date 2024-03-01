@@ -74,10 +74,13 @@ public class SearchFieldApp extends Application {
         CheckBox showLeftRightNodes = new CheckBox("Show extra left & right nodes");
         showLeftRightNodes.setSelected(false);
 
+        CheckBox autoSubmitOnBlurBox = new CheckBox("Auto submit on field lost focus.");
+        autoSubmitOnBlurBox.selectedProperty().bindBidirectional(field.autoSubmitOnBlurProperty());
+
         field.leftProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionLeft : null, showLeftRightNodes.selectedProperty()));
         field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, hBox, hBox2, field);
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes,autoSubmitOnBlurBox, hBox, hBox2, field);
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);
