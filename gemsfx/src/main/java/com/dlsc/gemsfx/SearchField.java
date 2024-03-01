@@ -106,6 +106,13 @@ public class SearchField<T> extends Control {
         setPlaceholder(new Label("No items found"));
 
         editor.focusedProperty().addListener(it -> {
+            if (!isAutoCommitOnFocusLost()) {
+                if (popup.isShowing()) {
+                    popup.hide();
+                }
+                return;
+            }
+
             if (!editor.isFocused()) {
                 commit();
                 if (getSelectedItem() == null) {
@@ -868,6 +875,39 @@ public class SearchField<T> extends Control {
 
     public final Node getPlaceholder() {
         return placeholder == null ? null : placeholder.get();
+    }
+
+    private BooleanProperty autoCommitOnFocusLost;
+
+    /**
+     * Returns the BooleanProperty that indicates if text should auto-commit when the field loses focus.
+     * The property is lazy-initialized and defaults to true, enabling auto-commit by default.
+     *
+     * @return the BooleanProperty for autoCommitOnFocusLost.
+     */
+    public final BooleanProperty autoCommitOnFocusLostProperty() {
+        if (autoCommitOnFocusLost == null) {
+            autoCommitOnFocusLost = new SimpleBooleanProperty(this, "autoCommitOnFocusLost", true);
+        }
+        return autoCommitOnFocusLost;
+    }
+
+    /**
+     * Checks if the auto-commit on focus lost feature is enabled.
+     *
+     * @return true if auto-commit on focus lost is enabled, false otherwise.
+     */
+    public final boolean isAutoCommitOnFocusLost() {
+        return autoCommitOnFocusLost == null || autoCommitOnFocusLost.get();
+    }
+
+    /**
+     * Sets the value of the autoCommitOnFocusLost property.
+     *
+     * @param value if true, enables auto-commit on focus lost; if false, disables it.
+     */
+    public final void setAutoCommitOnFocusLost(boolean value) {
+        autoCommitOnFocusLostProperty().set(value);
     }
 
     /**
