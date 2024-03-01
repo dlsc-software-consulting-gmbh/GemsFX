@@ -106,7 +106,7 @@ public class SearchField<T> extends Control {
         setPlaceholder(new Label("No items found"));
 
         editor.focusedProperty().addListener(it -> {
-            if (!isAutoSubmitOnBlur()) {
+            if (!isAutoCommitOnFocusLost()) {
                 if (popup.isShowing()) {
                     popup.hide();
                 }
@@ -877,37 +877,37 @@ public class SearchField<T> extends Control {
         return placeholder == null ? null : placeholder.get();
     }
 
-    private BooleanProperty autoSubmitOnBlur;
+    private BooleanProperty autoCommitOnFocusLost;
 
     /**
-     * Returns the BooleanProperty that indicates if text should auto-submit when the field loses focus.
-     * The property is lazy-initialized and defaults to true, enabling auto-submit by default.
+     * Returns the BooleanProperty that indicates if text should auto-commit when the field loses focus.
+     * The property is lazy-initialized and defaults to true, enabling auto-commit by default.
      *
-     * @return the BooleanProperty for autoSubmitOnBlur.
+     * @return the BooleanProperty for autoCommitOnFocusLost.
      */
-    public final BooleanProperty autoSubmitOnBlurProperty() {
-        if (autoSubmitOnBlur == null) {
-            autoSubmitOnBlur = new SimpleBooleanProperty(this, "autoSubmitOnBlur", true);
+    public final BooleanProperty autoCommitOnFocusLostProperty() {
+        if (autoCommitOnFocusLost == null) {
+            autoCommitOnFocusLost = new SimpleBooleanProperty(this, "autoCommitOnFocusLost", true);
         }
-        return autoSubmitOnBlur;
+        return autoCommitOnFocusLost;
     }
 
     /**
-     * Checks if the auto-submit on blur feature is enabled.
+     * Checks if the auto-commit on focus lost feature is enabled.
      *
-     * @return true if auto-submit on blur is enabled, false otherwise.
+     * @return true if auto-commit on focus lost is enabled, false otherwise.
      */
-    public final boolean isAutoSubmitOnBlur() {
-        return autoSubmitOnBlur == null || autoSubmitOnBlur.get();
+    public final boolean isAutoCommitOnFocusLost() {
+        return autoCommitOnFocusLost == null || autoCommitOnFocusLost.get();
     }
 
     /**
-     * Sets the value of the autoSubmitOnBlur property.
+     * Sets the value of the autoCommitOnFocusLost property.
      *
-     * @param value if true, enables auto-submit on blur; if false, disables it.
+     * @param value if true, enables auto-commit on focus lost; if false, disables it.
      */
-    public final void setAutoSubmitOnBlur(boolean value) {
-        autoSubmitOnBlurProperty().set(value);
+    public final void setAutoCommitOnFocusLost(boolean value) {
+        autoCommitOnFocusLostProperty().set(value);
     }
 
     /**
