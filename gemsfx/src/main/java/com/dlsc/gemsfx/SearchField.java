@@ -227,7 +227,7 @@ public class SearchField<T> extends Control {
         rotateTransition.setDuration(Duration.millis(500));
 
         searching.addListener(it -> {
-            if (searching.get()) {
+            if (searching.get() && isShowSearchIcon()) {
                 rotateTransition.play();
             } else {
                 rotateTransition.stop();
