@@ -105,6 +105,12 @@ public class SearchField<T> extends Control {
         setFocusTraversable(false);
         setPlaceholder(new Label("No items found"));
 
+        focusedProperty().addListener(it -> {
+            if (isFocused()) {
+                getEditor().requestFocus();
+            }
+        });
+
         editor.focusedProperty().addListener(it -> {
             if (!isAutoCommitOnFocusLost()) {
                 if (popup.isShowing()) {
