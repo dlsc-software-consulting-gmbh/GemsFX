@@ -178,10 +178,25 @@ public class SearchField<T> extends Control {
             if (selectedItem != null) {
                 String displayName = getConverter().toString(selectedItem);
                 String text = editor.getText();
-                if (StringUtils.startsWithIgnoreCase(displayName, text)) {
-                    autoCompletedText.set(displayName.substring(text.length()));
+
+                if (StringUtils.isBlank(text)) {
+                    /*
+                     * Looks like the "selected item" was set from outside, and not because of a search.
+                     * We are using the "committing" flag so that the listener that responds to editor text
+                     * property changes will not trigger a new search.
+                     */
+                    committing = true;
+                    try {
+                        editor.setText(displayName);
+                    } finally {
+                        committing = false;
+                    }
                 } else {
-                    autoCompletedText.set("");
+                    if (StringUtils.startsWithIgnoreCase(displayName, text)) {
+                        autoCompletedText.set(displayName.substring(text.length()));
+                    } else {
+                        autoCompletedText.set("");
+                    }
                 }
             } else {
                 autoCompletedText.set("");
@@ -547,10 +562,7 @@ public class SearchField<T> extends Control {
 
                 newItem.set(false);
 
-                newSuggestions.stream().filter(item -> matcher.apply(item, searchText)).findFirst().ifPresentOrElse(item -> {
-                    selectedItem.set(null);
-                    selectedItem.set(item);
-                }, () -> {
+                newSuggestions.stream().filter(item -> matcher.apply(item, searchText)).findFirst().ifPresentOrElse(selectedItem::set, () -> {
                     if (StringUtils.isNotBlank(searchText)) {
                         Callback<String, T> itemProducer = getNewItemProducer();
                         if (itemProducer != null) {
