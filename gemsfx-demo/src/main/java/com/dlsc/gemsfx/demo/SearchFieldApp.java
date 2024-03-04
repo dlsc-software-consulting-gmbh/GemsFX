@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class SearchFieldApp extends Application {
 
-    private List<Country> countries = new ArrayList<>();
+    private final List<Country> countries = new ArrayList<>();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
