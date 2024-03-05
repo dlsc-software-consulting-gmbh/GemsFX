@@ -461,6 +461,26 @@ public class SearchField<T> extends Control {
         this.hidePopupWithSingleChoice.set(hidePopupWithSingleChoice);
     }
 
+    private final BooleanProperty hidePopupWithNoChoice = new SimpleBooleanProperty(this, "hidePopupWithNoChoice", false);
+
+    public final boolean isHidePopupWithNoChoice() {
+        return hidePopupWithNoChoice.get();
+    }
+
+    /**
+     * Determines whether to hide the popup window when there are no choices available in the suggestion list.
+     * The default value is "false", indicating that the popup does not hide automatically under this condition.
+     *
+     * @return true if the popup should not be shown when there are no suggestions to display.
+     */
+    public final BooleanProperty hidePopupWithNoChoiceProperty() {
+        return hidePopupWithNoChoice;
+    }
+
+    public final void setHidePopupWithNoChoice(boolean hidePopupWithNoChoice) {
+        this.hidePopupWithNoChoice.set(hidePopupWithNoChoice);
+    }
+
     /**
      * A flag indicating whether the asynchronous search is currently in progress.
      * This flag can be used to animate something that expresses that the search is

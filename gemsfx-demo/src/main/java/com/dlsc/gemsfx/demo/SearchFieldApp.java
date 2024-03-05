@@ -33,7 +33,7 @@ public class SearchFieldApp extends Application {
 
         CountriesSearchField field = new CountriesSearchField();
         field.getEditor().setPrefColumnCount(30);
-        field.setOnCommit(country-> System.out.println("on commit listener in demo was invoked, country = " + country));
+        field.setOnCommit(country -> System.out.println("on commit listener in demo was invoked, country = " + country));
 
         Region regionLeft = new Region();
         regionLeft.setPrefWidth(30);
@@ -68,6 +68,9 @@ public class SearchFieldApp extends Application {
         CheckBox hideWithSingleChoiceBox = new CheckBox("Hide popup if it has only the currently selected item in it");
         hideWithSingleChoiceBox.selectedProperty().bindBidirectional(field.hidePopupWithSingleChoiceProperty());
 
+        CheckBox hideWithNoChoiceBox = new CheckBox("Hide popup if it has no selectable items in it");
+        hideWithNoChoiceBox.selectedProperty().bindBidirectional(field.hidePopupWithNoChoiceProperty());
+
         CheckBox showSearchIconBox = new CheckBox("Show search icon");
         showSearchIconBox.selectedProperty().bindBidirectional(field.showSearchIconProperty());
 
@@ -80,7 +83,7 @@ public class SearchFieldApp extends Application {
         field.leftProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionLeft : null, showLeftRightNodes.selectedProperty()));
         field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes,autoCommitOnFocusLostBox, hBox, hBox2, field);
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, hideWithNoChoiceBox, showSearchIconBox, showLeftRightNodes, autoCommitOnFocusLostBox, hBox, hBox2, field);
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);

@@ -54,7 +54,12 @@ public class SearchFieldPopup<T> extends PopupControl {
 
                 // assuming that we don't have to show it
                 boolean showIt = false;
-                if (searchField.getSuggestions().size() == 1) {
+                int suggestionsItemsSize = searchField.getSuggestions().size();
+                if (suggestionsItemsSize == 0) {
+                    if (!searchField.isHidePopupWithNoChoice()) {
+                        showIt = true;
+                    }
+                } else if (suggestionsItemsSize == 1) {
                     if (!searchField.isHidePopupWithSingleChoice() || !searchField.getMatcher().apply(searchField.getSuggestions().get(0), evt.getText())) {
                         showIt = true;
                     }
