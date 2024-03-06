@@ -28,6 +28,10 @@
     -fx-pref-height: 200px;
 }
 
+.search-field-popup:above .search-field-list-view {
+    -fx-translate-y: -6;
+}
+
 .search-field-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-padding: 4 0 4 5;
     /* No alternate highlighting */
