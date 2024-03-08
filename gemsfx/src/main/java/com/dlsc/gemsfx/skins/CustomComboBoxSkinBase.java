@@ -25,6 +25,21 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
 
     public CustomComboBoxSkinBase(T control) {
         super(control);
+
+        control.showingProperty().addListener(it -> {
+            if (control.isShowing()) {
+                show();
+            } else if (popup != null) {
+                hide();
+            }
+        });
+
+        control.focusedProperty().addListener(it -> {
+            if (!control.isFocused()) {
+                hide();
+            }
+        });
+
     }
 
     private PopupControl popup;

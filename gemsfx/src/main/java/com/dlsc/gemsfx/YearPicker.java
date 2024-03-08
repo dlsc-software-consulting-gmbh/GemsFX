@@ -40,7 +40,6 @@ public class YearPicker extends ComboBoxBase<Year> {
         setFocusTraversable(false);
         setEditable(true);
 
-        setOnMouseClicked(evt -> commitValueAndShow());
         setOnTouchPressed(evt -> commitValueAndShow());
 
         valueProperty().addListener((obs, oldV, newV) -> {

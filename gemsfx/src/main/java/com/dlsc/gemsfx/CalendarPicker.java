@@ -41,7 +41,6 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
         setEditable(true);
 
-        setOnMouseClicked(evt -> commitValueAndShow());
         setOnTouchPressed(evt -> commitValueAndShow());
 
         calendarView.setShowToday(true);

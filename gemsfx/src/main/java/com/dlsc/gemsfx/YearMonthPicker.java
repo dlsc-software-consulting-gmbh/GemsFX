@@ -39,7 +39,6 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
         getStyleClass().setAll("year-month-picker", "text-input");
 
         setFocusTraversable(false);
-        setOnMouseClicked(evt -> commitValueAndShow());
         setOnTouchPressed(evt -> commitValueAndShow());
 
         valueProperty().addListener(it -> updateText());

@@ -4,13 +4,16 @@ import com.dlsc.gemsfx.CalendarPicker;
 import com.dlsc.gemsfx.daterange.DateRange;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.daterange.DateRangePreset;
-import com.dlsc.gemsfx.daterange.DateRangeView;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -19,10 +22,8 @@ import org.scenicview.ScenicView;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
-import java.util.Date;
 import java.util.Locale;
 
 public class DateRangePickerApp extends Application {
@@ -78,7 +79,15 @@ public class DateRangePickerApp extends Application {
         VBox.setMargin(optionsLabel, new Insets(20, 0, 0, 0));
         VBox.setMargin(scenicViewButton, new Insets(20, 0, 0, 0));
 
-        VBox vBox = new VBox(10, picker, comparisonLabel, comboBox, datePicker, choiceBox, calendarPicker, optionsLabel, smallBox, showPresetTitleCheckBox, showIconCheckBox, formattersBox, changePresetsButton, scenicViewButton);
+        Button showPopupButton = new Button("Show Popup");
+        showPopupButton.setOnAction(evt -> picker.show());
+
+        Button hidePopupButton = new Button("Hide Popup");
+        hidePopupButton.setOnAction(evt -> picker.hide());
+
+        HBox popupButtons = new HBox(10, showPopupButton, hidePopupButton);
+
+        VBox vBox = new VBox(10, picker, comparisonLabel, comboBox, datePicker, choiceBox, calendarPicker, optionsLabel, smallBox, showPresetTitleCheckBox, showIconCheckBox, formattersBox, changePresetsButton, popupButtons, scenicViewButton);
 
         vBox.setPadding(new Insets(20));
 
