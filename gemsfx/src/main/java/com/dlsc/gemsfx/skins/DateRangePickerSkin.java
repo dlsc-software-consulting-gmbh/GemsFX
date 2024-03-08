@@ -7,6 +7,7 @@ import javafx.beans.InvalidationListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -17,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.time.format.DateTimeFormatter;
 
-public class DateRangePickerSkin extends CustomComboBoxSkinBase<DateRangePicker> {
+public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangePicker> {
 
     private final DateRangePicker picker;
     private final DateRangeView view;
@@ -36,6 +37,9 @@ public class DateRangePickerSkin extends CustomComboBoxSkinBase<DateRangePicker>
 
         picker.setOnMouseClicked(evt -> showPicker());
         picker.setOnTouchPressed(evt -> showPicker());
+        picker.addEventHandler(MouseEvent.MOUSE_ENTERED, this::mouseEntered);
+        picker.addEventHandler(MouseEvent.MOUSE_EXITED, this::mouseExited);
+        picker.addEventHandler(MouseEvent.MOUSE_RELEASED, this::mouseReleased);
 
         InvalidationListener updateLabelsListener = it -> updateLabels();
         picker.valueProperty().addListener(updateLabelsListener);

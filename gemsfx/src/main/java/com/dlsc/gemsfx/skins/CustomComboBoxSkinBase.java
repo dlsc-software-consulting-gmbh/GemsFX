@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.util.Utils;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ObservableValue;
 import javafx.css.Styleable;
+import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.Point2D;
@@ -24,20 +25,6 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
 
     public CustomComboBoxSkinBase(T control) {
         super(control);
-
-        control.showingProperty().addListener(it -> {
-            if (control.isShowing()) {
-                show();
-            } else if (popup != null) {
-                hide();
-            }
-        });
-
-        control.focusedProperty().addListener(it -> {
-            if (!control.isFocused()) {
-                hide();
-            }
-        });
     }
 
     private PopupControl popup;
@@ -108,7 +95,6 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
         }
     }
 
-
     private void createPopup() {
         popup = new PopupControl() {
             @Override
@@ -145,6 +131,7 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
             getSkinnable().notifyAccessibleAttributeChanged(AccessibleAttribute.FOCUS_NODE);
             getSkinnable().hide();
         });
+        popup.setOnAutoHide(this::popupOnAutoHide);
 
         // Fix for RT-21207
         InvalidationListener layoutPosListener = o -> {
@@ -214,9 +201,16 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
         }
     }
 
+    protected void popupOnAutoHide(Event event) {
+    }
+
     public void show() {
-        if (getSkinnable() == null) {
+        T control = getSkinnable();
+        if (control == null) {
             throw new IllegalStateException("ComboBox is null");
+        }
+        if (control.isFocusTraversable()) {
+            control.requestFocus();
         }
 
         Node content = getPopupContent();
