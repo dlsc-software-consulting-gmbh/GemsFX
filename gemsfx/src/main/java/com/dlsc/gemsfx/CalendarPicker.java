@@ -48,7 +48,7 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
         setFocusTraversable(false);
 
-        valueProperty().addListener(it -> updateText());
+        valueProperty().addListener(it -> updateTextAndHidePopup());
 
         editor.promptTextProperty().bindBidirectional(promptTextProperty());
         editor.editableProperty().bind(editableProperty());
@@ -83,7 +83,7 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
         });
 
         setMaxWidth(Region.USE_PREF_SIZE);
-        updateText();
+        updateTextAndHidePopup();
     }
 
     private void placeCaretAtEnd() {
@@ -134,8 +134,9 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
     /*
      * Updates the text of the text field based on the current value / month.
+     * Hide the popup.
      */
-    private void updateText() {
+    private void updateTextAndHidePopup() {
         LocalDate value = getValue();
         if (value != null && getConverter() != null) {
             editor.setText(getConverter().toString(value));
@@ -143,6 +144,11 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
             editor.setText("");
         }
         editor.positionCaret(editor.getText().length());
+
+        CalendarPickerSkin skin = (CalendarPickerSkin) getSkin();
+        if (skin != null) {
+            skin.hide();
+        }
     }
 
     /**

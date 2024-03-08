@@ -41,7 +41,7 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
         setFocusTraversable(false);
         setOnTouchPressed(evt -> commitValueAndShow());
 
-        valueProperty().addListener(it -> updateText());
+        valueProperty().addListener(it -> updateTextAndHidedPopup());
 
         editor.setPromptText("Example: March 2023");
         editor.editableProperty().bind(editableProperty());
@@ -114,8 +114,9 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
 
     /*
      * Updates the text of the text field based on the current value / month.
+     * Hide the popup.
      */
-    private void updateText() {
+    private void updateTextAndHidedPopup() {
         YearMonth value = getValue();
         if (value != null && getConverter() != null) {
             editor.setText(getConverter().toString(value));
@@ -123,6 +124,11 @@ public class YearMonthPicker extends ComboBoxBase<YearMonth> {
             editor.setText("");
         }
         editor.positionCaret(editor.getText().length());
+
+        YearMonthPickerSkin skin = (YearMonthPickerSkin) getSkin();
+        if (skin != null) {
+            skin.hide();
+        }
     }
 
     /**
