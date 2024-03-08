@@ -66,16 +66,16 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
         editor.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
             if (evt.getCode().equals(KeyCode.UP)) {
-                setValue(getValue().minusDays(1));
+                setValue(getValue() != null ? getValue().minusDays(1) : LocalDate.now());
                 placeCaretAtEnd();
             } else if (evt.getCode().equals(KeyCode.DOWN)) {
-                setValue(getValue().plusDays(1));
+                setValue(getValue() != null ? getValue().plusDays(1) : LocalDate.now());
                 placeCaretAtEnd();
             } else if (evt.getCode().equals(KeyCode.LEFT) && !isEditable()) {
-                setValue(getValue().minusDays(1));
+                setValue(getValue() != null ? getValue().minusDays(1) : LocalDate.now());
                 placeCaretAtEnd();
             } else if (evt.getCode().equals(KeyCode.RIGHT) && !isEditable()) {
-                setValue(getValue().plusDays(1));
+                setValue(getValue() != null ? getValue().plusDays(1) : LocalDate.now());
                 placeCaretAtEnd();
             }
         });
