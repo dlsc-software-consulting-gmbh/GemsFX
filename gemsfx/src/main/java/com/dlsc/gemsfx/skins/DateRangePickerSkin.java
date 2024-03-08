@@ -35,8 +35,10 @@ public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangeP
         view.valueProperty().bindBidirectional(getSkinnable().valueProperty());
         view.setOnClose(this::hide);
 
-        picker.setOnMouseClicked(evt -> showPicker());
-        picker.setOnTouchPressed(evt -> showPicker());
+        picker.setOnTouchPressed(evt -> {
+            picker.requestFocus();
+            picker.show();
+        });
         picker.addEventHandler(MouseEvent.MOUSE_ENTERED, this::mouseEntered);
         picker.addEventHandler(MouseEvent.MOUSE_EXITED, this::mouseExited);
         picker.addEventHandler(MouseEvent.MOUSE_RELEASED, this::mouseReleased);
@@ -50,11 +52,6 @@ public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangeP
 
         updateView();
         updateLabels();
-    }
-
-    private void showPicker() {
-        picker.requestFocus();
-        picker.show();
     }
 
     @Override
