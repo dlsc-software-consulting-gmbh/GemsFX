@@ -6,6 +6,7 @@ import com.dlsc.gemsfx.CalendarView.SelectionModel;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Objects;
 
-public class CalendarPickerSkin extends CustomComboBoxSkinBase<CalendarPicker> {
+public class CalendarPickerSkin extends ToggleVisibilityComboBoxSkin<CalendarPicker> {
 
     private CalendarView view;
 
@@ -34,10 +35,10 @@ public class CalendarPickerSkin extends CustomComboBoxSkinBase<CalendarPicker> {
         StackPane arrowButton = new StackPane(arrow);
         arrowButton.setFocusTraversable(false);
         arrowButton.getStyleClass().add("arrow-button"); // using styles similar to combobox, for consistency
-        arrowButton.setOnMouseClicked(evt -> {
-            picker.requestFocus();
-            picker.show();
-        });
+        arrowButton.addEventHandler(MouseEvent.MOUSE_RELEASED, this::mouseReleased);
+        arrowButton.addEventHandler(MouseEvent.MOUSE_ENTERED, this::mouseEntered);
+        arrowButton.addEventHandler(MouseEvent.MOUSE_EXITED, this::mouseExited);
+
         HBox.setHgrow(picker.getEditor(), Priority.ALWAYS);
 
         HBox box = new HBox(picker.getEditor(), arrowButton);

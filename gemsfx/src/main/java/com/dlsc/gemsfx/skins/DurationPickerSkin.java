@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -18,7 +19,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DurationPickerSkin extends CustomComboBoxSkinBase<DurationPicker> {
+public class DurationPickerSkin extends ToggleVisibilityComboBoxSkin<DurationPicker> {
 
     private final HBox innerBox = new HBox();
     private final List<DurationUnitField> durationUnitFields = new ArrayList<>();
@@ -30,24 +31,15 @@ public class DurationPickerSkin extends CustomComboBoxSkinBase<DurationPicker> {
 
         Button editButton = new Button();
         editButton.getStyleClass().add("edit-button");
-        editButton.setOnAction(evt -> {
-            picker.requestFocus();
-            picker.getOnShowPopup().accept(picker);
-        });
+        editButton.addEventHandler(MouseEvent.MOUSE_ENTERED, this::mouseEntered);
+        editButton.addEventHandler(MouseEvent.MOUSE_EXITED, this::mouseExited);
+        editButton.addEventHandler(MouseEvent.MOUSE_RELEASED, this::mouseReleased);
+
         editButton.setMaxHeight(Double.MAX_VALUE);
         editButton.setGraphic(new FontIcon());
         editButton.setFocusTraversable(false);
         editButton.visibleProperty().bind(picker.showPopupTriggerButtonProperty());
         editButton.managedProperty().bind(picker.showPopupTriggerButtonProperty());
-
-
-        picker.showingProperty().addListener(it -> {
-            if (picker.isShowing()) {
-                show();
-            } else {
-                hide();
-            }
-        });
 
         InvalidationListener updateListener = it -> buildView();
         picker.fieldsProperty().addListener(updateListener);

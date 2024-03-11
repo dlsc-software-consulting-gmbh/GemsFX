@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.YearPicker;
 import com.dlsc.gemsfx.YearView;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -11,7 +12,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Objects;
 
-public class YearPickerSkin extends CustomComboBoxSkinBase<YearPicker> {
+public class YearPickerSkin extends ToggleVisibilityComboBoxSkin<YearPicker> {
 
     private YearView yearView;
 
@@ -25,10 +26,9 @@ public class YearPickerSkin extends CustomComboBoxSkinBase<YearPicker> {
         editButton.setFocusTraversable(false);
         editButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         editButton.getStyleClass().add("edit-button"); // using styles similar to combobox, for consistency
-        editButton.setOnMouseClicked(evt -> {
-            picker.requestFocus();
-            picker.show();
-        });
+        editButton.addEventFilter(MouseEvent.MOUSE_RELEASED, this::mouseReleased);
+        editButton.addEventFilter(MouseEvent.MOUSE_ENTERED, this::mouseEntered);
+        editButton.addEventFilter(MouseEvent.MOUSE_EXITED, this::mouseExited);
 
         HBox.setHgrow(picker.getEditor(), Priority.ALWAYS);
 

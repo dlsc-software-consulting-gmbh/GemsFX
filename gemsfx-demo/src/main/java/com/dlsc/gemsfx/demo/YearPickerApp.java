@@ -7,8 +7,10 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -27,7 +29,15 @@ public class YearPickerApp extends Application {
         CheckBox disable = new CheckBox("Disable");
         disable.selectedProperty().bindBidirectional(yearPicker.disableProperty());
 
-        VBox vBox = new VBox(10, yearPicker, valueLabel, editable, disable);
+        Button showPopupButton = new Button("Show Popup");
+        showPopupButton.setOnAction(evt -> yearPicker.show());
+
+        Button hidePopupButton = new Button("Hide Popup");
+        hidePopupButton.setOnAction(evt -> yearPicker.hide());
+
+        HBox popupButtons = new HBox(10, showPopupButton, hidePopupButton);
+
+        VBox vBox = new VBox(10, popupButtons, yearPicker, valueLabel, editable, disable);
 
         vBox.setPadding(new Insets(20));
         vBox.setAlignment(Pos.TOP_LEFT);

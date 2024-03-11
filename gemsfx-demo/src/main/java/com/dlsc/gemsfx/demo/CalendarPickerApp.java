@@ -7,8 +7,10 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -30,7 +32,15 @@ public class CalendarPickerApp extends Application {
         CheckBox disable = new CheckBox("Disable");
         disable.selectedProperty().bindBidirectional(calendarPicker.disableProperty());
 
-        VBox vBox = new VBox(10, calendarPicker, valueLabel, editable, disable);
+        Button showPopupButton = new Button("Show Popup");
+        showPopupButton.setOnAction(evt -> calendarPicker.show());
+
+        Button hidePopupButton = new Button("Hide Popup");
+        hidePopupButton.setOnAction(evt -> calendarPicker.hide());
+
+        HBox popupButtons = new HBox(10, showPopupButton, hidePopupButton);
+
+        VBox vBox = new VBox(10, popupButtons, calendarPicker, valueLabel, editable, disable);
         vBox.setAlignment(Pos.TOP_LEFT);
         vBox.setPadding(new Insets(20));
 

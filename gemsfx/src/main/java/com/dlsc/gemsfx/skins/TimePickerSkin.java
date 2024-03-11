@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -16,7 +17,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.time.LocalTime;
 
-public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
+public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
 
     private static final PseudoClass EMPTY_PSEUDO_CLASS = PseudoClass.getPseudoClass("empty");
 
@@ -50,10 +51,9 @@ public class TimePickerSkin extends CustomComboBoxSkinBase<TimePicker> {
         millisecondField.setPreviousField(secondField);
 
         editButton.getStyleClass().add("edit-button");
-        editButton.setOnAction(evt -> {
-            picker.requestFocus();
-            picker.getOnShowPopup().accept(picker);
-        });
+        editButton.addEventHandler(MouseEvent.MOUSE_ENTERED, this::mouseEntered);
+        editButton.addEventHandler(MouseEvent.MOUSE_EXITED, this::mouseExited);
+        editButton.addEventHandler(MouseEvent.MOUSE_RELEASED, this::mouseReleased);
         editButton.setMaxHeight(Double.MAX_VALUE);
         editButton.setGraphic(new FontIcon());
         editButton.setFocusTraversable(false);

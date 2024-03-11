@@ -40,11 +40,10 @@ public class YearPicker extends ComboBoxBase<Year> {
         setFocusTraversable(false);
         setEditable(true);
 
-        setOnMouseClicked(evt -> commitValueAndShow());
         setOnTouchPressed(evt -> commitValueAndShow());
 
         valueProperty().addListener((obs, oldV, newV) -> {
-            updateText(newV);
+            updateTextAndHidePopup(newV);
             year.set(newV == null ? null : newV.getValue());
         });
 
@@ -143,13 +142,18 @@ public class YearPicker extends ComboBoxBase<Year> {
         }
     }
 
-    private void updateText(Year value) {
+    private void updateTextAndHidePopup(Year value) {
         if (value != null) {
             editor.setText(String.valueOf(value.getValue()));
         } else {
             editor.setText("");
         }
         editor.positionCaret(editor.getText().length());
+
+        YearPickerSkin skin = (YearPickerSkin) getSkin();
+        if (skin != null) {
+            skin.hide();
+        }
     }
 
     static class NumberStringFilteredConverter extends NumberStringConverter {
