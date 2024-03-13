@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.LocalDateStringConverter;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +46,7 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
         calendarView.setShowToday(true);
         calendarView.setShowTodayButton(true);
+        calendarView.dateFilterProperty().bind(dateFilterProperty());
 
         setFocusTraversable(false);
 
@@ -123,11 +125,7 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
             StringConverter<LocalDate> converter = getConverter();
             if (converter != null) {
                 LocalDate value = converter.fromString(text);
-                if (value != null) {
-                    setValue(value);
-                } else {
-                    setValue(null);
-                }
+                setValue(value);
             }
         }
     }
@@ -178,5 +176,32 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
     public final void setConverter(StringConverter<LocalDate> converter) {
         this.converter.set(converter);
+    }
+
+    private final ObjectProperty<Callback<LocalDate,Boolean>> dateFilter = new SimpleObjectProperty<>(this, "dateFilter");
+
+    public final Callback<LocalDate, Boolean> getDateFilter() {
+        return dateFilter.get();
+    }
+
+    /**
+     * A property to define a filter for determining which dates in the calendar can be selected.
+     * This filter is applied to each date displayed in the calendar. If the filter returns true for
+     * a given date, that date will be selectable (i.e., it passes the filter). If the filter returns
+     * false, the date will be disabled and cannot be selected. This property is particularly useful
+     * for scenarios where only specific dates should be available for selection based on custom
+     * logic, such as business rules, holidays, or availability.
+     * <p>
+     * When SelectionMode is {@link CalendarView.SelectionModel.SelectionMode#DATE_RANGE}, disabled dates can be included within the selected range.
+     * However, disabled dates cannot be used as either the starting or ending point of the range.
+     *
+     * @return a callback that determines the selectability of each date based on custom criteria.
+     */
+    public final ObjectProperty<Callback<LocalDate, Boolean>> dateFilterProperty() {
+        return dateFilter;
+    }
+
+    public final void setDateFilter(Callback<LocalDate, Boolean> dateFilter) {
+        this.dateFilter.set(dateFilter);
     }
 }

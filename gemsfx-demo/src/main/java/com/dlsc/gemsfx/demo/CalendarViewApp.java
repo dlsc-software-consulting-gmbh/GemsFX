@@ -5,6 +5,7 @@ import com.dlsc.gemsfx.CalendarView.HeaderLayout;
 import com.dlsc.gemsfx.CalendarView.SelectionModel.SelectionMode;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
@@ -12,14 +13,16 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.scenicview.ScenicView;
 
 import java.time.LocalDate;
@@ -72,6 +75,15 @@ public class CalendarViewApp extends Application {
         VBox.setMargin(headerLayoutLabel, new Insets(10, 0, 0, 0));
         options1.getChildren().addAll(headerLayoutLabel, headerLayoutComboBox);
 
+        CheckBox disabledWeekendBox = new CheckBox("Filter: Disable Weekend");
+        calendarView.dateFilterProperty().bind(Bindings.createObjectBinding(() -> {
+            if (disabledWeekendBox.isSelected()) {
+                return date -> date.getDayOfWeek().getValue() < 6;
+            } else {
+                return null; // return date -> true;
+            }
+        }, disabledWeekendBox.selectedProperty()));
+
         VBox options2 = new VBox(10);
         options2.getChildren().add(createOption("Disable previous month", calendarView.disablePreviousMonthButtonProperty()));
         options2.getChildren().add(createOption("Disable next month", calendarView.disableNextMonthButtonProperty()));
@@ -82,7 +94,8 @@ public class CalendarViewApp extends Application {
         options2.getChildren().add(new Separator(Orientation.HORIZONTAL));
         options2.getChildren().add(createOption("Enable year selection view", calendarView.yearSelectionViewEnabledProperty()));
         options2.getChildren().add(createOption("Enable month selection view", calendarView.monthSelectionViewEnabledProperty()));
-
+        options2.getChildren().add(new Separator(Orientation.HORIZONTAL));
+        options2.getChildren().add(disabledWeekendBox);
         Button scenicViewButton = new Button("Scenic View");
 
         VBox calendarWrapper = new VBox(50, calendarView, scenicViewButton);
