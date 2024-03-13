@@ -418,6 +418,8 @@ public class CalendarView extends Control {
      * false, the date will be disabled and cannot be selected. This property is particularly useful
      * for scenarios where only specific dates should be available for selection based on custom
      * logic, such as business rules, holidays, or availability.
+     * When SelectionMode is DATE_RANGE, disabled dates can be included within the selected range.
+     * However, disabled dates cannot be used as either the starting or ending point of the range.
      *
      * @return A callback that determines the selectability of each date based on custom criteria.
      */
