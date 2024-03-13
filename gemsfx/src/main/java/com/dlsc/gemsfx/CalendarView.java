@@ -412,6 +412,30 @@ public class CalendarView extends Control {
     }
 
     /**
+     * A property to define a filter for determining which dates in the calendar can be selected.
+     * This filter is applied to each date displayed in the calendar. If the filter returns true for
+     * a given date, that date will be selectable (i.e., it passes the filter). If the filter returns
+     * false, the date will be disabled and cannot be selected. This property is particularly useful
+     * for scenarios where only specific dates should be available for selection based on custom
+     * logic, such as business rules, holidays, or availability.
+     *
+     * @return A callback that determines the selectability of each date based on custom criteria.
+     */
+    private final ObjectProperty<Callback<LocalDate,Boolean>> dateFilter = new SimpleObjectProperty<>(this, "dateFilter");
+
+    public Callback<LocalDate, Boolean> getDateFilter() {
+        return dateFilter.get();
+    }
+
+    public ObjectProperty<Callback<LocalDate, Boolean>> dateFilterProperty() {
+        return dateFilter;
+    }
+
+    public void setDateFilter(Callback<LocalDate, Boolean> dateFilter) {
+        this.dateFilter.set(dateFilter);
+    }
+
+    /**
      * The base date cell implementation for month views.
      *
      * @see #setCellFactory(Callback)

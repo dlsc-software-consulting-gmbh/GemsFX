@@ -504,9 +504,11 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
                         if (latestDate != null && cellDate.isAfter(latestDate)) {
                             return true;
                         }
+                        Callback<LocalDate, Boolean> dateFilter = view.getDateFilter();
+                        return dateFilter != null && !dateFilter.call(cellDate);
                     }
                     return false;
-                }, view.earliestDateProperty(), view.latestDateProperty(), cell.itemProperty()));
+                }, view.earliestDateProperty(), view.latestDateProperty(), view.dateFilterProperty() , cell.itemProperty()));
 
                 bodyGridPane.add(cell, showWeekNumbers ? col + 1 : col, row);
 
