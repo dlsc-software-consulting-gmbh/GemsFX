@@ -75,7 +75,7 @@ public class CalendarViewApp extends Application {
         VBox.setMargin(headerLayoutLabel, new Insets(10, 0, 0, 0));
         options1.getChildren().addAll(headerLayoutLabel, headerLayoutComboBox);
 
-        CheckBox disabledWeekendBox = new CheckBox("Disable Weekend");
+        CheckBox disabledWeekendBox = new CheckBox("Filter: Disable Weekend");
         calendarView.dateFilterProperty().bind(Bindings.createObjectBinding(() -> {
             if (disabledWeekendBox.isSelected()) {
                 return date -> date.getDayOfWeek().getValue() < 6;

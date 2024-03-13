@@ -32,6 +32,15 @@ public class CalendarPickerApp extends Application {
         CheckBox disable = new CheckBox("Disable");
         disable.selectedProperty().bindBidirectional(calendarPicker.disableProperty());
 
+        CheckBox disabledWeekendBox = new CheckBox("Filter: Disable Weekend");
+        calendarPicker.dateFilterProperty().bind(Bindings.createObjectBinding(() -> {
+            if (disabledWeekendBox.isSelected()) {
+                return date -> date.getDayOfWeek().getValue() < 6;
+            } else {
+                return null; // return date -> true;
+            }
+        }, disabledWeekendBox.selectedProperty()));
+
         Button showPopupButton = new Button("Show Popup");
         showPopupButton.setOnAction(evt -> calendarPicker.show());
 
@@ -40,7 +49,7 @@ public class CalendarPickerApp extends Application {
 
         HBox popupButtons = new HBox(10, showPopupButton, hidePopupButton);
 
-        VBox vBox = new VBox(10, popupButtons, calendarPicker, valueLabel, editable, disable);
+        VBox vBox = new VBox(10, popupButtons, calendarPicker, valueLabel, editable, disable, disabledWeekendBox);
         vBox.setAlignment(Pos.TOP_LEFT);
         vBox.setPadding(new Insets(20));
 
