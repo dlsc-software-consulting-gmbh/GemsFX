@@ -309,7 +309,7 @@ public class CalendarView extends Control {
 
     private final BooleanProperty disableNextMonthButton = new SimpleBooleanProperty(this, "disablePreviousMonth");
 
-    public final  boolean isDisableNextMonthButton() {
+    public final boolean isDisableNextMonthButton() {
         return disableNextMonthButton.get();
     }
 
@@ -411,9 +411,9 @@ public class CalendarView extends Control {
         this.disableYearDropdownButton.set(disableYearDropdownButton);
     }
 
-    private final ObjectProperty<Callback<LocalDate,Boolean>> dateFilter = new SimpleObjectProperty<>(this, "dateFilter");
+    private final ObjectProperty<Callback<LocalDate, Boolean>> dateFilter = new SimpleObjectProperty<>(this, "dateFilter");
 
-    public Callback<LocalDate, Boolean> getDateFilter() {
+    public final Callback<LocalDate, Boolean> getDateFilter() {
         return dateFilter.get();
     }
 
@@ -425,16 +425,16 @@ public class CalendarView extends Control {
      * for scenarios where only specific dates should be available for selection based on custom
      * logic, such as business rules, holidays, or availability.
      * <p>
-     * When SelectionMode is DATE_RANGE, disabled dates can be included within the selected range.
+     * When SelectionMode is {@link CalendarView.SelectionModel.SelectionMode#DATE_RANGE}, disabled dates can be included within the selected range.
      * However, disabled dates cannot be used as either the starting or ending point of the range.
      *
-     * @return A callback that determines the selectability of each date based on custom criteria.
+     * @return a callback that determines the selectability of each date based on custom criteria.
      */
-    public ObjectProperty<Callback<LocalDate, Boolean>> dateFilterProperty() {
+    public final ObjectProperty<Callback<LocalDate, Boolean>> dateFilterProperty() {
         return dateFilter;
     }
 
-    public void setDateFilter(Callback<LocalDate, Boolean> dateFilter) {
+    public final void setDateFilter(Callback<LocalDate, Boolean> dateFilter) {
         this.dateFilter.set(dateFilter);
     }
 
@@ -514,8 +514,8 @@ public class CalendarView extends Control {
      * Determines whether the control offers the option to the user to pick a different
      * month directly via a designated month selection view.
      *
-     * @see YearMonthView
      * @return true if the user can pick a month directly
+     * @see YearMonthView
      */
     public final BooleanProperty monthSelectionViewEnabledProperty() {
         return monthSelectionViewEnabled;
@@ -531,8 +531,8 @@ public class CalendarView extends Control {
      * Determines whether the control offers the option to the user to pick a different
      * year directly via a designated year selection view.
      *
-     * @see YearView
      * @return true if the user can pick a month directly
+     * @see YearView
      */
     public final BooleanProperty yearSelectionViewEnabledProperty() {
         return yearSelectionViewEnabled;

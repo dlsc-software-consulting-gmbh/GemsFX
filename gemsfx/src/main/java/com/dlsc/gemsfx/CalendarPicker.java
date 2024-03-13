@@ -180,7 +180,7 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
     private final ObjectProperty<Callback<LocalDate,Boolean>> dateFilter = new SimpleObjectProperty<>(this, "dateFilter");
 
-    public Callback<LocalDate, Boolean> getDateFilter() {
+    public final Callback<LocalDate, Boolean> getDateFilter() {
         return dateFilter.get();
     }
 
@@ -192,16 +192,16 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
      * for scenarios where only specific dates should be available for selection based on custom
      * logic, such as business rules, holidays, or availability.
      * <p>
-     * When SelectionMode is DATE_RANGE, disabled dates can be included within the selected range.
+     * When SelectionMode is {@link CalendarView.SelectionModel.SelectionMode#DATE_RANGE}, disabled dates can be included within the selected range.
      * However, disabled dates cannot be used as either the starting or ending point of the range.
      *
-     * @return A callback that determines the selectability of each date based on custom criteria.
+     * @return a callback that determines the selectability of each date based on custom criteria.
      */
-    public ObjectProperty<Callback<LocalDate, Boolean>> dateFilterProperty() {
+    public final ObjectProperty<Callback<LocalDate, Boolean>> dateFilterProperty() {
         return dateFilter;
     }
 
-    public void setDateFilter(Callback<LocalDate, Boolean> dateFilter) {
+    public final void setDateFilter(Callback<LocalDate, Boolean> dateFilter) {
         this.dateFilter.set(dateFilter);
     }
 }
