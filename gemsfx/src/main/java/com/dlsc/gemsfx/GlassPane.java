@@ -52,7 +52,7 @@ public class GlassPane extends StackPane {
                 });
                 fadeTransition.play();
             } else {
-                setOpacity(newHide ? 0 : .5);
+                setOpacity(newHide ? 0 : getBlockingOpacity());
                 setVisible(!newHide);
             }
         });
