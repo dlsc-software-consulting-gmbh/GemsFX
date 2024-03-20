@@ -60,7 +60,8 @@
                         <id>debug</id>
                         <configuration>
                             <options>
-                                <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:8000</option>
+                                <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:8000
+                                </option>
                                 <option>--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
                             </options>
                         </configuration>
@@ -87,7 +88,7 @@
                                 <option>${profiler.jvmargs.arg5}</option>
                             </options>
                         </configuration>
-                    </execution>                           
+                    </execution>
                 </executions>
             </plugin>
 
@@ -137,6 +138,12 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dlsc.pdfviewfx</groupId>
+            <artifactId>pdfviewfx</artifactId>
+            <version>3.0.0</version>
         </dependency>
 
         <!-- required if any dependency intends to log -->
