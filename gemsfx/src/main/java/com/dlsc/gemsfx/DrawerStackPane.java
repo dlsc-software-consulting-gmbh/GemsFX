@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import javafx.animation.*;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -53,7 +54,7 @@ public class DrawerStackPane extends StackPane {
 
     private String preferenceKey = "drawer.stackpane";
 
-    private StackPane glassPane;
+    private GlassPane glassPane;
 
     private VBox drawer;
 
@@ -92,6 +93,15 @@ public class DrawerStackPane extends StackPane {
         drawer.setManaged(false);
 
         glassPane = new GlassPane();
+        glassPane.fadeInOutDurationProperty().bind(animationDurationProperty());
+        glassPane.fadeInOutProperty().bind(animateDrawerProperty());
+        glassPane.setOnMouseClicked(evt -> {
+            if (isAutoHide() && evt.getButton().equals(MouseButton.PRIMARY) && !evt.isConsumed()) {
+                setShowDrawer(false);
+            }
+        });
+
+        glassPane.hideProperty().bind(showDrawer.not());
 
         getChildren().addAll(glassPane, drawer);
 
@@ -153,7 +163,9 @@ public class DrawerStackPane extends StackPane {
             }
         });
 
-        drawerHeightProperty().addListener(it -> requestLayout());
+        InvalidationListener layoutListener = it -> requestLayout();
+        drawerHeightProperty().addListener(layoutListener);
+        preferredDrawerWidthProperty().addListener(layoutListener);
 
         minDrawerHeight.addListener(it -> {
             if (getMinDrawerHeight() < 0) {
@@ -221,51 +233,6 @@ public class DrawerStackPane extends StackPane {
 
     public void setAutoHide(boolean autoHide) {
         this.autoHide.set(autoHide);
-    }
-
-    class GlassPane extends StackPane {
-
-        public GlassPane() {
-            getStyleClass().add("glass-pane");
-
-            setVisible(false);
-            setMouseTransparent(false);
-            setOnMouseClicked(evt -> {
-                if (isAutoHide() && evt.getButton().equals(MouseButton.PRIMARY) && !evt.isConsumed()) {
-                    setShowDrawer(false);
-                }
-            });
-
-            hide.bind(showDrawer.not());
-
-            hide.addListener(it -> {
-
-                if (isFadeInOut()) {
-                    setVisible(true);
-
-                    FadeTransition fadeTransition = new FadeTransition();
-                    fadeTransition.setDuration(Duration.millis(200));
-                    fadeTransition.setNode(this);
-                    fadeTransition.setFromValue(isHide() ? .5 : 0);
-                    fadeTransition.setToValue(isHide() ? 0 : .5);
-                    fadeTransition.setOnFinished(evt -> {
-                        if (isHide()) {
-                            setVisible(false);
-                        }
-                    });
-                    fadeTransition.play();
-                } else {
-                    setOpacity(isHide() ? 0 : .5);
-                    setVisible(!isHide());
-                }
-            });
-        }
-
-        private final BooleanProperty hide = new SimpleBooleanProperty(this, "hide");
-
-        public final boolean isHide() {
-            return hide.get();
-        }
     }
 
     /**
@@ -612,6 +579,25 @@ public class DrawerStackPane extends StackPane {
         this.drawerHeight.set(drawerHeight);
     }
 
+    private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(this, "animationDuration", Duration.millis(100));
+
+    public final Duration getAnimationDuration() {
+        return animationDuration.get();
+    }
+
+    /**
+     * The duration it takes to show / hide the drawer.
+     *
+     * @return the animation duration
+     */
+    public final ObjectProperty<Duration> animationDurationProperty() {
+        return animationDuration;
+    }
+
+    public final void setAnimationDuration(Duration animationDuration) {
+        this.animationDuration.set(animationDuration);
+    }
+
     private void showDrawer() {
         glassPane.toFront();
 
@@ -620,10 +606,10 @@ public class DrawerStackPane extends StackPane {
         drawer.toFront();
         drawer.setVisible(true);
 
-        if (isAnimateDrawer()) {
+        if (isAnimateDrawer() && getAnimationDuration() != null && getAnimationDuration().greaterThan(Duration.ZERO)) {
             setDrawerHeight(0);
             KeyValue keyValue = new KeyValue(drawerHeightProperty(), loadDrawerHeightFromUserPreferences());
-            KeyFrame keyFrame = new KeyFrame(Duration.millis(100), keyValue);
+            KeyFrame keyFrame = new KeyFrame(getAnimationDuration(), keyValue);
             timeline = new Timeline(keyFrame);
             timeline.setOnFinished(evt -> drawer.setCache(false));
             timeline.play();
@@ -663,7 +649,7 @@ public class DrawerStackPane extends StackPane {
     private void hideDrawer() {
         if (isAnimateDrawer()) {
             KeyValue keyValue = new KeyValue(drawerHeightProperty(), 0);
-            KeyFrame keyFrame = new KeyFrame(Duration.millis(100), keyValue);
+            KeyFrame keyFrame = new KeyFrame(getAnimationDuration(), keyValue);
             timeline = new Timeline(keyFrame);
             timeline.setOnFinished(evt -> postHiding());
             timeline.play();
