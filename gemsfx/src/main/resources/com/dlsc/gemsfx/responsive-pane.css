@@ -1,0 +1,32 @@
+.responsive-pane:forced .overview {
+    -fx-border-width: 1px 0px 0px 0px;
+    -fx-border-color: -grey-30;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 10, 0, 5, 0);
+}
+
+.responsive-pane:top {
+}
+
+.responsive-pane:right {
+}
+
+.responsive-pane:bottom {
+}
+
+.responsive-pane:left {
+}
+
+.responsive-pane:forced {
+}
+
+.responsive-pane:covering {
+}
+
+.responsive-pane:showing-small {
+}
+
+.responsive-pane:showing-large {
+}
+
+.responsive-pane:showing-none {
+}
