@@ -1055,6 +1055,8 @@ public class DialogPane extends Pane {
 
             ImageView dialogIcon = new ImageView();
             dialogIcon.getStyleClass().addAll("icon");
+            dialogIcon.visibleProperty().bind(showIconProperty());
+            dialogIcon.managedProperty().bind(showIconProperty());
 
             VBox dialogHeader = new VBox();
             dialogHeader.setAlignment(Pos.CENTER);
@@ -1262,6 +1264,20 @@ public class DialogPane extends Pane {
 
             return button;
         }
+    }
+
+    private final BooleanProperty showIcon = new SimpleBooleanProperty(this, "showIcon", true);
+
+    public final boolean isShowIcon() {
+        return showIcon.get();
+    }
+
+    public final BooleanProperty showIconProperty() {
+        return showIcon;
+    }
+
+    public final void setShowIcon(boolean showIcon) {
+        this.showIcon.set(showIcon);
     }
 
     private class BusyIndicator extends CircularProgressIndicator {
