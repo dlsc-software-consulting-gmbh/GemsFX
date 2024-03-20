@@ -112,10 +112,9 @@ public class DialogPane extends Pane {
 
     private final Map<ContentPane, DoubleProperty> dialogVisibilityMap = new HashMap<>();
 
-    private final ListProperty<Dialog> dialogs = new SimpleListProperty<>(this, "dialogs", FXCollections.observableArrayList());
-
     private final EventHandler<KeyEvent> escapeHandler = evt -> {
         if (evt.getCode() == KeyCode.ESCAPE) { // hide the last dialog that was opened
+            ObservableList<Dialog<?>> dialogs = getDialogs();
             if (!dialogs.isEmpty()) {
                 Dialog<?> dialog = dialogs.get(dialogs.size() - 1);
                 if (!dialog.isCancelled()) {
@@ -192,34 +191,53 @@ public class DialogPane extends Pane {
 
     @Override
     public String getUserAgentStylesheet() {
-        return DialogPane.class.getResource("dialog.css").toExternalForm();
+        return Objects.requireNonNull(DialogPane.class.getResource("dialog.css")).toExternalForm();
+    }
+
+    private final ListProperty<Dialog<?>> dialogs = new SimpleListProperty<>(this, "dialogs", FXCollections.observableArrayList());
+
+    public final ObservableList<Dialog<?>> getDialogs() {
+        return dialogs.get();
+    }
+
+    /**
+     * Stores the list of currently active dialogs.
+     *
+     * @return the list of dialogs
+     */
+    public final ListProperty<Dialog<?>> dialogsProperty() {
+        return dialogs;
+    }
+
+    public final void setDialogs(ObservableList<Dialog<?>> dialogs) {
+        this.dialogs.set(dialogs);
     }
 
     private final BooleanProperty showCloseButton = new SimpleBooleanProperty(this, "showCloseButton", true);
 
-    public boolean isShowCloseButton() {
+    public final boolean isShowCloseButton() {
         return showCloseButton.get();
     }
 
-    public BooleanProperty showCloseButtonProperty() {
+    public final BooleanProperty showCloseButtonProperty() {
         return showCloseButton;
     }
 
-    public void setShowCloseButton(boolean showCloseButton) {
+    public final void setShowCloseButton(boolean showCloseButton) {
         this.showCloseButton.set(showCloseButton);
     }
 
     private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(this, "animationDuration", Duration.millis(100));
 
-    public Duration getAnimationDuration() {
+    public final Duration getAnimationDuration() {
         return animationDuration.get();
     }
 
-    public ObjectProperty<Duration> animationDurationProperty() {
+    public final ObjectProperty<Duration> animationDurationProperty() {
         return animationDuration;
     }
 
-    public void setAnimationDuration(Duration animationDuration) {
+    public final void setAnimationDuration(Duration animationDuration) {
         this.animationDuration.set(animationDuration);
     }
 
@@ -454,11 +472,11 @@ public class DialogPane extends Pane {
 
     private final ReadOnlyBooleanWrapper showingDialog = new ReadOnlyBooleanWrapper(this, "showDialog", false);
 
-    public ReadOnlyBooleanProperty showingDialogProperty() {
+    public final ReadOnlyBooleanProperty showingDialogProperty() {
         return showingDialog.getReadOnlyProperty();
     }
 
-    public boolean isShowingDialog() {
+    public final boolean isShowingDialog() {
         return showingDialog.get();
     }
 
