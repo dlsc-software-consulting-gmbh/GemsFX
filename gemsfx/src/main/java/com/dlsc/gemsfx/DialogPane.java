@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.util.FocusUtil;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -75,6 +76,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -249,6 +251,12 @@ public class DialogPane extends Pane {
         dialogs.remove(dialog);
     }
 
+    public final void hideAllDialogs() {
+        for (int i = dialogs.size() - 1; i >= 0; i--) {
+            hideDialog(dialogs.get(i));
+        }
+    }
+
     private Dialog<ButtonType> doShowDialog(Type type, String title, String message) {
         return doShowDialog(type, title, message, Collections.emptyList());
     }
@@ -309,11 +317,13 @@ public class DialogPane extends Pane {
             VBox content = new VBox(messageLabel, titledPane);
             content.getStyleClass().add("container");
             dialog.setContent(content);
+
+            FocusUtil.requestFocus(textArea);
         }
 
         dialog.setException(exception);
 
-        dialogs.add(dialog);
+        dialog.show();
 
         return dialog;
     }
@@ -357,17 +367,17 @@ public class DialogPane extends Pane {
             textArea.getEditor().setPrefRowCount(6);
             textArea.setResizeVertical(true);
             textArea.setResizeHorizontal(true);
-            textArea.getEditor().skinProperty().addListener(it -> Platform.runLater(() -> textArea.getEditor().requestFocus()));
             textInputControl = textArea.getEditor();
             node = textArea;
         } else {
             TextField textField = new TextField(text);
             textField.setPromptText(prompt);
             textField.setPrefColumnCount(20);
-            textField.skinProperty().addListener(it -> Platform.runLater(() -> textField.requestFocus()));
             textInputControl = textField;
             node = textField;
         }
+
+        FocusUtil.requestFocus(textInputControl);
 
         VBox box = new VBox();
         box.getStyleClass().add("prompt-node-wrapper");
@@ -378,8 +388,10 @@ public class DialogPane extends Pane {
         }
 
         box.getChildren().add(node);
+
         Dialog<String> dialog = showNode(Type.INPUT, title, box);
-        textInputControl.textProperty().addListener(it -> dialog.setValue(textInputControl.getText()));
+        dialog.valueProperty().bindBidirectional(textInputControl.textProperty());
+
         return dialog;
     }
 
@@ -418,7 +430,7 @@ public class DialogPane extends Pane {
             dialog.validProperty().bind(validProperty);
         }
 
-        dialogs.add(dialog);
+        dialog.show();
 
         return dialog;
     }
@@ -436,8 +448,8 @@ public class DialogPane extends Pane {
         Dialog<Void> dialog = new Dialog<>(this, Type.BLANK);
         dialog.setContent(busyIndicator);
         dialog.getButtonTypes().clear();
-
-        dialogs.add(dialog);
+        dialog.setDelay(Duration.millis(1000));
+        dialog.show();
 
         return dialog;
     }
@@ -736,6 +748,10 @@ public class DialogPane extends Pane {
             return pane;
         }
 
+        public void show() {
+            pane.showDialog(this);
+        }
+
         /**
          * Hides the dialog by cancelling it.
          */
@@ -743,6 +759,40 @@ public class DialogPane extends Pane {
             pane.hideDialog(this);
             setValue(null);
             complete(ButtonType.CANCEL);
+        }
+
+        private Consumer<ButtonType> onButtonPressed;
+
+        public Consumer<ButtonType> getOnButtonPressed() {
+            return onButtonPressed;
+        }
+
+        /**
+         * Specifies a consumer that gets invoked when the user presses on of the standard
+         * dialog buttons. The invocation happens as part of the complete() method.
+         *
+         * @param onButtonPressed an optional consumer that gets invoked when the user finishes the dialog
+         */
+        public void setOnButtonPressed(Consumer<ButtonType> onButtonPressed) {
+            this.onButtonPressed = onButtonPressed;
+        }
+
+        /**
+         * Overrides the complete() method of CompletableFuture to check whether there is a
+         * "on button pressed" handler registered. If so the method will first invoke the
+         * handler before continuing normally.
+         *
+         * @see #setOnButtonPressed(Consumer)
+         * @param value the result value
+         * @return true on normal completion
+         */
+        @Override
+        public boolean complete(ButtonType value) {
+            if (onButtonPressed != null) {
+                onButtonPressed.accept(value);
+            }
+
+            return super.complete(value);
         }
 
         // valid property (important to have default set to true)
