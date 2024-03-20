@@ -12,6 +12,7 @@ module com.dlsc.gemsfx.demo {
     requires org.kordamp.ikonli.materialdesign;
 
     requires fr.brouillard.oss.cssfx;
+    requires net.synedra.validatorfx;
 
     exports com.dlsc.gemsfx.demo;
 }

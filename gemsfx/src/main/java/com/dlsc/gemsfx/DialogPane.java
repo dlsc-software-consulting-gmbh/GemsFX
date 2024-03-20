@@ -1,10 +1,28 @@
 package com.dlsc.gemsfx;
 
-import javafx.animation.*;
+import javafx.animation.Animation;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.RotateTransition;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.BooleanPropertyBase;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.DoublePropertyBase;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
@@ -17,12 +35,24 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
+import javafx.scene.control.TitledPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -30,13 +60,19 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import net.synedra.validatorfx.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -611,8 +647,10 @@ public class DialogPane extends Pane {
                     getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
                     break;
                 case INFORMATION:
-                case ERROR:
                     getButtonTypes().setAll(ButtonType.OK);
+                    break;
+                case ERROR:
+                    getButtonTypes().setAll(ButtonType.CLOSE);
                     break;
                 case CONFIRMATION:
                     getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
@@ -764,6 +802,22 @@ public class DialogPane extends Pane {
             return content.get();
         }
 
+        // title extras
+
+        private final ObjectProperty<Node> titleExtras = new SimpleObjectProperty<>(this, "titleExtras");
+
+        public Node getTitleExtras() {
+            return titleExtras.get();
+        }
+
+        public ObjectProperty<Node> titleExtrasProperty() {
+            return titleExtras;
+        }
+
+        public void setTitleExtras(Node titleExtras) {
+            this.titleExtras.set(titleExtras);
+        }
+
         // title
 
         private final StringProperty title = new SimpleStringProperty(this, "title", "Dialog");
@@ -824,6 +878,82 @@ public class DialogPane extends Pane {
 
         public final Button getButton(ButtonType type) {
             return buttonMap.get(type);
+        }
+
+        // validator
+
+        private final ObjectProperty<Validator> validator = new SimpleObjectProperty<>(this, "validator", new Validator());
+
+        public final Validator getValidator() {
+            return validator.get();
+        }
+
+        public final ObjectProperty<Validator> validatorProperty() {
+            return validator;
+        }
+
+        public final void setValidator(Validator validator) {
+            this.validator.set(validator);
+        }
+
+        // scrollable
+
+        private final BooleanProperty scrollable = new SimpleBooleanProperty(this, "scrollable");
+
+        public final boolean isScrollable() {
+            return scrollable.get();
+        }
+
+        public final BooleanProperty scrollableProperty() {
+            return scrollable;
+        }
+
+        public final void setScrollable(boolean scrollable) {
+            this.scrollable.set(scrollable);
+        }
+
+        // resizable
+
+        private final BooleanProperty resizable = new SimpleBooleanProperty(this, "resizable");
+
+        public final boolean isResizable() {
+            return resizable.get();
+        }
+
+        public final BooleanProperty resizableProperty() {
+            return resizable;
+        }
+
+        public final void setResizable(boolean resizable) {
+            this.resizable.set(resizable);
+        }
+
+        private final DoubleProperty prefWidth = new SimpleDoubleProperty(this, "prefWidth", Region.USE_COMPUTED_SIZE);
+
+        public final double getPrefWidth() {
+            return prefWidth.get();
+        }
+
+        public final DoubleProperty prefWidthProperty() {
+            return prefWidth;
+        }
+
+        public final void setPrefWidth(double prefWidth) {
+            this.prefWidth.set(prefWidth);
+        }
+
+        private final DoubleProperty prefHeight = new SimpleDoubleProperty(this, "prefHeight", Region.USE_COMPUTED_SIZE);
+
+        public final double getPrefHeight() {
+            return prefHeight.get();
+        }
+
+        public final DoubleProperty prefHeightProperty() {
+            return prefHeight;
+        }
+
+        public final void setPrefHeight(double prefHeight) {
+            this.prefHeight.set(prefHeight);
         }
     }
 
@@ -1006,6 +1136,18 @@ public class DialogPane extends Pane {
                         if (buttonType.equals(ButtonType.CANCEL)) {
                             dialog.cancel();
                         } else {
+
+                            // some buttons will trigger dialog validation should a validator exist
+                            if (buttonType.equals(ButtonType.YES) || buttonType.equals(ButtonType.OK) || buttonType.equals(ButtonType.APPLY)) {
+                                Validator validator = dialog.getValidator();
+                                if (validator != null) {
+                                    if (!validator.validate()) {
+                                        // the dialog is not valid, yet, so do not close / finish it
+                                        return;
+                                    }
+                                }
+                            }
+
                             dialog.getDialogPane().hideDialog(dialog);
                             dialog.complete(buttonType);
                         }

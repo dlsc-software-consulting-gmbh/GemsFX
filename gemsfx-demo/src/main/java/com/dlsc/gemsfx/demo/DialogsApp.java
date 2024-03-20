@@ -2,9 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.DialogPane.Dialog;
-
-import java.util.List;
-
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -20,6 +17,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
@@ -32,6 +30,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+
+import java.util.List;
 
 import static com.dlsc.gemsfx.DialogPane.Type.INFORMATION;
 
@@ -52,6 +52,22 @@ public class DialogsApp extends Application {
 
         Button confirmButton = new Button("Confirmation");
         confirmButton.setOnAction(evt -> dialogPane.showConfirmation("Confirmation Title", "A confirmation requires the user to decide."));
+
+        Button validationButton = new Button("Validate");
+        validationButton.setOnAction(evt -> {
+            TextField textField = new TextField();
+            Dialog<Object> dialog = dialogPane.showNode(DialogPane.Type.INPUT, "Validation", textField);
+            dialog.getValidator().createCheck()
+                    .dependsOn("text", textField.textProperty())
+                    .decorates(textField)
+                    .immediateClear()
+                    .withMethod(ctx -> {
+                        String text = ctx.get("text");
+                        if (text == null || text.isBlank()) {
+                            ctx.error("text can not be empty");
+                        }
+                    });
+        });
 
         Button inputSingleLineButton = new Button("Input");
         inputSingleLineButton.setOnAction(evt -> dialogPane.showTextInput("Text Input", "Please enter something, anything really.", "Text already there ...", false));
@@ -89,15 +105,14 @@ public class DialogsApp extends Application {
             later(() -> dialogPane.showError("Error", "An error was encountered while running this application."), 3);
         });
 
-        FlowPane flowPane = new FlowPane(10, 10, infoButton, warnButton, errorButton, confirmButton,
-                inputSingleLineButton, inputMultiLineButton, node1Button, node2Button, busyButton,
-                overlappingButton, maxButton);
+        FlowPane flowPane = new FlowPane(10, 10, infoButton, warnButton, errorButton, confirmButton, validationButton,
+                inputSingleLineButton, inputMultiLineButton, node1Button, node2Button, busyButton, overlappingButton, maxButton);
 
         flowPane.setAlignment(Pos.CENTER);
 
         Duration duration0 = Duration.ZERO;
         Duration duration1 = Duration.millis(100);
-        Duration duration2= Duration.millis(200);
+        Duration duration2 = Duration.millis(200);
         Duration duration3 = Duration.millis(500);
         Duration duration4 = Duration.seconds(1);
         Duration duration5 = Duration.seconds(5);

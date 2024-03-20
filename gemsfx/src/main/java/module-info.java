@@ -16,6 +16,7 @@ module com.dlsc.gemsfx {
     requires java.prefs;
 
     requires commons.validator;
+    requires net.synedra.validatorfx;
     requires org.apache.commons.lang3;
     requires org.controlsfx.controls;
 

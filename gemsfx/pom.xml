@@ -47,6 +47,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>net.synedra</groupId>
+            <artifactId>validatorfx</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.dlsc.unitfx</groupId>
             <artifactId>unitfx</artifactId>
             <version>1.0.10</version>
