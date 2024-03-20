@@ -470,7 +470,7 @@ public class DialogPane extends Pane {
         fadeInOut.set(animate);
     }
 
-    private final ReadOnlyBooleanWrapper showingDialog = new ReadOnlyBooleanWrapper(this, "showDialog", false);
+    private final ReadOnlyBooleanWrapper showingDialog = new ReadOnlyBooleanWrapper(this, "showingDialog", false);
 
     public final ReadOnlyBooleanProperty showingDialogProperty() {
         return showingDialog.getReadOnlyProperty();
