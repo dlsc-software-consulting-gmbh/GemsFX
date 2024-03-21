@@ -209,10 +209,6 @@ public class PowerPaneApp extends Application {
 
         vBox.getChildren().add(hBox);
 
-        CheckBox closeButtonBox = new CheckBox("Show close button:");
-        closeButtonBox.selectedProperty().bindBidirectional(dialogPane.showCloseButtonProperty());
-        vBox.getChildren().add(closeButtonBox);
-
         vBox.getChildren().forEach(node -> ((Region) node).setMaxWidth(Double.MAX_VALUE));
         return vBox;
     }

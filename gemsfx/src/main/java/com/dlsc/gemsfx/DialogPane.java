@@ -148,7 +148,7 @@ public class DialogPane extends Pane {
         glassPane.fadeInOutDurationProperty().bind(animationDurationProperty());
         glassPane.hideProperty().bind(dialogs.emptyProperty());
 
-        dialogs.addListener((ListChangeListener.Change<? extends Dialog> change) -> {
+        dialogs.addListener((ListChangeListener.Change<? extends Dialog<?>> change) -> {
             while (change.next()) {
                 if (change.wasAdded()) {
 
@@ -248,20 +248,6 @@ public class DialogPane extends Pane {
 
     public final void setDialogs(ObservableList<Dialog<?>> dialogs) {
         this.dialogs.set(dialogs);
-    }
-
-    private final BooleanProperty showCloseButton = new SimpleBooleanProperty(this, "showCloseButton", true);
-
-    public final boolean isShowCloseButton() {
-        return showCloseButton.get();
-    }
-
-    public final BooleanProperty showCloseButtonProperty() {
-        return showCloseButton;
-    }
-
-    public final void setShowCloseButton(boolean showCloseButton) {
-        this.showCloseButton.set(showCloseButton);
     }
 
     private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(this, "animationDuration", Duration.millis(100));
@@ -1126,21 +1112,7 @@ public class DialogPane extends Pane {
             glassPane.hideProperty().bind(blocked.not());
             glassPane.fadeInOutProperty().bind(shell.fadeInOutProperty());
 
-            FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_CLOSE);
-
-            Button closeButton = new Button();
-            closeButton.setGraphic(fontIcon);
-            closeButton.setFocusTraversable(false);
-            closeButton.setAlignment(Pos.CENTER);
-            closeButton.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-            closeButton.getStyleClass().add("close-button");
-            closeButton.visibleProperty().bind(dialog.showCloseButtonProperty().and(showCloseButtonProperty()));
-            closeButton.managedProperty().bind(dialog.showCloseButtonProperty().and(showCloseButtonProperty()));
-            closeButton.setOnAction(evt -> dialog.cancel());
-
-            StackPane.setAlignment(closeButton, Pos.TOP_RIGHT);
-
-            getChildren().addAll(box, closeButton, glassPane);
+            getChildren().addAll(box, glassPane);
         }
 
         private boolean isInsideDialogPane(Parent parent) {
@@ -1177,7 +1149,7 @@ public class DialogPane extends Pane {
      *
      * @see DialogPane#setHeaderFactory(Callback)
      */
-    public class DialogHeader extends VBox {
+    public static class DialogHeader extends StackPane {
 
         /**
          * Constructs a new header for the given dialog.
@@ -1199,8 +1171,39 @@ public class DialogPane extends Pane {
             dialogIcon.visibleProperty().bind(showIconProperty());
             dialogIcon.managedProperty().bind(showIconProperty());
 
+            VBox vBox = new VBox(dialogIcon, dialogTitle);
+            vBox.getStyleClass().add("title-and-icon-box");
+
+            // close icon / button support
+            FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_CLOSE);
+
+            Button closeButton = new Button();
+            closeButton.setGraphic(fontIcon);
+            closeButton.setFocusTraversable(false);
+            closeButton.setAlignment(Pos.CENTER);
+            closeButton.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+            closeButton.getStyleClass().add("close-button");
+            closeButton.visibleProperty().bind(dialog.showCloseButtonProperty().and(showCloseButtonProperty()));
+            closeButton.managedProperty().bind(dialog.showCloseButtonProperty().and(showCloseButtonProperty()));
+            closeButton.setOnAction(evt -> dialog.cancel());
+            StackPane.setAlignment(closeButton, Pos.TOP_RIGHT);
+
             managedProperty().bind(visibleProperty());
-            getChildren().setAll(dialogIcon, dialogTitle);
+            getChildren().setAll(vBox, closeButton);
+        }
+
+        private final BooleanProperty showCloseButton = new SimpleBooleanProperty(this, "showCloseButton", true);
+
+        public final boolean isShowCloseButton() {
+            return showCloseButton.get();
+        }
+
+        public final BooleanProperty showCloseButtonProperty() {
+            return showCloseButton;
+        }
+
+        public final void setShowCloseButton(boolean showCloseButton) {
+            this.showCloseButton.set(showCloseButton);
         }
 
         private final BooleanProperty showIcon = new SimpleBooleanProperty(this, "showIcon", true);

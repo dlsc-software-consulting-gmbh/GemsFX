@@ -30,6 +30,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import org.scenicview.ScenicView;
 
 import java.util.List;
 
@@ -56,7 +57,10 @@ public class DialogsApp extends Application {
         Button validationButton = new Button("Validate");
         validationButton.setOnAction(evt -> {
             TextField textField = new TextField();
-            Dialog<Object> dialog = dialogPane.showNode(DialogPane.Type.INPUT, "Validation", textField);
+            Label label = new Label("Click OK without entering anything to trigger validation.");
+            VBox box = new VBox(10, label, textField);
+
+            Dialog<Object> dialog = dialogPane.showNode(DialogPane.Type.INPUT, "Validation", box);
             dialog.getValidator().createCheck()
                     .dependsOn("text", textField.textProperty())
                     .decorates(textField)
@@ -151,14 +155,13 @@ public class DialogsApp extends Application {
             }
         });
 
-        CheckBox closeButtonBox = new CheckBox("Show close button:");
-        closeButtonBox.selectedProperty().bindBidirectional(dialogPane.showCloseButtonProperty());
-
         VBox.setVgrow(flowPane, Priority.ALWAYS);
         VBox.setVgrow(durationBox, Priority.ALWAYS);
-        VBox.setVgrow(closeButtonBox, Priority.ALWAYS);
 
-        HBox hBox = new HBox(10, new Label("Animation:"), durationBox, new Label("Style:"), styleBox, closeButtonBox);
+        Button scenicView = new Button("Scenic View");
+        scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
+
+        HBox hBox = new HBox(10, new Label("Animation:"), durationBox, new Label("Style:"), styleBox, scenicView);
         hBox.setAlignment(Pos.CENTER);
 
         VBox vBox = new VBox(flowPane, hBox);

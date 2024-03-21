@@ -37,44 +37,48 @@
 .dialog-pane > .content-pane > .vbox > .button-bar > .button:default {
 }
 
-.dialog-pane > .content-pane > .vbox > .header {
+.dialog-pane > .content-pane > .vbox > .header > .title-and-icon-box {
     -fx-padding: 25px 50px 0px 50px;
     -fx-background-color: transparent;
     -fx-background-insets: 0, 0 0 1 0;
     -fx-spacing: 15px;
 }
 
-.dialog-pane > .content-pane > .vbox > .header > .title {
+.dialog-pane > .content-pane > .vbox > .header > .title-and-icon-box > .title {
     -fx-alignment: center;
     -fx-padding: 0;
     -fx-font-size: 24px;
     -fx-font-family: "Rubik Medium";
 }
 
-.dialog-pane > .content-pane > .vbox > .content {
+.dialog-pane > .content-pane > .vbox > .header > .title-and-icon-box {
+    -fx-alignment: center;
+}
+
+.dialog-pane > .content-pane.information > .vbox > .header > .title-and-icon-box > .icon {
+    -fx-image: url("dialog-information.png");
+}
+
+.dialog-pane > .content-pane.warning > .vbox > .header > .title-and-icon-box > .icon {
+    -fx-image: url("dialog-warning.png");
+}
+
+.dialog-pane > .content-pane.error > .vbox > .header > .title-and-icon-box > .icon {
+    -fx-image: url("dialog-error.png");
+}
+
+.dialog-pane > .content-pane.confirmation > .vbox > .header > .title-and-icon-box > .icon {
+    -fx-image: url("dialog-confirm.png");
+}
+
+dialog-pane > .content-pane > .vbox > .content {
 }
 
 .dialog-pane > .content-pane > .vbox > .content.padding {
     -fx-padding: 30px 30px 50px 30px;
 }
 
-.dialog-pane > .content-pane.information > .vbox > .header > .icon {
-    -fx-image: url("dialog-information.png");
-}
-
-.dialog-pane > .content-pane.warning > .vbox > .header > .icon {
-    -fx-image: url("dialog-warning.png");
-}
-
-.dialog-pane > .content-pane.error > .vbox > .header > .icon {
-    -fx-image: url("dialog-error.png");
-}
-
-.dialog-pane > .content-pane.confirmation > .vbox > .header > .icon {
-    -fx-image: url("dialog-confirm.png");
-}
-
-.dialog-pane > .content-pane > .close-button {
+.dialog-pane > .content-pane > .vbox > .header > .close-button {
     -fx-background-radius: 3px;
     -fx-background-color: rgba(100, 112, 122, 0.2);
     -fx-background-insets: 0px;
