@@ -42,6 +42,17 @@ public class DialogsApp extends Application {
     public void start(Stage primaryStage) {
         DialogPane dialogPane = new DialogPane();
 
+        Button blankButton = new Button("Blank");
+        blankButton.setOnAction(evt -> {
+            Dialog<ButtonType> dialog = new Dialog<>(dialogPane, DialogPane.Type.BLANK);
+            Label content = new Label("Content");
+            content.setAlignment(Pos.CENTER);
+            content.setPrefSize(400, 300);
+            content.setOnMouseClicked(e -> dialog.cancel());
+            dialog.setContent(content);
+            dialog.show();
+        });
+
         Button infoButton = new Button("Info");
         infoButton.setOnAction(evt -> dialogPane.showInformation("Information Dialog Title", "Just some plain old information folks."));
 
@@ -109,7 +120,7 @@ public class DialogsApp extends Application {
             later(() -> dialogPane.showError("Error", "An error was encountered while running this application."), 3);
         });
 
-        FlowPane flowPane = new FlowPane(10, 10, infoButton, warnButton, errorButton, confirmButton, validationButton,
+        FlowPane flowPane = new FlowPane(10, 10, blankButton, infoButton, warnButton, errorButton, confirmButton, validationButton,
                 inputSingleLineButton, inputMultiLineButton, node1Button, node2Button, busyButton, overlappingButton, maxButton);
 
         flowPane.setAlignment(Pos.CENTER);

@@ -8,6 +8,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
@@ -1069,7 +1070,6 @@ public class DialogPane extends Pane {
 
             DialogPane shell = this.dialog.getDialogPane();
 
-
             Node header = getHeaderFactory().call(dialog);
 
             StackPane content = new StackPane();
@@ -1098,7 +1098,10 @@ public class DialogPane extends Pane {
             boolean blankDialog = this.dialog.getType().equals(Type.BLANK);
 
             header.setVisible(!blankDialog);
-            footer.setVisible(!blankDialog);
+            header.setManaged(!blankDialog);
+
+            footer.setVisible(!blankDialog && !dialog.getButtonTypes().isEmpty());
+            footer.setManaged(!blankDialog && !dialog.getButtonTypes().isEmpty());
 
             getStyleClass().setAll("content-pane");
             getStyleClass().addAll(this.dialog.getStyleClass());
@@ -1106,6 +1109,7 @@ public class DialogPane extends Pane {
             VBox box = new VBox();
             box.getStyleClass().add("vbox");
             box.setFillWidth(true);
+
             box.getChildren().setAll(header, content, footer);
 
             GlassPane glassPane = new GlassPane();
@@ -1188,7 +1192,6 @@ public class DialogPane extends Pane {
             closeButton.setOnAction(evt -> dialog.cancel());
             StackPane.setAlignment(closeButton, Pos.TOP_RIGHT);
 
-            managedProperty().bind(visibleProperty());
             getChildren().setAll(vBox, closeButton);
         }
 
@@ -1248,11 +1251,22 @@ public class DialogPane extends Pane {
                 setButtonOrder("L_HENYCOA+U+FBIX_R");
             }
 
-            managedProperty().bind(visibleProperty());
-
             if (!dialog.getType().equals(Type.BLANK)) {
                 createButtons();
             }
+
+            dialog.getButtonTypes().addListener((Observable it) -> {
+                if (dialog.getButtonTypes().isEmpty()) {
+                    setVisible(false);
+                    setManaged(false);
+                } else {
+                    if (!dialog.getType().equals(Type.BLANK)) {
+                        createButtons();
+                        setVisible(true);
+                        setManaged(true);
+                    }
+                }
+            });
         }
 
         /**
