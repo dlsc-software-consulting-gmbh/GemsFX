@@ -7,7 +7,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -38,7 +37,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -59,6 +57,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.stage.Window;
+import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import net.synedra.validatorfx.Validator;
@@ -103,7 +102,12 @@ import java.util.function.Supplier;
  *     dialogPane.showConfirmation("Confirm", "Really delete?").thenAccept(buttonType -> { ... });
  * </pre>
  * </p>
+ * The pane supports factories for creating the header and the footer. This allows application developers
+ * to completely replace those elements of the dialogs. Default factories are already registered and will
+ * be used if not replaced.
  *
+ * @see #setHeaderFactory(Callback)
+ * @see #setFooterFactory(Callback)
  * </p>
  */
 public class DialogPane extends Pane {
@@ -131,6 +135,9 @@ public class DialogPane extends Pane {
 
     public DialogPane() {
         getStyleClass().add("dialog-pane");
+
+        setHeaderFactory(DialogHeader::new);
+        setFooterFactory(DialogButtonBar::new);
 
         showingDialog.bind(dialogs.emptyProperty().not());
 
@@ -194,6 +201,34 @@ public class DialogPane extends Pane {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(DialogPane.class.getResource("dialog.css")).toExternalForm();
+    }
+
+    private final ObjectProperty<Callback<Dialog<?>, Node>> headerFactory = new SimpleObjectProperty<>(this, "headerFactory");
+
+    public final Callback<Dialog<?>, Node> getHeaderFactory() {
+        return headerFactory.get();
+    }
+
+    public final ObjectProperty<Callback<Dialog<?>, Node>> headerFactoryProperty() {
+        return headerFactory;
+    }
+
+    public final void setHeaderFactory(Callback<Dialog<?>, Node> headerFactory) {
+        this.headerFactory.set(headerFactory);
+    }
+
+    private final ObjectProperty<Callback<Dialog<?>, Node>> footerFactory = new SimpleObjectProperty<>(this, "footerFactory");
+
+    public final Callback<Dialog<?>, Node> getFooterFactory() {
+        return footerFactory.get();
+    }
+
+    public final ObjectProperty<Callback<Dialog<?>, Node>> footerFactoryProperty() {
+        return footerFactory;
+    }
+
+    public final void setFooterFactory(Callback<Dialog<?>, Node> footerFactory) {
+        this.footerFactory.set(footerFactory);
     }
 
     private final ListProperty<Dialog<?>> dialogs = new SimpleListProperty<>(this, "dialogs", FXCollections.observableArrayList());
@@ -1027,7 +1062,6 @@ public class DialogPane extends Pane {
 
     private class ContentPane extends StackPane {
 
-        private final ButtonBar dialogButtonBar;
         private final Dialog<?> dialog;
 
         private final ChangeListener<Node> focusListener = (o, oldOwner, newOwner) -> {
@@ -1049,20 +1083,8 @@ public class DialogPane extends Pane {
 
             DialogPane shell = this.dialog.getDialogPane();
 
-            Label dialogTitle = new Label("Dialog");
-            dialogTitle.setMaxWidth(Double.MAX_VALUE);
-            dialogTitle.getStyleClass().add("title");
 
-            ImageView dialogIcon = new ImageView();
-            dialogIcon.getStyleClass().addAll("icon");
-            dialogIcon.visibleProperty().bind(showIconProperty());
-            dialogIcon.managedProperty().bind(showIconProperty());
-
-            VBox dialogHeader = new VBox();
-            dialogHeader.setAlignment(Pos.CENTER);
-            dialogHeader.getStyleClass().add("header");
-            dialogHeader.managedProperty().bind(dialogHeader.visibleProperty());
-            dialogHeader.getChildren().setAll(dialogIcon, dialogTitle);
+            Node header = getHeaderFactory().call(dialog);
 
             StackPane content = new StackPane();
             content.getStyleClass().add("content");
@@ -1071,18 +1093,7 @@ public class DialogPane extends Pane {
                 content.getStyleClass().add("padding");
             }
 
-            dialogButtonBar = new ButtonBar();
-
-            if (System.getProperty("os.name").startsWith("Mac")) {
-                dialogButtonBar.setButtonOrder("L_NCYOAHE+U+FBIX_R");
-            } else if (System.getProperty("os.name").startsWith("Windows")) {
-                dialogButtonBar.setButtonOrder("L_YNOCAHE+U+FBXI_R");
-            } else {
-                dialogButtonBar.setButtonOrder("L_HENYCOA+U+FBIX_R");
-            }
-
-            dialogButtonBar.getStyleClass().add("button-bar");
-            dialogButtonBar.managedProperty().bind(dialogButtonBar.visibleProperty());
+            Node footer = getFooterFactory().call(dialog);
 
             sceneProperty().addListener((obs, oldScene, newScene) -> {
                 if (oldScene != null) {
@@ -1093,29 +1104,23 @@ public class DialogPane extends Pane {
                 }
             });
 
-            VBox.setVgrow(dialogTitle, Priority.NEVER);
             VBox.setVgrow(content, Priority.ALWAYS);
-            VBox.setVgrow(dialogButtonBar, Priority.NEVER);
+            VBox.setVgrow(footer, Priority.NEVER);
 
             content.getChildren().setAll(this.dialog.getContent());
 
             boolean blankDialog = this.dialog.getType().equals(Type.BLANK);
 
-            dialogHeader.setVisible(!blankDialog);
-            dialogButtonBar.setVisible(!blankDialog);
+            header.setVisible(!blankDialog);
+            footer.setVisible(!blankDialog);
 
-            dialogTitle.textProperty().bind(this.dialog.titleProperty());
             getStyleClass().setAll("content-pane");
             getStyleClass().addAll(this.dialog.getStyleClass());
-
-            if (!blankDialog) {
-                createButtons();
-            }
 
             VBox box = new VBox();
             box.getStyleClass().add("vbox");
             box.setFillWidth(true);
-            box.getChildren().setAll(dialogHeader, content, dialogButtonBar);
+            box.getChildren().setAll(header, content, footer);
 
             GlassPane glassPane = new GlassPane();
             glassPane.hideProperty().bind(blocked.not());
@@ -1165,10 +1170,95 @@ public class DialogPane extends Pane {
         public Dialog<?> getDialog() {
             return dialog;
         }
+    }
 
-        private void createButtons() {
-            dialogButtonBar.getButtons().clear();
-            dialogButtonBar.setVisible(dialog.isShowButtonsBar());
+    /**
+     * The default header implementation for dialogs managed by the {@link DialogPane}.
+     *
+     * @see DialogPane#setHeaderFactory(Callback)
+     */
+    public class DialogHeader extends VBox {
+
+        /**
+         * Constructs a new header for the given dialog.
+         *
+         * @param dialog the model object defining the dialog
+         */
+        public DialogHeader(Dialog<?> dialog) {
+            setAlignment(Pos.CENTER);
+            getStyleClass().add("header");
+
+            Label dialogTitle = new Label("Dialog");
+            dialogTitle.setMaxWidth(Double.MAX_VALUE);
+            dialogTitle.getStyleClass().add("title");
+            dialogTitle.textProperty().bind(dialog.titleProperty());
+            VBox.setVgrow(dialogTitle, Priority.NEVER);
+
+            ImageView dialogIcon = new ImageView();
+            dialogIcon.getStyleClass().addAll("icon");
+            dialogIcon.visibleProperty().bind(showIconProperty());
+            dialogIcon.managedProperty().bind(showIconProperty());
+
+            managedProperty().bind(visibleProperty());
+            getChildren().setAll(dialogIcon, dialogTitle);
+        }
+
+        private final BooleanProperty showIcon = new SimpleBooleanProperty(this, "showIcon", true);
+
+        public final boolean isShowIcon() {
+            return showIcon.get();
+        }
+
+        public final BooleanProperty showIconProperty() {
+            return showIcon;
+        }
+
+        public final void setShowIcon(boolean showIcon) {
+            this.showIcon.set(showIcon);
+        }
+    }
+
+    /**
+     * The default footer / button bar implementation for dialogs managed by the {@link DialogPane}.
+     *
+     * @see DialogPane#setHeaderFactory(Callback)
+     */
+    public static class DialogButtonBar extends ButtonBar {
+
+        private final Dialog<?> dialog;
+
+        /**
+         * Constructs a new footer / button bar for the given dialog.
+         *
+         * @param dialog the model object defining the dialog
+         */
+        public DialogButtonBar(Dialog<?> dialog) {
+            this.dialog = dialog;
+
+            getStyleClass().add("footer");
+
+            if (System.getProperty("os.name").startsWith("Mac")) {
+                setButtonOrder("L_NCYOAHE+U+FBIX_R");
+            } else if (System.getProperty("os.name").startsWith("Windows")) {
+                setButtonOrder("L_YNOCAHE+U+FBXI_R");
+            } else {
+                setButtonOrder("L_HENYCOA+U+FBIX_R");
+            }
+
+            managedProperty().bind(visibleProperty());
+
+            if (!dialog.getType().equals(Type.BLANK)) {
+                createButtons();
+            }
+        }
+
+        /**
+         * Creates all buttons as defined by {@link Dialog#getButtonTypes()}.
+         */
+        protected void createButtons() {
+            getButtons().clear();
+
+            setVisible(dialog.isShowButtonsBar());
 
             boolean hasDefault = false;
             for (ButtonType buttonType : dialog.getButtonTypes()) {
@@ -1242,13 +1332,19 @@ public class DialogPane extends Pane {
                     }
                 }
 
-                dialogButtonBar.getButtons().add(button);
+                getButtons().add(button);
             }
         }
 
+        /**
+         * Creates an individual button based on the button type definition passed to it.
+         *
+         * @param buttonType the type of the button to create
+         * @return the button for the given type
+         */
         protected Button createButton(ButtonType buttonType) {
             String text = buttonType.getText();
-            StringConverter<ButtonType> converter = getDialog().getDialogPane().getConverter();
+            StringConverter<ButtonType> converter = dialog.getDialogPane().getConverter();
             if (converter != null) {
                 text = converter.toString(buttonType);
             }
@@ -1266,20 +1362,6 @@ public class DialogPane extends Pane {
         }
     }
 
-    private final BooleanProperty showIcon = new SimpleBooleanProperty(this, "showIcon", true);
-
-    public final boolean isShowIcon() {
-        return showIcon.get();
-    }
-
-    public final BooleanProperty showIconProperty() {
-        return showIcon;
-    }
-
-    public final void setShowIcon(boolean showIcon) {
-        this.showIcon.set(showIcon);
-    }
-
     private class BusyIndicator extends CircularProgressIndicator {
 
         public BusyIndicator() {
@@ -1295,10 +1377,8 @@ public class DialogPane extends Pane {
         }
     }
 
-    /**
-     * Created by hansolo on 08.04.16.
-     */
-    private class CircularProgressIndicator extends Region {
+    private static class CircularProgressIndicator extends Region {
+
         private static final double PREFERRED_WIDTH = 24;
         private static final double PREFERRED_HEIGHT = 24;
         private static final double MINIMUM_WIDTH = 12;
@@ -1507,9 +1587,13 @@ public class DialogPane extends Pane {
         }
 
         private void startIndeterminate() {
-            if (isRunning) return;
+            if (isRunning) {
+                return;
+            }
+
             manageNode(indeterminatePane, true);
             manageNode(progressPane, false);
+
             timeline.play();
             indeterminatePaneRotation.play();
             isRunning = true;
@@ -1517,12 +1601,17 @@ public class DialogPane extends Pane {
         }
 
         private void stopIndeterminate() {
-            if (!isRunning) return;
+            if (!isRunning) {
+                return;
+            }
+
             timeline.stop();
             indeterminatePaneRotation.stop();
             indeterminatePane.setRotate(0);
+
             manageNode(progressPane, true);
             manageNode(indeterminatePane, false);
+
             isRunning = false;
             indeterminate.set(false);
         }
