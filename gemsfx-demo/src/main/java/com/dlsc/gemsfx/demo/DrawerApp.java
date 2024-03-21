@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.DrawerStackPane;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -10,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import net.synedra.validatorfx.Check;
 
 public class DrawerApp extends Application {
 
@@ -46,7 +48,7 @@ public class DrawerApp extends Application {
         ScrollPane scrollPane = new ScrollPane(label);
         scrollPane.setFitToWidth(true);
 
-        drawerStackPane.setPreferredDrawerWidth(500);
+        drawerStackPane.setPreferredDrawerWidth(800);
         drawerStackPane.setDrawerContent(scrollPane);
 
         Button showButton = new Button("Show Drawer");
@@ -59,23 +61,46 @@ public class DrawerApp extends Application {
         ComboBox<Duration> durationBox = new ComboBox<>();
         durationBox.getItems().addAll(Duration.millis(100), Duration.millis(250), Duration.millis(500), Duration.millis(500), Duration.millis(1000), Duration.millis(2000));
         durationBox.valueProperty().bindBidirectional(drawerStackPane.animationDurationProperty());
-        durationBox.getSelectionModel().select(0);
+        durationBox.getSelectionModel().select(1);
 
         Slider slider = new Slider(500, 1200, drawerStackPane.getPreferredDrawerWidth());
         slider.valueProperty().bindBidirectional(drawerStackPane.preferredDrawerWidthProperty());
 
-        HBox controls = new HBox(10, animateBox, new Label("Duration"), durationBox, new Label("Width"), slider);
+        CheckBox maximizeBox = new CheckBox("Maximize");
+        maximizeBox.selectedProperty().addListener(it -> {
+            if (maximizeBox.isSelected()) {
+                drawerStackPane.setPreferredDrawerWidth(-1);
+            } else {
+                drawerStackPane.setPreferredDrawerWidth(800);
+            }
+        });
+
+        Slider topPaddingSlider = new Slider(0, 100, drawerStackPane.getTopPadding());
+        topPaddingSlider.valueProperty().bindBidirectional(drawerStackPane.topPaddingProperty());
+
+        Slider sidePaddingSlider = new Slider(0, 100, drawerStackPane.getTopPadding());
+        sidePaddingSlider.valueProperty().bindBidirectional(drawerStackPane.sidePaddingProperty());
+
+        slider.disableProperty().bind(maximizeBox.selectedProperty());
+
+        HBox controls = new HBox(10, animateBox, new Separator(Orientation.VERTICAL),
+                new Label("Duration"), durationBox, new Separator(Orientation.VERTICAL),
+                new Label("Width"), slider, new Separator(Orientation.VERTICAL),
+                maximizeBox, new Separator(Orientation.VERTICAL),
+                new Label("Top Padding"), topPaddingSlider, new Separator(Orientation.VERTICAL),
+                new Label("Side Padding"), sidePaddingSlider);
+
         controls.setAlignment(Pos.CENTER_LEFT);
         controls.setStyle("-fx-padding: 10px; -fx-background-color: lightgrey, white; -fx-background-insets: 0px, 1px 0px 0px 0px;");
 
         BorderPane borderPane = new BorderPane(drawerStackPane);
         borderPane.setBottom(controls);
+        borderPane.setPrefHeight(850);
 
         Scene scene = new Scene(borderPane);
         stage.setTitle("Drawer Demo");
         stage.setScene(scene);
-        stage.setWidth(1000);
-        stage.setHeight(850);
+        stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
     }

@@ -3,14 +3,7 @@ package com.dlsc.gemsfx;
 import javafx.animation.*;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.geometry.Pos;
 import javafx.scene.CacheHint;
 import javafx.scene.Cursor;
@@ -23,7 +16,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -51,6 +43,8 @@ import java.util.prefs.Preferences;
 public class DrawerStackPane extends StackPane {
 
     private static final Logger LOG = Logger.getLogger(DrawerStackPane.class.getName());
+
+    private static final int MAXIMIZE = -1;
 
     private String preferenceKey = "drawer.stackpane";
 
@@ -166,6 +160,8 @@ public class DrawerStackPane extends StackPane {
         InvalidationListener layoutListener = it -> requestLayout();
         drawerHeightProperty().addListener(layoutListener);
         preferredDrawerWidthProperty().addListener(layoutListener);
+        topPaddingProperty().addListener(layoutListener);
+        sidePaddingProperty().addListener(layoutListener);
 
         minDrawerHeight.addListener(it -> {
             if (getMinDrawerHeight() < 0) {
@@ -176,6 +172,18 @@ public class DrawerStackPane extends StackPane {
         maxDrawerHeight.addListener(it -> {
             if (getMaxDrawerHeight() > 1) {
                 throw new IllegalArgumentException("maximum drawer height can not be greater than 1 but was " + getMaxDrawerHeight());
+            }
+        });
+
+        sidePadding.addListener(it -> {
+            if (getSidePadding() < 0) {
+                throw new IllegalArgumentException("side padding must be larger or equal to 0 but was " + getSidePadding());
+            }
+        });
+
+        topPadding.addListener(it -> {
+            if (getTopPadding() < 0) {
+                throw new IllegalArgumentException("top padding must be larger or equal to 0 but was " + getTopPadding());
             }
         });
 
@@ -287,7 +295,8 @@ public class DrawerStackPane extends StackPane {
 
     /**
      * The minimum drawer height, a value between 0 and 1 with 0 meaning that the drawer can be made
-     * completely invisible.
+     * completely invisible. Even with a value larger than 0 the drawer can be made to hide by the user
+     * by continuing to drag below the drawer.
      *
      * @return the minimum drawer height (value between 0 and 1)
      */
@@ -303,11 +312,22 @@ public class DrawerStackPane extends StackPane {
     protected void layoutChildren() {
         super.layoutChildren();
 
-        double availableHeight = getHeight() - 20;
-        double maxDrawerWidth = getWidth() - 100;
-        double drawerWidth = getPreferredDrawerWidth() != -1 ? Math.min(getPreferredDrawerWidth(), maxDrawerWidth) : maxDrawerWidth;
+        double availableHeight = getHeight() - getTopPadding();
+        double maxDrawerWidth = getWidth() - 2 * getSidePadding();
+        double drawerWidth;
 
-        drawer.resizeRelocate((getWidth() - drawerWidth) / 2, getHeight() - getDrawerHeight() * availableHeight, drawerWidth, availableHeight * getDrawerHeight());
+        if (getPreferredDrawerWidth() == MAXIMIZE) {
+            drawerWidth = maxDrawerWidth;
+        } else {
+            drawerWidth = Math.min(getPreferredDrawerWidth(), maxDrawerWidth);
+        }
+
+        double drawerHeight = getDrawerHeight();
+
+        double x = (getWidth() - drawerWidth) / 2;
+        double y = getHeight() - drawerHeight * availableHeight;
+
+        drawer.resizeRelocate(x, y, drawerWidth, availableHeight * drawerHeight);
     }
 
     private VBox createContainer() {
@@ -516,15 +536,16 @@ public class DrawerStackPane extends StackPane {
 
     // preferred drawer width support
 
-    private final DoubleProperty preferredDrawerWidth = new SimpleDoubleProperty(this, "preferredDrawerWidth", Region.USE_COMPUTED_SIZE);
+    private final DoubleProperty preferredDrawerWidth = new SimpleDoubleProperty(this, "preferredDrawerWidth", MAXIMIZE);
 
     public final double getPreferredDrawerWidth() {
         return preferredDrawerWidth.get();
     }
 
     /**
-     * Stores the preferred width of the drawer. Normally this value is is equal to
-     * {@link Region#USE_COMPUTED_SIZE}.
+     * Stores the preferred width of the drawer. Normally this value is equal to -1, which indicates that the
+     * drawer should use the entire available width. A value larger than -1 will make the pane use that value
+     * for the width of the drawer.
      *
      * @return the preferred drawer width
      */
@@ -534,6 +555,46 @@ public class DrawerStackPane extends StackPane {
 
     public final void setPreferredDrawerWidth(double preferredDrawerWidth) {
         this.preferredDrawerWidth.set(preferredDrawerWidth);
+    }
+
+    private final DoubleProperty topPadding = new SimpleDoubleProperty(this, "topPadding", 20);
+
+    public final double getTopPadding() {
+        return topPadding.get();
+    }
+
+    /**
+     * Specifies a value used for padding at the top of the drawer. This value will
+     * always be enforced,.
+     *
+     * @return the padding used for the top of the drawer
+     */
+    public final DoubleProperty topPaddingProperty() {
+        return topPadding;
+    }
+
+    public final void setTopPadding(double topPadding) {
+        this.topPadding.set(topPadding);
+    }
+
+    private final DoubleProperty sidePadding = new SimpleDoubleProperty(this, "sidePadding", 100);
+
+    public final double getSidePadding() {
+        return sidePadding.get();
+    }
+
+    /**
+     * Specifies a value used for padding to the left and the right of the drawer. This value will
+     * always be enforced, not matter what the preferred width of the drawer content is.
+     *
+     * @return the padding used for the left and right side next to the drawer
+     */
+    public final DoubleProperty sidePaddingProperty() {
+        return sidePadding;
+    }
+
+    public final void setSidePadding(double sidePadding) {
+        this.sidePadding.set(sidePadding);
     }
 
     // drawer animation support
@@ -563,7 +624,7 @@ public class DrawerStackPane extends StackPane {
     private final DoubleProperty drawerHeight = new SimpleDoubleProperty(this, "drawerHeight");
 
     public final double getDrawerHeight() {
-        return Math.min(1, Math.max(.1, drawerHeight.get()));
+        return Math.min(1, Math.max(0, drawerHeight.get()));
     }
 
     /**
@@ -579,7 +640,7 @@ public class DrawerStackPane extends StackPane {
         this.drawerHeight.set(drawerHeight);
     }
 
-    private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(this, "animationDuration", Duration.millis(100));
+    private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(this, "animationDuration", Duration.millis(250));
 
     public final Duration getAnimationDuration() {
         return animationDuration.get();
@@ -608,7 +669,7 @@ public class DrawerStackPane extends StackPane {
 
         if (isAnimateDrawer() && getAnimationDuration() != null && getAnimationDuration().greaterThan(Duration.ZERO)) {
             setDrawerHeight(0);
-            KeyValue keyValue = new KeyValue(drawerHeightProperty(), loadDrawerHeightFromUserPreferences());
+            KeyValue keyValue = new KeyValue(drawerHeightProperty(), loadDrawerHeightFromUserPreferences(), Interpolator.EASE_BOTH);
             KeyFrame keyFrame = new KeyFrame(getAnimationDuration(), keyValue);
             timeline = new Timeline(keyFrame);
             timeline.setOnFinished(evt -> drawer.setCache(false));
@@ -648,7 +709,7 @@ public class DrawerStackPane extends StackPane {
 
     private void hideDrawer() {
         if (isAnimateDrawer()) {
-            KeyValue keyValue = new KeyValue(drawerHeightProperty(), 0);
+            KeyValue keyValue = new KeyValue(drawerHeightProperty(), 0, Interpolator.EASE_BOTH);
             KeyFrame keyFrame = new KeyFrame(getAnimationDuration(), keyValue);
             timeline = new Timeline(keyFrame);
             timeline.setOnFinished(evt -> postHiding());
