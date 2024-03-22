@@ -91,7 +91,7 @@ public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangeP
 
         Pane pane;
 
-        if (!picker.getSmall()) {
+        if (!picker.isSmall()) {
             pane = new VBox(titleLabel, rangeLabel);
             pane.getStyleClass().remove("small");
         } else {
