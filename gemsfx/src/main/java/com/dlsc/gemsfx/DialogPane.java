@@ -265,15 +265,15 @@ public class DialogPane extends Pane {
         this.animationDuration.set(animationDuration);
     }
 
-    public final <T> void showDialog(Dialog<T> dialog) {
+    public <T> void showDialog(Dialog<T> dialog) {
         dialogs.add(dialog);
     }
 
-    public final void hideDialog(Dialog<?> dialog) {
+    public void hideDialog(Dialog<?> dialog) {
         dialogs.remove(dialog);
     }
 
-    public final void hideAllDialogs() {
+    public void hideAllDialogs() {
         for (int i = dialogs.size() - 1; i >= 0; i--) {
             hideDialog(dialogs.get(i));
         }
