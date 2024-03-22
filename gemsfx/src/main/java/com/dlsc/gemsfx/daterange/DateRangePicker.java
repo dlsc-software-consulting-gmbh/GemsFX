@@ -60,6 +60,8 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
         return dateRangeView;
     }
 
+    // show icon
+
     private final BooleanProperty showIcon = new SimpleBooleanProperty(this, "showIcon", true);
 
     public final boolean isShowIcon() {
@@ -79,6 +81,8 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
     public final void setShowIcon(boolean showIcon) {
         this.showIcon.set(showIcon);
     }
+
+    // preset title
 
     private final BooleanProperty showPresetTitle = new SimpleBooleanProperty(this, "showPresetTitle", true);
 
@@ -100,9 +104,11 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
         this.showPresetTitle.set(showPresetTitle);
     }
 
+    // small
+
     private final BooleanProperty small = new SimpleBooleanProperty(this, "small", true);
 
-    public final boolean getSmall() {
+    public final boolean isSmall() {
         return small.get();
     }
 
@@ -119,6 +125,8 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
     public final void setSmall(boolean small) {
         this.small.set(small);
     }
+
+    // formatter
 
     private final ObjectProperty<DateTimeFormatter> formatter = new SimpleObjectProperty<>(this, "formatter", DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM));
 
@@ -138,6 +146,8 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
     public final void setFormatter(DateTimeFormatter formatter) {
         this.formatter.set(formatter);
     }
+
+    // custom range text
 
     private final StringProperty customRangeText = new SimpleStringProperty(this, "customRangeText", "Date Range");
 
