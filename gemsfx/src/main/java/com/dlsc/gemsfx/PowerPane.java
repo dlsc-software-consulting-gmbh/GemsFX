@@ -10,13 +10,18 @@ import org.controlsfx.control.HiddenSidesPane;
 
 public class PowerPane extends StackPane {
 
-    private final InfoCenterPane infoCenterPane = new InfoCenterPane();
-    private final DialogPane dialogPane = new DialogPane();
-    private final DrawerStackPane drawerStackPane = new DrawerStackPane();
-    private final HiddenSidesPane hiddenSidesPane = new HiddenSidesPane();
+    private final InfoCenterPane infoCenterPane;
+    private final DialogPane dialogPane;
+    private final DrawerStackPane drawerStackPane;
+    private final HiddenSidesPane hiddenSidesPane;
 
     public PowerPane() {
         getStyleClass().add("power-pane");
+
+        infoCenterPane = createInfoCenterPane();
+        dialogPane = createDialogPane();
+        drawerStackPane = createDrawerStackPane();
+        hiddenSidesPane = createHiddenSidesPane();
 
         BorderPane borderPane = new BorderPane();
         borderPane.topProperty().bind(topProperty());
@@ -29,6 +34,22 @@ public class PowerPane extends StackPane {
         infoCenterPane.setContent(new StackPane(borderPane, getHiddenSidesPane(), getDrawerStackPane(), getDialogPane()));
 
         getChildren().add(infoCenterPane);
+    }
+
+    protected InfoCenterPane createInfoCenterPane() {
+        return new InfoCenterPane();
+    }
+
+    protected DialogPane createDialogPane() {
+        return new DialogPane();
+    }
+
+    protected DrawerStackPane createDrawerStackPane() {
+        return new DrawerStackPane();
+    }
+
+    protected HiddenSidesPane createHiddenSidesPane() {
+        return new HiddenSidesPane();
     }
 
     public InfoCenterPane getInfoCenterPane() {
