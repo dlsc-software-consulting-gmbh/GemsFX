@@ -10,6 +10,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -24,6 +25,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import org.controlsfx.control.HiddenSidesPane;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -35,15 +37,28 @@ public class PowerPaneApp extends Application {
 
     private DialogPane dialogPane;
     private InfoCenterPane infoCenterPane;
+    private HiddenSidesPane hiddenSidesPane;
 
     @Override
     public void start(Stage stage) {
-        PowerPane powerPane = new PowerPane();
-        powerPane.setLeft(new RegionView("Left"));
-        powerPane.setRight(new RegionView("Right"));
-        powerPane.setCenter(new RegionView("Center"));
-        powerPane.setTop(new RegionView("Top"));
-        powerPane.setBottom(new RegionView("Bottom"));
+        Button testMe = new Button("Test Me");
+        PowerPane powerPane = new PowerPane(testMe);
+
+        RegionView leftHiddenSide = new RegionView("Left Hidden");
+        RegionView rightHiddenSide = new RegionView("Right Hidden");
+        RegionView topHiddenSide = new RegionView("Top Hidden");
+        RegionView bottomHiddenSide = new RegionView("Bottom Hidden");
+
+        hiddenSidesPane = powerPane.getHiddenSidesPane();
+        hiddenSidesPane.setLeft(leftHiddenSide);
+        hiddenSidesPane.setRight(rightHiddenSide);
+        hiddenSidesPane.setTop(topHiddenSide);
+        hiddenSidesPane.setBottom(bottomHiddenSide);
+
+        testMe.setOnAction(evt -> {
+            System.out.println("button pressed");
+            powerPane.getDialogPane().showInformation("Info", "Button pressed!");
+        });
 
         dialogPane = powerPane.getDialogPane();
         infoCenterPane = powerPane.getInfoCenterPane();
@@ -67,7 +82,10 @@ public class PowerPaneApp extends Application {
                 new Label("Dialogs"),
                 createDialogControls(),
                 new Label("Info Center"),
-                createInfoCenterPaneControls());
+                createInfoCenterPaneControls(),
+                new Label("Hidden Sides"),
+                createHiddenSidesPaneControls()
+        );
 
         controls.setStyle("-fx-background-color: aliceblue;");
         controls.setPadding(new Insets(20));
@@ -277,6 +295,30 @@ public class PowerPaneApp extends Application {
         public String getAddress() {
             return address;
         }
+    }
+
+    private Node createHiddenSidesPaneControls() {
+        Button unpin = new Button("Unpin");
+        unpin.setOnAction(evt -> hiddenSidesPane.setPinnedSide(null));
+        unpin.setMaxWidth(Double.MAX_VALUE);
+
+        Button pinLeft = new Button("Pin Left");
+        pinLeft.setOnAction(evt -> hiddenSidesPane.setPinnedSide(Side.LEFT));
+        pinLeft.setMaxWidth(Double.MAX_VALUE);
+
+        Button pinRight = new Button("Pin Right");
+        pinRight.setOnAction(evt -> hiddenSidesPane.setPinnedSide(Side.RIGHT));
+        pinRight.setMaxWidth(Double.MAX_VALUE);
+
+        Button pinTop = new Button("Pin Top");
+        pinTop.setOnAction(evt -> hiddenSidesPane.setPinnedSide(Side.TOP));
+        pinTop.setMaxWidth(Double.MAX_VALUE);
+
+        Button pinBottom = new Button("Pin Bottom");
+        pinBottom.setOnAction(evt -> hiddenSidesPane.setPinnedSide(Side.BOTTOM));
+        pinBottom.setMaxWidth(Double.MAX_VALUE);
+
+        return new VBox(10, unpin, pinLeft, pinRight, pinTop, pinBottom);
     }
 
     private final NotificationGroup<Mail, MailNotification> mailGroup = new NotificationGroup<>("Mail");
