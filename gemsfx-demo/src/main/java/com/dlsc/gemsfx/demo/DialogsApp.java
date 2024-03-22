@@ -12,13 +12,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -33,6 +34,7 @@ import javafx.util.StringConverter;
 import org.scenicview.ScenicView;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.dlsc.gemsfx.DialogPane.Type.INFORMATION;
 
@@ -97,7 +99,7 @@ public class DialogsApp extends Application {
         node2Button.setOnAction(evt -> dialogPane.showNode(INFORMATION, "Generic Node Dialog", createGenericNode()));
 
         Button busyButton = new Button("Busy");
-        busyButton.setOnAction(evt -> dialogPane.showBusyIndicator().thenAccept(buttonType -> {
+        busyButton.setOnAction(evt -> dialogPane.showBusyIndicator().onClose(buttonType -> {
             if (buttonType.equals(ButtonType.CANCEL)) {
                 dialogPane.showInformation("Cancelled", "The busy dialog has been cancelled via the ESC key.");
             }
@@ -105,15 +107,15 @@ public class DialogsApp extends Application {
 
         Button maxButton = new Button("Maximize");
         maxButton.setOnAction(evt -> {
-            Dialog<Object> dialog = new Dialog(dialogPane, INFORMATION);
+            Dialog<Object> dialog = new Dialog<>(dialogPane, INFORMATION);
             dialog.setTitle("Maximized");
             dialog.setContent(new Label("Dialog using all available width and height."));
             dialog.setMaximize(true);
             dialogPane.showDialog(dialog);
         });
 
-        Button overlappingButton = new Button("Multiple Dialogs");
-        overlappingButton.setOnAction(evt -> {
+        Button multipleDialogsButton = new Button("Multiple Dialogs");
+        multipleDialogsButton.setOnAction(evt -> {
             dialogPane.showInformation("Information", "some very long information text is coming here.");
             later(() -> dialogPane.showConfirmation("Confirmation", "some info"), 1);
             later(() -> dialogPane.showWarning("Warning", "Again a warning message?"), 2);
@@ -121,7 +123,8 @@ public class DialogsApp extends Application {
         });
 
         FlowPane flowPane = new FlowPane(10, 10, blankButton, infoButton, warnButton, errorButton, confirmButton, validationButton,
-                inputSingleLineButton, inputMultiLineButton, node1Button, node2Button, busyButton, overlappingButton, maxButton);
+                inputSingleLineButton, inputMultiLineButton, node1Button, node2Button, busyButton, multipleDialogsButton,
+                maxButton);
 
         flowPane.setAlignment(Pos.CENTER);
 
@@ -146,11 +149,11 @@ public class DialogsApp extends Application {
                     dialogPane.setConverter(null);
                     break;
                 case "Dark":
-                    dialogPane.getStylesheets().setAll(DialogsApp.class.getResource("dialogs-dark.css").toExternalForm());
+                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogsApp.class.getResource("dialogs-dark.css")).toExternalForm());
                     dialogPane.setConverter(null);
                     break;
                 case "Custom":
-                    dialogPane.getStylesheets().setAll(DialogsApp.class.getResource("dialogs-custom.css").toExternalForm());
+                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogsApp.class.getResource("dialogs-custom.css")).toExternalForm());
                     dialogPane.setConverter(new StringConverter<>() {
                         @Override
                         public String toString(ButtonType object) {
@@ -248,7 +251,7 @@ public class DialogsApp extends Application {
         return new StackPane(rect, label);
     }
 
-    public class Person {
+    public static class Person {
 
         private String name;
         private String address;

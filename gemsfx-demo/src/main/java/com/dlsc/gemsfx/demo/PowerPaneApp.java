@@ -136,7 +136,7 @@ public class PowerPaneApp extends Application {
         node2Button.setOnAction(evt -> dialogPane.showNode(INFORMATION, "Generic Node Dialog", createGenericNode()));
 
         Button busyButton = new Button("Busy");
-        busyButton.setOnAction(evt -> dialogPane.showBusyIndicator().thenAccept(buttonType -> {
+        busyButton.setOnAction(evt -> dialogPane.showBusyIndicator().onClose(buttonType -> {
             if (buttonType.equals(ButtonType.CANCEL)) {
                 dialogPane.showInformation("Cancelled", "The busy dialog has been cancelled via the ESC key.");
             }
@@ -144,7 +144,7 @@ public class PowerPaneApp extends Application {
 
         Button maxButton = new Button("Maximize");
         maxButton.setOnAction(evt -> {
-            DialogPane.Dialog<Object> dialog = new DialogPane.Dialog(dialogPane, INFORMATION);
+            DialogPane.Dialog<Object> dialog = new DialogPane.Dialog<>(dialogPane, INFORMATION);
             dialog.setTitle("Maximized");
             dialog.setContent(new Label("Dialog using all available width and height."));
             dialog.setMaximize(true);

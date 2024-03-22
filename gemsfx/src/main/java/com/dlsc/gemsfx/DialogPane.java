@@ -8,7 +8,6 @@ import javafx.animation.KeyValue;
 import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
@@ -47,6 +46,7 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -68,14 +68,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -100,7 +93,7 @@ import java.util.function.Supplier;
  * then the following can be written:
  * <p>
  * <pre>
- *     dialogPane.showConfirmation("Confirm", "Really delete?").thenAccept(buttonType -> { ... });
+ *     dialogPane.showConfirmation("Confirm", "Really delete?").onClose(buttonType -> { ... });
  * </pre>
  * </p>
  * The pane supports factories for creating the header and the footer. This allows application developers
@@ -120,20 +113,23 @@ public class DialogPane extends Pane {
     private final Map<ContentPane, DoubleProperty> dialogVisibilityMap = new HashMap<>();
 
     private final EventHandler<KeyEvent> escapeHandler = evt -> {
-        if (evt.getCode() == KeyCode.ESCAPE) { // hide the last dialog that was opened
+        if (KeyCombination.keyCombination("ESC+SHIFT").match(evt)) {
+            hideAllDialogs();
+        } else if (evt.getCode() == KeyCode.ESCAPE) { // hide the last dialog that was opened
             ObservableList<Dialog<?>> dialogs = getDialogs();
             if (!dialogs.isEmpty()) {
                 Dialog<?> dialog = dialogs.get(dialogs.size() - 1);
-                if (!dialog.isCancelled()) {
-                    dialog.cancel();
-                    evt.consume();
-                }
+                dialog.cancel();
+                evt.consume();
             }
         }
     };
 
     private final WeakEventHandler<KeyEvent> weakEscapeHandler = new WeakEventHandler<>(escapeHandler);
 
+    /**
+     * Constructs a new dialog pane.
+     */
     public DialogPane() {
         getStyleClass().add("dialog-pane");
 
@@ -154,15 +150,15 @@ public class DialogPane extends Pane {
                 if (change.wasAdded()) {
 
                     change.getAddedSubList().forEach(dialog -> {
-                        ContentPane dialogPane = new ContentPane(dialog);
-                        dialogPane.blockedProperty().bind(Bindings.createBooleanBinding(() -> !dialogContentPanes.isEmpty() && dialogContentPanes.get(dialogContentPanes.size() - 1) != dialogPane, dialogContentPanes));
-                        dialogContentPanes.add(dialogPane);
+                        ContentPane contentPane = new ContentPane(dialog);
+                        contentPane.blockedProperty().bind(Bindings.createBooleanBinding(() -> !dialogContentPanes.isEmpty() && dialogContentPanes.get(dialogContentPanes.size() - 1) != contentPane, dialogContentPanes));
+                        dialogContentPanes.add(contentPane);
 
                         SimpleDoubleProperty visibility = new SimpleDoubleProperty();
                         visibility.addListener(it -> requestLayout());
-                        dialogVisibilityMap.put(dialogPane, visibility);
-                        getChildren().add(dialogPane);
-                        slideInOut(1, visibility, () -> dialogPane);
+                        dialogVisibilityMap.put(contentPane, visibility);
+                        getChildren().add(contentPane);
+                        slideInOut(1, visibility, () -> contentPane);
                     });
 
                 } else if (change.wasRemoved()) {
@@ -204,12 +200,33 @@ public class DialogPane extends Pane {
         return Objects.requireNonNull(DialogPane.class.getResource("dialog.css")).toExternalForm();
     }
 
+    /**
+     * Retrieves the glass pane associated with this dialog pane.
+     * The glass pane is a transparent overlay that can be used to block user input.
+     *
+     * @return the glass pane object
+     */
+    public final GlassPane getGlassPane() {
+        return glassPane;
+    }
+
+    // header factory
+
     private final ObjectProperty<Callback<Dialog<?>, Node>> headerFactory = new SimpleObjectProperty<>(this, "headerFactory");
 
     public final Callback<Dialog<?>, Node> getHeaderFactory() {
         return headerFactory.get();
     }
 
+    /**
+     * A callback used as a factory for creating the header for each dialog. The dialog pane comes
+     * with its own built-in header factory. Applications only need to specify one if they completely
+     * want to change the appearance and / or the behaviour of the title area.
+     *
+     * @return the header factory
+     * @see DialogHeader
+     * @see #footerFactoryProperty()
+     */
     public final ObjectProperty<Callback<Dialog<?>, Node>> headerFactoryProperty() {
         return headerFactory;
     }
@@ -218,12 +235,23 @@ public class DialogPane extends Pane {
         this.headerFactory.set(headerFactory);
     }
 
+    // footer factory
+
     private final ObjectProperty<Callback<Dialog<?>, Node>> footerFactory = new SimpleObjectProperty<>(this, "footerFactory");
 
     public final Callback<Dialog<?>, Node> getFooterFactory() {
         return footerFactory.get();
     }
 
+    /**
+     * A callback used as a factory for creating the footer for each dialog. The dialog pane comes
+     * with its own built-in footer factory. Applications only need to specify one if they completely
+     * want to change the appearance and / or the behaviour of the button bar.
+     *
+     * @return the header factory
+     * @see DialogButtonBar
+     * @see #headerFactoryProperty()
+     */
     public final ObjectProperty<Callback<Dialog<?>, Node>> footerFactoryProperty() {
         return footerFactory;
     }
@@ -232,8 +260,15 @@ public class DialogPane extends Pane {
         this.footerFactory.set(footerFactory);
     }
 
+    // dialogs
+
     private final ListProperty<Dialog<?>> dialogs = new SimpleListProperty<>(this, "dialogs", FXCollections.observableArrayList());
 
+    /**
+     * The list of currently active / showing dialogs.
+     *
+     * @return the list of dialogs currently showing
+     */
     public final ObservableList<Dialog<?>> getDialogs() {
         return dialogs.get();
     }
@@ -251,12 +286,20 @@ public class DialogPane extends Pane {
         this.dialogs.set(dialogs);
     }
 
+    // animation duration
+
     private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(this, "animationDuration", Duration.millis(100));
 
     public final Duration getAnimationDuration() {
         return animationDuration.get();
     }
 
+    /**
+     * Stores the duration used to animate the fly-in / fly-out of the dialogs. The
+     * default value is 100 milliseconds.
+     *
+     * @return the animation duration
+     */
     public final ObjectProperty<Duration> animationDurationProperty() {
         return animationDuration;
     }
@@ -265,17 +308,41 @@ public class DialogPane extends Pane {
         this.animationDuration.set(animationDuration);
     }
 
-    public <T> void showDialog(Dialog<T> dialog) {
+    /**
+     * Makes the given dialog visible in the pane.
+     *
+     * @param dialog the dialog to show
+     * @throws IllegalArgumentException when the given dialog belongs to a different dialog pane
+     */
+    public void showDialog(Dialog<?> dialog) {
+        if (dialog.getDialogPane() != this) {
+            throw new IllegalArgumentException("the given dialog does not belong to this dialog pane");
+        }
         dialogs.add(dialog);
     }
 
+    /**
+     * Hides the given dialog.
+     *
+     * @param dialog the dialog to hide
+     * @throws IllegalArgumentException when the given dialog belongs to a different dialog pane
+     */
     public void hideDialog(Dialog<?> dialog) {
+        if (!dialogs.contains(dialog)) {
+            throw new IllegalArgumentException("the given dialog does not belong to this dialog pane");
+        }
         dialogs.remove(dialog);
     }
 
+    /**
+     * Hides all currently active dialogs.
+     *
+     * @see #hideDialog(Dialog)
+     */
     public void hideAllDialogs() {
-        for (int i = dialogs.size() - 1; i >= 0; i--) {
-            hideDialog(dialogs.get(i));
+        List<Dialog<?>> list = new ArrayList<>(getDialogs());
+        for (int i = list.size() - 1; i >= 0; i--) {
+            hideDialog(list.get(i));
         }
     }
 
@@ -287,26 +354,50 @@ public class DialogPane extends Pane {
         return showNode(type, title, new Label(message), buttons);
     }
 
+    /**
+     * Creates and shows an error message dialog.
+     *
+     * @param title   the title for the dialog
+     * @param message the main error message
+     * @return the dialog
+     */
     public final Dialog<Void> showError(String title, String message) {
         return showError(title, message, null, null);
     }
 
+    /**
+     * Creates and shows an error message dialog.
+     *
+     * @param title     the title for the dialog
+     * @param message   the main error message
+     * @param exception an exception that will be used to provide more details
+     * @return the dialog
+     */
     public final Dialog<Void> showError(String title, String message, Throwable exception) {
         StringWriter stringWriter = new StringWriter();
         exception.printStackTrace(new PrintWriter(stringWriter));
         return showError(title, message, stringWriter.toString(), exception);
     }
 
+    /**
+     * Creates and shows an error message dialog.
+     *
+     * @param title     the title for the dialog
+     * @param exception an exception that will be used to provide the main message additional details
+     * @return the dialog
+     */
     public final Dialog<Void> showError(String title, Exception exception) {
         return showError(title, exception.getMessage(), exception);
     }
 
-    public final Dialog<Void> showError(String title, String message, Exception exception) {
-        StringWriter stringWriter = new StringWriter();
-        exception.printStackTrace(new PrintWriter(stringWriter));
-        return showError(title, message, stringWriter.toString(), exception);
-    }
-
+    /**
+     * Creates and shows an error message dialog.
+     *
+     * @param title   the title for the dialog
+     * @param message the main error message
+     * @param details additional details
+     * @return the dialog
+     */
     public final Dialog<Void> showError(String title, String message, String details) {
         return showError(title, message, details, null);
     }
@@ -343,17 +434,29 @@ public class DialogPane extends Pane {
             FocusUtil.requestFocus(textArea);
         }
 
-        dialog.setException(exception);
-
         dialog.show();
 
         return dialog;
     }
 
+    /**
+     * Creates and shows a warning dialog.
+     *
+     * @param title   the text shown in the header of the dialog
+     * @param message the warning message
+     * @return the dialog
+     */
     public final Dialog<ButtonType> showWarning(String title, String message) {
         return doShowDialog(Type.WARNING, title, message);
     }
 
+    /**
+     * Creates and shows a warning dialog.
+     *
+     * @param title   the text shown in the header of the dialog
+     * @param message the main message, usually a question
+     * @return the dialog
+     */
     public final Dialog<ButtonType> showConfirmation(String title, String message) {
         return doShowDialog(Type.CONFIRMATION, title, message);
     }
@@ -362,22 +465,64 @@ public class DialogPane extends Pane {
         return doShowDialog(Type.INFORMATION, title, message);
     }
 
+    /**
+     * Creates and shows an information dialog.
+     *
+     * @param title   the text shown in the header of the dialog
+     * @param message the main message, usually a question
+     * @param buttons the list of buttons to create in the footer / button bar
+     * @return the dialog
+     */
     public final Dialog<ButtonType> showInformation(String title, String message, List<ButtonType> buttons) {
         return doShowDialog(Type.INFORMATION, title, message, buttons);
     }
 
+    /**
+     * Creates and shows a text input dialog.
+     *
+     * @param title the text shown in the header of the dialog
+     * @param text  the initial text to show
+     * @return the dialog
+     */
     public final Dialog<String> showTextInput(String title, String text) {
         return showTextInput(title, null, null, text, false);
     }
 
+    /**
+     * Creates and shows a text input dialog.
+     *
+     * @param title     the text shown in the header of the dialog
+     * @param text      the initial text to show
+     * @param multiline if true the dialog will show a text area, otherwise a text field
+     * @return the dialog
+     */
     public final Dialog<String> showTextInput(String title, String text, boolean multiline) {
         return showTextInput(title, null, null, text, multiline);
     }
 
+    /**
+     * Creates and shows a text input dialog.
+     *
+     * @param title     the text shown in the header of the dialog
+     * @param message   the main message, usually a question
+     * @param text      the initial text to show
+     * @param multiline if true the dialog will show a text area, otherwise a text field
+     * @return the dialog
+     */
     public final Dialog<String> showTextInput(String title, String message, String text, boolean multiline) {
         return showTextInput(title, message, null, text, multiline);
     }
 
+    /**
+     * Creates and shows a text input dialog.
+     *
+     * @param title     the text shown in the header of the dialog
+     * @param message   the main message, usually a question
+     * @param prompt    the prompt text for the text input control
+     * @param text      the initial text to show
+     * @param multiline if true the dialog will show a text area, otherwise a text field
+     * @return the dialog
+     */
     public final Dialog<String> showTextInput(String title, String message, String prompt, String text, boolean multiline) {
         TextInputControl textInputControl;
         Node node;
@@ -417,26 +562,91 @@ public class DialogPane extends Pane {
         return dialog;
     }
 
+    /**
+     * Shows an arbitrary node in a dialog.
+     *
+     * @param type  the type of dialog (info, warning, error, ....)
+     * @param title the text shown in the title section / header of the dialog
+     * @param node  the node to show
+     * @param <T>   the type of the value provided by the dialog
+     * @return the dialog
+     */
     public final <T> Dialog<T> showNode(Type type, String title, Node node) {
         return showNode(type, title, node, false, Collections.emptyList());
     }
 
+    /**
+     * Shows an arbitrary node in a dialog.
+     *
+     * @param type     the type of dialog (info, warning, error, ....)
+     * @param title    the text shown in the title section / header of the dialog
+     * @param node     the node to show
+     * @param maximize if true the dialog will use the maximum size available
+     * @param <T>      the type of the value provided by the dialog
+     * @return the dialog
+     */
     public final <T> Dialog<T> showNode(Type type, String title, Node node, boolean maximize) {
         return showNode(type, title, node, maximize, Collections.emptyList());
     }
 
+    /**
+     * Shows an arbitrary node in a dialog.
+     *
+     * @param type    the type of dialog (info, warning, error, ....)
+     * @param title   the text shown in the title section / header of the dialog
+     * @param node    the node to show
+     * @param buttons a list of buttons to create inside the footer / button bar
+     * @param <T>     the type of the value provided by the dialog
+     * @return the dialog
+     */
     public final <T> Dialog<T> showNode(Type type, String title, Node node, List<ButtonType> buttons) {
         return showNode(type, title, node, false, buttons);
     }
 
+    /**
+     * Shows an arbitrary node in a dialog.
+     *
+     * @param type     the type of dialog (info, warning, error, ....)
+     * @param title    the text shown in the title section / header of the dialog
+     * @param node     the node to show
+     * @param maximize if true the dialog will use the maximum size available
+     * @param buttons  a list of buttons to create inside the footer / button bar
+     * @param <T>      the type of the value provided by the dialog
+     * @return the dialog
+     */
     public final <T> Dialog<T> showNode(Type type, String title, Node node, boolean maximize, List<ButtonType> buttons) {
         return showNode(type, title, node, maximize, buttons, true, null);
     }
 
+    /**
+     * Shows an arbitrary node in a dialog.
+     *
+     * @param type             the type of dialog (info, warning, error, ....)
+     * @param title            the text shown in the title section / header of the dialog
+     * @param node             the node to show
+     * @param maximize         if true the dialog will use the maximum size available
+     * @param buttons          a list of buttons to create inside the footer / button bar
+     * @param sameWidthButtons if true all buttons in the footer / button bar will have the same width
+     * @param <T>              the type of the value provided by the dialog
+     * @return the dialog
+     */
     public final <T> Dialog<T> showNode(Type type, String title, Node node, boolean maximize, List<ButtonType> buttons, boolean sameWidthButtons) {
         return showNode(type, title, node, maximize, buttons, sameWidthButtons, null);
     }
 
+    /**
+     * Shows an arbitrary node in a dialog.
+     *
+     * @param type             the type of dialog (info, warning, error, ....)
+     * @param title            the text shown in the title section / header of the dialog
+     * @param node             the node to show
+     * @param maximize         if true the dialog will use the maximum size available
+     * @param buttons          a list of buttons to create inside the footer / button bar
+     * @param sameWidthButtons if true all buttons in the footer / button bar will have the same width
+     * @param validProperty    a validity property that will be bound to the validity property of the dialog
+     * @param <T>              the type of the value provided by the dialog
+     * @return the dialog
+     */
     public final <T> Dialog<T> showNode(Type type, String title, Node node, boolean maximize, List<ButtonType> buttons, boolean sameWidthButtons, BooleanProperty validProperty) {
         Dialog<T> dialog = new Dialog<>(this, type);
         dialog.setTitle(title);
@@ -457,6 +667,11 @@ public class DialogPane extends Pane {
         return dialog;
     }
 
+    /**
+     * Creates and shows a dialog that shows a busy indicator / busy animation.
+     *
+     * @return the create dialog
+     */
     public final Dialog<Void> showBusyIndicator() {
         BusyIndicator busyIndicator = new BusyIndicator();
         busyIndicator.sceneProperty().addListener(it -> {
@@ -476,8 +691,16 @@ public class DialogPane extends Pane {
         return dialog;
     }
 
+    // animate
+
     private final BooleanProperty animateDialogs = new SimpleBooleanProperty(this, "animateDialogs", true);
 
+    /**
+     * Determines if the dialogs will be animated when they appear. Animation is currently a simple fly-in /
+     * fly-out. Other animation types could be considered in the future.
+     *
+     * @return true if the dialog will be animated when appearing / disappearing
+     */
     public final BooleanProperty animateDialogsProperty() {
         return animateDialogs;
     }
@@ -490,8 +713,16 @@ public class DialogPane extends Pane {
         animateDialogs.set(animate);
     }
 
+    // fade-in / fade-out
+
     private final BooleanProperty fadeInOut = new SimpleBooleanProperty(this, "fadeInOut", true);
 
+    /**
+     * Controls whether the glass pane and the dialogs will animate their opacity during showing or
+     * hiding dialogs.
+     *
+     * @return true if fade-in / fade-out will be used for showing / hiding dialogs
+     */
     public final BooleanProperty fadeInOutProperty() {
         return fadeInOut;
     }
@@ -504,8 +735,15 @@ public class DialogPane extends Pane {
         fadeInOut.set(animate);
     }
 
+    // showing
+
     private final ReadOnlyBooleanWrapper showingDialog = new ReadOnlyBooleanWrapper(this, "showingDialog", false);
 
+    /**
+     * A read-only property used to signal that the pane is currently showing a dialog or not.
+     *
+     * @return true if at least one dialog is currently showing
+     */
     public final ReadOnlyBooleanProperty showingDialogProperty() {
         return showingDialog.getReadOnlyProperty();
     }
@@ -679,17 +917,26 @@ public class DialogPane extends Pane {
         this.converter.set(converter);
     }
 
-    public static class Dialog<T> extends CompletableFuture<ButtonType> {
+    /**
+     * Represents a dialog that can be displayed to the user.
+     *
+     * @param <T> the type of value that the dialog can return
+     */
+    public static class Dialog<T> {
 
         private final Type type;
 
         private final DialogPane pane;
 
-        private boolean padding = true;
-
+        /**
+         * Creates a new dialog with the specified dialog pane and type.
+         *
+         * @param pane the dialog pane where the dialog will be shown
+         * @param type the type of the dialog (info, warning, error, ...)
+         */
         public Dialog(DialogPane pane, Type type) {
-            this.pane = Objects.requireNonNull(pane);
-            this.type = Objects.requireNonNull(type);
+            this.pane = Objects.requireNonNull(pane, "dialog pane can not be null");
+            this.type = Objects.requireNonNull(type, "dialog type can not be null");
 
             getStyleClass().add(type.name().toLowerCase());
 
@@ -712,12 +959,39 @@ public class DialogPane extends Pane {
             }
         }
 
+        /**
+         * Returns the type of the dialog, e.g. "info", "error", "warning".
+         *
+         * @return the dialog's type
+         */
+        public final Type getType() {
+            return type;
+        }
+
+        /**
+         * Returns the dialog pane where the dialog is showing.
+         *
+         * @return the dialog pane to which the dialog belongs
+         */
+        public final DialogPane getDialogPane() {
+            return pane;
+        }
+
+        // show close button
+
         private final BooleanProperty showCloseButton = new SimpleBooleanProperty(this, "showCloseButton", true);
 
         public final boolean isShowCloseButton() {
             return showCloseButton.get();
         }
 
+        /**
+         * Determines if the dialog will make a "close" button available to the user. Whether this
+         * property will be observed or not depends on the actual header implementation. The default
+         * implementation of the header does contain a close button.
+         *
+         * @return true if the close button will be shown
+         */
         public final BooleanProperty showCloseButtonProperty() {
             return showCloseButton;
         }
@@ -726,12 +1000,22 @@ public class DialogPane extends Pane {
             this.showCloseButton.set(showCloseButton);
         }
 
-        private final ObjectProperty<Duration> delay = new SimpleObjectProperty<>(this, "delay", Duration.millis(100));
+        // delay
+
+        private final ObjectProperty<Duration> delay = new SimpleObjectProperty<>(this, "delay", Duration.ZERO);
 
         public final Duration getDelay() {
             return delay.get();
         }
 
+        /**
+         * A property that can be used to delay the appearance of the dialog inside the
+         * dialog pane. This is very useful for dialogs that display a busy animation or
+         * a progress indicator as usually you only want those to appear if a background
+         * operation takes a while.
+         *
+         * @return the delay before the dialog becomes visible, default is ZERO
+         */
         public final ObjectProperty<Duration> delayProperty() {
             return delay;
         }
@@ -740,13 +1024,30 @@ public class DialogPane extends Pane {
             this.delay.set(delay);
         }
 
-        public final boolean isPadding() {
-            return padding;
+        // padding
+
+        private final BooleanProperty usingPadding = new SimpleBooleanProperty(this, "usingPadding", true);
+
+        public final boolean isUsingPadding() {
+            return usingPadding.get();
         }
 
-        public final void setPadding(boolean padding) {
-            this.padding = padding;
+        /**
+         * Controls whether additional padding will be applied "around" the content node. The actual amount
+         * of padding depends on the CSS rules.
+         *
+         * @return true if padding will be added
+         * @see #setContent
+         */
+        public final BooleanProperty usingPaddingProperty() {
+            return usingPadding;
         }
+
+        public final void setUsingPadding(boolean usingPadding) {
+            this.usingPadding.set(usingPadding);
+        }
+
+        // value
 
         private final ObjectProperty<T> value = new SimpleObjectProperty<>(this, "value");
 
@@ -754,20 +1055,19 @@ public class DialogPane extends Pane {
             return value.get();
         }
 
+        /**
+         * Stores the value entered or selected by the user in the dialog. If the dialog is, for
+         * example, a text input dialog then the value will be the text entered into the text field
+         * of the dialog.
+         *
+         * @return the user entered or selected value
+         */
         public final ObjectProperty<T> valueProperty() {
             return value;
         }
 
         public final void setValue(T value) {
             this.value.set(value);
-        }
-
-        public final Type getType() {
-            return type;
-        }
-
-        public final DialogPane getDialogPane() {
-            return pane;
         }
 
         public void show() {
@@ -780,8 +1080,10 @@ public class DialogPane extends Pane {
         public void cancel() {
             pane.hideDialog(this);
             setValue(null);
-            complete(ButtonType.CANCEL);
+            commit(ButtonType.CANCEL);
         }
+
+        // on button pressed
 
         private Consumer<ButtonType> onButtonPressed;
 
@@ -795,40 +1097,67 @@ public class DialogPane extends Pane {
          *
          * @param onButtonPressed an optional consumer that gets invoked when the user finishes the dialog
          */
-        public void setOnButtonPressed(Consumer<ButtonType> onButtonPressed) {
+        public final void setOnButtonPressed(Consumer<ButtonType> onButtonPressed) {
             this.onButtonPressed = onButtonPressed;
         }
 
-        /**
-         * Overrides the complete() method of CompletableFuture to check whether there is a
-         * "on button pressed" handler registered. If so the method will first invoke the
-         * handler before continuing normally.
-         *
-         * @see #setOnButtonPressed(Consumer)
-         * @param value the result value
-         * @return true on normal completion
-         */
-        @Override
-        public boolean complete(ButtonType value) {
-            if (onButtonPressed != null) {
-                onButtonPressed.accept(value);
-            }
+        // on commit
 
-            return super.complete(value);
+        private final ObjectProperty<Consumer<ButtonType>> onClose = new SimpleObjectProperty<>(this, "onClose", buttonType -> {
+        });
+
+        public final Consumer<ButtonType> getOnClose() {
+            return onClose.get();
+        }
+
+        public final ObjectProperty<Consumer<ButtonType>> onCloseProperty() {
+            return onClose;
+        }
+
+        public final void setOnClose(Consumer<ButtonType> onClose) {
+            this.onClose.set(onClose);
+        }
+
+        /**
+         * A method in fluent-api style that sets the given consumer and returns the dialog
+         * again.
+         *
+         * @param onCommit the handler
+         */
+        public final Dialog<T> onClose(Consumer<ButtonType> onCommit) {
+            Objects.requireNonNull(onCommit, "onCommit handler can not be null");
+            setOnClose(onCommit);
+            return this;
+        }
+
+        private void commit(ButtonType buttonType) {
+            if (onButtonPressed != null) {
+                onButtonPressed.accept(buttonType);
+            }
+            getOnClose().accept(buttonType);
         }
 
         // valid property (important to have default set to true)
+
         private final BooleanProperty valid = new SimpleBooleanProperty(this, "valid", true);
 
-        public boolean isValid() {
+        public final boolean isValid() {
             return valid.get();
         }
 
-        public BooleanProperty validProperty() {
+        /**
+         * Determines whether the values entered in the dialog are currently valid and will
+         * be accepted by the application. The validity is normally determines by the validator
+         * object.
+         *
+         * @return true if the dialog fiels are currently valid
+         * @see #validatorProperty()
+         */
+        public final BooleanProperty validProperty() {
             return valid;
         }
 
-        public void setValid(boolean valid) {
+        public final void setValid(boolean valid) {
             this.valid.set(valid);
         }
 
@@ -836,21 +1165,29 @@ public class DialogPane extends Pane {
 
         private final ObservableList<ButtonType> buttonTypes = FXCollections.observableArrayList();
 
-        public ObservableList<ButtonType> getButtonTypes() {
+        public final ObservableList<ButtonType> getButtonTypes() {
             return buttonTypes;
         }
 
+        // same width buttons
+
         private final BooleanProperty sameWidthButtons = new SimpleBooleanProperty(true);
 
-        public boolean isSameWidthButtons() {
+        public final boolean isSameWidthButtons() {
             return sameWidthButtons.get();
         }
 
-        public BooleanProperty sameWidthButtonsProperty() {
+        /**
+         * Determines if the buttons in the button bar will all have the same width or
+         * each one will have its preferred width.
+         *
+         * @return true if all buttons should have the same width
+         */
+        public final BooleanProperty sameWidthButtonsProperty() {
             return sameWidthButtons;
         }
 
-        public void setSameWidthButtons(boolean sameWidthButtons) {
+        public final void setSameWidthButtons(boolean sameWidthButtons) {
             this.sameWidthButtons.set(sameWidthButtons);
         }
 
@@ -858,6 +1195,12 @@ public class DialogPane extends Pane {
 
         private final BooleanProperty maximize = new SimpleBooleanProperty();
 
+        /**
+         * If maximized the dialog will try to use as much width and height inside
+         * the dialog pane as possible.
+         *
+         * @return true if the dialog will try to maximize itself
+         */
         public final BooleanProperty maximizeProperty() {
             return maximize;
         }
@@ -870,42 +1213,50 @@ public class DialogPane extends Pane {
             return maximize.get();
         }
 
-        private final ObjectProperty<Callable> onCancelled = new SimpleObjectProperty<>(this, "onCancelled");
-
-        public Callable getOnCancelled() {
-            return onCancelled.get();
-        }
-
         // content
 
         private final ObjectProperty<Node> content = new SimpleObjectProperty<>(this, "content");
 
+        /**
+         * Stores the content shown in the center of the dialog.
+         *
+         * @return the content node with the actual UI being displayed to the user
+         */
         public final ObjectProperty<Node> contentProperty() {
             return content;
         }
 
-        public void setContent(Node content) {
+        public final void setContent(Node content) {
             this.content.set(content);
         }
 
-        public Node getContent() {
+        public final Node getContent() {
             return content.get();
         }
 
-        // title extras
+        // extras
 
-        private final ObjectProperty<Node> titleExtras = new SimpleObjectProperty<>(this, "titleExtras");
+        private final ObjectProperty<Node> extras = new SimpleObjectProperty<>(this, "extras");
 
-        public Node getTitleExtras() {
-            return titleExtras.get();
+        public final Node getExtras() {
+            return extras.get();
         }
 
-        public ObjectProperty<Node> titleExtrasProperty() {
-            return titleExtras;
+        /**
+         * An extra node that might be displayed in the header or the footer of the dialog. This
+         * node will only be shown if custom header or footer factories make use of it. By default
+         * this node will not be visible anywhere.
+         *
+         * @return an extra node to be placed in the header or footer
+         * @see DialogPane#setHeaderFactory(Callback)
+         * @see DialogPane#setFooterFactory(Callback)
+         */
+        public final ObjectProperty<Node> extrasProperty() {
+            return extras;
         }
 
-        public void setTitleExtras(Node titleExtras) {
-            this.titleExtras.set(titleExtras);
+        public final void setExtras(Node extras) {
+            this.extras.set(extras);
         }
 
         // title
@@ -916,6 +1267,12 @@ public class DialogPane extends Pane {
             return title;
         }
 
+        /**
+         * The title for the dialog. The default header factory will use this property
+         * to populate a label with it.
+         *
+         * @return the dialog's title
+         */
         public final String getTitle() {
             return title.get();
         }
@@ -928,44 +1285,68 @@ public class DialogPane extends Pane {
 
         private final ObservableList<String> styleClass = FXCollections.observableArrayList();
 
-        public ObservableList<String> getStyleClass() {
+        /**
+         * A list with additional styles that will be added to the content pane of the dialog.
+         *
+         * @return additional css styles
+         */
+        public final ObservableList<String> getStyleClass() {
             return styleClass;
         }
 
 
-        // Show buttons bar
-        private final BooleanProperty showButtonsBar = new SimpleBooleanProperty(this, "showButtonsBar", true);
+        // show header / title
 
-        public final BooleanProperty showButtonsBarProperty() {
-            return showButtonsBar;
+        private final BooleanProperty showHeader = new SimpleBooleanProperty(this, "showHeader", true);
+
+        /**
+         * Determines if the dialog will show the title / header at the bottom or not.
+         *
+         * @return true if the dialog shows the button bar
+         */
+        public final BooleanProperty showHeaderProperty() {
+            return showHeader;
         }
 
-        public final boolean isShowButtonsBar() {
-            return showButtonsBarProperty().get();
+        public final boolean isShowHeader() {
+            return showHeaderProperty().get();
         }
 
-        public final void setShowButtonsBar(boolean showButtonsBar) {
-            showButtonsBarProperty().set(showButtonsBar);
+        public final void setShowHeader(boolean showHeader) {
+            showHeaderProperty().set(showHeader);
         }
 
-        // exception
+        // show footer / button bar
 
-        private final ObjectProperty<Throwable> exception = new SimpleObjectProperty<>(this, "exception");
+        private final BooleanProperty showFooter = new SimpleBooleanProperty(this, "showFooter", true);
 
-        public final ObjectProperty<Throwable> exceptionProperty() {
-            return exception;
+        /**
+         * Determines if the dialog will show the button bar / footer at the bottom or not.
+         *
+         * @return true if the dialog shows the button bar
+         */
+        public final BooleanProperty showFooterProperty() {
+            return showFooter;
         }
 
-        public final void setException(Throwable ex) {
-            exception.set(ex);
+        public final boolean isShowFooter() {
+            return showFooterProperty().get();
         }
 
-        public final Throwable getException() {
-            return exception.get();
+        public final void setShowFooter(boolean showFooter) {
+            showFooterProperty().set(showFooter);
         }
 
-        Map<ButtonType, Button> buttonMap = new HashMap<>();
+        private final Map<ButtonType, Button> buttonMap = new HashMap<>();
 
+        /**
+         * Returns the button that was created for the given button type, but only if
+         * such a button type was requested for the dialog.
+         *
+         * @param type the button type
+         * @return the button
+         * @see #getButtonTypes
+         */
         public final Button getButton(ButtonType type) {
             return buttonMap.get(type);
         }
@@ -978,28 +1359,19 @@ public class DialogPane extends Pane {
             return validator.get();
         }
 
+        /**
+         * A validator that can be used in the context of this dialog. Applications
+         * can call {@link Validator#createCheck()} to add one or more checks which will
+         * be validated once the user tries to commit the dialog.
+         *
+         * @return the dialog's validator
+         */
         public final ObjectProperty<Validator> validatorProperty() {
             return validator;
         }
 
         public final void setValidator(Validator validator) {
             this.validator.set(validator);
-        }
-
-        // scrollable
-
-        private final BooleanProperty scrollable = new SimpleBooleanProperty(this, "scrollable");
-
-        public final boolean isScrollable() {
-            return scrollable.get();
-        }
-
-        public final BooleanProperty scrollableProperty() {
-            return scrollable;
-        }
-
-        public final void setScrollable(boolean scrollable) {
-            this.scrollable.set(scrollable);
         }
 
         // resizable
@@ -1010,6 +1382,11 @@ public class DialogPane extends Pane {
             return resizable.get();
         }
 
+        /**
+         * Determines if the user will be able to interactively resize the dialog.
+         *
+         * @return true if the dialog can be resized
+         */
         public final BooleanProperty resizableProperty() {
             return resizable;
         }
@@ -1018,12 +1395,19 @@ public class DialogPane extends Pane {
             this.resizable.set(resizable);
         }
 
+        // pref width
+
         private final DoubleProperty prefWidth = new SimpleDoubleProperty(this, "prefWidth", Region.USE_COMPUTED_SIZE);
 
         public final double getPrefWidth() {
             return prefWidth.get();
         }
 
+        /**
+         * Explicitly determines the preferred width of the dialog. The default value is {@link Region#USE_COMPUTED_SIZE}.
+         *
+         * @return the preferred width of the dialog
+         */
         public final DoubleProperty prefWidthProperty() {
             return prefWidth;
         }
@@ -1038,6 +1422,11 @@ public class DialogPane extends Pane {
             return prefHeight.get();
         }
 
+        /**
+         * Explicitly determines the preferred height of the dialog. The default value is {@link Region#USE_COMPUTED_SIZE}.
+         *
+         * @return the preferred height of the dialog
+         */
         public final DoubleProperty prefHeightProperty() {
             return prefHeight;
         }
@@ -1075,7 +1464,7 @@ public class DialogPane extends Pane {
             StackPane content = new StackPane();
             content.getStyleClass().add("content");
 
-            if (dialog.isPadding()) {
+            if (dialog.isUsingPadding()) {
                 content.getStyleClass().add("padding");
             }
 
@@ -1097,11 +1486,11 @@ public class DialogPane extends Pane {
 
             boolean blankDialog = this.dialog.getType().equals(Type.BLANK);
 
-            header.setVisible(!blankDialog);
-            header.setManaged(!blankDialog);
+            header.setVisible(!blankDialog && dialog.isShowHeader());
+            header.setManaged(!blankDialog && dialog.isShowHeader());
 
-            footer.setVisible(!blankDialog && !dialog.getButtonTypes().isEmpty());
-            footer.setManaged(!blankDialog && !dialog.getButtonTypes().isEmpty());
+            footer.setVisible(!blankDialog && dialog.isShowFooter());
+            footer.setManaged(!blankDialog && dialog.isShowFooter());
 
             getStyleClass().setAll("content-pane");
             getStyleClass().addAll(this.dialog.getStyleClass());
@@ -1254,19 +1643,6 @@ public class DialogPane extends Pane {
             if (!dialog.getType().equals(Type.BLANK)) {
                 createButtons();
             }
-
-            dialog.getButtonTypes().addListener((Observable it) -> {
-                if (dialog.getButtonTypes().isEmpty()) {
-                    setVisible(false);
-                    setManaged(false);
-                } else {
-                    if (!dialog.getType().equals(Type.BLANK)) {
-                        createButtons();
-                        setVisible(true);
-                        setManaged(true);
-                    }
-                }
-            });
         }
 
         /**
@@ -1274,8 +1650,6 @@ public class DialogPane extends Pane {
          */
         protected void createButtons() {
             getButtons().clear();
-
-            setVisible(dialog.isShowButtonsBar());
 
             boolean hasDefault = false;
             for (ButtonType buttonType : dialog.getButtonTypes()) {
@@ -1326,7 +1700,7 @@ public class DialogPane extends Pane {
                             }
 
                             dialog.getDialogPane().hideDialog(dialog);
-                            dialog.complete(buttonType);
+                            dialog.commit(buttonType);
                         }
                     });
 
