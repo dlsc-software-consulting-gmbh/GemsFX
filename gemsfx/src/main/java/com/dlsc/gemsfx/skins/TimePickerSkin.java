@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.TimePicker;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -34,9 +35,24 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
     private final HBox fieldsBox = new HBox();
 
     private TimePickerPopup popup;
+    private final Region spacer;
+    private final HBox box;
 
     public TimePickerSkin(TimePicker picker) {
         super(picker);
+
+        spacer = new Region();
+        spacer.getStyleClass().add("spacer");
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        fieldsBox.setFillHeight(true);
+        fieldsBox.setAlignment(Pos.CENTER_LEFT);
+        fieldsBox.getStyleClass().add("fields-box");
+
+        box = new HBox();
+        box.setFillHeight(true);
+        box.getStyleClass().add("box");
+        box.setAlignment(Pos.CENTER_LEFT);
 
         hourField = new HourField(picker);
         minuteField = new MinuteField(picker);
@@ -55,6 +71,7 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
         editButton.addEventHandler(MouseEvent.MOUSE_EXITED, this::mouseExited);
         editButton.addEventHandler(MouseEvent.MOUSE_RELEASED, this::mouseReleased);
         editButton.setMaxHeight(Double.MAX_VALUE);
+        editButton.setMaxWidth(Double.MAX_VALUE);
         editButton.setGraphic(new FontIcon());
         editButton.setFocusTraversable(false);
         editButton.visibleProperty().bind(picker.showPopupTriggerButtonProperty());
@@ -75,6 +92,7 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
         picker.hoursSeparatorProperty().addListener(buildViewListener);
         picker.minutesSeparatorProperty().addListener(buildViewListener);
         picker.secondsSeparatorProperty().addListener(buildViewListener);
+        registerChangeListener(picker.buttonDisplayProperty(), it -> updateBox());
 
         buildView();
 
@@ -95,6 +113,8 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
                 hide();
             }
         });
+
+        getChildren().add(box);
     }
 
     private void updateFormat() {
@@ -140,13 +160,14 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
     }
 
     private void updateEmptyPseudoClass() {
-        hourField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
-        minuteField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
-        secondField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
-        millisecondField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
-        getSkinnable().getHoursSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
-        getSkinnable().getMinutesSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
-        getSkinnable().getSecondsSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, getSkinnable().getTime() == null);
+        LocalTime time = getSkinnable().getTime();
+        hourField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, time == null);
+        minuteField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, time == null);
+        secondField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, time == null);
+        millisecondField.pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, time == null);
+        getSkinnable().getHoursSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, time == null);
+        getSkinnable().getMinutesSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, time == null);
+        getSkinnable().getSecondsSeparator().pseudoClassStateChanged(EMPTY_PSEUDO_CLASS, time == null);
     }
 
     private void updateFocus() {
@@ -163,25 +184,34 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
         Node minutesSeparator = getSkinnable().getMinutesSeparator();
         Node secondsSeparator = getSkinnable().getSecondsSeparator();
 
-        Region spacer = new Region();
-        spacer.getStyleClass().add("spacer");
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        fieldsBox.getChildren().addAll(hourField, hoursSeparator, minuteField, minutesSeparator, secondField, secondsSeparator, millisecondField);
-        fieldsBox.setFillHeight(true);
-        fieldsBox.setAlignment(Pos.CENTER_LEFT);
-        fieldsBox.getStyleClass().add("fields-box");
-
-        HBox box = new HBox(fieldsBox, spacer, editButton);
-        box.setFillHeight(true);
-        box.getStyleClass().add("box");
-        box.setAlignment(Pos.CENTER_LEFT);
-
         hoursSeparator.setOnMouseClicked(evt -> minuteField.requestFocus());
         minutesSeparator.setOnMouseClicked(evt -> secondField.requestFocus());
         secondsSeparator.setOnMouseClicked(evt -> millisecondField.requestFocus());
 
-        getChildren().add(box);
+        fieldsBox.getChildren().setAll(hourField, hoursSeparator, minuteField, minutesSeparator, secondField, secondsSeparator, millisecondField);
+        updateBox();
+    }
+
+    private void updateBox() {
+        CustomComboBox.ButtonDisplay buttonDisplay = getSkinnable().getButtonDisplay();
+        switch (buttonDisplay) {
+            case LEFT:
+                box.getChildren().setAll(editButton, spacer, fieldsBox);
+                HBox.setHgrow(editButton, Priority.NEVER);
+                break;
+            case RIGHT:
+                box.getChildren().setAll(fieldsBox, spacer, editButton);
+                HBox.setHgrow(editButton, Priority.NEVER);
+                break;
+            case BUTTON_ONLY:
+                box.getChildren().setAll(editButton);
+                HBox.setHgrow(editButton, Priority.ALWAYS);
+                break;
+            case FIELD_ONLY:
+                box.getChildren().setAll(fieldsBox);
+                HBox.setHgrow(editButton, Priority.NEVER);
+                break;
+        }
     }
 
     private void updateFieldValues() {
@@ -330,5 +360,16 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
                 }
             });
         }
+    }
+
+    @Override
+    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        CustomComboBox.ButtonDisplay buttonDisplay = getSkinnable().getButtonDisplay();
+        if (buttonDisplay == CustomComboBox.ButtonDisplay.LEFT) {
+            double v = editButton.prefWidth(height);
+            System.out.println("v = " + v);
+            return v;
+        }
+        return super.computeMaxWidth(height, topInset, rightInset, bottomInset, leftInset);
     }
 }

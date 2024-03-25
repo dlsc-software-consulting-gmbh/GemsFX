@@ -202,8 +202,8 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
         Bounds b = popupContent.getLayoutBounds();
         double currentWidth = b.getWidth();
         double currentHeight = b.getHeight();
-        double newWidth = currentWidth < minWidth ? minWidth : currentWidth;
-        double newHeight = currentHeight < minHeight ? minHeight : currentHeight;
+        double newWidth = Math.max(currentWidth, minWidth);
+        double newHeight = Math.max(currentHeight, minHeight);
 
         if (newWidth != currentWidth || newHeight != currentHeight) {
             // Resizing content to resolve issues such as RT-32582 and RT-33700
@@ -224,9 +224,7 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
         if (control == null) {
             throw new IllegalStateException("ComboBox is null");
         }
-        if (control.isFocusTraversable()) {
-            control.requestFocus();
-        }
+        control.requestFocus();
 
         Node content = getPopupContent();
         if (content == null) {

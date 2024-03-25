@@ -5,7 +5,6 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.css.PseudoClass;
-import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
@@ -24,7 +23,7 @@ import java.util.function.UnaryOperator;
  * A control for selecting a year. This class utilizes the {@link YearView} control inside of its
  * popup.
  */
-public class YearPicker extends ComboBoxBase<Year> {
+public class YearPicker extends CustomComboBox<Year> {
 
     private final TextField editor = new TextField();
     private final NumberStringFilteredConverter converter = new NumberStringFilteredConverter();

@@ -3,9 +3,11 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.CalendarPicker;
 import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.SelectionModel;
+import com.dlsc.gemsfx.CustomComboBox;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.scene.Node;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -19,6 +21,9 @@ import java.util.Objects;
 public class CalendarPickerSkin extends ToggleVisibilityComboBoxSkin<CalendarPicker> {
 
     private CalendarView view;
+    private final HBox box;
+    private final TextField editor;
+    private final StackPane arrowButton;
 
     public CalendarPickerSkin(CalendarPicker picker) {
         super(picker);
@@ -32,20 +37,45 @@ public class CalendarPickerSkin extends ToggleVisibilityComboBoxSkin<CalendarPic
         Region arrow = new Region();
         arrow.getStyleClass().add("arrow");
 
-        StackPane arrowButton = new StackPane(arrow);
+        arrowButton = new StackPane(arrow);
         arrowButton.setFocusTraversable(false);
         arrowButton.getStyleClass().add("arrow-button"); // using styles similar to combobox, for consistency
         arrowButton.addEventHandler(MouseEvent.MOUSE_RELEASED, this::mouseReleased);
         arrowButton.addEventHandler(MouseEvent.MOUSE_ENTERED, this::mouseEntered);
         arrowButton.addEventHandler(MouseEvent.MOUSE_EXITED, this::mouseExited);
 
-        HBox.setHgrow(picker.getEditor(), Priority.ALWAYS);
+        editor = picker.getEditor();
+        HBox.setHgrow(editor, Priority.ALWAYS);
 
-        HBox box = new HBox(picker.getEditor(), arrowButton);
+        box = new HBox();
         box.setFillHeight(true);
         box.getStyleClass().add("box");
+        updateBox();
 
         getChildren().add(box);
+        registerChangeListener(picker.buttonDisplayProperty(), o -> updateBox());
+    }
+
+    private void updateBox() {
+        CustomComboBox.ButtonDisplay buttonDisplay = getSkinnable().getButtonDisplay();
+        switch (buttonDisplay) {
+            case LEFT:
+                box.getChildren().setAll(arrowButton, editor);
+                HBox.setHgrow(arrowButton, Priority.NEVER);
+                break;
+            case RIGHT:
+                box.getChildren().setAll(editor, arrowButton);
+                HBox.setHgrow(arrowButton, Priority.NEVER);
+                break;
+            case BUTTON_ONLY:
+                box.getChildren().setAll(arrowButton);
+                HBox.setHgrow(arrowButton, Priority.ALWAYS);
+                break;
+            case FIELD_ONLY:
+                box.getChildren().setAll(editor);
+                HBox.setHgrow(arrowButton, Priority.NEVER);
+                break;
+        }
     }
 
     protected Node getPopupContent() {

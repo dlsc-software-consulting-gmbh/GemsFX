@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.MapChangeListener;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.input.KeyCode;
@@ -26,7 +25,7 @@ import java.util.function.Consumer;
  * to show hours and minutes, or hours and minutes and seconds, or hours and minutes and seconds
  * and milliseconds (see {@link #formatProperty()})
  */
-public class TimePicker extends ComboBoxBase<LocalTime> {
+public class TimePicker extends CustomComboBox<LocalTime> {
 
     /**
      * The time picker control supports 12 and 24 hour times. 12 hour times

@@ -5,7 +5,6 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
-import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -26,7 +25,7 @@ import java.util.Objects;
  * used by {@link javafx.scene.control.DatePicker}. The {@link CalendarView} allows the user to directly jump
  * to a specific month or year.
  */
-public class CalendarPicker extends ComboBoxBase<LocalDate> {
+public class CalendarPicker extends CustomComboBox<LocalDate> {
 
     private final TextField editor = new TextField();
 
