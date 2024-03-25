@@ -29,7 +29,7 @@ public class CalendarPicker extends CustomComboBox<LocalDate> {
 
     private final TextField editor = new TextField();
 
-    private final CalendarView calendarView = new CalendarView();
+    private CalendarView calendarView;
 
     /**
      * Constructs a new calendar picker.
@@ -43,6 +43,7 @@ public class CalendarPicker extends CustomComboBox<LocalDate> {
 
         setOnTouchPressed(evt -> commitValueAndShow());
 
+        calendarView = getCalendarView();
         calendarView.setShowToday(true);
         calendarView.setShowTodayButton(true);
         calendarView.dateFilterProperty().bind(dateFilterProperty());
@@ -107,11 +108,15 @@ public class CalendarPicker extends CustomComboBox<LocalDate> {
     }
 
     /**
-     * Returns the view used to display dates when the picker is opening up.
+     * Returns the view used to display dates when the picker is opening up. This method can be overridden
+     * to return a customized version of a {@link CalendarView}.
      *
      * @return the calendar view for picking a date
      */
-    public final CalendarView getCalendarView() {
+    public CalendarView getCalendarView() {
+        if (calendarView == null) {
+            calendarView = new CalendarView();
+        }
         return calendarView;
     }
 
