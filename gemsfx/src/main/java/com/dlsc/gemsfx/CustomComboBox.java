@@ -22,18 +22,22 @@ public class CustomComboBox<T> extends ComboBoxBase<T> {
     private static final PseudoClass PSEUDO_CLASS_FIELD_ONLY = PseudoClass.getPseudoClass("field-only");
 
     public enum ButtonDisplay {
+
         /**
          * Button positioned before the text field
          */
         LEFT,
+
         /**
          * Button positioned after the text field
          */
         RIGHT,
+
         /**
          * Only the button is displayed
          */
         BUTTON_ONLY,
+
         /**
          * Only the text field is displayed
          */
@@ -44,6 +48,18 @@ public class CustomComboBox<T> extends ComboBoxBase<T> {
         pseudoClassStateChanged(PSEUDO_CLASS_RIGHT, true);
     }
 
+    /**
+     * This property allows customization of the button's display mode within the picker component.
+     * Four display modes are supported:
+     * <P>
+     * {@link ButtonDisplay#LEFT}: Places the button to the left side of the text field. <br/>
+     * {@link ButtonDisplay#RIGHT}: Places the button to the right side of the text field, which is the default behavior.<br/>
+     * {@link ButtonDisplay#BUTTON_ONLY}: Only the button is visible, and the text field is hidden.<br/>
+     * {@link ButtonDisplay#FIELD_ONLY}: Only the text field is visible, and the button is hidden.
+     * <P>
+     *
+     * @return  the button display property of the picker
+     */
     public final ObjectProperty<ButtonDisplay> buttonDisplayProperty() {
         if (buttonDisplay == null) {
             buttonDisplay = new StyleableObjectProperty<>(DEFAULT_BUTTON_DISPLAY) {
