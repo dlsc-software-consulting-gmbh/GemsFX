@@ -21,6 +21,20 @@
     -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
     -fx-background-insets: 1 1 1 0, 1, 2;
     -fx-background-radius: 0 3 3 0, 0 2 2 0, 0 1 1 0;
+    -fx-cursor: default;
+}
+
+.calendar-picker:left > .box > .arrow-button {
+    -fx-padding: 0.5em 0.833333em 0.5em 0.667em; /* 6 10 6 8 */
+    -fx-background-insets: 1 0 1 1, 1, 2;
+    -fx-background-radius: 3 0 0 3, 2 0 0 2, 1 0 0 1;
+}
+
+.calendar-picker:button-only > .box > .arrow-button {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 1;
+    -fx-background-radius: 5, 5, 4, 3;
+    -fx-padding: 0.5em 0.75em; /* 6 9 6 9 */
 }
 
 .calendar-picker > .box > .arrow-button > .arrow {
@@ -38,6 +52,18 @@
     -fx-border-color: -fx-faint-focus-color;
     -fx-border-width: 0 0 0 1;
     -fx-border-insets: 0 0 0 -1;
+}
+
+.calendar-picker:left:focused > .box > .arrow-button {
+    -fx-background-radius: 2 0 0 2, 1 0 0 1, 1 0 0 1, 1 0 0 1;
+    -fx-border-width: 0 1 0 0;
+    -fx-border-insets: 0 -1 0 0;
+}
+
+.calendar-picker:button-only:focused > .box > .arrow-button {
+    -fx-background-radius: 2, 1, 1, 1;
+    -fx-border-width: 1;
+    -fx-border-insets: -1;
 }
 
 .calendar-picker > .box > .text-field {

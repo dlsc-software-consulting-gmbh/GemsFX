@@ -12,7 +12,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
@@ -23,7 +22,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Consumer;
 
-public class DurationPicker extends ComboBoxBase<Duration> {
+public class DurationPicker extends CustomComboBox<Duration> {
 
     public DurationPicker() {
         getStyleClass().setAll("duration-picker", "text-input");

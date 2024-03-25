@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.skins.YearMonthPickerSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
-import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -24,7 +23,7 @@ import java.util.Objects;
  * and expects the full month name, e.g. "January", "February", etc. An invalid text
  * resets the value of the picker to null.
  */
-public class YearMonthPicker extends ComboBoxBase<YearMonth> {
+public class YearMonthPicker extends CustomComboBox<YearMonth> {
 
     private final TextField editor = new TextField();
 

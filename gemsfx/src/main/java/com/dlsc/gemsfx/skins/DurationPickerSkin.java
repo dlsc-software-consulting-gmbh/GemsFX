@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.DurationPicker;
+import com.dlsc.gemsfx.Spacer;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -9,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -21,6 +22,9 @@ import java.util.List;
 
 public class DurationPickerSkin extends ToggleVisibilityComboBoxSkin<DurationPicker> {
 
+    private final HBox box;
+    private final Spacer spacer;
+    private final Button editButton;
     private final HBox innerBox = new HBox();
     private final List<DurationUnitField> durationUnitFields = new ArrayList<>();
 
@@ -29,13 +33,14 @@ public class DurationPickerSkin extends ToggleVisibilityComboBoxSkin<DurationPic
     public DurationPickerSkin(DurationPicker picker) {
         super(picker);
 
-        Button editButton = new Button();
+        editButton = new Button();
         editButton.getStyleClass().add("edit-button");
         editButton.addEventHandler(MouseEvent.MOUSE_ENTERED, this::mouseEntered);
         editButton.addEventHandler(MouseEvent.MOUSE_EXITED, this::mouseExited);
         editButton.addEventHandler(MouseEvent.MOUSE_RELEASED, this::mouseReleased);
 
         editButton.setMaxHeight(Double.MAX_VALUE);
+        editButton.setMaxWidth(Double.MAX_VALUE);
         editButton.setGraphic(new FontIcon());
         editButton.setFocusTraversable(false);
         editButton.visibleProperty().bind(picker.showPopupTriggerButtonProperty());
@@ -47,17 +52,38 @@ public class DurationPickerSkin extends ToggleVisibilityComboBoxSkin<DurationPic
         innerBox.getStyleClass().add("fields-box");
         innerBox.setAlignment(Pos.CENTER_LEFT);
 
-        Region spacer = new Region();
-        spacer.getStyleClass().add("spacer");
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        spacer = new Spacer();
 
-        HBox box = new HBox(innerBox, spacer, editButton);
+        box = new HBox();
         box.getStyleClass().add("box");
-
+        updateBox();
         getChildren().add(box);
 
+        registerChangeListener(picker.buttonDisplayProperty(), it -> updateBox());
         picker.separatorFactoryProperty().addListener(it -> buildView());
         buildView();
+    }
+
+    private void updateBox() {
+        CustomComboBox.ButtonDisplay value = getSkinnable().getButtonDisplay();
+        switch (value) {
+            case LEFT:
+                box.getChildren().setAll(editButton, spacer, innerBox);
+                HBox.setHgrow(editButton, Priority.NEVER);
+                break;
+            case RIGHT:
+                box.getChildren().setAll(innerBox, spacer, editButton);
+                HBox.setHgrow(editButton, Priority.NEVER);
+                break;
+            case BUTTON_ONLY:
+                box.getChildren().setAll(editButton);
+                HBox.setHgrow(editButton, Priority.ALWAYS);
+                break;
+            case FIELD_ONLY:
+                box.getChildren().setAll(innerBox);
+                HBox.setHgrow(editButton, Priority.NEVER);
+                break;
+        }
     }
 
     @Override

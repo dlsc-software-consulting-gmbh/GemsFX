@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
+import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.TimePicker.Format;
 import fr.brouillard.oss.cssfx.CSSFX;
@@ -122,6 +123,10 @@ public class TimePickerApp extends Application {
             }
         });
 
+        ComboBox<CustomComboBox.ButtonDisplay> buttonDisplayBox = new ComboBox<>();
+        buttonDisplayBox.getItems().addAll(CustomComboBox.ButtonDisplay.values());
+        buttonDisplayBox.valueProperty().bindBidirectional(timePicker.buttonDisplayProperty());
+
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
         gridPane.setVgap(20);
@@ -132,8 +137,10 @@ public class TimePickerApp extends Application {
         gridPane.add(earliestTimeBox, 1, 1);
         gridPane.add(new Label("Latest time:"), 0, 2);
         gridPane.add(latestTimeBox, 1, 2);
-        gridPane.add(new Label("Format"), 0, 3);
-        gridPane.add(formatComboBox, 1, 3);
+        gridPane.add(new Label("Button Display"), 0, 3);
+        gridPane.add(buttonDisplayBox, 1, 3);
+        gridPane.add(new Label("Format"), 0, 4);
+        gridPane.add(formatComboBox, 1, 4);
 
         VBox box0 = new VBox(20, timePicker, valueLabel);
         VBox box1 = new VBox(20, datePicker, textField);

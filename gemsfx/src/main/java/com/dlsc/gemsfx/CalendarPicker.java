@@ -5,7 +5,6 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
-import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -26,11 +25,11 @@ import java.util.Objects;
  * used by {@link javafx.scene.control.DatePicker}. The {@link CalendarView} allows the user to directly jump
  * to a specific month or year.
  */
-public class CalendarPicker extends ComboBoxBase<LocalDate> {
+public class CalendarPicker extends CustomComboBox<LocalDate> {
 
     private final TextField editor = new TextField();
 
-    private final CalendarView calendarView = new CalendarView();
+    private CalendarView calendarView;
 
     /**
      * Constructs a new calendar picker.
@@ -44,6 +43,7 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
 
         setOnTouchPressed(evt -> commitValueAndShow());
 
+        calendarView = getCalendarView();
         calendarView.setShowToday(true);
         calendarView.setShowTodayButton(true);
         calendarView.dateFilterProperty().bind(dateFilterProperty());
@@ -108,11 +108,15 @@ public class CalendarPicker extends ComboBoxBase<LocalDate> {
     }
 
     /**
-     * Returns the view used to display dates when the picker is opening up.
+     * Returns the view used to display dates when the picker is opening up. This method can be overridden
+     * to return a customized version of a {@link CalendarView}.
      *
      * @return the calendar view for picking a date
      */
-    public final CalendarView getCalendarView() {
+    public CalendarView getCalendarView() {
+        if (calendarView == null) {
+            calendarView = new CalendarView();
+        }
         return calendarView;
     }
 
