@@ -17,7 +17,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class YearPickerApp extends Application {
-    private int index = 0;
 
     @Override
     public void start(Stage stage) {
