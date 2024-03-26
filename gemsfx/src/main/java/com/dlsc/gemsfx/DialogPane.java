@@ -683,6 +683,7 @@ public class DialogPane extends Pane {
         });
 
         Dialog<Void> dialog = new Dialog<>(this, Type.BLANK);
+        dialog.getStyleClass().add("busy-dialog");
         dialog.setContent(busyIndicator);
         dialog.getButtonTypes().clear();
         dialog.setDelay(Duration.millis(1000));
@@ -807,6 +808,26 @@ public class DialogPane extends Pane {
         }
     }
 
+    private final DoubleProperty maximizedPadding = new SimpleDoubleProperty(this, "dialogPadding", 20);
+
+    public final double getMaximizedPadding() {
+        return maximizedPadding.get();
+    }
+
+    /**
+     * Defines the padding around a maximized dialog in the dialog pane. A padding of zero would result in
+     * the dialog to use the entire width and height of the dialog pane.
+     *
+     * @return the padding around a maximized dialog
+     */
+    public final DoubleProperty maximizedPaddingProperty() {
+        return maximizedPadding;
+    }
+
+    public final void setMaximizedPadding(double maximizedPadding) {
+        this.maximizedPadding.set(maximizedPadding);
+    }
+
     @Override
     protected void layoutChildren() {
         Insets insets = getInsets();
@@ -816,25 +837,29 @@ public class DialogPane extends Pane {
         double contentWidth = getWidth() - insets.getLeft() - insets.getRight();
         double contentHeight = getHeight() - insets.getTop() - insets.getBottom();
 
-        for (ContentPane dialogContentPane : dialogContentPanes) {
-            double dialogWidth = Math.min(dialogContentPane.maxWidth(-1), Math.max(dialogContentPane.minWidth(-1), dialogContentPane.prefWidth(-1)));
-            double dialogHeight = Math.min(dialogContentPane.maxHeight(-1), Math.max(dialogContentPane.minHeight(-1), dialogContentPane.prefHeight(-1)));
+        for (ContentPane contentPane : dialogContentPanes) {
 
-            Dialog<?> dialog = dialogContentPane.getDialog();
+            double dialogWidth = Math.min(contentPane.maxWidth(contentHeight), Math.max(contentPane.minWidth(contentHeight), contentPane.prefWidth(contentHeight)));
+            double dialogHeight = Math.min(contentPane.maxHeight(contentWidth), Math.max(contentPane.minHeight(contentWidth), contentPane.prefHeight(contentWidth)));
+
+            Dialog<?> dialog = contentPane.getDialog();
+
+            double maxWidth = contentWidth - 2 * getMaximizedPadding();
+            double maxHeight = contentHeight - 2 * getMaximizedPadding();
 
             if (dialog.isMaximize()) {
-                dialogWidth = contentWidth * .9;
-                dialogHeight = contentHeight * .9;
+                dialogWidth = maxWidth;
+                dialogHeight = maxHeight;
             } else {
                 // make sure the dialog fits into the visible area
-                dialogWidth = Math.min(dialogWidth, contentWidth * .9);
-                dialogHeight = Math.min(dialogHeight, contentHeight * .9);
+                dialogWidth = Math.min(dialogWidth, maxWidth);
+                dialogHeight = Math.min(dialogHeight, maxHeight);
             }
 
             double dialogTargetY = contentY + (contentHeight - dialogHeight) / 2;
-            DoubleProperty dialogVisibility = dialogVisibilityMap.get(dialogContentPane);
+            DoubleProperty dialogVisibility = dialogVisibilityMap.get(contentPane);
             if (dialogVisibility != null) {
-                dialogContentPane.resizeRelocate(contentX + (contentWidth - dialogWidth) / 2, dialogTargetY * dialogVisibility.get(), dialogWidth, dialogHeight);
+                contentPane.resizeRelocate(contentX + (contentWidth - dialogWidth) / 2, dialogTargetY * dialogVisibility.get(), dialogWidth, dialogHeight);
             }
         }
 
@@ -1393,46 +1418,6 @@ public class DialogPane extends Pane {
 
         public final void setResizable(boolean resizable) {
             this.resizable.set(resizable);
-        }
-
-        // pref width
-
-        private final DoubleProperty prefWidth = new SimpleDoubleProperty(this, "prefWidth", Region.USE_COMPUTED_SIZE);
-
-        public final double getPrefWidth() {
-            return prefWidth.get();
-        }
-
-        /**
-         * Explicitly determines the preferred width of the dialog. The default value is {@link Region#USE_COMPUTED_SIZE}.
-         *
-         * @return the preferred width of the dialog
-         */
-        public final DoubleProperty prefWidthProperty() {
-            return prefWidth;
-        }
-
-        public final void setPrefWidth(double prefWidth) {
-            this.prefWidth.set(prefWidth);
-        }
-
-        private final DoubleProperty prefHeight = new SimpleDoubleProperty(this, "prefHeight", Region.USE_COMPUTED_SIZE);
-
-        public final double getPrefHeight() {
-            return prefHeight.get();
-        }
-
-        /**
-         * Explicitly determines the preferred height of the dialog. The default value is {@link Region#USE_COMPUTED_SIZE}.
-         *
-         * @return the preferred height of the dialog
-         */
-        public final DoubleProperty prefHeightProperty() {
-            return prefHeight;
-        }
-
-        public final void setPrefHeight(double prefHeight) {
-            this.prefHeight.set(prefHeight);
         }
     }
 
