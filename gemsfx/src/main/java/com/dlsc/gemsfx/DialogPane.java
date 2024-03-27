@@ -140,6 +140,9 @@ public class DialogPane extends Pane {
 
         mouseTransparentProperty().bind(showingDialogProperty().not());
 
+        visibleProperty().bind(dialogsProperty().emptyProperty().not());
+        managedProperty().bind(dialogsProperty().emptyProperty().not());
+
         glassPane = new GlassPane();
         glassPane.fadeInOutProperty().bind(fadeInOutProperty());
         glassPane.fadeInOutDurationProperty().bind(animationDurationProperty());
@@ -192,12 +195,7 @@ public class DialogPane extends Pane {
             }
         });
 
-        getStylesheets().add(getUserAgentStylesheet());
-    }
-
-    @Override
-    public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(DialogPane.class.getResource("dialog.css")).toExternalForm();
+        getStylesheets().add(Objects.requireNonNull(DialogPane.class.getResource("dialog.css")).toExternalForm());
     }
 
     /**
