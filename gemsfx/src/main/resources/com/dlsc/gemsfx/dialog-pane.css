@@ -6,8 +6,6 @@
     -fx-background-radius: 3px;
     -fx-background-color: -fx-base;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
-    -fx-min-width: 350px;
-    -fx-min-height: 250px;
 }
 
 .dialog-pane > .content-pane .prompt-node-wrapper {
@@ -71,11 +69,16 @@
     -fx-image: url("dialog-confirm.png");
 }
 
-dialog-pane > .content-pane > .vbox > .content {
+.dialog-pane > .content-pane > .vbox > .content {
+}
+
+.dialog-pane > .content-pane > .vbox > .content > .message-label {
+    -fx-pref-width: 350px;
+    -fx-alignment: center;
 }
 
 .dialog-pane > .content-pane > .vbox > .content.padding {
-    -fx-padding: 30px 30px 50px 30px;
+    -fx-padding: 30px;
 }
 
 .dialog-pane > .content-pane > .vbox > .header > .close-button {

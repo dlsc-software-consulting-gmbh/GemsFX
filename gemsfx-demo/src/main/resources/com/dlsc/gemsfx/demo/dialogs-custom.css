@@ -15,8 +15,6 @@
     -fx-background-radius: 3px;
     -fx-background-color: #3C434C;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
-    -fx-min-width: 350px;
-    -fx-min-height: 250px;
 }
 
 .dialog-pane > .content-pane .prompt-node-wrapper {
@@ -30,7 +28,6 @@
     -fx-text-fill: white;
     -fx-font-family: "Inter Bold";
 }
-
 
 .dialog-pane > .content-pane > .vbox > .button-bar {
     -fx-padding: 10px 30px;
@@ -78,14 +75,14 @@
     -fx-background-insets: -3px, 0px;
 }
 
-.dialog-pane > .content-pane > .vbox > .header {
+.dialog-pane > .content-pane > .vbox > .header > .title-and-icon-box {
     -fx-padding: 25px 50px 0px 50px;
     -fx-background-color: transparent;
     -fx-background-insets: 0, 0 0 1 0;
     -fx-spacing: 15px;
 }
 
-.dialog-pane > .content-pane > .vbox > .header > .title {
+.dialog-pane > .content-pane > .vbox > .header > .title-and-icon-box > .title {
     -fx-alignment: center;
     -fx-padding: 0;
     -fx-font-size: 24px;
@@ -96,23 +93,32 @@
 .dialog-pane > .content-pane > .vbox > .content {
 }
 
+.dialog-pane > .content-pane > .vbox > .content > .message-label {
+    -fx-pref-width: 350px;
+    -fx-alignment: center;
+}
+
 .dialog-pane > .content-pane > .vbox > .content.padding {
     -fx-padding: 30px 30px 50px 30px;
 }
 
-.dialog-pane > .content-pane.information > .vbox > .header > .icon {
+.dialog-pane > .content-pane > .vbox > .header > .title-and-icon-box {
+    -fx-alignment: center;
+}
+
+.dialog-pane > .content-pane.information > .vbox > .header > .title-and-icon-box > .icon {
     -fx-image: url("icon_dialog_info.png");
 }
 
-.dialog-pane > .content-pane.warning > .vbox > .header > .icon {
+.dialog-pane > .content-pane.warning > .vbox > .header > .title-and-icon-box > .icon {
     -fx-image: url("icon_dialog_warning.png");
 }
 
-.dialog-pane > .content-pane.error > .vbox > .header > .icon {
+.dialog-pane > .content-pane.error > .vbox > .header > .title-and-icon-box > .icon {
     -fx-image: url("icon_dialog_error.png");
 }
 
-.dialog-pane > .content-pane.confirmation > .vbox > .header > .icon {
+.dialog-pane > .content-pane.confirmation > .vbox > .header > .title-and-icon-box > .icon {
     -fx-image: url("icon_dialog_help.png");
 }
 
@@ -135,7 +141,7 @@
     -fx-text-fill: white;
 }
 
-.dialog-pane > .content-pane > .close-button {
+.dialog-pane > .content-pane > .vbox > .header > .close-button {
     -fx-graphic: url("dialog-cancel.png");
     -size: 21px;
     -fx-background-color: #64707A;
@@ -148,7 +154,7 @@
  * BusyIndicator
  */
 
-.dialog-pane .busy-indicator {
+.dialog-pane > * > * > * > .dialog-pane-busy-indicator {
     -size: 100px;
     -fx-pref-width: -size;
     -fx-pref-height: -size;

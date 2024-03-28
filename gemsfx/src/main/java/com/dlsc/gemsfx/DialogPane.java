@@ -69,6 +69,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -160,7 +161,6 @@ public class DialogPane extends Pane {
                         SimpleDoubleProperty visibility = new SimpleDoubleProperty();
                         visibility.addListener(it -> requestLayout());
                         dialogVisibilityMap.put(contentPane, visibility);
-                        getChildren().add(contentPane);
                         slideInOut(1, visibility, () -> contentPane);
                     });
 
@@ -194,8 +194,11 @@ public class DialogPane extends Pane {
                 newScene.addEventFilter(KeyEvent.KEY_PRESSED, weakEscapeHandler);
             }
         });
+    }
 
-        getStylesheets().add(Objects.requireNonNull(DialogPane.class.getResource("dialog.css")).toExternalForm());
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(DialogPane.class.getResource("dialog-pane.css")).toExternalForm();
     }
 
     /**
@@ -349,7 +352,9 @@ public class DialogPane extends Pane {
     }
 
     private Dialog<ButtonType> doShowDialog(Type type, String title, String message, List<ButtonType> buttons) {
-        return showNode(type, title, new Label(message), buttons);
+        Label node = new Label(message);
+        node.getStyleClass().add("message-label");
+        return showNode(type, title, node, buttons);
     }
 
     /**
@@ -978,6 +983,7 @@ public class DialogPane extends Pane {
                     getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
                     break;
                 case BLANK:
+                    setUsingPadding(false);
                     break;
             }
         }
@@ -998,6 +1004,29 @@ public class DialogPane extends Pane {
          */
         public final DialogPane getDialogPane() {
             return pane;
+        }
+
+        // resize callback
+
+        private final ObjectProperty<BiConsumer<Double, Double>> onResize = new SimpleObjectProperty<>(this, "onResize");
+
+        public final BiConsumer<Double, Double> getOnResize() {
+            return onResize.get();
+        }
+
+        /**
+         * A callback used to inform interested parties when the width or height of the
+         * dialog was changed interactively by the user.
+         *
+         * @see #resizableProperty()
+         * @return the callback / the consumer of the new width and height
+         */
+        public final ObjectProperty<BiConsumer<Double, Double>> onResizeProperty() {
+            return onResize;
+        }
+
+        public final void setOnResize(BiConsumer<Double, Double> onResize) {
+            this.onResize.set(onResize);
         }
 
         // show close button
@@ -1406,9 +1435,10 @@ public class DialogPane extends Pane {
         }
 
         /**
-         * Determines if the user will be able to interactively resize the dialog.
+         * Determines if the user will be able to interactively resize the dialog. The default is
+         * false.
          *
-         * @return true if the dialog can be resized
+         * @return true if the dialog can be resized (default is false)
          */
         public final BooleanProperty resizableProperty() {
             return resizable;
@@ -1419,7 +1449,7 @@ public class DialogPane extends Pane {
         }
     }
 
-    private class ContentPane extends StackPane {
+    private class ContentPane extends ResizablePane {
 
         private final Dialog<?> dialog;
 
@@ -1437,6 +1467,9 @@ public class DialogPane extends Pane {
 
         public ContentPane(Dialog<?> dialog) {
             this.dialog = Objects.requireNonNull(dialog);
+
+            resizableProperty().bind(dialog.resizableProperty());
+            onResizeProperty().bind(dialog.onResizeProperty());
 
             setFocusTraversable(false);
 

@@ -5,6 +5,7 @@ import com.dlsc.gemsfx.DialogPane.Dialog;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -20,12 +21,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -47,9 +43,13 @@ public class DialogsApp extends Application {
         Button blankButton = new Button("Blank");
         blankButton.setOnAction(evt -> {
             Dialog<ButtonType> dialog = new Dialog<>(dialogPane, DialogPane.Type.BLANK);
+            dialog.setResizable(true);
+            dialog.setOnResize((width, height) -> System.out.println("width: " + width + ", height: " + height));
+
             Label content = new Label("Content");
             content.setAlignment(Pos.CENTER);
             content.setPrefSize(400, 300);
+            content.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
             content.setOnMouseClicked(e -> dialog.cancel());
             dialog.setContent(content);
             dialog.show();
@@ -93,10 +93,16 @@ public class DialogsApp extends Application {
         inputMultiLineButton.setOnAction(evt -> dialogPane.showTextInput("Multiline Text Input", "Please enter something, anything really.", "Text already there ...", true));
 
         Button node1Button = new Button("Node 1");
-        node1Button.setOnAction(evt -> dialogPane.showNode(INFORMATION, "Select Person", createCustomNode(), List.of(new ButtonType("Send Mail", ButtonBar.ButtonData.OK_DONE), new ButtonType("Call", ButtonBar.ButtonData.APPLY))));
+        node1Button.setOnAction(evt -> {
+            Dialog<Object> dialog = dialogPane.showNode(INFORMATION, "Select Person", createCustomNode(), List.of(new ButtonType("Send Mail", ButtonBar.ButtonData.OK_DONE), new ButtonType("Call", ButtonBar.ButtonData.APPLY)));
+            dialog.setResizable(true);
+        });
 
         Button node2Button = new Button("Node 2");
-        node2Button.setOnAction(evt -> dialogPane.showNode(INFORMATION, "Generic Node Dialog", createGenericNode()));
+        node2Button.setOnAction(evt -> {
+            Dialog<Object> dialog = dialogPane.showNode(INFORMATION, "Generic Node Dialog", createGenericNode());
+            dialog.setResizable(true);
+        });
 
         Button busyButton = new Button("Busy");
         busyButton.setOnAction(evt -> dialogPane.showBusyIndicator().onClose(buttonType -> {
@@ -145,11 +151,12 @@ public class DialogsApp extends Application {
         styleBox.valueProperty().addListener(it -> {
             switch (styleBox.getValue()) {
                 case "Default":
-                    dialogPane.getStylesheets().clear();
+                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPane.class.getResource("dialog-pane.css")).toExternalForm());
                     dialogPane.setConverter(null);
                     break;
                 case "Dark":
-                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogsApp.class.getResource("dialogs-dark.css")).toExternalForm());
+                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPane.class.getResource("dialog-pane.css")).toExternalForm());
+                    dialogPane.getStylesheets().add(Objects.requireNonNull(DialogsApp.class.getResource("dialogs-dark.css")).toExternalForm());
                     dialogPane.setConverter(null);
                     break;
                 case "Custom":
@@ -242,13 +249,17 @@ public class DialogsApp extends Application {
     private Node createGenericNode() {
         Rectangle rect = new Rectangle();
         rect.setFill(Color.RED);
-        rect.setWidth(300);
-        rect.setHeight(300);
 
-        Label label = new Label("300 x 300");
+        Label label = new Label();
+        label.textProperty().bind(Bindings.createStringBinding(() -> (int) rect.getWidth() + "x" + (int) rect.getHeight(), rect.widthProperty(), rect.heightProperty()));
         label.setStyle("-fx-text-fill: white;");
 
-        return new StackPane(rect, label);
+        StackPane pane = new StackPane(rect, label);
+        pane.setPrefSize(300, 300);
+        pane.setMinSize(300, 300);
+        rect.widthProperty().bind(pane.widthProperty());
+        rect.heightProperty().bind(pane.heightProperty());
+        return pane;
     }
 
     public static class Person {

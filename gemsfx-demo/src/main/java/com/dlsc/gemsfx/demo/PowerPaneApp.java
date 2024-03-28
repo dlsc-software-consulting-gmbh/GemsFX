@@ -198,11 +198,12 @@ public class PowerPaneApp extends Application {
         styleBox.valueProperty().addListener(it -> {
             switch (styleBox.getValue()) {
                 case "Default":
-                    dialogPane.getStylesheets().clear();
+                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPane.class.getResource("dialog-pane.css")).toExternalForm());
                     dialogPane.setConverter(null);
                     break;
                 case "Dark":
-                    dialogPane.getStylesheets().setAll(DialogsApp.class.getResource("dialogs-dark.css").toExternalForm());
+                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPane.class.getResource("dialog-pane.css")).toExternalForm());
+                    dialogPane.getStylesheets().add(DialogsApp.class.getResource("dialogs-dark.css").toExternalForm());
                     dialogPane.setConverter(null);
                     break;
                 case "Custom":

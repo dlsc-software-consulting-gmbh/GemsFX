@@ -3,3 +3,4 @@ target/
 *.iml
 out/
 trace.log
+/scenicView.properties
