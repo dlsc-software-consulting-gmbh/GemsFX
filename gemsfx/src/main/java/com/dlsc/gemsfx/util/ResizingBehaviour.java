@@ -1,11 +1,10 @@
-package com.dlsc.gemsfx;
+package com.dlsc.gemsfx.util;
 
 import javafx.beans.property.*;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Region;
 
 import java.util.function.BiConsumer;
 
@@ -13,7 +12,7 @@ import java.util.function.BiConsumer;
  * A stack pane that can be resized interactively by the user. Resize operations (mouse pressed and
  * dragged) modify the preferred width and height of the pane and also the layout x and y coordinates.
  */
-public class ResizablePane extends StackPane {
+public class ResizingBehaviour {
 
     private double startX;
     private double startY;
@@ -33,24 +32,24 @@ public class ResizablePane extends StackPane {
         RESIZE_SE
     }
 
-    private Operation operation;
+    private Operation operation = Operation.NONE;
 
     /**
-     * Constructs a new pane without any children. Those have to be added later
-     * via the {@link StackPane#getChildren()} method.
+     * Installs the resizing behaviour on the given region. Once installed
+     * the user will be able to resize the given region (depending on the container
+     * the region lives in and the layout algorithms used by that container).
+     *
+     * @param region the region to support resizing
+     * @return the installed behaviour
      */
-    public ResizablePane() {
-        this(new Node[]{});
+    public static ResizingBehaviour install(Region region) {
+        return new ResizingBehaviour(region);
     }
 
     /**
      * Constructs a new pane with the given children.
      */
-    public ResizablePane(Node... children) {
-        super(children);
-
-        getStyleClass().add("resizable-pane");
-
+    private ResizingBehaviour(Region region) {
         EventHandler<MouseEvent> mouseMovedHandler = evt -> {
             if (!isResizable()) {
                 return;
@@ -63,32 +62,32 @@ public class ResizablePane extends StackPane {
 
             if (x < offset) {
                 if (y < offset) {
-                    setCursor(Cursor.NW_RESIZE);
-                } else if (y > getHeight() - offset) {
-                    setCursor(Cursor.SW_RESIZE);
+                    region.setCursor(Cursor.NW_RESIZE);
+                } else if (y > region.getHeight() - offset) {
+                    region.setCursor(Cursor.SW_RESIZE);
                 } else {
-                    setCursor(Cursor.W_RESIZE);
+                    region.setCursor(Cursor.W_RESIZE);
                 }
-            } else if (x > getWidth() - offset) {
+            } else if (x > region.getWidth() - offset) {
                 if (y < offset) {
-                    setCursor(Cursor.NE_RESIZE);
-                } else if (y > getHeight() - offset) {
-                    setCursor(Cursor.SE_RESIZE);
+                    region.setCursor(Cursor.NE_RESIZE);
+                } else if (y > region.getHeight() - offset) {
+                    region.setCursor(Cursor.SE_RESIZE);
                 } else {
-                    setCursor(Cursor.E_RESIZE);
+                    region.setCursor(Cursor.E_RESIZE);
                 }
             } else if (y < offset) {
-                setCursor(Cursor.N_RESIZE);
-            } else if (y > getHeight() - offset) {
-                setCursor(Cursor.S_RESIZE);
+                region.setCursor(Cursor.N_RESIZE);
+            } else if (y > region.getHeight() - offset) {
+                region.setCursor(Cursor.S_RESIZE);
             } else {
-                setCursor(Cursor.DEFAULT);
+                region.setCursor(Cursor.DEFAULT);
             }
         };
 
-        addEventFilter(MouseEvent.MOUSE_MOVED, mouseMovedHandler);
-        addEventFilter(MouseEvent.MOUSE_ENTERED, mouseMovedHandler);
-        addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, mouseMovedHandler);
+        region.addEventFilter(MouseEvent.MOUSE_MOVED, mouseMovedHandler);
+        region.addEventFilter(MouseEvent.MOUSE_ENTERED, mouseMovedHandler);
+        region.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, mouseMovedHandler);
 
         EventHandler<MouseEvent> mousePressedHandler = evt -> {
             if (!isResizable()) {
@@ -106,45 +105,45 @@ public class ResizablePane extends StackPane {
             if (x < offset) {
                 if (y < offset) {
                     operation = Operation.RESIZE_NW;
-                } else if (y > getHeight() - offset) {
+                } else if (y > region.getHeight() - offset) {
                     operation = Operation.RESIZE_SW;
                 } else {
                     operation = Operation.RESIZE_W;
                 }
-            } else if (x > getWidth() - offset) {
+            } else if (x > region.getWidth() - offset) {
                 if (y < offset) {
                     operation = Operation.RESIZE_NE;
-                } else if (y > getHeight() - offset) {
+                } else if (y > region.getHeight() - offset) {
                     operation = Operation.RESIZE_SE;
                 } else {
                     operation = Operation.RESIZE_E;
                 }
             } else if (y < offset) {
                 operation = Operation.RESIZE_N;
-            } else if (y > getHeight() - offset) {
+            } else if (y > region.getHeight() - offset) {
                 operation = Operation.RESIZE_S;
             } else {
                 operation = Operation.NONE;
             }
         };
 
-        addEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedHandler);
-        addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> operation = Operation.NONE);
-        addEventFilter(MouseEvent.MOUSE_DRAGGED, evt -> {
+        region.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedHandler);
+        region.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> operation = Operation.NONE);
+        region.addEventFilter(MouseEvent.MOUSE_DRAGGED, evt -> {
             double x = evt.getScreenX();
             double y = evt.getScreenY();
 
             double deltaX = (evt.getScreenX() - startX) * 4;
             double deltaY = (evt.getScreenY() - startY) * 4;
 
-            double width = getWidth();
-            double height = getHeight();
+            double width = region.getWidth();
+            double height = region.getHeight();
 
-            double minHeight = minHeight(width);
-            double maxHeight = maxHeight(width);
+            double minHeight = region.minHeight(width);
+            double maxHeight = region.maxHeight(width);
 
-            double minWidth = minWidth(height);
-            double maxWidth = maxWidth(height);
+            double minWidth = region.minWidth(height);
+            double maxWidth = region.maxWidth(height);
 
             double newHeight;
             double newWidth;
@@ -156,8 +155,8 @@ public class ResizablePane extends StackPane {
                 case RESIZE_N:
                     newHeight = height - deltaY;
                     if (newHeight >= minHeight && newHeight <= maxHeight) {
-                        setLayoutY(y);
-                        setPrefHeight(Math.min(maxHeight, Math.max(minHeight, newHeight)));
+                        region.setLayoutY(y);
+                        region.setPrefHeight(Math.min(maxHeight, Math.max(minHeight, newHeight)));
                         startX = x;
                         startY = y;
                     }
@@ -166,7 +165,7 @@ public class ResizablePane extends StackPane {
                 case RESIZE_S:
                     newHeight = height + deltaY;
                     if (newHeight >= minHeight && newHeight <= maxHeight) {
-                        setPrefHeight(Math.min(maxHeight, Math.max(minHeight, newHeight)));
+                        region.setPrefHeight(Math.min(maxHeight, Math.max(minHeight, newHeight)));
                         startX = x;
                         startY = y;
                     }
@@ -175,8 +174,8 @@ public class ResizablePane extends StackPane {
                 case RESIZE_W:
                     newWidth = width - deltaX;
                     if (newWidth >= minWidth && newWidth <= maxWidth) {
-                        setLayoutX(x);
-                        setPrefWidth(Math.min(maxWidth, Math.max(minWidth, newWidth)));
+                        region.setLayoutX(x);
+                        region.setPrefWidth(Math.min(maxWidth, Math.max(minWidth, newWidth)));
                         startX = x;
                         startY = y;
                     }
@@ -185,7 +184,7 @@ public class ResizablePane extends StackPane {
                 case RESIZE_E:
                     newWidth = width + deltaX;
                     if (newWidth >= minWidth && newWidth <= maxWidth) {
-                        setPrefWidth(Math.min(maxWidth, Math.max(minWidth, newWidth)));
+                        region.setPrefWidth(Math.min(maxWidth, Math.max(minWidth, newWidth)));
                         startX = x;
                         startY = y;
                     }
@@ -194,14 +193,14 @@ public class ResizablePane extends StackPane {
                 case RESIZE_NW:
                     newWidth = width - deltaX;
                     if (newWidth >= minWidth && newWidth <= maxWidth) {
-                        setLayoutX(x);
-                        setPrefWidth(Math.min(maxWidth, Math.max(minWidth, newWidth)));
+                        region.setLayoutX(x);
+                        region.setPrefWidth(Math.min(maxWidth, Math.max(minWidth, newWidth)));
                         startX = x;
                     }
                     newHeight = height - deltaY;
                     if (newHeight >= minHeight && newHeight <= maxHeight) {
-                        setLayoutY(y);
-                        setPrefHeight(Math.min(maxHeight, Math.max(minHeight, newHeight)));
+                        region.setLayoutY(y);
+                        region.setPrefHeight(Math.min(maxHeight, Math.max(minHeight, newHeight)));
                         startY = y;
                     }
                     evt.consume();
@@ -209,14 +208,14 @@ public class ResizablePane extends StackPane {
                 case RESIZE_NE:
                     newWidth = width + deltaX;
                     if (newWidth >= minWidth && newWidth <= maxWidth) {
-                        setPrefWidth(Math.min(maxWidth, Math.max(minWidth, newWidth)));
+                        region.setPrefWidth(Math.min(maxWidth, Math.max(minWidth, newWidth)));
                         startX = x;
                     }
 
                     newHeight = height - deltaY;
                     if (newHeight >= minHeight && newHeight <= maxHeight) {
-                        setLayoutY(y);
-                        setPrefHeight(Math.min(maxHeight, Math.max(minHeight, height - deltaY)));
+                        region.setLayoutY(y);
+                        region.setPrefHeight(Math.min(maxHeight, Math.max(minHeight, height - deltaY)));
                         startY = y;
                     }
 
@@ -225,14 +224,14 @@ public class ResizablePane extends StackPane {
                 case RESIZE_SW:
                     newWidth = width - deltaX;
                     if (newWidth >= minWidth && newWidth <= maxWidth) {
-                        setLayoutX(x);
-                        setPrefWidth(Math.min(maxWidth, Math.max(minWidth, width - deltaX)));
+                        region.setLayoutX(x);
+                        region.setPrefWidth(Math.min(maxWidth, Math.max(minWidth, width - deltaX)));
                         startX = x;
                     }
 
                     newHeight = height + deltaY;
                     if (newHeight >= minHeight && newHeight <= maxHeight) {
-                        setPrefHeight(Math.min(newHeight, Math.max(minHeight, height + deltaY)));
+                        region.setPrefHeight(Math.min(newHeight, Math.max(minHeight, height + deltaY)));
                         startY = y;
                     }
 
@@ -242,15 +241,15 @@ public class ResizablePane extends StackPane {
                     newWidth = width + deltaX;
 
                     if (newWidth >= minWidth && newWidth <= maxWidth) {
-                        setLayoutX(x);
-                        setPrefWidth(Math.min(maxWidth, Math.max(minWidth, newWidth)));
+                        region.setLayoutX(x);
+                        region.setPrefWidth(Math.min(maxWidth, Math.max(minWidth, newWidth)));
                         startX = x;
                     }
 
                     newHeight = height + deltaY;
 
                     if (newHeight >= minHeight && newHeight <= maxHeight) {
-                        setPrefHeight(Math.max(minHeight, newHeight));
+                        region.setPrefHeight(Math.max(minHeight, newHeight));
                         startY = y;
                     }
 
@@ -260,7 +259,7 @@ public class ResizablePane extends StackPane {
 
             BiConsumer<Double, Double> onResize = getOnResize();
             if (onResize != null) {
-                onResize.accept(getWidth(), getHeight());
+                onResize.accept(region.getWidth(), region.getHeight());
             }
         });
     }

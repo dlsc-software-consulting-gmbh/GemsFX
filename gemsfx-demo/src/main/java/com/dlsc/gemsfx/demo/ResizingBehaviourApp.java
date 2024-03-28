@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.ResizablePane;
-import com.dlsc.gemsfx.YearView;
+import com.dlsc.gemsfx.util.ResizingBehaviour;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -9,12 +8,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ResizablePaneApp extends Application {
+public class ResizingBehaviourApp extends Application {
 
     @Override
     public void start(Stage stage) {
@@ -24,18 +21,22 @@ public class ResizablePaneApp extends Application {
         content.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         content.setAlignment(Pos.CENTER);
 
-        ResizablePane resizablePane = new ResizablePane(content);
-        resizablePane.setStyle("-fx-background-color: blue;");
-        resizablePane.setPadding(new Insets(10));
-        resizablePane.setPrefSize(250, 250);
-        resizablePane.setMaxSize(950, 850);
+        StackPane stackPane = new StackPane(content);
+        stackPane.setStyle("-fx-background-color: blue;");
+        stackPane.setPadding(new Insets(10));
+        stackPane.setPrefSize(250, 250);
+        stackPane.setMaxSize(950, 850);
 
-        Group group = new Group(resizablePane);
+        ResizingBehaviour resizingSupport = ResizingBehaviour.install(stackPane);
+        resizingSupport.setResizable(true);
+        resizingSupport.setOnResize((width, height) -> System.out.println("width: " + width + ", height: " + height));
 
-        StackPane stackPane = new StackPane(group);
-        stackPane.setAlignment(Pos.CENTER);
+        Group group = new Group(stackPane);
 
-        Scene scene = new Scene(stackPane);
+        StackPane container = new StackPane(group);
+        container.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(container);
         CSSFX.start(scene);
 
         stage.setTitle("Resizable Pane");

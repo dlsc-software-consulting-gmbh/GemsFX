@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.util.FocusUtil;
+import com.dlsc.gemsfx.util.ResizingBehaviour;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -690,6 +691,7 @@ public class DialogPane extends Pane {
         dialog.setContent(busyIndicator);
         dialog.getButtonTypes().clear();
         dialog.setDelay(Duration.millis(1000));
+        dialog.setUsingPadding(true); // blank dialogs have no padding
         dialog.show();
 
         return dialog;
@@ -1449,7 +1451,7 @@ public class DialogPane extends Pane {
         }
     }
 
-    private class ContentPane extends ResizablePane {
+    private class ContentPane extends StackPane {
 
         private final Dialog<?> dialog;
 
@@ -1468,8 +1470,9 @@ public class DialogPane extends Pane {
         public ContentPane(Dialog<?> dialog) {
             this.dialog = Objects.requireNonNull(dialog);
 
-            resizableProperty().bind(dialog.resizableProperty());
-            onResizeProperty().bind(dialog.onResizeProperty());
+            ResizingBehaviour resizingSupport = ResizingBehaviour.install(this);
+            resizingSupport.resizableProperty().bind(dialog.resizableProperty());
+            resizingSupport.onResizeProperty().bind(dialog.onResizeProperty());
 
             setFocusTraversable(false);
 
