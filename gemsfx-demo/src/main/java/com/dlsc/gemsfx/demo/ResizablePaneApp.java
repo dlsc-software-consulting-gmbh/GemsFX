@@ -6,6 +6,7 @@ import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
@@ -20,16 +21,18 @@ public class ResizablePaneApp extends Application {
         Label content = new Label("Content");
         content.setMouseTransparent(false);
         content.setStyle("-fx-background-color: orange;");
-        content.setPrefSize(250, 250);
         content.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
         content.setAlignment(Pos.CENTER);
 
-        ResizablePane view = new ResizablePane(content);
-        view.setStyle("-fx-background-color: blue;");
-        view.setPadding(new Insets(10));
+        ResizablePane resizablePane = new ResizablePane(content);
+        resizablePane.setStyle("-fx-background-color: blue;");
+        resizablePane.setPadding(new Insets(10));
+        resizablePane.setPrefSize(250, 250);
+        resizablePane.setMaxSize(950, 850);
 
-        StackPane stackPane = new StackPane(view);
+        Group group = new Group(resizablePane);
+
+        StackPane stackPane = new StackPane(group);
         stackPane.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(stackPane);

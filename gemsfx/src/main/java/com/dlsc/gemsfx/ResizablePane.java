@@ -9,11 +9,18 @@ import javafx.scene.layout.StackPane;
 
 import java.util.function.BiConsumer;
 
+/**
+ * A stack pane that can be resized interactively by the user. Resize operations (mouse pressed and
+ * dragged) modify the preferred width and height of the pane and also the layout x and y coordinates.
+ */
 public class ResizablePane extends StackPane {
 
     private double startX;
     private double startY;
 
+    /*
+     * List of possible resizing operations.
+     */
     private enum Operation {
         NONE,
         RESIZE_N,
@@ -26,10 +33,19 @@ public class ResizablePane extends StackPane {
         RESIZE_SE
     }
 
+    private Operation operation;
+
+    /**
+     * Constructs a new pane without any children. Those have to be added later
+     * via the {@link StackPane#getChildren()} method.
+     */
     public ResizablePane() {
         this(new Node[]{});
     }
 
+    /**
+     * Constructs a new pane with the given children.
+     */
     public ResizablePane(Node... children) {
         super(children);
 
@@ -85,8 +101,6 @@ public class ResizablePane extends StackPane {
             double x = evt.getX();
             double y = evt.getY();
 
-            Operation operation;
-
             final double offset = getOffset();
 
             if (x < offset) {
@@ -112,12 +126,10 @@ public class ResizablePane extends StackPane {
             } else {
                 operation = Operation.NONE;
             }
-
-            setOperation(operation);
         };
 
         addEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedHandler);
-        addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> setOperation(Operation.NONE));
+        addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> operation = Operation.NONE);
         addEventFilter(MouseEvent.MOUSE_DRAGGED, evt -> {
             double x = evt.getScreenX();
             double y = evt.getScreenY();
@@ -137,7 +149,7 @@ public class ResizablePane extends StackPane {
             double newHeight;
             double newWidth;
 
-            switch (getOperation()) {
+            switch (operation) {
 
                 case NONE:
                     break;
@@ -294,22 +306,17 @@ public class ResizablePane extends StackPane {
         this.offset.set(offset);
     }
 
-    private final ObjectProperty<Operation> operation = new SimpleObjectProperty<>(this, "operation", Operation.NONE);
-
-    private Operation getOperation() {
-        return operation.get();
-    }
-
-    private void setOperation(Operation operation) {
-        this.operation.set(operation);
-    }
-
     private final BooleanProperty resizable = new SimpleBooleanProperty(this, "resizable", true);
 
     public final boolean isResizable() {
         return resizable.get();
     }
 
+    /**
+     * Determines if the pane can currently be resized or not.
+     *
+     * @return true if the pane is resizable
+     */
     public final BooleanProperty resizableProperty() {
         return resizable;
     }
