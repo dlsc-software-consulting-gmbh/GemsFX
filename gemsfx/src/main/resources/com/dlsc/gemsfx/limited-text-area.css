@@ -1,0 +1,38 @@
+.limited-text-area > .container {
+    -fx-spacing: 5px;
+}
+
+.limited-text-area > .container > .bottom-box {
+    -fx-alignment: center-left;
+}
+
+.limited-text-area > .container > .bottom-box .tips {
+    -fx-text-fill: -fx-box-border;
+    -fx-font-size: 12px;
+}
+
+.limited-text-area > .container > .bottom-box .tips .ikonli-font-icon {
+    -fx-icon-size: 15px;
+    -fx-icon-color: -fx-box-border;
+}
+
+.limited-text-area:error > .container > .bottom-box .tips {
+    -fx-text-fill: -fx-mark-color;
+}
+
+.limited-text-area:error > .container > .bottom-box .tips .ikonli-font-icon {
+    -fx-icon-color: -fx-mark-color;
+}
+
+.limited-text-area:error > .container .length-indicator .length-label {
+    -fx-text-fill: #ff5700;
+    -fx-font-weight: bold;
+}
+
+.limited-text-area:error > .container .length-indicator > .circle-progress-indicator .progress-arc {
+    -fx-stroke: #ff5700;
+}
+
+.limited-text-area:warning > .container .length-indicator > .circle-progress-indicator > .progress-arc {
+    -fx-stroke: #f3c34c;
+}
