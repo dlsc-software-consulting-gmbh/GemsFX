@@ -139,18 +139,21 @@ public class LimitedTextArea extends Control {
         return editor;
     }
 
-
     private final ObjectProperty<IntegerRange> characterRangeLimit = new SimpleObjectProperty<>(this, "characterRangeLimit");
 
-    public IntegerRange getCharacterRangeLimit() {
+    public final IntegerRange getCharacterRangeLimit() {
         return characterRangeLimit.get();
     }
 
-    public ObjectProperty<IntegerRange> characterRangeLimitProperty() {
+    /**
+     * The character range limit property defines the minimum and maximum number of characters allowed in the text area.
+     * @return the character range limit property
+     */
+    public final ObjectProperty<IntegerRange> characterRangeLimitProperty() {
         return characterRangeLimit;
     }
 
-    public void setCharacterRangeLimit(IntegerRange characterRangeLimit) {
+    public final void setCharacterRangeLimit(IntegerRange characterRangeLimit) {
         this.characterRangeLimit.set(characterRangeLimit);
     }
 
@@ -160,72 +163,83 @@ public class LimitedTextArea extends Control {
      */
     private final ObservableList<String> excludedItems = FXCollections.observableArrayList();
 
-    public ObservableList<String> getExcludedItems() {
+    public final ObservableList<String> getExcludedItems() {
         return excludedItems;
     }
 
     private final StringProperty tips = new SimpleStringProperty(this, "tips");
 
-    public String getTips() {
+    public final String getTips() {
         return tips.get();
     }
 
-    public StringProperty tipsProperty() {
+    /**
+     * The tips property used to display a hint or description of the text area.
+     */
+    public final StringProperty tipsProperty() {
         return tips;
     }
 
-    public void setTips(String tips) {
+    public final void setTips(String tips) {
         this.tips.set(tips);
     }
 
     private final StringProperty text = new SimpleStringProperty(this, "text", "");
 
-    public String getText() {
+    public final String getText() {
         return text.get();
     }
 
-    public StringProperty textProperty() {
+    /**
+     * The text property represents the content of the text area.
+     */
+    public final StringProperty textProperty() {
         return text;
     }
 
-    public void setText(String text) {
+    public final void setText(String text) {
         this.text.set(text);
     }
 
     private final ReadOnlyBooleanWrapper outOfRange = new ReadOnlyBooleanWrapper(this, "isOverLimit", false);
 
-    public boolean getOutOfRange() {
+    public final boolean getOutOfRange() {
         return outOfRange.get();
     }
 
     /**
      * A read-only property indicating whether the text content is over the maximum length or under the minimum length.
      */
-    public ReadOnlyBooleanProperty outOfRangeProperty() {
+    public final ReadOnlyBooleanProperty outOfRangeProperty() {
         return outOfRange.getReadOnlyProperty();
     }
 
-    private void setOutOfRange(boolean outOfRange) {
+    private final void setOutOfRange(boolean outOfRange) {
         this.outOfRange.set(outOfRange);
     }
 
     private final ObjectProperty<LengthDisplayMode> lengthDisplayMode = new SimpleObjectProperty<>(this, "lengthDisplayMode", LengthDisplayMode.AUTO);
 
-    public LengthDisplayMode getLengthDisplayMode() {
+    public final LengthDisplayMode getLengthDisplayMode() {
         return lengthDisplayMode.get();
     }
 
-    public ObjectProperty<LengthDisplayMode> lengthDisplayModeProperty() {
+    /**
+     * The length display mode property defines when the text length indicator label should be displayed.
+     * {@link LengthDisplayMode#AUTO}, {@link LengthDisplayMode#ALWAYS_SHOW}, {@link LengthDisplayMode#ALWAYS_HIDE}
+     * @return the length display mode property
+     */
+    public final ObjectProperty<LengthDisplayMode> lengthDisplayModeProperty() {
         return lengthDisplayMode;
     }
 
-    public void setLengthDisplayMode(LengthDisplayMode lengthDisplayMode) {
+    public final void setLengthDisplayMode(LengthDisplayMode lengthDisplayMode) {
         this.lengthDisplayMode.set(lengthDisplayMode);
     }
 
     private final DoubleProperty warningThreshold = new SimpleDoubleProperty(this, "warningThreshold", 0.9);
 
-    public double getWarningThreshold() {
+    public final double getWarningThreshold() {
         return warningThreshold.get();
     }
 
@@ -233,11 +247,11 @@ public class LimitedTextArea extends Control {
      * The warning threshold is a value between 0 and 1.
      * When the text length is greater than or equal to the maximum length times the warning threshold, the warning style will be applied.
      */
-    public DoubleProperty warningThresholdProperty() {
+    public final DoubleProperty warningThresholdProperty() {
         return warningThreshold;
     }
 
-    public void setWarningThreshold(double warningThreshold) {
+    public final void setWarningThreshold(double warningThreshold) {
         this.warningThreshold.set(warningThreshold);
     }
 

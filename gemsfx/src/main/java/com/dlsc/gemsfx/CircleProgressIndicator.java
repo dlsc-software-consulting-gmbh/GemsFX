@@ -158,11 +158,11 @@ public class CircleProgressIndicator extends ProgressIndicator {
         return arcType;
     }
 
-    public ArcType getArcType() {
+    public final ArcType getArcType() {
         return arcType == null ? DEFAULT_ARC_TYPE : arcType.get();
     }
 
-    public void setArcType(ArcType arcType) {
+    public final void setArcType(ArcType arcType) {
         arcTypeProperty().set(arcType);
     }
 
