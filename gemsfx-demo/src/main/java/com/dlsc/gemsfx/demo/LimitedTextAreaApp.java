@@ -6,6 +6,7 @@ import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -25,7 +26,7 @@ public class LimitedTextAreaApp extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         //init the text area
-        textArea.getTextArea().getEditor().setWrapText(true);
+        textArea.setWrapText(true);
         textArea.setText("Hello, World!");
         textArea.setCharacterRangeLimit(new IntegerRange(0, 30));
 
@@ -33,7 +34,7 @@ public class LimitedTextAreaApp extends Application {
         splitPane.setDividerPositions(0.75);
         splitPane.getItems().addAll(textArea, getControlPanel());
 
-        Scene scene = new Scene(splitPane, 600, 320);
+        Scene scene = new Scene(splitPane, 560, 420);
         primaryStage.setScene(scene);
         primaryStage.setTitle("LimitedTextArea Demo");
         primaryStage.show();
@@ -71,6 +72,9 @@ public class LimitedTextAreaApp extends Application {
                 }
                 , textArea.characterRangeLimitProperty()));
 
+        CheckBox showBottomCheckBox = new CheckBox("Show bottom");
+        showBottomCheckBox.selectedProperty().bindBidirectional(textArea.showBottomProperty());
+
         Label excludedItems = new Label("Excluded characters");
         ListView<String> excludedItemsView = new ListView<>();
         excludedItems.textProperty().bind(Bindings.createStringBinding(
@@ -99,7 +103,7 @@ public class LimitedTextAreaApp extends Application {
         Bindings.bindContent(textArea.getExcludedItems(), excludedItemsView.getSelectionModel().getSelectedItems());
 
         return new VBox(10, lengthDisplayMode, lengthDisplayModeComboBox, warningThreshold, warningThresholdSlider,
-                minLength, minLengthField, maxLength, maxLengthField, excludedItems, excludedItemsView);
+                minLength, minLengthField, maxLength, maxLengthField, showBottomCheckBox, excludedItems, excludedItemsView);
     }
 
     public static void main(String[] args) {

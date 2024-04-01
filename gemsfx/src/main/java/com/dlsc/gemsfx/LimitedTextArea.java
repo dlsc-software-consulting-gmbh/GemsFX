@@ -2,8 +2,7 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.LimitedTextAreaSkin;
 import com.dlsc.gemsfx.util.IntegerRange;
-import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -14,10 +13,16 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.css.PseudoClass;
-import javafx.scene.control.Control;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
 import javafx.scene.control.Skin;
-import javafx.scene.control.TextArea;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A specialized text area view that imposes restrictions on the input text length, allowing
@@ -37,14 +42,10 @@ import javafx.scene.control.TextArea;
  * phrases.
  */
 
-public class LimitedTextArea extends Control {
+public class LimitedTextArea extends ResizableTextArea {
 
     private static final String DEFAULT_STYLE_CLASS = "limited-text-area";
-    private static final PseudoClass ERROR_PSEUDO_CLASS = PseudoClass.getPseudoClass("error");
-    private static final PseudoClass WARNING_PSEUDO_CLASS = PseudoClass.getPseudoClass("warning");
-
-    private final ResizableTextArea textArea = new ResizableTextArea();
-    private final TextArea editor = textArea.getEditor();
+    private static final boolean DEFAULT_SHOW_BOTTOM = true;
 
     public enum LengthDisplayMode {
 
@@ -69,74 +70,43 @@ public class LimitedTextArea extends Control {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
         getStylesheets().add(LimitedTextArea.class.getResource("limited-text-area.css").toExternalForm());
-
-        editor.setWrapText(true);
-        textArea.textProperty().bindBidirectional(textProperty());
-
-        updateTextAndPseudoClass();
-
-        warningThresholdProperty().addListener(it -> updatePseudoClass());
-        characterRangeLimitProperty().addListener(it -> updatePseudoClass());
-        textProperty().addListener(it -> updateTextAndPseudoClass());
-        excludedItems.addListener((InvalidationListener) it -> updateTextAndPseudoClass());
-    }
-
-    private void updateTextAndPseudoClass() {
-        String content = getText() == null ? "" : getText();
-        if (getExcludedItems().stream().anyMatch(content::contains)) {
-            Platform.runLater(() -> {
-                String result = content.replaceAll(String.join("|", getExcludedItems()), "");
-                setText(result);
-                editor.positionCaret(result.length());
-            });
-        }
-        updatePseudoClass();
-    }
-
-    private void updatePseudoClass() {
-        IntegerRange limit = getCharacterRangeLimit();
-        double warningThreshold = getValidWarningThreshold();
-        if (limit != null && limit.getMax() > 0) {
-            int textLen = getText() == null ? 0 : getText().length();
-            int maximum = limit.getMax();
-            int minimum = limit.getMin();
-            boolean error = textLen > maximum || textLen < minimum;
-
-            pseudoClassStateChanged(ERROR_PSEUDO_CLASS, error);
-            if (error) {
-                pseudoClassStateChanged(WARNING_PSEUDO_CLASS, false);
-
-                if (!textArea.getStyleClass().contains("error")) {
-                    textArea.getStyleClass().add("error");
-                }
-            } else {
-                boolean warning = textLen >= maximum * warningThreshold;
-                pseudoClassStateChanged(WARNING_PSEUDO_CLASS, warning);
-
-                textArea.getStyleClass().remove("error");
-            }
-
-            setOutOfRange(error);
-        } else {
-            pseudoClassStateChanged(ERROR_PSEUDO_CLASS, false);
-            pseudoClassStateChanged(WARNING_PSEUDO_CLASS, false);
-
-            textArea.getStyleClass().remove("error");
-            setOutOfRange(false);
-        }
     }
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new LimitedTextAreaSkin(this);
+        return new LimitedTextAreaSkin(this, outOfRange);
     }
 
-    public final ResizableTextArea getTextArea() {
-        return textArea;
+    private BooleanProperty showBottom;
+
+    public final BooleanProperty showBottomProperty() {
+        if (showBottom == null) {
+            showBottom = new StyleableBooleanProperty(DEFAULT_SHOW_BOTTOM) {
+                @Override
+                public Object getBean() {
+                    return LimitedTextArea.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "showBottom";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.SHOW_BOTTOM;
+                }
+            };
+        }
+        return showBottom;
     }
 
-    public final TextArea getEditor() {
-        return editor;
+    public final boolean isShowBottom() {
+        return showBottom == null ? DEFAULT_SHOW_BOTTOM : showBottom.get();
+    }
+
+    public final void setShowBottom(boolean showBottom) {
+        showBottomProperty().set(showBottom);
     }
 
     private final ObjectProperty<IntegerRange> characterRangeLimit = new SimpleObjectProperty<>(this, "characterRangeLimit");
@@ -147,6 +117,7 @@ public class LimitedTextArea extends Control {
 
     /**
      * The character range limit property defines the minimum and maximum number of characters allowed in the text area.
+     *
      * @return the character range limit property
      */
     public final ObjectProperty<IntegerRange> characterRangeLimitProperty() {
@@ -184,23 +155,6 @@ public class LimitedTextArea extends Control {
         this.tips.set(tips);
     }
 
-    private final StringProperty text = new SimpleStringProperty(this, "text", "");
-
-    public final String getText() {
-        return text.get();
-    }
-
-    /**
-     * The text property represents the content of the text area.
-     */
-    public final StringProperty textProperty() {
-        return text;
-    }
-
-    public final void setText(String text) {
-        this.text.set(text);
-    }
-
     private final ReadOnlyBooleanWrapper outOfRange = new ReadOnlyBooleanWrapper(this, "isOverLimit", false);
 
     public final boolean getOutOfRange() {
@@ -227,6 +181,7 @@ public class LimitedTextArea extends Control {
     /**
      * The length display mode property defines when the text length indicator label should be displayed.
      * {@link LengthDisplayMode#AUTO}, {@link LengthDisplayMode#ALWAYS_SHOW}, {@link LengthDisplayMode#ALWAYS_HIDE}
+     *
      * @return the length display mode property
      */
     public final ObjectProperty<LengthDisplayMode> lengthDisplayModeProperty() {
@@ -257,6 +212,40 @@ public class LimitedTextArea extends Control {
 
     public final double getValidWarningThreshold() {
         return Math.min(Math.max(getWarningThreshold(), 0), 0.999999);
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<LimitedTextArea, Boolean> SHOW_BOTTOM = new CssMetaData<>(
+                "-fx-show-bottom", BooleanConverter.getInstance(), DEFAULT_SHOW_BOTTOM) {
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(LimitedTextArea control) {
+                return (StyleableProperty<Boolean>) control.showBottomProperty();
+            }
+
+            @Override
+            public boolean isSettable(LimitedTextArea control) {
+                return control.showBottom == null || !control.showBottom.isBound();
+            }
+        };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(ResizableTextArea.getClassCssMetaData());
+            styleables.add(SHOW_BOTTOM);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return LimitedTextArea.StyleableProperties.STYLEABLES;
     }
 
     // Issue: some css styles will fail. All css files merged into one maybe a solution

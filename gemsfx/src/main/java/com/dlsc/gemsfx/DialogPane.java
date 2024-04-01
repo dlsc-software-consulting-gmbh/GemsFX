@@ -419,8 +419,8 @@ public class DialogPane extends Pane {
         } else {
             ResizableTextArea textArea = new ResizableTextArea();
             textArea.setText(details);
-            textArea.getEditor().setWrapText(false);
-            textArea.getEditor().setPrefColumnCount(80);
+            textArea.setWrapText(false);
+            textArea.setPrefColumnCount(80);
             textArea.setResizeHorizontal(true);
             textArea.setResizeVertical(true);
             textArea.getStyleClass().add("error-text-area");
@@ -529,23 +529,20 @@ public class DialogPane extends Pane {
      */
     public final Dialog<String> showTextInput(String title, String message, String prompt, String text, boolean multiline) {
         TextInputControl textInputControl;
-        Node node;
 
         if (multiline) {
             ResizableTextArea textArea = new ResizableTextArea(text);
-            textArea.getEditor().setPromptText(prompt);
-            textArea.getEditor().setWrapText(true);
-            textArea.getEditor().setPrefRowCount(6);
+            textArea.setPromptText(prompt);
+            textArea.setWrapText(true);
+            textArea.setPrefRowCount(6);
             textArea.setResizeVertical(true);
             textArea.setResizeHorizontal(true);
-            textInputControl = textArea.getEditor();
-            node = textArea;
+            textInputControl = textArea;
         } else {
             TextField textField = new TextField(text);
             textField.setPromptText(prompt);
             textField.setPrefColumnCount(20);
             textInputControl = textField;
-            node = textField;
         }
 
         FocusUtil.requestFocus(textInputControl);
@@ -558,7 +555,7 @@ public class DialogPane extends Pane {
             box.getChildren().add(promptLabel);
         }
 
-        box.getChildren().add(node);
+        box.getChildren().add(textInputControl);
 
         Dialog<String> dialog = showNode(Type.INPUT, title, box);
         dialog.valueProperty().bindBidirectional(textInputControl.textProperty());
@@ -1020,8 +1017,8 @@ public class DialogPane extends Pane {
          * A callback used to inform interested parties when the width or height of the
          * dialog was changed interactively by the user.
          *
-         * @see #resizableProperty()
          * @return the callback / the consumer of the new width and height
+         * @see #resizableProperty()
          */
         public final ObjectProperty<BiConsumer<Double, Double>> onResizeProperty() {
             return onResize;

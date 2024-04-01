@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ResizableTextArea;
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,7 +18,7 @@ public class ResizableTextAreaApp extends Application {
     @Override
     public void start(Stage stage) {
         ResizableTextArea textArea = new ResizableTextArea();
-        textArea.getEditor().setWrapText(true);
+        textArea.setWrapText(true);
         textArea.setMinHeight(100);
 
         VBox box = new VBox(textArea);

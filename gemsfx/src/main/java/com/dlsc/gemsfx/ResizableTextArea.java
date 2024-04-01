@@ -1,34 +1,25 @@
 package com.dlsc.gemsfx;
 
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
-
+import com.dlsc.gemsfx.skins.ResizableTextAreaSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.css.PseudoClass;
-import javafx.geometry.Pos;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.StackPane;
 
-public class ResizableTextArea extends Control {
+public class ResizableTextArea extends TextArea {
 
-    private final TextArea editor = new TextArea();
+    private static final boolean DEFAULT_RESIZE_VERTICAL = true;
+    private static final boolean DEFAULT_RESIZE_HORIZONTAL = false;
 
     public ResizableTextArea() {
-        getStyleClass().add("resizable-text-area");
-        setFocusTraversable(false);
-        getStylesheets().add(getUserAgentStylesheet());
-        editor.textProperty().bindBidirectional(textProperty());
+        this("");
     }
 
     public ResizableTextArea(String text) {
-        this();
-        setText(text);
+        super(text);
+        getStyleClass().add("resizable-text-area");
+        setFocusTraversable(false);
+        getStylesheets().add(getUserAgentStylesheet());
     }
 
     @Override
@@ -41,109 +32,56 @@ public class ResizableTextArea extends Control {
         return ResizableTextArea.class.getResource("resizable-text-area.css").toExternalForm();
     }
 
-    public final TextArea getEditor() {
-        return editor;
-    }
-
-    private final BooleanProperty resizeVertical = new SimpleBooleanProperty(this, "resizeVertical", true);
+    private BooleanProperty resizeVertical;
 
     public final boolean isResizeVertical() {
-        return resizeVertical.get();
+        return resizeVertical == null ? DEFAULT_RESIZE_VERTICAL : resizeVertical.get();
     }
 
+    /**
+     * Defines whether the ResizableTextArea supports vertical resizing.
+     * If true, users can adjust the height of the ResizableTextArea.
+     * If false, the height is fixed.
+     * <p>
+     * The default setting is true.
+     *
+     * @return a BooleanProperty representing the vertical resize capability.
+     */
     public final BooleanProperty resizeVerticalProperty() {
+        if (resizeVertical == null) {
+            resizeVertical = new SimpleBooleanProperty(this, "resizeVertical", DEFAULT_RESIZE_VERTICAL);
+        }
         return resizeVertical;
     }
 
     public final void setResizeVertical(boolean resizeVertical) {
-        this.resizeVertical.set(resizeVertical);
+        resizeVerticalProperty().set(resizeVertical);
     }
 
-    private final BooleanProperty resizeHorizontal = new SimpleBooleanProperty(this, "resizeHorizontal", false);
+    private BooleanProperty resizeHorizontal;
 
     public final boolean isResizeHorizontal() {
-        return resizeHorizontal.get();
+        return resizeHorizontal == null ? DEFAULT_RESIZE_HORIZONTAL : resizeHorizontal.get();
     }
 
+    /**
+     * Defines whether the ResizableTextArea supports horizontal resizing.
+     * If true, users can adjust the width of the ResizableTextArea.
+     * If false, the width is fixed.
+     * <p>
+     * The default setting is false.
+     *
+     * @return a BooleanProperty representing the horizontal resize capability.
+     */
     public final BooleanProperty resizeHorizontalProperty() {
+        if (resizeHorizontal == null) {
+            resizeHorizontal = new SimpleBooleanProperty(this, "resizeHorizontal", DEFAULT_RESIZE_HORIZONTAL);
+        }
         return resizeHorizontal;
     }
 
     public final void setResizeHorizontal(boolean resizeHorizontal) {
-        this.resizeHorizontal.set(resizeHorizontal);
+        resizeHorizontalProperty().set(resizeHorizontal);
     }
 
-    private final StringProperty text = new SimpleStringProperty(this, "text");
-
-    public final String getText() {
-        return text.get();
-    }
-
-    public final StringProperty textProperty() {
-        return text;
-    }
-
-    public final void setText(String text) {
-        this.text.set(text);
-    }
-
-    private static class ResizableTextAreaSkin extends SkinBase<ResizableTextArea> {
-        private double startX;
-        private double startY;
-        private double startW;
-        private double startH;
-
-        public ResizableTextAreaSkin(ResizableTextArea area) {
-            super(area);
-
-            TextArea editor = area.getEditor();
-
-            FontIcon resizeIcon = new FontIcon(MaterialDesign.MDI_RESIZE_BOTTOM_RIGHT);
-
-            StackPane resizeCorner = new StackPane(resizeIcon);
-            resizeCorner.getStyleClass().add("resize-corner");
-            resizeCorner.setPrefSize(10, 10);
-            resizeCorner.setMaxSize(10, 10);
-            resizeCorner.setOnMousePressed(evt -> {
-                editor.requestFocus();
-                startX = evt.getScreenX();
-                startY = evt.getScreenY();
-                startW = editor.getWidth();
-                startH = editor.getHeight();
-            });
-
-            resizeCorner.setOnMouseDragged(evt -> {
-                double screenX = evt.getScreenX();
-                double screenY = evt.getScreenY();
-
-                double deltaX = screenX - startX;
-                double deltaY = screenY - startY;
-
-                double w = startW + deltaX;
-                double h = startH + deltaY;
-
-                if (editor.getMaxWidth() > 0) {
-                    w = Math.min(editor.getMaxWidth(), w);
-                }
-
-                if (editor.getMaxHeight() > 0) {
-                    h = Math.min(editor.getMaxHeight(), h);
-                }
-
-                if (area.isResizeHorizontal()) {
-                    editor.setPrefWidth(w);
-                }
-
-                if (area.isResizeVertical()) {
-                    editor.setPrefHeight(h);
-                }
-            });
-            StackPane.setAlignment(resizeCorner, Pos.BOTTOM_RIGHT);
-
-            editor.focusedProperty().addListener(it -> resizeIcon.pseudoClassStateChanged(PseudoClass.getPseudoClass("active"), editor.isFocused()));
-
-            StackPane pane = new StackPane(editor, resizeCorner);
-            getChildren().setAll(pane);
-        }
-    }
 }
