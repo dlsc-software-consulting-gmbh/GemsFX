@@ -1,0 +1,67 @@
+.circle-progress-indicator {
+    /*-fx-font-family: Monospaced;*/
+}
+
+.circle-progress-indicator .progress-label {
+    -fx-font-size: 15px;
+}
+
+/** --- icons --- */
+.circle-progress-indicator .progress-label .ikonli-font-icon {
+    -fx-icon-code: mdi-download;
+    -fx-icon-size: 16px;
+}
+
+.circle-progress-indicator:indeterminate .progress-label .ikonli-font-icon {
+    -fx-icon-code: mdi-access-point-network;
+}
+
+.circle-progress-indicator:completed .progress-label .ikonli-font-icon {
+    -fx-icon-code: mdi-check-circle-outline;
+}
+
+/* --- bold style --- */
+.circle-progress-indicator.bold-style .track-circle {
+    -fx-stroke-width: 10px;
+    -fx-stroke: #dadada;
+}
+
+.circle-progress-indicator.bold-style .progress-arc {
+    -fx-stroke-width: 5px;
+    -fx-stroke: #67986e;
+}
+
+/** --- thin style --- */
+.circle-progress-indicator.thin-style .track-circle {
+    -fx-stroke-width: 1px;
+    -fx-stroke: #c9c9c9;
+}
+
+.circle-progress-indicator.thin-style .progress-arc {
+    -fx-stroke-width: 1px;
+    -fx-stroke: #f87328;
+}
+
+/** --- sector style --- */
+.circle-progress-indicator.sector-style {
+    -fx-arc-type: ROUND;
+}
+
+.circle-progress-indicator.sector-style .track-circle {
+    -fx-stroke-width: 5px;
+}
+
+.circle-progress-indicator.sector-style .progress-arc {
+    -fx-fill: #47bce833;
+    -fx-stroke-width: 1px;
+}
+
+.circle-progress-indicator.sector-style:completed .progress-arc {
+    -fx-stroke: #00000001;
+    -fx-fill: radial-gradient(focus-angle 0.0deg, focus-distance 0.0%, center 50.0% 50.0%, radius 50.0%, #47bce833 0.0%, #47bce833 0.6667%, #47bce833 90.5208%, #47bce833 91.8333%, #ffffff08 92.7083%, #ffffff08 100.0%);
+}
+
+/** --- custom style --- */
+.container-box {
+    -fx-background-color: white;
+}

@@ -1,11 +1,31 @@
+.resize-corner:h-resize {
+    -fx-cursor: e-resize;
+}
+
+.resize-corner:v-resize {
+    -fx-cursor: s-resize;
+}
+
+.resize-corner:both-resize {
+    -fx-cursor: se-resize;
+}
+
+.resize-corner:no-resize {
+    -fx-cursor: none;
+}
+
 .resizable-text-area .resize-corner {
-    -fx-padding: 0px 2px 2px 0px;
+    -fx-padding: 0px 5px 5px 0px;
 }
 
 .resizable-text-area .resize-corner .ikonli-font-icon {
     -fx-icon-size: 24px;
 }
 
-.resizable-text-area .resize-corner .ikonli-font-icon:active {
+.resizable-text-area .resize-corner:no-resize .ikonli-font-icon {
+    visibility: hidden;
+}
+
+.resizable-text-area:focused .resize-corner .ikonli-font-icon {
     -fx-icon-color: -fx-accent;
 }
