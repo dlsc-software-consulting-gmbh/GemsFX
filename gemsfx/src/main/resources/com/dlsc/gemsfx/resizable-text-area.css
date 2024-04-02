@@ -15,17 +15,32 @@
 }
 
 .resizable-text-area .resize-corner {
-    -fx-padding: 0px 5px 5px 0px;
+    -fx-padding: 0px 7px 7px 0px;
 }
 
-.resizable-text-area .resize-corner .ikonli-font-icon {
-    -fx-icon-size: 24px;
+.resizable-text-area .resize-corner .resize-icon {
+    /* MaterialDesign/svg/resize-bottom-right.svg */
+    -fx-shape: "M22,22H20V20H22V22M22,18H20V16H22V18M18,22H16V20H18V22M18,18H16V16H18V18M14,22H12V20H14V22M22,14H20V12H22V14Z";
+    -fx-background-color: -fx-box-border;
+    -fx-padding: 7px;
 }
 
-.resizable-text-area .resize-corner:no-resize .ikonli-font-icon {
+.resizable-text-area .resize-corner:hover .resize-icon {
+    -fx-background-color: grey;
+}
+
+.resizable-text-area .resize-corner:no-resize .resize-icon {
     visibility: hidden;
 }
 
-.resizable-text-area:focused .resize-corner .ikonli-font-icon {
-    -fx-icon-color: -fx-accent;
+.resizable-text-area:focused .resize-corner .resize-icon {
+    -fx-background-color: -fx-accent;
+}
+
+.resizable-text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.resizable-text-area:disabled {
+    -fx-opacity: -fx-disabled-opacity;
 }

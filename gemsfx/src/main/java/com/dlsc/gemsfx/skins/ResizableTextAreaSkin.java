@@ -13,8 +13,6 @@ import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 public class ResizableTextAreaSkin extends TextAreaSkin {
 
@@ -38,7 +36,8 @@ public class ResizableTextAreaSkin extends TextAreaSkin {
         super(control);
 
         scrollPane = (ScrollPane) getChildren().get(0);
-        FontIcon resizeIcon = new FontIcon(MaterialDesign.MDI_RESIZE_BOTTOM_RIGHT);
+        Region resizeIcon = new Region();
+        resizeIcon.getStyleClass().add("resize-icon");
         resizeCorner = new StackPane(resizeIcon);
         resizeCorner.getStyleClass().add("resize-corner");
         resizeCorner.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);

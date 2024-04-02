@@ -1,46 +1,20 @@
-.limited-text-area {
-    -fx-background-color: -fx-background;
-    -fx-border-color: -fx-box-border;
-}
-
+.limited-text-area,
 .limited-text-area:focused {
     -fx-background-color: -fx-background;
     -fx-border-color: -fx-box-border;
 }
 
-.limited-text-area > .content-box {
-    -fx-spacing: 5px;
-}
-
-.limited-text-area > .content-box > .content-pane {
-    -fx-background-color: -fx-shadow-highlight-color, -fx-text-box-border, -fx-control-inner-background;
-    -fx-background-insets: 0, 1, 2;
-    -fx-background-radius: 3, 2, 2;
-    -fx-padding: 1;
-}
-
 .limited-text-area:focused > .content-box > .content-pane {
     -fx-background-color: -fx-focus-color, -fx-text-box-border, -fx-control-inner-background;
     -fx-background-insets: -0.4, 1, 2;
-    -fx-background-radius: 3.4, 2, 2;
-}
-
-.limited-text-area > .content-box > .content-pane:disabled {
-    -fx-opacity: -fx-disabled-opacity;
-}
-
-.limited-text-area > .content-box > .content-pane .content {
-    -fx-padding: 3px 5px;
-    -fx-cursor: text;
-}
-
-.limited-text-area > .content-box > .content-pane > .scroll-pane {
-    -fx-background-color: transparent;
+    -fx-background-radius: 0;
 }
 
 .limited-text-area > .content-box > .bottom-box {
-    -fx-padding: 5px 0px;
+    -fx-padding: 5px 3px;
     -fx-alignment: center-left;
+    -fx-border-color: -fx-text-box-border;
+    -fx-border-width: 1px 0 0 0;
 }
 
 .limited-text-area > .content-box > .bottom-box .tips {
@@ -78,5 +52,5 @@
 .limited-text-area:error:focused > .content-box > .content-pane {
     -fx-background-color: #ff5700, -fx-text-box-border, -fx-control-inner-background;
     -fx-background-insets: -0.4, 1, 2;
-    -fx-background-radius: 3.4, 2, 2;
+    -fx-background-radius: 0;
 }
