@@ -31,8 +31,9 @@ public class LimitedTextAreaApp extends Application {
         textArea.setWrapText(true);
         textArea.setText("Hello, World!");
         textArea.setCharacterRangeLimit(new IntegerRange(0, 30));
+        textArea.setPrefHeight(380);
 
-        StackPane wrapper = new StackPane(textArea);
+        StackPane wrapper = new StackPane(new VBox(textArea));
         wrapper.setPadding(new Insets(20));
 
         SplitPane splitPane = new SplitPane();
