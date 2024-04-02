@@ -45,6 +45,7 @@
     </scm>
 
     <properties>
+        <version.nexus.plugin>1.6.13</version.nexus.plugin>
         <project.identifier>gemsfx</project.identifier>
         <project.github.repository>dlsc-software-consulting-gmbh/GemsFX</project.github.repository>
         <local.repository.path>/tmp/repository</local.repository.path>
