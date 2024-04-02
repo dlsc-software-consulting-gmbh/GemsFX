@@ -20,6 +20,7 @@ import javafx.util.Pair;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class DurationPicker extends CustomComboBox<Duration> {
@@ -91,7 +92,7 @@ public class DurationPicker extends CustomComboBox<Duration> {
 
     @Override
     public String getUserAgentStylesheet() {
-        return DurationPicker.class.getResource("duration-picker.css").toExternalForm();
+        return Objects.requireNonNull(DurationPicker.class.getResource("duration-picker.css")).toExternalForm();
     }
 
     @Override

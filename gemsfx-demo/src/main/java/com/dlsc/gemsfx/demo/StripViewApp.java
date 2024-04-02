@@ -23,6 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class StripViewApp extends Application {
 
@@ -126,8 +127,8 @@ public class StripViewApp extends Application {
 
         Scene scene = new Scene(vBox);
         scene.setFill(Color.WHITE);
-        scene.getStylesheets().add(StripViewApp.class.getResource("fonts.css").toExternalForm());
-        scene.getStylesheets().add(StripViewApp.class.getResource("strip-view-app.css").toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(StripViewApp.class.getResource("fonts.css")).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(StripViewApp.class.getResource("strip-view-app.css")).toExternalForm());
 
         CSSFX.start();
 

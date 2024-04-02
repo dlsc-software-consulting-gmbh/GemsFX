@@ -1077,11 +1077,11 @@ public class SearchField<T> extends Control {
      */
     public static class SearchFieldListCell<T> extends ListCell<T> {
 
-        private SearchField<T> searchField;
+        private final SearchField<T> searchField;
 
-        private Text text1 = new Text();
-        private Text text2 = new Text();
-        private Text text3 = new Text();
+        private final Text text1 = new Text();
+        private final Text text2 = new Text();
+        private final Text text3 = new Text();
 
         public SearchFieldListCell(SearchField<T> searchField) {
             this.searchField = searchField;

@@ -23,6 +23,7 @@ import javafx.scene.control.Skin;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A specialized text area view that imposes restrictions on the input text length, allowing
@@ -69,7 +70,7 @@ public class LimitedTextArea extends ResizableTextArea {
     public LimitedTextArea() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
-        getStylesheets().add(LimitedTextArea.class.getResource("limited-text-area.css").toExternalForm());
+        getStylesheets().add(Objects.requireNonNull(LimitedTextArea.class.getResource("limited-text-area.css")).toExternalForm());
     }
 
     @Override

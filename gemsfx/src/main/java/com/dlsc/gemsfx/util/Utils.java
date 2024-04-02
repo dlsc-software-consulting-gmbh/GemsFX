@@ -136,7 +136,7 @@ public class Utils {
      */
     public static String stripQuotes(String str) {
         if (str == null) return str;
-        if (str.length() == 0) return str;
+        if (str.isEmpty()) return str;
 
         int beginIndex = 0;
         char openQuote = str.charAt(beginIndex);
@@ -167,14 +167,14 @@ public class Utils {
         int index = str.indexOf(separator);
         while (index >= 0) {
             String newStr = str.substring(0, index);
-            if (newStr != null && newStr.length() > 0) {
+            if (!newStr.isEmpty()) {
                 result.add(newStr);
             }
             str = str.substring(index + separator.length());
             index = str.indexOf(separator);
         }
 
-        if (str != null && str.length() > 0) {
+        if (!str.isEmpty()) {
             result.add(str);
         }
 
@@ -318,8 +318,13 @@ public class Utils {
             }
             prevStop = stop;
         }
+
         // position is greater than biggest stop, so will we biggest stop's color
-        return prevStop.getColor();
+        if (prevStop != null) {
+            return prevStop.getColor();
+        }
+
+        return null;
     }
 
     /**

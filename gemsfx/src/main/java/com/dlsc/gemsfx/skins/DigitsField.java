@@ -124,7 +124,7 @@ public abstract class DigitsField extends TimeField {
 
                 if (handled) {
 
-                    if ("".equals(typedText) || getTypedText().length() == 0) {
+                    if (StringUtils.isBlank(typedText.getValueSafe()) || typedText.getValueSafe().isEmpty()) {
                         setValue(null);
                     } else {
                         setValue(Integer.parseInt(getTypedText()));

@@ -68,7 +68,7 @@ public class YearMonthView extends Control {
         this.value.set(value);
     }
 
-    private final ObjectProperty<StringConverter<Month>> converter = new SimpleObjectProperty<>(this, "converter", new StringConverter<Month>() {
+    private final ObjectProperty<StringConverter<Month>> converter = new SimpleObjectProperty<>(this, "converter", new StringConverter<>() {
         @Override
         public String toString(Month month) {
             if (month != null) {

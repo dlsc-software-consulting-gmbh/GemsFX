@@ -7,6 +7,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
 import java.time.Year;
+import java.util.Objects;
 
 /**
  * A view for selecting a year.
@@ -37,7 +38,7 @@ public class YearView extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return YearView.class.getResource("year-view.css").toExternalForm();
+        return Objects.requireNonNull(YearView.class.getResource("year-view.css")).toExternalForm();
     }
 
     private final ReadOnlyIntegerWrapper year = new ReadOnlyIntegerWrapper(this, "year");

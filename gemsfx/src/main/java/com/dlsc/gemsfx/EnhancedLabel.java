@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import javafx.beans.property.BooleanProperty;
@@ -44,7 +45,7 @@ public class EnhancedLabel extends Label {
 
     @Override
     public String getUserAgentStylesheet() {
-        return EnhancedLabel.class.getResource("enhanced-label.css").toExternalForm();
+        return Objects.requireNonNull(EnhancedLabel.class.getResource("enhanced-label.css")).toExternalForm();
     }
 
     private void init() {

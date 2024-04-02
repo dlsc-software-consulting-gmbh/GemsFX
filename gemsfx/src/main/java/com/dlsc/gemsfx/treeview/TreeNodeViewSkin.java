@@ -45,7 +45,7 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
 
     private final List<TreeNode<T>> currentLevelNodesCache = new ArrayList<>();
 
-    private List<Node> additionalLinkedNodeList = new ArrayList<>();
+//    private List<Node> additionalLinkedNodeList = new ArrayList<>();
 
     private final Group contentGroup = new Group();
 
@@ -571,109 +571,65 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
 
     private double computeRegularAdjustedXPosition(double x, double maxLevelWidth, double nodeWidth, HPos alignment, TreeNodeView.LayoutDirection direction) {
         if (direction == TreeNodeView.LayoutDirection.LEFT_TO_RIGHT) {
-            switch (alignment) {
-                case LEFT:
-                    return x;
-                case CENTER:
-                    return x + (maxLevelWidth - nodeWidth) / 2;
-                case RIGHT:
-                    return x + maxLevelWidth - nodeWidth;
-                default:
-                    return x;
-            }
+            return switch (alignment) {
+                case LEFT -> x;
+                case CENTER -> x + (maxLevelWidth - nodeWidth) / 2;
+                case RIGHT -> x + maxLevelWidth - nodeWidth;
+            };
         } else { // RIGHT_TO_LEFT
-            switch (alignment) {
-                case LEFT:
-                    return x - maxLevelWidth;
-                case CENTER:
-                    return x - (maxLevelWidth + nodeWidth) / 2;
-                case RIGHT:
-                    return x - nodeWidth;
-                default:
-                    return x;
-            }
+            return switch (alignment) {
+                case LEFT -> x - maxLevelWidth;
+                case CENTER -> x - (maxLevelWidth + nodeWidth) / 2;
+                case RIGHT -> x - nodeWidth;
+            };
         }
     }
 
     private double computeRegularAdjustedYPosition(double y, double maxLevelHeight, double nodeHeight, VPos alignment, TreeNodeView.LayoutDirection layoutDirection) {
         if (layoutDirection == TreeNodeView.LayoutDirection.TOP_TO_BOTTOM) {
-            switch (alignment) {
-                case TOP:
-                    return y;
-                case CENTER:
-                    return y + (maxLevelHeight - nodeHeight) / 2;
-                case BASELINE:
-                case BOTTOM:
-                    return y + maxLevelHeight - nodeHeight;
-                default:
-                    return y;
-            }
+            return switch (alignment) {
+                case TOP -> y;
+                case CENTER -> y + (maxLevelHeight - nodeHeight) / 2;
+                case BASELINE, BOTTOM -> y + maxLevelHeight - nodeHeight;
+            };
         } else {
-            switch (alignment) {
-                case TOP:
-                    return y - maxLevelHeight;
-                case CENTER:
-                    return y - (maxLevelHeight + nodeHeight) / 2;
-                case BASELINE:
-                case BOTTOM:
-                    return y - nodeHeight;
-                default:
-                    return y;
-            }
+            return switch (alignment) {
+                case TOP -> y - maxLevelHeight;
+                case CENTER -> y - (maxLevelHeight + nodeHeight) / 2;
+                case BASELINE, BOTTOM -> y - nodeHeight;
+            };
         }
     }
 
     private double computeCompactAdjustedYPosition(double y, double maxLevelHeight, double nodeHeight, VPos alignment, TreeNodeView.LayoutDirection layoutDirection) {
         if (layoutDirection == TreeNodeView.LayoutDirection.TOP_TO_BOTTOM) {
-            switch (alignment) {
-                case TOP:
-                    return y;
-                case CENTER:
-                    return y + (maxLevelHeight - nodeHeight) / 2;
-                case BASELINE:
-                case BOTTOM:
-                    return y + maxLevelHeight - nodeHeight;
-                default:
-                    return y;
-            }
+            return switch (alignment) {
+                case TOP -> y;
+                case CENTER -> y + (maxLevelHeight - nodeHeight) / 2;
+                case BASELINE, BOTTOM -> y + maxLevelHeight - nodeHeight;
+            };
         } else {
-            switch (alignment) {
-                case TOP:
-                    return y;
-                case CENTER:
-                    return y + (maxLevelHeight / 2) - (nodeHeight / 2);
-                case BASELINE:
-                case BOTTOM:
-                    return y + maxLevelHeight - nodeHeight;
-                default:
-                    return y;
-            }
+            return switch (alignment) {
+                case TOP -> y;
+                case CENTER -> y + (maxLevelHeight / 2) - (nodeHeight / 2);
+                case BASELINE, BOTTOM -> y + maxLevelHeight - nodeHeight;
+            };
         }
     }
 
     private double computeCompactAdjustedXPosition(double x, double maxLevelWidth, double nodeWidth, HPos alignment, TreeNodeView.LayoutDirection direction) {
         if (direction == TreeNodeView.LayoutDirection.LEFT_TO_RIGHT) {
-            switch (alignment) {
-                case LEFT:
-                    return x;
-                case CENTER:
-                    return x + (maxLevelWidth - nodeWidth) / 2;
-                case RIGHT:
-                    return x + maxLevelWidth - nodeWidth;
-                default:
-                    return x;
-            }
+            return switch (alignment) {
+                case LEFT -> x;
+                case CENTER -> x + (maxLevelWidth - nodeWidth) / 2;
+                case RIGHT -> x + maxLevelWidth - nodeWidth;
+            };
         } else {
-            switch (alignment) {
-                case LEFT:
-                    return x + maxLevelWidth - nodeWidth;
-                case CENTER:
-                    return x + (maxLevelWidth / 2) - (nodeWidth / 2);
-                case RIGHT:
-                    return x;
-                default:
-                    return x;
-            }
+            return switch (alignment) {
+                case LEFT -> x + maxLevelWidth - nodeWidth;
+                case CENTER -> x + (maxLevelWidth / 2) - (nodeWidth / 2);
+                case RIGHT -> x;
+            };
         }
     }
 
@@ -733,7 +689,7 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
                     nodes.forEach(n -> n.getStyleClass().add("link-extra-" + node.getName() + "-" + linkedNode.getName()));
                 }
                 contentGroup.getChildren().addAll(nodes);
-                additionalLinkedNodeList.addAll(nodes);
+//                additionalLinkedNodeList.addAll(nodes);
             }
         }
     }
@@ -743,7 +699,7 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
      */
     private void clearMapsForUpdate() {
         nodeToComponentsMap.clear();
-        additionalLinkedNodeList.clear();
+//        additionalLinkedNodeList.clear();
         nodeToPositionMap.clear();
         nodeTotalDimensionMap.clear();
         levelToMaxDimensionMap.clear();

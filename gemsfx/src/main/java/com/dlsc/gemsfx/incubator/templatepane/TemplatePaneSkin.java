@@ -175,14 +175,14 @@ public class TemplatePaneSkin extends SkinBase<TemplatePane> {
 
 	private double layoutContentRight(Map<Tile, Rectangle2D> boundsMap, double contentX, double contentY, double contentWidth, double contentHeight) {
 		Tile tile = getTile(Position.CONTENT_RIGHT);
-		double prefWidth = tile.prefWidth(contentWidth);
+		double prefWidth = tile.prefWidth(contentHeight);
 		boundsMap.put(tile, new Rectangle2D(contentX - prefWidth, contentY, prefWidth, contentHeight));
 		return prefWidth;
 	}
 
 	private double layoutContentLeft(Map<Tile, Rectangle2D> boundsMap, double contentX, double contentY, double contentWidth, double contentHeight) {
 		Tile tile = getTile(Position.CONTENT_LEFT);
-		double prefWidth = tile.prefWidth(contentWidth);
+		double prefWidth = tile.prefWidth(contentHeight);
 		boundsMap.put(tile, new Rectangle2D(contentX, contentY, prefWidth, contentHeight));
 		return prefWidth;
 	}
@@ -203,15 +203,15 @@ public class TemplatePaneSkin extends SkinBase<TemplatePane> {
 
 	private double layoutLeft(Map<Tile, Rectangle2D> boundsMap, double contentX, double contentY, double contentWidth, double contentHeight) {
 		Tile tile = getTile(Position.LEFT);
-		double prefWidth = tile.prefWidth(contentWidth);
+		double prefWidth = tile.prefWidth(contentHeight);
 		boundsMap.put(tile, new Rectangle2D(contentX, contentY, prefWidth, contentHeight));
 		return prefWidth;
 	}
 
 	private double layoutRight(Map<Tile, Rectangle2D> boundsMap, double contentX, double contentY, double contentWidth, double contentHeight) {
 		Tile tile = getTile(Position.RIGHT);
-		double prefWidth = tile.prefWidth(contentWidth);
-		boundsMap.put(tile, new Rectangle2D(contentX + -prefWidth, contentY, prefWidth, contentHeight));
+		double prefWidth = tile.prefWidth(contentHeight);
+		boundsMap.put(tile, new Rectangle2D(contentX - prefWidth, contentY, prefWidth, contentHeight));
 		return prefWidth;
 	}
 

@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MultiColumnListViewApp extends Application {
 
@@ -59,7 +60,7 @@ public class MultiColumnListViewApp extends Application {
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);
-        scene.getStylesheets().add(MultiColumnListViewApp.class.getResource("multi-column-app.css").toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(MultiColumnListViewApp.class.getResource("multi-column-app.css")).toExternalForm());
 
         CSSFX.start();
 
@@ -86,7 +87,7 @@ public class MultiColumnListViewApp extends Application {
         return List.of(col1, col2, col3, col4, col5);
     }
 
-    public class Issue {
+    public static class Issue {
 
         private String title;
         private String status;
@@ -116,7 +117,7 @@ public class MultiColumnListViewApp extends Application {
         }
     }
 
-    public class IssueListCell extends ColumnListCell<Issue> {
+    public static class IssueListCell extends ColumnListCell<Issue> {
 
         private final StackPane wrapper;
 

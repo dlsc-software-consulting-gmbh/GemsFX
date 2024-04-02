@@ -18,6 +18,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableView;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public class ColumnBrowser<S> extends Control {
@@ -25,7 +26,7 @@ public class ColumnBrowser<S> extends Control {
     private final InvalidationListener filterListener = evt -> filter();
 
     public ColumnBrowser() {
-        getStylesheets().add(ColumnBrowser.class.getResource("column-browser-view.css").toExternalForm());
+        getStylesheets().add(Objects.requireNonNull(ColumnBrowser.class.getResource("column-browser-view.css")).toExternalForm());
 
         tableView.addListener(evt -> getTableView().setItems(getFilteredItems()));
 

@@ -11,6 +11,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class TemplatePaneApp extends Application {
 
 	@Override
@@ -24,7 +26,7 @@ public class TemplatePaneApp extends Application {
 			controls.show();
 		});
 		Scene scene = new Scene(pane);
-		pane.getStylesheets().add(TemplatePaneApp.class.getResource("template.css").toExternalForm());
+		pane.getStylesheets().add(Objects.requireNonNull(TemplatePaneApp.class.getResource("template.css")).toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Tiles Pane");
 		primaryStage.sizeToScene();

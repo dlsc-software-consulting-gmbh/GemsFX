@@ -199,7 +199,7 @@ public class CalendarPicker extends CustomComboBox<LocalDate> {
      * When SelectionMode is {@link CalendarView.SelectionModel.SelectionMode#DATE_RANGE}, disabled dates can be included within the selected range.
      * However, disabled dates cannot be used as either the starting or ending point of the range.
      *
-     * @return a callback that determines the selectability of each date based on custom criteria.
+     * @return a callback that determines the selection ability of each date based on custom criteria.
      */
     public final ObjectProperty<Callback<LocalDate, Boolean>> dateFilterProperty() {
         return dateFilter;

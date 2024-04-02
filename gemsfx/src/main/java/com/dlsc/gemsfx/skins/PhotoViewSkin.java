@@ -286,8 +286,8 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             int h;
 
             if (getSkinnable().getClipShape().equals(ClipShape.CIRCLE)) {
-                x -= (circle.getRadius() * scale);
-                y -= (circle.getRadius() * scale);
+                x -= (int) (circle.getRadius() * scale);
+                y -= (int) (circle.getRadius() * scale);
                 w = (int) (circle.getRadius() * scale * 2);
                 h = (int) (circle.getRadius() * scale * 2);
             } else {

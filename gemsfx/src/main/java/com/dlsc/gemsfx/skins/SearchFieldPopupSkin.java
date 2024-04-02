@@ -62,7 +62,7 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
                     result = -1;
                 }
                 if (selectedItem.equals(o2)) {
-                    result = +1;
+                    result = 1;
                 }
             }
 
@@ -82,7 +82,7 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
             }
 
             if (text2.startsWith(searchText)) {
-                result = +1;
+                result = 1;
             }
 
             return result;

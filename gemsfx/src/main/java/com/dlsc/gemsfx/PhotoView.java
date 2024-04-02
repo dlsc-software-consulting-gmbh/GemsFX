@@ -32,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,7 +103,7 @@ public class PhotoView extends Control {
          * We need to also add the stylesheet directly as otherwise the styling for the
          * ikonli font icon will not work. Bug in Ikonli?
          */
-        getStylesheets().add(PhotoView.class.getResource("photo-view.css").toExternalForm());
+        getStylesheets().add(Objects.requireNonNull(PhotoView.class.getResource("photo-view.css")).toExternalForm());
 
         setPhotoSupplier(() -> {
             if (fileChooser == null) {
@@ -207,7 +208,7 @@ public class PhotoView extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return PhotoView.class.getResource("photo-view.css").toExternalForm();
+        return Objects.requireNonNull(PhotoView.class.getResource("photo-view.css")).toExternalForm();
     }
 
     // cropped image support

@@ -21,7 +21,7 @@ public class TemplatePaneControls extends BorderPane {
 	public TemplatePaneControls(TemplatePane pane) {
 		this.pane = Objects.requireNonNull(pane);
 
-		getStylesheets().add(TemplatePaneControls.class.getResource("controls.css").toExternalForm());
+		getStylesheets().add(Objects.requireNonNull(TemplatePaneControls.class.getResource("controls.css")).toExternalForm());
 
 		checkbox = new CheckBox("Show all tiles");
 		checkbox.setSelected(false);

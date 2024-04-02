@@ -29,6 +29,7 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import java.util.List;
+import java.util.Objects;
 
 public class TreeNodeViewApp extends Application {
 
@@ -150,7 +151,7 @@ public class TreeNodeViewApp extends Application {
         scrollPane.setFitToWidth(true);
         parent.setRight(scrollPane);
         Scene scene = new Scene(parent, 1280, 800);
-        scene.getStylesheets().add(TreeNodeViewApp.class.getResource("tree-node-view-app.css").toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(TreeNodeViewApp.class.getResource("tree-node-view-app.css")).toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
         CSSFX.start();

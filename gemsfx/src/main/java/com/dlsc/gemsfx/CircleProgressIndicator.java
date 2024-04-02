@@ -17,6 +17,7 @@ import javafx.util.StringConverter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -88,6 +89,11 @@ public class CircleProgressIndicator extends ProgressIndicator {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new CircleProgressIndicatorSkin(this);
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(CircleProgressIndicator.class.getResource("circle-progress-indicator.css")).toExternalForm();
     }
 
     private final ObjectProperty<StringConverter<Double>> converter = new SimpleObjectProperty<>(this, "converter", DEFAULT_CONVERTER);
@@ -199,10 +205,4 @@ public class CircleProgressIndicator extends ProgressIndicator {
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return CircleProgressIndicator.StyleableProperties.STYLEABLES;
     }
-
-    @Override
-    public String getUserAgentStylesheet() {
-        return CircleProgressIndicator.class.getResource("circle-progress-indicator.css").toExternalForm();
-    }
-
 }

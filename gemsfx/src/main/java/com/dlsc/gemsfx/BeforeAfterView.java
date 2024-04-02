@@ -14,6 +14,8 @@ import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.util.Objects;
+
 
 public class BeforeAfterView extends Control {
 
@@ -75,7 +77,7 @@ public class BeforeAfterView extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return BeforeAfterView.class.getResource("before-after-view.css").toExternalForm();
+        return Objects.requireNonNull(BeforeAfterView.class.getResource("before-after-view.css")).toExternalForm();
     }
 
     private final ObjectProperty<Orientation> orientation = new SimpleObjectProperty<>(this, "orientation", Orientation.HORIZONTAL);

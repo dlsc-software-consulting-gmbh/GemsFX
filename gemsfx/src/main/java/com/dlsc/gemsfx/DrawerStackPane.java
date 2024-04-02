@@ -20,6 +20,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -197,7 +198,7 @@ public class DrawerStackPane extends StackPane {
 
     @Override
     public String getUserAgentStylesheet() {
-        return DrawerStackPane.class.getResource("drawer-stackpane.css").toExternalForm();
+        return Objects.requireNonNull(DrawerStackPane.class.getResource("drawer-stackpane.css")).toExternalForm();
     }
 
     // fade in / out support

@@ -6,20 +6,34 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextArea;
 
+import java.util.Objects;
+
+/**
+ * A text area with the additional ability to be resizable. The resizing behaviour can
+ * be configured to support resizing in vertical and horizontal direction or only in one
+ * of them. Resizing can also be turned off completely. When resizable the text area will
+ * display a resize icon in the lower right corner.
+ */
 public class ResizableTextArea extends TextArea {
 
     private static final boolean DEFAULT_RESIZE_VERTICAL = true;
     private static final boolean DEFAULT_RESIZE_HORIZONTAL = false;
 
+    /**
+     * Constructs a new resizable text area.
+     */
     public ResizableTextArea() {
-        this("");
-    }
-
-    public ResizableTextArea(String text) {
-        super(text);
         getStyleClass().add("resizable-text-area");
         setFocusTraversable(false);
         getStylesheets().add(getUserAgentStylesheet());
+    }
+
+    /**
+     * Constructs a new resizable text area with the given text.
+     */
+    public ResizableTextArea(String text) {
+        this();
+        setText(text);
     }
 
     @Override
@@ -29,7 +43,7 @@ public class ResizableTextArea extends TextArea {
 
     @Override
     public String getUserAgentStylesheet() {
-        return ResizableTextArea.class.getResource("resizable-text-area.css").toExternalForm();
+        return Objects.requireNonNull(ResizableTextArea.class.getResource("resizable-text-area.css")).toExternalForm();
     }
 
     private BooleanProperty resizeVertical;
@@ -83,5 +97,4 @@ public class ResizableTextArea extends TextArea {
     public final void setResizeHorizontal(boolean resizeHorizontal) {
         resizeHorizontalProperty().set(resizeHorizontal);
     }
-
 }

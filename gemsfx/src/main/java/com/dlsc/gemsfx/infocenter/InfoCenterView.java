@@ -16,6 +16,7 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -80,7 +81,7 @@ public class InfoCenterView extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return InfoCenterView.class.getResource("info-center-view.css").toExternalForm();
+        return Objects.requireNonNull(InfoCenterView.class.getResource("info-center-view.css")).toExternalForm();
     }
 
     private void updateStyle() {

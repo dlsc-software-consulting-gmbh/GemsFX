@@ -56,6 +56,10 @@ public class AutoscrollListView<T> extends ListView<T> {
          * 0x0. In this case we try to use the virtual flow.
          */
         Region hotRegion = getClippedContainer();
+        if (hotRegion == null) {
+            return;
+        }
+
         if (hotRegion.getBoundsInLocal().getWidth() < 1) {
             hotRegion = this;
             if (hotRegion.getBoundsInLocal().getWidth() < 1) {
@@ -110,7 +114,7 @@ public class AutoscrollListView<T> extends ListView<T> {
         private double yOffset;
 
         ScrollThread() {
-            super("Autoscrolling List View");
+            super("Auto-Scrolling List View");
             setDaemon(true);
         }
 
@@ -130,7 +134,7 @@ public class AutoscrollListView<T> extends ListView<T> {
 
             while (running) {
 
-                Platform.runLater(() -> scrollY());
+                Platform.runLater(this::scrollY);
 
                 try {
                     sleep(15);

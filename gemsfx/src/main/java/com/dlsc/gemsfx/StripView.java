@@ -22,6 +22,8 @@ import javafx.scene.control.Skin;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
+import java.util.Objects;
+
 /**
  * A view which can be used to lay out a fixed number of items horizontally. If the
  * available width is not sufficient then scrolling buttons will appear on either side
@@ -61,7 +63,7 @@ public class StripView<T> extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return StripView.class.getResource("strip-view.css").toExternalForm();
+        return Objects.requireNonNull(StripView.class.getResource("strip-view.css")).toExternalForm();
     }
 
     private final BooleanProperty alwaysCenter = new SimpleBooleanProperty(this, "alwaysCenter", true);

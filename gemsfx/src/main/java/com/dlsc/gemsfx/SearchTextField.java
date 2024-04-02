@@ -6,6 +6,8 @@ import org.controlsfx.control.textfield.CustomTextField;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import java.util.Objects;
+
 public class SearchTextField extends CustomTextField {
 
     public SearchTextField() {
@@ -19,7 +21,7 @@ public class SearchTextField extends CustomTextField {
 
         getStyleClass().add("search-text-field");
 
-        getStylesheets().add(SearchTextField.class.getResource("search-text-field.css").toExternalForm());
+        getStylesheets().add(Objects.requireNonNull(SearchTextField.class.getResource("search-text-field.css")).toExternalForm());
 
         setPromptText("Search...");
 

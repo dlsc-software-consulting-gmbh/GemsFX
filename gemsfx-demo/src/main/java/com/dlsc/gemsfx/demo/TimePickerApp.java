@@ -82,6 +82,7 @@ public class TimePickerApp extends Application {
             try {
                 DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).parse(datePicker.getEditor().getText());
             } catch (DateTimeParseException ex) {
+                // ignore
             }
         });
 
@@ -100,12 +101,12 @@ public class TimePickerApp extends Application {
         stepRateBox.getSelectionModel().select(Integer.valueOf(timePicker.getStepRateInMinutes())); // must be "Integer" object, not int
 
         ComboBox<LocalTime> earliestTimeBox = new ComboBox<>();
-        earliestTimeBox.getItems().addAll(LocalTime.MIN, LocalTime.of(6, 30), LocalTime.of(23, 00));
+        earliestTimeBox.getItems().addAll(LocalTime.MIN, LocalTime.of(6, 30), LocalTime.of(23, 0));
         earliestTimeBox.valueProperty().addListener(it -> timePicker.setEarliestTime(earliestTimeBox.getValue()));
         earliestTimeBox.getSelectionModel().select(LocalTime.MIN);
 
         ComboBox<LocalTime> latestTimeBox = new ComboBox<>();
-        latestTimeBox.getItems().addAll(LocalTime.MAX, LocalTime.of(18, 00), LocalTime.of(2, 00));
+        latestTimeBox.getItems().addAll(LocalTime.MAX, LocalTime.of(18, 0), LocalTime.of(2, 0));
         latestTimeBox.valueProperty().addListener(it -> timePicker.setLatestTime(latestTimeBox.getValue()));
         latestTimeBox.getSelectionModel().select(LocalTime.MAX);
         latestTimeBox.setConverter(new StringConverter<>() {

@@ -5,6 +5,7 @@ import com.dlsc.gemsfx.util.IntegerRange;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -15,6 +16,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SplitPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -30,9 +32,12 @@ public class LimitedTextAreaApp extends Application {
         textArea.setText("Hello, World!");
         textArea.setCharacterRangeLimit(new IntegerRange(0, 30));
 
+        StackPane wrapper = new StackPane(textArea);
+        wrapper.setPadding(new Insets(20));
+
         SplitPane splitPane = new SplitPane();
         splitPane.setDividerPositions(0.75);
-        splitPane.getItems().addAll(textArea, getControlPanel());
+        splitPane.getItems().addAll(wrapper, getControlPanel());
 
         Scene scene = new Scene(splitPane, 560, 420);
         primaryStage.setScene(scene);

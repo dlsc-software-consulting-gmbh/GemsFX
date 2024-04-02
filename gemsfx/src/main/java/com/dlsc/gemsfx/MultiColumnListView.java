@@ -55,7 +55,7 @@ public class MultiColumnListView<T> extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return MultiColumnListView.class.getResource("multi-column-list-view.css").toExternalForm();
+        return Objects.requireNonNull(MultiColumnListView.class.getResource("multi-column-list-view.css")).toExternalForm();
     }
 
     private final BooleanProperty showHeaders = new SimpleBooleanProperty(this, "showHeaders", true);
@@ -118,7 +118,7 @@ public class MultiColumnListView<T> extends Control {
         this.columns.set(columns);
     }
 
-    private final ObjectProperty<Callback<MultiColumnListView<T>, ColumnListCell<T>>> cellFactory = new SimpleObjectProperty<>(this, "cellFactory", listView -> new ColumnListCell<T>(listView));
+    private final ObjectProperty<Callback<MultiColumnListView<T>, ColumnListCell<T>>> cellFactory = new SimpleObjectProperty<>(this, "cellFactory", ColumnListCell::new);
 
     public final Callback<MultiColumnListView<T>, ColumnListCell<T>> getCellFactory() {
         return cellFactory.get();
@@ -191,7 +191,7 @@ public class MultiColumnListView<T> extends Control {
 
         private final ListProperty<T> items = new SimpleListProperty<>(this, "items", FXCollections.observableArrayList());
 
-        public final ObservableList getItems() {
+        public final ObservableList<T> getItems() {
             return items.get();
         }
 
@@ -204,7 +204,7 @@ public class MultiColumnListView<T> extends Control {
             return items;
         }
 
-        public final void setItems(ObservableList items) {
+        public final void setItems(ObservableList<T> items) {
             this.items.set(items);
         }
 
@@ -368,9 +368,7 @@ public class MultiColumnListView<T> extends Control {
                 }
             });
 
-            setOnDragEntered(event -> {
-                log("drag entered");
-            });
+            setOnDragEntered(event -> log("drag entered"));
 
             setOnDragExited(event -> {
                 log("drag exited");

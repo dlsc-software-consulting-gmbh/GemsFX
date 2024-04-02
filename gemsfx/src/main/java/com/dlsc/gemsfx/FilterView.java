@@ -111,7 +111,7 @@ public class FilterView<T> extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return FilterView.class.getResource("filter-view.css").toExternalForm();
+        return Objects.requireNonNull(FilterView.class.getResource("filter-view.css")).toExternalForm();
     }
 
     @Override

@@ -16,6 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Objects;
 
 public class SVGImageViewApp extends Application {
 
@@ -28,7 +29,7 @@ public class SVGImageViewApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         SVGImageView imageView = new SVGImageView();
-        String svgUrl = SVGImageViewApp.class.getResource("microphone.svg").toExternalForm();
+        String svgUrl = Objects.requireNonNull(SVGImageViewApp.class.getResource("microphone.svg")).toExternalForm();
         imageView.setSvgUrl(svgUrl);
 
         VBox controlBox = createControlBox(primaryStage, imageView);
@@ -42,7 +43,7 @@ public class SVGImageViewApp extends Application {
         SplitPane root = new SplitPane(scrollPane, controlBox);
         root.setDividerPositions(0.7);
         Scene scene = new Scene(root, 600, 380);
-        scene.getStylesheets().add(SVGImageViewApp.class.getResource("svg-image-view-app.css").toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(SVGImageViewApp.class.getResource("svg-image-view-app.css")).toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.setTitle("SVGImageView Demo");
         primaryStage.show();

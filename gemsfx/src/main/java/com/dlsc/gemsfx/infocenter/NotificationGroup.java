@@ -253,7 +253,7 @@ public class NotificationGroup<T, S extends Notification<T>> implements Comparab
     @Override
     public int compareTo(NotificationGroup o) {
         // if the app uses sort order then use that
-        if (sortOrder.getValue() != null && o.getSortOrder() != null) {
+        if (sortOrder.getValue() != null) {
             return sortOrder.getValue().compareTo(o.getSortOrder());
         }
 

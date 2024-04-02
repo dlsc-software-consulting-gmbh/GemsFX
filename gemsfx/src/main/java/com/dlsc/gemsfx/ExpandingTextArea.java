@@ -90,7 +90,7 @@ public class ExpandingTextArea extends TextArea {
                     if (text == null) {
                         text = findTextNode();
                         if (text != null) {
-                            prefHeightProperty().bind(Bindings.createDoubleBinding(() -> computeHeight(), text.layoutBoundsProperty()));
+                            prefHeightProperty().bind(Bindings.createDoubleBinding(this::computeHeight, text.layoutBoundsProperty()));
                         }
                     }
                 }

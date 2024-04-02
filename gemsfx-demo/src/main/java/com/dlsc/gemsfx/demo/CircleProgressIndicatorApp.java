@@ -18,6 +18,8 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.Objects;
+
 public class CircleProgressIndicatorApp extends Application {
 
     private StringConverter<Double> customConverter;
@@ -72,7 +74,7 @@ public class CircleProgressIndicatorApp extends Application {
         containerBox.getChildren().addAll(indicatorWrapper, new Separator(), bottom);
 
         Scene scene = new Scene(containerBox, 330, 390);
-        scene.getStylesheets().add(CircleProgressIndicatorApp.class.getResource("circle-progress-indicator-demo.css").toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(CircleProgressIndicatorApp.class.getResource("circle-progress-indicator-demo.css")).toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.setTitle("CircleProgressIndicator Demo");
         primaryStage.show();

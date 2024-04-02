@@ -203,11 +203,11 @@ public class PowerPaneApp extends Application {
                     break;
                 case "Dark":
                     dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPane.class.getResource("dialog-pane.css")).toExternalForm());
-                    dialogPane.getStylesheets().add(DialogsApp.class.getResource("dialogs-dark.css").toExternalForm());
+                    dialogPane.getStylesheets().add(Objects.requireNonNull(DialogsApp.class.getResource("dialogs-dark.css")).toExternalForm());
                     dialogPane.setConverter(null);
                     break;
                 case "Custom":
-                    dialogPane.getStylesheets().setAll(DialogsApp.class.getResource("dialogs-custom.css").toExternalForm());
+                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogsApp.class.getResource("dialogs-custom.css")).toExternalForm());
                     dialogPane.setConverter(new StringConverter<>() {
                         @Override
                         public String toString(ButtonType object) {
@@ -235,7 +235,7 @@ public class PowerPaneApp extends Application {
     private void later(Runnable runnable, int counter) {
         Thread thread = new Thread(() -> {
             try {
-                Thread.sleep(counter * 500);
+                Thread.sleep(counter * 500L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -279,7 +279,7 @@ public class PowerPaneApp extends Application {
         return new StackPane(rect, label);
     }
 
-    public class Person {
+    public static class Person {
 
         private String name;
         private String address;
@@ -480,7 +480,7 @@ public class PowerPaneApp extends Application {
         return time;
     }
 
-    public class CalendarNotification extends Notification<Object> {
+    public static class CalendarNotification extends Notification<Object> {
 
         public CalendarNotification(String title, String description) {
             super(title, description);
@@ -488,7 +488,7 @@ public class PowerPaneApp extends Application {
         }
     }
 
-    public class SlackNotification extends Notification<Object> {
+    public static class SlackNotification extends Notification<Object> {
 
         public SlackNotification(String title, String description) {
             super(title, description);
@@ -496,7 +496,7 @@ public class PowerPaneApp extends Application {
         }
     }
 
-    public class MailNotification extends Notification<Mail> {
+    public static class MailNotification extends Notification<Mail> {
 
         public MailNotification(Mail mail) {
             super(mail.getTitle(), mail.getDescription(), mail.getDateTime());
@@ -505,7 +505,7 @@ public class PowerPaneApp extends Application {
         }
     }
 
-    public class Mail {
+    public static class Mail {
 
         private String title;
         private String description;
@@ -542,7 +542,7 @@ public class PowerPaneApp extends Application {
         }
     }
 
-    class BlueprintCanvas extends Canvas {
+    static class BlueprintCanvas extends Canvas {
 
         public BlueprintCanvas() {
             widthProperty().addListener(it -> draw());

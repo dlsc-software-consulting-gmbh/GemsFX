@@ -13,12 +13,14 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class BeforeAfterViewApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        Image beforeImage = new Image(BeforeAfterViewApp.class.getResource("berlin/before1.png").toExternalForm());
-        Image afterImage = new Image(BeforeAfterViewApp.class.getResource("berlin/after1.png").toExternalForm());
+        Image beforeImage = new Image(Objects.requireNonNull(BeforeAfterViewApp.class.getResource("berlin/before1.png")).toExternalForm());
+        Image afterImage = new Image(Objects.requireNonNull(BeforeAfterViewApp.class.getResource("berlin/after1.png")).toExternalForm());
 
         BeforeAfterView beforeAfterView = new BeforeAfterView(beforeImage, afterImage);
         beforeAfterView.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);

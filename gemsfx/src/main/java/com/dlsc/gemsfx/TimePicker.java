@@ -17,6 +17,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Region;
 
 import java.time.LocalTime;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -121,7 +122,7 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         /*
          * Added here, too, as a work-around for styling issues related to Ikonli font icon.
          */
-        getStylesheets().add(TimePicker.class.getResource("time-picker.css").toExternalForm());
+        getStylesheets().add(Objects.requireNonNull(TimePicker.class.getResource("time-picker.css")).toExternalForm());
 
         setOnKeyPressed(evt -> {
             if (evt.getCode().equals(KeyCode.F4) || evt.getCode().equals(KeyCode.ENTER)) {
@@ -177,7 +178,7 @@ public class TimePicker extends CustomComboBox<LocalTime> {
 
     @Override
     public String getUserAgentStylesheet() {
-        return TimePicker.class.getResource("time-picker.css").toExternalForm();
+        return Objects.requireNonNull(TimePicker.class.getResource("time-picker.css")).toExternalForm();
     }
 
     private final ObjectProperty<LocalTime> earliestTime = new SimpleObjectProperty<>(this, "earliestTime", LocalTime.MIN);
@@ -230,7 +231,7 @@ public class TimePicker extends CustomComboBox<LocalTime> {
      * default separator is a label with text ":".
      *
      * @return a node used as a hoursSeparator
-     * @depracated we now have more than just one separator, hence use {@link #hoursSeparatorProperty()} etc...
+     * @deprecated we now have more than just one separator, hence use {@link #hoursSeparatorProperty()} etc...
      */
     @Deprecated
     public final ObjectProperty<Node> separatorProperty() {
@@ -374,20 +375,7 @@ public class TimePicker extends CustomComboBox<LocalTime> {
     private boolean adjustViaStepRate() {
         LocalTime time = getTime();
         if (time != null) {
-            int hour = time.getHour();
-
-            int unadjustedMinutes = time.getMinute();
-            int lowerAdjustment = unadjustedMinutes - time.getMinute() % getStepRateInMinutes();
-            int higherAdjustment = lowerAdjustment + getStepRateInMinutes();
-
-            LocalTime adjustedTime = LocalTime.of(hour, lowerAdjustment);
-            if (Math.abs(lowerAdjustment - unadjustedMinutes) > Math.abs(higherAdjustment - unadjustedMinutes)) {
-                if (higherAdjustment > 59) {
-                    higherAdjustment = lowerAdjustment;
-                }
-
-                adjustedTime = LocalTime.of(hour, higherAdjustment);
-            }
+            LocalTime adjustedTime = getAdjustedTime(time);
 
             /*
              * We have to check "manually" for equality of the original time and the adjusted time as equality for us
@@ -402,6 +390,25 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         }
 
         return false;
+    }
+
+    private LocalTime getAdjustedTime(LocalTime time) {
+        int hour = time.getHour();
+
+        int unadjustedMinutes = time.getMinute();
+        int lowerAdjustment = unadjustedMinutes - time.getMinute() % getStepRateInMinutes();
+        int higherAdjustment = lowerAdjustment + getStepRateInMinutes();
+
+        LocalTime adjustedTime = LocalTime.of(hour, lowerAdjustment);
+        if (Math.abs(lowerAdjustment - unadjustedMinutes) > Math.abs(higherAdjustment - unadjustedMinutes)) {
+            if (higherAdjustment > 59) {
+                higherAdjustment = lowerAdjustment;
+            }
+
+            adjustedTime = LocalTime.of(hour, higherAdjustment);
+        }
+
+        return adjustedTime;
     }
 
     private final ObjectProperty<LocalTime> time = new SimpleObjectProperty<>(this, "time");

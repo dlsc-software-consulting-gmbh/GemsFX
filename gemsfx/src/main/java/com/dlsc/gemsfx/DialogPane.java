@@ -1769,7 +1769,7 @@ public class DialogPane extends Pane {
         }
     }
 
-    private class BusyIndicator extends CircularProgressIndicator {
+    private static class BusyIndicator extends CircularProgressIndicator {
 
         public BusyIndicator() {
             getStyleClass().add("dialog-pane-busy-indicator");

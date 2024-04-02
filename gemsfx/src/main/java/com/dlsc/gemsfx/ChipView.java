@@ -2,6 +2,7 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.ChipViewSkin;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import javafx.beans.property.ObjectProperty;
@@ -35,7 +36,7 @@ public class ChipView<T> extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return ChipView.class.getResource("chip-view.css").toExternalForm();
+        return Objects.requireNonNull(ChipView.class.getResource("chip-view.css")).toExternalForm();
     }
 
     // value

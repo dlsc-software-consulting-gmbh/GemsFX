@@ -176,7 +176,8 @@ public class FilterViewApp extends Application {
         CSSFX.start();
     }
 
-    public class Person {
+    public static class Person {
+
         private String firstName;
         private String lastName;
         private LocalDate birthday;

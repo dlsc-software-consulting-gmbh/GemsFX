@@ -17,6 +17,8 @@ import javafx.stage.Stage;
 import org.controlsfx.control.StatusBar;
 import org.controlsfx.control.textfield.CustomTextField;
 
+import java.util.Objects;
+
 public class TemplatePaneExampleApp extends Application {
 
 	@Override
@@ -25,7 +27,7 @@ public class TemplatePaneExampleApp extends Application {
 		fillPane(pane);
 		pane.setStyle("-fx-border-color: black; -fx-border-insets: 20px;");
 		pane.setPrefSize(1200, 1000);
-		pane.getStylesheets().add(TemplatePaneExampleApp.class.getResource("template-controls-demo.css").toExternalForm());
+		pane.getStylesheets().add(Objects.requireNonNull(TemplatePaneExampleApp.class.getResource("template-controls-demo.css")).toExternalForm());
 		Platform.runLater(() -> {
 			TemplatePaneControls controls = new TemplatePaneControls(pane);
 			controls.show();
@@ -92,7 +94,7 @@ public class TemplatePaneExampleApp extends Application {
 		pane.setNode(Position.HEADER, stackPane);
 		stackPane.setStyle("-fx-background-color: white");
 
-		ImageView logo = new ImageView(TemplatePaneExampleApp.class.getResource("logo-dlsc.png").toExternalForm());
+		ImageView logo = new ImageView(Objects.requireNonNull(TemplatePaneExampleApp.class.getResource("logo-dlsc.png")).toExternalForm());
 		StackPane.setAlignment(logo, Pos.CENTER_LEFT);
 		stackPane.getChildren().add(logo);
 

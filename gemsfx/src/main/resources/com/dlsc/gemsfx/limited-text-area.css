@@ -39,6 +39,7 @@
 }
 
 .limited-text-area > .content-box > .bottom-box {
+    -fx-padding: 5px 0px;
     -fx-alignment: center-left;
 }
 

@@ -93,7 +93,7 @@ public class SVGImageView extends Control {
      * value is <= 0, the svg image's intrinsic width will be used.
      * <p>
      * When {@link #preserveRatioProperty()} is set to true, then the actual displayed
-     * width of the image is constrained not only by {@link #fitWidthProperty()}, but
+     * width of the image is constrained not only by this property, but
      * also by {@link #fitHeightProperty()}, and it may not be the same as fitWidth.
      * <p/>
      * The default value is 0.
@@ -142,7 +142,7 @@ public class SVGImageView extends Control {
      * value is <= 0, the svg image's intrinsic height will be used.
      * <p>
      * When {@link #preserveRatioProperty()} is set to true, then the actual displayed
-     * height of the image is constrained not only by {@link #fitHeightProperty()}, but
+     * height of the image is constrained not only by this property, but
      * also by {@link #fitWidthProperty()}, and it may not be the same as fitHeight.
      * <p/>
      * The default value is 0.

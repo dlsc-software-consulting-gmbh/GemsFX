@@ -82,7 +82,7 @@ public class TagsField<T> extends SearchField<T> {
             if (evt.getCode().equals(KeyCode.BACK_SPACE)) {
                 if (!tagSelectionModel.isEmpty()) {
                     removeTags((T[]) tagSelectionModel.getSelectedItems().toArray());
-                } else if (getText().equals("") && !getTags().isEmpty()) {
+                } else if (getText().isEmpty() && !getTags().isEmpty()) {
                     removeTags(getTags().get(getTags().size() - 1));
                 }
             } else if (KeyCombination.keyCombination("shortcut+z").match(evt)) {
@@ -230,7 +230,7 @@ public class TagsField<T> extends SearchField<T> {
 
     private class AddTagCommand implements Command {
 
-        private T[] tags;
+        private final T[] tags;
 
         @SafeVarargs
         public AddTagCommand(T... tags) {
@@ -254,7 +254,7 @@ public class TagsField<T> extends SearchField<T> {
 
     private class RemoveTagCommand implements Command {
 
-        private T[] tags;
+        private final T[] tags;
 
         @SafeVarargs
         public RemoveTagCommand(T... tags) {
@@ -278,7 +278,7 @@ public class TagsField<T> extends SearchField<T> {
 
     private class ClearTagsCommand implements Command {
 
-        private List<T> tags = new ArrayList<>();
+        private final List<T> tags = new ArrayList<>();
 
         public ClearTagsCommand(List<T> tags) {
             this.tags.addAll(tags);

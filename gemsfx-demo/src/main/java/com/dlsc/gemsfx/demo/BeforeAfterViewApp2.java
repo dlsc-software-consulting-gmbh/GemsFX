@@ -11,6 +11,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class BeforeAfterViewApp2 extends Application {
 
     @Override
@@ -24,8 +26,8 @@ public class BeforeAfterViewApp2 extends Application {
         pane2.setPadding(new Insets(20));
         pane2.getStyleClass().add("styled-settings-pane");
 
-        pane1.getStylesheets().add(SettingsPane.class.getResource("styles.css").toExternalForm());
-        pane2.getStylesheets().add(SettingsPane.class.getResource("styles.css").toExternalForm());
+        pane1.getStylesheets().add(Objects.requireNonNull(SettingsPane.class.getResource("styles.css")).toExternalForm());
+        pane2.getStylesheets().add(Objects.requireNonNull(SettingsPane.class.getResource("styles.css")).toExternalForm());
 
         BeforeAfterView beforeAfterView = new BeforeAfterView(pane1, pane2);
 

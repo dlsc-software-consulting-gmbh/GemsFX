@@ -7,6 +7,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
+
 /**
  * A control for displaying different types of payment options, e.g. various
  * credit cards (MasterCard, American Express, Visa) but also new online options
@@ -202,18 +204,12 @@ public class PaymentOptionView extends ImageView {
         }
 
         if (StringUtils.isNotBlank(fileName)) {
-            switch (getTheme()) {
-                case DARK:
-                    fileName = fileName + "-dark.png";
-                    break;
-                case LIGHT:
-                    fileName = fileName + "-light.png";
-                    break;
-                default:
-                    throw new IllegalArgumentException("theme can not be " + getTheme());
-            }
+            fileName = switch (getTheme()) {
+                case DARK -> fileName + "-dark.png";
+                case LIGHT -> fileName + "-light.png";
+            };
 
-            setImage(new Image(PaymentOptionView.class.getResource("paymentoptions/" + fileName).toExternalForm()));
+            setImage(new Image(Objects.requireNonNull(PaymentOptionView.class.getResource("paymentoptions/" + fileName)).toExternalForm()));
         } else {
             setImage(null);
         }

@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
 import java.time.Year;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 /**
@@ -111,7 +112,7 @@ public class YearPicker extends CustomComboBox<Year> {
 
     @Override
     public String getUserAgentStylesheet() {
-        return YearMonthView.class.getResource("year-picker.css").toExternalForm();
+        return Objects.requireNonNull(YearMonthView.class.getResource("year-picker.css")).toExternalForm();
     }
 
     private final ReadOnlyObjectWrapper<Integer> year = new ReadOnlyObjectWrapper<>(this, "year");

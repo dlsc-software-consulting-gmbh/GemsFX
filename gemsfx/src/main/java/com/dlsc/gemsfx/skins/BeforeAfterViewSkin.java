@@ -10,6 +10,8 @@ import javafx.scene.shape.Rectangle;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import java.util.Objects;
+
 public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
 
     private StackPane content = new StackPane();
@@ -29,7 +31,7 @@ public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
 
         handle.getStyleClass().add("handle");
         handle.setManaged(false);
-        handle.getStylesheets().add(BeforeAfterView.class.getResource("before-after-view.css").toExternalForm());
+        handle.getStylesheets().add(Objects.requireNonNull(BeforeAfterView.class.getResource("before-after-view.css")).toExternalForm());
         handle.getChildren().add(new FontIcon(MaterialDesign.MDI_DRAG));
         handle.setMouseTransparent(true);
 

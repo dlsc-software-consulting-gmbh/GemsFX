@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ResourcesUtil {
 
@@ -17,7 +18,7 @@ public class ResourcesUtil {
     }
 
     public static String toExternalForm(String path) {
-        return ResourcesUtil.class.getResource(path).toExternalForm();
+        return Objects.requireNonNull(ResourcesUtil.class.getResource(path)).toExternalForm();
     }
 
     public static Map<String, SoftReference<Image>> getAvatarImgCacheMap() {

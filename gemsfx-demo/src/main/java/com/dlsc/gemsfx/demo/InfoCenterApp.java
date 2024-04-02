@@ -213,7 +213,7 @@ public class InfoCenterApp extends Application {
         return time;
     }
 
-    public class CalendarNotification extends Notification<Object> {
+    public static class CalendarNotification extends Notification<Object> {
 
         public CalendarNotification(String title, String description) {
             super(title, description);
@@ -221,7 +221,7 @@ public class InfoCenterApp extends Application {
         }
     }
 
-    public class SlackNotification extends Notification<Object> {
+    public static class SlackNotification extends Notification<Object> {
 
         public SlackNotification(String title, String description) {
             super(title, description);
@@ -229,7 +229,7 @@ public class InfoCenterApp extends Application {
         }
     }
 
-    public class MailNotification extends Notification<Mail> {
+    public static class MailNotification extends Notification<Mail> {
 
         public MailNotification(Mail mail) {
             super(mail.getTitle(), mail.getDescription(), mail.getDateTime());
@@ -238,7 +238,7 @@ public class InfoCenterApp extends Application {
         }
     }
 
-    public class Mail {
+    public static class Mail {
 
         private String title;
         private String description;

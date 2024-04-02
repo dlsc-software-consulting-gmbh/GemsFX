@@ -101,12 +101,7 @@ public class YearMonthPicker extends CustomComboBox<YearMonth> {
         if (StringUtils.isNotBlank(text)) {
             StringConverter<YearMonth> converter = getConverter();
             if (converter != null) {
-                YearMonth value = converter.fromString(text);
-                if (value != null) {
-                    setValue(value);
-                } else {
-                    setValue(null);
-                }
+                setValue(converter.fromString(text));
             }
         }
     }

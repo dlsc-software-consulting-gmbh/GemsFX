@@ -120,7 +120,7 @@ public class StageManager {
 
     private void saveStage() throws SecurityException {
         if (supportFullScreenAndMaximized && stage.isMaximized()) {
-            LOG.fine(MessageFormat.format("saving stage, iconified = {1}, maximized = {2}, fullscreen = {3}", stage.isIconified(), stage.isMaximized(), stage.isFullScreen()));
+            LOG.fine(MessageFormat.format("saving stage, iconified = {0}, maximized = {1}, fullscreen = {2}", stage.isIconified(), stage.isMaximized(), stage.isFullScreen()));
         } else {
             LOG.fine(MessageFormat.format("saving stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}, maximized = {5}, fullscreen = {6}", stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight(), stage.isIconified(), stage.isMaximized(), stage.isFullScreen()));
         }

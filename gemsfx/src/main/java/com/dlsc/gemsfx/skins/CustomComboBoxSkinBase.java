@@ -121,7 +121,7 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
                 setSkin(new Skin<>() {
                     @Override
                     public Skinnable getSkinnable() {
-                        return getSkinnable();
+                        return popup;
                     }
 
                     @Override

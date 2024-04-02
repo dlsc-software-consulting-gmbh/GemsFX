@@ -214,7 +214,7 @@ public class DialogsApp extends Application {
     private void later(Runnable runnable, int counter) {
         Thread thread = new Thread(() -> {
             try {
-                Thread.sleep(counter * 500);
+                Thread.sleep(counter * 500L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
