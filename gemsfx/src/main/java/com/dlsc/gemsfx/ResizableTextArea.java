@@ -24,7 +24,6 @@ public class ResizableTextArea extends TextArea {
      */
     public ResizableTextArea() {
         getStyleClass().add("resizable-text-area");
-        setFocusTraversable(false);
     }
 
     /**
