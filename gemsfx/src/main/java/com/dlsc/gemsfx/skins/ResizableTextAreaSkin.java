@@ -128,8 +128,7 @@ public class ResizableTextAreaSkin extends TextAreaSkin {
 
     private void findScrollBar() {
         scrollPane.getChildrenUnmodifiable().forEach(node -> {
-            if (node instanceof ScrollBar) {
-                ScrollBar scrollBar = (ScrollBar) node;
+            if (node instanceof ScrollBar scrollBar) {
                 if (scrollBar.getOrientation() == Orientation.VERTICAL) {
                     verticalScrollBar = scrollBar;
                 } else {
