@@ -36,11 +36,6 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         updateTooltipVisibility(field.getInvalidText(), rightIconWrapper, invalidToolTip);
         field.invalidTextProperty().addListener((ob, ov, newValue) -> updateTooltipVisibility(newValue, rightIconWrapper, invalidToolTip));
 
-        /*
-         * Needed because custom text field brings its own user agent stylesheet. Not
-         * really sure what the logic is behind this.
-         */
-        customTextField.getStylesheets().add(field.getUserAgentStylesheet());
         customTextField.textProperty().bindBidirectional(field.emailAddressProperty());
         customTextField.promptTextProperty().bind(field.promptTextProperty());
         customTextField.setLeft(leftIconWrapper);

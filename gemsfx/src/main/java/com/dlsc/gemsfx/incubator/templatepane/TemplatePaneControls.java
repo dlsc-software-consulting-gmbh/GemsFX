@@ -21,8 +21,6 @@ public class TemplatePaneControls extends BorderPane {
 	public TemplatePaneControls(TemplatePane pane) {
 		this.pane = Objects.requireNonNull(pane);
 
-		getStylesheets().add(Objects.requireNonNull(TemplatePaneControls.class.getResource("controls.css")).toExternalForm());
-
 		checkbox = new CheckBox("Show all tiles");
 		checkbox.setSelected(false);
 		checkbox.setOnAction(evt -> controlsPane.requestLayout());
@@ -37,6 +35,11 @@ public class TemplatePaneControls extends BorderPane {
 
 		fillPane();
 		setPrefSize(200, 300);
+	}
+
+	@Override
+	public String getUserAgentStylesheet() {
+		return Objects.requireNonNull(TemplatePaneControls.class.getResource("controls.css")).toExternalForm();
 	}
 
 	private Stage stage;

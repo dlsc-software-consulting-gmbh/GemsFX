@@ -91,28 +91,31 @@
     -fx-background-color: white;
 }
 
-.duration-picker .popup > .picker {
+/* -----------------------------------------------------------------------------------------------------
+ * DurationPickerPopupView
+ */
+.picker {
     -fx-cell-size: 30px;
     -fx-indicator-size: 30px;
     -fx-padding: 1px;
     -fx-border-width: 1;
     -fx-border-color: -fx-box-border;
-    -fx-background-color: -fx-control-inner-background-alt;
+    -fx-background-color: -fx-control-inner-background;
 }
 
-.duration-picker .popup > .picker .container {
+.picker .container {
     -fx-spacing: 0px;
     -fx-padding: 0px;
 }
 
-.duration-picker .popup > .picker:vertical .segment {
+.picker:vertical .segment {
     -fx-background-color: -fx-control-inner-background;
     -fx-pref-height: 150;
     -fx-pref-width: 50;
     -fx-padding: 0px;
 }
 
-.duration-picker .popup > .picker:vertical .segment > .segment-cell {
+.picker:vertical .segment > .segment-cell {
     -fx-font-size: 1em;
     -fx-font-family: null;
     -fx-text-fill: black;
@@ -120,7 +123,7 @@
     -fx-background-insets: 0;
 }
 
-.duration-picker .popup > .picker:vertical .colon {
+.picker:vertical .colon {
     -fx-padding: 0px 2px;
     -fx-font-family: null;
     -fx-pref-width: 5;
@@ -128,11 +131,11 @@
     -fx-background-color: transparent;
 }
 
-.duration-picker .popup > .picker:vertical > .shadow {
+.picker:vertical > .shadow {
     -fx-background-color: transparent;
 }
 
-.duration-picker .popup > .picker:vertical > .indicator {
+.picker:vertical > .indicator {
     -fx-border-color: black;
     -fx-border-width: 1;
     -fx-border-insets: 0;
@@ -142,7 +145,7 @@
     -fx-opacity: .4;
 }
 
-.duration-picker .popup > .picker:vertical .segment-separator {
+.picker:vertical .segment-separator {
     -fx-background-color: -fx-box-border;
     -fx-pref-width: 1;
     -fx-min-width: 1;

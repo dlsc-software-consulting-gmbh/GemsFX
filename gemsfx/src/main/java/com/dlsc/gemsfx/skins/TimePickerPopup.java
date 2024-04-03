@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.TimePicker.Format;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -13,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 public class TimePickerPopup extends HBox {
 
@@ -109,6 +111,11 @@ public class TimePickerPopup extends HBox {
         });
 
         initializePopupView();
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(TimePicker.class.getResource("time-picker.css")).toExternalForm();
     }
 
     private void initializePopupView() {
@@ -208,6 +215,10 @@ public class TimePickerPopup extends HBox {
             label.visibleProperty().bind(emptyProperty().not());
             label.textProperty().bind(textProperty());
 
+            getPseudoClassStates().addListener((Observable it) -> {
+                System.out.println("---------");
+                getPseudoClassStates().forEach(System.out::println);
+            });
             setGraphic(label);
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         }

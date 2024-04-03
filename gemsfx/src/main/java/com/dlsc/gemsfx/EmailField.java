@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.skins.EmailFieldSkin;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -29,7 +30,12 @@ public class EmailField extends Control {
     private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
     private static final EmailValidator emailValidator = EmailValidator.getInstance();
 
-    private final CustomTextField editor = new CustomTextField();
+    private final CustomTextField editor = new CustomTextField() {
+        @Override
+        public String getUserAgentStylesheet() {
+            return Objects.requireNonNull(EmailField.class.getResource("email-field.css")).toExternalForm();
+        }
+    };
 
     public EmailField() {
         getStyleClass().add("email-field");
@@ -38,7 +44,7 @@ public class EmailField extends Control {
 
         focusedProperty().addListener(it -> {
             if (isFocused()) {
-               getEditor().requestFocus();
+                getEditor().requestFocus();
             }
         });
 

@@ -21,8 +21,6 @@ public class SearchTextField extends CustomTextField {
 
         getStyleClass().add("search-text-field");
 
-        getStylesheets().add(Objects.requireNonNull(SearchTextField.class.getResource("search-text-field.css")).toExternalForm());
-
         setPromptText("Search...");
 
         FontIcon searchIcon = new FontIcon(MaterialDesign.MDI_MAGNIFY);
@@ -44,5 +42,10 @@ public class SearchTextField extends CustomTextField {
         clearIconWrapper.getStyleClass().addAll("wrapper", "clear-icon-wrapper");
 
         setRight(clearIconWrapper);
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(SearchTextField.class.getResource("search-text-field.css")).toExternalForm();
     }
 }

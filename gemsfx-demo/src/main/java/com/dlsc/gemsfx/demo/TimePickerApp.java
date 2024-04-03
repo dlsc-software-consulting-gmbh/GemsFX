@@ -35,7 +35,7 @@ public class TimePickerApp extends Application {
     public void start(Stage primaryStage) {
         TimePicker timePicker = new TimePicker();
 
-        ComboBox<Format> formatComboBox = new ComboBox();
+        ComboBox<Format> formatComboBox = new ComboBox<>();
         formatComboBox.getItems().add(Format.HOURS_MINUTES);
         formatComboBox.getItems().add(Format.HOURS_MINUTES_SECONDS);
         formatComboBox.getItems().add(Format.HOURS_MINUTES_SECONDS_MILLIS);

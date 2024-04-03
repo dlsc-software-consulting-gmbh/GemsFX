@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DurationPickerSkin extends ToggleVisibilityComboBoxSkin<DurationPicker> {
 
@@ -90,7 +91,12 @@ public class DurationPickerSkin extends ToggleVisibilityComboBoxSkin<DurationPic
     protected Node getPopupContent() {
         if (popupContent == null) {
             DurationPicker skinnable = getSkinnable();
-            com.dlsc.pickerfx.DurationPicker durationPicker = new com.dlsc.pickerfx.DurationPicker();
+            com.dlsc.pickerfx.DurationPicker durationPicker = new com.dlsc.pickerfx.DurationPicker() {
+                @Override
+                public String getUserAgentStylesheet() {
+                    return Objects.requireNonNull(DurationPicker.class.getResource("duration-picker.css")).toExternalForm();
+                }
+            };
             durationPicker.valueProperty().bindBidirectional(skinnable.durationProperty());
             durationPicker.maximumDurationProperty().bind(skinnable.maximumDurationProperty());
             durationPicker.minimumDurationProperty().bind(skinnable.minimumDurationProperty());

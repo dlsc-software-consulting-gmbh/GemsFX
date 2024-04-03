@@ -30,9 +30,14 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
 
         SortedList<T> sortedList = new SortedList<>(searchField.getSuggestions(), createInnerComparator());
 
-        listView = new ListView<>(sortedList);
+        listView = new ListView<>(sortedList) {
+            @Override
+            public String getUserAgentStylesheet() {
+                return Objects.requireNonNull(SearchField.class.getResource("search-field.css")).toExternalForm();
+            }
+        };
+
         listView.getStyleClass().add("search-field-list-view");
-        listView.getStylesheets().add(Objects.requireNonNull(SearchField.class.getResource("search-field.css")).toExternalForm());
         listView.cellFactoryProperty().bind(searchField.cellFactoryProperty());
 
         listView.prefWidthProperty().bind(control.prefWidthProperty());

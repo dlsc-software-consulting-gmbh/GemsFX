@@ -31,7 +31,6 @@ public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
 
         handle.getStyleClass().add("handle");
         handle.setManaged(false);
-        handle.getStylesheets().add(Objects.requireNonNull(BeforeAfterView.class.getResource("before-after-view.css")).toExternalForm());
         handle.getChildren().add(new FontIcon(MaterialDesign.MDI_DRAG));
         handle.setMouseTransparent(true);
 

@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -28,11 +29,11 @@ public class EmailFieldApp extends Application {
         invalidTextField.setPromptText("Invalid text for the tooltip");
         view.invalidTextProperty().bind(invalidTextField.textProperty());
 
-        VBox topBox = new VBox(10, required, showMailIcon, showValidationIcon, invalidTextField);
+        VBox topBox = new VBox(10, required, showMailIcon, showValidationIcon, new Label("Text to show when invalid:"), invalidTextField);
 
         VBox box = new VBox(20, topBox, view);
         box.setPadding(new Insets(10));
-        Scene scene = new Scene(box, 320, 180);
+        Scene scene = new Scene(box);
         stage.setScene(scene);
         stage.sizeToScene();
         stage.centerOnScreen();

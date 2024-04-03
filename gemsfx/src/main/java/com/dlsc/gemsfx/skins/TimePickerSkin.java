@@ -17,6 +17,7 @@ import javafx.scene.layout.Region;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
 
@@ -49,7 +50,13 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
         fieldsBox.setAlignment(Pos.CENTER_LEFT);
         fieldsBox.getStyleClass().add("fields-box");
 
-        box = new HBox();
+        box = new HBox() {
+            @Override
+            public String getUserAgentStylesheet() {
+                return Objects.requireNonNull(TimePicker.class.getResource("time-picker.css")).toExternalForm();
+            }
+        };
+
         box.setFillHeight(true);
         box.getStyleClass().add("box");
         box.setAlignment(Pos.CENTER_LEFT);
@@ -99,9 +106,7 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
         picker.timeProperty().addListener(it -> updateFieldValues());
         updateFieldValues();
 
-        picker.formatProperty().addListener(cl -> {
-            updateFormat();
-        });
+        picker.formatProperty().addListener(cl -> updateFormat());
 
         updateEmptyPseudoClass();
         updateFormat();

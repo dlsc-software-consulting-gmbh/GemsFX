@@ -99,12 +99,6 @@ public class PhotoView extends Control {
         placeholder.getStyleClass().add("placeholder");
         setPlaceholder(placeholder);
 
-        /*
-         * We need to also add the stylesheet directly as otherwise the styling for the
-         * ikonli font icon will not work. Bug in Ikonli?
-         */
-        getStylesheets().add(Objects.requireNonNull(PhotoView.class.getResource("photo-view.css")).toExternalForm());
-
         setPhotoSupplier(() -> {
             if (fileChooser == null) {
                 fileChooser = new FileChooser();

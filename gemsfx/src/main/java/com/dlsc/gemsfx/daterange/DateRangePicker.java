@@ -35,7 +35,6 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
         setValue(dateRangeView.getValue());
 
         getStyleClass().add("date-range-picker");
-        getStylesheets().add(getUserAgentStylesheet());
     }
 
     @Override

@@ -67,8 +67,6 @@ public class DurationPicker extends CustomComboBox<Duration> {
         };
 
         getProperties().addListener(propertiesListener);
-
-        getStylesheets().add(getUserAgentStylesheet());
     }
 
     private void constrain() {

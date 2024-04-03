@@ -119,11 +119,6 @@ public class TimePicker extends CustomComboBox<LocalTime> {
             }
         });
 
-        /*
-         * Added here, too, as a work-around for styling issues related to Ikonli font icon.
-         */
-        getStylesheets().add(Objects.requireNonNull(TimePicker.class.getResource("time-picker.css")).toExternalForm());
-
         setOnKeyPressed(evt -> {
             if (evt.getCode().equals(KeyCode.F4) || evt.getCode().equals(KeyCode.ENTER)) {
                 getOnShowPopup().accept(this);
