@@ -124,6 +124,7 @@ public class FilterView<T> extends Control {
     public int getScrollThreshold() {
         return scrollThreshold.get();
     }
+
     /**
      * The threshold number of filters at which a ScrollPane is introduced to handle large number of elements.
      * If the number of filters is equal to or exceeds this value, the filters will be displayed within a ScrollPane.
@@ -518,6 +519,7 @@ public class FilterView<T> extends Control {
     public abstract static class Filter<T> implements Predicate<T> {
 
         private FilterGroup<T> group;
+        private boolean defaultEnabled;
 
         /**
          * Constructs a new filter with the given name.
@@ -538,6 +540,29 @@ public class FilterView<T> extends Control {
          */
         public Filter(String name) {
             this(name, StringUtils.replaceEach(name, new String[]{"(", ")", "&", "_", " "}, new String[]{"", "", "and", "-", "-"}).toLowerCase());
+        }
+
+        /**
+         * Constructs a new filter with the given name, setting it to the default enabled state.
+         *
+         * @param name           the name of the filter (e.g., "Male")
+         * @param defaultEnabled the default enabled state of the filter; {@code true} if the filter should be enabled by default, {@code false} otherwise
+         */
+        public Filter(String name, boolean defaultEnabled) {
+            this(name);
+            this.defaultEnabled = defaultEnabled;
+        }
+
+        /**
+         * Constructs a new filter with the given name and id, setting it to the default enabled state.
+         *
+         * @param name           the name of the filter (e.g., "Male")
+         * @param id             the id of the filter
+         * @param defaultEnabled the default enabled state of the filter; {@code true} if the filter should be enabled by default, {@code false} otherwise
+         */
+        public Filter(String name, String id, boolean defaultEnabled) {
+            this(name, id);
+            this.defaultEnabled = defaultEnabled;
         }
 
         /**
@@ -593,5 +618,15 @@ public class FilterView<T> extends Control {
         public final void setId(String id) {
             this.id.set(id);
         }
+
+        /**
+         * Returns the default enabled state of the filter.
+         *
+         * @return {@code true} if the filter is enabled by default, {@code false} otherwise
+         */
+        public boolean isDefaultEnabled() {
+            return defaultEnabled;
+        }
+
     }
 }

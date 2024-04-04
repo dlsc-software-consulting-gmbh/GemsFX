@@ -3,9 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.FilterView;
 import com.dlsc.gemsfx.FilterView.Filter;
 import com.dlsc.gemsfx.FilterView.FilterGroup;
-
-import java.time.LocalDate;
-
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.collections.transformation.SortedList;
@@ -17,6 +14,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.time.LocalDate;
 
 public class FilterViewApp extends Application {
 
@@ -78,6 +77,16 @@ public class FilterViewApp extends Application {
             @Override
             public boolean test(Person person) {
                 return person.getLastName().equals("Smith");
+            }
+        });
+
+        birthdayGroup.getFilters().add(new Filter<>("1900 - 2100", true) {
+            @Override
+            public boolean test(Person person) {
+                if (person.getBirthday().getYear() < 1900) {
+                    return false;
+                }
+                return person.getBirthday().getYear() <= 2100;
             }
         });
 
