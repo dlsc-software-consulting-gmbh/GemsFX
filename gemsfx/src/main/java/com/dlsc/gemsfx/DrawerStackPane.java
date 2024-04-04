@@ -244,13 +244,19 @@ public class DrawerStackPane extends StackPane {
         this.autoHide.set(autoHide);
     }
 
+    private final StringProperty preferencesKey = new SimpleStringProperty(this, "preferencesKey");
+
+    public final StringProperty preferencesKeyProperty() {
+        return preferencesKey;
+    }
+
     /**
      * Sets the key that will be used when storing the last drawer height via
      * the Java preferences API.
      *
      * @param key the preferences key
      */
-    public void setPreferencesKey(String key) {
+    public final void setPreferencesKey(String key) {
         preferenceKey = key;
     }
 
@@ -260,7 +266,7 @@ public class DrawerStackPane extends StackPane {
      *
      * @return the preferences key
      */
-    public String getPreferencesKey() {
+    public final String getPreferencesKey() {
         return preferenceKey;
     }
 
