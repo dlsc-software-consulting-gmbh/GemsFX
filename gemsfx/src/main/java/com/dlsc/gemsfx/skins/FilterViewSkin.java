@@ -181,6 +181,7 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
                         activeFilters.remove(filter);
                     }
                 });
+                item.setSelected(filter.isSelected());
                 menuButton.getItems().add(item);
 
                 filterItemMap.put(filter, item);

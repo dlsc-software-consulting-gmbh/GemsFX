@@ -124,6 +124,7 @@ public class FilterView<T> extends Control {
     public int getScrollThreshold() {
         return scrollThreshold.get();
     }
+
     /**
      * The threshold number of filters at which a ScrollPane is introduced to handle large number of elements.
      * If the number of filters is equal to or exceeds this value, the filters will be displayed within a ScrollPane.
@@ -518,6 +519,7 @@ public class FilterView<T> extends Control {
     public abstract static class Filter<T> implements Predicate<T> {
 
         private FilterGroup<T> group;
+        private boolean selected;
 
         /**
          * Constructs a new filter with the given name.
@@ -538,6 +540,29 @@ public class FilterView<T> extends Control {
          */
         public Filter(String name) {
             this(name, StringUtils.replaceEach(name, new String[]{"(", ")", "&", "_", " "}, new String[]{"", "", "and", "-", "-"}).toLowerCase());
+        }
+
+        /**
+         * Constructs a new filter with the given name, setting it to the default selected state.
+         *
+         * @param name           the name of the filter (e.g., "Male")
+         * @param selected the default selected state of the filter; {@code true} if the filter should be selected by default, {@code false} otherwise
+         */
+        public Filter(String name, boolean selected) {
+            this(name);
+            this.selected = selected;
+        }
+
+        /**
+         * Constructs a new filter with the given name and id, setting it to the default selected state.
+         *
+         * @param name           the name of the filter (e.g., "Male")
+         * @param id             the id of the filter
+         * @param selected the default selected state of the filter; {@code true} if the filter should be selected by default, {@code false} otherwise
+         */
+        public Filter(String name, String id, boolean selected) {
+            this(name, id);
+            this.selected = selected;
         }
 
         /**
@@ -593,5 +618,15 @@ public class FilterView<T> extends Control {
         public final void setId(String id) {
             this.id.set(id);
         }
+
+        /**
+         * Returns the default selected state of the filter.
+         *
+         * @return {@code true} if the filter is selected by default, {@code false} otherwise
+         */
+        public boolean isSelected() {
+            return selected;
+        }
+
     }
 }
