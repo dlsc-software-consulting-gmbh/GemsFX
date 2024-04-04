@@ -519,7 +519,7 @@ public class FilterView<T> extends Control {
     public abstract static class Filter<T> implements Predicate<T> {
 
         private FilterGroup<T> group;
-        private boolean defaultEnabled;
+        private boolean selected;
 
         /**
          * Constructs a new filter with the given name.
@@ -543,26 +543,26 @@ public class FilterView<T> extends Control {
         }
 
         /**
-         * Constructs a new filter with the given name, setting it to the default enabled state.
+         * Constructs a new filter with the given name, setting it to the default selected state.
          *
          * @param name           the name of the filter (e.g., "Male")
-         * @param defaultEnabled the default enabled state of the filter; {@code true} if the filter should be enabled by default, {@code false} otherwise
+         * @param selected the default selected state of the filter; {@code true} if the filter should be selected by default, {@code false} otherwise
          */
-        public Filter(String name, boolean defaultEnabled) {
+        public Filter(String name, boolean selected) {
             this(name);
-            this.defaultEnabled = defaultEnabled;
+            this.selected = selected;
         }
 
         /**
-         * Constructs a new filter with the given name and id, setting it to the default enabled state.
+         * Constructs a new filter with the given name and id, setting it to the default selected state.
          *
          * @param name           the name of the filter (e.g., "Male")
          * @param id             the id of the filter
-         * @param defaultEnabled the default enabled state of the filter; {@code true} if the filter should be enabled by default, {@code false} otherwise
+         * @param selected the default selected state of the filter; {@code true} if the filter should be selected by default, {@code false} otherwise
          */
-        public Filter(String name, String id, boolean defaultEnabled) {
+        public Filter(String name, String id, boolean selected) {
             this(name, id);
-            this.defaultEnabled = defaultEnabled;
+            this.selected = selected;
         }
 
         /**
@@ -620,12 +620,12 @@ public class FilterView<T> extends Control {
         }
 
         /**
-         * Returns the default enabled state of the filter.
+         * Returns the default selected state of the filter.
          *
-         * @return {@code true} if the filter is enabled by default, {@code false} otherwise
+         * @return {@code true} if the filter is selected by default, {@code false} otherwise
          */
-        public boolean isDefaultEnabled() {
-            return defaultEnabled;
+        public boolean isSelected() {
+            return selected;
         }
 
     }
