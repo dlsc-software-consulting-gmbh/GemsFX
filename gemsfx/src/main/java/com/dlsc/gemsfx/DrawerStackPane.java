@@ -47,8 +47,6 @@ public class DrawerStackPane extends StackPane {
 
     private static final int MAXIMIZE = -1;
 
-    private String preferenceKey = "drawer.stackpane";
-
     private GlassPane glassPane;
 
     private VBox drawer;
@@ -244,8 +242,13 @@ public class DrawerStackPane extends StackPane {
         this.autoHide.set(autoHide);
     }
 
-    private final StringProperty preferencesKey = new SimpleStringProperty(this, "preferencesKey");
+    private final StringProperty preferencesKey = new SimpleStringProperty(this, "preferencesKey", "drawer.stackpane");
 
+    /**
+     * Stores the key used to store the drawer height via the preferences store.
+     *
+     * @return the preferences key property
+     */
     public final StringProperty preferencesKeyProperty() {
         return preferencesKey;
     }
@@ -257,7 +260,7 @@ public class DrawerStackPane extends StackPane {
      * @param key the preferences key
      */
     public final void setPreferencesKey(String key) {
-        preferenceKey = key;
+        preferencesKey.set(key);
     }
 
     /**
@@ -267,7 +270,7 @@ public class DrawerStackPane extends StackPane {
      * @return the preferences key
      */
     public final String getPreferencesKey() {
-        return preferenceKey;
+        return preferencesKey.get();
     }
 
     // max drawer height support
