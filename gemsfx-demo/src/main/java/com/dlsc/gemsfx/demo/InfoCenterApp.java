@@ -26,6 +26,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.scenicview.ScenicView;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -115,11 +116,15 @@ public class InfoCenterApp extends Application {
         transparentButton.setMaxWidth(Double.MAX_VALUE);
         transparentButton.selectedProperty().bindBidirectional(infoCenterView.transparentProperty());
 
+        Button scenicView = new Button("Scenic View");
+        scenicView.setOnAction(evt -> ScenicView.show(infoCenterView.getScene()));
+        scenicView.setMaxWidth(Double.MAX_VALUE);
+
         Label counterLabel = new Label();
         counterLabel.setStyle("-fx-text-fill: white;");
         counterLabel.textProperty().bind(Bindings.createStringBinding(() -> "Count: " + infoCenterView.getUnmodifiableNotifications().size(), infoCenterView.getUnmodifiableNotifications()));
 
-        VBox buttonBox = new VBox(10, showNotifications, hideNotifications, pinNotifications, autoOpenGroups, randomNotification, manyNotifications, clearAll, transparentButton, counterLabel);
+        VBox buttonBox = new VBox(10, showNotifications, hideNotifications, pinNotifications, autoOpenGroups, randomNotification, manyNotifications, clearAll, transparentButton, scenicView, counterLabel);
         buttonBox.getStyleClass().add("button-box");
         buttonBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         buttonBox.setTranslateX(50);
