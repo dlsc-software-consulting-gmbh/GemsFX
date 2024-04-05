@@ -53,9 +53,7 @@ public class CircleProgressIndicatorApp extends Application {
         // string converter
         StringConverter<Double> defaultConvert = progressIndicator.getConverter();
         CheckBox customConverterBox = new CheckBox("Custom Converter");
-        customConverterBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            progressIndicator.setConverter(newValue ? getCustomConverter() : defaultConvert);
-        });
+        customConverterBox.selectedProperty().addListener((observable, oldValue, newValue) -> progressIndicator.setConverter(newValue ? getCustomConverter() : defaultConvert));
         customConverterBox.setSelected(true);
 
         // layout
