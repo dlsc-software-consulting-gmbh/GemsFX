@@ -36,26 +36,20 @@ public class FilterViewApp extends Application {
         firstNameGroup.getFilters().add(new Filter<>("Steve or Jennifer") {
             @Override
             public boolean test(Person person) {
-                switch (person.getFirstName()) {
-                    case "Steve":
-                    case "Jennifer":
-                        return true;
-                    default:
-                        return false;
-                }
+                return switch (person.getFirstName()) {
+                    case "Steve", "Jennifer" -> true;
+                    default -> false;
+                };
             }
         });
 
         firstNameGroup.getFilters().add(new Filter<>("Paul, Eric") {
             @Override
             public boolean test(Person person) {
-                switch (person.getFirstName()) {
-                    case "Paul":
-                    case "Eric":
-                        return true;
-                    default:
-                        return false;
-                }
+                return switch (person.getFirstName()) {
+                    case "Paul", "Eric" -> true;
+                    default -> false;
+                };
             }
         });
 
