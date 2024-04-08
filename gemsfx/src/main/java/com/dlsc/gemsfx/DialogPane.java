@@ -1391,7 +1391,7 @@ public class DialogPane extends Pane {
         private final Map<ButtonType, Button> buttonMap = new HashMap<>();
 
         /**
-         * Returns the button that was created for the given button type, but only if
+         * Returns the button created for the given button type, but only if
          * such a button type was requested for the dialog.
          *
          * @param type the button type
@@ -1705,7 +1705,7 @@ public class DialogPane extends Pane {
                         } else {
 
                             // some buttons will trigger dialog validation should a validator exist
-                            if (buttonType.equals(ButtonType.YES) || buttonType.equals(ButtonType.OK) || buttonType.equals(ButtonType.APPLY)) {
+                            if (buttonData != null && isTriggeringValidation(buttonData)) {
                                 Validator validator = dialog.getValidator();
                                 if (validator != null) {
                                     if (!validator.validate()) {
@@ -1741,6 +1741,31 @@ public class DialogPane extends Pane {
 
                 getButtons().add(button);
             }
+        }
+
+        /**
+         * Determines whether validation should be run for the given button data / button type.
+         *
+         * @param data the button data / button type to check
+         */
+        protected boolean isTriggeringValidation(ButtonData data) {
+            return switch (data) {
+                case LEFT -> true;
+                case RIGHT -> true;
+                case HELP -> false;
+                case HELP_2 -> false;
+                case YES -> true;
+                case NO -> false;
+                case NEXT_FORWARD -> true;
+                case BACK_PREVIOUS -> true;
+                case FINISH -> true;
+                case APPLY -> true;
+                case CANCEL_CLOSE -> false;
+                case OK_DONE -> true;
+                case OTHER -> true;
+                case BIG_GAP -> true;
+                case SMALL_GAP -> true;
+            };
         }
 
         /**
