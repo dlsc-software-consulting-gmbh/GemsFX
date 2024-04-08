@@ -11,14 +11,15 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import net.synedra.validatorfx.Check;
+import org.scenicview.ScenicView;
 
-public class DrawerApp extends Application {
+public class DrawerStackPaneApp extends Application {
 
     @Override
     public void start(Stage stage) {
         DrawerStackPane drawerStackPane = new DrawerStackPane();
         drawerStackPane.setAnimateDrawer(true);
+        drawerStackPane.getToolbarItems().add(new Button("Refresh"));
 
         Label label = new Label("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.   \n" +
                 "\n" +
@@ -103,6 +104,8 @@ public class DrawerApp extends Application {
         stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
+
+        ScenicView.show(scene);
     }
 
     public static void main(String[] args) {

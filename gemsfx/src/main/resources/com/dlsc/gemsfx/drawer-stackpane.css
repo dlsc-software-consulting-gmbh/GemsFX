@@ -20,7 +20,12 @@
     -fx-graphic-text-gap: 20;
 }
 
-.drawer-stackpane > .drawer > .top > .header > .close-button {
+.drawer-stackpane > .drawer > .top > .header > .tool-bar {
+    -fx-padding: 0px;
+    -fx-background-color: transparent;
+}
+
+.drawer-stackpane > .drawer > .top > .header > .tool-bar > .container > .button {
     -fx-background-insets: 0;
     -fx-background-color: #3b424c;
     -fx-text-fill: white;

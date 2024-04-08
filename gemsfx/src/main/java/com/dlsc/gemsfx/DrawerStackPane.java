@@ -4,6 +4,8 @@ import javafx.animation.*;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.CacheHint;
 import javafx.scene.Cursor;
@@ -11,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -20,6 +23,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -342,14 +346,14 @@ public class DrawerStackPane extends StackPane {
 
     private VBox createContainer() {
         StackPane dragHandle = createDragHandle();
-        Button closeButton = createCloseButton();
         Label titleLabel = createTitleLabel();
+        ToolBar toolBar = createToolBar();
 
         titleLabel.setMouseTransparent(true);
 
         StackPane.setAlignment(dragHandle, Pos.CENTER);
 
-        headerBox = new HBox(titleLabel, closeButton);
+        headerBox = new HBox(titleLabel, toolBar);
         headerBox.getStyleClass().add("header");
         headerBox.setAlignment(Pos.CENTER_LEFT);
         headerBox.setFillHeight(false);
@@ -368,12 +372,35 @@ public class DrawerStackPane extends StackPane {
         return box;
     }
 
-    private Button createCloseButton() {
+    private final ListProperty<Node> toolbarItems = new SimpleListProperty<>(this, "toolbarItems", FXCollections.observableArrayList());
+
+    public final ObservableList<Node> getToolbarItems() {
+        return toolbarItems.get();
+    }
+
+    /**
+     * The list of items to display in the toolbar.
+     *
+     * @return the toolbar items / toolbar buttons
+     */
+    public final ListProperty<Node> toolbarItemsProperty() {
+        return toolbarItems;
+    }
+
+    public final void setToolbarItems(ObservableList<Node> items) {
+        toolbarItems.set(items);
+    }
+
+    private ToolBar createToolBar() {
+        ToolBar toolBar = new ToolBar();
+        Bindings.bindContent(toolBar.getItems(), toolbarItemsProperty());
+
         Button closeButton = new Button("Close");
         closeButton.setOnAction(evt -> setShowDrawer(false));
         closeButton.getStyleClass().add("close-button");
+        getToolbarItems().add(closeButton);
 
-        return closeButton;
+        return toolBar;
     }
 
     private Label createTitleLabel() {
