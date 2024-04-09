@@ -116,6 +116,7 @@
     -fx-background-insets: 0, 1;
     -fx-padding: 10px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
+    -fx-cursor: default;
 }
 
 .time-picker-popup .time-list-view {
@@ -128,7 +129,9 @@
 
 .time-picker-popup .time-list-view .list-cell:focus-within,
 .time-picker-popup .time-list-view .list-cell:selected,
-.time-picker-popup .time-list-view .list-cell:focused {
+.time-picker-popup .time-list-view .list-cell:focused,
+.time-picker-popup .time-list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.time-picker-popup .time-list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
     -fx-background-color: white;
 }
 
