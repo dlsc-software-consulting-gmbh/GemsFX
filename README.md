@@ -1,25 +1,40 @@
 [![JFXCentral](https://img.shields.io/badge/Find_me_on-JFXCentral-blue?logo=googlechrome&logoColor=white)](https://www.jfx-central.com/libraries/gemsfx)
+[![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx?color=brightgreen)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # GemsFX
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
+GemsFX is a collection of custom controls and utilities for JavaFX.
+
+## Quick Links
+
+- [Date & Time Controls](#date-time-controls)
+  > [CalendarView](#calendar-view), [CalendarPicker](#calendar-picker), [DateRangeView](#date-range-view), [DateRangePicker](#date-range-picker),[YearView](#year-view), [YearPicker](#year-picker), [YearMonthView](#year-month-view), [YearMonthPicker](#year-month-picker), [TimePicker](#time-picker), [DurationPicker](#duration-picker)
+- [Text Input Controls](#text-input-controls)
+  > [SearchTextField](#search-text-field), [SearchField](#search-field), [EmailField](#email-field), [TagsField](#tags-field), [ExpandingTextArea](#expanding-text-area), [ResizableTextArea](#resizable-text-area), [LimitedTextArea](#limited-text-area)
+- [Dialogs & Notifications](#dialogs-notifications)
+  > [DialogPane](#dialog-pane), [InfoCenterPane](#info-center-pane)
 
 ## SVGImageView
 
-A control used for rendering SVG image files. Utilizing the [jsvg](https://github.com/weisJ/jsvg) library, ensuring high-definition quality even when scaled.
+A control used for rendering SVG image files. Utilizing the [jsvg](https://github.com/weisJ/jsvg) library, ensuring
+high-definition quality even when scaled.
 
 - Packaging Note: Not suitable for native packaging yet due to AWT dependency.
 - Content Note: Static only for now; future jsvg updates may add animation.
-- Development Note: [jsvg](https://github.com/weisJ/jsvg) is evolving and does not yet support all features of the SVG specification.
+- Development Note: [jsvg](https://github.com/weisJ/jsvg) is evolving and does not yet support all features of the SVG
+  specification.
 
 ![SVGImageView](gemsfx/docs/svg-image-view.png)
 
-## CalendarView 
+## CalendarView
+
+<span id="calendar-view" ></span>
 
 A nice UI for displaying the month of a year. The view is highly configurable and allows specifying
 latest and earliest date for selection purposes. The days of the previous or the next month can either
 be shown or hidden. When clicking on the month the user will be presented with a custom view for quickly
-selecting a different month. The same happens when clicking on the year. The calendar view uses a 
+selecting a different month. The same happens when clicking on the year. The calendar view uses a
 selection model which can work in three ways: single date selection, multiple date selection, or date range
 selection. Last but not least, the layout of the header can be changed, so that the month and year labels
 are either left, center, or right aligned.
@@ -28,6 +43,8 @@ are either left, center, or right aligned.
 
 ## CalendarPicker
 
+<span id="calendar-picker" ></span>
+
 A date picker control that uses the calendar view of GemsFX. The field is editable to the
 user can also enter the date via keyboard.
 
@@ -35,17 +52,21 @@ user can also enter the date via keyboard.
 
 ## DateRangeView
 
+<span id="date-range-view" ></span>
+
 A view that allows the user to specify a date range. The view supports defining a couple of presets
 for quick range selection, e.g. "last week". The left and right month views are bound so that the
-right calendar will never allow the user to specify a date that is earlier than those dates shown in 
+right calendar will never allow the user to specify a date that is earlier than those dates shown in
 the left month view.
 
 ![DateRangeView](gemsfx/docs/date-range-view.png)
 
 ## DateRangePicker
 
+<span id="date-range-picker" ></span>
+
 A picker that allows the user to specify a date range via the date range view. The picker supports
-two different layouts (small, big). The picker shows the selected range and also a name for the range, 
+two different layouts (small, big). The picker shows the selected range and also a name for the range,
 which is either derived from the name of a selected preset or simply says something like "custom range".
 
 ![DateRangePicker](gemsfx/docs/date-range-picker-small.png)
@@ -54,6 +75,8 @@ which is either derived from the name of a selected preset or simply says someth
 
 ## YearView
 
+<span id="year-view" ></span>
+
 A view for displaying a configurable number of columns and rows with years. The user can use the grid
 to quickly select a new year. Properties are available to restrict the earliest and the latest year that
 is selectable.
@@ -61,12 +84,14 @@ is selectable.
 ![YearView](gemsfx/docs/year-view.png)
 
 ## YearPicker
+<span id="year-picker"></span>
 
 A view for picking a year from a dropdown showing the year view control.
 
 ![YearMonthPicker](gemsfx/docs/year-picker.png)
 
 ## YearMonthView
+<span id="year-month-view"></span>
 
 A view for displaying the months of a given year. The user can quickly switch between years. Properties
 are available to restrict the selection to an earliest and a latest month.
@@ -74,35 +99,56 @@ are available to restrict the selection to an earliest and a latest month.
 ![YearMonthPicker](gemsfx/docs/year-month-view.png)
 
 ## YearMonthPicker
+<span id="year-month-picker"></span>
 
-A control for specifying the month of a year (see time API class "YearMonth"). It is very similar to the standard date picker class
+A control for specifying the month of a year (see time API class "YearMonth"). It is very similar to the standard date
+picker class
 and actually inherits a lot of styling attributes from it.
 
 ![YearMonthPicker](gemsfx/docs/year-month-picker.png)
 
-## Time Picker
+## TimePicker
+<span id="time-picker"></span>
 
-A small control used for entering a time. The control can be configured with a "step rate" for the minutes field (e.g. "15 minutes") that will be used when
-incrementing or decrementing the minutes field via the keyboard (arrow keys). The control can also be configured to only allow a time within the time range
-defined by an earliest and a latest time. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
-or not when they reach their minimum or maximum value. For example: the minute field shows 59 minutes and the user wants to increase it via the arrow key. Then
-the new value will be "0" when rollover is enabled. If not the value will remain at 59. Rollover combined with "linking fields" will cause the hours field to
+A small control used for entering a time. The control can be configured with a "step rate" for the minutes field (e.g. "
+15 minutes") that will be used when
+incrementing or decrementing the minutes field via the keyboard (arrow keys). The control can also be configured to only
+allow a time within the time range
+defined by an earliest and a latest time. A popup can be used to work with the mouse only. It is also possible to
+specify whether the fields should "roll over"
+or not when they reach their minimum or maximum value. For example: the minute field shows 59 minutes and the user wants
+to increase it via the arrow key. Then
+the new value will be "0" when rollover is enabled. If not the value will remain at 59. Rollover combined with "linking
+fields" will cause the hours field to
 get increased when the minute field rolls over from 59 to 0 or decreased when the minute field rolls over from 0 to 59.
 
 ![TimePicker](gemsfx/docs/time-picker.png)
 
-## Duration Picker
+## DurationPicker
+<span id="duration-picker"></span>
 
 A small control used for entering a duration. The control can be configured to only allow a duration within the range
-defined by a minimum and maximum duration. A popup can be used to work with the mouse only. It is also possible to specify whether the fields should "roll over"
-or not when they reach their minimum or maximum value. The control supports similar features as the time picker: rollover fields, keyboard support, linking fields,
+defined by a minimum and maximum duration. A popup can be used to work with the mouse only. It is also possible to
+specify whether the fields should "roll over"
+or not when they reach their minimum or maximum value. The control supports similar features as the time picker:
+rollover fields, keyboard support, linking fields,
 filling fields with leading zeros, etc..
 
 ![DurationPicker](gemsfx/docs/duration-picker.png)
 
+## SearchTextField
+<span id="search-text-field"></span>
+
+A textfield that has been nicely decorated to express that it is used for performing searches.
+
+![SearchTextField](gemsfx/docs/search-text-field.png)
+
+
 ## Spacer
 
-Spacer extends Region and is designed to create flexible spaces in container layouts, especially in HBox and VBox. Within an HBox, the Spacer grows horizontally. Within a VBox, it grows vertically. When the activeProperty is set to false, the Spacer will not grow.
+Spacer extends Region and is designed to create flexible spaces in container layouts, especially in HBox and VBox.
+Within an HBox, the Spacer grows horizontally. Within a VBox, it grows vertically. When the activeProperty is set to
+false, the Spacer will not grow.
 
 ![Spacer](gemsfx/docs/spacer.png)
 
@@ -110,18 +156,20 @@ Spacer extends Region and is designed to create flexible spaces in container lay
 
 A view for horizontally positioning a number of nodes, one for each item added to the view's model. Scroll buttons will
 become visible on either side of the view if the available width is not sufficient to show all items / nodes. Scrolling
-is animated (can be turned off). The nodes on either side are fading out so that the scroll controls are completely 
+is animated (can be turned off). The nodes on either side are fading out so that the scroll controls are completely
 visible. The view also supports the single selection of an item.
 
 ![StripView](gemsfx/docs/strip-view.png)
 
-
 ## InfoCenterPane
 
-A view for displaying (groups of) notifications. Incoming / new notifications slide-in via an animation. Each group can have its own factory for the creation of notification views. A group with multiple notifications can be shown stacked or expanded. A threshold can be defined to determine the maximum number of notifications that  can be shown. If the notifcation count is higher than the threshold then the user can switch to a list view showing them all. Groups can be pinned so that they always stay in the top position without being scrolled out of view.
+A view for displaying (groups of) notifications. Incoming / new notifications slide-in via an animation. Each group can
+have its own factory for the creation of notification views. A group with multiple notifications can be shown stacked or
+expanded. A threshold can be defined to determine the maximum number of notifications that can be shown. If the
+notifcation count is higher than the threshold then the user can switch to a list view showing them all. Groups can be
+pinned so that they always stay in the top position without being scrolled out of view.
 
 ![InfoCenterPane](gemsfx/docs/info-center-pane.png)
-
 
 ## ScreensView
 
@@ -129,7 +177,6 @@ A small control that can be used to display the screen geometries as seen by the
 display the application's windows, and some arbitrary shapes (might be useful for debugging purposes).
 
 ![ScreensView](gemsfx/docs/screens-view.png)
-
 
 ## Stage Manager
 
@@ -141,28 +188,29 @@ will be stored and used across user sessions via the `java.util.prefs` API.
 The `SessionManager` class is a utility class that can be used to monitor observables and persist them across user
 sessions. This can be useful, for example, for storing and restoring the position of the divider of a SplitPane.
 
-## Search Text Field
-
-A textfield that has been nicely decorated to express that it is used for performing searches.
-
-![SearchTextField](gemsfx/docs/search-text-field.png)
-
 ## Search Field
 
-An auto-suggest text field with a behaviour similar to the spotlight search experience on Mac. While typing the field will automatically finish the entered text if it has a search result where the name starts with the exact typed text. At any time the typed text and the auto-completed text will be visually distinguishable. The field is also capable of creating a new object for the entered text if no result can be found. For detailed instructions [read the WIKI page](https://github.com/dlsc-software-consulting-gmbh/GemsFX/wiki/SearchField).
-
+An auto-suggest text field with a behaviour similar to the spotlight search experience on Mac. While typing the field
+will automatically finish the entered text if it has a search result where the name starts with the exact typed text. At
+any time the typed text and the auto-completed text will be visually distinguishable. The field is also capable of
+creating a new object for the entered text if no result can be found. For detailed
+instructions [read the WIKI page](https://github.com/dlsc-software-consulting-gmbh/GemsFX/wiki/SearchField).
 
 ![SearchField](gemsfx/docs/search-field.png)
 
 ## Tags Field
 
-An extension of the SearchField control that supports the creation of tags. Selected values are converted into tags when the user hits enter, the right arrow key, or tab. The API of this control allows applications to retrieve the tags, or to monitor the selection state of the tags. The control uses a FlowPane for its layout, which allows the tags to span multiple rows.
+An extension of the SearchField control that supports the creation of tags. Selected values are converted into tags when
+the user hits enter, the right arrow key, or tab. The API of this control allows applications to retrieve the tags, or
+to monitor the selection state of the tags. The control uses a FlowPane for its layout, which allows the tags to span
+multiple rows.
 
 ![TagsField](gemsfx/docs/tags-field.png)
 
 ## Dialog Pane
 
-The class DialogPane can be used as a layer on top of any application. It offers various methods to display different types of dialogs.
+The class DialogPane can be used as a layer on top of any application. It offers various methods to display different
+types of dialogs.
 
 * Information
 * Warning
@@ -175,43 +223,54 @@ The class DialogPane can be used as a layer on top of any application. It offers
 
 ![DialogPane](gemsfx/docs/dialog-pane.png)
 
-## Resizable Text Area
+## ResizableTextArea
 
-A custom control that wraps a text area and adds a resize handle to the lower right corner of it. The area can be configured to be resizable in vertical, horizontal, or both directions. 
+A custom control that wraps a text area and adds a resize handle to the lower right corner of it. The area can be
+configured to be resizable in vertical, horizontal, or both directions.
 
 ![ResizableTextArea](gemsfx/docs/resizable-text-area.png)
 
 ## Expanding Text Area
 
-A customized text area that grows based on its text content. The text area will never show vertical or horizontal scrollbars.
+A customized text area that grows based on its text content. The text area will never show vertical or horizontal
+scrollbars.
 
 ![ExpandingTextArea](gemsfx/docs/expanding-text-area.png)
 
 ## Photo View
 
-A control for adding and editing a user profile photo (or whatever). The user can click on the control to choose an image file
-via a file chooser (replacable) or via drag and drop. Once added the user can move the image around and zoom in / out. As a convenience
-the view always provide a cropped version of the original image. This allows applications to store a smaller file on the server / in
-the database. The control supports some keyboard shortcuts. The file chooser can be activated by pressing SPACE or ENTER. The photo can
+A control for adding and editing a user profile photo (or whatever). The user can click on the control to choose an
+image file
+via a file chooser (replacable) or via drag and drop. Once added the user can move the image around and zoom in / out.
+As a convenience
+the view always provide a cropped version of the original image. This allows applications to store a smaller file on the
+server / in
+the database. The control supports some keyboard shortcuts. The file chooser can be activated by pressing SPACE or
+ENTER. The photo can
 be removed by pressing DELETE or BACK_SPACE.
 
 ![PhotoView](gemsfx/docs/photo-view.png)
 
 ## Payment Option Controls
 
-A specialized subclass of ImageView that can be used to display different graphics for different payment options. Graphics provided by Gregoire Segretain (https://www.sketchappsources.com/contributor/gregoiresgt)
+A specialized subclass of ImageView that can be used to display different graphics for different payment options.
+Graphics provided by Gregoire Segretain (https://www.sketchappsources.com/contributor/gregoiresgt)
 
 ![LightOption](gemsfx/docs/payment-options-light.png) ![DarkOption](gemsfx/docs/payment-options-dark.png)
 
 ## DrawerStackPane
 
-A stackpane with an optional node that can be shown inside a drawer. The drawer is animated and can slide in and out. When the drawer is showing a semi-transparent glass pane will cover the background. In addition the last height of the drawer can be persisted via the preferences API so that next time the drawer will show itself like in the last user session.
+A stackpane with an optional node that can be shown inside a drawer. The drawer is animated and can slide in and out.
+When the drawer is showing a semi-transparent glass pane will cover the background. In addition the last height of the
+drawer can be persisted via the preferences API so that next time the drawer will show itself like in the last user
+session.
 
 ![DrawerStackPane](gemsfx/docs/drawer-stackpane.png)
 
 ## FilterView
 
-A control for filtering the content of an observable list. Works in combination with TableView, ListView, or any control that is based on observable lists.
+A control for filtering the content of an observable list. Works in combination with TableView, ListView, or any control
+that is based on observable lists.
 
 ![FilterView](gemsfx/docs/filter-view.png)
 
