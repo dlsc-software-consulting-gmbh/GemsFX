@@ -248,7 +248,7 @@ based on the width of the pane. When the window width is narrow, the sidebar is 
 shown.
 When the window width is moderate, both a small sidebar and a large sidebar, along with the content panel, are
 displayed.
-When the window width is wide, only the large sidebar is shown.
+When the window width is wide, both the large sidebar and the main content pane are shown.
 Similarly, if the sidebar is positioned at the TOP or BOTTOM, its visibility will be adjusted based on the height of the
 pane.
 However, it is also possible to force the sidebar to be displayed regardless of the window size.
@@ -295,6 +295,7 @@ high-definition quality even when scaled.
 ![SVGImageView](gemsfx/docs/svg-image-view.png)
 
 ## Circle Progress Indicator
+
 <span id="circle-progress-indicator"></span>
 
 A control for displaying a circular progress indicator. The control can be configured to show a percentage value or a
@@ -368,19 +369,20 @@ The `StageManager` class is a utility class that keeps track of a stage's locati
 will be stored and used across user sessions via the `java.util.prefs` API.
 
 ## Tree Node View
+
 <span id="tree-node-view"></span>
 
-A view for displaying a tree of nodes. 
+A view for displaying a tree of nodes.
 
 ![TreeNodeView](gemsfx/docs/tree-node-view.png)
-
 
 ## Multi Column List View
 
 <span id="multi-column-list-view"></span>
 
-A view for displaying multiple columns where each column consists of a header control and a ListView. 
-The control allows the user to rearrange the items in each ListView and also to drag and drop items from one column to another.
+A view for displaying multiple columns where each column consists of a header control and a ListView.
+The control allows the user to rearrange the items in each ListView and also to drag and drop items from one column to
+another.
 
 ![MultiColumnListView](gemsfx/docs/multi-column-list-view.png)
 
