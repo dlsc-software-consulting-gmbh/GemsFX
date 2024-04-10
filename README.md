@@ -10,15 +10,15 @@ GemsFX is a collection of custom controls and utilities for JavaFX.
 
 ## Quick Links
 
-- Date & Time Controls <br/>
+- #### Date & Time Controls
   [CalendarView](#calendar-view), [CalendarPicker](#calendar-picker), [DateRangeView](#date-range-view), [DateRangePicker](#date-range-picker),[YearView](#year-view), [YearPicker](#year-picker), [YearMonthView](#year-month-view), [YearMonthPicker](#year-month-picker), [TimePicker](#time-picker), [DurationPicker](#duration-picker)
-- Text Input Controls <br/>
+- #### Text Input Controls
   [SearchTextField](#search-text-field), [SearchField](#search-field), [EmailField](#email-field), [TagsField](#tags-field), [ExpandingTextArea](#expanding-text-area), [ResizableTextArea](#resizable-text-area), [LimitedTextArea](#limited-text-area)
-- Advanced Panes <br/>
+- #### Advanced Panes
   [DialogPane](#dialog-pane), [DrawerStackPane](#drawer-stack-pane), [PowerPane](#power-pane), [ResponsivePane](#responsive-pane)
-- Image controls <br/>
+- #### Image controls
   [PhotoView](#photo-view), [PaymentOptionControls](#payment-option-controls), [SVGImageView](#svg-image-view)
-- Other Controls <br/>
+- #### Other Controls
   [CircleProgressIndicator](#circle-progress-indicator), [FilterView](#filter-view), [InfoCenterPane](#info-center-pane), [StripView](#strip-view), [Spacer](#spacer), [ScreensView](#screens-view), [SessionManager](#session-manager), [StageManager](#stage-manager), [TreeNodeView](#tree-node-view), [MultiColumnListView](#multi-column-list-view)
 
 ## CalendarView
