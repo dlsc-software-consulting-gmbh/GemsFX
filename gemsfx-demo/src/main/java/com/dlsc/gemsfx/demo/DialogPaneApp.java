@@ -66,10 +66,16 @@ public class DialogPaneApp extends Application {
         confirmButton.setOnAction(evt -> dialogPane.showConfirmation("Confirmation Title", "A confirmation requires the user to decide."));
 
         Button inputSingleLineButton = new Button("Input");
-        inputSingleLineButton.setOnAction(evt -> dialogPane.showTextInput("Text Input", "Please enter something, anything really.", "Text already there ...", false));
+        inputSingleLineButton.setOnAction(evt -> {
+            Dialog<String> dialog = dialogPane.showTextInput("Text Input", "Please enter something, anything really.", "Text already there ...", false);
+            dialog.setRequired(true);
+        });
 
         Button inputMultiLineButton = new Button("Input Multi");
-        inputMultiLineButton.setOnAction(evt -> dialogPane.showTextInput("Multiline Text Input", "Please enter something, anything really.", "Text already there ...", true));
+        inputMultiLineButton.setOnAction(evt -> {
+            Dialog<String> dialog = dialogPane.showTextInput("Multiline Text Input", "Please enter something, anything really.", "Text already there ...", true);
+            dialog.setRequired(true);
+        });
 
         Button node1Button = new Button("Node 1");
         node1Button.setOnAction(evt -> {

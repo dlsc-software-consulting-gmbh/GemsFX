@@ -8,6 +8,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -45,6 +46,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.skin.ButtonBarSkin;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
@@ -559,6 +561,18 @@ public class DialogPane extends Pane {
 
         Dialog<String> dialog = showNode(Type.INPUT, title, box);
         dialog.valueProperty().bindBidirectional(textInputControl.textProperty());
+        dialog.getValidator().createCheck()
+                .dependsOn("text", textInputControl.textProperty())
+                .decorates(textInputControl)
+                .immediateClear()
+                .withMethod(ctx -> {
+                    if (dialog.isRequired()) {
+                        String str = ctx.get("text");
+                        if (StringUtils.isBlank(str)) {
+                            ctx.error("Missing text.");
+                        }
+                    }
+                });
 
         return dialog;
     }
@@ -1028,6 +1042,29 @@ public class DialogPane extends Pane {
             this.onResize.set(onResize);
         }
 
+        // required
+
+        private final BooleanProperty required = new SimpleBooleanProperty(this, "required", false);
+
+        public final boolean isRequired() {
+            return required.get();
+        }
+
+        /**
+         * A flag used to signal to the framework that input is required in this dialog. This
+         * is useful when showing things like text inputs where we automatically want to add
+         * a validator.
+         *
+         * @return true if the dialog requires input
+         */
+        public final BooleanProperty requiredProperty() {
+            return required;
+        }
+
+        public final void setRequired(boolean required) {
+            this.required.set(required);
+        }
+
         // show close button
 
         private final BooleanProperty showCloseButton = new SimpleBooleanProperty(this, "showCloseButton", true);
@@ -1484,8 +1521,6 @@ public class DialogPane extends Pane {
                 content.getStyleClass().add("padding");
             }
 
-            Node footer = getFooterFactory().call(dialog);
-
             sceneProperty().addListener((obs, oldScene, newScene) -> {
                 if (oldScene != null) {
                     oldScene.focusOwnerProperty().removeListener(weakFocusListener);
@@ -1496,7 +1531,6 @@ public class DialogPane extends Pane {
             });
 
             VBox.setVgrow(content, Priority.ALWAYS);
-            VBox.setVgrow(footer, Priority.NEVER);
 
             content.getChildren().setAll(this.dialog.getContent());
 
@@ -1505,6 +1539,8 @@ public class DialogPane extends Pane {
             header.setVisible(!blankDialog && dialog.isShowHeader());
             header.setManaged(!blankDialog && dialog.isShowHeader());
 
+            Node footer = getFooterFactory().call(dialog);
+            VBox.setVgrow(footer, Priority.NEVER);
             footer.setVisible(!blankDialog && dialog.isShowFooter());
             footer.setManaged(!blankDialog && dialog.isShowFooter());
 
@@ -1645,6 +1681,11 @@ public class DialogPane extends Pane {
          */
         public DialogButtonBar(Dialog<?> dialog) {
             this.dialog = dialog;
+
+            // Setting the skin eagerly to make sure the focus does not
+            // switch to one of the buttons in the button bar when it
+            // should stay with a node shown by the dialog.
+            setSkin(new ButtonBarSkin(this));
 
             getStyleClass().add("footer");
 
@@ -1789,7 +1830,6 @@ public class DialogPane extends Pane {
             ButtonBar.setButtonData(button, buttonData);
             button.setDefaultButton(buttonData.isDefaultButton());
             button.setCancelButton(buttonData.isCancelButton());
-
             return button;
         }
     }
