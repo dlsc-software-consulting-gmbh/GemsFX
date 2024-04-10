@@ -17,7 +17,7 @@ import javafx.util.StringConverter;
 
 public class ResponsivePaneApp extends Application {
 
-    private final ResponsivePane sideBarPane = new ResponsivePane();
+    private final ResponsivePane responsivePane = new ResponsivePane();
 
     private StackPane mainContent;
     private Region smallSidebar;
@@ -28,7 +28,7 @@ public class ResponsivePaneApp extends Application {
         Label widthLabel = new Label();
         widthLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         widthLabel.setStyle("-fx-background-color: pink; -fx-alignment: center; -fx-padding: 5px 10px;");
-        widthLabel.textProperty().bind(Bindings.createStringBinding(() -> String.format("SideBarPane: %.0f x %.0f", sideBarPane.getWidth(), sideBarPane.getHeight()), sideBarPane.widthProperty(), sideBarPane.heightProperty()));
+        widthLabel.textProperty().bind(Bindings.createStringBinding(() -> String.format("ResponsivePane: %.0f x %.0f", responsivePane.getWidth(), responsivePane.getHeight()), responsivePane.widthProperty(), responsivePane.heightProperty()));
 
         mainContent = new StackPane(widthLabel);
         mainContent.setStyle("-fx-background-color: #eeeeee;");
@@ -42,15 +42,15 @@ public class ResponsivePaneApp extends Application {
         largeSidebar.setPrefSize(150, 150);
         largeSidebar.setStyle("-fx-background-color: rgba(43,83,241,0.5); -fx-border-color: white; -fx-border-insets: 1px;");
 
-        sideBarPane.setSmallSidebar(smallSidebar);
-        sideBarPane.setLargeSidebar(largeSidebar);
-        sideBarPane.setContent(mainContent);
-        sideBarPane.setForceLargeSidebarDisplay(true);
-        sideBarPane.setLargeSidebarCoversSmall(false);
-        sideBarPane.setGap(10);
-        sideBarPane.setStyle("-fx-background-color: white;");
+        responsivePane.setSmallSidebar(smallSidebar);
+        responsivePane.setLargeSidebar(largeSidebar);
+        responsivePane.setContent(mainContent);
+        responsivePane.setForceLargeSidebarDisplay(true);
+        responsivePane.setLargeSidebarCoversSmall(false);
+        responsivePane.setGap(10);
+        responsivePane.setStyle("-fx-background-color: white;");
 
-        BorderPane borderPane = new BorderPane(sideBarPane);
+        BorderPane borderPane = new BorderPane(responsivePane);
         borderPane.setRight(createControlPanel());
 
         Scene scene = new Scene(borderPane);
@@ -74,18 +74,18 @@ public class ResponsivePaneApp extends Application {
                 return null;
             }
         });
-        sideComboBox.valueProperty().bindBidirectional(sideBarPane.sideProperty());
+        sideComboBox.valueProperty().bindBidirectional(responsivePane.sideProperty());
         sideComboBox.setMaxWidth(Double.MAX_VALUE);
 
         Spinner<Double> gapSpinner = new Spinner<>(0, 10, 0, 2);
-        sideBarPane.gapProperty().bind(gapSpinner.valueProperty());
+        responsivePane.gapProperty().bind(gapSpinner.valueProperty());
         gapSpinner.setMaxWidth(Double.MAX_VALUE);
 
         CheckBox largeSidebarCoverCheckBox = new CheckBox("Large Covers Small");
-        largeSidebarCoverCheckBox.selectedProperty().bindBidirectional(sideBarPane.largeSidebarCoversSmallProperty());
+        largeSidebarCoverCheckBox.selectedProperty().bindBidirectional(responsivePane.largeSidebarCoversSmallProperty());
 
         CheckBox forceLargeDisplayCheckBox = new CheckBox("Force Display Large");
-        forceLargeDisplayCheckBox.selectedProperty().bindBidirectional(sideBarPane.forceLargeSidebarDisplayProperty());
+        forceLargeDisplayCheckBox.selectedProperty().bindBidirectional(responsivePane.forceLargeSidebarDisplayProperty());
 
         VBox controlBox = new VBox(new Label("Side"), sideComboBox, new Label("Gap"), gapSpinner,
                 new Label("Content PrefSize"), createSizeInfoField(mainContent), new Label("Small Sidebar PrefSize"),

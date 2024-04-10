@@ -26,6 +26,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+
+/**
+ * A visual control for displaying trees.
+ * <p>
+ * Built on the {@link TreeNode} class, this control visualizes hierarchical structures, allowing nodes to have children.
+ * <p>
+ * Customizable in layout, alignment, and style, it's ideal for representing data like file systems or organizational charts.
+ */
 public class TreeNodeView<T> extends Control {
     private static final int DEFAULT_CELL_WIDTH = 60;
     private static final int DEFAULT_CELL_HEIGHT = 30;
@@ -282,7 +290,7 @@ public class TreeNodeView<T> extends Control {
         this.vgap.set(vgap);
     }
 
-    private final DoubleProperty nodeLineGap = new StyleableDoubleProperty(DEFAULT_NODE_LINE_GAP){
+    private final DoubleProperty nodeLineGap = new StyleableDoubleProperty(DEFAULT_NODE_LINE_GAP) {
         @Override
         public CssMetaData<? extends Styleable, Number> getCssMetaData() {
             return StyleableProperties.NODE_LINE_GAP;
@@ -356,7 +364,7 @@ public class TreeNodeView<T> extends Control {
         COMPACT;
     }
 
-    private final ObjectProperty<LayoutType> layoutType = new StyleableObjectProperty<>(DEFAULT_LAYOUT_TYPE){
+    private final ObjectProperty<LayoutType> layoutType = new StyleableObjectProperty<>(DEFAULT_LAYOUT_TYPE) {
         @Override
         public CssMetaData<? extends Styleable, LayoutType> getCssMetaData() {
             return StyleableProperties.LAYOUT_TYPE;
@@ -404,7 +412,7 @@ public class TreeNodeView<T> extends Control {
         BOTTOM_TO_TOP;
     }
 
-    private final ObjectProperty<LayoutDirection> layoutDirection = new StyleableObjectProperty<>(DEFAULT_LAYOUT_DIRECTION){
+    private final ObjectProperty<LayoutDirection> layoutDirection = new StyleableObjectProperty<>(DEFAULT_LAYOUT_DIRECTION) {
         @Override
         public CssMetaData<? extends Styleable, LayoutDirection> getCssMetaData() {
             return StyleableProperties.LAYOUT_DIRECTION;
