@@ -203,11 +203,11 @@ public class PowerPaneApp extends Application {
                     break;
                 case "Dark":
                     dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPane.class.getResource("dialog-pane.css")).toExternalForm());
-                    dialogPane.getStylesheets().add(Objects.requireNonNull(DialogsApp.class.getResource("dialogs-dark.css")).toExternalForm());
+                    dialogPane.getStylesheets().add(Objects.requireNonNull(DialogPaneApp.class.getResource("dialogs-dark.css")).toExternalForm());
                     dialogPane.setConverter(null);
                     break;
                 case "Custom":
-                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogsApp.class.getResource("dialogs-custom.css")).toExternalForm());
+                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPaneApp.class.getResource("dialogs-custom.css")).toExternalForm());
                     dialogPane.setConverter(new StringConverter<>() {
                         @Override
                         public String toString(ButtonType object) {

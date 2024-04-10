@@ -19,8 +19,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -34,7 +32,7 @@ import java.util.Objects;
 
 import static com.dlsc.gemsfx.DialogPane.Type.INFORMATION;
 
-public class DialogsApp extends Application {
+public class DialogPaneApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
@@ -66,25 +64,6 @@ public class DialogsApp extends Application {
 
         Button confirmButton = new Button("Confirmation");
         confirmButton.setOnAction(evt -> dialogPane.showConfirmation("Confirmation Title", "A confirmation requires the user to decide."));
-
-        Button validationButton = new Button("Validate");
-        validationButton.setOnAction(evt -> {
-            TextField textField = new TextField();
-            Label label = new Label("Click OK without entering anything to trigger validation.");
-            VBox box = new VBox(10, label, textField);
-
-            Dialog<Object> dialog = dialogPane.showNode(DialogPane.Type.INPUT, "Validation", box);
-            dialog.getValidator().createCheck()
-                    .dependsOn("text", textField.textProperty())
-                    .decorates(textField)
-                    .immediateClear()
-                    .withMethod(ctx -> {
-                        String text = ctx.get("text");
-                        if (text == null || text.isBlank()) {
-                            ctx.error("text can not be empty");
-                        }
-                    });
-        });
 
         Button inputSingleLineButton = new Button("Input");
         inputSingleLineButton.setOnAction(evt -> dialogPane.showTextInput("Text Input", "Please enter something, anything really.", "Text already there ...", false));
@@ -128,7 +107,7 @@ public class DialogsApp extends Application {
             later(() -> dialogPane.showError("Error", "An error was encountered while running this application."), 3);
         });
 
-        FlowPane flowPane = new FlowPane(10, 10, blankButton, infoButton, warnButton, errorButton, confirmButton, validationButton,
+        FlowPane flowPane = new FlowPane(10, 10, blankButton, infoButton, warnButton, errorButton, confirmButton,
                 inputSingleLineButton, inputMultiLineButton, node1Button, node2Button, busyButton, multipleDialogsButton,
                 maxButton);
 
@@ -156,11 +135,11 @@ public class DialogsApp extends Application {
                     break;
                 case "Dark":
                     dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPane.class.getResource("dialog-pane.css")).toExternalForm());
-                    dialogPane.getStylesheets().add(Objects.requireNonNull(DialogsApp.class.getResource("dialogs-dark.css")).toExternalForm());
+                    dialogPane.getStylesheets().add(Objects.requireNonNull(DialogPaneApp.class.getResource("dialogs-dark.css")).toExternalForm());
                     dialogPane.setConverter(null);
                     break;
                 case "Custom":
-                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogsApp.class.getResource("dialogs-custom.css")).toExternalForm());
+                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPaneApp.class.getResource("dialogs-custom.css")).toExternalForm());
                     dialogPane.setConverter(new StringConverter<>() {
                         @Override
                         public String toString(ButtonType object) {
