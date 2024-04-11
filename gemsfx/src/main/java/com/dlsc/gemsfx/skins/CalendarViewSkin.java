@@ -211,7 +211,13 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         monthDropdownArrowButton.visibleProperty().bind(view.monthSelectionViewEnabledProperty().and(view.showMonthDropdownProperty().and(view.showMonthProperty())));
         monthDropdownArrowButton.managedProperty().bind(monthDropdownArrowButton.visibleProperty());
         monthDropdownArrowButton.disableProperty().bind(view.disableMonthDropdownButtonProperty());
-        monthLabel.setGraphic(monthDropdownArrowButton);
+        monthLabel.graphicProperty().bind(Bindings.createObjectBinding(() -> {
+                    if (view.isMonthSelectionViewEnabled() && view.isShowMonthDropdown()) {
+                        return monthDropdownArrowButton;
+                    }
+                    return null;
+                },
+                view.showMonthDropdownProperty(), view.monthSelectionViewEnabledProperty()));
 
         StackPane yearDropdownArrow = new StackPane();
         yearDropdownArrow.getStyleClass().add("arrow");
