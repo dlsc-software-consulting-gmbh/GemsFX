@@ -1,12 +1,14 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.CalendarView;
-import com.dlsc.gemsfx.CalendarView.HeaderLayout;
 import com.dlsc.gemsfx.CalendarView.SelectionModel.SelectionMode;
+import com.dlsc.gemsfx.CalendarView.YearDisplayMode;
+import com.dlsc.gemsfx.CalendarView.MonthDisplayMode;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -50,30 +52,24 @@ public class CalendarViewApp extends Application {
         options1.getChildren().add(createOption("Show today button", calendarView.showTodayButtonProperty()));
         options1.getChildren().add(createOption("Show month", calendarView.showMonthProperty()));
         options1.getChildren().add(createOption("Show year", calendarView.showYearProperty()));
-        options1.getChildren().add(createOption("Show year spinner", calendarView.showYearSpinnerProperty()));
-        options1.getChildren().add(createOption("Show year dropdown", calendarView.showYearDropdownProperty()));
         options1.getChildren().add(createOption("Show month arrows", calendarView.showMonthArrowsProperty()));
-        options1.getChildren().add(createOption("Show month dropdown", calendarView.showMonthDropdownProperty()));
         options1.getChildren().add(createOption("Show week numbers", calendarView.showWeekNumbersProperty()));
         options1.getChildren().add(createOption("Show days of other months", calendarView.showDaysOfPreviousOrNextMonthProperty()));
         options1.getChildren().add(createOption("Mark days of other months selected", calendarView.markSelectedDaysOfPreviousOrNextMonthProperty()));
         options1.getChildren().add(createOption("Show grid lines", showGridLines));
+        options1.getChildren().add(new Separator());
 
-        ComboBox<SelectionMode> selectionModeComboBox = new ComboBox<>();
-        selectionModeComboBox.setMaxWidth(Double.MAX_VALUE);
-        selectionModeComboBox.getItems().setAll(SelectionMode.values());
-        selectionModeComboBox.valueProperty().bindBidirectional(calendarView.getSelectionModel().selectionModeProperty());
-        Label selectionModeLabel = new Label("Selection mode");
-        VBox.setMargin(selectionModeLabel, new Insets(10, 0, 0, 0));
-        options1.getChildren().addAll(selectionModeLabel, selectionModeComboBox);
+        VBox yearDisplayMode = createComboBoxOption("Year Display Mode", YearDisplayMode.TEXT_ONLY, calendarView.yearDisplayModeProperty());
+        options1.getChildren().add(yearDisplayMode);
 
-        ComboBox<HeaderLayout> headerLayoutComboBox = new ComboBox<>();
-        headerLayoutComboBox.setMaxWidth(Double.MAX_VALUE);
-        headerLayoutComboBox.getItems().setAll(HeaderLayout.values());
-        headerLayoutComboBox.valueProperty().bindBidirectional(calendarView.headerLayoutProperty());
-        Label headerLayoutLabel = new Label("Header layout");
-        VBox.setMargin(headerLayoutLabel, new Insets(10, 0, 0, 0));
-        options1.getChildren().addAll(headerLayoutLabel, headerLayoutComboBox);
+        VBox monthDisplayMode = createComboBoxOption("Month Display Mode", MonthDisplayMode.TEXT_ONLY, calendarView.monthDisplayModeProperty());
+        options1.getChildren().add(monthDisplayMode);
+
+        VBox selectionModeBox = createComboBoxOption("Selection mode", SelectionMode.DATE_RANGE, calendarView.getSelectionModel().selectionModeProperty());
+        options1.getChildren().add(selectionModeBox);
+
+        VBox headerLayoutBox = createComboBoxOption("Header layout", CalendarView.HeaderLayout.CENTER, calendarView.headerLayoutProperty());
+        options1.getChildren().add(headerLayoutBox);
 
         CheckBox disabledWeekendBox = new CheckBox("Filter: Disable Weekend");
         calendarView.dateFilterProperty().bind(Bindings.createObjectBinding(() -> {
@@ -89,6 +85,8 @@ public class CalendarViewApp extends Application {
         options2.getChildren().add(createOption("Disable next month", calendarView.disableNextMonthButtonProperty()));
         options2.getChildren().add(createOption("Disable previous year", calendarView.disablePreviousYearButtonProperty()));
         options2.getChildren().add(createOption("Disable next year", calendarView.disableNextYearButtonProperty()));
+        options2.getChildren().add(createOption("Disable month dropdown", calendarView.disableMonthDropdownButtonProperty()));
+        options2.getChildren().add(createOption("Disable year dropdown", calendarView.disableYearDropdownButtonProperty()));
         options2.getChildren().add(new Separator(Orientation.HORIZONTAL));
         options2.getChildren().add(createOption("Enable year selection view", calendarView.yearSelectionViewEnabledProperty()));
         options2.getChildren().add(createOption("Enable month selection view", calendarView.monthSelectionViewEnabledProperty()));
@@ -122,6 +120,18 @@ public class CalendarViewApp extends Application {
         CheckBox box = new CheckBox(name);
         box.selectedProperty().bindBidirectional(property);
         return box;
+    }
+
+    private <E extends Enum<E>> VBox createComboBoxOption(String title, E defaultEnum, ObjectProperty<E> property) {
+        ComboBox<E> comboBox = new ComboBox<>();
+        comboBox.setMaxWidth(Double.MAX_VALUE);
+        comboBox.getItems().addAll(defaultEnum.getDeclaringClass().getEnumConstants());
+        comboBox.setValue(defaultEnum);
+        comboBox.valueProperty().bindBidirectional(property);
+        VBox.setMargin(comboBox, new Insets(0, 0, 5, 0));
+
+        Label selectionModeLabel = new Label(title);
+        return new VBox(2, selectionModeLabel, comboBox);
     }
 
     public static void main(String[] args) {
