@@ -211,7 +211,13 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         monthDropdownArrowButton.visibleProperty().bind(view.monthSelectionViewEnabledProperty().and(view.showMonthDropdownProperty().and(view.showMonthProperty())));
         monthDropdownArrowButton.managedProperty().bind(monthDropdownArrowButton.visibleProperty());
         monthDropdownArrowButton.disableProperty().bind(view.disableMonthDropdownButtonProperty());
-        monthLabel.setGraphic(monthDropdownArrowButton);
+        monthLabel.graphicProperty().bind(Bindings.createObjectBinding(() -> {
+                    if (view.isMonthSelectionViewEnabled() && view.isShowMonthDropdown()) {
+                        return monthDropdownArrowButton;
+                    }
+                    return null;
+                },
+                view.showMonthDropdownProperty(), view.monthSelectionViewEnabledProperty()));
 
         StackPane yearDropdownArrow = new StackPane();
         yearDropdownArrow.getStyleClass().add("arrow");
@@ -411,7 +417,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
      * depending on whether the week number column is shown or not.
      *
      * @param numberOfColumns the number of total columns (either 7 or 8)
-     * @param columnIndex          the index of the column for which to create the constraints, -1 indicates the column used for showing the "week of year" numbers
+     * @param columnIndex     the index of the column for which to create the constraints, -1 indicates the column used for showing the "week of year" numbers
      * @return the column constraints for the given column
      */
     protected ColumnConstraints createColumnConstraints(int numberOfColumns, int columnIndex) {
@@ -508,7 +514,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
                         return dateFilter != null && !dateFilter.call(cellDate);
                     }
                     return false;
-                }, view.earliestDateProperty(), view.latestDateProperty(), view.dateFilterProperty() , cell.itemProperty()));
+                }, view.earliestDateProperty(), view.latestDateProperty(), view.dateFilterProperty(), cell.itemProperty()));
 
                 bodyGridPane.add(cell, showWeekNumbers ? col + 1 : col, row);
 
@@ -632,9 +638,10 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
                     cell.getStyleClass().add(TODAY);
                 }
 
-                if (YearMonth.from(date).isBefore(yearMonth)) {
+                YearMonth cellYearMonth = YearMonth.from(date);
+                if (cellYearMonth.isBefore(yearMonth)) {
                     cell.getStyleClass().add(PREVIOUS_MONTH);
-                } else if (YearMonth.from(date).isAfter(yearMonth)) {
+                } else if (cellYearMonth.isAfter(yearMonth)) {
                     cell.getStyleClass().add(NEXT_MONTH);
                 }
 
@@ -642,8 +649,10 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
                     cell.getStyleClass().add(WEEKEND_DAY);
                 }
 
-                if (view.getSelectionModel().isSelected(localDate) && YearMonth.from(localDate).equals(displayedYearMonth)) {
-                    cell.getStyleClass().add(SELECTED);
+                if (view.getSelectionModel().isSelected(localDate)) {
+                    if (cellYearMonth.equals(yearMonth) || view.isMarkSelectedDaysOfPreviousOrNextMonth()) {
+                        cell.getStyleClass().add(SELECTED);
+                    }
 
                     if (Objects.equals(view.getSelectionModel().getSelectionMode(), SelectionModel.SelectionMode.DATE_RANGE)) {
 
