@@ -233,7 +233,7 @@ session.
 
 <span id="power-pane"></span>
 
-The PowerPane is a versatile container that amalgamates specialized panes such as the InfoCenterPane, DialogPane,
+The PowerPane is a versatile container that combines specialized panes such as the InfoCenterPane, DialogPane,
 DrawerStackPane, and HiddenSidesPane. It serves as an ideal foundation for crafting feature-rich client applications.
 
 ![PowerPane](gemsfx/docs/power-pane.png)
