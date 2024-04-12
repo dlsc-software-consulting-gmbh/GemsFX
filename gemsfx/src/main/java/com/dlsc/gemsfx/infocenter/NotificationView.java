@@ -273,26 +273,15 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             notification.getActions().addListener((Observable it) -> updateActions(actionsBox));
             updateActions(actionsBox);
 
-            centerProperty().bind(Bindings.createObjectBinding(() -> {
-                VBox center = new VBox(titleTimeBox, descriptionLabel, actionsBox);
-                center.setFillWidth(true);
-                center.setAlignment(Pos.CENTER_LEFT);
-                center.getStyleClass().add("text-container");
-                center.setMinHeight(Region.USE_PREF_SIZE);
+            VBox center = new VBox(titleTimeBox, descriptionLabel, actionsBox);
+            center.setFillWidth(true);
+            center.setAlignment(Pos.CENTER_LEFT);
+            center.getStyleClass().add("text-container");
+            center.setMinHeight(Region.USE_PREF_SIZE);
+            setCenter(center);
 
-                boolean contentIsExpanded = false;
-                if (isShowContent()) {
-                    Node content = getContent();
-                    if (content != null) {
-                        VBox.setMargin(content, new Insets(5, 0, 0, 0));
-                        center.getChildren().add(content);
-                        contentIsExpanded = true;
-                    }
-                }
-                NotificationView.this.pseudoClassStateChanged(PSEUDO_CLASS_EXPANDED, contentIsExpanded);
-
-                return center;
-            }, contentProperty(), showContentProperty()));
+            contentProperty().addListener(it -> updateCenterNode(center));
+            showContentProperty().addListener(it -> updateCenterNode(center));
 
             Label clearAllLabel = new Label("Clear All");
             clearAllLabel.getStyleClass().add("clear-all");
@@ -347,6 +336,23 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
 
             // we are updating the date and time here and also via an animation timer
             updateDateAndTimeLabel();
+        }
+
+        private void updateCenterNode(VBox center) {
+            Node content = getContent();
+            boolean contentIsExpanded = isShowContent() && content != null;
+            NotificationView.this.pseudoClassStateChanged(PSEUDO_CLASS_EXPANDED, contentIsExpanded);
+
+            if (contentIsExpanded) {
+                if (!center.getChildren().contains(content)) {
+                    VBox.setMargin(content, new Insets(5, 0, 0, 0));
+                    center.getChildren().add(content);
+                }
+            } else {
+                if (content != null) {
+                    center.getChildren().remove(content);
+                }
+            }
         }
 
         private void updateStackStyle() {
