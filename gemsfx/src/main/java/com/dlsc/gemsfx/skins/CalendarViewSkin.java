@@ -176,7 +176,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         VBox yearSpinnerBox = new VBox(incrementYearButton, decrementYearButton);
         yearSpinnerBox.getStyleClass().add("year-spinner");
         yearSpinnerBox.setMaxWidth(Region.USE_PREF_SIZE);
-        yearSpinnerBox.visibleProperty().bind(view.showYearProperty().and(view.showYearSpinnerProperty()).and(view.showYearDropdownProperty().not()));
+        yearSpinnerBox.visibleProperty().bind(view.showYearProperty().and(view.showYearSpinnerProperty()));
         yearSpinnerBox.managedProperty().bind(yearSpinnerBox.visibleProperty());
 
         HBox header = new HBox();
@@ -207,35 +207,20 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         StackPane monthDropdownArrowButton = new StackPane(monthDropdownArrow);
         monthDropdownArrowButton.getStyleClass().addAll("dropdown-button", "month-dropdown-button");
-        monthDropdownArrowButton.setOnMouseClicked(evt -> viewMode.set(ViewMode.MONTH));
-        monthDropdownArrowButton.visibleProperty().bind(view.monthSelectionViewEnabledProperty().and(view.showMonthDropdownProperty().and(view.showMonthProperty())));
+        monthDropdownArrowButton.visibleProperty().bind(view.showMonthDropdownProperty());
         monthDropdownArrowButton.managedProperty().bind(monthDropdownArrowButton.visibleProperty());
-        monthDropdownArrowButton.disableProperty().bind(view.disableMonthDropdownButtonProperty());
-        monthLabel.graphicProperty().bind(Bindings.createObjectBinding(() -> {
-                    if (view.isMonthSelectionViewEnabled() && view.isShowMonthDropdown()) {
-                        return monthDropdownArrowButton;
-                    }
-                    return null;
-                },
-                view.showMonthDropdownProperty(), view.monthSelectionViewEnabledProperty()));
+        monthDropdownArrowButton.disableProperty().bind(view.monthSelectionViewEnabledProperty().not());
+        monthLabel.graphicProperty().bind(view.showMonthDropdownProperty().map(showMonthDropdown -> showMonthDropdown ? monthDropdownArrowButton : null));
 
         StackPane yearDropdownArrow = new StackPane();
         yearDropdownArrow.getStyleClass().add("arrow");
 
         StackPane yearDropdownArrowButton = new StackPane(yearDropdownArrow);
         yearDropdownArrowButton.getStyleClass().addAll("dropdown-button", "year-dropdown-button");
-        yearDropdownArrowButton.setOnMouseClicked(evt -> viewMode.set(ViewMode.YEAR));
-        yearDropdownArrowButton.visibleProperty().bind(view.yearSelectionViewEnabledProperty().and(view.showYearDropdownProperty().and(view.showYearProperty())));
+        yearDropdownArrowButton.visibleProperty().bind(view.showYearDropdownProperty());
         yearDropdownArrowButton.managedProperty().bind(yearDropdownArrowButton.visibleProperty());
-        yearDropdownArrowButton.disableProperty().bind(view.disableYearDropdownButtonProperty());
-
-        yearLabel.graphicProperty().bind(Bindings.createObjectBinding(() -> {
-                    if (view.isYearSelectionViewEnabled() && view.isShowYearDropdown()) {
-                        return yearDropdownArrowButton;
-                    }
-                    return null;
-                },
-                view.showYearDropdownProperty(), view.yearSelectionViewEnabledProperty()));
+        yearDropdownArrowButton.disableProperty().bind(view.yearSelectionViewEnabledProperty().not());
+        yearLabel.graphicProperty().bind(view.showYearDropdownProperty().map(showYearDropdown -> showYearDropdown ? yearDropdownArrowButton : null));
 
         Spacer leftSpacer = new Spacer();
         leftSpacer.getStyleClass().add("left");

@@ -58,16 +58,16 @@
     -fx-background-radius: 2px;
 }
 
-.calendar-view > .stack-pane > .container > .header > .dropdown-button {
-    -fx-padding: 2px 2px 2px 5px;
-}
-
 .calendar-view > .stack-pane > .container > .header > .date-label > .dropdown-button > .arrow {
     -fx-background-color: -fx-mark-color;
     -fx-background-insets: 0;
     -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
     -fx-shape: "M 0 0 h 9 l -4.5 5 z";
     -fx-scale-shape: false;
+}
+
+.calendar-view > .stack-pane > .container > .header > .date-label > .dropdown-button:disabled {
+    -fx-opacity: 0.4;
 }
 
 .calendar-view > .stack-pane > .container > .header > .year-spinner {

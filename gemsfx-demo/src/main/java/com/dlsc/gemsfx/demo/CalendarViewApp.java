@@ -89,8 +89,6 @@ public class CalendarViewApp extends Application {
         options2.getChildren().add(createOption("Disable next month", calendarView.disableNextMonthButtonProperty()));
         options2.getChildren().add(createOption("Disable previous year", calendarView.disablePreviousYearButtonProperty()));
         options2.getChildren().add(createOption("Disable next year", calendarView.disableNextYearButtonProperty()));
-        options2.getChildren().add(createOption("Disable month dropdown", calendarView.disableMonthDropdownButtonProperty()));
-        options2.getChildren().add(createOption("Disable year dropdown", calendarView.disableYearDropdownButtonProperty()));
         options2.getChildren().add(new Separator(Orientation.HORIZONTAL));
         options2.getChildren().add(createOption("Enable year selection view", calendarView.yearSelectionViewEnabledProperty()));
         options2.getChildren().add(createOption("Enable month selection view", calendarView.monthSelectionViewEnabledProperty()));

@@ -373,44 +373,6 @@ public class CalendarView extends Control {
         this.disablePreviousYearButton.set(disablePreviousYearButton);
     }
 
-    public final BooleanProperty disableMonthDropdownButton = new SimpleBooleanProperty(this, "disableMonthDropdownButton", false);
-
-    public final boolean isDisableMonthDropdownButton() {
-        return disableMonthDropdownButton.get();
-    }
-
-    /**
-     * A property to control whether the "show month view" button will be disabled or not.
-     *
-     * @return true if the button used for showing the month selection view should be disabled
-     */
-    public final BooleanProperty disableMonthDropdownButtonProperty() {
-        return disableMonthDropdownButton;
-    }
-
-    public final void setDisableMonthDropdownButton(boolean disableMonthDropdownButton) {
-        this.disableMonthDropdownButton.set(disableMonthDropdownButton);
-    }
-
-    public final BooleanProperty disableYearDropdownButton = new SimpleBooleanProperty(this, "disableYearDropdownButton", false);
-
-    public final boolean isDisableYearDropdownButton() {
-        return disableYearDropdownButton.get();
-    }
-
-    /**
-     * A property to control whether the "show year view" button will be disabled or not.
-     *
-     * @return true if the button used for showing the year selection view should be disabled
-     */
-    public final BooleanProperty disableYearDropdownButtonProperty() {
-        return disableYearDropdownButton;
-    }
-
-    public final void setDisableYearDropdownButton(boolean disableYearDropdownButton) {
-        this.disableYearDropdownButton.set(disableYearDropdownButton);
-    }
-
     private final ObjectProperty<Callback<LocalDate, Boolean>> dateFilter = new SimpleObjectProperty<>(this, "dateFilter");
 
     public final Callback<LocalDate, Boolean> getDateFilter() {
