@@ -12,6 +12,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.MapChangeListener;
+import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -42,6 +43,7 @@ import java.util.Objects;
  */
 public class NotificationView<T, S extends Notification<T>> extends StackPane {
 
+    private static final PseudoClass PSEUDO_CLASS_EXPANDED = PseudoClass.getPseudoClass("expanded");
     private final S notification;
     private final ContentPane contentPane;
     private final StackPane stackNotification1;
@@ -278,13 +280,16 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
                 center.getStyleClass().add("text-container");
                 center.setMinHeight(Region.USE_PREF_SIZE);
 
+                boolean contentIsExpanded = false;
                 if (isShowContent()) {
                     Node content = getContent();
                     if (content != null) {
                         VBox.setMargin(content, new Insets(5, 0, 0, 0));
                         center.getChildren().add(content);
+                        contentIsExpanded = true;
                     }
                 }
+                NotificationView.this.pseudoClassStateChanged(PSEUDO_CLASS_EXPANDED, contentIsExpanded);
 
                 return center;
             }, contentProperty(), showContentProperty()));

@@ -189,7 +189,7 @@
 .info-center-view .notification-view {
 }
 
-.info-center-view .notification-view > .content > .upper-right-pane > .arrow-pane {
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane {
     -size: 20;
     -fx-pref-width: -size;
     -fx-pref-height: -size;
@@ -201,9 +201,12 @@
     -fx-background-color: lightgrey;
 }
 
-.info-center-view .notification-view > .content > .upper-right-pane > .arrow-pane .ikonli-font-icon {
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
     -fx-icon-size: 16px;
     -fx-icon-code: gmi-chevron-right;
+}
+
+.info-center-view .notification-view:expanded > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
     -fx-rotate: 90;
 }
 
