@@ -18,10 +18,24 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.CalendarViewSkin;
 import com.dlsc.gemsfx.skins.DateCellSkin;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.EnumConverter;
 import javafx.scene.control.Cell;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -33,6 +47,9 @@ import javafx.util.Callback;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import static java.lang.Double.MAX_VALUE;
@@ -63,6 +80,8 @@ import static javafx.geometry.Pos.CENTER;
  */
 public class CalendarView extends Control {
 
+    private static final YearDisplayMode DEFAULT_YEAR_DISPLAY_MODE = YearDisplayMode.TEXT_ONLY;
+    private static final MonthDisplayMode DEFAULT_MONTH_DISPLAY_MODE = MonthDisplayMode.TEXT_ONLY;
     private YearMonthView yearMonthView;
 
     private YearView yearView;
@@ -579,75 +598,6 @@ public class CalendarView extends Control {
         this.showYear.set(showYear);
     }
 
-    private final BooleanProperty showMonthDropdown = new SimpleBooleanProperty(this, "showMonthDropdown", false);
-
-    public final boolean isShowMonthDropdown() {
-        return showMonthDropdown.get();
-    }
-
-    /**
-     * Show or hide a dropdown icon next to the label that displays
-     * the currently selected month.
-     *
-     * @return show / hide month dropdown
-     */
-    public final BooleanProperty showMonthDropdownProperty() {
-        return showMonthDropdown;
-    }
-
-    public final void setShowMonthDropdown(boolean showMonthDropdown) {
-        this.showMonthDropdown.set(showMonthDropdown);
-    }
-
-    private final BooleanProperty showYearDropdown = new SimpleBooleanProperty(this, "showYearDropdown", false);
-
-    public final boolean isShowYearDropdown() {
-        return showYearDropdown.get();
-    }
-
-    /**
-     * Show or hide a dropdown icon next to the label that displays
-     * the currently selected year.
-     *
-     * @return show / hide year dropdown
-     */
-    public final BooleanProperty showYearDropdownProperty() {
-        return showYearDropdown;
-    }
-
-    public final void setShowYearDropdown(boolean showYearDropdown) {
-        this.showYearDropdown.set(showYearDropdown);
-    }
-
-    private final BooleanProperty showYearSpinner = new SimpleBooleanProperty(this, "showYearSpinner", false);
-
-    /**
-     * Show or hide the year / month spinner.
-     *
-     * @return true if the year will be shown
-     */
-    public final BooleanProperty showYearSpinnerProperty() {
-        return showYearSpinner;
-    }
-
-    /**
-     * Sets the value of {@link #showYearSpinnerProperty()}.
-     *
-     * @param show if true the year / month spinner at the top will be shown
-     */
-    public final void setShowYearSpinner(boolean show) {
-        showYearSpinnerProperty().set(show);
-    }
-
-    /**
-     * Returns the value of {@link #showYearSpinnerProperty()}.
-     *
-     * @return true if the year / month spinner will be shown
-     */
-    public final boolean isShowYearSpinner() {
-        return showYearSpinnerProperty().get();
-    }
-
     private final BooleanProperty showTodayButton = new SimpleBooleanProperty(this, "showTodayButton");
 
     /**
@@ -839,6 +789,117 @@ public class CalendarView extends Control {
         this.latestDate.set(latestDate);
     }
 
+    /**
+     * Enumerates the display modes for the year label at the top of the calendar view.
+     */
+    public enum YearDisplayMode {
+        /**
+         * Displays only the year text. This is the default mode.
+         */
+        TEXT_ONLY,
+
+        /**
+         * Displays the year text with a spinner for adjustment.
+         */
+        TEXT_AND_SPINNER,
+
+        /**
+         * Displays the year text with a dropdown button.
+         */
+        TEXT_AND_DROPDOWN
+    }
+
+    private ObjectProperty<YearDisplayMode> yearDisplayMode;
+
+    /**
+     * The display mode for the year label at the top of the calendar view.
+     * {@link YearDisplayMode#TEXT_ONLY} is the default mode.
+     *
+     * @return the year display mode property.
+     */
+    public final ObjectProperty<YearDisplayMode> yearDisplayModeProperty() {
+        if (yearDisplayMode == null) {
+            yearDisplayMode = new StyleableObjectProperty<>(DEFAULT_YEAR_DISPLAY_MODE) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "yearDisplayMode";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, YearDisplayMode> getCssMetaData() {
+                    return StyleableProperties.YEAR_DISPLAY_MODE;
+                }
+            };
+        }
+        return yearDisplayMode;
+    }
+
+    public final YearDisplayMode getYearDisplayMode() {
+        return yearDisplayMode == null ? DEFAULT_YEAR_DISPLAY_MODE : yearDisplayMode.get();
+    }
+
+    public final void setYearDisplayMode(YearDisplayMode yearDisplayMode) {
+        yearDisplayModeProperty().set(yearDisplayMode);
+    }
+
+    /**
+     * Enumerates the display modes for the month label at the top of the calendar view.
+     */
+    public enum MonthDisplayMode {
+        /**
+         * Displays only the month text.  This is the default mode.
+         */
+        TEXT_ONLY,
+
+        /**
+         * Displays the month text with a dropdown button.
+         */
+        TEXT_AND_DROPDOWN
+    }
+
+    private ObjectProperty<MonthDisplayMode> monthDisplayMode;
+
+    /**
+     * The display mode for the month label at the top of the calendar view.
+     * {@link MonthDisplayMode#TEXT_ONLY} is the default mode.
+     *
+     * @return the month display mode property.
+     */
+    public final ObjectProperty<MonthDisplayMode> monthDisplayModeProperty() {
+        if (monthDisplayMode == null) {
+            monthDisplayMode = new StyleableObjectProperty<>(DEFAULT_MONTH_DISPLAY_MODE) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "monthDisplayMode";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, MonthDisplayMode> getCssMetaData() {
+                    return StyleableProperties.MONTH_DISPLAY_MODE;
+                }
+            };
+        }
+        return monthDisplayMode;
+    }
+
+    public final MonthDisplayMode getMonthDisplayMode() {
+        return monthDisplayMode == null ? DEFAULT_MONTH_DISPLAY_MODE : monthDisplayMode.get();
+    }
+
+    public final void setMonthDisplayMode(MonthDisplayMode monthDisplayMode) {
+        monthDisplayModeProperty().set(monthDisplayMode);
+    }
+
     public static class SelectionModel {
 
         public enum SelectionMode {
@@ -986,4 +1047,53 @@ public class CalendarView extends Control {
             this.selectedDates.set(selectedDates);
         }
     }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<CalendarView, YearDisplayMode> YEAR_DISPLAY_MODE = new CssMetaData<>(
+                "-fx-year-display-mode", new EnumConverter<>(YearDisplayMode.class), DEFAULT_YEAR_DISPLAY_MODE) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.yearDisplayMode == null || !control.yearDisplayMode.isBound();
+            }
+
+            @Override
+            public StyleableProperty<YearDisplayMode> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<YearDisplayMode>) control.yearDisplayModeProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, MonthDisplayMode> MONTH_DISPLAY_MODE = new CssMetaData<>(
+                "-fx-month-display-mode", new EnumConverter<>(MonthDisplayMode.class), DEFAULT_MONTH_DISPLAY_MODE) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.monthDisplayMode == null || !control.monthDisplayMode.isBound();
+            }
+
+            @Override
+            public StyleableProperty<MonthDisplayMode> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<MonthDisplayMode>) control.monthDisplayModeProperty();
+            }
+        };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            Collections.addAll(styleables, YEAR_DISPLAY_MODE, MONTH_DISPLAY_MODE);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return CalendarView.StyleableProperties.STYLEABLES;
+    }
+
 }

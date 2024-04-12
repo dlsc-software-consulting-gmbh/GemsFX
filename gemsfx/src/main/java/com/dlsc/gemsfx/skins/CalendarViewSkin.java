@@ -176,7 +176,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         VBox yearSpinnerBox = new VBox(incrementYearButton, decrementYearButton);
         yearSpinnerBox.getStyleClass().add("year-spinner");
         yearSpinnerBox.setMaxWidth(Region.USE_PREF_SIZE);
-        yearSpinnerBox.visibleProperty().bind(view.showYearProperty().and(view.showYearSpinnerProperty()).and(view.showYearDropdownProperty().not()));
+        yearSpinnerBox.visibleProperty().bind(view.showYearProperty().and(view.yearDisplayModeProperty().isEqualTo(CalendarView.YearDisplayMode.TEXT_AND_SPINNER)));
         yearSpinnerBox.managedProperty().bind(yearSpinnerBox.visibleProperty());
 
         HBox header = new HBox();
@@ -207,35 +207,41 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         StackPane monthDropdownArrowButton = new StackPane(monthDropdownArrow);
         monthDropdownArrowButton.getStyleClass().addAll("dropdown-button", "month-dropdown-button");
-        monthDropdownArrowButton.setOnMouseClicked(evt -> viewMode.set(ViewMode.MONTH));
-        monthDropdownArrowButton.visibleProperty().bind(view.monthSelectionViewEnabledProperty().and(view.showMonthDropdownProperty().and(view.showMonthProperty())));
+        monthDropdownArrowButton.visibleProperty().bind(
+                view.monthSelectionViewEnabledProperty()
+                        .and(view.monthDisplayModeProperty().isEqualTo(CalendarView.MonthDisplayMode.TEXT_AND_DROPDOWN))
+                        .and(view.showMonthProperty())
+        );
         monthDropdownArrowButton.managedProperty().bind(monthDropdownArrowButton.visibleProperty());
         monthDropdownArrowButton.disableProperty().bind(view.disableMonthDropdownButtonProperty());
         monthLabel.graphicProperty().bind(Bindings.createObjectBinding(() -> {
-                    if (view.isMonthSelectionViewEnabled() && view.isShowMonthDropdown()) {
+                    if (view.isMonthSelectionViewEnabled() && view.getMonthDisplayMode() == CalendarView.MonthDisplayMode.TEXT_AND_DROPDOWN) {
                         return monthDropdownArrowButton;
                     }
                     return null;
                 },
-                view.showMonthDropdownProperty(), view.monthSelectionViewEnabledProperty()));
+                view.monthDisplayModeProperty(), view.monthSelectionViewEnabledProperty()));
 
         StackPane yearDropdownArrow = new StackPane();
         yearDropdownArrow.getStyleClass().add("arrow");
 
         StackPane yearDropdownArrowButton = new StackPane(yearDropdownArrow);
         yearDropdownArrowButton.getStyleClass().addAll("dropdown-button", "year-dropdown-button");
-        yearDropdownArrowButton.setOnMouseClicked(evt -> viewMode.set(ViewMode.YEAR));
-        yearDropdownArrowButton.visibleProperty().bind(view.yearSelectionViewEnabledProperty().and(view.showYearDropdownProperty().and(view.showYearProperty())));
+        yearDropdownArrowButton.visibleProperty().bind(
+                view.yearSelectionViewEnabledProperty()
+                        .and(view.yearDisplayModeProperty().isEqualTo(CalendarView.YearDisplayMode.TEXT_AND_DROPDOWN))
+                        .and(view.showYearProperty())
+        );
         yearDropdownArrowButton.managedProperty().bind(yearDropdownArrowButton.visibleProperty());
         yearDropdownArrowButton.disableProperty().bind(view.disableYearDropdownButtonProperty());
 
         yearLabel.graphicProperty().bind(Bindings.createObjectBinding(() -> {
-                    if (view.isYearSelectionViewEnabled() && view.isShowYearDropdown()) {
+                    if (view.isYearSelectionViewEnabled() && view.getYearDisplayMode() == CalendarView.YearDisplayMode.TEXT_AND_DROPDOWN) {
                         return yearDropdownArrowButton;
                     }
                     return null;
                 },
-                view.showYearDropdownProperty(), view.yearSelectionViewEnabledProperty()));
+                view.yearDisplayModeProperty(), view.yearSelectionViewEnabledProperty()));
 
         Spacer leftSpacer = new Spacer();
         leftSpacer.getStyleClass().add("left");
@@ -256,7 +262,6 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         InvalidationListener buildViewListener = evt -> buildView();
         view.showWeekNumbersProperty().addListener(buildViewListener);
         view.showMonthArrowsProperty().addListener(buildViewListener);
-        view.showYearSpinnerProperty().addListener(buildViewListener);
         view.cellFactoryProperty().addListener(buildViewListener);
         view.markSelectedDaysOfPreviousOrNextMonthProperty().addListener(buildViewListener);
 
