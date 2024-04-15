@@ -48,10 +48,12 @@ public class EnhancedPasswordFieldApp extends Application {
 
         VBox root = new VBox(echoCharBoxWrapper, tips, passwordField1, new Separator(), passwordField2, new Separator(), passwordField3);
         root.getStyleClass().add("content-box");
-        Scene scene = new Scene(root, 330, 210);
+        Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/com/dlsc/gemsfx/demo/enhanced-password-filed-demo.css").toExternalForm());
+
         primaryStage.setScene(scene);
         primaryStage.setTitle("Enhanced Password Field");
+        primaryStage.sizeToScene();
         primaryStage.show();
     }
 
