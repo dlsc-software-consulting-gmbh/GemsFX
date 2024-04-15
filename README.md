@@ -13,7 +13,7 @@ GemsFX is a collection of custom controls and utilities for JavaFX.
 - #### Date & Time Controls
   [CalendarView](#calendar-view), [CalendarPicker](#calendar-picker), [DateRangeView](#date-range-view), [DateRangePicker](#date-range-picker),[YearView](#year-view), [YearPicker](#year-picker), [YearMonthView](#year-month-view), [YearMonthPicker](#year-month-picker), [TimePicker](#time-picker), [DurationPicker](#duration-picker)
 - #### Text Input Controls
-  [SearchTextField](#search-text-field), [SearchField](#search-field), [EmailField](#email-field), [TagsField](#tags-field), [ExpandingTextArea](#expanding-text-area), [ResizableTextArea](#resizable-text-area), [LimitedTextArea](#limited-text-area)
+  [SearchTextField](#search-text-field), [SearchField](#search-field), [EnhancedPasswordField](#enhanced-password-field), [EmailField](#email-field), [TagsField](#tags-field), [ExpandingTextArea](#expanding-text-area), [ResizableTextArea](#resizable-text-area), [LimitedTextArea](#limited-text-area)
 - #### Advanced Panes
   [DialogPane](#dialog-pane), [DrawerStackPane](#drawer-stack-pane), [PowerPane](#power-pane), [ResponsivePane](#responsive-pane)
 - #### Image controls
@@ -154,6 +154,15 @@ creating a new object for the entered text if no result can be found. For detail
 instructions [read the WIKI page](https://github.com/dlsc-software-consulting-gmbh/GemsFX/wiki/SearchField).
 
 ![SearchField](gemsfx/docs/search-field.png)
+
+## EnhancedPasswordField
+
+<span id="enhanced-password-field"></span>
+
+The EnhancedPasswordField is a custom password field. It allows the addition of custom nodes like icons or buttons to the sides of the field,
+supports toggling password visibility between masked and plain text, and enables customization of the echo character used for masking.
+
+![EnhancedPasswordField](gemsfx/docs/enhanced-password-field.png)
 
 ## Email Field
 
