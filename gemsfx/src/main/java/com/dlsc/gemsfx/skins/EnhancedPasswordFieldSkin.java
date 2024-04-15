@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.EnhancedPasswordField;
 import javafx.beans.binding.StringBinding;
 import javafx.scene.Node;
+import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
 import java.util.Optional;
@@ -10,11 +11,8 @@ import java.util.Set;
 
 public abstract class EnhancedPasswordFieldSkin extends CustomTextFieldSkin {
 
-    private final EnhancedPasswordField control;
-
     public EnhancedPasswordFieldSkin(EnhancedPasswordField control) {
         super(control);
-        this.control = control;
 
         // find the text nodes
         Set<Node> nodes = control.lookupAll(".text");
@@ -43,12 +41,23 @@ public abstract class EnhancedPasswordFieldSkin extends CustomTextFieldSkin {
 
     @Override
     protected String maskText(String txt) {
-        if (control == null || !control.isShowPassword()) {
-            int n = txt.length();
-            char echoChar = control != null ? control.getEchoCharSafe() : EnhancedPasswordField.DEFAULT_ECHO_CHAR;
-            return String.valueOf(echoChar).repeat(n);
+        TextField skinnable = getSkinnable();
+        int len = txt.length();
+        if (skinnable == null) {
+            return getDefaultMaskText(len);
         }
-        return txt;
+
+        if (skinnable instanceof EnhancedPasswordField passwordField) {
+            if (passwordField.isShowPassword()) {
+                return txt;
+            }
+            return String.valueOf(passwordField.getEchoCharSafe()).repeat(len);
+        }
+        return getDefaultMaskText(len);
+    }
+
+    private String getDefaultMaskText(int len) {
+        return String.valueOf(EnhancedPasswordField.DEFAULT_ECHO_CHAR).repeat(len);
     }
 
 }
