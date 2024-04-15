@@ -25,6 +25,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.text.MessageFormat;
@@ -205,6 +206,68 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
 
     public final void setShowContent(boolean showContent) {
         this.showContent.set(showContent);
+    }
+
+    private static final StringConverter<ZonedDateTime> DEFAULT_TIME_CONVERTER = new StringConverter<>() {
+        @Override
+        public String toString(ZonedDateTime dateTime) {
+            System.out.println(">> 0");
+            if (dateTime != null) {
+                Duration between = Duration.between(dateTime, ZonedDateTime.now());
+                if (between.toDays() == 0) {
+                    if (between.toHours() > 2) {
+                        return DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(dateTime.toLocalTime());
+                    } else if (between.toHours() > 0) {
+                        return MessageFormat.format("{0}h ago", between.toHours());
+                    } else if (between.toMinutes() > 0) {
+                        return MessageFormat.format("{0}m ago", between.toMinutes());
+                    } else {
+                        return "now";
+                    }
+                } else if (between.toDays() == 1) {
+                    return MessageFormat.format("Yesterday, {0}", DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(dateTime.toLocalTime()));
+                } else if (between.toDays() < 7) {
+                    return MessageFormat.format("{0} days ago", between.toDays());
+                } else {
+                    return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).format(dateTime);
+                }
+            }
+            return "";
+        }
+
+        @Override
+        public ZonedDateTime fromString(String string) {
+            return null;
+        }
+    };
+
+    private ObjectProperty<StringConverter<ZonedDateTime>> timeConverter;
+
+    public final StringConverter<ZonedDateTime> getTimeConverter() {
+        return timeConverter == null ? DEFAULT_TIME_CONVERTER : timeConverter.get();
+    }
+
+    /**
+     * A converter that is used to convert the date and time of the notification
+     * into a human-readable text. The default converter creates a text like
+     * "now", "yesterday", "2 days ago", etc...
+     *
+     * @return the time converter
+     */
+    public final ObjectProperty<StringConverter<ZonedDateTime>> timeConverterProperty() {
+        if (timeConverter == null) {
+            timeConverter = new SimpleObjectProperty<>(this, "timeConverter", DEFAULT_TIME_CONVERTER) {
+                @Override
+                protected void invalidated() {
+                    updateDateAndTimeLabel();
+                }
+            };
+        }
+        return timeConverter;
+    }
+
+    public final void setTimeConverter(StringConverter<ZonedDateTime> timeConverter) {
+        timeConverterProperty().set(timeConverter);
     }
 
     public class ContentPane extends BorderPane {
@@ -407,35 +470,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
         }
 
         private void updateDateAndTimeLabel() {
-            timeLabel.setText(createTimeText(notification));
-        }
-
-        /*
-         * Creates a nice human-readable date and time text, e.g. "yesterday", "now", etc...
-         */
-        private String createTimeText(Notification<?> notification) {
-            ZonedDateTime dateTime = notification.getDateTime();
-            if (dateTime != null) {
-                Duration between = Duration.between(dateTime, ZonedDateTime.now());
-                if (between.toDays() == 0) {
-                    if (between.toHours() > 2) {
-                        return DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(dateTime.toLocalTime());
-                    } else if (between.toHours() > 0) {
-                        return MessageFormat.format("{0}h ago", between.toHours());
-                    } else if (between.toMinutes() > 0) {
-                        return MessageFormat.format("{0}m ago", between.toMinutes());
-                    } else {
-                        return "now";
-                    }
-                } else if (between.toDays() == 1) {
-                    return MessageFormat.format("Yesterday, {0}", DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(dateTime.toLocalTime()));
-                } else if (between.toDays() < 7) {
-                    return MessageFormat.format("{0} days ago", between.toDays());
-                } else {
-                    return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).format(notification.getDateTime());
-                }
-            }
-            return "";
+            timeLabel.setText(NotificationView.this.getTimeConverter().toString(notification.getDateTime()));
         }
     }
 
