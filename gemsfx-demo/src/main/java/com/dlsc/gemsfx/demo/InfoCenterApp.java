@@ -33,8 +33,12 @@ import java.util.Objects;
 
 public class InfoCenterApp extends Application {
 
-    private final InfoCenterPane infoCenterPane = new InfoCenterPane();
+    private static final Image SLACK_IMAGE = new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/slack.png")));
+    private static final Image CALENDAR_IMAGE = new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/calendar.png")));
+    private static final Image MAP_IMAGE = new Image(Objects.requireNonNull(CalendarNotification.class.getResource("notification/map.png")).toExternalForm());
+    private static final Image MAIL_IMAGE = new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/mail.png")));
 
+    private final InfoCenterPane infoCenterPane = new InfoCenterPane();
     private final NotificationGroup<Mail, MailNotification> mailGroup = new NotificationGroup<>("Mail");
     private final NotificationGroup<Object, SlackNotification> slackGroup = new NotificationGroup<>("Slack");
     private final NotificationGroup<Object, CalendarNotification> calendarGroup = new NotificationGroup<>("Calendar");
@@ -51,16 +55,16 @@ public class InfoCenterApp extends Application {
 
         slackGroup.setViewFactory(n -> {
             NotificationView<Object, SlackNotification> view = new NotificationView<>(n);
-            view.setGraphic(createImageView(new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/slack.png")))));
+            view.setGraphic(createImageView(SLACK_IMAGE));
             return view;
         });
 
         calendarGroup.setViewFactory(n -> {
             NotificationView<Object, CalendarNotification> view = new NotificationView<>(n);
-            view.setGraphic(createImageView(new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/calendar.png")))));
+            view.setGraphic(createImageView(CALENDAR_IMAGE));
             Region region = new Region();
             region.setMinHeight(200);
-            region.setBackground(new Background(new BackgroundImage(new Image(Objects.requireNonNull(CalendarNotification.class.getResource("notification/map.png")).toExternalForm()), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(100, 100, true, true, false, true))));
+            region.setBackground(new Background(new BackgroundImage(MAP_IMAGE, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(100, 100, true, true, false, true))));
             StackPane stackPane = new StackPane(region);
             stackPane.setStyle("-fx-border-color: grey;");
             view.setContent(stackPane);
@@ -69,7 +73,7 @@ public class InfoCenterApp extends Application {
 
         mailGroup.setViewFactory(n -> {
             NotificationView<Mail, MailNotification> view = new NotificationView<>(n);
-            view.setGraphic(createImageView(new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/mail.png")))));
+            view.setGraphic(createImageView(MAIL_IMAGE));
             return view;
         });
 
