@@ -24,6 +24,7 @@ open module com.dlsc.gemsfx {
     requires okhttp3;
     requires java.desktop;
     requires com.dlsc.pickerfx;
+    requires com.dlsc.unitfx;
 
     exports com.dlsc.gemsfx;
     exports com.dlsc.gemsfx.daterange;
