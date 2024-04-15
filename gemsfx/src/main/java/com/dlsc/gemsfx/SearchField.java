@@ -102,7 +102,6 @@ public class SearchField<T> extends Control {
         editor.textProperty().bindBidirectional(textProperty());
         editor.promptTextProperty().bindBidirectional(promptTextProperty());
 
-        setFocusTraversable(false);
         setPlaceholder(new Label("No items found"));
 
         focusedProperty().addListener(it -> {
