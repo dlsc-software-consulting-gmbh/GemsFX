@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.infocenter;
 
 import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -45,6 +46,8 @@ import java.util.Objects;
 public class NotificationView<T, S extends Notification<T>> extends StackPane {
 
     private static final PseudoClass PSEUDO_CLASS_EXPANDED = PseudoClass.getPseudoClass("expanded");
+    private static final DateTimeFormatter SHORT_TIME_FORMATTER = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
+
     private final S notification;
     private final ContentPane contentPane;
     private final StackPane stackNotification1;
@@ -211,23 +214,22 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
     private static final StringConverter<ZonedDateTime> DEFAULT_TIME_CONVERTER = new StringConverter<>() {
         @Override
         public String toString(ZonedDateTime dateTime) {
-            System.out.println(">> 0");
             if (dateTime != null) {
                 Duration between = Duration.between(dateTime, ZonedDateTime.now());
                 if (between.toDays() == 0) {
                     if (between.toHours() > 2) {
                         return DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(dateTime.toLocalTime());
                     } else if (between.toHours() > 0) {
-                        return MessageFormat.format("{0}h ago", between.toHours());
+                        return MessageFormat.format("{0}{1}", between.toHours(), ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.hours.ago"));
                     } else if (between.toMinutes() > 0) {
-                        return MessageFormat.format("{0}m ago", between.toMinutes());
+                        return MessageFormat.format("{0}{1}", between.toMinutes(), ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.minutes.ago"));
                     } else {
-                        return "now";
+                        return ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.now");
                     }
                 } else if (between.toDays() == 1) {
-                    return MessageFormat.format("Yesterday, {0}", DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(dateTime.toLocalTime()));
+                    return MessageFormat.format("{0}, {1}", ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW,"time.yesterday"), SHORT_TIME_FORMATTER.format(dateTime.toLocalTime()));
                 } else if (between.toDays() < 7) {
-                    return MessageFormat.format("{0} days ago", between.toDays());
+                    return MessageFormat.format("{0} {1}", between.toDays(), ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.days.ago"));
                 } else {
                     return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).format(dateTime);
                 }
@@ -346,7 +348,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             contentProperty().addListener(it -> updateCenterNode(center));
             showContentProperty().addListener(it -> updateCenterNode(center));
 
-            Label clearAllLabel = new Label("Clear All");
+            Label clearAllLabel = new Label(ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "group.clear.all"));
             clearAllLabel.getStyleClass().add("clear-all");
             clearAllLabel.setMouseTransparent(true);
 

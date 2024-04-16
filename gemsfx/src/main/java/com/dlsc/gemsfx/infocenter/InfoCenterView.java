@@ -4,17 +4,24 @@ import com.dlsc.gemsfx.skins.InfoCenterViewSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableDoubleProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.SizeConverter;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -31,6 +38,11 @@ import java.util.stream.Collectors;
 public class InfoCenterView extends Control {
 
     private static final String TRANSPARENT = "transparent";
+    private static final double DEFAULT_NOTIFICATION_SPACING = 10.0;
+    private static final Duration DEFAULT_EXPAND_DURATION = Duration.millis(300);
+    private static final Duration DEFAULT_SLIDE_IN_DURATION = Duration.millis(500);
+    private static final boolean DEFAULT_AUTO_OPEN_GROUP = false;
+    private static final boolean DEFAULT_TRANSPARENT = false;
 
     private final InvalidationListener updateNotificationsListener = it -> updateNotificationsList();
 
@@ -70,8 +82,6 @@ public class InfoCenterView extends Control {
         getGroups().addListener(groupListListener);
 
         setFocusTraversable(false);
-
-        transparentProperty().addListener(it -> updateStyle());
     }
 
     @Override
@@ -171,8 +181,6 @@ public class InfoCenterView extends Control {
      * notifications of that group. Applications can choose to display the notifications in
      * a different place, e.g. in a dialog.
      *
-     * @see NotificationGroup#maximumNumberOfNotificationsProperty()
-     *
      * @return the callback that gets invoked when requesting to see all notifications of a group
      */
     public final ObjectProperty<Consumer<NotificationGroup<?, ?>>> onShowAllGroupNotificationsProperty() {
@@ -183,10 +191,10 @@ public class InfoCenterView extends Control {
         this.onShowAllGroupNotifications.set(onShowAllGroupNotifications);
     }
 
-    private final BooleanProperty autoOpenGroup = new SimpleBooleanProperty(this, "autoOpenGroup", false);
+    private BooleanProperty autoOpenGroup;
 
     public final boolean isAutoOpenGroup() {
-        return autoOpenGroup.get();
+        return autoOpenGroup == null ? DEFAULT_AUTO_OPEN_GROUP : autoOpenGroup.get();
     }
 
     /**
@@ -196,11 +204,14 @@ public class InfoCenterView extends Control {
      * @return true if the group of a newly added notification should be automatically expanded
      */
     public final BooleanProperty autoOpenGroupProperty() {
+        if (autoOpenGroup == null) {
+            autoOpenGroup = new SimpleBooleanProperty(this, "autoOpenGroup", DEFAULT_AUTO_OPEN_GROUP);
+        }
         return autoOpenGroup;
     }
 
     public final void setAutoOpenGroup(boolean autoOpenGroup) {
-        this.autoOpenGroup.set(autoOpenGroup);
+        autoOpenGroupProperty().set(autoOpenGroup);
     }
 
     private final ObservableList<Notification<?>> notifications = FXCollections.observableArrayList();
@@ -281,10 +292,10 @@ public class InfoCenterView extends Control {
         this.showAllFadeDuration.set(showAllFadeDuration);
     }
 
-    private final ObjectProperty<Duration> expandDuration = new SimpleObjectProperty<>(this, "expandDuration", Duration.millis(300));
+    private ObjectProperty<Duration> expandDuration;
 
     public final Duration getExpandDuration() {
-        return expandDuration.get();
+        return expandDuration == null ? DEFAULT_EXPAND_DURATION : expandDuration.get();
     }
 
     /**
@@ -294,17 +305,20 @@ public class InfoCenterView extends Control {
      * @return the expand / collapse animation duration
      */
     public final ObjectProperty<Duration> expandDurationProperty() {
+        if (expandDuration == null) {
+            expandDuration = new SimpleObjectProperty<>(this, "expandDuration", DEFAULT_EXPAND_DURATION);
+        }
         return expandDuration;
     }
 
     public final void setExpandDuration(Duration expandDuration) {
-        this.expandDuration.set(expandDuration);
+        expandDurationProperty().set(expandDuration);
     }
 
-    private final ObjectProperty<Duration> slideInDuration = new SimpleObjectProperty<>(this, "slideInDuration", Duration.millis(500));
+    private ObjectProperty<Duration> slideInDuration;
 
     public final Duration getSlideInDuration() {
-        return slideInDuration.get();
+        return slideInDuration == null ? DEFAULT_SLIDE_IN_DURATION : slideInDuration.get();
     }
 
     /**
@@ -313,17 +327,20 @@ public class InfoCenterView extends Control {
      * @return the slide-in duration of a new notification
      */
     public final ObjectProperty<Duration> slideInDurationProperty() {
+        if (slideInDuration == null) {
+            slideInDuration = new SimpleObjectProperty<>(this, "slideInDuration", DEFAULT_SLIDE_IN_DURATION);
+        }
         return slideInDuration;
     }
 
     public final void setSlideInDuration(Duration slideInDuration) {
-        this.slideInDuration.set(slideInDuration);
+        slideInDurationProperty().set(slideInDuration);
     }
 
-    private final BooleanProperty transparent = new SimpleBooleanProperty(this, "transparent", false);
+    private BooleanProperty transparent;
 
     public final boolean isTransparent() {
-        return transparent.get();
+        return transparent == null ? DEFAULT_TRANSPARENT : transparent.get();
     }
 
     /**
@@ -333,11 +350,91 @@ public class InfoCenterView extends Control {
      * @return true if the control is not transparent
      */
     public final BooleanProperty transparentProperty() {
+        if (transparent == null) {
+            transparent = new SimpleBooleanProperty(this, "transparent", DEFAULT_TRANSPARENT) {
+                @Override
+                protected void invalidated() {
+                    updateStyle();
+                }
+            };
+        }
         return transparent;
     }
 
     public final void setTransparent(boolean transparent) {
-        this.transparent.set(transparent);
+        transparentProperty().set(transparent);
+    }
+
+    private DoubleProperty notificationSpacing;
+
+    /**
+     * Represents the spacing between individual notification views within the same notification group.
+     * This property allows adjustment of the vertical gap depending on the layout of the notification container.
+     * The default value is 10.0.
+     *
+     * @return the DoubleProperty that controls the spacing between notifications in the same group.
+     */
+    public final DoubleProperty notificationSpacingProperty() {
+        if (notificationSpacing == null) {
+            notificationSpacing = new StyleableDoubleProperty(DEFAULT_NOTIFICATION_SPACING) {
+                @Override
+                public Object getBean() {
+                    return InfoCenterView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "notificationSpacing";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+                    return StyleableProperties.NOTIFICATION_SPACING;
+                }
+            };
+        }
+        return notificationSpacing;
+    }
+
+    public final double getNotificationSpacing() {
+        return notificationSpacing == null ? DEFAULT_NOTIFICATION_SPACING : notificationSpacing.get();
+    }
+
+    public final void setNotificationSpacing(double notificationSpacing) {
+        notificationSpacingProperty().set(notificationSpacing);
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<InfoCenterView, Number> NOTIFICATION_SPACING =
+                new CssMetaData<>("-fx-notification-spacing", SizeConverter.getInstance(), DEFAULT_NOTIFICATION_SPACING) {
+                    @Override
+                    public boolean isSettable(InfoCenterView view) {
+                        return view.notificationSpacing == null || !view.notificationSpacing.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(InfoCenterView view) {
+                        return (StyleableProperty<Number>) view.notificationSpacingProperty();
+                    }
+                };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(NOTIFICATION_SPACING);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return InfoCenterView.StyleableProperties.STYLEABLES;
     }
 
     public void clearAll() {
