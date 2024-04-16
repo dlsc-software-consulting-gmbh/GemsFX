@@ -25,6 +25,8 @@ import one.jpro.jproutils.treeshowing.TreeShowing;
  */
 public class InfoCenterPane extends Control {
 
+    private static final Duration DEFAULT_SLIDE_IN_DURATION = Duration.millis(200);
+
     /*
      * The managed info center instance.
      */
@@ -161,7 +163,7 @@ public class InfoCenterPane extends Control {
             }
         };
 
-        TreeShowing.treeShowing(this).addListener((p,o,n) -> {
+        TreeShowing.treeShowing(this).addListener((p, o, n) -> {
             if (n) {
                 timer.start();
             } else {
@@ -231,9 +233,8 @@ public class InfoCenterPane extends Control {
      * A flag that determines if the info center view should automatically disappear again
      * after a certain timeout duration.
      *
-     * @see #autoHideDuration
-     *
      * @return true if the info center hides automatically after a certain period of time
+     * @see #autoHideDuration
      */
     public final BooleanProperty autoHideProperty() {
         return autoHide;
@@ -269,7 +270,7 @@ public class InfoCenterPane extends Control {
 
     // slide in / slide out duration
 
-    private final ObjectProperty<Duration> slideInDuration = new SimpleObjectProperty<>(this, "slideDuration", Duration.millis(200)); //$NON-NLS-1$
+    private ObjectProperty<Duration> slideInDuration; //$NON-NLS-1$
 
     /**
      * The duration used for the "slide in" / "slide out" animation when the info center view
@@ -277,16 +278,19 @@ public class InfoCenterPane extends Control {
      *
      * @return animation duration for the sliding in and out of the info center view
      */
-    public final ObjectProperty<Duration> slideInDuration() {
+    public final ObjectProperty<Duration> slideInDurationProperty() {
+        if (slideInDuration == null) {
+            slideInDuration = new SimpleObjectProperty<>(this, "slideInDuration", DEFAULT_SLIDE_IN_DURATION);
+        }
         return slideInDuration;
     }
 
     public final Duration getSlideInDuration() {
-        return slideInDuration.get();
+        return slideInDuration == null ? DEFAULT_SLIDE_IN_DURATION : slideInDuration.get();
     }
 
     public final void setSlideInDuration(Duration duration) {
-        slideInDuration.set(duration);
+        slideInDurationProperty().set(duration);
     }
 
     private final BooleanProperty showInfoCenter = new SimpleBooleanProperty(this, "showInfoCenter", false);
