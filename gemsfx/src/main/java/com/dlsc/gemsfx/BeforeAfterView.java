@@ -12,6 +12,7 @@ import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.EnumConverter;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -91,7 +92,13 @@ public class BeforeAfterView extends Control {
         this.dividerPosition.set(dividerPosition);
     }
 
-    private final ObjectProperty<Node> before = new SimpleObjectProperty<>(this, "before", new Label("Before"));
+
+    private final ObjectProperty<Node> before = new SimpleObjectProperty<>(this, "before", new Label("Before"){
+        {
+            setPrefSize(600, 400);
+            setStyle("-fx-background-color: red;");
+        }
+    });
 
     public final Node getBefore() {
         return before.get();
@@ -105,7 +112,13 @@ public class BeforeAfterView extends Control {
         this.before.set(before);
     }
 
-    private final ObjectProperty<Node> after = new SimpleObjectProperty<>(this, "after", new Label("After"));
+    private final ObjectProperty<Node> after = new SimpleObjectProperty<>(this, "after", new Label("After"){
+        {
+            setPrefSize(600, 400);
+            setStyle("-fx-background-color: green;");
+            setAlignment(Pos.CENTER_RIGHT);
+        }
+    });
 
     public final Node getAfter() {
         return after.get();
