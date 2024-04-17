@@ -6,6 +6,7 @@ import com.dlsc.gemsfx.infocenter.Notification;
 import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import com.dlsc.gemsfx.infocenter.NotificationView;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 import javafx.animation.AnimationTimer;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -238,8 +239,8 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         groupNameLabel.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(groupNameLabel, Priority.ALWAYS);
 
-        Button closeShowAllButton = new Button("Close Group");
-        closeShowAllButton.setTooltip(new Tooltip("Switch back to view with all groups"));
+        Button closeShowAllButton = new Button(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"single.group.header.close"));
+        closeShowAllButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"single.group.header.close.tip")));
         closeShowAllButton.getStyleClass().add("close-show-all-button");
         closeShowAllButton.setOnAction(evt -> view.setShowAllGroup(null));
 
@@ -247,7 +248,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         clearAllButton.setGraphic(new FontIcon());
         clearAllButton.getStyleClass().add("clear-all-button");
         clearAllButton.setOnAction(evt -> view.getShowAllGroup().getNotifications().clear());
-        clearAllButton.setTooltip(new Tooltip("Remove all notifications"));
+        clearAllButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"single.group.header.remove.all")));
 
         HBox singleGroupHeader = new HBox(groupNameLabel, closeShowAllButton, clearAllButton);
         singleGroupHeader.getStyleClass().add("single-group-header");
@@ -427,11 +428,12 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
 
         private final HBox headerBox = new HBox();
 
-        private final int SPACING = 10;
-
         private final InvalidationListener requestedNotificationListener = it -> showNotificationView();
-
         private final WeakInvalidationListener weakRequestedNotificationListener = new WeakInvalidationListener(requestedNotificationListener);
+
+        private final InvalidationListener spacingListener = it -> layoutChildren();
+        private final WeakInvalidationListener weakSpacingListener = new WeakInvalidationListener(spacingListener);
+
 
         public GroupView(NotificationGroup<T, S> group) {
             this.group = group;
@@ -444,24 +446,28 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             groupNameLabel.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(groupNameLabel, Priority.ALWAYS);
 
-            Button showLessButton = new Button("Show Less");
+            Button showLessButton = new Button(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW, "group.header.show.less"));
             showLessButton.getStyleClass().add("show-less-button");
-            showLessButton.setOnAction(evt -> group.setExpanded(false));
-            showLessButton.setTooltip(new Tooltip("Stack the notifications"));
+            showLessButton.setOnAction(evt -> {
+                requestFocus();
+                group.setExpanded(false);
+            });
+            showLessButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"group.header.show.less.tip")));
 
             InfoCenterView infoCenterView = getSkinnable();
+            infoCenterView.notificationSpacingProperty().addListener(weakSpacingListener);
 
             Button showAllButton = new Button();
-            showAllButton.textProperty().bind(Bindings.createStringBinding(() -> MessageFormat.format("Show All {0}", group.getNotifications().size()), group.getNotifications()));
+            showAllButton.textProperty().bind(Bindings.createStringBinding(() -> MessageFormat.format("{0} {1}", ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"group.header.show.all"), group.getNotifications().size()), group.getNotifications()));
             showAllButton.getStyleClass().add("show-all-button");
-            showAllButton.setTooltip(new Tooltip("Show all notifications of this group in a list"));
+            showAllButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"group.header.show.all.tip")));
             showAllButton.setOnAction(evt -> infoCenterView.getOnShowAllGroupNotifications().accept(group));
             showAllButton.visibleProperty().bind(Bindings.createBooleanBinding(() -> infoCenterView.getOnShowAllGroupNotifications() != null && group.getNotifications().size() > group.getMaximumNumberOfNotifications(),
                     group.maximumNumberOfNotificationsProperty(), group.getNotifications(), infoCenterView.onShowAllGroupNotificationsProperty()));
 
             Button clearButton = new Button();
             clearButton.getStyleClass().add("clear-button");
-            clearButton.setTooltip(new Tooltip("Remove all notifications from the group"));
+            clearButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"group.header.remove.all.tip")));
             clearButton.setGraphic(new FontIcon());
             clearButton.setOnAction(evt -> {
                 group.setExpanded(false);
@@ -470,7 +476,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
 
             ToggleButton pinButton = new ToggleButton();
             pinButton.getStyleClass().add("pin-button");
-            pinButton.setTooltip(new Tooltip("Pin the group at the top"));
+            pinButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"group.header.pin.tip")));
             pinButton.setGraphic(new FontIcon());
             pinButton.visibleProperty().bind(group.pinnableProperty());
             pinButton.managedProperty().bind(group.pinnableProperty());
@@ -568,9 +574,10 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
 
             width = width - getInsets().getLeft() - getInsets().getRight();
 
+            double spacing = getSkinnable().getNotificationSpacing();
             if (headerBox.isVisible()) {
                 h += headerBox.prefHeight(width);
-                h += SPACING;
+                h += spacing;
             }
 
             List<Node> notificationViews = getChildren().stream().filter(node -> node instanceof NotificationView).collect(Collectors.toList());
@@ -586,7 +593,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             if (notificationViews.size() > 1) {
                 for (int i = notificationViews.size() - 2; i >= 0; i--) {
                     Node node = notificationViews.get(i);
-                    innerHeight += SPACING;
+                    innerHeight += spacing;
                     innerHeight += node.prefHeight(width);
                 }
             }
@@ -607,11 +614,12 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             List<Node> notificationViews = getChildren().stream().filter(node -> node instanceof NotificationView).collect(Collectors.toList());
             int size = notificationViews.size();
 
+            double spacing = getSkinnable().getNotificationSpacing();
             if (headerBox.isVisible()) {
                 double boxHeight = headerBox.prefHeight(w);
                 headerBox.resizeRelocate(x, y, w, boxHeight);
                 y += boxHeight;
-                y += SPACING;
+                y += spacing;
             }
 
             for (int i = size - 1; i >= 0; i--) {
@@ -622,7 +630,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
                 y += h;
 
                 if (i > 0) {
-                    y += SPACING;
+                    y += spacing;
                 }
             }
         }
