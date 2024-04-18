@@ -8,6 +8,24 @@
     -fx-padding: 10px 10px 10px 0px;
 }
 
+.info-center-view > .main-pane > .default-placeholder {
+    -fx-background-color: rgba(0, 0, 0, .3);
+    -fx-background-radius: 2px;
+}
+
+.info-center-view > .main-pane > .default-placeholder > .label {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 5px 0;
+    -fx-graphic-text-gap: 15px;
+}
+
+.info-center-view > .main-pane > .default-placeholder > .label > .ikonli-font-icon {
+    -fx-icon-size: 20px;
+    -fx-icon-color: white;
+}
+
 .info-center-view .notification-view .default-icon {
     -fx-icon-size: 42px;
     -fx-icon-color: -fx-accent;

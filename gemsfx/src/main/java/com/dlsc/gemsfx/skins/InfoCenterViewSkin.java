@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.binding.AggregatedListBinding;
 import com.dlsc.gemsfx.infocenter.InfoCenterEvent;
 import com.dlsc.gemsfx.infocenter.InfoCenterView;
 import com.dlsc.gemsfx.infocenter.Notification;
@@ -18,6 +19,7 @@ import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -264,6 +266,19 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
 
         getChildren().add(mainPane);
 
+        AggregatedListBinding<NotificationGroup<?, ?>, ? extends Notification<?>, Boolean> emptyBinding = new AggregatedListBinding<>(
+                view.getGroups(),
+                NotificationGroup::getNotifications,
+                List::isEmpty
+        );
+
+        addPlaceholderIfNotNull(view.getPlaceholder(), emptyBinding);
+
+        view.placeholderProperty().addListener((obs, oldVal, newVal) -> {
+            removePlaceholderIfNotNull(oldVal);
+            addPlaceholderIfNotNull(newVal, emptyBinding);
+        });
+
         InvalidationListener invalidationListener = (Observable it) -> updateView();
         view.getUnmodifiablePinnedGroups().addListener(invalidationListener);
         view.getUnmodifiableUnpinnedGroups().addListener(invalidationListener);
@@ -304,6 +319,23 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
 
         updateVisibilities();
         view.showAllGroupProperty().addListener(it -> updateVisibilities());
+    }
+
+
+    private void addPlaceholderIfNotNull(Node placeholder, ObjectBinding<Boolean> emptyBing) {
+        if (placeholder != null) {
+            placeholder.managedProperty().bind(emptyBing);
+            placeholder.visibleProperty().bind(emptyBing);
+            mainPane.getChildren().add(placeholder);
+        }
+    }
+
+    private void removePlaceholderIfNotNull(Node placeholder) {
+        if (placeholder != null) {
+            placeholder.managedProperty().unbind();
+            placeholder.visibleProperty().unbind();
+            mainPane.getChildren().remove(placeholder);
+        }
     }
 
     private void updateVisibilities() {
