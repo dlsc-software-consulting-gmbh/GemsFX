@@ -9,12 +9,16 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.Styleable;
+import javafx.css.StyleableDoubleProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.SizeConverter;
 import javafx.scene.AccessibleAttribute;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -22,6 +26,9 @@ import javafx.scene.control.Skin;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -35,6 +42,8 @@ import java.util.Objects;
  */
 public class StripView<T> extends Control {
 
+    private static final int DEFAULT_FADING_SIZE = 120;
+
     /**
      * Constructs a new strip view.
      */
@@ -43,7 +52,6 @@ public class StripView<T> extends Control {
 
         setPrefWidth(400);
         setPrefHeight(50);
-        setFadingSize(100);
         setFocusTraversable(false);
 
         setCellFactory(strip -> new StripCell<>());
@@ -86,10 +94,10 @@ public class StripView<T> extends Control {
         this.alwaysCenter.set(alwaysCenter);
     }
 
-    private final DoubleProperty fadingSize = new SimpleDoubleProperty(this, "fadingSize", 120);
+    private DoubleProperty fadingSize;
 
     public final double getFadingSize() {
-        return fadingSize.get();
+        return fadingSize == null ? DEFAULT_FADING_SIZE : fadingSize.get();
     }
 
     /**
@@ -98,11 +106,29 @@ public class StripView<T> extends Control {
      * @return the size of the fading areas / the clips used for fading
      */
     public final DoubleProperty fadingSizeProperty() {
+        if (fadingSize == null) {
+            fadingSize = new StyleableDoubleProperty(DEFAULT_FADING_SIZE) {
+                @Override
+                public Object getBean() {
+                    return StripView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "fadingSize";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+                    return StyleableProperties.FADING_SIZE;
+                }
+            };
+        }
         return fadingSize;
     }
 
     public final void setFadingSize(double fadingSize) {
-        this.fadingSize.set(fadingSize);
+        fadingSizeProperty().set(fadingSize);
     }
 
     // Autoscrolling.
@@ -374,4 +400,39 @@ public class StripView<T> extends Control {
             this.item.set(item);
         }
     }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<StripView, Number> FADING_SIZE = new CssMetaData<>(
+                "-fx-fading-size", SizeConverter.getInstance(), DEFAULT_FADING_SIZE) {
+
+            @Override
+            public StyleableProperty<Number> getStyleableProperty(StripView control) {
+                return (StyleableProperty<Number>) control.fadingSizeProperty();
+            }
+
+            @Override
+            public boolean isSettable(StripView control) {
+                return control.fadingSize == null || !control.fadingSize.isBound();
+            }
+        };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(FADING_SIZE);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    @Override
+    protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StripView.StyleableProperties.STYLEABLES;
+    }
+
 }
