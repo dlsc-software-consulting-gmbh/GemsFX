@@ -18,6 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -48,7 +49,7 @@ public class AggregatedListBindingApp extends Application {
         AggregatedListBinding<Student, Integer, Double> averageBinding = new AggregatedListBinding<>(
                 students, // the list of students
                 Student::getScores, // function to get scores from each student
-                scores -> scores.stream().mapToInt(Integer::intValue).average().orElse(0.0) // function to calculate average of scores
+                stream -> stream.mapToInt(Integer::intValue).average().orElse(0.0) // function to calculate average of scores
         );
         averageLabel.textProperty().bind(averageBinding.asString("Average Score: %.2f"));
 
@@ -58,7 +59,7 @@ public class AggregatedListBindingApp extends Application {
         AggregatedListBinding<Student, Integer, Integer> sumBinding = new AggregatedListBinding<>(
                 students, // the list of students
                 Student::getScores, // function to get scores from each student
-                scores -> scores.stream().mapToInt(Integer::intValue).sum() // function to sum all scores
+                stream -> stream.mapToInt(Integer::intValue).sum() // function to sum all scores
         );
         sumLabel.textProperty().bind(sumBinding.asString("Total Score: %d"));
 
@@ -70,7 +71,10 @@ public class AggregatedListBindingApp extends Application {
                 students, // the list of students
                 Student::getScores, // function to extract scores from each student
                 scores -> new Pair<>(scores.stream().mapToInt(Integer::intValue).sum(), scores.size()), // maps scores to a pair of sum and count
-                results -> results.stream().mapToDouble(Pair::getKey).sum() / results.stream().mapToDouble(Pair::getValue).sum() // computes average from sum and count
+                results -> {
+                    List<Pair<Integer, Integer>> resultsList = results.toList();
+                    return resultsList.stream().mapToDouble(Pair::getKey).sum() / resultsList.stream().mapToDouble(Pair::getValue).sum();
+                }
         );
         averageLabel2.textProperty().bind(averageBinding2.asString("Average Score: %.2f"));
 
@@ -80,7 +84,7 @@ public class AggregatedListBindingApp extends Application {
                 students, // the list of students
                 Student::getScores, // function to extract scores from each student
                 scores -> scores.stream().mapToInt(Integer::intValue).sum(), // function to sum scores of a single student
-                results -> results.stream().reduce(0, Integer::sum) // reduces all individual sums into one sum
+                results -> results.reduce(0, Integer::sum) // reduces all individual sums into one sum
         );
         sumLabel2.textProperty().bind(sumBinding2.asString("Total Score: %d"));
 
@@ -92,7 +96,7 @@ public class AggregatedListBindingApp extends Application {
                 students, // the list of students
                 Student::getScores, // function to extract scores from each student
                 scores -> scores.stream().anyMatch(score -> score < 60) ? 1L : 0L, // checks if any score is below 60, returns 1 if true, else 0
-                results -> results.stream().reduce(0L, Long::sum) // sums up all '1's representing failing students
+                results -> results.reduce(0L, Long::sum) // sums up all '1's representing failing students
         );
         failingCountLabel.textProperty().bind(failingCountBinding.asString("Number of Failing Students: %d"));
 

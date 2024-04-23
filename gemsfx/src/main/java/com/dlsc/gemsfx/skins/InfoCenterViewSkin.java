@@ -269,7 +269,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         AggregatedListBinding<NotificationGroup<?, ?>, ? extends Notification<?>, Boolean> emptyBinding = new AggregatedListBinding<>(
                 view.getGroups(),
                 NotificationGroup::getNotifications,
-                List::isEmpty
+                stream -> stream.findFirst().isEmpty()
         );
 
         addPlaceholderIfNotNull(view.getPlaceholder(), emptyBinding);
