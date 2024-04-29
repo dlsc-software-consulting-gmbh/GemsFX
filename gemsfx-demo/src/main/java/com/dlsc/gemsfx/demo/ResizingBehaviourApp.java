@@ -27,6 +27,7 @@ public class ResizingBehaviourApp extends Application {
     @Override
     public void start(Stage stage) {
         Label content = new Label("Content");
+        content.setMouseTransparent(false);
         content.setStyle("-fx-background-color: orange;");
         content.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         content.setAlignment(Pos.CENTER);
