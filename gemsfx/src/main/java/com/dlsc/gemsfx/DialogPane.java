@@ -1019,6 +1019,92 @@ public class DialogPane extends Pane {
             return pane;
         }
 
+        // pref width
+
+        private final DoubleProperty prefWidth = new SimpleDoubleProperty(this, "prefWidth", Region.USE_COMPUTED_SIZE);
+
+        public final double getPrefWidth() {
+            return prefWidth.get();
+        }
+
+        public final DoubleProperty prefWidthProperty() {
+            return prefWidth;
+        }
+
+        public final void setPrefWidth(double prefWidth) {
+            this.prefWidth.set(prefWidth);
+        }
+
+        private final DoubleProperty prefHeight = new SimpleDoubleProperty(this, "prefHeight", Region.USE_COMPUTED_SIZE);
+
+        public final double getPrefHeight() {
+            return prefHeight.get();
+        }
+
+        public final DoubleProperty prefHeightProperty() {
+            return prefHeight;
+        }
+
+        public final void setPrefHeight(double prefHeight) {
+            this.prefHeight.set(prefHeight);
+        }
+
+        private final DoubleProperty minWidth = new SimpleDoubleProperty(this, "minWidth", Region.USE_COMPUTED_SIZE);
+
+        public final double getMinWidth() {
+            return minWidth.get();
+        }
+
+        public final DoubleProperty minWidthProperty() {
+            return minWidth;
+        }
+
+        public final void setMinWidth(double minWidth) {
+            this.minWidth.set(minWidth);
+        }
+
+        private final DoubleProperty minHeight = new SimpleDoubleProperty(this, "minHeight", Region.USE_COMPUTED_SIZE);
+
+        public final double getMinHeight() {
+            return minHeight.get();
+        }
+
+        public final DoubleProperty minHeightProperty() {
+            return minHeight;
+        }
+
+        public final void setMinHeight(double minHeight) {
+            this.minHeight.set(minHeight);
+        }
+
+        private final DoubleProperty maxWidth = new SimpleDoubleProperty(this, "maxWidth", Region.USE_COMPUTED_SIZE);
+
+        public final double getMaxWidth() {
+            return maxWidth.get();
+        }
+
+        public final DoubleProperty maxWidthProperty() {
+            return maxWidth;
+        }
+
+        public final void setMaxWidth(double maxWidth) {
+            this.maxWidth.set(maxWidth);
+        }
+
+        private final DoubleProperty maxHeight = new SimpleDoubleProperty(this, "maxHeight", Region.USE_COMPUTED_SIZE);
+
+        public final double getMaxHeight() {
+            return maxHeight.get();
+        }
+
+        public final DoubleProperty maxHeightProperty() {
+            return maxHeight;
+        }
+
+        public final void setMaxHeight(double maxHeight) {
+            this.maxHeight.set(maxHeight);
+        }
+
         // resize callback
 
         private final ObjectProperty<BiConsumer<Double, Double>> onResize = new SimpleObjectProperty<>(this, "onResize");
@@ -1028,8 +1114,8 @@ public class DialogPane extends Pane {
         }
 
         /**
-         * A callback used to inform interested parties when the width or height of the
-         * dialog was changed interactively by the user.
+         * A callback used to inform interested parties when the user changed the width or height of the
+         * dialog.
          *
          * @return the callback / the consumer of the new width and height
          * @see #resizableProperty()
@@ -1503,6 +1589,15 @@ public class DialogPane extends Pane {
 
         public ContentPane(Dialog<?> dialog) {
             this.dialog = Objects.requireNonNull(dialog);
+
+            prefWidthProperty().bindBidirectional(dialog.prefWidthProperty());
+            prefHeightProperty().bindBidirectional(dialog.prefHeightProperty());
+
+            minWidthProperty().bindBidirectional(dialog.minWidthProperty());
+            minHeightProperty().bindBidirectional(dialog.minHeightProperty());
+
+            maxWidthProperty().bindBidirectional(dialog.maxWidthProperty());
+            maxHeightProperty().bindBidirectional(dialog.maxHeightProperty());
 
             ResizingBehaviour resizingSupport = ResizingBehaviour.install(this);
             resizingSupport.resizableProperty().bind(dialog.resizableProperty());
