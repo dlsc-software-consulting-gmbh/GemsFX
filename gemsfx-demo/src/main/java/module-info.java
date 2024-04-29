@@ -16,4 +16,5 @@ module com.dlsc.gemsfx.demo {
     requires net.synedra.validatorfx;
 
     exports com.dlsc.gemsfx.demo;
+    exports com.dlsc.gemsfx.demo.binding;
 }

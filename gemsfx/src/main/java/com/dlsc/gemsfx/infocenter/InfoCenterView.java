@@ -16,9 +16,15 @@ import javafx.css.Styleable;
 import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.SizeConverter;
+import javafx.scene.Node;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +49,7 @@ public class InfoCenterView extends Control {
     private static final Duration DEFAULT_SLIDE_IN_DURATION = Duration.millis(500);
     private static final boolean DEFAULT_AUTO_OPEN_GROUP = false;
     private static final boolean DEFAULT_TRANSPARENT = false;
+    private static final Node DEFAULT_PLACEHOLDER = createDefaultPlaceholder();
 
     private final InvalidationListener updateNotificationsListener = it -> updateNotificationsList();
 
@@ -363,6 +370,40 @@ public class InfoCenterView extends Control {
 
     public final void setTransparent(boolean transparent) {
         transparentProperty().set(transparent);
+    }
+
+    private ObjectProperty<Node> placeholder;
+
+    /**
+     * A placeholder node that is shown when the info is empty.
+     *
+     * @return the placeholder node
+     */
+    public final ObjectProperty<Node> placeholderProperty() {
+        if (placeholder == null) {
+            placeholder = new SimpleObjectProperty<>(this, "placeholder", DEFAULT_PLACEHOLDER);
+        }
+        return placeholder;
+    }
+
+    public final void setPlaceholder(Node placeholder) {
+        placeholderProperty().set(placeholder);
+    }
+
+    public final Node getPlaceholder() {
+        return placeholder == null ? DEFAULT_PLACEHOLDER : placeholder.get();
+    }
+
+    private static StackPane createDefaultPlaceholder() {
+        FontIcon graphic = new FontIcon(MaterialDesign.MDI_CREATION);
+        graphic.setIconSize(20);
+        graphic.setIconColor(Color.WHITE);
+
+        Label noNotifications = new Label("No notifications", graphic);
+
+        StackPane placeholder = new StackPane(noNotifications);
+        placeholder.getStyleClass().add("default-placeholder");
+        return placeholder;
     }
 
     private DoubleProperty notificationSpacing;
