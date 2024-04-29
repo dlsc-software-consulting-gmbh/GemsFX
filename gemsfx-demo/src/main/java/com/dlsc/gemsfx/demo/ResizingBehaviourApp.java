@@ -5,17 +5,21 @@ import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.controlsfx.control.CheckComboBox;
@@ -55,14 +59,20 @@ public class ResizingBehaviourApp extends Application {
         uninstallButton.setOnAction(e -> {
             if (resizingSupport.isInstalled()) {
                 resizingSupport.uninstall();
-                installLabel.setText("Tips: ResizingBehaviour already uninstalled.");
+                installLabel.setText("Tips: ResizingBehaviour already uninstalled. All resizing operations are disabled.");
+                installLabel.setTextFill(Color.RED);
+                installLabel.setFont(Font.font(16));
             }
         });
 
-        HBox controlsBox = new HBox(10,  uninstallButton, supportedOperationsBox, resizeableBox, new Label("Edge Offset:"), offsetSpinner);
-        controlsBox.setAlignment(Pos.CENTER_LEFT);
+        HBox controlsBox = new HBox(5,
+                new Label("Supported Operations: "), supportedOperationsBox, new Separator(Orientation.VERTICAL),
+                resizeableBox, new Separator(Orientation.VERTICAL),
+                new Label("Edge Offset:"), offsetSpinner,new Separator(Orientation.VERTICAL),
+                uninstallButton);
+        controlsBox.setAlignment(Pos.CENTER_RIGHT);
         VBox controlsContainer = new VBox(10, controlsBox, installLabel);
-        controlsContainer.setAlignment(Pos.CENTER_LEFT);
+        controlsContainer.setAlignment(Pos.CENTER_RIGHT);
         controlsContainer.setPadding(new Insets(10));
 
         Group group = new Group(stackPane);
@@ -75,7 +85,7 @@ public class ResizingBehaviourApp extends Application {
 
         stage.setTitle("Resizable Pane");
         stage.setScene(scene);
-        stage.setWidth(1000);
+        stage.setWidth(1090);
         stage.setHeight(900);
         stage.centerOnScreen();
         stage.show();
