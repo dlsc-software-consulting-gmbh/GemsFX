@@ -13,6 +13,7 @@ Adding GemsFX to your project.
 
 #### Using Maven
 Add the following dependency to your pom.xml:
+<span id="maven-dependency"></span>
 ```xml
 <dependency>
     <groupId>com.dlsc.gemsfx</groupId>
@@ -23,6 +24,7 @@ Add the following dependency to your pom.xml:
 
 #### Using Gradle
 Add the following dependency to your build.gradle:
+<span id="gradle-dependency"></span>
 ```groovy
 implementation 'com.dlsc.gemsfx:gemsfx:2.11.0'
 ```
