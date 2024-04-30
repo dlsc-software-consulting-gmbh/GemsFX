@@ -28,15 +28,17 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
 public class InfoCenterApp extends Application {
 
-    private static final Image SLACK_IMAGE = new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/slack.png")));
-    private static final Image CALENDAR_IMAGE = new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/calendar.png")));
-    private static final Image MAP_IMAGE = new Image(Objects.requireNonNull(CalendarNotification.class.getResource("notification/map.png")).toExternalForm());
-    private static final Image MAIL_IMAGE = new Image(Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream("notification/mail.png")));
+    private static final Image SLACK_IMAGE = loadResourceImage("notification/slack.png");
+    private static final Image CALENDAR_IMAGE = loadResourceImage("notification/calendar.png");
+    private static final Image MAP_IMAGE = loadResourceImage("notification/map.png");
+    private static final Image MAIL_IMAGE = loadResourceImage("notification/mail.png");
 
     private final InfoCenterPane infoCenterPane = new InfoCenterPane();
     private final NotificationGroup<Mail, MailNotification> mailGroup = new NotificationGroup<>("Mail");
@@ -284,6 +286,23 @@ public class InfoCenterApp extends Application {
         }
     }
 
+    /**
+     * Loads an image from a specified resource path.
+     * This method ensures that the resource stream is properly closed after the image is loaded.
+     *
+     * @param path the resource path relative to the class location
+     * @return Image loaded from the specified path
+     * @throws RuntimeException if an I/O error occurs or the resource cannot be found
+     */
+    private static Image loadResourceImage(String path) {
+        try (InputStream is = Objects.requireNonNull(InfoCenterApp.class.getResourceAsStream(path))) {
+            return new Image(is);
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading image from path: " + path, e);
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("Resource not found: " + path, e);
+        }
+    }
 
     public static void main(String[] args) {
         launch();

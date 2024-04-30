@@ -32,7 +32,7 @@ public class InfoCenterEvent extends Event {
     /**
      * An explicit request to hide the info center.
      */
-    public static final EventType<InfoCenterEvent> HIDE = new EventType<>(ANY, "CLOSE");
+    public static final EventType<InfoCenterEvent> HIDE = new EventType<>(ANY, "HIDE");
 
     private Notification<?> notification;
 
