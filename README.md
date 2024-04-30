@@ -8,6 +8,25 @@
 
 GemsFX is a collection of custom controls and utilities for JavaFX.
 
+## Installation
+Adding GemsFX to your project.
+
+#### Using Maven
+Add the following dependency to your pom.xml:
+```xml
+<dependency>
+    <groupId>com.dlsc.gemsfx</groupId>
+    <artifactId>gemsfx</artifactId>
+    <version>2.11.0</version>
+</dependency>
+```
+
+#### Using Gradle
+Add the following dependency to your build.gradle:
+```groovy
+implementation 'com.dlsc.gemsfx:gemsfx:2.11.0'
+```
+
 ## Quick Links
 
 - #### Date & Time Controls
