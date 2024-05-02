@@ -2,6 +2,8 @@ package com.dlsc.gemsfx.skins;
 
 import javafx.event.Event;
 import javafx.scene.control.ComboBoxBase;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 public abstract class ToggleVisibilityComboBoxSkin<T extends ComboBoxBase> extends CustomComboBoxSkinBase<T> {
@@ -11,6 +13,14 @@ public abstract class ToggleVisibilityComboBoxSkin<T extends ComboBoxBase> exten
 
     public ToggleVisibilityComboBoxSkin(T control) {
         super(control);
+
+        // Pressed the esc key to hide the popup.
+        control.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() == KeyCode.ESCAPE) {
+                showPopupOnMouseRelease = true;
+                hide();
+            }
+        });
     }
 
     @Override
