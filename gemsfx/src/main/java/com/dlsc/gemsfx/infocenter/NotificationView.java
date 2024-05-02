@@ -227,7 +227,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
                         return ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.now");
                     }
                 } else if (between.toDays() == 1) {
-                    return MessageFormat.format("{0}, {1}", ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW,"time.yesterday"), SHORT_TIME_FORMATTER.format(dateTime.toLocalTime()));
+                    return MessageFormat.format("{0}, {1}", ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.yesterday"), SHORT_TIME_FORMATTER.format(dateTime.toLocalTime()));
                 } else if (between.toDays() < 7) {
                     return MessageFormat.format("{0} {1}", between.toDays(), ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.days.ago"));
                 } else {
@@ -297,7 +297,18 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             titleLabel.getStyleClass().add("title-label");
             HBox.setHgrow(titleLabel, Priority.ALWAYS);
 
-            BooleanBinding showArrowBinding = hoverProperty().and(notification.getGroup().expandedProperty()).and(contentProperty().isNotNull());
+            BooleanBinding showArrowBinding = Bindings.createBooleanBinding(() -> {
+                boolean contentIsNull = getContent() == null;
+                if (contentIsNull || !isHover()) {
+                    return false;
+                }
+
+                if (notification.getGroup().getNotifications().size() == 1) {
+                    return true;
+                }
+
+                return notification.getGroup().isExpanded();
+            }, hoverProperty(), notification.getGroup().expandedProperty(), notification.getGroup().getNotifications(), contentProperty());
 
             timeLabel = new Label();
             timeLabel.setMinWidth(Region.USE_PREF_SIZE);
