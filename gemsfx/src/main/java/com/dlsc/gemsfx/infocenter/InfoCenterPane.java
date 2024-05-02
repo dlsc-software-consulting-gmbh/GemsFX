@@ -26,6 +26,10 @@ import one.jpro.jproutils.treeshowing.TreeShowing;
 public class InfoCenterPane extends Control {
 
     private static final Duration DEFAULT_SLIDE_IN_DURATION = Duration.millis(200);
+    private static final Duration DEFAULT_AUTO_HIDE_DURATION = Duration.seconds(5);
+    private static final boolean DEFAULT_PINNED = false;
+    private static final boolean DEFAULT_AUTO_HIDE = true;
+    private static final boolean DEFAULT_SHOW_INFO_CENTER = false;
 
     /*
      * The managed info center instance.
@@ -110,7 +114,7 @@ public class InfoCenterPane extends Control {
         });
 
         // show / or hide the info center when the "pinned" property changes
-        pinned.addListener(it -> setShowInfoCenter(isPinned()));
+        pinnedProperty().addListener(it -> setShowInfoCenter(isPinned()));
 
         /*
          * We use an animation timer to automatically hide the info center after
@@ -183,10 +187,10 @@ public class InfoCenterPane extends Control {
         return new InfoCenterPaneSkin(this);
     }
 
-    private final ObjectProperty<Duration> autoHideDuration = new SimpleObjectProperty<>(this, "autoHideDuration", Duration.seconds(5));
+    private ObjectProperty<Duration> autoHideDuration;
 
     public final Duration getAutoHideDuration() {
-        return autoHideDuration.get();
+        return autoHideDuration == null ? DEFAULT_AUTO_HIDE_DURATION : autoHideDuration.get();
     }
 
     /**
@@ -196,17 +200,20 @@ public class InfoCenterPane extends Control {
      * @return the auto-hide duration
      */
     public final ObjectProperty<Duration> autoHideDurationProperty() {
+        if (autoHideDuration == null) {
+            autoHideDuration = new SimpleObjectProperty<>(this, "autoHideDuration", DEFAULT_AUTO_HIDE_DURATION);
+        }
         return autoHideDuration;
     }
 
     public final void setAutoHideDuration(Duration autoHideDuration) {
-        this.autoHideDuration.set(autoHideDuration);
+        autoHideDurationProperty().set(autoHideDuration);
     }
 
-    private final BooleanProperty pinned = new SimpleBooleanProperty(this, "pinned", false);
+    private BooleanProperty pinned;
 
     public final boolean isPinned() {
-        return pinned.get();
+        return pinned == null ? DEFAULT_PINNED : pinned.get();
     }
 
     /**
@@ -216,17 +223,20 @@ public class InfoCenterPane extends Control {
      * @return true if the info center view is pinned
      */
     public final BooleanProperty pinnedProperty() {
+        if (pinned == null) {
+            pinned = new SimpleBooleanProperty(this, "pinned", DEFAULT_PINNED);
+        }
         return pinned;
     }
 
     public final void setPinned(boolean pinned) {
-        this.pinned.set(pinned);
+        pinnedProperty().set(pinned);
     }
 
-    private final BooleanProperty autoHide = new SimpleBooleanProperty(this, "autoHide", true);
+    private BooleanProperty autoHide;
 
     public final boolean isAutoHide() {
-        return autoHide.get();
+        return autoHide == null ? DEFAULT_AUTO_HIDE : autoHide.get();
     }
 
     /**
@@ -237,11 +247,14 @@ public class InfoCenterPane extends Control {
      * @see #autoHideDuration
      */
     public final BooleanProperty autoHideProperty() {
+        if (autoHide == null) {
+            autoHide = new SimpleBooleanProperty(this, "autoHide", DEFAULT_AUTO_HIDE);
+        }
         return autoHide;
     }
 
     public final void setAutoHide(boolean autoHide) {
-        this.autoHide.set(autoHide);
+        autoHideProperty().set(autoHide);
     }
 
     public final InfoCenterView getInfoCenterView() {
@@ -293,10 +306,10 @@ public class InfoCenterPane extends Control {
         slideInDurationProperty().set(duration);
     }
 
-    private final BooleanProperty showInfoCenter = new SimpleBooleanProperty(this, "showInfoCenter", false);
+    private BooleanProperty showInfoCenter;
 
     public final boolean isShowInfoCenter() {
-        return showInfoCenter.get();
+        return showInfoCenter == null ? DEFAULT_SHOW_INFO_CENTER : showInfoCenter.get();
     }
 
     /**
@@ -305,10 +318,13 @@ public class InfoCenterPane extends Control {
      * @return true if the info center shall be shown
      */
     public final BooleanProperty showInfoCenterProperty() {
+        if (showInfoCenter == null) {
+            showInfoCenter = new SimpleBooleanProperty(this, "showInfoCenter", DEFAULT_SHOW_INFO_CENTER);
+        }
         return showInfoCenter;
     }
 
     public final void setShowInfoCenter(boolean showInfoCenter) {
-        this.showInfoCenter.set(showInfoCenter);
+        showInfoCenterProperty().set(showInfoCenter);
     }
 }
