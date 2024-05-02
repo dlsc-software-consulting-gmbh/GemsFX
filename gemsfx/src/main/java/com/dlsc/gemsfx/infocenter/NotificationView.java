@@ -298,8 +298,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             HBox.setHgrow(titleLabel, Priority.ALWAYS);
 
             BooleanBinding showArrowBinding = Bindings.createBooleanBinding(() -> {
-                boolean contentIsNull = getContent() == null;
-                if (contentIsNull || !isHover()) {
+                if ((getContent() == null) || !isHover()) {
                     return false;
                 }
 
