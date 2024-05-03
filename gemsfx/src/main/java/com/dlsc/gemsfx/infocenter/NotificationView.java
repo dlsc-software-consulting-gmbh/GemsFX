@@ -17,6 +17,7 @@ import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -36,6 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A view used for visualizing a notification
@@ -84,7 +86,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
         getChildren().addAll(stackNotification2, stackNotification1, contentPane);
 
         // This is needed. Maybe a bug in the centerProperty() binding inside ContentPane?
-        showContentProperty().addListener(it -> getParent().requestLayout());
+        showContentProperty().addListener(it -> Optional.ofNullable(getParent()).ifPresent(Parent::requestLayout));
 
         MapChangeListener<? super Object, ? super Object> ml = change -> {
             if (change.wasAdded()) {
@@ -227,7 +229,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
                         return ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.now");
                     }
                 } else if (between.toDays() == 1) {
-                    return MessageFormat.format("{0}, {1}", ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW,"time.yesterday"), SHORT_TIME_FORMATTER.format(dateTime.toLocalTime()));
+                    return MessageFormat.format("{0}, {1}", ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.yesterday"), SHORT_TIME_FORMATTER.format(dateTime.toLocalTime()));
                 } else if (between.toDays() < 7) {
                     return MessageFormat.format("{0} {1}", between.toDays(), ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.days.ago"));
                 } else {
@@ -297,7 +299,17 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             titleLabel.getStyleClass().add("title-label");
             HBox.setHgrow(titleLabel, Priority.ALWAYS);
 
-            BooleanBinding showArrowBinding = hoverProperty().and(notification.getGroup().expandedProperty()).and(contentProperty().isNotNull());
+            BooleanBinding showArrowBinding = Bindings.createBooleanBinding(() -> {
+                if ((getContent() == null) || !isHover()) {
+                    return false;
+                }
+
+                if (notification.getGroup().getNotifications().size() == 1) {
+                    return true;
+                }
+
+                return notification.getGroup().isExpanded();
+            }, hoverProperty(), notification.getGroup().expandedProperty(), notification.getGroup().getNotifications(), contentProperty());
 
             timeLabel = new Label();
             timeLabel.setMinWidth(Region.USE_PREF_SIZE);
@@ -411,7 +423,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             if (contentIsExpanded) {
                 if (!center.getChildren().contains(content)) {
                     VBox.setMargin(content, new Insets(5, 0, 0, 0));
-                    center.getChildren().add(content);
+                    center.getChildren().add(2, content);
                 }
             } else {
                 if (content != null) {

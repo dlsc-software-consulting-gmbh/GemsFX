@@ -1,6 +1,5 @@
 package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.binding.AggregatedListBinding;
 import com.dlsc.gemsfx.infocenter.InfoCenterEvent;
 import com.dlsc.gemsfx.infocenter.InfoCenterView;
 import com.dlsc.gemsfx.infocenter.Notification;
@@ -19,7 +18,6 @@ import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -266,11 +264,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
 
         getChildren().add(mainPane);
 
-        AggregatedListBinding<NotificationGroup<?, ?>, ? extends Notification<?>, Boolean> emptyBinding = new AggregatedListBinding<>(
-                view.getGroups(),
-                NotificationGroup::getNotifications,
-                stream -> stream.findFirst().isEmpty()
-        );
+        BooleanBinding emptyBinding = Bindings.createBooleanBinding(() -> view.getUnmodifiableNotifications().isEmpty(), view.getUnmodifiableNotifications());
 
         addPlaceholderIfNotNull(view.getPlaceholder(), emptyBinding);
 
@@ -322,7 +316,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
     }
 
 
-    private void addPlaceholderIfNotNull(Node placeholder, ObjectBinding<Boolean> emptyBing) {
+    private void addPlaceholderIfNotNull(Node placeholder, BooleanBinding emptyBing) {
         if (placeholder != null) {
             placeholder.managedProperty().bind(emptyBing);
             placeholder.visibleProperty().bind(emptyBing);
