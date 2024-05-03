@@ -423,7 +423,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             if (contentIsExpanded) {
                 if (!center.getChildren().contains(content)) {
                     VBox.setMargin(content, new Insets(5, 0, 0, 0));
-                    center.getChildren().add(content);
+                    center.getChildren().add(2, content);
                 }
             } else {
                 if (content != null) {
