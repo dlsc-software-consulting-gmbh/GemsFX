@@ -17,6 +17,7 @@ import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -36,6 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A view used for visualizing a notification
@@ -84,7 +86,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
         getChildren().addAll(stackNotification2, stackNotification1, contentPane);
 
         // This is needed. Maybe a bug in the centerProperty() binding inside ContentPane?
-        showContentProperty().addListener(it -> getParent().requestLayout());
+        showContentProperty().addListener(it -> Optional.ofNullable(getParent()).ifPresent(Parent::requestLayout));
 
         MapChangeListener<? super Object, ? super Object> ml = change -> {
             if (change.wasAdded()) {
