@@ -55,7 +55,7 @@ public class InfoCenterPaneSkin extends SkinBase<InfoCenterPane> {
         clip.widthProperty().bind(getSkinnable().widthProperty());
         clip.heightProperty().bind(getSkinnable().heightProperty());
 
-        getSkinnable().setClip(clip);
+        getSkinnable().getInfoCenterView().setClip(clip);
 
         pane.showInfoCenterProperty().addListener(it -> {
             if (pane.isShowInfoCenter()) {
