@@ -143,7 +143,15 @@ public class InfoCenterApp extends Application {
         infoCenterPane.setContent(background);
         infoCenterPane.getStylesheets().add(Objects.requireNonNull(InfoCenterApp.class.getResource("notification/scene.css")).toExternalForm());
 
-        Scene scene = new Scene(infoCenterPane);
+        /*
+         * Note:
+         * It is advised not to use InfoCenterPane as the root of a Scene to avoid occasional ghost images on Windows systems.
+         * This issue does not occur on macOS, suggesting a platform-specific JavaFX rendering bug.
+         *
+         * As a recommended solution, wrap InfoCenterPane in a StackPane or another suitable container to resolve this issue.
+         */
+        StackPane root = new StackPane(infoCenterPane);
+        Scene scene = new Scene(root);
 
         stage.setScene(scene);
         stage.setWidth(1000);
