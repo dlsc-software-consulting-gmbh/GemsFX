@@ -148,7 +148,7 @@ public class InfoCenterApp extends Application {
          * It is advised not to use InfoCenterPane as the root of a Scene to avoid occasional ghost images on Windows systems.
          * This issue does not occur on macOS, suggesting a platform-specific JavaFX rendering bug.
          *
-         * As a recommended solution, wrap InfoCenterPane in a StackPane or another suitable container to mitigate this issue.
+         * As a recommended solution, wrap InfoCenterPane in a StackPane or another suitable container to resolve this issue.
          */
         StackPane root = new StackPane(infoCenterPane);
         Scene scene = new Scene(root);

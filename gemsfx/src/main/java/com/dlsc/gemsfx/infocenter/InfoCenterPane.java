@@ -30,7 +30,7 @@ import one.jpro.jproutils.treeshowing.TreeShowing;
  * <p>
  * <b>Workaround:</b> To prevent this issue, avoid using InfoCenterPane directly as the root of a Scene.
  * Instead, wrap InfoCenterPane in another layout container, such as a StackPane or another suitable
- * container. This arrangement helps to mitigate the rendering anomaly.
+ * container. This arrangement helps to resolve the rendering anomaly.
  * <pre>
  *    InfoCenterPane infoCenterPane = new InfoCenterPane();
  *    StackPane root = new StackPane(infoCenterPane);
