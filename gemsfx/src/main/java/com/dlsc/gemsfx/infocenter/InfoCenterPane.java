@@ -22,6 +22,20 @@ import one.jpro.jproutils.treeshowing.TreeShowing;
  * A pane used for managing a single instance of {@link InfoCenterView}. The pane will show or
  * hide the view depending on various criteria, e.g. events that have been received or the auto-hide
  * feature is kicking in.
+ * <p>
+ * <b>Note:</b> There is a known issue with the InfoCenterPane component on <b>Windows</b> systems where
+ * ghost images of previously hidden InfoCenterViews may appear occasionally. This problem does not occur
+ * on <b>macOS</b>, suggesting it may be a bug specific to the JavaFX implementation on Windows.
+ * </p>
+ * <p>
+ * <b>Workaround:</b> To prevent this issue, avoid using InfoCenterPane directly as the root of a Scene.
+ * Instead, wrap InfoCenterPane in another layout container, such as a StackPane or another suitable
+ * container. This arrangement helps to mitigate the rendering anomaly.
+ * <pre>
+ *    InfoCenterPane infoCenterPane = new InfoCenterPane();
+ *    StackPane root = new StackPane(infoCenterPane);
+ * </pre>
+ * </p>
  */
 public class InfoCenterPane extends Control {
 
