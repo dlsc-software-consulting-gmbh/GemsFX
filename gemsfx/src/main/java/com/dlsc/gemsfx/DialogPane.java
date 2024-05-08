@@ -8,7 +8,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -68,6 +67,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.prefs.Preferences;
 
 /**
  * A pane that allows applications to display a lightweight dialog right inside the application
@@ -473,7 +473,6 @@ public class DialogPane extends Pane {
      *
      * @param title   the text shown in the header of the dialog
      * @param message the main message, usually a question
-     *
      * @return the dialog
      */
     public final Dialog<ButtonType> showConfirmation(String title, String message) {
@@ -483,10 +482,9 @@ public class DialogPane extends Pane {
     /**
      * Creates and shows a confirmation dialog.
      *
-     * @param title   the text shown in the header of the dialog
-     * @param message the main message, usually a question
+     * @param title       the text shown in the header of the dialog
+     * @param message     the main message, usually a question
      * @param buttonTypes the buttons to show in the footer
-     *
      * @return the dialog
      */
     public final Dialog<ButtonType> showConfirmation(String title, String message, List<ButtonType> buttonTypes) {
@@ -498,7 +496,6 @@ public class DialogPane extends Pane {
      *
      * @param title   the text shown in the header of the dialog
      * @param message the main message, usually a question
-     *
      * @return the dialog
      */
     public final Dialog<ButtonType> showInformation(String title, String message) {
@@ -778,12 +775,11 @@ public class DialogPane extends Pane {
     /**
      * A supplier used for creating the label instances that will be used by the standard dialogs.
      *
+     * @return the label supplier / callback / factory
      * @see #showInformation(String, String)
      * @see #showWarning(String, String)
      * @see #showError(String, String)
      * @see #showConfirmation(String, String)
-     *
-     * @return the label supplier / callback / factory
      */
     public final ObjectProperty<Supplier<Label>> labelSupplierProperty() {
         return labelSupplier;
@@ -1084,6 +1080,24 @@ public class DialogPane extends Pane {
                     setUsingPadding(false);
                     break;
             }
+
+            setOnResize(new DefaultResizeHandler(this));
+
+            idProperty().subscribe(id -> {
+                if (StringUtils.isNotBlank(id) && istStoringSize()) {
+                    Preferences preferences = Preferences.userNodeForPackage(DialogPane.class).node(id);
+                    if (preferences != null) {
+                        double width = preferences.getDouble("width", -1d);
+                        if (width != -1d) {
+                            setPrefWidth(width);
+                        }
+                        double height = preferences.getDouble("height", -1d);
+                        if (height != -1d) {
+                            setPrefHeight(height);
+                        }
+                    }
+                }
+            });
         }
 
         /**
@@ -1102,6 +1116,50 @@ public class DialogPane extends Pane {
          */
         public final DialogPane getDialogPane() {
             return pane;
+        }
+
+        // id
+
+        private final StringProperty id = new SimpleStringProperty(this, "id");
+
+        public final String getId() {
+            return id.get();
+        }
+
+        /**
+         * Stores an optional ID for the dialog, which can be handy for various situations, e.g.
+         * for the built-in session persistence support.
+         *
+         * @return the id of the dialog, e.g. "preferences.dialog"
+         */
+        public final StringProperty idProperty() {
+            return id;
+        }
+
+        public final void setId(String id) {
+            this.id.set(id);
+        }
+
+        // storing size
+
+        private final BooleanProperty storingSize = new SimpleBooleanProperty(this, "storingSize", true);
+
+        public final boolean istStoringSize() {
+            return storingSize.get();
+        }
+
+        /**
+         * Determines if the dialog's width and height will be stored in the user preferences, so that the
+         * dialog will keep the size requested by the user via a resize operation.
+         *
+         * @return true if the width and height of the dialog will be persisted
+         */
+        public final BooleanProperty storingSizeProperty() {
+            return storingSize;
+        }
+
+        public final void setStoringSize(boolean storingSize) {
+            this.storingSize.set(storingSize);
         }
 
         // pref width
@@ -2361,6 +2419,32 @@ public class DialogPane extends Pane {
             double progress = getProgress();
             progressPane.setVisible(Double.compare(progress, 0) > 0);
             arc.setLength(-360.0 * progress);
+        }
+    }
+
+    /**
+     * The default resize handler is used to persist the dialog's width and height after the
+     * user performed a resize operation on the dialog. Both values are stored via the
+     * java.util.prefs.Preferences API.
+     */
+    public static class DefaultResizeHandler implements BiConsumer<Double, Double> {
+
+        private final Dialog<?> dialog;
+
+        public DefaultResizeHandler(Dialog<?> dialog) {
+            this.dialog = Objects.requireNonNull(dialog, "dialog can not be null");
+        }
+
+        @Override
+        public void accept(Double width, Double height) {
+            if (StringUtils.isNotBlank(dialog.getId()) && dialog.istStoringSize()) {
+                Preferences preferences = Preferences.userNodeForPackage(DialogPane.class);
+                if (preferences != null) {
+                    Preferences node = preferences.node(dialog.getId());
+                    node.put("width", width.toString());
+                    node.put("height", height.toString());
+                }
+            }
         }
     }
 }

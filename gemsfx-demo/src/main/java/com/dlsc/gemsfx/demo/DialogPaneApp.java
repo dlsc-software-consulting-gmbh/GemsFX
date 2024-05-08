@@ -42,7 +42,8 @@ public class DialogPaneApp extends Application {
         blankButton.setOnAction(evt -> {
             Dialog<ButtonType> dialog = new Dialog<>(dialogPane, DialogPane.Type.BLANK);
             dialog.setResizable(true);
-            dialog.setOnResize((width, height) -> System.out.println("width: " + width + ", height: " + height));
+            dialog.setId("blank.dialog");
+            dialog.setContentAlignment(Pos.CENTER);
 
             Label content = new Label("Content");
             content.setAlignment(Pos.CENTER);
