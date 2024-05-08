@@ -10,9 +10,12 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,9 +38,11 @@ public class SearchFieldApp extends Application {
         field.getEditor().setPrefColumnCount(30);
         field.setOnCommit(country -> System.out.println("on commit listener in demo was invoked, country = " + country));
 
-        Region regionLeft = new Region();
+        FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_HISTORY);
+        StackPane regionLeft = new StackPane(fontIcon);
         regionLeft.setPrefWidth(30);
-        regionLeft.setStyle("-fx-background-color: red;");
+        field.setLeft(regionLeft);
+//        regionLeft.setStyle("-fx-background-color: red;");
 
         Region regionRight = new Region();
         regionRight.setPrefWidth(30);
@@ -80,8 +85,8 @@ public class SearchFieldApp extends Application {
         CheckBox autoCommitOnFocusLostBox = new CheckBox("Auto commit on field lost focus.");
         autoCommitOnFocusLostBox.selectedProperty().bindBidirectional(field.autoCommitOnFocusLostProperty());
 
-        field.leftProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionLeft : null, showLeftRightNodes.selectedProperty()));
-        field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
+//        field.leftProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionLeft : null, showLeftRightNodes.selectedProperty()));
+//        field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
 
         VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, hideWithNoChoiceBox, showSearchIconBox, showLeftRightNodes, autoCommitOnFocusLostBox, hBox, hBox2, field);
         vbox.setPadding(new Insets(20));
