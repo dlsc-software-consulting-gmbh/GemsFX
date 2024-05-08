@@ -26,6 +26,7 @@
             <name>Apache 2.0</name>
         </license>
     </licenses>
+
     <scm>
         <url>https://github.com/dlsc-software-consulting-gmbh/GemsFX</url>
     </scm>
@@ -108,7 +109,20 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>sandec</id>
+            <url>https://sandec.jfrog.io/artifactory/repo</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+
+        <dependency>
+            <groupId>com.sandec</groupId>
+            <artifactId>mdfx</artifactId>
+            <version>0.2.12</version>
+        </dependency>
 
         <dependency>
             <groupId>net.raumzeitfalle.fx</groupId>

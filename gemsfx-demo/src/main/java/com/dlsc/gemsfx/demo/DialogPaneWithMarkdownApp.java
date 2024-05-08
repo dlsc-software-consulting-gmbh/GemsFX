@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.DialogPane.Dialog;
+import com.sandec.mdfx.MarkdownView;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -10,14 +11,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -32,25 +26,20 @@ import java.util.Objects;
 
 import static com.dlsc.gemsfx.DialogPane.Type.INFORMATION;
 
-public class DialogPaneApp extends Application {
+public class DialogPaneWithMarkdownApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
         DialogPane dialogPane = new DialogPane();
+        dialogPane.setLabelSupplier(() -> {
+            Label label = new Label();
 
-        Button blankButton = new Button("Blank");
-        blankButton.setOnAction(evt -> {
-            Dialog<ButtonType> dialog = new Dialog<>(dialogPane, DialogPane.Type.BLANK);
-            dialog.setResizable(true);
-            dialog.setOnResize((width, height) -> System.out.println("width: " + width + ", height: " + height));
+            MarkdownView markdownView = new MarkdownView();
+            markdownView.mdStringProperty().bind(label.textProperty());
+            label.setGraphic(markdownView);
+            label.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 
-            Label content = new Label("Content");
-            content.setAlignment(Pos.CENTER);
-            content.setPrefSize(400, 300);
-            content.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-            content.setOnMouseClicked(e -> dialog.cancel());
-            dialog.setContent(content);
-            dialog.show();
+            return label;
         });
 
         Button infoButton = new Button("Info");
@@ -98,33 +87,8 @@ public class DialogPaneApp extends Application {
             dialog.setResizable(true);
         });
 
-        Button busyButton = new Button("Busy");
-        busyButton.setOnAction(evt -> dialogPane.showBusyIndicator().onClose(buttonType -> {
-            if (buttonType.equals(ButtonType.CANCEL)) {
-                dialogPane.showInformation("Cancelled", "The busy dialog has been cancelled via the ESC key.");
-            }
-        }));
-
-        Button maxButton = new Button("Maximize");
-        maxButton.setOnAction(evt -> {
-            Dialog<Object> dialog = new Dialog<>(dialogPane, INFORMATION);
-            dialog.setTitle("Maximized");
-            dialog.setContent(new Label("Dialog using all available width and height."));
-            dialog.setMaximize(true);
-            dialogPane.showDialog(dialog);
-        });
-
-        Button multipleDialogsButton = new Button("Multiple Dialogs");
-        multipleDialogsButton.setOnAction(evt -> {
-            dialogPane.showInformation("Information", "some very long information text is coming here.");
-            later(() -> dialogPane.showConfirmation("Confirmation", "some info"), 1);
-            later(() -> dialogPane.showWarning("Warning", "Again a warning message?"), 2);
-            later(() -> dialogPane.showError("Error", "An error was encountered while running this application."), 3);
-        });
-
-        FlowPane flowPane = new FlowPane(10, 10, blankButton, infoButton, warnButton, errorButton, errorWithDetailsButton, errorWithExceptionButton,
-                confirmButton, inputSingleLineButton, inputMultiLineButton, node1Button, node2Button, busyButton, multipleDialogsButton,
-                maxButton);
+        FlowPane flowPane = new FlowPane(10, 10, infoButton, warnButton, errorButton, errorWithDetailsButton, errorWithExceptionButton,
+                confirmButton, inputSingleLineButton, inputMultiLineButton, node1Button, node2Button);
 
         flowPane.setAlignment(Pos.CENTER);
 
@@ -150,11 +114,11 @@ public class DialogPaneApp extends Application {
                     break;
                 case "Dark":
                     dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPane.class.getResource("dialog-pane.css")).toExternalForm());
-                    dialogPane.getStylesheets().add(Objects.requireNonNull(DialogPaneApp.class.getResource("dialogs-dark.css")).toExternalForm());
+                    dialogPane.getStylesheets().add(Objects.requireNonNull(DialogPaneWithMarkdownApp.class.getResource("dialogs-dark.css")).toExternalForm());
                     dialogPane.setConverter(null);
                     break;
                 case "Custom":
-                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPaneApp.class.getResource("dialogs-custom.css")).toExternalForm());
+                    dialogPane.getStylesheets().setAll(Objects.requireNonNull(DialogPaneWithMarkdownApp.class.getResource("dialogs-custom.css")).toExternalForm());
                     dialogPane.setConverter(new StringConverter<>() {
                         @Override
                         public String toString(ButtonType object) {

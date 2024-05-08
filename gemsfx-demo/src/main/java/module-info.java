@@ -7,6 +7,8 @@ module com.dlsc.gemsfx.demo {
     requires javafx.web;
     requires javafx.controls;
 
+    requires com.sandec.mdfx;
+
     requires org.scenicview.scenicview;
     requires org.controlsfx.controls;
     requires org.kordamp.ikonli.javafx;
