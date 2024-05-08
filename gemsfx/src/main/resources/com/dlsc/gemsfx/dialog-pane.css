@@ -73,8 +73,7 @@
 }
 
 .dialog-pane > .content-pane > .vbox > .content .message-label { /* message label can be on different levels */
-    -fx-pref-width: 350px;
-    -fx-alignment: center;
+    -fx-max-width: 350px;
 }
 
 .dialog-pane > .content-pane > .vbox > .content.padding {
