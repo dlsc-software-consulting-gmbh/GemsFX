@@ -163,7 +163,7 @@ public class LimitedTextArea extends ResizableTextArea {
 
     private final ReadOnlyBooleanWrapper outOfRange = new ReadOnlyBooleanWrapper(this, "isOverLimit", false);
 
-    public final boolean getOutOfRange() {
+    public final boolean isOutOfRange() {
         return outOfRange.get();
     }
 
