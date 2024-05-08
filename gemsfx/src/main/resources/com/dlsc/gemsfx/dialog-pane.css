@@ -72,7 +72,7 @@
 .dialog-pane > .content-pane > .vbox > .content {
 }
 
-.dialog-pane > .content-pane > .vbox > .content > .message-label {
+.dialog-pane > .content-pane > .vbox > .content .message-label { /* message label can be on different levels */
     -fx-pref-width: 350px;
     -fx-alignment: center;
 }

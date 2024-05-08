@@ -33,19 +33,12 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.control.skin.ButtonBarSkin;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -109,6 +102,8 @@ import java.util.function.Supplier;
  * </p>
  */
 public class DialogPane extends Pane {
+
+    private static final String MESSAGE_LABEL_STYLE_CLASS = "message-label";
 
     private final GlassPane glassPane;
 
@@ -355,9 +350,16 @@ public class DialogPane extends Pane {
     }
 
     private Dialog<ButtonType> doShowDialog(Type type, String title, String message, List<ButtonType> buttons) {
-        Label node = new Label(message);
-        node.getStyleClass().add("message-label");
-        return showNode(type, title, node, buttons);
+        Label messageLabel = getLabelSupplier().get();
+
+        messageLabel.setText(message);
+        messageLabel.setWrapText(true);
+
+        if (!messageLabel.getStyleClass().contains(MESSAGE_LABEL_STYLE_CLASS)) {
+            messageLabel.getStyleClass().add(MESSAGE_LABEL_STYLE_CLASS);
+        }
+
+        return showNode(type, title, messageLabel, buttons);
     }
 
     /**
@@ -368,7 +370,7 @@ public class DialogPane extends Pane {
      * @return the dialog
      */
     public final Dialog<Void> showError(String title, String message) {
-        return showError(title, message, null, null);
+        return showError(title, message, (String) null);
     }
 
     /**
@@ -382,7 +384,7 @@ public class DialogPane extends Pane {
     public final Dialog<Void> showError(String title, String message, Throwable exception) {
         StringWriter stringWriter = new StringWriter();
         exception.printStackTrace(new PrintWriter(stringWriter));
-        return showError(title, message, stringWriter.toString(), exception);
+        return showError(title, message, stringWriter.toString());
     }
 
     /**
@@ -405,16 +407,15 @@ public class DialogPane extends Pane {
      * @return the dialog
      */
     public final Dialog<Void> showError(String title, String message, String details) {
-        return showError(title, message, details, null);
-    }
-
-    private Dialog<Void> showError(String title, String message, String details, Throwable exception) {
         Dialog<Void> dialog = new Dialog<>(this, Type.ERROR);
         dialog.setTitle(title);
 
-        Label messageLabel = new Label(message);
+        Label messageLabel = getLabelSupplier().get();
+        messageLabel.setText(message);
         messageLabel.setWrapText(true);
-        messageLabel.setMaxWidth(500);
+        if (!messageLabel.getStyleClass().contains(MESSAGE_LABEL_STYLE_CLASS)) {
+            messageLabel.getStyleClass().add(MESSAGE_LABEL_STYLE_CLASS);
+        }
 
         if (StringUtils.isBlank(details)) {
             dialog.setContent(messageLabel);
@@ -453,22 +454,55 @@ public class DialogPane extends Pane {
      * @return the dialog
      */
     public final Dialog<ButtonType> showWarning(String title, String message) {
-        return doShowDialog(Type.WARNING, title, message);
+        return showWarning(title, message, Collections.emptyList());
     }
 
     /**
      * Creates and shows a warning dialog.
      *
      * @param title   the text shown in the header of the dialog
+     * @param message the warning message
+     * @return the dialog
+     */
+    public final Dialog<ButtonType> showWarning(String title, String message, List<ButtonType> buttonTypes) {
+        return doShowDialog(Type.WARNING, title, message, buttonTypes);
+    }
+
+    /**
+     * Creates and shows a confirmation dialog.
+     *
+     * @param title   the text shown in the header of the dialog
      * @param message the main message, usually a question
+     *
      * @return the dialog
      */
     public final Dialog<ButtonType> showConfirmation(String title, String message) {
-        return doShowDialog(Type.CONFIRMATION, title, message);
+        return showConfirmation(title, message, Collections.emptyList());
     }
 
+    /**
+     * Creates and shows a confirmation dialog.
+     *
+     * @param title   the text shown in the header of the dialog
+     * @param message the main message, usually a question
+     * @param buttonTypes the buttons to show in the footer
+     *
+     * @return the dialog
+     */
+    public final Dialog<ButtonType> showConfirmation(String title, String message, List<ButtonType> buttonTypes) {
+        return doShowDialog(Type.CONFIRMATION, title, message, buttonTypes);
+    }
+
+    /**
+     * Creates and shows an information dialog.
+     *
+     * @param title   the text shown in the header of the dialog
+     * @param message the main message, usually a question
+     *
+     * @return the dialog
+     */
     public final Dialog<ButtonType> showInformation(String title, String message) {
-        return doShowDialog(Type.INFORMATION, title, message);
+        return showInformation(title, message, Collections.emptyList());
     }
 
     /**
@@ -530,6 +564,20 @@ public class DialogPane extends Pane {
      * @return the dialog
      */
     public final Dialog<String> showTextInput(String title, String message, String prompt, String text, boolean multiline) {
+        return showTextInput(title, message, prompt, text, multiline, Collections.emptyList());
+    }
+
+    /**
+     * Creates and shows a text input dialog.
+     *
+     * @param title     the text shown in the header of the dialog
+     * @param message   the main message, usually a question
+     * @param prompt    the prompt text for the text input control
+     * @param text      the initial text to show
+     * @param multiline if true the dialog will show a text area, otherwise a text field
+     * @return the dialog
+     */
+    public final Dialog<String> showTextInput(String title, String message, String prompt, String text, boolean multiline, List<ButtonType> buttonTypes) {
         TextInputControl textInputControl;
 
         if (multiline) {
@@ -553,7 +601,14 @@ public class DialogPane extends Pane {
         box.getStyleClass().add("prompt-node-wrapper");
 
         if (StringUtils.isNotBlank(message)) {
-            Label promptLabel = new Label(message);
+            Label promptLabel = getLabelSupplier().get();
+            promptLabel.getStyleClass().add("prompt-label");
+            promptLabel.setText(message);
+
+            if (!promptLabel.getStyleClass().contains(MESSAGE_LABEL_STYLE_CLASS)) {
+                promptLabel.getStyleClass().add(MESSAGE_LABEL_STYLE_CLASS);
+            }
+
             box.getChildren().add(promptLabel);
         }
 
@@ -561,6 +616,10 @@ public class DialogPane extends Pane {
 
         Dialog<String> dialog = showNode(Type.INPUT, title, box);
         dialog.valueProperty().bindBidirectional(textInputControl.textProperty());
+        if (buttonTypes != null && !buttonTypes.isEmpty()) {
+            dialog.getButtonTypes().setAll(buttonTypes);
+        }
+
         dialog.getValidator().createCheck()
                 .dependsOn("text", textInputControl.textProperty())
                 .decorates(textInputControl)
@@ -669,7 +728,7 @@ public class DialogPane extends Pane {
         dialog.setMaximize(maximize);
         dialog.setSameWidthButtons(sameWidthButtons);
 
-        if (!buttons.isEmpty()) {
+        if (buttons != null && !buttons.isEmpty()) {
             dialog.getButtonTypes().setAll(buttons);
         }
 
@@ -702,10 +761,36 @@ public class DialogPane extends Pane {
         dialog.setContent(busyIndicator);
         dialog.getButtonTypes().clear();
         dialog.setDelay(Duration.millis(1000));
-        dialog.setUsingPadding(true); // blank dialogs have no padding
+        dialog.setUsingPadding(true); // by default blank dialogs have no padding, so we are adding it back here
         dialog.show();
 
         return dialog;
+    }
+
+    // label factory
+
+    private final ObjectProperty<Supplier<Label>> labelSupplier = new SimpleObjectProperty<>(this, "labelSupplier", Label::new);
+
+    public final Supplier<Label> getLabelSupplier() {
+        return labelSupplier.get();
+    }
+
+    /**
+     * A supplier used for creating the label instances that will be used by the standard dialogs.
+     *
+     * @see #showInformation(String, String)
+     * @see #showWarning(String, String)
+     * @see #showError(String, String)
+     * @see #showConfirmation(String, String)
+     *
+     * @return the label supplier / callback / factory
+     */
+    public final ObjectProperty<Supplier<Label>> labelSupplierProperty() {
+        return labelSupplier;
+    }
+
+    public final void setLabelSupplier(Supplier<Label> labelSupplier) {
+        this.labelSupplier.set(labelSupplier);
     }
 
     // animate
@@ -1221,6 +1306,28 @@ public class DialogPane extends Pane {
             this.usingPadding.set(usingPadding);
         }
 
+        // alignment
+
+        private final ObjectProperty<Pos> contentAlignment = new SimpleObjectProperty<>(this, "contentAlignment", Pos.CENTER_LEFT);
+
+        public final Pos getContentAlignment() {
+            return contentAlignment.get();
+        }
+
+        /**
+         * Determines how the content node is positioned within the content pane of the dialog. Default
+         * is CENTER_LEFT.
+         *
+         * @return the position of the content
+         */
+        public final ObjectProperty<Pos> contentAlignmentProperty() {
+            return contentAlignment;
+        }
+
+        public final void setContentAlignment(Pos contentAlignment) {
+            this.contentAlignment.set(contentAlignment);
+        }
+
         // value
 
         private final ObjectProperty<T> value = new SimpleObjectProperty<>(this, "value");
@@ -1627,6 +1734,7 @@ public class DialogPane extends Pane {
 
             VBox.setVgrow(content, Priority.ALWAYS);
 
+            StackPane.setAlignment(this.dialog.getContent(), dialog.getContentAlignment());
             content.getChildren().setAll(this.dialog.getContent());
 
             boolean blankDialog = this.dialog.getType().equals(Type.BLANK);
@@ -1653,6 +1761,11 @@ public class DialogPane extends Pane {
             glassPane.fadeInOutProperty().bind(shell.fadeInOutProperty());
 
             getChildren().addAll(box, glassPane);
+        }
+
+        @Override
+        public Orientation getContentBias() {
+            return Orientation.VERTICAL;
         }
 
         private boolean isInsideDialogPane(Parent parent) {
