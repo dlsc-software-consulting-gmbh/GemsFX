@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.CustomPopupControl;
 import com.dlsc.gemsfx.SearchTextField;
-import javafx.scene.Node;
 import javafx.scene.control.Skin;
 
 import java.util.Objects;
@@ -23,14 +22,6 @@ public class SearchTextFieldHistoryPopup extends CustomPopupControl {
         setAutoFix(true);
         setAutoHide(true);
         setHideOnEscape(true);
-    }
-
-    @Override
-    public void show(Node node) {
-        if (getSkin() instanceof SearchTextFieldHistoryPopupSkin skin) {
-            skin.resetSelection();
-        }
-        super.show(node);
     }
 
     protected Skin<?> createDefaultSkin() {

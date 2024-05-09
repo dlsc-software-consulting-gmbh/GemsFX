@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
+import com.dlsc.gemsfx.RemovableListCell;
 import com.dlsc.gemsfx.SearchTextField;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -20,10 +21,14 @@ import java.util.List;
 
 public class SearchTextFieldApp extends Application {
 
+    private SearchTextField field1;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        SearchTextField field1 = new SearchTextField();
+        field1 = new SearchTextField();
+        field1.setCellFactory(param -> new RemovableListCell<>((listView, item) -> field1.removeHistory(item)));
+
         SearchTextField field2 = new SearchTextField(true);
 
         Label label = new Label("Max History Size:");

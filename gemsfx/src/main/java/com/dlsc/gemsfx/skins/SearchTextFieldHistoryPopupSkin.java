@@ -63,20 +63,6 @@ public class SearchTextFieldHistoryPopupSkin implements Skin<SearchTextFieldHist
         }
     }
 
-    /**
-     * Resets the selection of the ListView by focusing on it and selecting the first item, scrolling to the top if necessary.
-     */
-    public void resetSelection() {
-        listView.requestFocus();
-
-        if (!listView.getItems().isEmpty()) {
-            listView.getSelectionModel().select(0);
-            listView.scrollTo(0);
-            listView.getFocusModel().focus(0);
-        }
-
-    }
-
     public Node getNode() {
         return listView;
     }

@@ -89,7 +89,7 @@
 
 .search-history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
     -fx-background: -fx-accent;
-    -fx-background-color: -fx-selection-bar;
+    -fx-background-color: #c9c9c9;
 }
 
 .search-history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
