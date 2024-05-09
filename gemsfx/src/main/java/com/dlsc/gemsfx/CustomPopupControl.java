@@ -7,6 +7,11 @@ import javafx.scene.control.PopupControl;
 import javafx.stage.Screen;
 import javafx.stage.Window;
 
+/**
+ * A custom popup control that extends PopupControl.
+ * <p>
+ * The popup can be displayed above or below the anchor node depending on the available space.
+ */
 public class CustomPopupControl extends PopupControl {
 
     private static final PseudoClass ABOVE_PSEUDO_CLASS = PseudoClass.getPseudoClass("above");

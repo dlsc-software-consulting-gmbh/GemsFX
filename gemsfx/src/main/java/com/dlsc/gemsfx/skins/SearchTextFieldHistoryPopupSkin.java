@@ -31,11 +31,8 @@ public class SearchTextFieldHistoryPopupSkin implements Skin<SearchTextFieldHist
             }
         };
         listView.getStyleClass().add("search-history-list-view");
-        Bindings.bindContent(listView.getItems(), searchTextField.getUnmodifiableHistory());
 
-        listView.prefWidthProperty().bind(control.prefWidthProperty());
-        listView.maxWidthProperty().bind(control.maxWidthProperty());
-        listView.minWidthProperty().bind(control.minWidthProperty());
+        Bindings.bindContent(listView.getItems(), searchTextField.getUnmodifiableHistory());
 
         listView.cellFactoryProperty().bind(searchTextField.cellFactoryProperty());
         listView.placeholderProperty().bind(searchTextField.historyPlaceholderProperty());
@@ -61,15 +58,23 @@ public class SearchTextFieldHistoryPopupSkin implements Skin<SearchTextFieldHist
             int oldTextLen = control.getSearchTextField().textProperty().getValueSafe().length();
             searchTextField.replaceText(0, oldTextLen, selectedHistory);
 
-            // reset selection
-            if (!listView.getItems().isEmpty()) {
-                listView.getSelectionModel().select(0);
-                listView.scrollTo(0);
-            }
-
             // hide popup
             control.hide();
         }
+    }
+
+    /**
+     * Resets the selection of the ListView by focusing on it and selecting the first item, scrolling to the top if necessary.
+     */
+    public void resetSelection() {
+        listView.requestFocus();
+
+        if (!listView.getItems().isEmpty()) {
+            listView.getSelectionModel().select(0);
+            listView.scrollTo(0);
+            listView.getFocusModel().focus(0);
+        }
+
     }
 
     public Node getNode() {
