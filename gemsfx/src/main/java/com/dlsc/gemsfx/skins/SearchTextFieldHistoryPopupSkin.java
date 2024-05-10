@@ -34,7 +34,7 @@ public class SearchTextFieldHistoryPopupSkin implements Skin<SearchTextFieldHist
 
         Bindings.bindContent(listView.getItems(), searchTextField.getUnmodifiableHistory());
 
-        listView.cellFactoryProperty().bind(searchTextField.cellFactoryProperty());
+        listView.cellFactoryProperty().bind(searchTextField.historyCellFactoryProperty());
         listView.placeholderProperty().bind(searchTextField.historyPlaceholderProperty());
 
         listView.setOnMouseClicked(mouseEvent -> {

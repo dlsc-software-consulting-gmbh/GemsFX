@@ -97,7 +97,7 @@ public class SearchTextField extends CustomTextField {
         addEventHandlers();
         addPropertyListeners();
 
-        setCellFactory(param -> new RemovableListCell<>((listView, item) -> removeHistory(item)));
+        setHistoryCellFactory(param -> new RemovableListCell<>((listView, item) -> removeHistory(item)));
 
         getUnmodifiableHistory().addListener((Observable it) -> {
             if (getPreferences() != null) {
@@ -356,10 +356,10 @@ public class SearchTextField extends CustomTextField {
         historyPlaceholderProperty().set(historyPlaceholder);
     }
 
-    private ObjectProperty<Callback<ListView<String>, ListCell<String>>> cellFactory;
+    private ObjectProperty<Callback<ListView<String>, ListCell<String>>> historyCellFactory;
 
-    public final Callback<ListView<String>, ListCell<String>> getCellFactory() {
-        return cellFactory == null ? null : cellFactory.get();
+    public final Callback<ListView<String>, ListCell<String>> getHistoryCellFactory() {
+        return historyCellFactory == null ? null : historyCellFactory.get();
     }
 
     /**
@@ -367,15 +367,15 @@ public class SearchTextField extends CustomTextField {
      *
      * @return the cell factory
      */
-    public final ObjectProperty<Callback<ListView<String>, ListCell<String>>> cellFactoryProperty() {
-        if (cellFactory == null) {
-            cellFactory = new SimpleObjectProperty<>(this, "cellFactory");
+    public final ObjectProperty<Callback<ListView<String>, ListCell<String>>> historyCellFactoryProperty() {
+        if (historyCellFactory == null) {
+            historyCellFactory = new SimpleObjectProperty<>(this, "cellFactory");
         }
-        return cellFactory;
+        return historyCellFactory;
     }
 
-    public final void setCellFactory(Callback<ListView<String>, ListCell<String>> cellFactory) {
-        cellFactoryProperty().set(cellFactory);
+    public final void setHistoryCellFactory(Callback<ListView<String>, ListCell<String>> historyCellFactory) {
+        historyCellFactoryProperty().set(historyCellFactory);
     }
 
     private BooleanProperty enableHistoryPopup;
