@@ -37,21 +37,20 @@
     -fx-background-color: derive(-fx-base, -10%);
 }
 
-.search-text-field > .left-pane > .search-icon-wrapper > .ikonli-font-icon,
+.search-text-field > .left-pane > .search-icon-wrapper > .search-icon {
+    -fx-padding: 0.43995em 0.5em;
+    -fx-background-color: -fx-text-inner-color;
+    -fx-shape: "M8,2.2c4.1,0,7.4,3.3,7.4,7.4c0,1.8-0.7,3.5-1.8,4.8l0.3,0.3h0.9l5.7,5.7l-1.7,1.7l-5.7-5.7v-0.9l-0.3-0.3  C11.5,16.3,9.8,17,8,17c-4.1,0-7.4-3.3-7.4-7.4S3.9,2.2,8,2.2 M8,4.5c-2.8,0-5.1,2.3-5.1,5.1s2.3,5.1,5.1,5.1s5.1-2.3,5.1-5.1  S10.9,4.5,8,4.5zM16.2,10.7h7.1l-3.5,6.1";
+}
+
+.search-text-field:disabled-popup > .left-pane > .search-icon-wrapper > .search-icon {
+    -fx-padding: 0.5em;
+    -fx-shape: "M9.5,3C13.1,3,16,5.9,16,9.5c0,1.6-0.6,3.1-1.6,4.2l0.3,0.3h0.8l5,5L19,20.5l-5-5v-0.8l-0.3-0.3c-1.1,1-2.6,1.6-4.2,1.6  C5.9,16,3,13.1,3,9.5S5.9,3,9.5,3 M9.5,5C7,5,5,7,5,9.5S7,14,9.5,14S14,12,14,9.5S12,5,9.5,5z";
+}
+
 .search-text-field > .right-pane > .clear-icon-wrapper > .ikonli-font-icon {
     -fx-icon-size: 1em;
     -fx-icon-color: -fx-text-inner-color;
-}
-
-.search-text-field > .left-pane > .search-icon-wrapper > .arrow {
-    -fx-shape: "M 0 0 h 7 l -3.5 4 z";
-    -fx-background-color: -fx-text-inner-color;
-    -fx-padding: 0.25em 0.333em 0 0;
-    -fx-translate-x: 0.08em;
-}
-
-.search-text-field:disabled-popup > .left-pane > .search-icon-wrapper > .arrow {
-    visibility: hidden;
 }
 
 /* -----------------------------------------------------------------------
