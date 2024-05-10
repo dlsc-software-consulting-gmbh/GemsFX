@@ -37,22 +37,21 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
- * A custom text field specifically designed for search functionality.
- * This class enhances a text field with features such as a history of search terms,
- * an optional history popup, and custom icons for search and clear operations.
+ * A custom text field specifically designed for search functionality. This class enhances a text field with features
+ * such as a history of search terms, an optional history popup, and custom icons for search and clear operations.
  * <p>
- * By default, when the user presses the Enter key (triggering the onAction event), the text is added to the history.
+ * By default, when the user presses the "enter" key (triggering the onAction event), the text is added to the history.
  * This behavior can be disabled by setting the {@link #addHistoryOnEnterProperty()}.
  * <br>
- * Additionally, history can be manually
- * added based on user actions, such as after typing text and selecting an item from a ListView or TableView that displays results,
- * or through other interactions, by calling the {@link #addHistory} method to add the current text to the history.
+ * Additionally, history can be manually added based on user actions, such as after typing text and selecting an item
+ * from a ListView or TableView that displays results, or through other interactions, by calling the {@link #addHistory}
+ * method to add the current text to the history.
  */
 public class SearchTextField extends CustomTextField {
 
     private static final int DEFAULT_MAX_HISTORY_SIZE = 30;
     private static final boolean ENABLE_HISTORY_POPUP = true;
-    private static final boolean DEFAULT_ADD_HISTORY_ON_ENTER = false;
+    private static final boolean DEFAULT_ADD_HISTORY_ON_ENTER = true;
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
     private static final PseudoClass HISTORY_POPUP_SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("history-popup-showing");
 
@@ -72,14 +71,14 @@ public class SearchTextField extends CustomTextField {
         getStyleClass().add("search-text-field");
 
         setPromptText("Search...");
+
         Label placeholder = new Label("No history available.");
         placeholder.getStyleClass().add("default-placeholder");
         setHistoryPlaceholder(placeholder);
-        setEnableHistoryPopup(false);
 
         searchIconWrapper = createLeftNode();
-        setLeft(searchIconWrapper);
 
+        setLeft(searchIconWrapper);
         setRight(createRightNode());
 
         addEventHandlers();
