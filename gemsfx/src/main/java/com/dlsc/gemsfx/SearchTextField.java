@@ -50,6 +50,7 @@ public class SearchTextField extends CustomTextField {
     private static final int DEFAULT_MAX_HISTORY_SIZE = 30;
     private static final boolean ENABLE_HISTORY_POPUP = true;
     private static final boolean DEFAULT_ADD_HISTORY_ON_ENTER = true;
+
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
     private static final PseudoClass HISTORY_POPUP_SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("history-popup-showing");
 
@@ -90,25 +91,21 @@ public class SearchTextField extends CustomTextField {
         addEventHandlers();
         addPropertyListeners();
 
+        setCellFactory(param -> new RemovableListCell<>((listView, item) -> removeHistory(item)));
+
         getUnmodifiableHistory().addListener((Observable it) -> {
-            if (isStoringHistory()) {
-                String id = getPreferencesId();
-                if (StringUtils.isNotBlank(id)) {
-                    storeHistory();
-                } else {
-                    throw new UnsupportedOperationException("Cannot store history, the preferences ID is empty");
-                }
+            if (getPreferences() != null) {
+                storeHistory();
             }
         });
 
         InvalidationListener loadHistoryListener = it -> {
-            if (isStoringHistory()) {
+            if (getPreferences() != null) {
                 loadHistory();
             }
         };
 
-        storingHistoryProperty().addListener(loadHistoryListener);
-        preferencesIdProperty().addListener(loadHistoryListener);
+        preferencesProperty().addListener(loadHistoryListener);
     }
 
     private void storeHistory() {
@@ -123,14 +120,6 @@ public class SearchTextField extends CustomTextField {
         if (preferences != null) {
             history.setAll(preferences.get("search-items", "").split(","));
         }
-    }
-
-    private Preferences getPreferences() {
-        String preferencesId = getPreferencesId();
-        if (StringUtils.isNotBlank(preferencesId)) {
-            return Preferences.userNodeForPackage(SearchTextField.class).node(preferencesId);
-        }
-        return null;
     }
 
     private void addEventHandlers() {
@@ -454,45 +443,23 @@ public class SearchTextField extends CustomTextField {
         return historyPopupShowing.getReadOnlyProperty();
     }
 
-    private final StringProperty preferencesId = new SimpleStringProperty(this, "preferencesId");
-
-    public final String getPreferencesId() {
-        return preferencesId.get();
-    }
+    private final ObjectProperty<Preferences> preferences = new SimpleObjectProperty<>(this, "preferences");
 
     /**
-     * Stores an ID for the field used for persisting the search history.
+     * Stores a preferences object that will be used for persisting the search history of the field.
      *
-     * @return the preferences id for the field
+     * @return the preferences used for persisting the search history
      */
-    public final StringProperty preferencesIdProperty() {
-        return preferencesId;
+    public final ObjectProperty<Preferences> preferencesProperty() {
+        return preferences;
     }
 
-    public final void setPreferencesId(String id) {
-        this.preferencesId.set(id);
+    public final Preferences getPreferences() {
+        return preferences.get();
     }
 
-    // storing size
-
-    private final BooleanProperty storingHistory = new SimpleBooleanProperty(this, "storingHistory", false);
-
-    public final boolean isStoringHistory() {
-        return storingHistory.get();
-    }
-
-    /**
-     * Determines if the field's search history will be stored in the user preferences, so that the
-     * items will appear automatically next time the application is run.
-     *
-     * @return true if the search history of the field will be persisted
-     */
-    public final BooleanProperty storingHistoryProperty() {
-        return storingHistory;
-    }
-
-    public final void setStoringHistory(boolean storingHistory) {
-        this.storingHistory.set(storingHistory);
+    public final void setPreferences(Preferences preferences) {
+        this.preferences.set(preferences);
     }
 
     /**
