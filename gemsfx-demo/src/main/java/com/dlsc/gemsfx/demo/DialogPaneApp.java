@@ -29,6 +29,7 @@ import org.scenicview.ScenicView;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.prefs.Preferences;
 
 import static com.dlsc.gemsfx.DialogPane.Type.INFORMATION;
 
@@ -43,6 +44,7 @@ public class DialogPaneApp extends Application {
             Dialog<ButtonType> dialog = new Dialog<>(dialogPane, DialogPane.Type.BLANK);
             dialog.setResizable(true);
             dialog.setId("blank.dialog");
+            dialog.setPreferences(Preferences.userNodeForPackage(DialogPaneApp.class).node(dialog.getId()));
             dialog.setContentAlignment(Pos.CENTER);
 
             Label content = new Label("Content");

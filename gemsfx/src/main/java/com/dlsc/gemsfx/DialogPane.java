@@ -1083,18 +1083,15 @@ public class DialogPane extends Pane {
 
             setOnResize(new DefaultResizeHandler(this));
 
-            idProperty().subscribe(id -> {
-                if (StringUtils.isNotBlank(id) && isStoringSize()) {
-                    Preferences preferences = Preferences.userNodeForPackage(DialogPane.class).node(id);
-                    if (preferences != null) {
-                        double width = preferences.getDouble("width", -1d);
-                        if (width != -1d) {
-                            setPrefWidth(width);
-                        }
-                        double height = preferences.getDouble("height", -1d);
-                        if (height != -1d) {
-                            setPrefHeight(height);
-                        }
+            preferencesProperty().subscribe(preferences -> {
+                if (preferences != null) {
+                    double width = preferences.getDouble("width", -1d);
+                    if (width != -1d) {
+                        setPrefWidth(width);
+                    }
+                    double height = preferences.getDouble("height", -1d);
+                    if (height != -1d) {
+                        setPrefHeight(height);
                     }
                 }
             });
@@ -1127,8 +1124,7 @@ public class DialogPane extends Pane {
         }
 
         /**
-         * Stores an optional ID for the dialog, which can be handy for various situations, e.g.
-         * for the built-in session persistence support.
+         * Stores an optional ID for the dialog, which can be handy for various situations.
          *
          * @return the id of the dialog, e.g. "preferences.dialog"
          */
@@ -1140,26 +1136,26 @@ public class DialogPane extends Pane {
             this.id.set(id);
         }
 
-        // storing size
+        // preferences
 
-        private final BooleanProperty storingSize = new SimpleBooleanProperty(this, "storingSize", true);
+        private final ObjectProperty<Preferences> preferences = new SimpleObjectProperty<>(this, "preferences");
 
-        public final boolean isStoringSize() {
-            return storingSize.get();
+        public final Preferences getPreferences() {
+            return preferences.get();
         }
 
         /**
-         * Determines if the dialog's width and height will be stored in the user preferences, so that the
-         * dialog will keep the size requested by the user via a resize operation.
+         * Stores a reference to a preferences object which can be used to persist the width and height of the
+         * dialog across user sessions.
          *
-         * @return true if the width and height of the dialog will be persisted
+         * @return the preferences where we want to store the bounds of the dialog after a resizing operation
          */
-        public final BooleanProperty storingSizeProperty() {
-            return storingSize;
+        public final ObjectProperty<Preferences> preferencesProperty() {
+            return preferences;
         }
 
-        public final void setStoringSize(boolean storingSize) {
-            this.storingSize.set(storingSize);
+        public final void setPreferences(Preferences preferences) {
+            this.preferences.set(preferences);
         }
 
         // pref width
@@ -2437,13 +2433,10 @@ public class DialogPane extends Pane {
 
         @Override
         public void accept(Double width, Double height) {
-            if (StringUtils.isNotBlank(dialog.getId()) && dialog.isStoringSize()) {
-                Preferences preferences = Preferences.userNodeForPackage(DialogPane.class);
-                if (preferences != null) {
-                    Preferences node = preferences.node(dialog.getId());
-                    node.put("width", width.toString());
-                    node.put("height", height.toString());
-                }
+            Preferences preferences = dialog.getPreferences();
+            if (preferences != null) {
+                preferences.put("width", width.toString());
+                preferences.put("height", height.toString());
             }
         }
     }
