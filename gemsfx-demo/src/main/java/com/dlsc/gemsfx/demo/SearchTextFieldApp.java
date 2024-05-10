@@ -49,6 +49,11 @@ public class SearchTextFieldApp extends Application {
         field1.addingItemToHistoryOnEnterProperty().bind(addHistoryOnActionBox.selectedProperty());
         field2.addingItemToHistoryOnEnterProperty().bind(addHistoryOnActionBox.selectedProperty());
 
+        CheckBox addHistoryOnFocusLossBox = new CheckBox("Add History on Focus Loss");
+        addHistoryOnFocusLossBox.setSelected(true);
+        field1.addingItemToHistoryOnFocusLostProperty().bind(addHistoryOnFocusLossBox.selectedProperty());
+        field2.addingItemToHistoryOnFocusLostProperty().bind(addHistoryOnFocusLossBox.selectedProperty());
+
         Button setHistoryButton = new Button("Set History");
         setHistoryButton.setMaxWidth(Double.MAX_VALUE);
         setHistoryButton.setOnAction(e -> {
@@ -75,7 +80,7 @@ public class SearchTextFieldApp extends Application {
         });
 
         VBox vbox = new VBox(20, new Label("Standard"), field1, new Label("Round"), field2,
-                new Separator(), maxHistorySizeBox, enableHistoryPopupBox, addHistoryOnActionBox,
+                new Separator(), maxHistorySizeBox, enableHistoryPopupBox, addHistoryOnActionBox, addHistoryOnFocusLossBox,
                 setHistoryButton, addHistoryButton, removeStandardHistoryButton, removeRoundHistoryButton, clearButton);
         vbox.setPadding(new Insets(20));
 
