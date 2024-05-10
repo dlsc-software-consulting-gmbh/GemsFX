@@ -3,13 +3,19 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.skins.SearchTextFieldHistoryPopup;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -91,7 +97,7 @@ public class SearchTextField extends CustomTextField {
         addEventHandlers();
         addPropertyListeners();
 
-        setCellFactory(param -> new RemovableListCell<>((listView, item) -> removeHistory(item)));
+        setHistoryCellFactory(param -> new RemovableListCell<>((listView, item) -> removeHistory(item)));
 
         getUnmodifiableHistory().addListener((Observable it) -> {
             if (getPreferences() != null) {
@@ -118,7 +124,11 @@ public class SearchTextField extends CustomTextField {
     private void loadHistory() {
         Preferences preferences = getPreferences();
         if (preferences != null) {
-            history.setAll(preferences.get("search-items", "").split(","));
+            String items = preferences.get("search-items", "");
+            if (StringUtils.isNotEmpty(items)) {
+                history.setAll(items.split(","));
+            }
+            // else { history.clear(); }
         }
     }
 
@@ -179,16 +189,11 @@ public class SearchTextField extends CustomTextField {
     }
 
     private StackPane createLeftNode() {
-        FontIcon searchIcon = new FontIcon(MaterialDesign.MDI_MAGNIFY);
+        Region searchIcon = new Region();
         searchIcon.getStyleClass().add("search-icon");
+        searchIcon.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
-        Region arrow = new Region();
-        arrow.getStyleClass().add("arrow");
-        arrow.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        arrow.managedProperty().bind(arrow.visibleProperty());
-        StackPane.setAlignment(arrow, Pos.CENTER_RIGHT);
-
-        StackPane searchIconWrapper = new StackPane(searchIcon, arrow);
+        StackPane searchIconWrapper = new StackPane(searchIcon);
         searchIconWrapper.getStyleClass().addAll("wrapper", "search-icon-wrapper");
         searchIconWrapper.setOnMouseClicked(this::clickIconWrapperHandler);
         return searchIconWrapper;
@@ -331,7 +336,6 @@ public class SearchTextField extends CustomTextField {
 
     private ObjectProperty<Node> historyPlaceholder = new SimpleObjectProperty<>(this, "historyPlaceholder");
 
-
     /**
      * Returns the property representing the history placeholder node.
      *
@@ -352,10 +356,10 @@ public class SearchTextField extends CustomTextField {
         historyPlaceholderProperty().set(historyPlaceholder);
     }
 
-    private ObjectProperty<Callback<ListView<String>, ListCell<String>>> cellFactory;
+    private ObjectProperty<Callback<ListView<String>, ListCell<String>>> historyCellFactory;
 
-    public final Callback<ListView<String>, ListCell<String>> getCellFactory() {
-        return cellFactory == null ? null : cellFactory.get();
+    public final Callback<ListView<String>, ListCell<String>> getHistoryCellFactory() {
+        return historyCellFactory == null ? null : historyCellFactory.get();
     }
 
     /**
@@ -363,15 +367,15 @@ public class SearchTextField extends CustomTextField {
      *
      * @return the cell factory
      */
-    public final ObjectProperty<Callback<ListView<String>, ListCell<String>>> cellFactoryProperty() {
-        if (cellFactory == null) {
-            cellFactory = new SimpleObjectProperty<>(this, "cellFactory");
+    public final ObjectProperty<Callback<ListView<String>, ListCell<String>>> historyCellFactoryProperty() {
+        if (historyCellFactory == null) {
+            historyCellFactory = new SimpleObjectProperty<>(this, "historyCellFactory");
         }
-        return cellFactory;
+        return historyCellFactory;
     }
 
-    public final void setCellFactory(Callback<ListView<String>, ListCell<String>> cellFactory) {
-        cellFactoryProperty().set(cellFactory);
+    public final void setHistoryCellFactory(Callback<ListView<String>, ListCell<String>> historyCellFactory) {
+        historyCellFactoryProperty().set(historyCellFactory);
     }
 
     private BooleanProperty enableHistoryPopup;
