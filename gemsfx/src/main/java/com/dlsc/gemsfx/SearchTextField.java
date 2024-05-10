@@ -369,7 +369,7 @@ public class SearchTextField extends CustomTextField {
      */
     public final ObjectProperty<Callback<ListView<String>, ListCell<String>>> historyCellFactoryProperty() {
         if (historyCellFactory == null) {
-            historyCellFactory = new SimpleObjectProperty<>(this, "cellFactory");
+            historyCellFactory = new SimpleObjectProperty<>(this, "historyCellFactory");
         }
         return historyCellFactory;
     }
