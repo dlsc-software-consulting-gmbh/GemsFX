@@ -1144,7 +1144,7 @@ public class DialogPane extends Pane {
 
         private final BooleanProperty storingSize = new SimpleBooleanProperty(this, "storingSize", true);
 
-        public final boolean istStoringSize() {
+        public final boolean isStoringSize() {
             return storingSize.get();
         }
 
