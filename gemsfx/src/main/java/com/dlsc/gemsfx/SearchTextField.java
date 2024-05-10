@@ -1,14 +1,9 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.SearchTextFieldHistoryPopup;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
@@ -35,6 +30,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 /**
  * A custom text field specifically designed for search functionality. This class enhances a text field with features
@@ -49,20 +45,30 @@ import java.util.logging.Logger;
  */
 public class SearchTextField extends CustomTextField {
 
+    private static final Logger LOG = Logger.getLogger(SearchTextField.class.getName());
+
     private static final int DEFAULT_MAX_HISTORY_SIZE = 30;
     private static final boolean ENABLE_HISTORY_POPUP = true;
     private static final boolean DEFAULT_ADD_HISTORY_ON_ENTER = true;
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
     private static final PseudoClass HISTORY_POPUP_SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("history-popup-showing");
 
-    private final Logger LOG = Logger.getLogger(SearchTextField.class.getName());
     private SearchTextFieldHistoryPopup historyPopup;
     private final StackPane searchIconWrapper;
 
+    /**
+     * Constructs a new text field customized for search operations.
+     */
     public SearchTextField() {
         this(false);
     }
 
+    /**
+     * Constructs a new text field customized for search operations. The look and feel can be
+     * adjusted to feature rounded corners / sides.
+     *
+     * @param round if true the sides of the field will be round
+     */
     public SearchTextField(boolean round) {
         if (round) {
             getStyleClass().add("round");
@@ -83,6 +89,48 @@ public class SearchTextField extends CustomTextField {
 
         addEventHandlers();
         addPropertyListeners();
+
+        getUnmodifiableHistory().addListener((Observable it) -> {
+            if (isStoringHistory()) {
+                String id = getPreferencesId();
+                if (StringUtils.isNotBlank(id)) {
+                    storeHistory();
+                } else {
+                    throw new UnsupportedOperationException("Cannot store history, the preferences ID is empty");
+                }
+            }
+        });
+
+        InvalidationListener loadHistoryListener = it -> {
+            if (isStoringHistory()) {
+                loadHistory();
+            }
+        };
+
+        storingHistoryProperty().addListener(loadHistoryListener);
+        preferencesIdProperty().addListener(loadHistoryListener);
+    }
+
+    private void storeHistory() {
+        Preferences preferences = getPreferences();
+        if (preferences != null) {
+            preferences.put("search-items", String.join(",", getUnmodifiableHistory()));
+        }
+    }
+
+    private void loadHistory() {
+        Preferences preferences = getPreferences();
+        if (preferences != null) {
+            history.setAll(preferences.get("search-items", "").split(","));
+        }
+    }
+
+    private Preferences getPreferences() {
+        String preferencesId = getPreferencesId();
+        if (StringUtils.isNotBlank(preferencesId)) {
+            return Preferences.userNodeForPackage(SearchTextField.class).node(preferencesId);
+        }
+        return null;
     }
 
     private void addEventHandlers() {
@@ -121,8 +169,9 @@ public class SearchTextField extends CustomTextField {
                 LOG.warning("Max history size must be greater than or equal to 0. ");
             }
 
-            if (history.size() > getSafetyMaxHistorySize()) {
-                history.remove(getSafetyMaxHistorySize(), history.size());
+            int max = Math.max(0, getMaxHistorySize());
+            if (history.size() > max) {
+                history.remove(max, history.size());
             }
         });
     }
@@ -156,10 +205,8 @@ public class SearchTextField extends CustomTextField {
         return searchIconWrapper;
     }
 
-    /**
+    /*
      * Handles the click event on the icon wrapper of the search text field.
-     *
-     * @param event the mouse event triggered by the click
      */
     private void clickIconWrapperHandler(MouseEvent event) {
         if (!isFocused()) {
@@ -198,7 +245,8 @@ public class SearchTextField extends CustomTextField {
     private final ObservableList<String> history = FXCollections.observableArrayList();
 
     /**
-     * Sets the history of the search text field.
+     * Sets the history of the search text field. The given list of Strings will be processed to guarantee unique
+     * entries.
      *
      * @param history the list of strings representing the history
      */
@@ -207,7 +255,7 @@ public class SearchTextField extends CustomTextField {
     }
 
     /**
-     * Adds the given item to the history.
+     * Adds the given item to the history. The method ensures that duplicates will not be added.
      *
      * @param item the item to add
      */
@@ -216,8 +264,10 @@ public class SearchTextField extends CustomTextField {
             history.remove(item);
             history.add(0, item);
         }
-        if (history.size() > getSafetyMaxHistorySize()) {
-            history.remove(getSafetyMaxHistorySize(), history.size());
+
+        int max = Math.max(0, getMaxHistorySize());
+        if (history.size() > max) {
+            history.remove(max, history.size());
         }
     }
 
@@ -404,6 +454,47 @@ public class SearchTextField extends CustomTextField {
         return historyPopupShowing.getReadOnlyProperty();
     }
 
+    private final StringProperty preferencesId = new SimpleStringProperty(this, "preferencesId");
+
+    public final String getPreferencesId() {
+        return preferencesId.get();
+    }
+
+    /**
+     * Stores an ID for the field used for persisting the search history.
+     *
+     * @return the preferences id for the field
+     */
+    public final StringProperty preferencesIdProperty() {
+        return preferencesId;
+    }
+
+    public final void setPreferencesId(String id) {
+        this.preferencesId.set(id);
+    }
+
+    // storing size
+
+    private final BooleanProperty storingHistory = new SimpleBooleanProperty(this, "storingHistory", false);
+
+    public final boolean isStoringHistory() {
+        return storingHistory.get();
+    }
+
+    /**
+     * Determines if the field's search history will be stored in the user preferences, so that the
+     * items will appear automatically next time the application is run.
+     *
+     * @return true if the search history of the field will be persisted
+     */
+    public final BooleanProperty storingHistoryProperty() {
+        return storingHistory;
+    }
+
+    public final void setStoringHistory(boolean storingHistory) {
+        this.storingHistory.set(storingHistory);
+    }
+
     /**
      * Converts a given list of strings to a unique list of strings. Filters out empty strings.
      *
@@ -411,18 +502,6 @@ public class SearchTextField extends CustomTextField {
      * @return the converted unique list of strings
      */
     private List<String> convertToUniqueList(List<String> history) {
-        return history.stream().distinct().filter(StringUtils::isNotEmpty).limit(getSafetyMaxHistorySize()).toList();
+        return history.stream().distinct().filter(StringUtils::isNotEmpty).limit(Math.max(0, getMaxHistorySize())).toList();
     }
-
-    /**
-     * Returns the maximum size of the history list that ensures safety.
-     * If the value of maxHistorySize is negative, 0 is returned.
-     * Otherwise, the value of maxHistorySize is returned.
-     *
-     * @return the safety maximum history size
-     */
-    public final int getSafetyMaxHistorySize() {
-        return Math.max(0, getMaxHistorySize());
-    }
-
 }

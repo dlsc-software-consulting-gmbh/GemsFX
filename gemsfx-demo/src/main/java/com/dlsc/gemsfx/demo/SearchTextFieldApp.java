@@ -27,9 +27,13 @@ public class SearchTextFieldApp extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         field1 = new SearchTextField();
+        field1.setStoringHistory(true);
+        field1.setPreferencesId("standard-field");
         field1.setCellFactory(param -> new RemovableListCell<>((listView, item) -> field1.removeHistory(item)));
 
         SearchTextField field2 = new SearchTextField(true);
+        field2.setStoringHistory(true);
+        field2.setPreferencesId("round-field");
 
         Label label = new Label("Max History Size:");
         Spinner<Integer> maxHistorySizeSpinner = new Spinner<>(5, 50, 10, 5);
