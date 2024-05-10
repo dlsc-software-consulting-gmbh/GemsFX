@@ -42,8 +42,9 @@ import java.util.prefs.Preferences;
  * A custom text field specifically designed for search functionality. This class enhances a text field with features
  * such as a history of search terms, an optional history popup, and custom icons for search and clear operations.
  * <p>
- * By default, when the user presses the "enter" key (triggering the onAction event), the text is added to the history.
- * This behavior can be disabled by setting the {@link #addingItemToHistoryOnEnterProperty()}.
+ * By default, when the field loses its focus or the user presses the "enter" key (triggering the onAction event), the
+ * text is added to the history. This behavior can be disabled by setting the {@link #addingItemToHistoryOnEnterProperty()}
+ * and / or the {@link #addingItemToHistoryOnEnterProperty()} to false.
  * <br>
  * Additionally, history can be manually added based on user actions, such as after typing text and selecting an item
  * from a ListView or TableView that displays results, or through other interactions, by calling the {@link #addHistory}
