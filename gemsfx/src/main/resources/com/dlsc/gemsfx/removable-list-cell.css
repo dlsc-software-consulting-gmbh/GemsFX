@@ -1,0 +1,36 @@
+.removable-list-cell .container-box {
+    -fx-padding: 2px 3px 2px 5px;
+}
+
+.removable-list-cell .remove-button {
+    visibility: hidden;
+    -fx-padding: 2px;
+    -fx-cursor: hand;
+}
+
+.removable-list-cell:hover {
+    -fx-background-color: #c9c9c9;
+}
+
+.removable-list-cell:hover .remove-button {
+    visibility: visible;
+}
+
+.removable-list-cell:empty {
+    -fx-background-color: transparent;
+}
+
+.removable-list-cell .remove-button .ikonli-font-icon {
+    -fx-icon-size: 1em;
+}
+
+.removable-list-cell:hover .remove-button .ikonli-font-icon,
+.removable-list-cell:selected .remove-button .ikonli-font-icon,
+.removable-list-cell .remove-button:pressed .ikonli-font-icon {
+    -fx-icon-color: -fx-text-background-color;
+}
+
+.removable-list-cell .remove-button:hover .ikonli-font-icon {
+    -fx-scale-x: 1.2;
+    -fx-scale-y: 1.2;
+}

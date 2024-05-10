@@ -11,8 +11,111 @@
     -fx-padding: 0px 5px;
 }
 
+.search-text-field:history-popup-showing > .left-pane > .search-icon-wrapper,
+.search-text-field > .left-pane > .search-icon-wrapper:hover,
+.search-text-field > .left-pane > .search-icon-wrapper:pressed {
+    -fx-cursor: hand;
+    -fx-background-color: -fx-base;
+    -fx-background-insets: 2px;
+    -fx-background-radius: 2px 0 0 2px;
+}
+
+.search-text-field.round:history-popup-showing > .left-pane > .search-icon-wrapper,
+.search-text-field.round > .left-pane > .search-icon-wrapper:hover,
+.search-text-field.round > .left-pane > .search-icon-wrapper:pressed {
+    -fx-background-radius: 1000px 0 0 1000px;
+}
+
+.search-text-field:disabled-popup > .left-pane > .search-icon-wrapper,
+.search-text-field:disabled-popup > .left-pane > .search-icon-wrapper:hover,
+.search-text-field:disabled-popup > .left-pane > .search-icon-wrapper:pressed {
+    -fx-cursor: text;
+    -fx-background-color: transparent;
+}
+
+.search-text-field > .left-pane > .search-icon-wrapper:pressed {
+    -fx-background-color: derive(-fx-base, -10%);
+}
+
 .search-text-field > .left-pane > .search-icon-wrapper > .ikonli-font-icon,
 .search-text-field > .right-pane > .clear-icon-wrapper > .ikonli-font-icon {
     -fx-icon-size: 1em;
     -fx-icon-color: -fx-text-inner-color;
+}
+
+.search-text-field > .left-pane > .search-icon-wrapper > .arrow {
+    -fx-shape: "M 0 0 h 7 l -3.5 4 z";
+    -fx-background-color: -fx-text-inner-color;
+    -fx-padding: 0.25em 0.333em 0 0;
+    -fx-translate-x: 0.08em;
+}
+
+.search-text-field:disabled-popup > .left-pane > .search-icon-wrapper > .arrow {
+    visibility: hidden;
+}
+
+/* -----------------------------------------------------------------------
+ * Style based on Modena.css combo-box-popup style
+ */
+.search-text-field.round .search-history-list-view {
+    -fx-background-radius: 10px;
+    -fx-padding: 5px;
+}
+
+.search-history-list-view {
+    -fx-background-color: linear-gradient(to bottom,
+    derive(-fx-color, -17%),
+    derive(-fx-color, -30%)
+    ),
+    -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
+    -fx-pref-height: 200px;
+}
+
+.search-history-list-view .default-placeholder {
+    -fx-padding: 0 10px;
+}
+
+.search-text-field-history-popup:above .search-history-list-view {
+    -fx-translate-y: -6;
+}
+
+.search-history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 4 0 4 5;
+    /* No alternate highlighting */
+    -fx-background: -fx-control-inner-background;
+}
+
+.search-history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-background: -fx-accent;
+    -fx-background-color: #c9c9c9;
+}
+
+.search-history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.search-history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-background, -fx-cell-focus-inner-border, -fx-background;
+    -fx-background-insets: 0, 1, 2;
+}
+
+.search-history-list-view > .placeholder > .label {
+    -fx-text-fill: derive(-fx-control-inner-background, -30%);
+}
+
+.search-history-list-view .search-field-list-cell {
+}
+
+.search-history-list-view .search-field-list-cell .text {
+    -fx-fill: -fx-selection-bar-text;
+}
+
+.search-history-list-view .search-field-list-cell .text.start {
+}
+
+.search-history-list-view .search-field-list-cell .text.middle {
+    -fx-underline: true;
+}
+
+.search-history-list-view .search-field-list-cell .text.end {
 }
