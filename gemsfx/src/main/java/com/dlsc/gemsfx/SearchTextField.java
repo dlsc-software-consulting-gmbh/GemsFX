@@ -1,6 +1,6 @@
 package com.dlsc.gemsfx;
 
-import com.dlsc.gemsfx.skins.SearchTextFieldHistoryPopup;
+import com.dlsc.gemsfx.skins.SearchHistoryPopup;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -21,6 +21,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -50,20 +51,16 @@ import java.util.prefs.Preferences;
  * from a ListView or TableView that displays results, or through other interactions, by calling the {@link #addHistory}
  * method to add the current text to the history.
  */
-public class SearchTextField extends CustomTextField {
+public class SearchTextField extends CustomTextField implements SearchHistorySupport {
 
     private static final Logger LOG = Logger.getLogger(SearchTextField.class.getName());
-
-    private static final int DEFAULT_MAX_HISTORY_SIZE = 30;
-    private static final boolean ENABLE_HISTORY_POPUP = true;
-    private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER = true;
-    private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST = true;
 
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
     private static final PseudoClass HISTORY_POPUP_SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("history-popup-showing");
 
-    private SearchTextFieldHistoryPopup historyPopup;
+    private final boolean round;
     private final StackPane searchIconWrapper;
+    private SearchHistoryPopup searchHistoryPopup;
 
     /**
      * Constructs a new text field customized for search operations.
@@ -82,6 +79,7 @@ public class SearchTextField extends CustomTextField {
         if (round) {
             getStyleClass().add("round");
         }
+        this.round = round;
 
         getStyleClass().add("search-text-field");
 
@@ -219,23 +217,26 @@ public class SearchTextField extends CustomTextField {
             return;
         }
 
-        if (historyPopup == null) {
-            historyPopup = new SearchTextFieldHistoryPopup(this);
-            historyPopupShowing.bind(historyPopup.showingProperty());
+        if (searchHistoryPopup == null) {
+            searchHistoryPopup = new SearchHistoryPopup(this);
+            if (round) {
+                searchHistoryPopup.getStyleClass().add("round");
+            }
+            historyPopupShowing.bind(searchHistoryPopup.showingProperty());
         }
 
-        if (historyPopup.isShowing()) {
-            historyPopup.hide();
+        if (searchHistoryPopup.isShowing()) {
+            searchHistoryPopup.hide();
         } else {
-            historyPopup.show(this);
+            searchHistoryPopup.show(this);
         }
 
         positionCaret(textProperty().getValueSafe().length());
     }
 
     private void hideHistoryPopup() {
-        if (historyPopup != null && historyPopup.isShowing()) {
-            historyPopup.hide();
+        if (searchHistoryPopup != null && searchHistoryPopup.isShowing()) {
+            searchHistoryPopup.hide();
         }
     }
 
@@ -500,13 +501,14 @@ public class SearchTextField extends CustomTextField {
         this.preferences.set(preferences);
     }
 
-    /**
-     * Converts a given list of strings to a unique list of strings. Filters out empty strings.
-     *
-     * @param history the list of strings to convert
-     * @return the converted unique list of strings
-     */
-    private List<String> convertToUniqueList(List<String> history) {
-        return history.stream().distinct().filter(StringUtils::isNotEmpty).limit(Math.max(0, getMaxHistorySize())).toList();
+    @Override
+    public final TextInputControl getTextInputControl() {
+        return this;
     }
+
+    @Override
+    public Region getNode() {
+        return this;
+    }
+
 }

@@ -1,24 +1,25 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.SearchHistorySupport;
 import com.dlsc.gemsfx.SearchField;
-import com.dlsc.gemsfx.SearchTextField;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.MouseButton;
 
 import java.util.Objects;
 
-public class SearchTextFieldHistoryPopupSkin implements Skin<SearchTextFieldHistoryPopup> {
+public class SearchHistoryPopupSkin implements Skin<SearchHistoryPopup> {
 
-    private final SearchTextFieldHistoryPopup control;
-    private final SearchTextField searchTextField;
+    private final SearchHistoryPopup control;
+    private final SearchHistorySupport historySupport;
     private ListView<String> listView;
 
-    public SearchTextFieldHistoryPopupSkin(SearchTextFieldHistoryPopup control) {
+    public SearchHistoryPopupSkin(SearchHistoryPopup control) {
         this.control = control;
-        searchTextField = control.getSearchTextField();
+        historySupport = control.getHistorySupport();
 
         initListView();
     }
@@ -27,15 +28,15 @@ public class SearchTextFieldHistoryPopupSkin implements Skin<SearchTextFieldHist
         listView = new ListView<>() {
             @Override
             public String getUserAgentStylesheet() {
-                return Objects.requireNonNull(SearchField.class.getResource("search-text-field.css")).toExternalForm();
+                return Objects.requireNonNull(SearchField.class.getResource("search-history-popup.css")).toExternalForm();
             }
         };
         listView.getStyleClass().add("search-history-list-view");
 
-        Bindings.bindContent(listView.getItems(), searchTextField.getUnmodifiableHistory());
+        Bindings.bindContent(listView.getItems(), historySupport.getUnmodifiableHistory());
 
-        listView.cellFactoryProperty().bind(searchTextField.historyCellFactoryProperty());
-        listView.placeholderProperty().bind(searchTextField.historyPlaceholderProperty());
+        listView.cellFactoryProperty().bind(historySupport.historyCellFactoryProperty());
+        listView.placeholderProperty().bind(historySupport.historyPlaceholderProperty());
 
         listView.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY && mouseEvent.getClickCount() == 1) {
@@ -55,8 +56,9 @@ public class SearchTextFieldHistoryPopupSkin implements Skin<SearchTextFieldHist
         String selectedHistory = listView.getSelectionModel().getSelectedItem();
         if (selectedHistory != null) {
             // replace text
-            int oldTextLen = control.getSearchTextField().textProperty().getValueSafe().length();
-            searchTextField.replaceText(0, oldTextLen, selectedHistory);
+            TextInputControl textInputControl = historySupport.getTextInputControl();
+            int oldTextLen = textInputControl.textProperty().getValueSafe().length();
+            textInputControl.replaceText(0, oldTextLen, selectedHistory);
 
             // hide popup
             control.hide();
@@ -67,12 +69,12 @@ public class SearchTextFieldHistoryPopupSkin implements Skin<SearchTextFieldHist
         return listView;
     }
 
-    public SearchTextFieldHistoryPopup getSkinnable() {
+    public SearchHistoryPopup getSkinnable() {
         return control;
     }
 
     public void dispose() {
-        Bindings.unbindContent(listView.getItems(), searchTextField.getUnmodifiableHistory());
+        Bindings.unbindContent(listView.getItems(), historySupport.getUnmodifiableHistory());
 
         listView.prefWidthProperty().unbind();
         listView.maxWidthProperty().unbind();
