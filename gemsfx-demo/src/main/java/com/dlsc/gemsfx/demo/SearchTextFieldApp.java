@@ -1,6 +1,5 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.RemovableListCell;
 import com.dlsc.gemsfx.SearchTextField;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -47,8 +46,8 @@ public class SearchTextFieldApp extends Application {
 
         CheckBox addHistoryOnActionBox = new CheckBox("Add History on Enter");
         addHistoryOnActionBox.setSelected(true);
-        field1.addHistoryOnEnterProperty().bind(addHistoryOnActionBox.selectedProperty());
-        field2.addHistoryOnEnterProperty().bind(addHistoryOnActionBox.selectedProperty());
+        field1.addingItemToHistoryOnEnterProperty().bind(addHistoryOnActionBox.selectedProperty());
+        field2.addingItemToHistoryOnEnterProperty().bind(addHistoryOnActionBox.selectedProperty());
 
         Button setHistoryButton = new Button("Set History");
         setHistoryButton.setMaxWidth(Double.MAX_VALUE);

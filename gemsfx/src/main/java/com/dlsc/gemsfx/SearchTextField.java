@@ -43,7 +43,7 @@ import java.util.prefs.Preferences;
  * such as a history of search terms, an optional history popup, and custom icons for search and clear operations.
  * <p>
  * By default, when the user presses the "enter" key (triggering the onAction event), the text is added to the history.
- * This behavior can be disabled by setting the {@link #addHistoryOnEnterProperty()}.
+ * This behavior can be disabled by setting the {@link #addingItemToHistoryOnEnterProperty()}.
  * <br>
  * Additionally, history can be manually added based on user actions, such as after typing text and selecting an item
  * from a ListView or TableView that displays results, or through other interactions, by calling the {@link #addHistory}
@@ -55,7 +55,8 @@ public class SearchTextField extends CustomTextField {
 
     private static final int DEFAULT_MAX_HISTORY_SIZE = 30;
     private static final boolean ENABLE_HISTORY_POPUP = true;
-    private static final boolean DEFAULT_ADD_HISTORY_ON_ENTER = true;
+    private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER = true;
+    private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST = true;
 
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
     private static final PseudoClass HISTORY_POPUP_SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("history-popup-showing");
@@ -99,6 +100,12 @@ public class SearchTextField extends CustomTextField {
 
         setHistoryCellFactory(param -> new RemovableListCell<>((listView, item) -> removeHistory(item)));
 
+        focusedProperty().addListener(it -> {
+            if (!isFocused() && isAddingItemToHistoryOnFocusLost()) {
+                addHistory(getText());
+            }
+        });
+
         getUnmodifiableHistory().addListener((Observable it) -> {
             if (getPreferences() != null) {
                 storeHistory();
@@ -135,7 +142,7 @@ public class SearchTextField extends CustomTextField {
     private void addEventHandlers() {
         // On Action event, add the text to the history
         addEventHandler(ActionEvent.ANY, e -> {
-            if (getAddHistoryOnEnter()) {
+            if (isAddingItemToHistoryOnEnter()) {
                 addHistory(getText());
             }
         });
@@ -405,26 +412,52 @@ public class SearchTextField extends CustomTextField {
         enableHistoryPopupProperty().set(enableHistoryPopup);
     }
 
-    private BooleanProperty addHistoryOnEnter;
+    // add on enter
+
+    private BooleanProperty addingItemToHistoryOnEnter;
 
     /**
-     * Indicates whether the text of the text field should be added to the history when the user presses the Enter key.
+     * Determines whether the text of the text field should be added to the history when the user presses the Enter key.
      *
      * @return true if the text should be added to the history on Enter, false otherwise
      */
-    public final BooleanProperty addHistoryOnEnterProperty() {
-        if (addHistoryOnEnter == null) {
-            addHistoryOnEnter = new SimpleBooleanProperty(this, "addHistoryOnEnter", DEFAULT_ADD_HISTORY_ON_ENTER);
+    public final BooleanProperty addingItemToHistoryOnEnterProperty() {
+        if (addingItemToHistoryOnEnter == null) {
+            addingItemToHistoryOnEnter = new SimpleBooleanProperty(this, "addingItemToHistoryOnEnter", DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER);
         }
-        return addHistoryOnEnter;
+        return addingItemToHistoryOnEnter;
     }
 
-    public final boolean getAddHistoryOnEnter() {
-        return addHistoryOnEnter == null ? DEFAULT_ADD_HISTORY_ON_ENTER : addHistoryOnEnter.get();
+    public final boolean isAddingItemToHistoryOnEnter() {
+        return addingItemToHistoryOnEnter == null ? DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER : addingItemToHistoryOnEnter.get();
     }
 
-    public final void setAddHistoryOnEnter(boolean addHistoryOnEnter) {
-        addHistoryOnEnterProperty().set(addHistoryOnEnter);
+    public final void setAddingItemToHistoryOnEnter(boolean addingItemToHistoryOnEnter) {
+        addingItemToHistoryOnEnterProperty().set(addingItemToHistoryOnEnter);
+    }
+
+    // add on focus lost
+
+    private BooleanProperty addingItemToHistoryOnFocusLost;
+
+    /**
+     * Determines whether the text of the text field should be added to the history when the field losses its focus.
+     *
+     * @return true if the text should be added to the history on focus lost, false otherwise
+     */
+    public final BooleanProperty addingItemToHistoryOnFocusLostProperty() {
+        if (addingItemToHistoryOnFocusLost == null) {
+            addingItemToHistoryOnFocusLost = new SimpleBooleanProperty(this, "addingItemToHistoryOnFocusLost", DEFAULT_ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST);
+        }
+        return addingItemToHistoryOnFocusLost;
+    }
+
+    public final boolean isAddingItemToHistoryOnFocusLost() {
+        return addingItemToHistoryOnFocusLost == null ? DEFAULT_ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST : addingItemToHistoryOnFocusLost.get();
+    }
+
+    public final void setAddingItemToHistoryOnFocusLost(boolean addingItemToHistoryOnFocusLost) {
+        addingItemToHistoryOnFocusLostProperty().set(addingItemToHistoryOnFocusLost);
     }
 
     private final ReadOnlyBooleanWrapper historyPopupShowing = new ReadOnlyBooleanWrapper(this, "historyPopupShowing") {
