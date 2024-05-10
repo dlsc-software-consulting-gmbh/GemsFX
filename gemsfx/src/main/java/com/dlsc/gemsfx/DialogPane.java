@@ -1084,7 +1084,7 @@ public class DialogPane extends Pane {
             setOnResize(new DefaultResizeHandler(this));
 
             idProperty().subscribe(id -> {
-                if (StringUtils.isNotBlank(id) && istStoringSize()) {
+                if (StringUtils.isNotBlank(id) && isStoringSize()) {
                     Preferences preferences = Preferences.userNodeForPackage(DialogPane.class).node(id);
                     if (preferences != null) {
                         double width = preferences.getDouble("width", -1d);
@@ -2437,7 +2437,7 @@ public class DialogPane extends Pane {
 
         @Override
         public void accept(Double width, Double height) {
-            if (StringUtils.isNotBlank(dialog.getId()) && dialog.istStoringSize()) {
+            if (StringUtils.isNotBlank(dialog.getId()) && dialog.isStoringSize()) {
                 Preferences preferences = Preferences.userNodeForPackage(DialogPane.class);
                 if (preferences != null) {
                     Preferences node = preferences.node(dialog.getId());
