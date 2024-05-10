@@ -58,6 +58,8 @@ import java.util.function.Predicate;
  */
 public class FilterView<T> extends Control {
 
+    private final SearchTextField searchTextField = new SearchTextField();
+
     public FilterView() {
         getStyleClass().add("filter-view");
 
@@ -117,6 +119,15 @@ public class FilterView<T> extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new FilterViewSkin<>(this);
+    }
+
+    /**
+     * Returns the search text field used for entering filter terms.
+     *
+     * @return the search text field
+     */
+    public final SearchTextField getSearchTextField() {
+        return searchTextField;
     }
 
     private final IntegerProperty scrollThreshold = new SimpleIntegerProperty(this, "scrollThreshold", 100);

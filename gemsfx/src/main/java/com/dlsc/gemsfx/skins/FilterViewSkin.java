@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
 
-    private final SearchTextField searchTextField = new SearchTextField();
+    private final SearchTextField searchTextField;
     private final HBox filterGroupsPane = new HBox();
     private final FlowPane filtersPane = new FlowPane();
     private final HBox headerBox = new HBox();
@@ -37,6 +37,8 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
 
     public FilterViewSkin(FilterView<T> view) {
         super(view);
+
+        searchTextField = view.getSearchTextField();
 
         InvalidationListener updateHeaderListener = it -> updateHeaderBox();
         view.titleLabelProperty().addListener(updateHeaderListener);
