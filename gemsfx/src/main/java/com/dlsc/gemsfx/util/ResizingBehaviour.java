@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.util;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -373,7 +374,7 @@ public class ResizingBehaviour {
         resizableProperty().set(resizable);
     }
 
-    private SimpleListProperty<Operation> supportedOperations;
+    private final ListProperty<Operation> supportedOperations = new SimpleListProperty<>(this, "supportedOperations", FXCollections.observableArrayList(Operation.values()));
 
     /**
      * The list of supported operations for resizing the region.
@@ -382,15 +383,12 @@ public class ResizingBehaviour {
      *
      * @return the list of supported operations
      */
-    public final SimpleListProperty<Operation> supportedOperationsProperty() {
-        if (supportedOperations == null) {
-            supportedOperations = new SimpleListProperty<>(this, "supportedOperations", FXCollections.observableArrayList(Operation.values()));
-        }
+    public final ListProperty<Operation> supportedOperationsProperty() {
         return supportedOperations;
     }
 
     public final ObservableList<Operation> getSupportedOperations() {
-        return supportedOperations == null ? FXCollections.observableArrayList(Operation.values()) : supportedOperations.get();
+        return supportedOperations.get();
     }
 
     public final void setSupportedOperations(ObservableList<Operation> supportedOperations) {
