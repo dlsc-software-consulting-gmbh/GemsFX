@@ -56,6 +56,7 @@ public class SearchTextField extends CustomTextField {
     private static final int DEFAULT_MAX_HISTORY_SIZE = 30;
     private static final boolean ENABLE_HISTORY_POPUP = true;
     private static final boolean DEFAULT_ADD_HISTORY_ON_ENTER = true;
+    private static final boolean DEFAULT_ADD_HISTORY_ON_LOST_FOCUS = true;
 
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
     private static final PseudoClass HISTORY_POPUP_SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("history-popup-showing");
@@ -160,7 +161,12 @@ public class SearchTextField extends CustomTextField {
     }
 
     private void addPropertyListeners() {
-        focusedProperty().addListener(it -> hideHistoryPopup());
+        focusedProperty().subscribe(isFocused -> {
+            hideHistoryPopup();
+            if (!isFocused && isAddHistoryOnLostFocus()) {
+                addHistory(getText());
+            }
+        });
 
         maxHistorySizeProperty().addListener(it -> {
             // Check if the max history size is negative. If so, log a warning.
@@ -464,6 +470,28 @@ public class SearchTextField extends CustomTextField {
 
     public final void setPreferences(Preferences preferences) {
         this.preferences.set(preferences);
+    }
+
+    private BooleanProperty addHistoryOnLostFocus;
+
+    /**
+     * Indicates whether the text of the text field should be added to the history when the text field loses focus.
+     *
+     * @return true if the text should be added to the history on lost focus, false otherwise
+     */
+    public final BooleanProperty addHistoryOnLostFocusProperty() {
+        if (addHistoryOnLostFocus == null) {
+            addHistoryOnLostFocus = new SimpleBooleanProperty(this, "addHistoryOnLostFocus", DEFAULT_ADD_HISTORY_ON_LOST_FOCUS);
+        }
+        return addHistoryOnLostFocus;
+    }
+
+    public final boolean isAddHistoryOnLostFocus() {
+        return addHistoryOnLostFocus == null ? DEFAULT_ADD_HISTORY_ON_LOST_FOCUS : addHistoryOnLostFocus.get();
+    }
+
+    public final void setAddHistoryOnLostFocus(boolean addHistoryOnLostFocus) {
+        addHistoryOnLostFocusProperty().set(addHistoryOnLostFocus);
     }
 
     /**
