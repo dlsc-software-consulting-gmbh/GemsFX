@@ -59,6 +59,12 @@ public class SearchTextField extends CustomTextField {
     private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER = true;
     private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST = true;
 
+    /**
+     * Using Unicode Record Separator as a delimiter. This separator is utilized for separating history items when storing.
+     * This character is unlikely to be utilized within the history items.
+     */
+    private static final String DELIMITER = "␞";
+
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
     private static final PseudoClass HISTORY_POPUP_SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("history-popup-showing");
 
@@ -125,16 +131,16 @@ public class SearchTextField extends CustomTextField {
     private void storeHistory() {
         Preferences preferences = getPreferences();
         if (preferences != null) {
-            preferences.put("search-items", String.join(",", getUnmodifiableHistory()));
+            preferences.put("history-items", String.join(DELIMITER, getUnmodifiableHistory()));
         }
     }
 
     private void loadHistory() {
         Preferences preferences = getPreferences();
         if (preferences != null) {
-            String items = preferences.get("search-items", "");
+            String items = preferences.get("history-items", "");
             if (StringUtils.isNotEmpty(items)) {
-                history.setAll(items.split(","));
+                history.setAll(items.split(DELIMITER));
             }
             // else { history.clear(); }
         }
