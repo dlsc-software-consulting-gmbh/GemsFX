@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 public class SearchFieldApp extends Application {
@@ -122,6 +123,8 @@ public class SearchFieldApp extends Application {
             setMatcher((broker, searchText) -> broker.getName().toLowerCase().startsWith(searchText.toLowerCase()));
             setComparator(Comparator.comparing(Country::getName));
             getEditor().setPromptText("Start typing country name ...");
+            // If not setPreferences() history records are only stored temporarily in memory and are not persisted locally.
+            getHistoryManager().setPreferences(Preferences.userNodeForPackage(SearchFieldApp.class).node("field"));
         }
     }
 

@@ -32,9 +32,10 @@ public class RemovableListCell<T> extends ListCell<T> {
 
         label = new Label();
 
+        setPrefWidth(0);
         StackPane removeBtn = new StackPane(new FontIcon(MaterialDesign.MDI_CLOSE));
         removeBtn.getStyleClass().add("remove-button");
-        removeBtn.setOnMouseClicked(this::onRemoveAction);
+        removeBtn.addEventHandler(MouseEvent.MOUSE_PRESSED, this::onRemoveAction);
 
         containerBox = new HBox(label, new Spacer(), removeBtn);
         containerBox.getStyleClass().add("container-box");
@@ -64,6 +65,7 @@ public class RemovableListCell<T> extends ListCell<T> {
     }
 
     public void onRemoveAction(MouseEvent event) {
+        event.consume();
         if (getOnRemove() != null) {
 
             // clear selection if the item is selected

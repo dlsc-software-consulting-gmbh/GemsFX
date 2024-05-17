@@ -1,0 +1,72 @@
+.history-popup.round > .content-pane {
+    -fx-background-radius: 10px;
+}
+
+.history-popup.round > .content-pane > .history-list-view {
+    -fx-background-radius: 10px;
+    -fx-padding: 5px;
+}
+
+.history-popup > .content-pane {
+    -fx-background-color: linear-gradient(to bottom,
+    derive(-fx-color, -17%),
+    derive(-fx-color, -30%)
+    ),
+    -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
+    -fx-pref-height: 200px;
+}
+
+.history-popup:above > .content-pane {
+    -fx-translate-y: -6;
+}
+
+.history-popup > .content-pane .popup-left {
+    -fx-background-color: linear-gradient(to right, #e0e0e0, #f8f8f8);
+    -fx-padding: 10px 5px 5px 5px;
+    -fx-alignment: top-center;
+}
+
+/* -----------------------------------------------------------------------
+ * Style based on Modena.css combo-box-popup style
+ */
+.history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 4 0 4 5;
+    /* No alternate highlighting */
+    -fx-background: -fx-control-inner-background;
+}
+
+.history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-background: -fx-accent;
+    -fx-background-color: #c9c9c9;
+}
+
+.history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-background, -fx-cell-focus-inner-border, -fx-background;
+    -fx-background-insets: 0, 1, 2;
+}
+
+.history-list-view > .placeholder > .label {
+    -fx-text-fill: derive(-fx-control-inner-background, -30%);
+    -fx-padding: 0 10px;
+}
+
+.history-list-view .search-field-list-cell {
+}
+
+.history-list-view .search-field-list-cell .text {
+    -fx-fill: -fx-selection-bar-text;
+}
+
+.history-list-view .search-field-list-cell .text.start {
+}
+
+.history-list-view .search-field-list-cell .text.middle {
+    -fx-underline: true;
+}
+
+.history-list-view .search-field-list-cell .text.end {
+}

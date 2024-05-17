@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.SearchTextField;
+import com.dlsc.gemsfx.util.StringHistoryManager;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -21,20 +22,21 @@ import java.util.prefs.Preferences;
 
 public class SearchTextFieldApp extends Application {
 
-    private SearchTextField field1;
-
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        field1 = new SearchTextField();
-        field1.setPreferences(Preferences.userNodeForPackage(SearchTextFieldApp.class).node("field1"));
+        SearchTextField field1 = new SearchTextField();
+        StringHistoryManager historyManager1 = field1.getHistoryManager();
+        historyManager1.setPreferences(Preferences.userNodeForPackage(SearchTextFieldApp.class).node("field1"));
 
         SearchTextField field2 = new SearchTextField(true);
-        field2.setPreferences(Preferences.userNodeForPackage(SearchTextFieldApp.class).node("field2"));
+        StringHistoryManager historyManager2 = field2.getHistoryManager();
+        historyManager2.setPreferences(Preferences.userNodeForPackage(SearchTextFieldApp.class).node("field2"));
 
         Label label = new Label("Max History Size:");
         Spinner<Integer> maxHistorySizeSpinner = new Spinner<>(5, 50, 10, 5);
-        field1.maxHistorySizeProperty().bind(maxHistorySizeSpinner.valueProperty());
+        historyManager1.maxHistorySizeProperty().bind(maxHistorySizeSpinner.valueProperty());
+        historyManager2.maxHistorySizeProperty().bind(maxHistorySizeSpinner.valueProperty());
         maxHistorySizeSpinner.setMaxWidth(Double.MAX_VALUE);
         HBox maxHistorySizeBox = new HBox(5, label, maxHistorySizeSpinner);
         maxHistorySizeBox.setAlignment(Pos.CENTER_LEFT);
@@ -58,25 +60,25 @@ public class SearchTextFieldApp extends Application {
         setHistoryButton.setMaxWidth(Double.MAX_VALUE);
         setHistoryButton.setOnAction(e -> {
             List<String> list = List.of("One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten");
-            field1.setHistory(list);
-            field2.setHistory(list);
+            historyManager1.set(list);
+            historyManager2.set(list);
         });
 
         Button addHistoryButton = new Button("Add History");
         addHistoryButton.setMaxWidth(Double.MAX_VALUE);
         addHistoryButton.setOnAction(e -> {
-            field1.addHistory("New " + LocalTime.now());
-            field2.addHistory("New" + LocalTime.now());
+            historyManager1.add("New " + LocalTime.now());
+            historyManager2.add("New" + LocalTime.now());
         });
 
-        Button removeStandardHistoryButton = createRemoveHistoryButton("Standard Field Remove First History Item", field1);
-        Button removeRoundHistoryButton = createRemoveHistoryButton("Round Field Remove First History Item", field2);
+        Button removeStandardHistoryButton = createRemoveHistoryButton("Standard Field Remove First History Item", historyManager1);
+        Button removeRoundHistoryButton = createRemoveHistoryButton("Round Field Remove First History Item", historyManager2);
 
         Button clearButton = new Button("Clear History");
         clearButton.setMaxWidth(Double.MAX_VALUE);
         clearButton.setOnAction(e -> {
-            field1.clearHistory();
-            field2.clearHistory();
+            historyManager1.clear();
+            historyManager2.clear();
         });
 
         VBox vbox = new VBox(20, new Label("Standard"), field1, new Label("Round"), field2,
@@ -92,11 +94,11 @@ public class SearchTextFieldApp extends Application {
         primaryStage.show();
     }
 
-    private Button createRemoveHistoryButton(String text, SearchTextField field) {
+    private Button createRemoveHistoryButton(String text, StringHistoryManager historyManager) {
         Button removeHistoryButton2 = new Button(text);
-        removeHistoryButton2.disableProperty().bind(Bindings.createObjectBinding(() -> field.getUnmodifiableHistory().isEmpty(), field.getUnmodifiableHistory()));
+        removeHistoryButton2.disableProperty().bind(Bindings.createObjectBinding(() -> historyManager.getAll().isEmpty(), historyManager.getAll()));
         removeHistoryButton2.setMaxWidth(Double.MAX_VALUE);
-        removeHistoryButton2.setOnAction(e -> field.removeHistory(field.getUnmodifiableHistory().get(0)));
+        removeHistoryButton2.setOnAction(e -> historyManager.remove(historyManager.getAll().get(0)));
         return removeHistoryButton2;
     }
 

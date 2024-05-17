@@ -1,21 +1,12 @@
 package com.dlsc.gemsfx;
 
-import com.dlsc.gemsfx.skins.SearchTextFieldHistoryPopup;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import com.dlsc.gemsfx.util.StringHistoryManager;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
-import javafx.event.EventTarget;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -23,20 +14,14 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
-import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 /**
  * A custom text field specifically designed for search functionality. This class enhances a text field with features
@@ -47,35 +32,55 @@ import java.util.prefs.Preferences;
  * and / or the {@link #addingItemToHistoryOnEnterProperty()} to false.
  * <br>
  * Additionally, history can be manually added based on user actions, such as after typing text and selecting an item
- * from a ListView or TableView that displays results, or through other interactions, by calling the {@link #addHistory}
- * method to add the current text to the history.
+ * from a ListView or TableView that displays results, or through other interactions, by calling the {@link #getHistoryManager()}
+ * method to access the {@link StringHistoryManager} instance. then calling the {@link StringHistoryManager#add(String)} method.
+ *
+ * <p>
+ * History management is enabled by default and can be accessed and controlled through a history button integrated into the search text field.
+ * Users can interact with their search history, revisit previous queries, or clear historical entries. The history functionality is managed by
+ * a {@link StringHistoryManager}, accessible via {@code getHistoryManager()}, allowing programmatic manipulation of history records.
+ * If {@code setPreferences(Preferences preferences)} is not set on the {@link StringHistoryManager}, history records are only stored temporarily in memory
+ * and are not persisted locally. This means that history data will not be retained after the application is closed.
+ * </p>
+ *
  */
 public class SearchTextField extends CustomTextField {
 
-    private static final Logger LOG = Logger.getLogger(SearchTextField.class.getName());
-
-    private static final int DEFAULT_MAX_HISTORY_SIZE = 30;
-    private static final boolean ENABLE_HISTORY_POPUP = true;
+    private static final boolean DEFAULT_ENABLE_HISTORY_POPUP = true;
     private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER = true;
     private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST = true;
 
-    /**
-     * Using Unicode Record Separator as a delimiter. This separator is utilized for separating history items when storing.
-     * This character is unlikely to be utilized within the history items.
-     */
-    private static final String DELIMITER = "␞";
-
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
-    private static final PseudoClass HISTORY_POPUP_SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("history-popup-showing");
 
-    private SearchTextFieldHistoryPopup historyPopup;
-    private final StackPane searchIconWrapper;
+    private final StringHistoryManager historyManager;
+    private final HistoryButton<String> historyButton;
+
+    /**
+     * Constructs a new text field customized for search operations.
+     * <p>
+     * The history manager is initialized with default values.
+     */
+    public SearchTextField() {
+        this(false, new StringHistoryManager());
+    }
 
     /**
      * Constructs a new text field customized for search operations.
      */
-    public SearchTextField() {
-        this(false);
+    public SearchTextField(StringHistoryManager historyManager) {
+        this(false, historyManager);
+    }
+
+    /**
+     * Constructs a new text field customized for search operations. The look and feel can be
+     * adjusted to feature rounded corners / sides.
+     * <p>
+     * The history manager is initialized with default values.
+     *
+     * @param round if true the sides of the field will be round
+     */
+    public SearchTextField(boolean round) {
+        this(round, new StringHistoryManager());
     }
 
     /**
@@ -84,7 +89,7 @@ public class SearchTextField extends CustomTextField {
      *
      * @param round if true the sides of the field will be round
      */
-    public SearchTextField(boolean round) {
+    public SearchTextField(boolean round, StringHistoryManager historyManager) {
         if (round) {
             getStyleClass().add("round");
         }
@@ -97,94 +102,73 @@ public class SearchTextField extends CustomTextField {
         placeholder.getStyleClass().add("default-placeholder");
         setHistoryPlaceholder(placeholder);
 
-        searchIconWrapper = createLeftNode();
+        this.historyManager = historyManager;
+        setHistoryCellFactory(view -> new RemovableListCell<>((listView, item) -> historyManager.remove(item)));
 
-        setLeft(searchIconWrapper);
+        historyButton = createLeftNode(round);
+        setLeft(historyButton);
+
         setRight(createRightNode());
 
         addEventHandlers();
-        addPropertyListeners();
-
-        setHistoryCellFactory(param -> new RemovableListCell<>((listView, item) -> removeHistory(item)));
 
         focusedProperty().addListener(it -> {
             if (!isFocused() && isAddingItemToHistoryOnFocusLost()) {
-                addHistory(getText());
+                historyManager.add(getText());
             }
+            historyButton.hideHistoryPopup();
         });
-
-        getUnmodifiableHistory().addListener((Observable it) -> {
-            if (getPreferences() != null) {
-                storeHistory();
-            }
-        });
-
-        InvalidationListener loadHistoryListener = it -> {
-            if (getPreferences() != null) {
-                loadHistory();
-            }
-        };
-
-        preferencesProperty().addListener(loadHistoryListener);
     }
 
-    private void storeHistory() {
-        Preferences preferences = getPreferences();
-        if (preferences != null) {
-            preferences.put("history-items", String.join(DELIMITER, getUnmodifiableHistory()));
-        }
-    }
+    private HistoryButton<String> createLeftNode(boolean round) {
+        HistoryButton<String> historyButton = new HistoryButton<>(this, historyManager);
 
-    private void loadHistory() {
-        Preferences preferences = getPreferences();
-        if (preferences != null) {
-            String items = preferences.get("history-items", "");
-            if (StringUtils.isNotEmpty(items)) {
-                history.setAll(items.split(DELIMITER));
+        // Create the graphic
+        Region graphic = new Region();
+        graphic.getStyleClass().add("icon");
+        historyButton.setGraphic(graphic);
+
+        // Configure the history button
+        historyButton.setFocusTraversable(false);
+        historyButton.setFocusPopupOwnerOnOpen(true);
+        historyButton.enableHistoryPopupProperty().bind(enableHistoryPopupProperty());
+        historyButton.setConfigureHistoryPopup(historyPopup -> {
+            if (round) {
+                historyPopup.getStyleClass().add("round");
             }
-            // else { history.clear(); }
-        }
+
+            historyPopup.historyPlaceholderProperty().bind(historyPlaceholderProperty());
+            historyPopup.historyCellFactoryProperty().bind(historyCellFactoryProperty());
+
+            historyPopup.setOnHistoryItemConfirmed(history -> {
+                if (history != null) {
+                    // replace text
+                    int oldTextLen = textProperty().getValueSafe().length();
+                    replaceText(0, oldTextLen, history);
+                }
+
+                // hide popup
+                historyPopup.hide();
+            });
+        });
+
+        return historyButton;
     }
 
     private void addEventHandlers() {
         // On Action event, add the text to the history
         addEventHandler(ActionEvent.ANY, e -> {
             if (isAddingItemToHistoryOnEnter()) {
-                addHistory(getText());
+                historyManager.add(getText());
             }
         });
 
-        // On mouse pressed, hide the history popup
-        addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
-            EventTarget target = e.getTarget();
-            boolean clickHistoryButton = (target instanceof Node && searchIconWrapper.getChildren().contains(target)) || searchIconWrapper.equals(target);
-            if (!clickHistoryButton) {
-                hideHistoryPopup();
-            }
-        });
-
-        // On key pressed, hide the history popup. Consume the UP and DOWN key events.
-        addEventHandler(KeyEvent.ANY, e -> {
+        // On key released, hide the history popup if the up or down key is pressed
+        addEventHandler(KeyEvent.KEY_RELEASED, e -> {
             if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN) {
                 e.consume();
             } else {
-                hideHistoryPopup();
-            }
-        });
-    }
-
-    private void addPropertyListeners() {
-        focusedProperty().addListener(it -> hideHistoryPopup());
-
-        maxHistorySizeProperty().addListener(it -> {
-            // Check if the max history size is negative. If so, log a warning.
-            if (getMaxHistorySize() < 0) {
-                LOG.warning("Max history size must be greater than or equal to 0. ");
-            }
-
-            int max = Math.max(0, getMaxHistorySize());
-            if (history.size() > max) {
-                history.remove(max, history.size());
+                historyButton.hideHistoryPopup();
             }
         });
     }
@@ -202,150 +186,9 @@ public class SearchTextField extends CustomTextField {
         return clearIconWrapper;
     }
 
-    private StackPane createLeftNode() {
-        Region searchIcon = new Region();
-        searchIcon.getStyleClass().add("search-icon");
-        searchIcon.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-
-        StackPane searchIconWrapper = new StackPane(searchIcon);
-        searchIconWrapper.getStyleClass().addAll("wrapper", "search-icon-wrapper");
-        searchIconWrapper.setOnMouseClicked(this::clickIconWrapperHandler);
-        return searchIconWrapper;
-    }
-
-    /*
-     * Handles the click event on the icon wrapper of the search text field.
-     */
-    private void clickIconWrapperHandler(MouseEvent event) {
-        if (!isFocused()) {
-            requestFocus();
-        }
-
-        if (event.getButton() != MouseButton.PRIMARY || !isEnableHistoryPopup()) {
-            return;
-        }
-
-        if (historyPopup == null) {
-            historyPopup = new SearchTextFieldHistoryPopup(this);
-            historyPopupShowing.bind(historyPopup.showingProperty());
-        }
-
-        if (historyPopup.isShowing()) {
-            historyPopup.hide();
-        } else {
-            historyPopup.show(this);
-        }
-
-        positionCaret(textProperty().getValueSafe().length());
-    }
-
-    private void hideHistoryPopup() {
-        if (historyPopup != null && historyPopup.isShowing()) {
-            historyPopup.hide();
-        }
-    }
-
     @Override
     public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(SearchTextField.class.getResource("search-text-field.css")).toExternalForm();
-    }
-
-    private final ObservableList<String> history = FXCollections.observableArrayList();
-
-    /**
-     * Sets the history of the search text field. The given list of Strings will be processed to guarantee unique
-     * entries.
-     *
-     * @param history the list of strings representing the history
-     */
-    public final void setHistory(List<String> history) {
-        this.history.setAll(convertToUniqueList(history));
-    }
-
-    /**
-     * Adds the given item to the history. The method ensures that duplicates will not be added.
-     *
-     * @param item the item to add
-     */
-    public final void addHistory(String item) {
-        if (StringUtils.isNotEmpty(item)) {
-            history.remove(item);
-            history.add(0, item);
-        }
-
-        int max = Math.max(0, getMaxHistorySize());
-        if (history.size() > max) {
-            history.remove(max, history.size());
-        }
-    }
-
-    /**
-     * Adds the given items to the history.
-     *
-     * @param items the items to add
-     */
-    public final void addHistory(List<String> items) {
-        List<String> uniqueItems = convertToUniqueList(items);
-        for (String item : uniqueItems) {
-            addHistory(item);
-        }
-    }
-
-    /**
-     * Removes the given item from the history.
-     *
-     * @param item the item to remove
-     * @return true if the item was removed, false otherwise
-     */
-    public final boolean removeHistory(String item) {
-        return history.remove(item);
-    }
-
-    /**
-     * Removes the given items from the history.
-     *
-     * @param items the items to remove
-     */
-    public final void removeHistory(List<String> items) {
-        history.removeAll(items);
-    }
-
-    /**
-     * Clears the history.
-     */
-    public final void clearHistory() {
-        history.clear();
-    }
-
-    private final ObservableList<String> unmodifiableHistory = FXCollections.unmodifiableObservableList(history);
-
-    /**
-     * Returns an unmodifiable list of the history.
-     */
-    public final ObservableList<String> getUnmodifiableHistory() {
-        return unmodifiableHistory;
-    }
-
-    private IntegerProperty maxHistorySize;
-
-    /**
-     * Returns the property representing the maximum history size of the search text field.
-     *
-     * @return the maximum history size property
-     */
-    public final IntegerProperty maxHistorySizeProperty() {
-        if (maxHistorySize == null) {
-            maxHistorySize = new SimpleIntegerProperty(this, "maxHistorySize", DEFAULT_MAX_HISTORY_SIZE);
-        }
-        return maxHistorySize;
-    }
-
-    public final int getMaxHistorySize() {
-        return maxHistorySize == null ? DEFAULT_MAX_HISTORY_SIZE : maxHistorySize.get();
-    }
-
-    public final void setMaxHistorySize(int maxHistorySize) {
-        maxHistorySizeProperty().set(maxHistorySize);
+        return Objects.requireNonNull(SearchTextField2.class.getResource("search-text-field.css")).toExternalForm();
     }
 
     private ObjectProperty<Node> historyPlaceholder = new SimpleObjectProperty<>(this, "historyPlaceholder");
@@ -401,7 +244,7 @@ public class SearchTextField extends CustomTextField {
      */
     public final BooleanProperty enableHistoryPopupProperty() {
         if (enableHistoryPopup == null) {
-            enableHistoryPopup = new SimpleBooleanProperty(this, "enableHistoryPopup", ENABLE_HISTORY_POPUP) {
+            enableHistoryPopup = new SimpleBooleanProperty(this, "enableHistoryPopup", DEFAULT_ENABLE_HISTORY_POPUP) {
                 @Override
                 protected void invalidated() {
                     pseudoClassStateChanged(DISABLED_POPUP_PSEUDO_CLASS, !get());
@@ -412,7 +255,7 @@ public class SearchTextField extends CustomTextField {
     }
 
     public final boolean isEnableHistoryPopup() {
-        return enableHistoryPopup == null ? ENABLE_HISTORY_POPUP : enableHistoryPopup.get();
+        return enableHistoryPopup == null ? DEFAULT_ENABLE_HISTORY_POPUP : enableHistoryPopup.get();
     }
 
     public final void setEnableHistoryPopup(boolean enableHistoryPopup) {
@@ -467,52 +310,13 @@ public class SearchTextField extends CustomTextField {
         addingItemToHistoryOnFocusLostProperty().set(addingItemToHistoryOnFocusLost);
     }
 
-    private final ReadOnlyBooleanWrapper historyPopupShowing = new ReadOnlyBooleanWrapper(this, "historyPopupShowing") {
-        @Override
-        protected void invalidated() {
-            pseudoClassStateChanged(HISTORY_POPUP_SHOWING_PSEUDO_CLASS, get());
-        }
-    };
-
-    public final boolean isHistoryPopupShowing() {
-        return historyPopupShowing.get();
-    }
-
     /**
-     * Indicates whether the history popup is showing. This is a read-only property.
+     * If we want to manually add history records, delete history records, clear history records, then please get the HistoryManager object through this method.
      *
-     * @return true if the history popup is showing, false otherwise
+     * @return the history manager
      */
-    public final ReadOnlyBooleanProperty historyPopupShowingProperty() {
-        return historyPopupShowing.getReadOnlyProperty();
+    public StringHistoryManager getHistoryManager() {
+        return historyManager;
     }
 
-    private final ObjectProperty<Preferences> preferences = new SimpleObjectProperty<>(this, "preferences");
-
-    /**
-     * Stores a preferences object that will be used for persisting the search history of the field.
-     *
-     * @return the preferences used for persisting the search history
-     */
-    public final ObjectProperty<Preferences> preferencesProperty() {
-        return preferences;
-    }
-
-    public final Preferences getPreferences() {
-        return preferences.get();
-    }
-
-    public final void setPreferences(Preferences preferences) {
-        this.preferences.set(preferences);
-    }
-
-    /**
-     * Converts a given list of strings to a unique list of strings. Filters out empty strings.
-     *
-     * @param history the list of strings to convert
-     * @return the converted unique list of strings
-     */
-    private List<String> convertToUniqueList(List<String> history) {
-        return history.stream().distinct().filter(StringUtils::isNotEmpty).limit(Math.max(0, getMaxHistorySize())).toList();
-    }
 }
