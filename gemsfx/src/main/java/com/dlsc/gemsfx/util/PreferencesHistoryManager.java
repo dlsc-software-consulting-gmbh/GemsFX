@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
@@ -127,7 +128,7 @@ public class PreferencesHistoryManager<T> implements HistoryManager<T> {
      * @param item the item to add
      */
     public final void add(T item) {
-        if (item != null) {
+        if (item != null && getFilter().test(item)) {
             history.remove(item);
             history.add(0, item);
             trimHistory();
@@ -203,6 +204,26 @@ public class PreferencesHistoryManager<T> implements HistoryManager<T> {
         maxHistorySizeProperty().set(maxHistorySize);
     }
 
+    private final ObjectProperty<Predicate<T>> filter = new SimpleObjectProperty<>(this, "filter", it -> true);
+
+    /**
+     * Returns the property object for the filter used when adding items to the history.
+     * Only items that pass the filter will be added to the history.
+     *
+     * @return the property object for the filter
+     */
+    public final ObjectProperty<Predicate<T>> filterProperty() {
+        return filter;
+    }
+
+    public final Predicate<T> getFilter() {
+        return filter.get();
+    }
+
+    public final void setFilter(Predicate<T> filter) {
+        this.filter.set(filter);
+    }
+
     private final ObjectProperty<Preferences> preferences = new SimpleObjectProperty<>(this, "preferences");
 
     /**
@@ -242,7 +263,7 @@ public class PreferencesHistoryManager<T> implements HistoryManager<T> {
      * @return the converted unique list of strings
      */
     private List<T> convertToUniqueList(List<T> history) {
-        return history.stream().distinct().filter(Objects::nonNull).limit(Math.max(0, getMaxHistorySize())).toList();
+        return history.stream().distinct().filter(Objects::nonNull).filter(getFilter()).limit(Math.max(0, getMaxHistorySize())).toList();
     }
 
     /**

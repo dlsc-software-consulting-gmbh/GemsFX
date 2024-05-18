@@ -188,7 +188,7 @@ public class SearchTextField extends CustomTextField {
 
     @Override
     public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(SearchTextField2.class.getResource("search-text-field.css")).toExternalForm();
+        return Objects.requireNonNull(SearchTextField.class.getResource("search-text-field.css")).toExternalForm();
     }
 
     private ObjectProperty<Node> historyPlaceholder = new SimpleObjectProperty<>(this, "historyPlaceholder");

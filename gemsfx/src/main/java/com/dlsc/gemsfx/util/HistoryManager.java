@@ -1,9 +1,11 @@
 package com.dlsc.gemsfx.util;
 
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * The HistoryManager interface defines the standard operations to manage history storage
@@ -79,4 +81,26 @@ public interface HistoryManager<T> {
      */
     void setMaxHistorySize(int maxHistorySize);
 
+    /**
+     * Returns the property that holds the filter used when adding items to the history.
+     * Only items that pass the filter will be added to the history.
+     *
+     * @return the property containing the filter
+     */
+    ObjectProperty<Predicate<T>> filterProperty();
+
+    /**
+     * Sets a filter to be used when adding items to the history. Only items that pass the
+     * filter will be added to the history.
+     *
+     * @param filter The filter to apply.
+     */
+    void setFilter(Predicate<T> filter);
+
+    /**
+     * Gets the current filter used for adding items to the history.
+     *
+     * @return The current filter.
+     */
+    Predicate<T> getFilter();
 }
