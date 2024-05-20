@@ -65,6 +65,13 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>24.1.0</version>
+                <optional>true</optional>
+            </dependency>
+
+            <dependency>
                 <groupId>org.controlsfx</groupId>
                 <artifactId>controlsfx</artifactId>
                 <version>11.1.2</version>

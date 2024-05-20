@@ -47,6 +47,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
             <groupId>net.synedra</groupId>
             <artifactId>validatorfx</artifactId>
             <version>0.5.0</version>
