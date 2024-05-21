@@ -61,7 +61,7 @@ public class CircleProgressIndicatorSkin extends SkinBase<CircleProgressIndicato
         // init the progress arc
         progressArc.getStyleClass().add("progress-arc");
         progressArc.setManaged(false);
-        progressArc.setStartAngle(90);
+        progressArc.startAngleProperty().bind(control.startAngleProperty());
         progressArc.setLength(360);
         progressArc.radiusXProperty().bind(radiusBinding);
         progressArc.radiusYProperty().bind(radiusBinding);

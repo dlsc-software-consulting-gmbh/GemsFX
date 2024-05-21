@@ -1,7 +1,9 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.CircleProgressIndicatorSkin;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
@@ -55,6 +57,7 @@ import java.util.Objects;
 public class CircleProgressIndicator extends ProgressIndicator {
 
     private static final String DEFAULT_STYLE_CLASS = "circle-progress-indicator";
+    private static final double DEFAULT_START_ANGLE = 90.0;
     private static final ArcType DEFAULT_ARC_TYPE = ArcType.OPEN;
     private static final StringConverter<Double> DEFAULT_CONVERTER = new StringConverter<>() {
         @Override
@@ -133,6 +136,29 @@ public class CircleProgressIndicator extends ProgressIndicator {
 
     public final void setGraphic(Node graphic) {
         graphicProperty().set(graphic);
+    }
+
+    private DoubleProperty startAngle;
+
+    /**
+     * The start angle property defines the starting angle of the arc that is used to display the progress.
+     * The default value is 90 degrees, which corresponds to the top of the circle.
+     *
+     * @return the start angle property
+     */
+    public final DoubleProperty startAngleProperty() {
+        if (startAngle == null) {
+            startAngle = new SimpleDoubleProperty(this, "startAngle", DEFAULT_START_ANGLE);
+        }
+        return startAngle;
+    }
+
+    public final double getStartAngle() {
+        return startAngle == null ? DEFAULT_START_ANGLE : startAngle.get();
+    }
+
+    public final void setStartAngle(double startAngle) {
+        startAngleProperty().set(startAngle);
     }
 
     private ObjectProperty<ArcType> arcType;
