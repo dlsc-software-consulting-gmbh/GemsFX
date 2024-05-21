@@ -26,8 +26,6 @@ open module com.dlsc.gemsfx {
     requires com.dlsc.pickerfx;
     requires com.dlsc.unitfx;
 
-    requires static org.jetbrains.annotations;
-
     exports com.dlsc.gemsfx;
     exports com.dlsc.gemsfx.daterange;
     exports com.dlsc.gemsfx.incubator;

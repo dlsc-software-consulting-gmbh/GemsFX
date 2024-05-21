@@ -8,8 +8,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +24,7 @@ public class UIUtil {
      * @param node       The node to add the style class to.
      * @param styleClass The style class to add.
      */
-    public static void addClassIfAbsent(@Nullable Node node, @NotNull String styleClass) {
+    public static void addClassIfAbsent(Node node, String styleClass) {
         Optional.ofNullable(node).ifPresent(n -> {
             if (!n.getStyleClass().contains(styleClass)) {
                 n.getStyleClass().add(styleClass);
@@ -40,7 +38,7 @@ public class UIUtil {
      * @param node         The node to add the style classes to.
      * @param styleClasses The style classes to add.
      */
-    public static void addClassesIfAbsent(@NotNull Node node, @NotNull String... styleClasses) {
+    public static void addClassesIfAbsent(Node node, String... styleClasses) {
         List<String> list = Arrays.stream(styleClasses)
                 .filter(styleClass -> !node.getStyleClass().contains(styleClass))
                 .toList();
@@ -55,7 +53,7 @@ public class UIUtil {
      * @param node       The node to toggle the style on.
      * @param styleClass The style class to add or remove.
      */
-    public static void toggleClass(@NotNull Node node, @NotNull String styleClass) {
+    public static void toggleClass(Node node, String styleClass) {
         if (node.getStyleClass().contains(styleClass)) {
             node.getStyleClass().remove(styleClass);
         } else {
@@ -72,7 +70,7 @@ public class UIUtil {
      * @param styleClass The style class to add or remove.
      * @param condition  The condition that determines whether to add or remove the style.
      */
-    public static void toggleClassOnCondition(@NotNull Node node, @NotNull String styleClass, boolean condition) {
+    public static void toggleClassOnCondition(Node node, String styleClass, boolean condition) {
         if (condition) {
             addClassIfAbsent(node, styleClass);
         } else {
@@ -90,7 +88,7 @@ public class UIUtil {
      * @param stylesToRemove A list of styles to be removed from the node, except for the styleToAdd.
      * @param styleToAdd     The style to be added to the node, if it's not already present.
      */
-    public static void updateStyles(@NotNull Node node, @NotNull List<String> stylesToRemove, @NotNull String styleToAdd) {
+    public static void updateStyles(Node node, List<String> stylesToRemove, String styleToAdd) {
         // Add the style if it's not already present
         addClassIfAbsent(node, styleToAdd);
 
@@ -109,7 +107,7 @@ public class UIUtil {
      * @param stylesToRemove An array of styles to be removed from the node, except for the styleToAdd.
      * @param styleToAdd     The style to be added to the node, if it's not already present.
      */
-    public static void updateStyles(@NotNull Node node, @NotNull String[] stylesToRemove, @NotNull String styleToAdd) {
+    public static void updateStyles(Node node, String[] stylesToRemove, String styleToAdd) {
         updateStyles(node, Arrays.asList(stylesToRemove), styleToAdd);
     }
 
@@ -120,7 +118,7 @@ public class UIUtil {
      * @param enumValue The enum value determining the style to apply.
      *                  <p> Example     If Dir.UP is passed, add "up" style and removes {"down", "left", "right"} styles.
      */
-    public static <T extends Enum<T>> void updateStyleFromEnum(@NotNull Node node, @NotNull T enumValue) {
+    public static <T extends Enum<T>> void updateStyleFromEnum(Node node, T enumValue) {
         updateStyles(node, EnumUtil.convertAllToStylesClassName(enumValue.getClass()), EnumUtil.convertToStyleClassName(enumValue));
     }
 
@@ -131,21 +129,21 @@ public class UIUtil {
      * @param enumClass The enum class whose associated styles will be removed.
      *                  <p> Example     If Dir.class is passed, removes all styles {"up","down","left", "right"}.
      */
-    public static <T extends Enum<T>> void clearStylesByEnum(@NotNull Node node, @NotNull Class<T> enumClass) {
+    public static <T extends Enum<T>> void clearStylesByEnum(Node node, Class<T> enumClass) {
         node.getStyleClass().removeAll(EnumUtil.convertAllToStylesClassName(enumClass));
     }
 
     /**
      * Returns the height of the top and bottom insets combined.
      */
-    public static double getInsetsHeight(@Nullable Insets insets) {
+    public static double getInsetsHeight(Insets insets) {
         return insets == null ? 0 : insets.getTop() + insets.getBottom();
     }
 
     /**
      * Returns the width of the left and right insets combined.
      */
-    public static double getInsetsWidth(@Nullable Insets insets) {
+    public static double getInsetsWidth(Insets insets) {
         return insets == null ? 0 : insets.getLeft() + insets.getRight();
     }
 
@@ -167,7 +165,7 @@ public class UIUtil {
      * @param camelCaseString The camelCase string to be converted.
      * @return A string in natural language format, with appropriate spaces and capitalization.
      */
-    public static String camelCaseToNaturalCase(@NotNull String camelCaseString) {
+    public static String camelCaseToNaturalCase(String camelCaseString) {
         return StringUtils.capitalize(StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(camelCaseString), " "));
     }
 
@@ -197,7 +195,7 @@ public class UIUtil {
      * @return {@code true} if the event is a single stable primary button click, {@code false} otherwise.
      * @throws NullPointerException if the event is null.
      */
-    public static boolean clickOnNode(@NotNull MouseEvent event) {
+    public static boolean clickOnNode(MouseEvent event) {
         return event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1 && event.isStillSincePress();
     }
 

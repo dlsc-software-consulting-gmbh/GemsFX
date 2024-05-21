@@ -1,8 +1,6 @@
 package com.dlsc.gemsfx.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Utility class for working with enums.
@@ -26,7 +24,7 @@ public class EnumUtil {
      * <p> Example: 1. null -> ""
      * <p> Example: 2. MY_ENUM_VALUE -> My enum value
      */
-    public static <T extends Enum<T>> String formatEnumNameAsCapitalized(@Nullable T enumValue) {
+    public static <T extends Enum<T>> String formatEnumNameAsCapitalized(T enumValue) {
         return formatEnumNameAsCapitalized(enumValue, "");
     }
 
@@ -41,7 +39,7 @@ public class EnumUtil {
      * <p> Example: 1. null -> nullDefaultValue
      * <p> Example: 2. Example: MY_ENUM_VALUE -> My enum value
      */
-    public static <T extends Enum<T>> String formatEnumNameAsCapitalized(@Nullable T enumValue, @Nullable String nullDefaultValue) {
+    public static <T extends Enum<T>> String formatEnumNameAsCapitalized(T enumValue, String nullDefaultValue) {
         return enumValue == null ? nullDefaultValue : formatEnumNameAsCapitalized(enumValue.name());
     }
 
@@ -55,7 +53,7 @@ public class EnumUtil {
      * <p> Example: 1. null -> ""
      * <p> Example: 2. Example: MY_ENUM_VALUE -> My enum value
      */
-    public static <T extends Enum<T>> String formatEnumNameAsCapitalized(@Nullable String enumName) {
+    public static <T extends Enum<T>> String formatEnumNameAsCapitalized(String enumName) {
         return enumName == null ? "" : StringUtils.capitalize(enumName.replace("_", " ").toLowerCase());
     }
 
@@ -68,7 +66,7 @@ public class EnumUtil {
      * <p> Example: 1. null -> ""
      * <p> Example: 2. MY_ENUM_VALUE -> My Enum Value
      */
-    public static <T extends Enum<T>> String formatEnumNameAsTitleCase(@Nullable T enumValue) {
+    public static <T extends Enum<T>> String formatEnumNameAsTitleCase(T enumValue) {
         return formatEnumNameAsTitleCase(enumValue, "");
     }
 
@@ -82,7 +80,7 @@ public class EnumUtil {
      * <p> Example: 1. null -> nullDefaultValue
      * <p> Example: 2. MY_ENUM_VALUE -> My Enum Value
      */
-    public static <T extends Enum<T>> String formatEnumNameAsTitleCase(@Nullable T enumValue, @Nullable String nullDefaultValue) {
+    public static <T extends Enum<T>> String formatEnumNameAsTitleCase(T enumValue, String nullDefaultValue) {
         return formatEnumNameAsTitleCase(enumValue == null ? null : enumValue.name(), nullDefaultValue);
     }
 
@@ -95,7 +93,7 @@ public class EnumUtil {
      * <p> Example: 1. null -> ""
      * <p> Example: 2. MY_ENUM_VALUE -> My Enum Value
      */
-    public static <T extends Enum<T>> String formatEnumNameAsTitleCase(@Nullable String enumName) {
+    public static <T extends Enum<T>> String formatEnumNameAsTitleCase(String enumName) {
         return formatEnumNameAsTitleCase(enumName, "");
     }
 
@@ -109,7 +107,7 @@ public class EnumUtil {
      * <p> Example: 1. null -> nullDefaultValue
      * <p> Example: 2. MY_ENUM_VALUE -> My Enum Value
      */
-    public static <T extends Enum<T>> String formatEnumNameAsTitleCase(@Nullable String enumName, @Nullable String nullDefaultValue) {
+    public static <T extends Enum<T>> String formatEnumNameAsTitleCase(String enumName, String nullDefaultValue) {
         if (enumName == null) {
             return nullDefaultValue;
         }
@@ -142,7 +140,7 @@ public class EnumUtil {
      * <p> Example: 1. null -> ""
      * <p> Example: 2. MY_ENUM_VALUE -> MY ENUM VALUE
      */
-    public static <T extends Enum<T>> String formatEnumNameAsSpacedWords(@Nullable T enumValue) {
+    public static <T extends Enum<T>> String formatEnumNameAsSpacedWords(T enumValue) {
         return enumValue == null ? "" : enumValue.name().replace("_", " ");
     }
 
@@ -155,7 +153,7 @@ public class EnumUtil {
      * <p> Example: 1. null -> ""
      * <p> Example: 2. MY_ENUM_VALUE -> MY ENUM VALUE
      */
-    public static <T extends Enum<T>> String formatEnumNameAsSpacedWords(@Nullable String enumName) {
+    public static <T extends Enum<T>> String formatEnumNameAsSpacedWords(String enumName) {
         return enumName == null ? "" : enumName.replace("_", " ");
     }
 
@@ -167,16 +165,16 @@ public class EnumUtil {
      * @return A string suitable for use as a CSS class name.
      * Example: MY_ENUM_VALUE -> my-enum-value
      */
-    public static <T extends Enum<T>> String convertToStyleClassName(@NotNull T enumValue) {
+    public static <T extends Enum<T>> String convertToStyleClassName(T enumValue) {
         return enumValue.name().toLowerCase().replace("_", "-");
     }
 
-    public static <T extends Enum<T>> String[] convertAllToStylesClassName(@NotNull Class<T> enumClass) {
+    public static <T extends Enum<T>> String[] convertAllToStylesClassName(Class<T> enumClass) {
         T[] enumConstants = enumClass.getEnumConstants();
         return convertAllToStylesClassName(enumConstants);
     }
 
-    public static <T extends Enum<T>> String[] convertAllToStylesClassName(@NotNull T[] enumValues) {
+    public static <T extends Enum<T>> String[] convertAllToStylesClassName(T[] enumValues) {
         String[] styles = new String[enumValues.length];
         for (int i = 0; i < enumValues.length; i++) {
             styles[i] = convertToStyleClassName(enumValues[i]);
