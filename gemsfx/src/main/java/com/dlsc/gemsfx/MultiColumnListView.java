@@ -347,7 +347,7 @@ public class MultiColumnListView<T> extends Control {
 
                 multiColumnListView.getDraggedItems().setAll(getListView().getSelectionModel().getSelectedItems());
 
-                ListUtils.updateFirstMatching(getListView().getItems(), item -> item == getItem(), multiColumnListView.getPlaceholderFrom());
+                ListUtils.replaceIf(getListView().getItems(), item -> item == getItem(), multiColumnListView.getPlaceholderFrom());
             });
 
             setOnDragOver(event -> {
@@ -390,7 +390,7 @@ public class MultiColumnListView<T> extends Control {
                 items.remove(multiColumnListView.getPlaceholderFrom());
 
                 T draggedItem = multiColumnListView.getDraggedItem();
-                ListUtils.updateFirstMatching(items, item -> item == multiColumnListView.getPlaceholderTo(), draggedItem);
+                ListUtils.replaceIf(items, item -> item == multiColumnListView.getPlaceholderTo(), draggedItem);
 
                 if (!items.contains(draggedItem)) {
                     // probably dropped on same list view / same column (hence no "to" placeholder)
@@ -412,14 +412,14 @@ public class MultiColumnListView<T> extends Control {
                         getListView().getItems().removeIf(item -> item == multiColumnListView.getPlaceholderFrom());
                     } else {
                         log("   drop was not completed, replacing placeholder with dragged item");
-                        ListUtils.updateFirstMatching(getListView().getItems(), item -> item == multiColumnListView.getPlaceholderFrom(), multiColumnListView.getDraggedItem());
+                        ListUtils.replaceIf(getListView().getItems(), item -> item == multiColumnListView.getPlaceholderFrom(), multiColumnListView.getDraggedItem());
                     }
                 } else {
                     log("drag done, not accepted");
 
                     // put the item back into the "from" location
                     log("putting item back into 'from' location");
-                    ListUtils.updateFirstMatching(getListView().getItems(), item -> item == multiColumnListView.getPlaceholderFrom(), multiColumnListView.getDraggedItem());
+                    ListUtils.replaceIf(getListView().getItems(), item -> item == multiColumnListView.getPlaceholderFrom(), multiColumnListView.getDraggedItem());
                 }
 
                 multiColumnListView.setDraggedItem(null);
