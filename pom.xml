@@ -64,6 +64,7 @@
 
     <dependencyManagement>
         <dependencies>
+
             <dependency>
                 <groupId>com.dlsc.gemsfx</groupId>
                 <artifactId>gemsfx</artifactId>
