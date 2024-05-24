@@ -1,19 +1,19 @@
-.circle-progress-indicator {
+.arc-progress-indicator {
 }
 
-.circle-progress-indicator .track-circle {
+.arc-progress-indicator .track-circle {
     -fx-stroke-width: 3px;
     -fx-stroke: -fx-box-border;
     -fx-fill: transparent;
 }
 
-.circle-progress-indicator .progress-arc {
+.arc-progress-indicator .progress-arc {
     -fx-stroke-width: 3px;
     -fx-stroke: -fx-accent;
     -fx-fill: transparent;
 }
 
-.circle-progress-indicator .progress-label {
+.arc-progress-indicator .progress-label {
     -fx-text-alignment: center;
     -fx-alignment: center;
 }

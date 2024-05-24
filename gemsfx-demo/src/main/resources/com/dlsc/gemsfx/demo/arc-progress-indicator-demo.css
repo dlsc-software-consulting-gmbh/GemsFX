@@ -1,57 +1,57 @@
-.circle-progress-indicator {
+.arc-progress-indicator {
     /*-fx-font-family: Monospaced;*/
 }
 
-.circle-progress-indicator .progress-label {
+.arc-progress-indicator .progress-label {
     -fx-font-size: 15px;
 }
 
 /** --- icons --- */
-.circle-progress-indicator .progress-label .ikonli-font-icon {
+.arc-progress-indicator .progress-label .ikonli-font-icon {
     -fx-icon-code: mdi-download;
     -fx-icon-size: 16px;
 }
 
-.circle-progress-indicator:indeterminate .progress-label .ikonli-font-icon {
+.arc-progress-indicator:indeterminate .progress-label .ikonli-font-icon {
     -fx-icon-code: mdi-access-point-network;
 }
 
-.circle-progress-indicator:completed .progress-label .ikonli-font-icon {
+.arc-progress-indicator:completed .progress-label .ikonli-font-icon {
     -fx-icon-code: mdi-check-circle-outline;
 }
 
 /* --- bold style --- */
-.circle-progress-indicator.bold-style .track-circle {
+.arc-progress-indicator.bold-style .track-circle {
     -fx-stroke-width: 10px;
     -fx-stroke: #dadada;
 }
 
-.circle-progress-indicator.bold-style .progress-arc {
+.arc-progress-indicator.bold-style .progress-arc {
     -fx-stroke-width: 5px;
     -fx-stroke: #67986e;
 }
 
 /** --- thin style --- */
-.circle-progress-indicator.thin-style .track-circle {
+.arc-progress-indicator.thin-style .track-circle {
     -fx-stroke-width: 1px;
     -fx-stroke: #c9c9c9;
 }
 
-.circle-progress-indicator.thin-style .progress-arc {
+.arc-progress-indicator.thin-style .progress-arc {
     -fx-stroke-width: 1px;
     -fx-stroke: #f87328;
 }
 
 /** --- sector style --- */
-.circle-progress-indicator.sector-style {
-    -fx-arc-type: ROUND;
+.arc-progress-indicator.sector-style {
+    -fx-progress-arc-type: ROUND;
 }
 
-.circle-progress-indicator.sector-style .track-circle {
+.arc-progress-indicator.sector-style .track-circle {
     -fx-stroke-width: 5px;
 }
 
-.circle-progress-indicator.sector-style .progress-arc {
+.arc-progress-indicator.sector-style .progress-arc {
     -fx-fill: #47bce833;
     -fx-stroke-width: 1px;
 }

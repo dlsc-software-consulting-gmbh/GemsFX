@@ -1,19 +1,15 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.CircleProgressIndicator;
+import com.dlsc.gemsfx.SemiCircleProgressIndicator;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.concurrent.Service;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.control.Slider;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -24,13 +20,13 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Objects;
 
-public class CircleProgressIndicatorApp extends Application {
+public class SemiCircleProgressIndicatorApp extends Application {
 
     private StringConverter<Double> customConverter;
 
     @Override
     public void start(Stage primaryStage) {
-        CircleProgressIndicator progressIndicator = new CircleProgressIndicator();
+        SemiCircleProgressIndicator progressIndicator = new SemiCircleProgressIndicator();
         delayAutoUpdateProgress(progressIndicator);
 
         // styles
@@ -40,22 +36,11 @@ public class CircleProgressIndicatorApp extends Application {
         String firstStyle = styles[0];
         // add style
         progressIndicator.getStyleClass().add(firstStyle);
-        styleComboBox.setMaxWidth(Double.MAX_VALUE);
         styleComboBox.setValue(firstStyle);
         styleComboBox.valueProperty().addListener(it -> {
             progressIndicator.getStyleClass().removeAll(styles);
             progressIndicator.getStyleClass().add(styleComboBox.getValue());
         });
-
-        // start Angle
-        Label startAngleLabel = new Label("Start Angle");
-        Slider startAngleSlider = new Slider(0, 360, 90);
-        progressIndicator.startAngleProperty().bind(startAngleSlider.valueProperty());
-        Label startAngleValue = new Label();
-        startAngleValue.setPrefWidth(30);
-        startAngleValue.textProperty().bind(Bindings.format("%.0f", startAngleSlider.valueProperty()));
-        HBox startAngleBox = new HBox(5, startAngleLabel, startAngleSlider, startAngleValue);
-        startAngleBox.setAlignment(Pos.CENTER_LEFT);
 
         // graphic
         FontIcon graphic = new FontIcon();
@@ -76,7 +61,7 @@ public class CircleProgressIndicatorApp extends Application {
         indicatorWrapper.getStyleClass().add("indicator-wrapper");
         VBox.setVgrow(indicatorWrapper, Priority.ALWAYS);
 
-        VBox bottom = new VBox(10, showGraphic, customConverterBox, startAngleBox, styleComboBox);
+        VBox bottom = new VBox(10, styleComboBox, showGraphic, customConverterBox);
         bottom.setAlignment(Pos.CENTER_LEFT);
         bottom.setMaxWidth(Region.USE_PREF_SIZE);
 
@@ -86,14 +71,14 @@ public class CircleProgressIndicatorApp extends Application {
         containerBox.setAlignment(Pos.CENTER);
         containerBox.getChildren().addAll(indicatorWrapper, new Separator(), bottom);
 
-        Scene scene = new Scene(containerBox, 330, 390);
-        scene.getStylesheets().add(Objects.requireNonNull(CircleProgressIndicatorApp.class.getResource("arc-progress-indicator-demo.css")).toExternalForm());
+        Scene scene = new Scene(containerBox, 300, 390);
+        scene.getStylesheets().add(Objects.requireNonNull(SemiCircleProgressIndicatorApp.class.getResource("arc-progress-indicator-demo.css")).toExternalForm());
         primaryStage.setScene(scene);
-        primaryStage.setTitle("CircleProgressIndicator Demo");
+        primaryStage.setTitle("SemiCircleProgressIndicator");
         primaryStage.show();
     }
 
-    private void delayAutoUpdateProgress(CircleProgressIndicator graphicIndicator) {
+    private void delayAutoUpdateProgress(SemiCircleProgressIndicator graphicIndicator) {
         Service<Void> service = new Service<>() {
             @Override
             protected javafx.concurrent.Task<Void> createTask() {
