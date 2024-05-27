@@ -1,24 +1,9 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.CircleProgressIndicatorSkin;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.css.CssMetaData;
-import javafx.css.Styleable;
-import javafx.css.StyleableObjectProperty;
-import javafx.css.StyleableProperty;
-import javafx.css.converter.EnumConverter;
-import javafx.scene.Node;
-import javafx.scene.control.ProgressIndicator;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.Skin;
-import javafx.scene.shape.ArcType;
-import javafx.util.StringConverter;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
 
 /**
  * CircleProgressIndicator is a visual control used to indicate the progress of a task.
@@ -35,6 +20,10 @@ import java.util.Objects;
  * <p>
  * Usage examples include file downloads, file transfers, or any long-running tasks where
  * visual feedback on progress is beneficial.
+ * <p>
+ * The CircleProgressIndicator extends ArcProgressIndicator and adds a start angle property
+ * that defines the starting angle of the arc used to display the progress. The default start angle is 90 degrees,
+ * which corresponds to the top of the circle.
  *
  * <p>
  * <b>Pseudo class:</b> Beyond the <b>inherited</b> , <b>indeterminate</b> and determinate pseudo-classes
@@ -52,29 +41,10 @@ import java.util.Objects;
  *     CircleProgressIndicator progressIndicator = new CircleProgressIndicator(0.0);
  * </pre>
  */
-public class CircleProgressIndicator extends ProgressIndicator {
+public class CircleProgressIndicator extends ArcProgressIndicator {
 
     private static final String DEFAULT_STYLE_CLASS = "circle-progress-indicator";
-    private static final ArcType DEFAULT_ARC_TYPE = ArcType.OPEN;
-    private static final StringConverter<Double> DEFAULT_CONVERTER = new StringConverter<>() {
-        @Override
-        public String toString(Double progress) {
-            // indeterminate
-            if (progress == null || progress < 0.0) {
-                return "";
-            }
-            // completed
-            if (progress == 1.0) {
-                return "Completed";
-            }
-            return String.format("%.0f%%", progress * 100);
-        }
-
-        @Override
-        public Double fromString(String string) {
-            return null;
-        }
-    };
+    private static final double DEFAULT_START_ANGLE = 90.0;
 
     public CircleProgressIndicator() {
         this(INDETERMINATE_PROGRESS);
@@ -91,118 +61,27 @@ public class CircleProgressIndicator extends ProgressIndicator {
         return new CircleProgressIndicatorSkin(this);
     }
 
-    @Override
-    public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(CircleProgressIndicator.class.getResource("circle-progress-indicator.css")).toExternalForm();
-    }
-
-    private final ObjectProperty<StringConverter<Double>> converter = new SimpleObjectProperty<>(this, "converter", DEFAULT_CONVERTER);
-
-    public final StringConverter<Double> getConverter() {
-        return converter.get();
-    }
+    private DoubleProperty startAngle;
 
     /**
-     * The converter is used to convert the progress value to a string that is displayed
+     * The start angle property defines the starting angle of the arc that is used to display the progress.
+     * The default value is 90 degrees, which corresponds to the top of the circle.
      *
-     * @return the converter property
+     * @return the start angle property
      */
-    public final ObjectProperty<StringConverter<Double>> converterProperty() {
-        return converter;
-    }
-
-    public final void setConverter(StringConverter<Double> converter) {
-        converterProperty().set(converter);
-    }
-
-    private final ObjectProperty<Node> graphic = new SimpleObjectProperty<>(this, "graphic");
-
-    /**
-     * The graphic property is used to display a custom node within the progress indicator.
-     * progress label's graphic property is bound to this property.
-     *
-     * @return the graphic property
-     */
-    public final ObjectProperty<Node> graphicProperty() {
-        return graphic;
-    }
-
-    public final Node getGraphic() {
-        return graphic.get();
-    }
-
-    public final void setGraphic(Node graphic) {
-        graphicProperty().set(graphic);
-    }
-
-    private ObjectProperty<ArcType> arcType;
-
-    /**
-     * The arc type property defines the type of the arc that is used to display the progress.
-     *
-     * @return the arc type property
-     */
-    public final ObjectProperty<ArcType> arcTypeProperty() {
-        if (arcType == null) {
-            arcType = new StyleableObjectProperty<>(DEFAULT_ARC_TYPE) {
-                @Override
-                public Object getBean() {
-                    return this;
-                }
-
-                @Override
-                public String getName() {
-                    return "arcType";
-                }
-
-                @Override
-                public CssMetaData<? extends Styleable, ArcType> getCssMetaData() {
-                    return StyleableProperties.ARC_TYPE;
-                }
-            };
+    public final DoubleProperty startAngleProperty() {
+        if (startAngle == null) {
+            startAngle = new SimpleDoubleProperty(this, "startAngle", DEFAULT_START_ANGLE);
         }
-        return arcType;
+        return startAngle;
     }
 
-    public final ArcType getArcType() {
-        return arcType == null ? DEFAULT_ARC_TYPE : arcType.get();
+    public final double getStartAngle() {
+        return startAngle == null ? DEFAULT_START_ANGLE : startAngle.get();
     }
 
-    public final void setArcType(ArcType arcType) {
-        arcTypeProperty().set(arcType);
+    public final void setStartAngle(double startAngle) {
+        startAngleProperty().set(startAngle);
     }
 
-    private static class StyleableProperties {
-
-        private static final CssMetaData<CircleProgressIndicator, ArcType> ARC_TYPE = new CssMetaData<>(
-                "-fx-arc-type", new EnumConverter<>(ArcType.class), DEFAULT_ARC_TYPE) {
-
-            @Override
-            public StyleableProperty<ArcType> getStyleableProperty(CircleProgressIndicator control) {
-                return (StyleableProperty<ArcType>) control.arcTypeProperty();
-            }
-
-            @Override
-            public boolean isSettable(CircleProgressIndicator control) {
-                return control.arcType == null || !control.arcType.isBound();
-            }
-        };
-
-        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
-
-        static {
-            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(ProgressIndicator.getClassCssMetaData());
-            styleables.add(ARC_TYPE);
-            STYLEABLES = Collections.unmodifiableList(styleables);
-        }
-    }
-
-    @Override
-    protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
-        return getClassCssMetaData();
-    }
-
-    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
-        return CircleProgressIndicator.StyleableProperties.STYLEABLES;
-    }
 }

@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.MultiColumnListViewSkin;
+import com.dlsc.gemsfx.util.ListUtils;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -346,13 +347,7 @@ public class MultiColumnListView<T> extends Control {
 
                 multiColumnListView.getDraggedItems().setAll(getListView().getSelectionModel().getSelectedItems());
 
-                getListView().getItems().replaceAll(item -> {
-                    if (item == getItem()) {
-                        return multiColumnListView.getPlaceholderFrom();
-                    }
-
-                    return item;
-                });
+                ListUtils.replaceIf(getListView().getItems(), item -> item == getItem(), multiColumnListView.getPlaceholderFrom());
             });
 
             setOnDragOver(event -> {
@@ -395,13 +390,7 @@ public class MultiColumnListView<T> extends Control {
                 items.remove(multiColumnListView.getPlaceholderFrom());
 
                 T draggedItem = multiColumnListView.getDraggedItem();
-                items.replaceAll(item -> {
-                    if (item == multiColumnListView.getPlaceholderTo()) {
-                        return draggedItem;
-                    }
-
-                    return item;
-                });
+                ListUtils.replaceIf(items, item -> item == multiColumnListView.getPlaceholderTo(), draggedItem);
 
                 if (!items.contains(draggedItem)) {
                     // probably dropped on same list view / same column (hence no "to" placeholder)
@@ -423,24 +412,14 @@ public class MultiColumnListView<T> extends Control {
                         getListView().getItems().removeIf(item -> item == multiColumnListView.getPlaceholderFrom());
                     } else {
                         log("   drop was not completed, replacing placeholder with dragged item");
-                        getListView().getItems().replaceAll(item -> {
-                            if (item == multiColumnListView.getPlaceholderFrom()) {
-                                return multiColumnListView.getDraggedItem();
-                            }
-                            return item;
-                        });
+                        ListUtils.replaceIf(getListView().getItems(), item -> item == multiColumnListView.getPlaceholderFrom(), multiColumnListView.getDraggedItem());
                     }
                 } else {
                     log("drag done, not accepted");
 
                     // put the item back into the "from" location
                     log("putting item back into 'from' location");
-                    getListView().getItems().replaceAll(item -> {
-                        if (item == multiColumnListView.getPlaceholderFrom()) {
-                            return multiColumnListView.getDraggedItem();
-                        }
-                        return item;
-                    });
+                    ListUtils.replaceIf(getListView().getItems(), item -> item == multiColumnListView.getPlaceholderFrom(), multiColumnListView.getDraggedItem());
                 }
 
                 multiColumnListView.setDraggedItem(null);

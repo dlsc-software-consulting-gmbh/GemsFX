@@ -19,4 +19,5 @@ module com.dlsc.gemsfx.demo {
 
     exports com.dlsc.gemsfx.demo;
     exports com.dlsc.gemsfx.demo.binding;
+    exports com.dlsc.gemsfx.demo.util;
 }
