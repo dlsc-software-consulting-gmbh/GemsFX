@@ -3,6 +3,8 @@ package com.dlsc.gemsfx.util;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.prefs.Preferences;
+
 /**
  * Manages a history of string records using the Java Preferences API. This class specializes
  * the generic {@link PreferencesHistoryManager} for strings, providing simple and efficient
@@ -47,9 +49,19 @@ public class StringHistoryManager extends PreferencesHistoryManager<String> {
         setFilter(StringUtils::isNotEmpty);
     }
 
+    public StringHistoryManager(Preferences preferences) {
+        this();
+        setPreferences(preferences);
+    }
+
     public StringHistoryManager(String delimiter, String preferencesKey) {
         super(delimiter, preferencesKey, DEFAULT_STRING_CONVERTER);
         setFilter(StringUtils::isNotEmpty);
+    }
+
+    public StringHistoryManager(String delimiter, String preferencesKey, Preferences preferences) {
+        this(delimiter, preferencesKey);
+        setPreferences(preferences);
     }
 
 }

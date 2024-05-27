@@ -35,10 +35,8 @@ import java.util.function.Consumer;
 public class HistoryPopup<T> extends CustomPopupControl {
 
     public static final String DEFAULT_STYLE_CLASS = "history-popup";
-    private final HistoryManager<T> historyManager;
 
-    public HistoryPopup(HistoryManager<T> historyManager) {
-        this.historyManager = historyManager;
+    public HistoryPopup() {
         getStyleClass().addAll(DEFAULT_STYLE_CLASS);
 
         setAutoFix(true);
@@ -50,10 +48,6 @@ public class HistoryPopup<T> extends CustomPopupControl {
 
     protected Skin<?> createDefaultSkin() {
         return new HistoryPopupSkin<>(this);
-    }
-
-    public final HistoryManager<T> getHistoryManager() {
-        return historyManager;
     }
 
     private final ObjectProperty<Node> left = new SimpleObjectProperty<>(this, "left");
@@ -186,7 +180,6 @@ public class HistoryPopup<T> extends CustomPopupControl {
         onHistoryItemConfirmedProperty().set(onHistoryItemConfirmed);
     }
 
-
     private ObjectProperty<Consumer<T>> onHistoryItemSelected;
 
     public final Consumer<T> getOnHistoryItemSelected() {
@@ -210,6 +203,23 @@ public class HistoryPopup<T> extends CustomPopupControl {
 
     public final void setOnHistoryItemSelected(Consumer<T> onHistoryItemSelected) {
         onHistoryItemSelectedProperty().set(onHistoryItemSelected);
+    }
+
+    private ObjectProperty<HistoryManager<T>> historyManager;
+
+    public final HistoryManager<T> getHistoryManager() {
+        return historyManager == null ? null : historyManager.get();
+    }
+
+    public final ObjectProperty<HistoryManager<T>> historyManagerProperty() {
+        if (historyManager == null) {
+            historyManager = new SimpleObjectProperty<>(this, "historyManager");
+        }
+        return historyManager;
+    }
+
+    public final void setHistoryManager(HistoryManager<T> historyManager) {
+        historyManagerProperty().set(historyManager);
     }
 
 }

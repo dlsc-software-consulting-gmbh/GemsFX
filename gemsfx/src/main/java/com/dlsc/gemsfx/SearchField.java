@@ -2,6 +2,7 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.SearchFieldPopup;
 import com.dlsc.gemsfx.skins.SearchFieldSkin;
+import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
 import javafx.animation.Animation;
 import javafx.animation.RotateTransition;
@@ -84,11 +85,11 @@ import java.util.function.Consumer;
  * </ol>
  *
  * <p>
- * History management is enabled by default and can be accessed and controlled through a history button integrated into the search field.
- * Users can interact with their search history, revisit previous queries, or clear historical entries. The history functionality is managed by
- * a {@link StringHistoryManager}, accessible via {@code getHistoryManager()}, allowing programmatic manipulation of history records.
- * If {@code setPreferences(Preferences preferences)} is not set on the {@link StringHistoryManager}, history records are only stored temporarily in memory
- * and are not persisted locally. This means that history data will not be retained after the application is closed.
+ * The history manager is disabled by default, but it can be enabled using the {@link #setHistoryManager(HistoryManager)} method.
+ * We have implemented a local history manager, {@link StringHistoryManager}, which uses the Java Preferences API to store history records.
+ * You can enable it via the {@link #setHistoryManager(HistoryManager)} method.
+ * If you want to persistently store history records, you also need to provide a {@link java.util.prefs.Preferences} instance to the {@link StringHistoryManager}.
+ * Otherwise, the history records will be lost after the application restarts.
  * </p>
  *
  * @param <T> the type of objects to work on
@@ -111,7 +112,6 @@ public class SearchField<T> extends Control {
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
 
     private final SearchService searchService = new SearchService();
-    private final StringHistoryManager historyManager;
 
     private final TextField editor = new TextField();
 
@@ -128,22 +128,8 @@ public class SearchField<T> extends Control {
      * @see #setNewItemProducer(Callback)
      */
     public SearchField() {
-        this(new StringHistoryManager());
-    }
-
-    /**
-     * Constructs a new spotlight field. The field will set defaults for the
-     * matcher, the converter, the cell factory, and the comparator. It will
-     * not set a default for the "new item" producer.
-     * <p>
-     * The history manager is initialized with the given preferences.
-     *
-     * @see #setNewItemProducer(Callback)
-     */
-    public SearchField(StringHistoryManager historyManager) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
-        this.historyManager = historyManager;
         historyButton = createHistorySupportedButton();
         setGraphic(historyButton);
 
@@ -153,7 +139,12 @@ public class SearchField<T> extends Control {
         editor.promptTextProperty().bindBidirectional(promptTextProperty());
 
         // history listCell factory
-        setHistoryCellFactory(view -> new RemovableListCell<>((listView, item) -> historyManager.remove(item)));
+        setHistoryCellFactory(view -> new RemovableListCell<>((listView, item) -> {
+            HistoryManager<String> historyManager = getHistoryManager();
+            if (historyManager != null) {
+                historyManager.remove(item);
+            }
+        }));
 
         // history listView placeholder
         Label placeholder = new Label("No history available.");
@@ -180,7 +171,7 @@ public class SearchField<T> extends Control {
             if (!editor.isFocused()) {
                 // Add the current text to the history if the editor lost focus.
                 if (isAddingItemToHistoryOnFocusLost()) {
-                    historyManager.add(editor.getText());
+                    addToHistory(editor.getText());
                 }
                 commit();
                 if (getSelectedItem() == null) {
@@ -205,7 +196,7 @@ public class SearchField<T> extends Control {
             boolean releasedEnter = keyCode.equals(KeyCode.ENTER);
             // Add the current text to the history if the user pressed the ENTER key.
             if (releasedEnter && isAddingItemToHistoryOnEnter() && !lastHistoryPopupShowing) {
-                historyManager.add(editor.getText());
+                addToHistory(editor.getText());
             }
 
             if ((keyCode.equals(KeyCode.RIGHT) || releasedEnter) && !lastHistoryPopupShowing) {
@@ -359,7 +350,8 @@ public class SearchField<T> extends Control {
     }
 
     private HistoryButton<String> createHistorySupportedButton() {
-        HistoryButton<String> historyButton = new HistoryButton<String>(this, historyManager);
+        HistoryButton<String> historyButton = new HistoryButton<>(this);
+        historyButton.historyManagerProperty().bind(historyManagerProperty());
 
         // Create the graphic
         Region graphic = new Region();
@@ -369,7 +361,6 @@ public class SearchField<T> extends Control {
         // Configure the history button
         historyButton.setFocusTraversable(false);
         historyButton.setFocusPopupOwnerOnOpen(true);
-        historyButton.enableHistoryPopupProperty().bind(enableHistoryPopupProperty());
 
         historyButton.setConfigureHistoryPopup(historyPopup -> {
 
@@ -420,7 +411,7 @@ public class SearchField<T> extends Control {
 
                     // add on commit
                     if (isAddingItemToHistoryOnCommit()) {
-                        historyManager.add(text);
+                        addToHistory(text);
                     }
                 } else {
                     clear();
@@ -432,6 +423,13 @@ public class SearchField<T> extends Control {
             getProperties().put("committed", "");
         } finally {
             committing = false;
+        }
+    }
+
+    private void addToHistory(String text) {
+        HistoryManager<String> historyManager = getHistoryManager();
+        if (historyManager != null) {
+            historyManager.add(text);
         }
     }
 
@@ -1307,31 +1305,48 @@ public class SearchField<T> extends Control {
         addingItemToHistoryOnCommitProperty().set(addingItemToHistoryOnCommit);
     }
 
-    private BooleanProperty enableHistoryPopup;
+    private ObjectProperty<HistoryManager<String>> historyManager;
 
     /**
-     * Indicates whether the history popup should be enabled.
+     * The history manager that is used to manage the history of the SearchField.
+     * <p>
+     * If its value is null, the history feature will not be enabled, which means only
+     * the magnifying glass icon will be displayed, and the dropdown arrow next to the
+     * magnifying glass will not be shown.
+     * <p>
+     * If its value is not null, the history feature will be enabled, meaning that both
+     * the magnifying glass icon and the dropdown arrow will be displayed. Clicking the
+     * magnifying glass icon button will display the history popup.
+     * <p>
+     * To enable the history feature, you need to set an instance of {@link HistoryManager}.
+     * Typically, you would use an instance of {@link StringHistoryManager}, which is an
+     * implementation of {@link HistoryManager} that manages string-type history records.
+     * <p>
+     * Please note that if you do not set the {@code StringHistoryManager#setPreferences(Preferences)}
+     * method for the {@link StringHistoryManager} instance, the history records will only be saved
+     * in memory and will not be persisted locally. This means that the history data will not be
+     * retained after the application is closed.
      *
-     * @return true if the history popup should be enabled, false otherwise
+     * @return the property representing the history manager
      */
-    public final BooleanProperty enableHistoryPopupProperty() {
-        if (enableHistoryPopup == null) {
-            enableHistoryPopup = new SimpleBooleanProperty(this, "enableHistoryPopup", DEFAULT_ENABLE_HISTORY_POPUP) {
+    public final ObjectProperty<HistoryManager<String>> historyManagerProperty() {
+        if (historyManager == null) {
+            historyManager = new SimpleObjectProperty<>(this, "historyManager") {
                 @Override
                 protected void invalidated() {
-                    pseudoClassStateChanged(DISABLED_POPUP_PSEUDO_CLASS, !get());
+                    pseudoClassStateChanged(DISABLED_POPUP_PSEUDO_CLASS, get() == null);
                 }
             };
         }
-        return enableHistoryPopup;
+        return historyManager;
     }
 
-    public final boolean isEnableHistoryPopup() {
-        return enableHistoryPopup == null ? DEFAULT_ENABLE_HISTORY_POPUP : enableHistoryPopup.get();
+    public final HistoryManager<String> getHistoryManager() {
+        return historyManager == null ? null : historyManager.get();
     }
 
-    public final void setEnableHistoryPopup(boolean enableHistoryPopup) {
-        enableHistoryPopupProperty().set(enableHistoryPopup);
+    public final void setHistoryManager(HistoryManager<String> historyManager) {
+        historyManagerProperty().set(historyManager);
     }
 
     /**
@@ -1394,15 +1409,6 @@ public class SearchField<T> extends Control {
 
     public final SearchFieldPopup<T> getPopup() {
         return popup;
-    }
-
-    /**
-     * If we want to manually add history records, delete history records, clear history records, then please get the HistoryManager object through this method.
-     *
-     * @return the history manager
-     */
-    public final StringHistoryManager getHistoryManager() {
-        return historyManager;
     }
 
 }

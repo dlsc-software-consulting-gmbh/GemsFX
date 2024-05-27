@@ -6,7 +6,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
@@ -15,6 +14,7 @@ import javafx.css.StyleableBooleanProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Region;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -23,6 +23,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -55,48 +56,55 @@ import java.util.function.Consumer;
 public class HistoryButton<T> extends Button {
 
     private static final String DEFAULT_STYLE_CLASS = "history-button";
-    private static final boolean ENABLE_HISTORY_POPUP = true;
     private static final boolean DEFAULT_FOCUS_POPUP_OWNER_ON_OPEN = false;
 
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
     private static final PseudoClass HISTORY_POPUP_SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("history-popup-showing");
 
-    private final Region popupOwner;
-    private final HistoryManager<T> historyManager;
     private HistoryPopup<T> historyPopup;
 
     /**
      * Creates a new instance of the history button.
-     *
-     * @param popupOwner     The owner of the popup. can be null. if null, the button will be the popup owner.
-     * @param historyManager The history manager.
      */
-    public HistoryButton(Region popupOwner, HistoryManager<T> historyManager) {
+    public HistoryButton() {
         getStyleClass().addAll(DEFAULT_STYLE_CLASS);
-        this.popupOwner = popupOwner;
-        this.historyManager = historyManager;
 
         setGraphic(new FontIcon(MaterialDesign.MDI_HISTORY));
         setOnAction(this::onActionHandler);
     }
 
+    /**
+     * Creates a new instance of the history button.
+     *
+     * @param popupOwner The owner of the popup. can be null. if null, the button will be the popup owner.
+     */
+    public HistoryButton(Region popupOwner) {
+        this();
+        setPopupOwner(popupOwner);
+    }
+
     protected void onActionHandler(ActionEvent event) {
-        Region popupOwner = getPopupOwner();
-        HistoryManager<T> historyManager = getHistoryManager();
+        Node popupOwner = getPopupOwner();
 
         if (popupOwner != null && popupOwner != this && !popupOwner.isFocused() && getFocusPopupOwnerOnOpen()) {
             popupOwner.requestFocus();
         }
 
-        if (!isEnableHistoryPopup()) {
+        if (getHistoryManager() == null) {
             return;
         }
 
         if (historyPopup == null) {
-            historyPopup = new HistoryPopup<>(historyManager);
+            historyPopup = new HistoryPopup<>();
             // basic settings
-            historyPopup.setHistoryCellFactory(view -> new RemovableListCell<>((listView, item) -> historyManager.remove(item)));
+            historyPopup.historyManagerProperty().bind(historyManagerProperty());
             historyPopupShowing.bind(historyPopup.showingProperty());
+            historyPopup.setHistoryCellFactory(view -> new RemovableListCell<>((listView, item) -> {
+                HistoryManager<T> historyManager = getHistoryManager();
+                if (historyManager != null) {
+                    historyManager.remove(item);
+                }
+            }));
 
             // Set up the popup
             if (getConfigureHistoryPopup() != null) {
@@ -170,33 +178,6 @@ public class HistoryButton<T> extends Button {
         configureHistoryPopupProperty().set(configureHistoryPopup);
     }
 
-    private BooleanProperty enableHistoryPopup;
-
-    /**
-     * Indicates whether the history popup should be enabled.
-     *
-     * @return true if the history popup should be enabled, false otherwise
-     */
-    public final BooleanProperty enableHistoryPopupProperty() {
-        if (enableHistoryPopup == null) {
-            enableHistoryPopup = new SimpleBooleanProperty(this, "enableHistoryPopup", ENABLE_HISTORY_POPUP) {
-                @Override
-                protected void invalidated() {
-                    pseudoClassStateChanged(DISABLED_POPUP_PSEUDO_CLASS, !get());
-                }
-            };
-        }
-        return enableHistoryPopup;
-    }
-
-    public final boolean isEnableHistoryPopup() {
-        return enableHistoryPopup == null ? ENABLE_HISTORY_POPUP : enableHistoryPopup.get();
-    }
-
-    public final void setEnableHistoryPopup(boolean enableHistoryPopup) {
-        enableHistoryPopupProperty().set(enableHistoryPopup);
-    }
-
     private final ReadOnlyBooleanWrapper historyPopupShowing = new ReadOnlyBooleanWrapper(this, "historyPopupShowing") {
         @Override
         protected void invalidated() {
@@ -206,6 +187,54 @@ public class HistoryButton<T> extends Button {
 
     public final boolean isHistoryPopupShowing() {
         return historyPopupShowing.get();
+    }
+
+    private ObjectProperty<HistoryManager<T>> historyManager;
+
+    /**
+     * The history manager that is used to manage the history of the HistoryButton.
+     * <p>
+     * If its value is null, clicking the button will not display the history popup.
+     * <p>
+     * If its value is not null, clicking the button will display the history popup.
+     *
+     * @return the property representing the history manager
+     */
+    public final ObjectProperty<HistoryManager<T>> historyManagerProperty() {
+        if (historyManager == null) {
+            historyManager = new SimpleObjectProperty<>(this, "historyManager") {
+                @Override
+                protected void invalidated() {
+                    pseudoClassStateChanged(DISABLED_POPUP_PSEUDO_CLASS, get() == null);
+                }
+            };
+        }
+        return historyManager;
+    }
+
+    public final void setHistoryManager(HistoryManager<T> historyManager) {
+        historyManagerProperty().set(historyManager);
+    }
+
+    public final HistoryManager<T> getHistoryManager() {
+        return historyManager == null ? null : historyManager.get();
+    }
+
+    private ObjectProperty<Node> popupOwner;
+
+    public final ObjectProperty<Node> popupOwnerProperty() {
+        if (popupOwner == null) {
+            popupOwner = new SimpleObjectProperty<>(this, "popupOwner");
+        }
+        return popupOwner;
+    }
+
+    public final Node getPopupOwner() {
+        return popupOwner == null ? null : popupOwner.get();
+    }
+
+    public final void setPopupOwner(Node popupOwner) {
+        popupOwnerProperty().set(popupOwner);
     }
 
     /**
@@ -252,24 +281,6 @@ public class HistoryButton<T> extends Button {
     }
 
     /**
-     * Returns the HistoryManager instance used by this control.
-     *
-     * @return the history manager
-     */
-    public final HistoryManager<T> getHistoryManager() {
-        return historyManager;
-    }
-
-    /**
-     * Returns the popup owner node.
-     *
-     * @return the popup owner node
-     */
-    public final Region getPopupOwner() {
-        return popupOwner;
-    }
-
-    /**
      * Returns the history popup.
      */
     public final HistoryPopup<T> getHistoryPopup() {
@@ -290,7 +301,7 @@ public class HistoryButton<T> extends Button {
      */
     public final void showHistoryPopup() {
         if (historyPopup != null) {
-            historyPopup.show(popupOwner == null ? this : popupOwner);
+            historyPopup.show(Optional.ofNullable(getPopupOwner()).orElse(this));
         }
     }
 

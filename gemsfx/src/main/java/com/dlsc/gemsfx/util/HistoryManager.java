@@ -32,6 +32,14 @@ public interface HistoryManager<T> {
     void add(List<T> items);
 
     /**
+     * Sets the history of the HistoryManager with the provided list of items.
+     * The method ensures that duplicates are removed from the list.
+     *
+     * @param items the list of items representing the history
+     */
+    void set(List<T> items);
+
+    /**
      * Removes a single item from the history storage.
      *
      * @param item The history item to be removed.

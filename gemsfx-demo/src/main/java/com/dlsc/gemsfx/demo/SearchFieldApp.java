@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.SearchField;
+import com.dlsc.gemsfx.util.HistoryManager;
+import com.dlsc.gemsfx.util.StringHistoryManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -8,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -21,7 +24,14 @@ import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
+/**
+ * This demo shows how to use the {@link SearchField} control.
+ * <p>
+ * About the HistoryManager, you can refer to: {@link HistoryManager} {@link SearchTextFieldApp}, {@link HistoryManagerApp}
+ */
 public class SearchFieldApp extends Application {
+
+    private StringHistoryManager historyManager;
 
     private final List<Country> countries = new ArrayList<>();
 
@@ -81,10 +91,45 @@ public class SearchFieldApp extends Application {
         CheckBox autoCommitOnFocusLostBox = new CheckBox("Auto commit on field lost focus.");
         autoCommitOnFocusLostBox.selectedProperty().bindBidirectional(field.autoCommitOnFocusLostProperty());
 
+        CheckBox enableHistoryBox = new CheckBox("Enable History");
+        enableHistoryBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                if (field.getHistoryManager() == null) {
+                    historyManager = new StringHistoryManager(Preferences.userNodeForPackage(SearchFieldApp.class).node("field"));
+                    // Optional: Set the maximum history size. default is 30.
+                    historyManager.setMaxHistorySize(20);
+                    // Optional: If the history items is empty, we can set a default history list.
+                    if (historyManager.getAll().isEmpty()) {
+                        historyManager.set(List.of("United Kingdom", "Switzerland"));
+                    }
+                }
+                // If the history manager is not null, the search field will have a history feature.
+                field.setHistoryManager(historyManager);
+            } else {
+                // If the history manager is null, the search field will not have a history feature.
+                field.setHistoryManager(null);
+            }
+            primaryStage.sizeToScene();
+        });
+        enableHistoryBox.setSelected(true);
+
+        CheckBox addHistoryOnActionBox = new CheckBox("Add History on Enter");
+        addHistoryOnActionBox.setSelected(true);
+        field.addingItemToHistoryOnEnterProperty().bind(addHistoryOnActionBox.selectedProperty());
+
+        CheckBox addHistoryOnFocusLossBox = new CheckBox("Add History on Focus Loss");
+        addHistoryOnFocusLossBox.setSelected(true);
+        field.addingItemToHistoryOnFocusLostProperty().bind(addHistoryOnFocusLossBox.selectedProperty());
+
+        VBox historyControls = new VBox(10, new Separator(), addHistoryOnActionBox, addHistoryOnFocusLossBox);
+        historyControls.managedProperty().bind(enableHistoryBox.selectedProperty());
+        historyControls.visibleProperty().bind(enableHistoryBox.selectedProperty());
+
         field.leftProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionLeft : null, showLeftRightNodes.selectedProperty()));
         field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, hideWithNoChoiceBox, showSearchIconBox, showLeftRightNodes, autoCommitOnFocusLostBox, hBox, hBox2, field);
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, hideWithNoChoiceBox, showSearchIconBox, showLeftRightNodes,
+                autoCommitOnFocusLostBox, hBox, hBox2, enableHistoryBox, historyControls, field);
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);
@@ -123,8 +168,8 @@ public class SearchFieldApp extends Application {
             setMatcher((broker, searchText) -> broker.getName().toLowerCase().startsWith(searchText.toLowerCase()));
             setComparator(Comparator.comparing(Country::getName));
             getEditor().setPromptText("Start typing country name ...");
-            // If not setPreferences() history records are only stored temporarily in memory and are not persisted locally.
-            getHistoryManager().setPreferences(Preferences.userNodeForPackage(SearchFieldApp.class).node("field"));
+            // Tips: If we don't set a HistoryManager, the search field will not have a history feature.
+            // setHistoryManager(new StringHistoryManager(Preferences.userNodeForPackage(SearchFieldApp.class).node("field")));
         }
     }
 

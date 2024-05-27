@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
+import com.dlsc.gemsfx.util.UIUtil;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -27,6 +29,12 @@ import java.util.Objects;
  * A custom text field specifically designed for search functionality. This class enhances a text field with features
  * such as a history of search terms, an optional history popup, and custom icons for search and clear operations.
  * <p>
+ * The history manager is disabled by default, but it can be enabled using the {@link #setHistoryManager(HistoryManager)} method.
+ * We have implemented a local history manager, {@link StringHistoryManager}, which uses the Java Preferences API to store history records.
+ * You can enable it via the {@link #setHistoryManager(HistoryManager)} method.
+ * If you want to persistently store history records, you also need to provide a {@link java.util.prefs.Preferences} instance to the {@link StringHistoryManager}.
+ * Otherwise, the history records will be lost after the application restarts.
+ * <p>
  * By default, when the field loses its focus or the user presses the "enter" key (triggering the onAction event), the
  * text is added to the history. This behavior can be disabled by setting the {@link #addingItemToHistoryOnEnterProperty()}
  * and / or the {@link #addingItemToHistoryOnEnterProperty()} to false.
@@ -34,25 +42,15 @@ import java.util.Objects;
  * Additionally, history can be manually added based on user actions, such as after typing text and selecting an item
  * from a ListView or TableView that displays results, or through other interactions, by calling the {@link #getHistoryManager()}
  * method to access the {@link StringHistoryManager} instance. then calling the {@link StringHistoryManager#add(String)} method.
- *
- * <p>
- * History management is enabled by default and can be accessed and controlled through a history button integrated into the search text field.
- * Users can interact with their search history, revisit previous queries, or clear historical entries. The history functionality is managed by
- * a {@link StringHistoryManager}, accessible via {@code getHistoryManager()}, allowing programmatic manipulation of history records.
- * If {@code setPreferences(Preferences preferences)} is not set on the {@link StringHistoryManager}, history records are only stored temporarily in memory
- * and are not persisted locally. This means that history data will not be retained after the application is closed.
- * </p>
- *
  */
 public class SearchTextField extends CustomTextField {
 
-    private static final boolean DEFAULT_ENABLE_HISTORY_POPUP = true;
     private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER = true;
     private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST = true;
+    private static final boolean DEFAULT_ROUND = false;
 
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
 
-    private final StringHistoryManager historyManager;
     private final HistoryButton<String> historyButton;
 
     /**
@@ -61,40 +59,8 @@ public class SearchTextField extends CustomTextField {
      * The history manager is initialized with default values.
      */
     public SearchTextField() {
-        this(false, new StringHistoryManager());
-    }
-
-    /**
-     * Constructs a new text field customized for search operations.
-     */
-    public SearchTextField(StringHistoryManager historyManager) {
-        this(false, historyManager);
-    }
-
-    /**
-     * Constructs a new text field customized for search operations. The look and feel can be
-     * adjusted to feature rounded corners / sides.
-     * <p>
-     * The history manager is initialized with default values.
-     *
-     * @param round if true the sides of the field will be round
-     */
-    public SearchTextField(boolean round) {
-        this(round, new StringHistoryManager());
-    }
-
-    /**
-     * Constructs a new text field customized for search operations. The look and feel can be
-     * adjusted to feature rounded corners / sides.
-     *
-     * @param round if true the sides of the field will be round
-     */
-    public SearchTextField(boolean round, StringHistoryManager historyManager) {
-        if (round) {
-            getStyleClass().add("round");
-        }
-
         getStyleClass().add("search-text-field");
+        UIUtil.toggleClassBasedOnObservable(this, "round", roundProperty());
 
         setPromptText("Search...");
 
@@ -102,10 +68,14 @@ public class SearchTextField extends CustomTextField {
         placeholder.getStyleClass().add("default-placeholder");
         setHistoryPlaceholder(placeholder);
 
-        this.historyManager = historyManager;
-        setHistoryCellFactory(view -> new RemovableListCell<>((listView, item) -> historyManager.remove(item)));
+        setHistoryCellFactory(view -> new RemovableListCell<>((listView, item) -> {
+            HistoryManager<String> historyManager = getHistoryManager();
+            if (historyManager != null) {
+                historyManager.remove(item);
+            }
+        }));
 
-        historyButton = createLeftNode(round);
+        historyButton = createLeftNode();
         setLeft(historyButton);
 
         setRight(createRightNode());
@@ -114,14 +84,22 @@ public class SearchTextField extends CustomTextField {
 
         focusedProperty().addListener(it -> {
             if (!isFocused() && isAddingItemToHistoryOnFocusLost()) {
-                historyManager.add(getText());
+                addToHistory();
             }
             historyButton.hideHistoryPopup();
         });
     }
 
-    private HistoryButton<String> createLeftNode(boolean round) {
-        HistoryButton<String> historyButton = new HistoryButton<>(this, historyManager);
+    private void addToHistory() {
+        HistoryManager<String> historyManager = getHistoryManager();
+        if (historyManager != null) {
+            historyManager.add(getText());
+        }
+    }
+
+    private HistoryButton<String> createLeftNode() {
+        HistoryButton<String> historyButton = new HistoryButton<>(this);
+        historyButton.historyManagerProperty().bind(historyManagerProperty());
 
         // Create the graphic
         Region graphic = new Region();
@@ -131,11 +109,8 @@ public class SearchTextField extends CustomTextField {
         // Configure the history button
         historyButton.setFocusTraversable(false);
         historyButton.setFocusPopupOwnerOnOpen(true);
-        historyButton.enableHistoryPopupProperty().bind(enableHistoryPopupProperty());
         historyButton.setConfigureHistoryPopup(historyPopup -> {
-            if (round) {
-                historyPopup.getStyleClass().add("round");
-            }
+            UIUtil.toggleClassBasedOnObservable(historyPopup, "round", roundProperty());
 
             historyPopup.historyPlaceholderProperty().bind(historyPlaceholderProperty());
             historyPopup.historyCellFactoryProperty().bind(historyCellFactoryProperty());
@@ -159,7 +134,7 @@ public class SearchTextField extends CustomTextField {
         // On Action event, add the text to the history
         addEventHandler(ActionEvent.ANY, e -> {
             if (isAddingItemToHistoryOnEnter()) {
-                historyManager.add(getText());
+                addToHistory();
             }
         });
 
@@ -235,33 +210,6 @@ public class SearchTextField extends CustomTextField {
         historyCellFactoryProperty().set(historyCellFactory);
     }
 
-    private BooleanProperty enableHistoryPopup;
-
-    /**
-     * Indicates whether the history popup should be enabled.
-     *
-     * @return true if the history popup should be enabled, false otherwise
-     */
-    public final BooleanProperty enableHistoryPopupProperty() {
-        if (enableHistoryPopup == null) {
-            enableHistoryPopup = new SimpleBooleanProperty(this, "enableHistoryPopup", DEFAULT_ENABLE_HISTORY_POPUP) {
-                @Override
-                protected void invalidated() {
-                    pseudoClassStateChanged(DISABLED_POPUP_PSEUDO_CLASS, !get());
-                }
-            };
-        }
-        return enableHistoryPopup;
-    }
-
-    public final boolean isEnableHistoryPopup() {
-        return enableHistoryPopup == null ? DEFAULT_ENABLE_HISTORY_POPUP : enableHistoryPopup.get();
-    }
-
-    public final void setEnableHistoryPopup(boolean enableHistoryPopup) {
-        enableHistoryPopupProperty().set(enableHistoryPopup);
-    }
-
     // add on enter
 
     private BooleanProperty addingItemToHistoryOnEnter;
@@ -310,13 +258,70 @@ public class SearchTextField extends CustomTextField {
         addingItemToHistoryOnFocusLostProperty().set(addingItemToHistoryOnFocusLost);
     }
 
+    private BooleanProperty round;
+
     /**
-     * If we want to manually add history records, delete history records, clear history records, then please get the HistoryManager object through this method.
+     * Determines whether the text field should have round corners.
      *
-     * @return the history manager
+     * @return true if the text field should have round corners, false otherwise
      */
-    public StringHistoryManager getHistoryManager() {
+    public final BooleanProperty roundProperty() {
+        if (round == null) {
+            round = new SimpleBooleanProperty(this, "round", DEFAULT_ROUND);
+        }
+        return round;
+    }
+
+    public final boolean isRound() {
+        return round == null ? DEFAULT_ROUND : round.get();
+    }
+
+    public final void setRound(boolean round) {
+        roundProperty().set(round);
+    }
+
+    private ObjectProperty<HistoryManager<String>> historyManager;
+
+    /**
+     * The history manager that is used to manage the history of the search text field.
+     * <p>
+     * If its value is null, the history feature will not be enabled, which means only
+     * the magnifying glass icon will be displayed, and the dropdown arrow next to the
+     * magnifying glass will not be shown.
+     * <p>
+     * If its value is not null, the history feature will be enabled, meaning that both
+     * the magnifying glass icon and the dropdown arrow will be displayed. Clicking the
+     * magnifying glass icon button will display the history popup.
+     * <p>
+     * To enable the history feature, you need to set an instance of {@link HistoryManager}.
+     * Typically, you would use an instance of {@link StringHistoryManager}, which is an
+     * implementation of {@link HistoryManager} that manages string-type history records.
+     * <p>
+     * Please note that if you do not set the {@code StringHistoryManager#setPreferences(Preferences)}
+     * method for the {@link StringHistoryManager} instance, the history records will only be saved
+     * in memory and will not be persisted locally. This means that the history data will not be
+     * retained after the application is closed.
+     *
+     * @return the property representing the history manager
+     */
+    public final ObjectProperty<HistoryManager<String>> historyManagerProperty() {
+        if (historyManager == null) {
+            historyManager = new SimpleObjectProperty<>(this, "historyManager") {
+                @Override
+                protected void invalidated() {
+                    pseudoClassStateChanged(DISABLED_POPUP_PSEUDO_CLASS, get() == null);
+                }
+            };
+        }
         return historyManager;
+    }
+
+    public final HistoryManager<String> getHistoryManager() {
+        return historyManager == null ? null : historyManager.get();
+    }
+
+    public final void setHistoryManager(HistoryManager<String> historyManager) {
+        historyManagerProperty().set(historyManager);
     }
 
 }

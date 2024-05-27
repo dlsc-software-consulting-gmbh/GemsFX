@@ -47,12 +47,12 @@ public class PreferencesHistoryManager<T> implements HistoryManager<T> {
      * Using Unicode Record Separator as delimiter.
      * This character is not likely to be used in the history items.
      */
-    private static final String DEFAULT_DELIMITER = "␞";
+    public static final String DEFAULT_DELIMITER = "␞";
 
     /**
      * Default preferences key used to store history items.
      */
-    private static final String DEFAULT_PREFERENCES_KEY = "history-items";
+    public static final String DEFAULT_PREFERENCES_KEY = "history-items";
 
     private final String delimiter;
     private final String preferencesKey;

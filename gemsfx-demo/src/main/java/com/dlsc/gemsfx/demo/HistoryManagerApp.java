@@ -53,10 +53,21 @@ public class HistoryManagerApp extends Application {
 
     private Node basicDemo() {
         TextField textField = new TextField();
+
+        HistoryButton<String> historyButton = new HistoryButton<>(textField);
+
+        // Tips: We can set the delimiter and preferencesKey when creating, otherwise use the default value.
+        // StringHistoryManager historyManager = new StringHistoryManager(";", "history-records",
+        //        Preferences.userNodeForPackage(HistoryManagerApp.class).node("simpleTextField"));
+
         StringHistoryManager historyManager = new StringHistoryManager();
+
+        // Tips: If we want to persist the history after the application restarts, we need to set the preferences.
         // historyManager.setPreferences(Preferences.userNodeForPackage(HistoryManagerApp.class).node("simpleTextField"));
 
-        HistoryButton<String> historyButton = new HistoryButton<>(textField, historyManager);
+        // Tips: If we want to enable the history function, we need to set the history manager.
+        historyButton.setHistoryManager(historyManager);
+
         historyButton.setConfigureHistoryPopup(historyPopup -> {
             // When choosing a history item, replace the text in the text field.
             historyPopup.setOnHistoryItemConfirmed(item -> {
@@ -108,7 +119,8 @@ public class HistoryManagerApp extends Application {
             historyManager.set(List.of("One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"));
         }
 
-        HistoryButton<String> historyButton = new HistoryButton<>(textField, historyManager);
+        HistoryButton<String> historyButton = new HistoryButton<>(textField);
+        historyButton.setHistoryManager(historyManager);
 
         // add history item to the history when the enter key is pressed.
         textField.setOnKeyPressed(e -> {
@@ -214,7 +226,8 @@ public class HistoryManagerApp extends Application {
 
         historyManager.setPreferences(Preferences.userNodeForPackage(HistoryManagerApp.class).node("list"));
 
-        HistoryButton<Student> historyButton = new HistoryButton<>(null, historyManager);
+        HistoryButton<Student> historyButton = new HistoryButton<>(null);
+        historyButton.setHistoryManager(historyManager);
         historyButton.setText("History");
 
         historyButton.setConfigureHistoryPopup(historyPopup -> {

@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.SearchField;
+import com.dlsc.gemsfx.util.HistoryManager;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
@@ -63,7 +64,19 @@ public class HistoryPopupSkin<T> implements Skin<HistoryPopup<T>> {
         ListView<T> listView = new ListView<>();
         listView.getStyleClass().add("history-list-view");
 
-        Bindings.bindContent(listView.getItems(), control.getHistoryManager().getAll());
+        HistoryManager<T> historyManager = control.getHistoryManager();
+        if (historyManager != null) {
+            Bindings.bindContent(listView.getItems(), historyManager.getAll());
+        }
+
+        control.historyManagerProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != null) {
+                Bindings.unbindContent(listView.getItems(), oldValue.getAll());
+            }
+            if (newValue != null) {
+                Bindings.bindContent(listView.getItems(), newValue.getAll());
+            }
+        });
 
         listView.cellFactoryProperty().bind(control.historyCellFactoryProperty());
         listView.placeholderProperty().bind(control.historyPlaceholderProperty());
@@ -116,7 +129,10 @@ public class HistoryPopupSkin<T> implements Skin<HistoryPopup<T>> {
     }
 
     public void dispose() {
-        Bindings.unbindContent(listView.getItems(), control.getHistoryManager().getAll());
+        HistoryManager<T> historyManager = control.getHistoryManager();
+        if (historyManager != null) {
+            Bindings.unbindContent(listView.getItems(), historyManager.getAll());
+        }
 
         listView.prefWidthProperty().unbind();
         listView.maxWidthProperty().unbind();
