@@ -29,7 +29,6 @@ import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
@@ -42,7 +41,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
@@ -130,21 +128,13 @@ public class SearchField<T> extends Control {
     public SearchField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
-        historyButton = createHistorySupportedButton();
+        historyButton = createHistoryButton();
         setGraphic(historyButton);
 
         popup = new SearchFieldPopup<>(this);
 
         editor.textProperty().bindBidirectional(textProperty());
         editor.promptTextProperty().bindBidirectional(promptTextProperty());
-
-        // history listCell factory
-        setHistoryCellFactory(view -> new RemovableListCell<>((listView, item) -> {
-            HistoryManager<String> historyManager = getHistoryManager();
-            if (historyManager != null) {
-                historyManager.remove(item);
-            }
-        }));
 
         // history listView placeholder
         Label placeholder = new Label("No history available.");
@@ -190,7 +180,7 @@ public class SearchField<T> extends Control {
 
             // On key pressed, hide the history popup if the user pressed keys other than UP or DOWN.
             if (keyCode != KeyCode.UP && keyCode != KeyCode.DOWN) {
-                historyButton.hideHistoryPopup();
+                historyButton.hidePopup();
             }
 
             boolean releasedEnter = keyCode.equals(KeyCode.ENTER);
@@ -206,7 +196,7 @@ public class SearchField<T> extends Control {
             } else if (keyCode.equals(KeyCode.LEFT)) {
                 editor.positionCaret(Math.max(0, editor.getCaretPosition() - 1));
             } else if (keyCode.equals(KeyCode.ESCAPE)) {
-                historyButton.hideHistoryPopup();
+                historyButton.hidePopup();
                 cancel();
                 evt.consume();
             } else if (KeyCombination.keyCombination("shortcut+a").match(evt)) {
@@ -346,12 +336,18 @@ public class SearchField<T> extends Control {
             int oldLen = editor.textProperty().getValueSafe().length();
             editor.replaceText(0, oldLen, historyItem);
         }
-        historyButton.hideHistoryPopup();
+        historyButton.hidePopup();
     }
 
-    private HistoryButton<String> createHistorySupportedButton() {
-        HistoryButton<String> historyButton = new HistoryButton<>(this);
+    private HistoryButton<String> createHistoryButton() {
+        HistoryButton<String> historyButton = new HistoryButton<>();
         historyButton.historyManagerProperty().bind(historyManagerProperty());
+        historyButton.setOnHistoryItemSelected(value -> {
+            if (StringUtils.isNotBlank(value)) {
+                setText(value);
+            }
+            historyButton.hidePopup();
+        });
 
         // Create the graphic
         Region graphic = new Region();
@@ -361,22 +357,6 @@ public class SearchField<T> extends Control {
         // Configure the history button
         historyButton.setFocusTraversable(false);
         historyButton.setFocusPopupOwnerOnOpen(true);
-
-        historyButton.setConfigureHistoryPopup(historyPopup -> {
-
-            historyPopup.maxWidthProperty().bind(this.widthProperty());
-            historyPopup.historyPlaceholderProperty().bind(historyPlaceholderProperty());
-            historyPopup.historyCellFactoryProperty().bind(historyCellFactoryProperty());
-            historyPopup.setOnHistoryItemConfirmed(this::onHistoryItemConfirmed);
-
-            Label label = new Label("Search History");
-            label.setRotate(90);
-            Group group = new Group(label);
-
-            VBox left = new VBox(group);
-            left.getStyleClass().add("popup-left");
-            historyPopup.setLeft(left);
-        });
 
         return historyButton;
     }
@@ -1209,28 +1189,6 @@ public class SearchField<T> extends Control {
 
     public final void setHistoryPlaceholder(Node historyPlaceholder) {
         historyPlaceholderProperty().set(historyPlaceholder);
-    }
-
-    private ObjectProperty<Callback<ListView<String>, ListCell<String>>> historyCellFactory;
-
-    public final Callback<ListView<String>, ListCell<String>> getHistoryCellFactory() {
-        return historyCellFactory == null ? null : historyCellFactory.get();
-    }
-
-    /**
-     * The cell factory for the history popup list view.
-     *
-     * @return the cell factory
-     */
-    public final ObjectProperty<Callback<ListView<String>, ListCell<String>>> historyCellFactoryProperty() {
-        if (historyCellFactory == null) {
-            historyCellFactory = new SimpleObjectProperty<>(this, "historyCellFactory");
-        }
-        return historyCellFactory;
-    }
-
-    public final void setHistoryCellFactory(Callback<ListView<String>, ListCell<String>> historyCellFactory) {
-        historyCellFactoryProperty().set(historyCellFactory);
     }
 
     // add on enter

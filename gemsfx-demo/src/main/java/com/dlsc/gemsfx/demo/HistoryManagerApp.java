@@ -1,18 +1,14 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.HistoryButton;
-import com.dlsc.gemsfx.Spacer;
 import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.PreferencesHistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
@@ -23,8 +19,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.List;
 import java.util.Objects;
@@ -54,7 +48,7 @@ public class HistoryManagerApp extends Application {
     private Node basicDemo() {
         TextField textField = new TextField();
 
-        HistoryButton<String> historyButton = new HistoryButton<>(textField);
+        HistoryButton<String> historyButton = new HistoryButton<>();
 
         // Tips: We can set the delimiter and preferencesKey when creating, otherwise use the default value.
         // StringHistoryManager historyManager = new StringHistoryManager(";", "history-records",
@@ -68,19 +62,9 @@ public class HistoryManagerApp extends Application {
         // Tips: If we want to enable the history function, we need to set the history manager.
         historyButton.setHistoryManager(historyManager);
 
-        historyButton.setConfigureHistoryPopup(historyPopup -> {
-            // When choosing a history item, replace the text in the text field.
-            historyPopup.setOnHistoryItemConfirmed(item -> {
-                if (item != null) {
-                    textField.setText(item);
-                }
-                historyPopup.hide();
-            });
-        });
-
         // Add history item to the history when the enter key is pressed.
         textField.setOnKeyPressed(e -> {
-            historyButton.hideHistoryPopup();
+            historyButton.hidePopup();
             if (e.getCode() == KeyCode.ENTER) {
                 historyManager.add(textField.getText());
             }
@@ -119,57 +103,16 @@ public class HistoryManagerApp extends Application {
             historyManager.set(List.of("One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"));
         }
 
-        HistoryButton<String> historyButton = new HistoryButton<>(textField);
+        HistoryButton<String> historyButton = new HistoryButton<>();
         historyButton.setHistoryManager(historyManager);
 
         // add history item to the history when the enter key is pressed.
         textField.setOnKeyPressed(e -> {
-            historyButton.hideHistoryPopup();
+            historyButton.hidePopup();
             if (e.getCode() == KeyCode.ENTER) {
                 historyManager.add(textField.getText());
             }
         });
-
-        // Optional: true means the popup owner will be focused when the history popup is opened.
-        // historyButton.setFocusPopupOwnerOnOpen(true);
-
-        // Optional: Configure the history popup
-        historyButton.setConfigureHistoryPopup(historyPopup -> {
-
-                    historyPopup.setHistoryPlaceholder(new Label("Tips: No history items available."));
-
-                    historyPopup.setOnHistoryItemConfirmed(item -> {
-                        if (item != null) {
-                            int length = textField.textProperty().getValueSafe().length();
-                            textField.replaceText(0, length, item);
-                        }
-                        historyPopup.hide();
-                    });
-
-                    // create the left node;
-                    VBox leftBox = new VBox();
-                    Label label = new Label("History");
-                    label.setRotate(90);
-                    Group group = new Group(label);
-
-                    Button clearAll = new Button("", new FontIcon(MaterialDesign.MDI_DELETE));
-                    clearAll.setPadding(new Insets(2, 4, 2, 4));
-                    clearAll.setOnAction(e -> {
-                        historyManager.clear();
-                        historyPopup.hide();
-                    });
-                    clearAll.managedProperty().bind(clearAll.visibleProperty());
-                    clearAll.visibleProperty().bind(Bindings.isNotEmpty(historyManager.getAll()));
-
-                    leftBox.getChildren().addAll(group, new Spacer(), clearAll);
-                    leftBox.setAlignment(Pos.CENTER);
-                    leftBox.setPadding(new Insets(10, 5, 5, 5));
-                    leftBox.setPrefWidth(35);
-                    leftBox.setStyle("-fx-background-color: #f4f4f4;");
-                    historyPopup.setLeft(leftBox);
-                }
-        );
-
 
         HBox box = new HBox(5, textField, historyButton);
         box.setAlignment(Pos.CENTER);
@@ -226,18 +169,16 @@ public class HistoryManagerApp extends Application {
 
         historyManager.setPreferences(Preferences.userNodeForPackage(HistoryManagerApp.class).node("list"));
 
-        HistoryButton<Student> historyButton = new HistoryButton<>(null);
+        HistoryButton<Student> historyButton = new HistoryButton<>();
         historyButton.setHistoryManager(historyManager);
         historyButton.setText("History");
-
-        historyButton.setConfigureHistoryPopup(historyPopup -> {
-            historyPopup.setOnHistoryItemConfirmed(item -> {
+            historyButton.setOnHistoryItemSelected(item -> {
                 if (item != null) {
                     listView.getSelectionModel().select(item);
                 }
-                historyPopup.hide();
+
+                historyButton.hidePopup();
             });
-        });
 
         Label label = new Label("""
                 1. Tips: Double-click the item to add it to the history.
