@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.HistoryButton;
 import com.dlsc.gemsfx.Spacer;
 import com.dlsc.gemsfx.util.HistoryManager;
+import com.dlsc.gemsfx.util.InMemoryHistoryManager;
 import com.dlsc.gemsfx.util.PreferencesHistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
 import javafx.application.Application;
@@ -36,9 +37,9 @@ public class HistoryManagerApp extends Application {
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabPane.getTabs().addAll(
-                new Tab("Basic", basicDemo()),
-                new Tab("Advanced", advancedDemo()),
-                new Tab("Other", otherDemo())
+                new Tab("In-Memory History Manager", inMemoryDemmo()),
+                new Tab("String History Manager", stringHistoryDemo()),
+                new Tab("Preferences History Manager)", prefsDemo())
         );
 
         primaryStage.setScene(new Scene(tabPane, 800, 600));
@@ -46,22 +47,14 @@ public class HistoryManagerApp extends Application {
         primaryStage.show();
     }
 
-    private Node basicDemo() {
+    private Node inMemoryDemmo() {
         TextField textField = new TextField();
 
         HistoryButton<String> historyButton = new HistoryButton<>(textField);
 
-        // Tips: We can set the delimiter and preferencesKey when creating, otherwise use the default value.
-        // StringHistoryManager historyManager = new StringHistoryManager(";", "history-records",
-        //        Preferences.userNodeForPackage(HistoryManagerApp.class).node("simpleTextField"));
-
-        StringHistoryManager historyManager = new StringHistoryManager();
-
-        // Tips: If we want to persist the history after the application restarts, we need to set the preferences.
-        // historyManager.setPreferences(Preferences.userNodeForPackage(HistoryManagerApp.class).node("simpleTextField"));
-
-        // Tips: If we want to enable the history function, we need to set the history manager.
+        InMemoryHistoryManager<String> historyManager = new InMemoryHistoryManager<>();
         historyButton.setHistoryManager(historyManager);
+
         historyButton.setOnItemSelected(item -> {
             historyButton.hidePopup();
             textField.setText(item);
@@ -92,19 +85,14 @@ public class HistoryManagerApp extends Application {
     /**
      * Creates a text field with a history button.
      */
-    private Node advancedDemo() {
+    private Node stringHistoryDemo() {
         TextField textField = new TextField();
 
-        StringHistoryManager historyManager = new StringHistoryManager();
-        // Tips: You can set the delimiter and preferencesKey when creating, otherwise use the default value.
-        // PreferencesHistoryManager historyManager = new PreferencesHistoryManager(";", "save-items");
-
-        // Tips: If you want to persist the history after the application restarts, Please set the preferences.
-        historyManager.setPreferences(Preferences.userNodeForPackage(HistoryManagerApp.class).node("textField"));
-        // Optional: Set the maximum history size.default is 30.
+        StringHistoryManager historyManager = new StringHistoryManager(Preferences.userNodeForPackage(HistoryManagerApp.class), "advanced-demo");
         historyManager.setMaxHistorySize(10);
+
         // Optional: if the history is empty, set some default values
-        if (historyManager.getAll().isEmpty()) {
+        if (historyManager.getAllUnmodifiable().isEmpty()) {
             historyManager.set(List.of("One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"));
         }
 
@@ -128,7 +116,7 @@ public class HistoryManagerApp extends Application {
             historyButton.hidePopup();
         });
         clearAll.managedProperty().bind(clearAll.visibleProperty());
-        clearAll.visibleProperty().bind(Bindings.isNotEmpty(historyManager.getAll()));
+        clearAll.visibleProperty().bind(Bindings.isNotEmpty(historyManager.getAllUnmodifiable()));
 
         leftBox.getChildren().addAll(group, new Spacer(), clearAll);
         leftBox.setAlignment(Pos.CENTER);
@@ -162,7 +150,7 @@ public class HistoryManagerApp extends Application {
     /**
      * Creates a list view with a history button.
      */
-    private Node otherDemo() {
+    private Node prefsDemo() {
         ListView<Student> listView = new ListView<>();
         listView.getItems().addAll(
                 new Student("John", 90),
@@ -177,28 +165,28 @@ public class HistoryManagerApp extends Application {
                 new Student("David", 83)
         );
 
-        PreferencesHistoryManager<Student> historyManager = new PreferencesHistoryManager<>(
-                new StringConverter<>() {
-                    @Override
-                    public String toString(Student object) {
-                        return object.name() + " : " + object.score();
-                    }
+        StringConverter<Student> converter = new StringConverter<>() {
+            @Override
+            public String toString(Student object) {
+                return object.name() + " : " + object.score();
+            }
 
-                    @Override
-                    public Student fromString(String string) {
-                        String[] parts = string.split(" : ");
-                        return new Student(parts[0], Integer.parseInt(parts[1]));
-                    }
-                }
-        );
+            @Override
+            public Student fromString(String string) {
+                String[] parts = string.split(" : ");
+                return new Student(parts[0], Integer.parseInt(parts[1]));
+            }
+        };
+
+        Preferences preferences = Preferences.userNodeForPackage(HistoryManagerApp.class);
+
+        PreferencesHistoryManager<Student> historyManager = new PreferencesHistoryManager<>(preferences, "list", converter);
 
         listView.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) {
                 historyManager.add(listView.getSelectionModel().getSelectedItem());
             }
         });
-
-        historyManager.setPreferences(Preferences.userNodeForPackage(HistoryManagerApp.class).node("list"));
 
         HistoryButton<Student> historyButton = new HistoryButton<>();
         historyButton.setHistoryManager(historyManager);

@@ -95,11 +95,11 @@ public class SearchFieldApp extends Application {
         enableHistoryBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
                 if (field.getHistoryManager() == null) {
-                    historyManager = new StringHistoryManager(Preferences.userNodeForPackage(SearchFieldApp.class).node("field"));
+                    historyManager = new StringHistoryManager(Preferences.userNodeForPackage(SearchFieldApp.class), "search-field-id");
                     // Optional: Set the maximum history size. default is 30.
                     historyManager.setMaxHistorySize(20);
                     // Optional: If the history items is empty, we can set a default history list.
-                    if (historyManager.getAll().isEmpty()) {
+                    if (historyManager.getAllUnmodifiable().isEmpty()) {
                         historyManager.set(List.of("United Kingdom", "Switzerland"));
                     }
                 }

@@ -38,8 +38,8 @@ public class SearchTextFieldApp extends Application {
         enableHistoryBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
                 if (stringHistoryManager == null) {
-                    Preferences preferences = Preferences.userNodeForPackage(SearchTextFieldApp.class).node("field1");
-                    stringHistoryManager = new StringHistoryManager(preferences);
+                    Preferences preferences = Preferences.userNodeForPackage(SearchTextFieldApp.class);
+                    stringHistoryManager = new StringHistoryManager(preferences, "search-text-field-id");
                 }
                 field.setHistoryManager(stringHistoryManager);
             } else {
@@ -86,7 +86,7 @@ public class SearchTextFieldApp extends Application {
 
         Button removeHistoryButton = new Button("Remove First History Item");
         removeHistoryButton.setMaxWidth(Double.MAX_VALUE);
-        removeHistoryButton.setOnAction(e -> Optional.ofNullable(field.getHistoryManager()).ifPresent(historyManager -> historyManager.remove(historyManager.getAll().get(0))));
+        removeHistoryButton.setOnAction(e -> Optional.ofNullable(field.getHistoryManager()).ifPresent(historyManager -> historyManager.remove(historyManager.getAllUnmodifiable().get(0))));
 
         Button clearButton = new Button("Clear History");
         clearButton.setMaxWidth(Double.MAX_VALUE);

@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.util.HistoryManager;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.css.PseudoClass;
@@ -392,15 +393,15 @@ public class HistoryButton<T> extends Button {
 
             HistoryManager<T> historyManager = getHistoryManager();
             if (historyManager != null) {
-                Bindings.bindContent(listView.getItems(), historyManager.getAll());
+                Bindings.bindContent(listView.getItems(), historyManager.getAllUnmodifiable());
             }
 
             historyManagerProperty().addListener((observable, oldManager, newManager) -> {
                 if (oldManager != null) {
-                    Bindings.unbindContent(listView.getItems(), oldManager.getAll());
+                    Bindings.unbindContent(listView.getItems(), oldManager.getAllUnmodifiable());
                 }
                 if (newManager != null) {
-                    Bindings.bindContent(listView.getItems(), newManager.getAll());
+                    Bindings.bindContent(listView.getItems(), newManager.getAllUnmodifiable());
                 }
             });
 

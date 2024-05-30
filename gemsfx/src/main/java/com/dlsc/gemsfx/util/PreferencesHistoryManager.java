@@ -1,19 +1,13 @@
 package com.dlsc.gemsfx.util;
 
-import javafx.beans.Observable;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
@@ -37,247 +31,51 @@ import java.util.stream.Collectors;
  * @see HistoryManager
  * @see StringConverter
  */
-public class PreferencesHistoryManager<T> implements HistoryManager<T> {
+public class PreferencesHistoryManager<T> extends HistoryManager<T> {
 
     private static final Logger LOG = Logger.getLogger(PreferencesHistoryManager.class.getName());
-
-    private static final int DEFAULT_MAX_HISTORY_SIZE = 30;
 
     /**
      * Using Unicode Record Separator as delimiter.
      * This character is not likely to be used in the history items.
      */
-    public static final String DEFAULT_DELIMITER = "␞";
+    public static String DELIMITER = "␞";
 
-    /**
-     * Default preferences key used to store history items.
-     */
-    public static final String DEFAULT_PREFERENCES_KEY = "history-items";
+    private final Preferences preferences;
 
-    private final String delimiter;
-    private final String preferencesKey;
+    private final String key;
+
     private final StringConverter<T> converter;
 
-    public PreferencesHistoryManager(StringConverter<T> converter) {
-        this(DEFAULT_DELIMITER, DEFAULT_PREFERENCES_KEY, converter);
-    }
-
-    public PreferencesHistoryManager(String delimiter, String preferencesKey, StringConverter<T> converter) {
-        this.delimiter = Objects.requireNonNull(delimiter);
-        this.preferencesKey = Objects.requireNonNull(preferencesKey);
+    public PreferencesHistoryManager(Preferences preferences, String key, StringConverter<T> converter) {
+        this.preferences = Objects.requireNonNull(preferences);
+        this.key = Objects.requireNonNull(key);
         this.converter = Objects.requireNonNull(converter);
-
         loadHistory();
-
-        maxHistorySizeProperty().addListener(it -> {
-            // Check if the max history size is negative. If so, log a warning.
-            if (getMaxHistorySize() < 0) {
-                LOG.warning("Max history size must be greater than or equal to 0. ");
-            }
-            trimHistory();
-        });
-
-        unmodifiableHistory.addListener((Observable it) -> storeHistory());
-        preferencesProperty().addListener(it -> loadHistory());
     }
 
     /**
      * Stores the history items in the preferences.
      */
-    private void storeHistory() {
-        Preferences preferences = getPreferences();
-        if (preferences != null) {
-            String result = unmodifiableHistory.stream()
-                    .map(converter::toString)
-                    .collect(Collectors.joining(delimiter));
-            preferences.put(preferencesKey, result);
-        }
+    @Override
+    protected void storeHistory() {
+        String result = getAllUnmodifiable().stream()
+                .map(converter::toString)
+                .collect(Collectors.joining(DELIMITER));
+        preferences.put(key, result);
     }
 
     /**
      * Loads the history items from the preferences.
      */
-    private void loadHistory() {
-        Preferences preferences = getPreferences();
-        if (preferences != null) {
-            String items = preferences.get(preferencesKey, "");
-            if (StringUtils.isNotEmpty(items)) {
-                String[] ary = items.split(delimiter);
-                Arrays.stream(ary)
-                        .map(converter::fromString)
-                        .forEach(history::add);
-            }
+    @Override
+    protected void loadHistory() {
+        String items = preferences.get(key, "");
+        if (StringUtils.isNotEmpty(items)) {
+            String[] ary = items.split(DELIMITER);
+            set(Arrays.stream(ary)
+                    .map(converter::fromString)
+                    .toList());
         }
     }
-
-    private final ObservableList<T> history = FXCollections.observableArrayList();
-
-    /**
-     * Sets the history of the HistoryManager with the provided list of strings.
-     * The method ensures that duplicates are removed from the list.
-     *
-     * @param history the list of strings representing the history
-     */
-    public final void set(List<T> history) {
-        this.history.setAll(convertToUniqueList(history));
-    }
-
-    /**
-     * Adds the given item to the history. The method ensures that duplicates will not be added.
-     *
-     * @param item the item to add
-     */
-    public final void add(T item) {
-        if (item != null && getFilter().test(item)) {
-            history.remove(item);
-            history.add(0, item);
-            trimHistory();
-        }
-    }
-
-    /**
-     * Adds the given items to the history.
-     *
-     * @param items the items to add
-     */
-    public final void add(List<T> items) {
-        List<T> uniqueItems = convertToUniqueList(items);
-        if (!uniqueItems.isEmpty()) {
-            history.removeAll(uniqueItems);
-            history.addAll(0, uniqueItems);
-            trimHistory();
-        }
-    }
-
-    /**
-     * Removes the given item from the history.
-     *
-     * @param item the item to remove
-     * @return true if the item was removed, false otherwise
-     */
-    public final boolean remove(T item) {
-        return history.remove(item);
-    }
-
-    /**
-     * Removes the given items from the history.
-     *
-     * @param items the items to remove
-     */
-    public final void remove(List<T> items) {
-        history.removeAll(items);
-    }
-
-    /**
-     * Clears the history.
-     */
-    public final void clear() {
-        history.clear();
-    }
-
-    private final ObservableList<T> unmodifiableHistory = FXCollections.unmodifiableObservableList(history);
-
-    /**
-     * Returns an unmodifiable list of the history.
-     */
-    public final ObservableList<T> getAll() {
-        return unmodifiableHistory;
-    }
-
-    private final IntegerProperty maxHistorySize = new SimpleIntegerProperty(this, "maxHistorySize", DEFAULT_MAX_HISTORY_SIZE);
-
-    /**
-     * The maximum number of items that the history will store. If the number of items exceeds this value, the oldest
-     * items will be removed.
-     *
-     * @return the maximum number of items in the history
-     */
-    public final IntegerProperty maxHistorySizeProperty() {
-        return maxHistorySize;
-    }
-
-    public final int getMaxHistorySize() {
-        return maxHistorySize.get();
-    }
-
-    public final void setMaxHistorySize(int maxHistorySize) {
-        maxHistorySizeProperty().set(maxHistorySize);
-    }
-
-    private final ObjectProperty<Predicate<T>> filter = new SimpleObjectProperty<>(this, "filter", it -> true);
-
-    /**
-     * Returns the property object for the filter used when adding items to the history.
-     * Only items that pass the filter will be added to the history.
-     *
-     * @return the property object for the filter
-     */
-    public final ObjectProperty<Predicate<T>> filterProperty() {
-        return filter;
-    }
-
-    public final Predicate<T> getFilter() {
-        return filter.get();
-    }
-
-    public final void setFilter(Predicate<T> filter) {
-        this.filter.set(filter);
-    }
-
-    private final ObjectProperty<Preferences> preferences = new SimpleObjectProperty<>(this, "preferences");
-
-    /**
-     * Returns the property object representing the preferences used for persisting history records.
-     * This property can be used to set or get the `Preferences` instance for storing history items.
-     *
-     * @return the property object representing the preferences
-     */
-    public final ObjectProperty<Preferences> preferencesProperty() {
-        return preferences;
-    }
-
-    public final Preferences getPreferences() {
-        return preferences.get();
-    }
-
-    public final void setPreferences(Preferences preferences) {
-        this.preferences.set(preferences);
-    }
-
-    /**
-     * Trims the history list to ensure it does not exceed the maximum allowed size.
-     * If the current history size is greater than the maximum size, the method removes
-     * the extra elements from the history list.
-     */
-    private void trimHistory() {
-        int max = Math.max(0, getMaxHistorySize());
-        if (history.size() > max) {
-            history.remove(max, history.size());
-        }
-    }
-
-    /**
-     * Converts a given list of strings to a unique list of strings. Filters out empty strings.
-     *
-     * @param history the list of strings to convert
-     * @return the converted unique list of strings
-     */
-    private List<T> convertToUniqueList(List<T> history) {
-        return history.stream().distinct().filter(Objects::nonNull).filter(getFilter()).limit(Math.max(0, getMaxHistorySize())).toList();
-    }
-
-    /**
-     * @return the delimiter used to separate history items
-     */
-    public final String getDelimiter() {
-        return delimiter;
-    }
-
-    /**
-     * @return the preferences key used to store history items
-     */
-    public final String getPreferencesKey() {
-        return preferencesKey;
-    }
-
 }
