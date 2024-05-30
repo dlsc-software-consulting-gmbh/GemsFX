@@ -12,7 +12,6 @@ import javafx.scene.layout.StackPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import java.util.Objects;
 import java.util.function.BiConsumer;
 
 /**

@@ -180,7 +180,7 @@ public class HistoryManagerApp extends Application {
 
         Preferences preferences = Preferences.userNodeForPackage(HistoryManagerApp.class);
 
-        PreferencesHistoryManager<Student> historyManager = new PreferencesHistoryManager<>(preferences, "list", converter);
+        PreferencesHistoryManager<Student> historyManager = new PreferencesHistoryManager<>(preferences, "list-values", converter);
 
         listView.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) {
