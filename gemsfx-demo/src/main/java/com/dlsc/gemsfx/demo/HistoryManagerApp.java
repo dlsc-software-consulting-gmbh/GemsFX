@@ -1,24 +1,25 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.HistoryButton;
+import com.dlsc.gemsfx.Spacer;
 import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.PreferencesHistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.List;
 import java.util.Objects;
@@ -48,7 +49,7 @@ public class HistoryManagerApp extends Application {
     private Node basicDemo() {
         TextField textField = new TextField();
 
-        HistoryButton<String> historyButton = new HistoryButton<>();
+        HistoryButton<String> historyButton = new HistoryButton<>(textField);
 
         // Tips: We can set the delimiter and preferencesKey when creating, otherwise use the default value.
         // StringHistoryManager historyManager = new StringHistoryManager(";", "history-records",
@@ -61,6 +62,10 @@ public class HistoryManagerApp extends Application {
 
         // Tips: If we want to enable the history function, we need to set the history manager.
         historyButton.setHistoryManager(historyManager);
+        historyButton.setOnItemSelected(item -> {
+            historyButton.hidePopup();
+            textField.setText(item);
+        });
 
         // Add history item to the history when the enter key is pressed.
         textField.setOnKeyPressed(e -> {
@@ -105,6 +110,32 @@ public class HistoryManagerApp extends Application {
 
         HistoryButton<String> historyButton = new HistoryButton<>();
         historyButton.setHistoryManager(historyManager);
+        historyButton.setOnItemSelected(item -> {
+            historyButton.hidePopup();
+            textField.setText(item);
+        });
+
+        // create the left node;
+        VBox leftBox = new VBox();
+        Label historyLabel = new Label("History");
+        historyLabel.setRotate(90);
+        Group group = new Group(historyLabel);
+
+        Button clearAll = new Button("", new FontIcon(MaterialDesign.MDI_DELETE));
+        clearAll.setPadding(new Insets(2, 4, 2, 4));
+        clearAll.setOnAction(e -> {
+            historyManager.clear();
+            historyButton.hidePopup();
+        });
+        clearAll.managedProperty().bind(clearAll.visibleProperty());
+        clearAll.visibleProperty().bind(Bindings.isNotEmpty(historyManager.getAll()));
+
+        leftBox.getChildren().addAll(group, new Spacer(), clearAll);
+        leftBox.setAlignment(Pos.CENTER);
+        leftBox.setPadding(new Insets(10, 5, 5, 5));
+        leftBox.setPrefWidth(35);
+        leftBox.setStyle("-fx-background-color: #f4f4f4;");
+        historyButton.setListDecorationLeft(leftBox);
 
         // add history item to the history when the enter key is pressed.
         textField.setOnKeyPressed(e -> {
@@ -172,13 +203,13 @@ public class HistoryManagerApp extends Application {
         HistoryButton<Student> historyButton = new HistoryButton<>();
         historyButton.setHistoryManager(historyManager);
         historyButton.setText("History");
-            historyButton.setOnHistoryItemSelected(item -> {
-                if (item != null) {
-                    listView.getSelectionModel().select(item);
-                }
+        historyButton.setOnItemSelected(item -> {
+            if (item != null) {
+                listView.getSelectionModel().select(item);
+            }
 
-                historyButton.hidePopup();
-            });
+            historyButton.hidePopup();
+        });
 
         Label label = new Label("""
                 1. Tips: Double-click the item to add it to the history.

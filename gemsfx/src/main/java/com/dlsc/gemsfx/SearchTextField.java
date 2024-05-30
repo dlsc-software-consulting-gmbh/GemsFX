@@ -62,7 +62,7 @@ public class SearchTextField extends CustomTextField {
 
         setPromptText("Search...");
 
-        Label placeholder = new Label("No history available.");
+        Label placeholder = new Label("No items.");
         placeholder.getStyleClass().add("default-placeholder");
         setHistoryPlaceholder(placeholder);
 
@@ -90,9 +90,9 @@ public class SearchTextField extends CustomTextField {
 
     private HistoryButton<String> createHistoryButton() {
         HistoryButton<String> historyButton = new HistoryButton<>(this);
-        historyButton.historyPlaceholderProperty().bind(historyPlaceholderProperty());
+        historyButton.placeholderProperty().bind(historyPlaceholderProperty());
         historyButton.historyManagerProperty().bind(historyManagerProperty());
-        historyButton.setOnHistoryItemSelected(value -> {
+        historyButton.setOnItemSelected(value -> {
             if (StringUtils.isNotBlank(value)) {
                 setText(value);
             }
@@ -106,8 +106,6 @@ public class SearchTextField extends CustomTextField {
 
         // Configure the history button
         historyButton.setFocusTraversable(false);
-        historyButton.setFocusPopupOwnerOnOpen(true);
-        historyButton.roundProperty().bind(roundProperty());
 
         return historyButton;
     }

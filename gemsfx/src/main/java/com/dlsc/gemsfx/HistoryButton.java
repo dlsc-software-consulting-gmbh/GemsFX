@@ -1,15 +1,9 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.util.HistoryManager;
-import com.dlsc.gemsfx.util.UIUtil;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
-import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
-import javafx.css.Styleable;
-import javafx.css.StyleableBooleanProperty;
-import javafx.css.StyleableProperty;
-import javafx.css.converter.BooleanConverter;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -29,10 +23,6 @@ import java.util.function.Consumer;
  * This button integrates directly with a {@link HistoryManager} to present a list of previously used
  * items to the user. The user can then pick one of those items to set a value on an input field.
  *
- * <p>Customization options include enabling or disabling the history popup, and configuring
- * how the history items are displayed and managed within the popup. The button's style and behavior
- * can be extensively customized through CSS properties and dynamic property bindings.</p>
- *
  * <p>Usage scenarios include search fields, form inputs, or any other component where users might benefit
  * from being able to see and interact with their previous entries. The generic type {@code T} allows for
  * flexibility, making it suitable for various data types that can represent user input history.</p>
@@ -42,19 +32,18 @@ import java.util.function.Consumer;
 public class HistoryButton<T> extends Button {
 
     private static final String DEFAULT_STYLE_CLASS = "history-button";
-    private static final boolean DEFAULT_ROUND_POPUP = false;
-    private static final boolean DEFAULT_FOCUS_POPUP_OWNER_ON_OPEN = false;
 
     private static final PseudoClass DISABLED_POPUP_PSEUDO_CLASS = PseudoClass.getPseudoClass("disabled-popup");
-    private static final PseudoClass HISTORY_POPUP_SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("history-popup-showing");
+    private static final PseudoClass POPUP_SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("popup-showing");
 
-    private HistoryPopup historyPopup;
+    private HistoryPopup popup;
 
     /**
      * Creates a new instance of the history button.
      */
     public HistoryButton() {
         getStyleClass().addAll(DEFAULT_STYLE_CLASS);
+
         setGraphic(new FontIcon(MaterialDesign.MDI_HISTORY));
         setOnAction(evt -> showPopup());
         setCellFactory(view -> new RemovableListCell<>((listView, item) -> {
@@ -76,10 +65,13 @@ public class HistoryButton<T> extends Button {
         setOwner(owner);
     }
 
+    /**
+     * Shows the popup that includes the list view with the items stored by the history manager.
+     */
     public void showPopup() {
         Node owner = getOwner();
 
-        if (owner != null && owner != this && !owner.isFocused() && getFocusPopupOwnerOnOpen()) {
+        if (owner != null && owner != this && !owner.isFocused()) {
             owner.requestFocus();
         }
 
@@ -87,18 +79,15 @@ public class HistoryButton<T> extends Button {
             return;
         }
 
-        if (historyPopup == null) {
-            historyPopup = new HistoryPopup();
-            UIUtil.toggleClassBasedOnObservable(historyPopup, "round", roundProperty());
-
-            // basic settings
-            historyPopupShowing.bind(historyPopup.showingProperty());
+        if (popup == null) {
+            popup = new HistoryPopup();
+            popupShowing.bind(popup.showingProperty());
         }
 
-        if (historyPopup.isShowing()) {
+        if (popup.isShowing()) {
             hidePopup();
         } else {
-            historyPopup.show(this);
+            popup.show(this);
         }
     }
 
@@ -106,119 +95,80 @@ public class HistoryButton<T> extends Button {
      * Hides the popup that is showing the history items.
      */
     public void hidePopup() {
-        if (historyPopup != null) {
-            historyPopup.hide();
+        if (popup != null) {
+            popup.hide();
         }
     }
 
-    private ObjectProperty<Node> historyPlaceholder = new SimpleObjectProperty<>(this, "historyPlaceholder");
+    // placeholder
+
+    private final ObjectProperty<Node> placeholder = new SimpleObjectProperty<>(this, "placeholder");
 
     /**
      * Returns the property representing the history placeholder node.
      *
      * @return the property representing the history placeholder node
      */
-    public final ObjectProperty<Node> historyPlaceholderProperty() {
-        if (historyPlaceholder == null) {
-            historyPlaceholder = new SimpleObjectProperty<>(this, "historyPlaceholder");
-        }
-        return historyPlaceholder;
+    public final ObjectProperty<Node> placeholderProperty() {
+        return placeholder;
     }
 
-    public final Node getHistoryPlaceholder() {
-        return historyPlaceholder == null ? null : historyPlaceholder.get();
+    public final Node getPlaceholder() {
+        return placeholder == null ? null : placeholder.get();
     }
 
-    public final void setHistoryPlaceholder(Node historyPlaceholder) {
-        historyPlaceholderProperty().set(historyPlaceholder);
+    public final void setPlaceholder(Node placeholder) {
+        placeholderProperty().set(placeholder);
     }
 
-    private ObjectProperty<Consumer<T>> onHistoryItemSelected;
+    private ObjectProperty<Consumer<T>> onItemSelected;
 
-    public final Consumer<T> getOnHistoryItemSelected() {
-        return onHistoryItemSelected == null ? null : onHistoryItemSelected.get();
+    public final Consumer<T> getOnItemSelected() {
+        return onItemSelected == null ? null : onItemSelected.get();
     }
 
     /**
-     * Returns the property representing the callback function to be executed when a history item within the ListView
+     * Returns the property representing the callback function to be executed when a history item within the list view
      * is either clicked directly or selected via the ENTER key press. This property enables setting a custom callback
      * function that will be invoked with the text of the clicked or selected history item as the argument.
      *
      * @return the property storing the "on history item confirmed" callback function.
      */
-    public final ObjectProperty<Consumer<T>> onHistoryItemSelectedProperty() {
-        if (onHistoryItemSelected == null) {
-            onHistoryItemSelected = new SimpleObjectProperty<>(this, "onHistoryItemConfirmed");
+    public final ObjectProperty<Consumer<T>> onItemSelectedProperty() {
+        if (onItemSelected == null) {
+            onItemSelected = new SimpleObjectProperty<>(this, "onItemSelectedProperty");
         }
-        return onHistoryItemSelected;
+        return onItemSelected;
     }
 
-    public final void setOnHistoryItemSelected(Consumer<T> onHistoryItemSelected) {
-        onHistoryItemSelectedProperty().set(onHistoryItemSelected);
+    public final void setOnItemSelected(Consumer<T> onItemSelected) {
+        onItemSelectedProperty().set(onItemSelected);
     }
 
-    private BooleanProperty focusPopupOwnerOnOpen;
+    // popup showing
 
-    /**
-     * Controls whether the Popup Owner should gain focus when the popup is displayed after a button click.
-     * <p>
-     * This property determines whether the Popup Owner, which is the reference component for the popup's position,
-     * should receive focus when the popup is opened. If set to true, the Popup Owner will be focused
-     * when the popup becomes visible. If set to false, the Popup Owner will retain its current focus state.
-     * <p>
-     * The default value is false.
-     *
-     * @return the BooleanProperty that enables or disables focus on the Popup Owner when the popup opens
-     */
-    public final BooleanProperty focusPopupOwnerOnOpenProperty() {
-        if (focusPopupOwnerOnOpen == null) {
-            focusPopupOwnerOnOpen = new StyleableBooleanProperty(DEFAULT_FOCUS_POPUP_OWNER_ON_OPEN) {
-                @Override
-                public Object getBean() {
-                    return this;
-                }
-
-                @Override
-                public String getName() {
-                    return "popupOwnerFocusOnClick";
-                }
-
-                @Override
-                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
-                    return StyleableProperties.FOCUS_POPUP_OWNER_ON_OPEN;
-                }
-            };
-        }
-        return focusPopupOwnerOnOpen;
-    }
-
-    public final boolean getFocusPopupOwnerOnOpen() {
-        return focusPopupOwnerOnOpen == null ? DEFAULT_FOCUS_POPUP_OWNER_ON_OPEN : focusPopupOwnerOnOpen.get();
-    }
-
-    public final void setFocusPopupOwnerOnOpen(boolean focusPopupOwnerOnOpen) {
-        focusPopupOwnerOnOpenProperty().set(focusPopupOwnerOnOpen);
-    }
-
-    private final ReadOnlyBooleanWrapper historyPopupShowing = new ReadOnlyBooleanWrapper(this, "historyPopupShowing") {
+    private final ReadOnlyBooleanWrapper popupShowing = new ReadOnlyBooleanWrapper(this, "popupShowing") {
         @Override
         protected void invalidated() {
-            pseudoClassStateChanged(HISTORY_POPUP_SHOWING_PSEUDO_CLASS, get());
+            pseudoClassStateChanged(POPUP_SHOWING_PSEUDO_CLASS, get());
         }
     };
 
-    public final boolean isHistoryPopupShowing() {
-        return historyPopupShowing.get();
+    public final boolean isPopupShowing() {
+        return popupShowing.get();
     }
+
+    // history manager
 
     private ObjectProperty<HistoryManager<T>> historyManager;
 
     /**
-     * The history manager that is used to manage the history of the HistoryButton.
+     * The history manager that is used for persisting the history of the button.
      * <p>
      * If its value is null, clicking the button will not display the history popup.
      * <p>
-     * If its value is not null, clicking the button will display the history popup.
+     * If its value is not null, clicking the button will display a popup showing the items previously stored
+     * for this button.
      *
      * @return the property representing the history manager
      */
@@ -242,6 +192,8 @@ public class HistoryButton<T> extends Button {
         return historyManager == null ? null : historyManager.get();
     }
 
+    // owner
+
     private ObjectProperty<Node> owner;
 
     /**
@@ -264,27 +216,95 @@ public class HistoryButton<T> extends Button {
         ownerProperty().set(owner);
     }
 
-    private BooleanProperty round;
+    // decoration left
+
+    private final ObjectProperty<Node> listDecorationLeft = new SimpleObjectProperty<>(this, "listDecorationLeft");
+
+    public final Node getListDecorationLeft() {
+        return listDecorationLeft.get();
+    }
 
     /**
-     * Determines whether the text field should have round corners.
+     * The list used by the popup to show previously used items can be easily decorated by specifying nodes for its
+     * left, right, top, and / or bottom sides. This property stores an optional node for the left side.
      *
-     * @return true if the text field should have round corners, false otherwise
+     * @return the node shown to the left of the list view
      */
-    public final BooleanProperty roundProperty() {
-        if (round == null) {
-            round = new SimpleBooleanProperty(this, "round", DEFAULT_ROUND_POPUP);
-        }
-        return round;
+    public final ObjectProperty<Node> listDecorationLeftProperty() {
+        return listDecorationLeft;
     }
 
-    public final boolean isRound() {
-        return round == null ? DEFAULT_ROUND_POPUP : round.get();
+    public final void setListDecorationLeft(Node listDecorationLeft) {
+        this.listDecorationLeft.set(listDecorationLeft);
     }
 
-    public final void setRound(boolean round) {
-        roundProperty().set(round);
+    // decoration right
+
+    private final ObjectProperty<Node> listDecorationRight = new SimpleObjectProperty<>(this, "listDecorationRight");
+
+    public final Node getListDecorationRight() {
+        return listDecorationRight.get();
     }
+
+    /**
+     * The list used by the popup to show previously used items can be easily decorated by specifying nodes for its
+     * left, right, top, and / or bottom sides. This property stores an optional node for the right side.
+     *
+     * @return the node shown to the right of the list view
+     */
+    public final ObjectProperty<Node> listDecorationRightProperty() {
+        return listDecorationRight;
+    }
+
+    public final void setListDecorationRight(Node listDecorationRight) {
+        this.listDecorationRight.set(listDecorationRight);
+    }
+
+    // decoration top
+
+    private final ObjectProperty<Node> listDecorationTop = new SimpleObjectProperty<>(this, "listDecorationTop");
+
+    public final Node getListDecorationTop() {
+        return listDecorationTop.get();
+    }
+
+    /**
+     * The list used by the popup to show previously used items can be easily decorated by specifying nodes for its
+     * left, right, top, and / or bottom sides. This property stores an optional node for the top side.
+     *
+     * @return the node shown at the top of the list view
+     */
+    public final ObjectProperty<Node> listDecorationTopProperty() {
+        return listDecorationTop;
+    }
+
+    public final void setListDecorationTop(Node listDecorationTop) {
+        this.listDecorationTop.set(listDecorationTop);
+    }
+
+    // decoration bottom
+
+    private final ObjectProperty<Node> listDecorationBottom = new SimpleObjectProperty<>(this, "listDecorationBottom");
+
+    public final Node getListDecorationBottom() {
+        return listDecorationBottom.get();
+    }
+
+    /**
+     * The list used by the popup to show previously used items can be easily decorated by specifying nodes for its
+     * left, right, top, and / or bottom sides. This property stores an optional node for the bottom side.
+     *
+     * @return the node shown on the bottom of the list view
+     */
+    public final ObjectProperty<Node> listDecorationBottomProperty() {
+        return listDecorationBottom;
+    }
+
+    public final void setListDecorationBottom(Node listDecorationBottom) {
+        this.listDecorationBottom.set(listDecorationBottom);
+    }
+
+    // cell factory
 
     private ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactory;
 
@@ -313,60 +333,13 @@ public class HistoryButton<T> extends Button {
      *
      * @return true if the history popup is showing, false otherwise
      */
-    public final ReadOnlyBooleanProperty historyPopupShowingProperty() {
-        return historyPopupShowing.getReadOnlyProperty();
-    }
-
-    private static class StyleableProperties {
-
-        private static final CssMetaData<HistoryButton, Boolean> FOCUS_POPUP_OWNER_ON_OPEN = new CssMetaData<>(
-                "-fx-focus-popup-owner-on-open", BooleanConverter.getInstance(), DEFAULT_FOCUS_POPUP_OWNER_ON_OPEN) {
-
-            @Override
-            public StyleableProperty<Boolean> getStyleableProperty(HistoryButton control) {
-                return (StyleableProperty<Boolean>) control.focusPopupOwnerOnOpenProperty();
-            }
-
-            @Override
-            public boolean isSettable(HistoryButton control) {
-                return control.focusPopupOwnerOnOpen == null || !control.focusPopupOwnerOnOpen.isBound();
-            }
-        };
-
-        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
-
-        static {
-            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Button.getClassCssMetaData());
-            styleables.add(FOCUS_POPUP_OWNER_ON_OPEN);
-            STYLEABLES = Collections.unmodifiableList(styleables);
-        }
-    }
-
-    @Override
-    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
-        return getClassCssMetaData();
-    }
-
-    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
-        return HistoryButton.StyleableProperties.STYLEABLES;
+    public final ReadOnlyBooleanProperty popupShowingProperty() {
+        return popupShowing.getReadOnlyProperty();
     }
 
     /**
-     * Represents a custom popup control tailored to display and manage history items of type T.
-     * This control integrates with a {@link HistoryManager} to provide a user interface for viewing,
-     * selecting, and managing historical entries directly through a popup window.
-     *
-     * <p>The popup is highly customizable, supporting the addition of custom nodes to its top, bottom,
-     * left, and right regions. It also allows setting a placeholder for situations where no history items
-     * are available. The appearance and behavior of the history items can be customized via a cell factory.</p>
-     *
-     * <p>Key features include:</p>
-     * <ul>
-     * <li>Automatic binding to a {@link HistoryManager} for dynamic history item management.</li>
-     * <li>Customizable regions (top, bottom, left, right) for additional UI components or decorations.</li>
-     * <li>Configurable callbacks for item selection and confirmation actions, enhancing interactive capabilities.</li>
-     * <li>Support for CSS styling to match the application's design requirements.</li>
-     * </ul>
+     * The popup used by the {@link HistoryButton} to display a list view with the previously used
+     * items.
      */
     public class HistoryPopup extends CustomPopupControl {
 
@@ -380,88 +353,19 @@ public class HistoryButton<T> extends Button {
             setHideOnEscape(true);
         }
 
+        @Override
         protected Skin<?> createDefaultSkin() {
             return new HistoryPopupSkin(this);
-        }
-
-        private final ObjectProperty<Node> left = new SimpleObjectProperty<>(this, "left");
-
-        public final ObjectProperty<Node> leftProperty() {
-            return left;
-        }
-
-        public final Node getLeft() {
-            return leftProperty().get();
-        }
-
-        public final void setLeft(Node left) {
-            leftProperty().set(left);
-        }
-
-        private final ObjectProperty<Node> right = new SimpleObjectProperty<>(this, "right");
-
-        public final ObjectProperty<Node> rightProperty() {
-            return right;
-        }
-
-        public final Node getRight() {
-            return rightProperty().get();
-        }
-
-        public final void setRight(Node right) {
-            rightProperty().set(right);
-        }
-
-        private final ObjectProperty<Node> top = new SimpleObjectProperty<>(this, "top");
-
-        public final ObjectProperty<Node> topProperty() {
-            return top;
-        }
-
-        public final Node getTop() {
-            return topProperty().get();
-        }
-
-        public final void setTop(Node top) {
-            topProperty().set(top);
-        }
-
-        private final ObjectProperty<Node> bottom = new SimpleObjectProperty<>(this, "bottom");
-
-        public final ObjectProperty<Node> bottomProperty() {
-            return bottom;
-        }
-
-        public final Node getBottom() {
-            return bottomProperty().get();
-        }
-
-        public final void setBottom(Node bottom) {
-            bottomProperty().set(bottom);
         }
     }
 
     /**
-     * Provides a concrete implementation of a skin for {@link HistoryPopup}, defining the visual representation
-     * and interaction handling of the popup. This skin layout includes a {@link ListView} that displays the history
-     * items, which can be interacted with via mouse or keyboard.
-     *
-     * <p>The skin binds various properties from the {@link HistoryPopup} to configure and customize the layout
-     * and behavior of the popup elements, including the arrangement of nodes around the central list view (top,
-     * bottom, left, right).</p>
-     *
-     * <p>Interactions such as mouse clicks and keyboard inputs are handled to select and confirm history items,
-     * allowing for a seamless user experience. The history items are displayed using a configurable cell factory,
-     * and the skin reacts to changes in the popup's properties to update the UI accordingly.</p>
-     *
-     * <p>This skin ensures that the popup's visual structure is maintained in alignment with the popup's configuration,
-     * supporting dynamic changes to the content and layout.</p>
+     * The skin used for the {@link HistoryPopup}.
      */
     public class HistoryPopupSkin implements Skin<HistoryPopup> {
 
         private final HistoryPopup popup;
         private final BorderPane root;
-        private final ListView<T> listView;
 
         public HistoryPopupSkin(HistoryPopup popup) {
             this.popup = popup;
@@ -469,22 +373,20 @@ public class HistoryButton<T> extends Button {
             root = new BorderPane() {
                 @Override
                 public String getUserAgentStylesheet() {
-                    return Objects.requireNonNull(SearchField.class.getResource("history-popup.css")).toExternalForm();
+                    return Objects.requireNonNull(HistoryButton.class.getResource("history-button.css")).toExternalForm();
                 }
             };
 
             root.getStyleClass().add("content-pane");
+            root.setCenter(createListView());
 
-            listView = createHistoryListView();
-            root.setCenter(listView);
-
-            root.leftProperty().bind(popup.leftProperty());
-            root.rightProperty().bind(popup.rightProperty());
-            root.topProperty().bind(popup.topProperty());
-            root.bottomProperty().bind(popup.bottomProperty());
+            root.leftProperty().bind(listDecorationLeftProperty());
+            root.rightProperty().bind(listDecorationRightProperty());
+            root.topProperty().bind(listDecorationTopProperty());
+            root.bottomProperty().bind(listDecorationBottomProperty());
         }
 
-        private ListView<T> createHistoryListView() {
+        private ListView<T> createListView() {
             ListView<T> listView = new ListView<>();
             listView.getStyleClass().add("history-list-view");
 
@@ -493,22 +395,22 @@ public class HistoryButton<T> extends Button {
                 Bindings.bindContent(listView.getItems(), historyManager.getAll());
             }
 
-            historyManagerProperty().addListener((observable, oldValue, newValue) -> {
-                if (oldValue != null) {
-                    Bindings.unbindContent(listView.getItems(), oldValue.getAll());
+            historyManagerProperty().addListener((observable, oldManager, newManager) -> {
+                if (oldManager != null) {
+                    Bindings.unbindContent(listView.getItems(), oldManager.getAll());
                 }
-                if (newValue != null) {
-                    Bindings.bindContent(listView.getItems(), newValue.getAll());
+                if (newManager != null) {
+                    Bindings.bindContent(listView.getItems(), newManager.getAll());
                 }
             });
 
             listView.cellFactoryProperty().bind(cellFactoryProperty());
-            listView.placeholderProperty().bind(historyPlaceholderProperty());
+            listView.placeholderProperty().bind(placeholderProperty());
 
             // handle mouse clicks on the listView item
             listView.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEvent -> {
-                if (isPrimarySingleClick(mouseEvent) && !mouseEvent.isConsumed()) {
-                    handlerHistoryItemConfirmed(listView);
+                if (mouseEvent.getButton() == MouseButton.PRIMARY && mouseEvent.getClickCount() == 1 && !mouseEvent.isConsumed()) {
+                    handleItemSelection(listView);
                     mouseEvent.consume();
                 }
             });
@@ -516,7 +418,7 @@ public class HistoryButton<T> extends Button {
             // handle keyboard events on the listView
             listView.addEventFilter(KeyEvent.KEY_RELEASED, keyEvent -> {
                 if (keyEvent.getCode() == KeyCode.ENTER) {
-                    handlerHistoryItemConfirmed(listView);
+                    handleItemSelection(listView);
                     keyEvent.consume();
                 }
             });
@@ -524,39 +426,23 @@ public class HistoryButton<T> extends Button {
             return listView;
         }
 
-        private void handlerHistoryItemConfirmed(ListView<T> listView) {
+        private void handleItemSelection(ListView<T> listView) {
             T historyItem = listView.getSelectionModel().getSelectedItem();
-            Optional.ofNullable(getOnHistoryItemSelected()).ifPresent(onItemSelected -> onItemSelected.accept(historyItem));
+            Optional.ofNullable(getOnItemSelected()).ifPresent(onItemSelected -> onItemSelected.accept(historyItem));
         }
 
-        private boolean isPrimarySingleClick(MouseEvent mouseEvent) {
-            return mouseEvent.getButton() == MouseButton.PRIMARY && mouseEvent.getClickCount() == 1;
-        }
-
-        public final ListView<T> getListView() {
-            return listView;
-        }
-
+        @Override
         public Node getNode() {
             return root;
         }
 
+        @Override
         public HistoryPopup getSkinnable() {
             return popup;
         }
 
+        @Override
         public void dispose() {
-            HistoryManager<T> historyManager = getHistoryManager();
-            if (historyManager != null) {
-                Bindings.unbindContent(listView.getItems(), historyManager.getAll());
-            }
-
-            listView.prefWidthProperty().unbind();
-            listView.maxWidthProperty().unbind();
-            listView.minWidthProperty().unbind();
-
-            listView.cellFactoryProperty().unbind();
-            listView.placeholderProperty().unbind();
         }
     }
 }

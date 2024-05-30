@@ -33,6 +33,7 @@ public class RemovableListCell<T> extends ListCell<T> {
         label = new Label();
 
         setPrefWidth(0);
+
         StackPane removeBtn = new StackPane(new FontIcon(MaterialDesign.MDI_CLOSE));
         removeBtn.getStyleClass().add("remove-button");
         removeBtn.addEventHandler(MouseEvent.MOUSE_PRESSED, this::onRemoveAction);
@@ -97,11 +98,6 @@ public class RemovableListCell<T> extends ListCell<T> {
 
     public final void setOnRemove(BiConsumer<ListView<T>, T> onRemove) {
         onRemoveProperty().set(onRemove);
-    }
-
-    @Override
-    public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(RemovableListCell.class.getResource("removable-list-cell.css")).toExternalForm();
     }
 }
 

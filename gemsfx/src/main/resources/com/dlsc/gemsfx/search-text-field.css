@@ -24,15 +24,14 @@
 
 .search-text-field > .left-pane > .history-button:hover,
 .search-text-field > .left-pane > .history-button:pressed,
-.search-text-field > .left-pane > .history-button:history-popup-showing {
-    -fx-background-color: -fx-base;
+.search-text-field > .left-pane > .history-button:popup-showing {
 }
 
 .search-text-field.round > .left-pane > .history-button,
 .search-text-field.round > .left-pane > .history-button:hover,
 .search-text-field.round > .left-pane > .history-button:pressed,
 .search-text-field.round > .left-pane > .history-button:focused,
-.search-text-field.round > .left-pane > .history-button:history-popup-showing {
+.search-text-field.round > .left-pane > .history-button:popup-showing {
     -fx-background-radius: 1000px 0 0 1000px;
 }
 
@@ -40,11 +39,9 @@
 .search-text-field > .left-pane > .history-button:disabled-popup:hover,
 .search-text-field > .left-pane > .history-button:disabled-popup:pressed {
     -fx-cursor: text;
-    -fx-background-color: transparent;
 }
 
 .search-text-field > .left-pane > .history-button:pressed {
-    -fx-background-color: derive(-fx-base, -10%);
 }
 
 .search-text-field > .left-pane > .history-button > .icon {

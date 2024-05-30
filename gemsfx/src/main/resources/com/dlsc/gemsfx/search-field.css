@@ -23,19 +23,16 @@
 
 .search-field  .graphic-wrapper .history-button:hover,
 .search-field  .graphic-wrapper .history-button:pressed,
-.search-field  .graphic-wrapper .history-button:history-popup-showing {
-    -fx-background-color: -fx-base;
+.search-field  .graphic-wrapper .history-button:popup-showing {
 }
 
 .search-field .graphic-wrapper .history-button:disabled-popup,
 .search-field .graphic-wrapper .history-button:disabled-popup:hover,
 .search-field .graphic-wrapper .history-button:disabled-popup:pressed {
     -fx-cursor: text;
-    -fx-background-color: transparent;
 }
 
 .search-field  .graphic-wrapper .history-button:pressed {
-    -fx-background-color: derive(-fx-base, -10%);
 }
 
 .search-field  .graphic-wrapper .history-button > .icon {

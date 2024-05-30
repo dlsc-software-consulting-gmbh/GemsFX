@@ -137,7 +137,7 @@ public class SearchField<T> extends Control {
         editor.promptTextProperty().bindBidirectional(promptTextProperty());
 
         // history listView placeholder
-        Label placeholder = new Label("No history available.");
+        Label placeholder = new Label("No items.");
         placeholder.getStyleClass().add("history-placeholder");
         setHistoryPlaceholder(placeholder);
 
@@ -176,7 +176,7 @@ public class SearchField<T> extends Control {
             KeyCode keyCode = evt.getCode();
 
             // record the history popup showing status before hide.
-            boolean lastHistoryPopupShowing = historyButton.isHistoryPopupShowing();
+            boolean lastHistoryPopupShowing = historyButton.isPopupShowing();
 
             // On key pressed, hide the history popup if the user pressed keys other than UP or DOWN.
             if (keyCode != KeyCode.UP && keyCode != KeyCode.DOWN) {
@@ -342,7 +342,7 @@ public class SearchField<T> extends Control {
     private HistoryButton<String> createHistoryButton() {
         HistoryButton<String> historyButton = new HistoryButton<>(this);
         historyButton.historyManagerProperty().bind(historyManagerProperty());
-        historyButton.setOnHistoryItemSelected(value -> {
+        historyButton.setOnItemSelected(value -> {
             if (StringUtils.isNotBlank(value)) {
                 setText(value);
             }
@@ -356,7 +356,6 @@ public class SearchField<T> extends Control {
 
         // Configure the history button
         historyButton.setFocusTraversable(false);
-        historyButton.setFocusPopupOwnerOnOpen(true);
 
         return historyButton;
     }
