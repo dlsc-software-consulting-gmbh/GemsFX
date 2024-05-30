@@ -1,14 +1,10 @@
 package com.dlsc.gemsfx.util;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
@@ -32,8 +28,6 @@ import java.util.stream.Collectors;
  * @see StringConverter
  */
 public class PreferencesHistoryManager<T> extends HistoryManager<T> {
-
-    private static final Logger LOG = Logger.getLogger(PreferencesHistoryManager.class.getName());
 
     /**
      * Using Unicode Record Separator as delimiter.
