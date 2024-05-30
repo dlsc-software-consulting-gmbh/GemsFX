@@ -102,7 +102,6 @@ public class SearchField<T> extends Control {
 
     private static final String DEFAULT_STYLE_CLASS = "search-field";
 
-    private static final boolean DEFAULT_ENABLE_HISTORY_POPUP = true;
     private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER = true;
     private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_COMMIT = true;
     private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST = true;
