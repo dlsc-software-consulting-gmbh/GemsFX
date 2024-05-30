@@ -133,6 +133,7 @@ public class SearchFieldApp extends Application {
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);
+        scene.focusOwnerProperty().addListener(it -> System.out.println("owner: " + scene.getFocusOwner()));
 
         primaryStage.setTitle("Search Field");
         primaryStage.setScene(scene);

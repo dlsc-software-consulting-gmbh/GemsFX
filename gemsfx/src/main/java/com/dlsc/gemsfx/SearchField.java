@@ -340,7 +340,7 @@ public class SearchField<T> extends Control {
     }
 
     private HistoryButton<String> createHistoryButton() {
-        HistoryButton<String> historyButton = new HistoryButton<>();
+        HistoryButton<String> historyButton = new HistoryButton<>(this);
         historyButton.historyManagerProperty().bind(historyManagerProperty());
         historyButton.setOnHistoryItemSelected(value -> {
             if (StringUtils.isNotBlank(value)) {

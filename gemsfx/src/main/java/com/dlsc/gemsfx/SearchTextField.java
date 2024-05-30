@@ -89,7 +89,7 @@ public class SearchTextField extends CustomTextField {
     }
 
     private HistoryButton<String> createHistoryButton() {
-        HistoryButton<String> historyButton = new HistoryButton<>();
+        HistoryButton<String> historyButton = new HistoryButton<>(this);
         historyButton.historyPlaceholderProperty().bind(historyPlaceholderProperty());
         historyButton.historyManagerProperty().bind(historyManagerProperty());
         historyButton.setOnHistoryItemSelected(value -> {

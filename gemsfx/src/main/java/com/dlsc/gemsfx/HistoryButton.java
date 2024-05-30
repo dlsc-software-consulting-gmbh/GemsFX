@@ -57,7 +57,6 @@ public class HistoryButton<T> extends Button {
         getStyleClass().addAll(DEFAULT_STYLE_CLASS);
         setGraphic(new FontIcon(MaterialDesign.MDI_HISTORY));
         setOnAction(evt -> showPopup());
-        setHistoryPlaceholder(new Label("No items."));
         setCellFactory(view -> new RemovableListCell<>((listView, item) -> {
             HistoryManager<T> historyManager = getHistoryManager();
             if (historyManager != null) {
@@ -66,22 +65,23 @@ public class HistoryButton<T> extends Button {
         }));
     }
 
-//    /**
-//     * Creates a new instance of the history button.
-//     *
-//     * @param popupOwner the owner of the button, used for focus management.
-//     */
-//    public HistoryButton(Region popupOwner) {
-//        this();
-//        setOwner(popupOwner);
-//    }
+    /**
+     * Creates a new instance of the history button where the button will be used in combination with
+     * the given node.
+     *
+     * @param owner the owner of the button, used for focus management.
+     */
+    public HistoryButton(Node owner) {
+        this();
+        setOwner(owner);
+    }
 
     public void showPopup() {
-//        Node owner = getOwner();
-//
-//        if (owner != null && owner != this && !owner.isFocused() && getFocusPopupOwnerOnOpen()) {
-//           //owner.requestFocus();
-//        }
+        Node owner = getOwner();
+
+        if (owner != null && owner != this && !owner.isFocused() && getFocusPopupOwnerOnOpen()) {
+            owner.requestFocus();
+        }
 
         if (getHistoryManager() == null) {
             return;
@@ -242,27 +242,27 @@ public class HistoryButton<T> extends Button {
         return historyManager == null ? null : historyManager.get();
     }
 
-//    private ObjectProperty<Node> owner;
-//
-//    /**
-//     * The (optional) "owner" of a history button can be a textfield where the button is shown inside the field.
-//     *
-//     * @return
-//     */
-//    public final ObjectProperty<Node> ownerProperty() {
-//        if (owner == null) {
-//            owner = new SimpleObjectProperty<>(this, "owner");
-//        }
-//        return owner;
-//    }
-//
-//    public final Node getOwner() {
-//        return owner == null ? null : owner.get();
-//    }
-//
-//    public final void setOwner(Node owner) {
-//        ownerProperty().set(owner);
-//    }
+    private ObjectProperty<Node> owner;
+
+    /**
+     * The (optional) "owner" of a history button can be a textfield where the button is shown inside the field.
+     *
+     * @return the owning node, e.g. a text field.
+     */
+    public final ObjectProperty<Node> ownerProperty() {
+        if (owner == null) {
+            owner = new SimpleObjectProperty<>(this, "owner");
+        }
+        return owner;
+    }
+
+    public final Node getOwner() {
+        return owner == null ? null : owner.get();
+    }
+
+    public final void setOwner(Node owner) {
+        ownerProperty().set(owner);
+    }
 
     private BooleanProperty round;
 
