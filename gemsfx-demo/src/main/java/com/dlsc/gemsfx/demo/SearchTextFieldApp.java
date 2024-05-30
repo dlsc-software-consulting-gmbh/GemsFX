@@ -1,8 +1,10 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.SearchTextField;
+import com.dlsc.gemsfx.Spacer;
+import com.dlsc.gemsfx.util.HistoryManager;
+import com.dlsc.gemsfx.util.StringHistoryManager;
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,71 +19,85 @@ import javafx.stage.Stage;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.prefs.Preferences;
 
 public class SearchTextFieldApp extends Application {
 
-    private SearchTextField field1;
+    private StringHistoryManager stringHistoryManager;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        field1 = new SearchTextField();
-        field1.setPreferences(Preferences.userNodeForPackage(SearchTextFieldApp.class).node("field1"));
+        SearchTextField field = new SearchTextField();
 
-        SearchTextField field2 = new SearchTextField(true);
-        field2.setPreferences(Preferences.userNodeForPackage(SearchTextFieldApp.class).node("field2"));
+        CheckBox roundBox = new CheckBox("Round");
+        field.roundProperty().bind(roundBox.selectedProperty());
+
+        CheckBox enableHistoryBox = new CheckBox("Enable History");
+        enableHistoryBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                if (stringHistoryManager == null) {
+                    Preferences preferences = Preferences.userNodeForPackage(SearchTextFieldApp.class).node("field1");
+                    stringHistoryManager = new StringHistoryManager(preferences);
+                }
+                field.setHistoryManager(stringHistoryManager);
+            } else {
+                field.setHistoryManager(null);
+            }
+            primaryStage.sizeToScene();
+        });
+        enableHistoryBox.setSelected(true);
 
         Label label = new Label("Max History Size:");
-        Spinner<Integer> maxHistorySizeSpinner = new Spinner<>(5, 50, 10, 5);
-        field1.maxHistorySizeProperty().bind(maxHistorySizeSpinner.valueProperty());
-        maxHistorySizeSpinner.setMaxWidth(Double.MAX_VALUE);
-        HBox maxHistorySizeBox = new HBox(5, label, maxHistorySizeSpinner);
-        maxHistorySizeBox.setAlignment(Pos.CENTER_LEFT);
+        Spinner<Integer> maxHistorySizeSpinner = new Spinner<>(5, 50, 30, 5);
+        maxHistorySizeSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
+            HistoryManager<String> historyManager = field.getHistoryManager();
+            if (newVal != null && historyManager != null) {
+                historyManager.setMaxHistorySize(newVal);
+            }
+        });
 
-        CheckBox enableHistoryPopupBox = new CheckBox("Enable History Popup");
-        enableHistoryPopupBox.setSelected(true);
-        field1.enableHistoryPopupProperty().bindBidirectional(enableHistoryPopupBox.selectedProperty());
-        field2.enableHistoryPopupProperty().bindBidirectional(enableHistoryPopupBox.selectedProperty());
+        maxHistorySizeSpinner.setMaxWidth(140);
+        HBox maxHistorySizeBox = new HBox(5, label, new Spacer(), maxHistorySizeSpinner);
+        maxHistorySizeBox.setAlignment(Pos.CENTER_LEFT);
 
         CheckBox addHistoryOnActionBox = new CheckBox("Add History on Enter");
         addHistoryOnActionBox.setSelected(true);
-        field1.addingItemToHistoryOnEnterProperty().bind(addHistoryOnActionBox.selectedProperty());
-        field2.addingItemToHistoryOnEnterProperty().bind(addHistoryOnActionBox.selectedProperty());
+        field.addingItemToHistoryOnEnterProperty().bind(addHistoryOnActionBox.selectedProperty());
 
         CheckBox addHistoryOnFocusLossBox = new CheckBox("Add History on Focus Loss");
         addHistoryOnFocusLossBox.setSelected(true);
-        field1.addingItemToHistoryOnFocusLostProperty().bind(addHistoryOnFocusLossBox.selectedProperty());
-        field2.addingItemToHistoryOnFocusLostProperty().bind(addHistoryOnFocusLossBox.selectedProperty());
+        field.addingItemToHistoryOnFocusLostProperty().bind(addHistoryOnFocusLossBox.selectedProperty());
 
         Button setHistoryButton = new Button("Set History");
         setHistoryButton.setMaxWidth(Double.MAX_VALUE);
         setHistoryButton.setOnAction(e -> {
             List<String> list = List.of("One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten");
-            field1.setHistory(list);
-            field2.setHistory(list);
+            Optional.ofNullable(field.getHistoryManager()).ifPresent(historyManager -> {
+                historyManager.set(list);
+                System.out.println("History set to: " + list);
+            });
         });
 
         Button addHistoryButton = new Button("Add History");
         addHistoryButton.setMaxWidth(Double.MAX_VALUE);
-        addHistoryButton.setOnAction(e -> {
-            field1.addHistory("New " + LocalTime.now());
-            field2.addHistory("New" + LocalTime.now());
-        });
+        addHistoryButton.setOnAction(e -> Optional.ofNullable(field.getHistoryManager()).ifPresent(historyManager -> historyManager.add("New " + LocalTime.now())));
 
-        Button removeStandardHistoryButton = createRemoveHistoryButton("Standard Field Remove First History Item", field1);
-        Button removeRoundHistoryButton = createRemoveHistoryButton("Round Field Remove First History Item", field2);
+        Button removeHistoryButton = new Button("Remove First History Item");
+        removeHistoryButton.setMaxWidth(Double.MAX_VALUE);
+        removeHistoryButton.setOnAction(e -> Optional.ofNullable(field.getHistoryManager()).ifPresent(historyManager -> historyManager.remove(historyManager.getAll().get(0))));
 
         Button clearButton = new Button("Clear History");
         clearButton.setMaxWidth(Double.MAX_VALUE);
-        clearButton.setOnAction(e -> {
-            field1.clearHistory();
-            field2.clearHistory();
-        });
+        clearButton.setOnAction(e -> Optional.ofNullable(field.getHistoryManager()).ifPresent(HistoryManager::clear));
 
-        VBox vbox = new VBox(20, new Label("Standard"), field1, new Label("Round"), field2,
-                new Separator(), maxHistorySizeBox, enableHistoryPopupBox, addHistoryOnActionBox, addHistoryOnFocusLossBox,
-                setHistoryButton, addHistoryButton, removeStandardHistoryButton, removeRoundHistoryButton, clearButton);
+        VBox historyControls = new VBox(5, new Separator(), maxHistorySizeBox, addHistoryOnActionBox, addHistoryOnFocusLossBox,
+                setHistoryButton, addHistoryButton, clearButton);
+        historyControls.managedProperty().bind(enableHistoryBox.selectedProperty());
+        historyControls.visibleProperty().bind(enableHistoryBox.selectedProperty());
+
+        VBox vbox = new VBox(20, new Label("Standard"), field, roundBox, enableHistoryBox, historyControls);
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);
@@ -90,14 +106,6 @@ public class SearchTextFieldApp extends Application {
         primaryStage.sizeToScene();
         primaryStage.centerOnScreen();
         primaryStage.show();
-    }
-
-    private Button createRemoveHistoryButton(String text, SearchTextField field) {
-        Button removeHistoryButton2 = new Button(text);
-        removeHistoryButton2.disableProperty().bind(Bindings.createObjectBinding(() -> field.getUnmodifiableHistory().isEmpty(), field.getUnmodifiableHistory()));
-        removeHistoryButton2.setMaxWidth(Double.MAX_VALUE);
-        removeHistoryButton2.setOnAction(e -> field.removeHistory(field.getUnmodifiableHistory().get(0)));
-        return removeHistoryButton2;
     }
 
     public static void main(String[] args) {

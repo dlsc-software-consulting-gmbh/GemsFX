@@ -1,8 +1,8 @@
 package com.dlsc.gemsfx.util;
 
-
+import javafx.beans.value.ObservableValue;
+import javafx.css.Styleable;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
@@ -24,7 +24,7 @@ public class UIUtil {
      * @param node       The node to add the style class to.
      * @param styleClass The style class to add.
      */
-    public static void addClassIfAbsent(Node node, String styleClass) {
+    public static void addClassIfAbsent(Styleable node, String styleClass) {
         Optional.ofNullable(node).ifPresent(n -> {
             if (!n.getStyleClass().contains(styleClass)) {
                 n.getStyleClass().add(styleClass);
@@ -38,7 +38,7 @@ public class UIUtil {
      * @param node         The node to add the style classes to.
      * @param styleClasses The style classes to add.
      */
-    public static void addClassesIfAbsent(Node node, String... styleClasses) {
+    public static void addClassesIfAbsent(Styleable node, String... styleClasses) {
         List<String> list = Arrays.stream(styleClasses)
                 .filter(styleClass -> !node.getStyleClass().contains(styleClass))
                 .toList();
@@ -53,7 +53,7 @@ public class UIUtil {
      * @param node       The node to toggle the style on.
      * @param styleClass The style class to add or remove.
      */
-    public static void toggleClass(Node node, String styleClass) {
+    public static void toggleClass(Styleable node, String styleClass) {
         if (node.getStyleClass().contains(styleClass)) {
             node.getStyleClass().remove(styleClass);
         } else {
@@ -70,7 +70,7 @@ public class UIUtil {
      * @param styleClass The style class to add or remove.
      * @param condition  The condition that determines whether to add or remove the style.
      */
-    public static void toggleClassOnCondition(Node node, String styleClass, boolean condition) {
+    public static void toggleClassOnCondition(Styleable node, String styleClass, boolean condition) {
         if (condition) {
             addClassIfAbsent(node, styleClass);
         } else {
@@ -78,6 +78,19 @@ public class UIUtil {
         }
     }
 
+    /**
+     * Toggles a style class on a node based on an observable value.
+     * If the observable value is true, the style class is added.
+     * If the observable value is false, the style class is removed.
+     *
+     * @param node                   The node to toggle the style on.
+     * @param styleClass            The style class to add or remove.
+     * @param booleanObservableValue The observable value that determines whether to add or remove the style.
+     */
+    public static void toggleClassBasedOnObservable(Styleable node, String styleClass, ObservableValue<Boolean> booleanObservableValue) {
+        toggleClassOnCondition(node, styleClass, booleanObservableValue.getValue());
+        booleanObservableValue.addListener((obs, oldVal, newVal) -> toggleClassOnCondition(node, styleClass, newVal));
+    }
 
     /**
      * Optimizes style updates for a given node by first adding a specified style to ensure it's present,
@@ -88,7 +101,7 @@ public class UIUtil {
      * @param stylesToRemove A list of styles to be removed from the node, except for the styleToAdd.
      * @param styleToAdd     The style to be added to the node, if it's not already present.
      */
-    public static void updateStyles(Node node, List<String> stylesToRemove, String styleToAdd) {
+    public static void updateStyles(Styleable node, List<String> stylesToRemove, String styleToAdd) {
         // Add the style if it's not already present
         addClassIfAbsent(node, styleToAdd);
 
@@ -107,7 +120,7 @@ public class UIUtil {
      * @param stylesToRemove An array of styles to be removed from the node, except for the styleToAdd.
      * @param styleToAdd     The style to be added to the node, if it's not already present.
      */
-    public static void updateStyles(Node node, String[] stylesToRemove, String styleToAdd) {
+    public static void updateStyles(Styleable node, String[] stylesToRemove, String styleToAdd) {
         updateStyles(node, Arrays.asList(stylesToRemove), styleToAdd);
     }
 
@@ -118,7 +131,7 @@ public class UIUtil {
      * @param enumValue The enum value determining the style to apply.
      *                  <p> Example     If Dir.UP is passed, add "up" style and removes {"down", "left", "right"} styles.
      */
-    public static <T extends Enum<T>> void updateStyleFromEnum(Node node, T enumValue) {
+    public static <T extends Enum<T>> void updateStyleFromEnum(Styleable node, T enumValue) {
         updateStyles(node, EnumUtil.convertAllToStylesClassName(enumValue.getClass()), EnumUtil.convertToStyleClassName(enumValue));
     }
 
@@ -129,7 +142,7 @@ public class UIUtil {
      * @param enumClass The enum class whose associated styles will be removed.
      *                  <p> Example     If Dir.class is passed, removes all styles {"up","down","left", "right"}.
      */
-    public static <T extends Enum<T>> void clearStylesByEnum(Node node, Class<T> enumClass) {
+    public static <T extends Enum<T>> void clearStylesByEnum(Styleable node, Class<T> enumClass) {
         node.getStyleClass().removeAll(EnumUtil.convertAllToStylesClassName(enumClass));
     }
 
