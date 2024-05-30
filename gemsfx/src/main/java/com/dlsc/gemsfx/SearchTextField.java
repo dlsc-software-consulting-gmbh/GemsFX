@@ -12,13 +12,11 @@ import javafx.event.ActionEvent;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.util.Callback;
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -64,29 +62,22 @@ public class SearchTextField extends CustomTextField {
 
         setPromptText("Search...");
 
-        Label placeholder = new Label("No history available.");
+        Label placeholder = new Label("No items.");
         placeholder.getStyleClass().add("default-placeholder");
         setHistoryPlaceholder(placeholder);
 
-        setHistoryCellFactory(view -> new RemovableListCell<>((listView, item) -> {
-            HistoryManager<String> historyManager = getHistoryManager();
-            if (historyManager != null) {
-                historyManager.remove(item);
-            }
-        }));
-
-        historyButton = createLeftNode();
-        setLeft(historyButton);
-
+        setLeft(historyButton = createHistoryButton());
         setRight(createRightNode());
 
         addEventHandlers();
 
         focusedProperty().addListener(it -> {
-            if (!isFocused() && isAddingItemToHistoryOnFocusLost()) {
-                addToHistory();
+            if (!isFocused()) {
+                if (isAddingItemToHistoryOnFocusLost()) {
+                    addToHistory();
+                }
+                historyButton.hidePopup();
             }
-            historyButton.hideHistoryPopup();
         });
     }
 
@@ -97,9 +88,16 @@ public class SearchTextField extends CustomTextField {
         }
     }
 
-    private HistoryButton<String> createLeftNode() {
+    private HistoryButton<String> createHistoryButton() {
         HistoryButton<String> historyButton = new HistoryButton<>(this);
+        historyButton.placeholderProperty().bind(historyPlaceholderProperty());
         historyButton.historyManagerProperty().bind(historyManagerProperty());
+        historyButton.setOnItemSelected(value -> {
+            if (StringUtils.isNotBlank(value)) {
+                setText(value);
+            }
+            historyButton.hidePopup();
+        });
 
         // Create the graphic
         Region graphic = new Region();
@@ -108,24 +106,6 @@ public class SearchTextField extends CustomTextField {
 
         // Configure the history button
         historyButton.setFocusTraversable(false);
-        historyButton.setFocusPopupOwnerOnOpen(true);
-        historyButton.setConfigureHistoryPopup(historyPopup -> {
-            UIUtil.toggleClassBasedOnObservable(historyPopup, "round", roundProperty());
-
-            historyPopup.historyPlaceholderProperty().bind(historyPlaceholderProperty());
-            historyPopup.historyCellFactoryProperty().bind(historyCellFactoryProperty());
-
-            historyPopup.setOnHistoryItemConfirmed(history -> {
-                if (history != null) {
-                    // replace text
-                    int oldTextLen = textProperty().getValueSafe().length();
-                    replaceText(0, oldTextLen, history);
-                }
-
-                // hide popup
-                historyPopup.hide();
-            });
-        });
 
         return historyButton;
     }
@@ -143,7 +123,7 @@ public class SearchTextField extends CustomTextField {
             if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN) {
                 e.consume();
             } else {
-                historyButton.hideHistoryPopup();
+                historyButton.hidePopup();
             }
         });
     }
@@ -186,28 +166,6 @@ public class SearchTextField extends CustomTextField {
 
     public final void setHistoryPlaceholder(Node historyPlaceholder) {
         historyPlaceholderProperty().set(historyPlaceholder);
-    }
-
-    private ObjectProperty<Callback<ListView<String>, ListCell<String>>> historyCellFactory;
-
-    public final Callback<ListView<String>, ListCell<String>> getHistoryCellFactory() {
-        return historyCellFactory == null ? null : historyCellFactory.get();
-    }
-
-    /**
-     * The cell factory for the history popup list view.
-     *
-     * @return the cell factory
-     */
-    public final ObjectProperty<Callback<ListView<String>, ListCell<String>>> historyCellFactoryProperty() {
-        if (historyCellFactory == null) {
-            historyCellFactory = new SimpleObjectProperty<>(this, "historyCellFactory");
-        }
-        return historyCellFactory;
-    }
-
-    public final void setHistoryCellFactory(Callback<ListView<String>, ListCell<String>> historyCellFactory) {
-        historyCellFactoryProperty().set(historyCellFactory);
     }
 
     // add on enter
@@ -323,5 +281,4 @@ public class SearchTextField extends CustomTextField {
     public final void setHistoryManager(HistoryManager<String> historyManager) {
         historyManagerProperty().set(historyManager);
     }
-
 }

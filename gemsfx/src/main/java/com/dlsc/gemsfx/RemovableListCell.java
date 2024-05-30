@@ -12,7 +12,6 @@ import javafx.scene.layout.StackPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import java.util.Objects;
 import java.util.function.BiConsumer;
 
 /**
@@ -27,21 +26,32 @@ public class RemovableListCell<T> extends ListCell<T> {
     private final HBox containerBox;
     private final Label label;
 
+    /**
+     * Constructs a new cell. Applications need to call {@link #setOnRemove(BiConsumer)} to define
+     * a function that will remove the item shown by the cell.
+     */
     public RemovableListCell() {
         getStyleClass().add("removable-list-cell");
 
         label = new Label();
 
         setPrefWidth(0);
+
         StackPane removeBtn = new StackPane(new FontIcon(MaterialDesign.MDI_CLOSE));
         removeBtn.getStyleClass().add("remove-button");
-        removeBtn.addEventHandler(MouseEvent.MOUSE_PRESSED, this::onRemoveAction);
+        removeBtn.addEventHandler(MouseEvent.MOUSE_PRESSED, this::removeItem);
+        removeBtn.visibleProperty().bind(onRemoveProperty().isNotNull());
+        removeBtn.managedProperty().bind(onRemoveProperty().isNotNull());
 
         containerBox = new HBox(label, new Spacer(), removeBtn);
         containerBox.getStyleClass().add("container-box");
         containerBox.setAlignment(Pos.CENTER_LEFT);
+        containerBox.visibleProperty().bind(itemProperty().isNotNull());
     }
 
+    /**
+     * Constructs a new cell with the given remove handler function.
+     */
     public RemovableListCell(BiConsumer<ListView<T>, T> onRemove) {
         this();
         setOnRemove(onRemove);
@@ -64,9 +74,9 @@ public class RemovableListCell<T> extends ListCell<T> {
         }
     }
 
-    public void onRemoveAction(MouseEvent event) {
-        event.consume();
+    private void removeItem(MouseEvent event) {
         if (getOnRemove() != null) {
+            event.consume();
 
             // clear selection if the item is selected
             if (isSelected()) {
@@ -76,6 +86,8 @@ public class RemovableListCell<T> extends ListCell<T> {
             getOnRemove().accept(getListView(), getItem());
         }
     }
+
+    // on remove handler
 
     private ObjectProperty<BiConsumer<ListView<T>, T>> onRemove;
 
@@ -97,11 +109,6 @@ public class RemovableListCell<T> extends ListCell<T> {
 
     public final void setOnRemove(BiConsumer<ListView<T>, T> onRemove) {
         onRemoveProperty().set(onRemove);
-    }
-
-    @Override
-    public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(RemovableListCell.class.getResource("removable-list-cell.css")).toExternalForm();
     }
 }
 

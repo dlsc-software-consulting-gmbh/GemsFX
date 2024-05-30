@@ -1,0 +1,80 @@
+.history-popup.round > .content-pane {
+    -fx-background-radius: 10px;
+}
+
+.history-popup.round > .content-pane > .history-list-view {
+    -fx-background-radius: 10px;
+    -fx-padding: 5px;
+}
+
+.history-popup > .content-pane {
+    -fx-background-color: linear-gradient(to bottom, derive(-fx-color, -17%), derive(-fx-color, -30%)), -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
+}
+
+.history-popup:above > .content-pane {
+    -fx-translate-y: -6;
+}
+
+.history-popup > .content-pane .popup-left {
+    -fx-background-color: linear-gradient(to right, #e0e0e0, #f8f8f8);
+    -fx-padding: 10px 5px 5px 5px;
+    -fx-alignment: top-center;
+}
+
+.history-popup > .content-pane > .history-list-view > .placeholder > .label {
+    -fx-text-fill: derive(-fx-control-inner-background, -30%);
+    -fx-padding: 0 10px;
+}
+
+.history-popup > .content-pane > .history-list-view {
+    -fx-pref-height: 200px;
+    -fx-min-width: 150px;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    /* No alternate highlighting */
+    -fx-background: -fx-control-inner-background;
+    -fx-padding: 2px 5px;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-background, -fx-background;
+    -fx-background-insets: 0, 1;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:focused {
+    -fx-background: -fx-accent;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell .remove-button {
+    visibility: hidden;
+    -fx-cursor: hand;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell:hover {
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell:hover .remove-button {
+    visibility: visible;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > removable-list-cell .remove-button .ikonli-font-icon {
+    -fx-icon-size: 1em;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell:hover .remove-button .ikonli-font-icon,
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell:selected .remove-button .ikonli-font-icon,
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell .remove-button:pressed .ikonli-font-icon {
+    -fx-icon-color: -fx-text-background-color;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell:focused .remove-button .ikonli-font-icon {
+    -fx-icon-color: -fx-selection-bar-text;
+}

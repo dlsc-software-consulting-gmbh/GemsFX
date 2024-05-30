@@ -19,11 +19,11 @@ import java.util.prefs.Preferences;
  * Due to the limitations of the {@code Preferences} API, this manager is not suitable for
  * scenarios involving large-scale data or complex data structures. It is optimized for
  * lightweight history management tasks where history items are stored and retrieved
- * straightforwardly without transformation.
+ * in a straight forward fashion without transformation.
  * </p>
  * <p>
  * Key features include:
- * - Persisting history in a simple, local manner using {@code Preferences}
+ * - Persisting history locally in a simple approach using the {@code Preferences} API
  * - Adding items while ensuring uniqueness
  * - Removing specific history items or clearing all history
  * - Providing a read-only view of history items to external components
@@ -32,7 +32,7 @@ import java.util.prefs.Preferences;
  */
 public class StringHistoryManager extends PreferencesHistoryManager<String> {
 
-    private static final StringConverter<String> DEFAULT_STRING_CONVERTER = new StringConverter<>() {
+    private static final StringConverter<String> CONVERTER = new StringConverter<>() {
         @Override
         public String toString(String object) {
             return object;
@@ -44,24 +44,8 @@ public class StringHistoryManager extends PreferencesHistoryManager<String> {
         }
     };
 
-    public StringHistoryManager() {
-        super(DEFAULT_STRING_CONVERTER);
+    public StringHistoryManager(Preferences preferences, String key) {
+        super(preferences, key, CONVERTER);
         setFilter(StringUtils::isNotEmpty);
     }
-
-    public StringHistoryManager(Preferences preferences) {
-        this();
-        setPreferences(preferences);
-    }
-
-    public StringHistoryManager(String delimiter, String preferencesKey) {
-        super(delimiter, preferencesKey, DEFAULT_STRING_CONVERTER);
-        setFilter(StringUtils::isNotEmpty);
-    }
-
-    public StringHistoryManager(String delimiter, String preferencesKey, Preferences preferences) {
-        this(delimiter, preferencesKey);
-        setPreferences(preferences);
-    }
-
 }

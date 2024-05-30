@@ -1,114 +1,179 @@
 package com.dlsc.gemsfx.util;
 
+import javafx.beans.Observable;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 /**
- * The HistoryManager interface defines the standard operations to manage history storage
+ * The HistoryManager class defines the standard operations to manage history storage
  * for any type of items, allowing for implementation of various data storage mechanisms.
  *
  * @param <T> the type of items stored in the history
  */
-public interface HistoryManager<T> {
+public abstract class HistoryManager<T> {
+
+    private static final Logger LOG = Logger.getLogger(HistoryManager.class.getName());
+
+    private static final int DEFAULT_MAX_HISTORY_SIZE = 30;
+
+    private final ObservableList<T> history = FXCollections.observableArrayList();
+
+    public HistoryManager() {
+        maxHistorySizeProperty().addListener(it -> {
+            // Check if the max history size is negative. If so, log a warning.
+            if (getMaxHistorySize() < 0) {
+                LOG.warning("Max history size must be greater than or equal to 0. ");
+            }
+            trimHistory();
+        });
+
+        unmodifiableHistory.addListener((Observable it) -> storeHistory());
+    }
+
+    protected abstract void loadHistory();
+
+    protected abstract void storeHistory();
 
     /**
-     * Adds a single item to the history storage.
-     * If the item already exists, its position is updated.
-     *
-     * @param item The history item to be added.
-     */
-    void add(T item);
-
-    /**
-     * Adds multiple items to the history storage.
-     * Duplicates in the input list are not added twice.
-     *
-     * @param items The list of history items to be added.
-     */
-    void add(List<T> items);
-
-    /**
-     * Sets the history of the HistoryManager with the provided list of items.
+     * Sets the history of the HistoryManager with the provided list of strings.
      * The method ensures that duplicates are removed from the list.
      *
-     * @param items the list of items representing the history
+     * @param history the list of strings representing the history
      */
-    void set(List<T> items);
+    public final void set(List<T> history) {
+        this.history.setAll(convertToUniqueList(history));
+    }
 
     /**
-     * Removes a single item from the history storage.
+     * Adds the given item to the history. The method ensures that duplicates will not be added.
      *
-     * @param item The history item to be removed.
-     * @return true if the item was successfully removed, false if the item was not found.
+     * @param item the item to add
      */
-    boolean remove(T item);
+    public final void add(T item) {
+        if (item != null && getFilter().test(item)) {
+            history.remove(item);
+            history.add(0, item);
+            trimHistory();
+        }
+    }
 
     /**
-     * Removes multiple items from the history storage.
+     * Adds the given items to the history.
      *
-     * @param items The list of history items to be removed.
+     * @param items the items to add
      */
-    void remove(List<T> items);
+    public final void add(List<T> items) {
+        List<T> uniqueItems = convertToUniqueList(items);
+        if (!uniqueItems.isEmpty()) {
+            history.removeAll(uniqueItems);
+            history.addAll(0, uniqueItems);
+            trimHistory();
+        }
+    }
 
     /**
-     * Clears all items from the history storage.
-     */
-    void clear();
-
-    /**
-     * Retrieves all stored history items.
+     * Removes the given item from the history.
      *
-     * @return A list of all history items.
+     * @param item the item to remove
+     * @return true if the item was removed, false otherwise
      */
-    ObservableList<T> getAll();
+    public final boolean remove(T item) {
+        return history.remove(item);
+    }
 
     /**
-     * Returns the property object for the maximum history size. This property can be
-     * used to bind the history size limit to UI components or to observe changes.
+     * Removes the given items from the history.
      *
-     * @return The IntegerProperty representing the maximum number of history items allowed.
+     * @param items the items to remove
      */
-    IntegerProperty maxHistorySizeProperty();
+    public final void remove(List<T> items) {
+        history.removeAll(items);
+    }
 
     /**
-     * Gets the current maximum size of the history list.
+     * Clears the history.
+     */
+    public final void clear() {
+        history.clear();
+    }
+
+    private final ObservableList<T> unmodifiableHistory = FXCollections.unmodifiableObservableList(history);
+
+    /**
+     * Returns an unmodifiable list of the history.
+     */
+    public final ObservableList<T> getAllUnmodifiable() {
+        return unmodifiableHistory;
+    }
+
+    private final IntegerProperty maxHistorySize = new SimpleIntegerProperty(this, "maxHistorySize", DEFAULT_MAX_HISTORY_SIZE);
+
+    /**
+     * The maximum number of items that the history will store. If the number of items exceeds this value, the oldest
+     * items will be removed.
      *
-     * @return The current maximum number of items that can be stored in the history.
+     * @return the maximum number of items in the history
      */
-    int getMaxHistorySize();
+    public final IntegerProperty maxHistorySizeProperty() {
+        return maxHistorySize;
+    }
+
+    public final int getMaxHistorySize() {
+        return maxHistorySize.get();
+    }
+
+    public final void setMaxHistorySize(int maxHistorySize) {
+        maxHistorySizeProperty().set(maxHistorySize);
+    }
+
+    private final ObjectProperty<Predicate<T>> filter = new SimpleObjectProperty<>(this, "filter", it -> true);
 
     /**
-     * Sets the maximum size of the history list. If the current number of items
-     * exceeds the specified size, items will be removed from the end of the list.
-     *
-     * @param maxHistorySize The maximum number of items to retain in the history.
-     */
-    void setMaxHistorySize(int maxHistorySize);
-
-    /**
-     * Returns the property that holds the filter used when adding items to the history.
+     * Returns the property object for the filter used when adding items to the history.
      * Only items that pass the filter will be added to the history.
      *
-     * @return the property containing the filter
+     * @return the property object for the filter
      */
-    ObjectProperty<Predicate<T>> filterProperty();
+    public final ObjectProperty<Predicate<T>> filterProperty() {
+        return filter;
+    }
+
+    public final Predicate<T> getFilter() {
+        return filter.get();
+    }
+
+    public final void setFilter(Predicate<T> filter) {
+        this.filter.set(filter);
+    }
 
     /**
-     * Sets a filter to be used when adding items to the history. Only items that pass the
-     * filter will be added to the history.
-     *
-     * @param filter The filter to apply.
+     * Trims the history list to ensure it does not exceed the maximum allowed size.
+     * If the current history size is greater than the maximum size, the method removes
+     * the extra elements from the history list.
      */
-    void setFilter(Predicate<T> filter);
+    private void trimHistory() {
+        int max = Math.max(0, getMaxHistorySize());
+        if (history.size() > max) {
+            history.remove(max, history.size());
+        }
+    }
 
     /**
-     * Gets the current filter used for adding items to the history.
+     * Converts a given list of strings to a unique list of strings. Filters out empty strings.
      *
-     * @return The current filter.
+     * @param history the list of strings to convert
+     * @return the converted unique list of strings
      */
-    Predicate<T> getFilter();
+    private List<T> convertToUniqueList(List<T> history) {
+        return history.stream().distinct().filter(Objects::nonNull).filter(getFilter()).limit(Math.max(0, getMaxHistorySize())).toList();
+    }
 }
