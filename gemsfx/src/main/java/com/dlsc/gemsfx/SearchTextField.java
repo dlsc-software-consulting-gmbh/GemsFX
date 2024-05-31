@@ -30,8 +30,6 @@ import java.util.Objects;
  * The history manager is disabled by default, but it can be enabled using the {@link #setHistoryManager(HistoryManager)} method.
  * We have implemented a local history manager, {@link StringHistoryManager}, which uses the Java Preferences API to store history records.
  * You can enable it via the {@link #setHistoryManager(HistoryManager)} method.
- * If you want to persistently store history records, you also need to provide a {@link java.util.prefs.Preferences} instance to the {@link StringHistoryManager}.
- * Otherwise, the history records will be lost after the application restarts.
  * <p>
  * By default, when the field loses its focus or the user presses the "enter" key (triggering the onAction event), the
  * text is added to the history. This behavior can be disabled by setting the {@link #addingItemToHistoryOnEnterProperty()}
@@ -39,7 +37,7 @@ import java.util.Objects;
  * <br>
  * Additionally, history can be manually added based on user actions, such as after typing text and selecting an item
  * from a ListView or TableView that displays results, or through other interactions, by calling the {@link #getHistoryManager()}
- * method to access the {@link StringHistoryManager} instance. then calling the {@link StringHistoryManager#add(String)} method.
+ * method to access the {@link StringHistoryManager} instance. then calling the {@link StringHistoryManager#add(Object)}} method.
  */
 public class SearchTextField extends CustomTextField {
 
@@ -257,11 +255,6 @@ public class SearchTextField extends CustomTextField {
      * To enable the history feature, you need to set an instance of {@link HistoryManager}.
      * Typically, you would use an instance of {@link StringHistoryManager}, which is an
      * implementation of {@link HistoryManager} that manages string-type history records.
-     * <p>
-     * Please note that if you do not set the {@code StringHistoryManager#setPreferences(Preferences)}
-     * method for the {@link StringHistoryManager} instance, the history records will only be saved
-     * in memory and will not be persisted locally. This means that the history data will not be
-     * retained after the application is closed.
      *
      * @return the property representing the history manager
      */

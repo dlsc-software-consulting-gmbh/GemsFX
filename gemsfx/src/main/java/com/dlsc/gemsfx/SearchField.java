@@ -86,8 +86,6 @@ import java.util.function.Consumer;
  * The history manager is disabled by default, but it can be enabled using the {@link #setHistoryManager(HistoryManager)} method.
  * We have implemented a local history manager, {@link StringHistoryManager}, which uses the Java Preferences API to store history records.
  * You can enable it via the {@link #setHistoryManager(HistoryManager)} method.
- * If you want to persistently store history records, you also need to provide a {@link java.util.prefs.Preferences} instance to the {@link StringHistoryManager}.
- * Otherwise, the history records will be lost after the application restarts.
  * </p>
  *
  * @param <T> the type of objects to work on
@@ -1277,11 +1275,6 @@ public class SearchField<T> extends Control {
      * To enable the history feature, you need to set an instance of {@link HistoryManager}.
      * Typically, you would use an instance of {@link StringHistoryManager}, which is an
      * implementation of {@link HistoryManager} that manages string-type history records.
-     * <p>
-     * Please note that if you do not set the {@code StringHistoryManager#setPreferences(Preferences)}
-     * method for the {@link StringHistoryManager} instance, the history records will only be saved
-     * in memory and will not be persisted locally. This means that the history data will not be
-     * retained after the application is closed.
      *
      * @return the property representing the history manager
      */
