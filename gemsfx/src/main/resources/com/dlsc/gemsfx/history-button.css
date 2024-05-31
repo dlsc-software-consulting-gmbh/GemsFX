@@ -41,8 +41,8 @@
 
 .history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
     -fx-background: -fx-accent;
-    -fx-background-color: -fx-background, -fx-background;
-    -fx-background-insets: 0, 1;
+    -fx-background-color: -fx-background;
+    -fx-background-insets: 0;
 }
 
 .history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:focused {
