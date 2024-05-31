@@ -406,7 +406,7 @@ public class SearchField<T> extends Control {
 
     private void addToHistory(String text) {
         HistoryManager<String> historyManager = getHistoryManager();
-        if (historyManager != null) {
+        if (historyManager != null && StringUtils.isNotBlank(text)) {
             historyManager.add(text);
         }
     }

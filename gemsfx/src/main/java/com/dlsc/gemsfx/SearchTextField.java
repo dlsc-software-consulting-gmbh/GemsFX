@@ -84,7 +84,10 @@ public class SearchTextField extends CustomTextField {
     private void addToHistory() {
         HistoryManager<String> historyManager = getHistoryManager();
         if (historyManager != null) {
-            historyManager.add(getText());
+            String text = getText();
+            if (StringUtils.isNotBlank(text)) {
+                historyManager.add(text);
+            }
         }
     }
 
