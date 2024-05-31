@@ -60,7 +60,7 @@ public class PreferencesHistoryManager<T> extends HistoryManager<T> {
                 .map(converter::toString)
                 .collect(Collectors.joining(DELIMITER));
         preferences.put(key, result);
-        LOG.info("Stored history items.");
+        LOG.finest(String.format("Stored history items with key: '%s'.", key));
     }
 
     /**
@@ -75,6 +75,6 @@ public class PreferencesHistoryManager<T> extends HistoryManager<T> {
                     .map(converter::fromString)
                     .toList());
         }
-        LOG.info("Loaded history items.");
+        LOG.finest(String.format("Loaded history items with key: '%s'.", key));
     }
 }
