@@ -7,6 +7,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.CssMetaData;
+import javafx.css.PseudoClass;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -16,7 +17,6 @@ import javafx.scene.control.Skin;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,45 +54,33 @@ import java.util.logging.Logger;
 public class EnhancedPasswordField extends PasswordField {
 
     public static final char DEFAULT_ECHO_CHAR = '●';
-    private static final boolean DEFAULT_SHOW_PASSWORD = false;
+
     private static final String DEFAULT_STYLE_CLASS = "enhanced-password-field";
+    private static final boolean DEFAULT_SHOW_PASSWORD = false;
+    private static final PseudoClass SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("showing");
+
     private final Logger LOG = Logger.getLogger(EnhancedPasswordField.class.getName());
 
     public EnhancedPasswordField() {
         super();
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        showPasswordProperty().addListener(it -> pseudoClassStateChanged(SHOWING_PSEUDO_CLASS, isShowPassword()));
+
+        //set right node
+        FontIcon fontIcon = new FontIcon();
+        StackPane right = new StackPane(fontIcon);
+        right.getStyleClass().add("right-icon-wrapper");
+        right.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                setShowPassword(!isShowPassword());
+            }
+        });
+        setRight(right);
     }
 
     public EnhancedPasswordField(String text) {
         this();
         setText(text);
-    }
-
-    /**
-     * Creates a simple password field with an eye icon on the right side.
-     * <p>
-     * This method creates a simple password field with an eye icon on the right side. The eye icon
-     * can be clicked to toggle the visibility of the password.
-     *
-     * @return a simple password field with an eye icon on the right side
-     */
-    public static EnhancedPasswordField createSimplePasswordField() {
-        EnhancedPasswordField passwordField = new EnhancedPasswordField();
-
-        //set right node
-        FontIcon fontIcon = new FontIcon();
-        fontIcon.iconCodeProperty().bind(passwordField.showPasswordProperty().map(it -> it ? MaterialDesign.MDI_EYE : MaterialDesign.MDI_EYE_OFF));
-
-        StackPane right = new StackPane(fontIcon);
-        right.getStyleClass().add("right-icon-wrapper");
-        right.setOnMouseClicked(event -> {
-            if (event.getButton() == MouseButton.PRIMARY) {
-                passwordField.setShowPassword(!passwordField.isShowPassword());
-            }
-        });
-
-        passwordField.setRight(right);
-        return passwordField;
     }
 
     @Override
