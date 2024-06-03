@@ -64,7 +64,8 @@ public class EnhancedPasswordField extends PasswordField {
     public EnhancedPasswordField() {
         super();
         getStyleClass().add(DEFAULT_STYLE_CLASS);
-        showPasswordProperty().addListener(it -> pseudoClassStateChanged(SHOWING_PSEUDO_CLASS, isShowPassword()));
+
+        showPasswordProperty().subscribe(showing -> pseudoClassStateChanged(SHOWING_PSEUDO_CLASS, showing));
 
         //set right node
         FontIcon fontIcon = new FontIcon();
