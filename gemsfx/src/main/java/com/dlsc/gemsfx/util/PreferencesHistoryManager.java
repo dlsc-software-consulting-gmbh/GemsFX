@@ -1,12 +1,9 @@
 package com.dlsc.gemsfx.util;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -63,6 +60,7 @@ public class PreferencesHistoryManager<T> extends HistoryManager<T> {
                 .map(converter::toString)
                 .collect(Collectors.joining(DELIMITER));
         preferences.put(key, result);
+        LOG.finest(String.format("Stored history items with key: '%s'.", key));
     }
 
     /**
@@ -77,5 +75,6 @@ public class PreferencesHistoryManager<T> extends HistoryManager<T> {
                     .map(converter::fromString)
                     .toList());
         }
+        LOG.finest(String.format("Loaded history items with key: '%s'.", key));
     }
 }
