@@ -15,8 +15,8 @@ import javafx.scene.Node;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Skin;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,15 +68,17 @@ public class EnhancedPasswordField extends PasswordField {
         showPasswordProperty().subscribe(showing -> pseudoClassStateChanged(SHOWING_PSEUDO_CLASS, showing));
 
         //set right node
-        FontIcon fontIcon = new FontIcon();
-        StackPane right = new StackPane(fontIcon);
-        right.getStyleClass().add("right-icon-wrapper");
-        right.setOnMouseClicked(event -> {
+        Region rightIcon = new Region();
+        rightIcon.getStyleClass().add("right-icon");
+
+        StackPane rightWrapper = new StackPane(rightIcon);
+        rightWrapper.getStyleClass().add("right-icon-wrapper");
+        rightWrapper.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
                 setShowPassword(!isShowPassword());
             }
         });
-        setRight(right);
+        setRight(rightWrapper);
     }
 
     public EnhancedPasswordField(String text) {
