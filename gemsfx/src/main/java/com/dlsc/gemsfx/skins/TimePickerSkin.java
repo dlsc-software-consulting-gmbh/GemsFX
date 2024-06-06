@@ -371,9 +371,7 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
     protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
         CustomComboBox.ButtonDisplay buttonDisplay = getSkinnable().getButtonDisplay();
         if (buttonDisplay == CustomComboBox.ButtonDisplay.LEFT) {
-            double v = editButton.prefWidth(height);
-            System.out.println("v = " + v);
-            return v;
+            return editButton.prefWidth(height);
         }
         return super.computeMaxWidth(height, topInset, rightInset, bottomInset, leftInset);
     }
