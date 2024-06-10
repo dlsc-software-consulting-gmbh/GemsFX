@@ -215,10 +215,6 @@ public class TimePickerPopup extends HBox {
             label.visibleProperty().bind(emptyProperty().not());
             label.textProperty().bind(textProperty());
 
-            getPseudoClassStates().addListener((Observable it) -> {
-                System.out.println("---------");
-                getPseudoClassStates().forEach(System.out::println);
-            });
             setGraphic(label);
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         }
