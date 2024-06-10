@@ -84,7 +84,7 @@ public class UIUtil {
      * If the observable value is false, the style class is removed.
      *
      * @param node                   The node to toggle the style on.
-     * @param styleClass            The style class to add or remove.
+     * @param styleClass             The style class to add or remove.
      * @param booleanObservableValue The observable value that determines whether to add or remove the style.
      */
     public static void toggleClassBasedOnObservable(Styleable node, String styleClass, ObservableValue<Boolean> booleanObservableValue) {
@@ -194,13 +194,12 @@ public class UIUtil {
     }
 
     /**
-     * Determines if the given mouse event is a single primary button click
+     * Determines if the given mouse event is a primary button click
      * that hasn't moved since it was pressed.
      *
      * <p>This method checks if the mouse event satisfies the following conditions:
      * <ul>
      *   <li>The mouse button is the primary button (usually the left button).</li>
-     *   <li>The click count is exactly one.</li>
      *   <li>The mouse has not moved since it was pressed.</li>
      * </ul>
      *
@@ -209,7 +208,27 @@ public class UIUtil {
      * @throws NullPointerException if the event is null.
      */
     public static boolean clickOnNode(MouseEvent event) {
-        return event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1 && event.isStillSincePress();
+        return clickOnNode(event, false);
+    }
+
+    /**
+     * Determines if the given mouse event is a primary button click
+     * that hasn't moved since it was pressed.
+     *
+     * <p>This method checks if the mouse event satisfies the following conditions:
+     * <ul>
+     *   <li>The mouse button is the primary button (usually the left button).</li>
+     *   <li>The mouse has not moved since it was pressed.</li>
+     *   <li>If {@code isSingleClick} is {@code true}, the event must be a single click.</li>
+     * </ul>
+     *
+     * @param event        The mouse event to check. Must not be null.
+     * @param isSingleClick {@code true} if the event must be a single click, {@code false} otherwise.
+     * @return {@code true} if the event is a stable primary button click, {@code false} otherwise.
+     * @throws NullPointerException if the event is null.
+     */
+    public static boolean clickOnNode(MouseEvent event, boolean isSingleClick) {
+        return event.getButton() == MouseButton.PRIMARY && event.isStillSincePress() && (!isSingleClick || event.getClickCount() == 1);
     }
 
 }

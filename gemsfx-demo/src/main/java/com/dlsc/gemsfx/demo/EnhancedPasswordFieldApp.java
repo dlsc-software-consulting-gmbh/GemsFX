@@ -20,7 +20,7 @@ public class EnhancedPasswordFieldApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        EnhancedPasswordField passwordField1 = EnhancedPasswordField.createSimplePasswordField();
+        EnhancedPasswordField passwordField1 = new EnhancedPasswordField();
         passwordField1.setPromptText("Enter your password");
         passwordField1.setEchoChar('★');
         passwordField1.setText("1234567890");
@@ -38,7 +38,7 @@ public class EnhancedPasswordFieldApp extends Application {
         passwordField2.setLeft(createIconNode(MaterialDesign.MDI_KEY));
         passwordField2.setStyle("-fx-echo-char: '■';");
 
-        EnhancedPasswordField passwordField3 = EnhancedPasswordField.createSimplePasswordField();
+        EnhancedPasswordField passwordField3 = new EnhancedPasswordField();
         passwordField3.setText("1234567890");
         passwordField3.setShowPassword(true);
 
