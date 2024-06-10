@@ -2,6 +2,7 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.EnhancedPasswordFieldSkin;
 import com.dlsc.gemsfx.util.EchoCharConverter;
+import com.dlsc.gemsfx.util.UIUtil;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -14,7 +15,6 @@ import javafx.css.StyleableProperty;
 import javafx.scene.Node;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Skin;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -74,8 +74,8 @@ public class EnhancedPasswordField extends PasswordField {
 
         StackPane rightWrapper = new StackPane(rightIcon);
         rightWrapper.getStyleClass().add("right-icon-wrapper");
-        rightWrapper.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            if (event.getButton() == MouseButton.PRIMARY) {
+        rightWrapper.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if (UIUtil.clickOnNode(event)) {
                 setShowPassword(!isShowPassword());
                 event.consume();
             }
