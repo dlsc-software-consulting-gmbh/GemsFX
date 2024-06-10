@@ -15,6 +15,7 @@ import javafx.css.StyleableProperty;
 import javafx.scene.Node;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Skin;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
@@ -73,9 +74,10 @@ public class EnhancedPasswordField extends PasswordField {
 
         StackPane rightWrapper = new StackPane(rightIcon);
         rightWrapper.getStyleClass().add("right-icon-wrapper");
-        rightWrapper.setOnMouseClicked(event -> {
+        rightWrapper.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             if (UIUtil.clickOnNode(event)) {
                 setShowPassword(!isShowPassword());
+                event.consume();
             }
         });
         setRight(rightWrapper);
