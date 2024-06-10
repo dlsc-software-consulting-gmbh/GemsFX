@@ -57,7 +57,7 @@ public class EnhancedPasswordField extends PasswordField {
 
     private static final String DEFAULT_STYLE_CLASS = "enhanced-password-field";
     private static final boolean DEFAULT_SHOW_PASSWORD = false;
-    private static final PseudoClass SHOWING_PSEUDO_CLASS = PseudoClass.getPseudoClass("showing");
+    private static final PseudoClass SHOWING_PASSWORD_PSEUDO_CLASS = PseudoClass.getPseudoClass("showing-password");
 
     private final Logger LOG = Logger.getLogger(EnhancedPasswordField.class.getName());
 
@@ -65,7 +65,7 @@ public class EnhancedPasswordField extends PasswordField {
         super();
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
-        showPasswordProperty().subscribe(showing -> pseudoClassStateChanged(SHOWING_PSEUDO_CLASS, showing));
+        showPasswordProperty().subscribe(showing -> pseudoClassStateChanged(SHOWING_PASSWORD_PSEUDO_CLASS, showing));
 
         //set right node
         Region rightIcon = new Region();
