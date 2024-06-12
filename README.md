@@ -38,7 +38,7 @@ implementation 'com.dlsc.gemsfx:gemsfx:2.16.0'
 - #### Advanced Panes
   [DialogPane](#dialog-pane), [DrawerStackPane](#drawer-stack-pane), [PowerPane](#power-pane), [ResponsivePane](#responsive-pane)
 - #### Image controls
-  [PhotoView](#photo-view), [PaymentOptionControls](#payment-option-controls), [SVGImageView](#svg-image-view)
+  [PhotoView](#photo-view), [AvatarView](#avatar-view), [PaymentOptionControls](#payment-option-controls), [SVGImageView](#svg-image-view)
 - #### Other Controls
   [CircleProgressIndicator](#circle-progress-indicator), [FilterView](#filter-view), [InfoCenterPane](#info-center-pane), [StripView](#strip-view), [Spacer](#spacer), [ScreensView](#screens-view), [SessionManager](#session-manager), [StageManager](#stage-manager), [TreeNodeView](#tree-node-view), [MultiColumnListView](#multi-column-list-view)
 
@@ -300,6 +300,16 @@ ENTER. The photo can
 be removed by pressing DELETE or BACK_SPACE.
 
 ![PhotoView](gemsfx/docs/photo-view.png)
+
+## Avatar View
+<span id="avatar-view"></span>
+
+AvatarView is a control for displaying user avatars. This component can show either a user's profile image or the initials of their name (if no image is provided or the image has not finished loading). It allows setting the avatar shape to be either circular or rectangular, with customizable corner rounding for rectangular avatars and adjustable avatar size.
+
+Compared to `PhotoView`, `AvatarView` offers a simpler functionality primarily for displaying avatars. If you need more advanced features such as adding and editing profile photos via a file chooser or drag-and-drop, and the ability to move and zoom the image, PhotoView is a better choice.
+If your requirement is simply to display a user's avatar, then AvatarView is a more lightweight option.
+
+![AvatarView](gemsfx/docs/avatar-view.png)
 
 ## Payment Option Controls
 
