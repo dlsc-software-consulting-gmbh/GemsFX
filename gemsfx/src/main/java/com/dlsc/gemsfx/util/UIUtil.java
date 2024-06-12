@@ -207,8 +207,8 @@ public class UIUtil {
      * @return {@code true} if the event is a single stable primary button click, {@code false} otherwise.
      * @throws NullPointerException if the event is null.
      */
-    public static boolean clickOnNode(MouseEvent event) {
-        return clickOnNode(event, false);
+    public static boolean isClickOnNode(MouseEvent event) {
+        return isClickOnNode(event, false);
     }
 
     /**
@@ -228,7 +228,7 @@ public class UIUtil {
      *
      * @throws IllegalArgumentException if the event is not a mouse clicked event.
      */
-    public static boolean clickOnNode(MouseEvent event, boolean isSingleClick) {
+    public static boolean isClickOnNode(MouseEvent event, boolean isSingleClick) {
         if (event.getEventType() != MouseEvent.MOUSE_CLICKED) {
             throw new IllegalArgumentException("The event must be a mouse clicked event.");
             // return false;
