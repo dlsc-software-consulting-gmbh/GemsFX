@@ -74,8 +74,8 @@ public class EnhancedPasswordField extends PasswordField {
 
         StackPane rightWrapper = new StackPane(rightIcon);
         rightWrapper.getStyleClass().add("right-icon-wrapper");
-        rightWrapper.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            if (UIUtil.clickOnNode(event)) {
+        rightWrapper.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if (UIUtil.isClickOnNode(event)) {
                 setShowPassword(!isShowPassword());
                 event.consume();
             }
