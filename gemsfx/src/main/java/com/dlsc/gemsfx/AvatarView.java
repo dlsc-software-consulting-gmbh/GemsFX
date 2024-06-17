@@ -54,7 +54,7 @@ public class AvatarView extends Control {
     private static final String DEFAULT_STYLE_CLASS = "avatar-view";
     private static final ClipType DEFAULT_CLIP_TYPE = ClipType.SQUARE;
     private static final double DEFAULT_ROUND_SIZE = 10;
-    private static final double DEFAULT_SIZE = 50;
+    private static final double DEFAULT_SIZE = 150;
 
     public AvatarView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
@@ -67,7 +67,6 @@ public class AvatarView extends Control {
                 int index = number.intValue() % getNumberOfStyles();
                 getStyleClass().add("style" + index);
             }
-            System.out.println(getStyleClass());
         });
 
         prefWidthProperty().bind(sizeProperty());
