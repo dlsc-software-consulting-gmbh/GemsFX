@@ -1,12 +1,65 @@
 .avatar-view {
     -fx-font-size: 21px;
     -fx-font-weight: bold;
+    -fx-avatar-size: 150px;
+}
+
+.avatar-view .icon-wrapper {
+    -fx-background-color: lightgrey;
+    -fx-padding: 10px;
+}
+
+.avatar-view .icon-wrapper .icon {
+    -fx-shape: "M12 2.4922 Q10.9688 2.4922 10.0625 2.8984 Q9.1406 3.2891 8.4531 3.9766 Q7.7812 4.6484 7.3906 5.5703 Q7.0156 6.4766 7.0156 7.5078 Q7.0156 8.5391 7.3906 9.4609 Q7.7812 10.3516 8.4531 11.0391 Q9.1406 11.7109 10.0625 12.1016 Q10.9688 12.5078 12 12.5078 Q13.0312 12.5078 13.9531 12.1016 Q14.8594 11.7109 15.5312 11.0391 Q16.2188 10.3516 16.625 9.4609 Q17 8.5391 17 7.5078 Q17 6.4766 16.625 5.5703 Q16.2188 4.6484 15.5312 3.9766 Q14.8594 3.2891 13.9531 2.8984 Q13.0312 2.4922 12 2.4922 L12 2.4922 ZM12 10.5078 Q10.7656 10.5078 9.875 9.6328 Q9 8.7578 9 7.5078 Q9 6.2734 9.875 5.3984 Q10.7656 4.5078 12 4.5078 Q13.25 4.5078 14.125 5.3984 Q15 6.2734 15 7.5078 Q15 8.7578 14.125 9.6328 Q13.25 10.5078 12 10.5078 ZM21 21.5078 L21 20.4922 Q21 19.0703 20.4375 17.7734 Q19.9062 16.5078 18.9531 15.5703 Q18 14.6172 16.7188 14.0547 Q15.4531 13.5078 14 13.5078 L10.0156 13.5078 Q8.5625 13.5078 7.2969 14.0547 Q6 14.6172 5.0469 15.5703 Q4.1094 16.5078 3.5625 17.7734 Q3 19.0703 3 20.4922 L3 21.5078 L5 21.5078 L5 20.4922 Q5 19.4609 5.3906 18.5547 Q5.7969 17.6641 6.4688 16.9922 Q7.1562 16.3047 8.0625 15.8984 Q8.9844 15.5078 10.0156 15.5078 L14 15.5078 Q15.0312 15.5078 15.9375 15.8984 Q16.8594 16.3047 17.5312 16.9922 Q18.2188 17.6641 18.6094 18.5547 Q19.0156 19.4609 19.0156 20.4922 L19.0156 21.5078 L21 21.5078 L21 21.5078 Z";
+    -fx-scale-shape: true;
+    -fx-background-color: white;
+    -fx-fill: black;
 }
 
 .avatar-view .text-wrapper {
-    -fx-background-color: #6495ED;
+    -fx-background-color: lightgrey;
 }
 
 .avatar-view .text-wrapper .inner-text {
+    -fx-fill: black;
+}
+
+.avatar-view.style0 .text-wrapper {
+    -fx-background-color: orchid;
+}
+
+.avatar-view.style0 .text-wrapper .inner-text {
+    -fx-fill: white;
+}
+
+.avatar-view.style1 .text-wrapper {
+    -fx-background-color: orange;
+}
+
+.avatar-view.style1 .text-wrapper .inner-text {
+    -fx-fill: white;
+}
+
+.avatar-view.style2 .text-wrapper {
+    -fx-background-color: mediumseagreen;
+}
+
+.avatar-view.style2 .text-wrapper .inner-text {
+    -fx-fill: white;
+}
+
+.avatar-view.style3 .text-wrapper {
+    -fx-background-color: goldenrod;
+}
+
+.avatar-view.style3 .text-wrapper .inner-text {
+    -fx-fill: white;
+}
+
+.avatar-view.style4 .text-wrapper {
+    -fx-background-color: cornflowerblue;
+}
+
+.avatar-view.style4 .text-wrapper .inner-text {
     -fx-fill: white;
 }

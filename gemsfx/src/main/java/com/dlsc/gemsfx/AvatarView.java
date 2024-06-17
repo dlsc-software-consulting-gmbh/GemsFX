@@ -1,8 +1,13 @@
+/*
+ * Magic number algorithm inspired by Dani Guardiola's blog: https://dio.la/article/colorful-avatars
+ */
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.AvatarViewSkin;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -16,6 +21,7 @@ import javafx.css.converter.SizeConverter;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,6 +59,23 @@ public class AvatarView extends Control {
     public AvatarView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         setFocusTraversable(false);
+
+        initials.subscribe(this::updateMagicNumber);
+        magicNumber.subscribe(number -> {
+            getStyleClass().setAll(DEFAULT_STYLE_CLASS);
+            if (number.intValue() >= 0) {
+                int index = number.intValue() % getNumberOfStyles();
+                getStyleClass().add("style" + index);
+            }
+            System.out.println(getStyleClass());
+        });
+
+        prefWidthProperty().bind(sizeProperty());
+        prefHeightProperty().bind(sizeProperty());
+        minWidthProperty().bind(sizeProperty());
+        minHeightProperty().bind(sizeProperty());
+        maxWidthProperty().bind(sizeProperty());
+        maxHeightProperty().bind(sizeProperty());
     }
 
     public AvatarView(String initials, Image image) {
@@ -64,6 +87,32 @@ public class AvatarView extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new AvatarViewSkin(this);
+    }
+
+    // number of styles
+
+    private final IntegerProperty numberOfStyles = new SimpleIntegerProperty(this, "numberOfStyles", 5);
+
+    public final int getNumberOfStyles() {
+        return numberOfStyles.get();
+    }
+
+    /**
+     * A property used to specify how many different styles the application wants to support
+     * for styling the view based on the initials. By default, this value is "5", which means that
+     * the view will have styles like this: style0, style1, style2, style3, style4 (but always only
+     * one of them). These five styles will use five different background colors. Please be aware that
+     * changing the number of styles requires you to define additional rules as the default agent
+     * stylesheet that ships with this control only supports five different styles out of the box.
+     *
+     * @return the number of supported styles
+     */
+    public final IntegerProperty numberOfStylesProperty() {
+        return numberOfStyles;
+    }
+
+    public final void setNumberOfStyles(int numberOfStyles) {
+        this.numberOfStyles.set(numberOfStyles);
     }
 
     // user name initials
@@ -97,10 +146,6 @@ public class AvatarView extends Control {
 
     /**
      * The image of the user that should be displayed in the avatar.
-     * <p>
-     * If an image is provided and has finished loading, it will be displayed in the avatar.
-     * If no image is provided or the image fails to load, the initials will be displayed instead.
-     * </p>
      *
      * @return the image property
      */
@@ -235,6 +280,32 @@ public class AvatarView extends Control {
         this.clipTypeProperty().set(type);
     }
 
+    private final IntegerProperty magicNumber = new SimpleIntegerProperty(this, "magicNumber", -1);
+
+    private void updateMagicNumber() {
+        String initials = getInitials();
+        if (StringUtils.isNotBlank(initials)) {
+            char[] numbers;
+            int spice;
+            if (initials.toLowerCase().length() >= 2) {
+                numbers = initials.toLowerCase().substring(0, 2).toCharArray();
+                spice = numbers[0] < numbers[1] ? 0 : 1;
+            } else {
+                numbers = initials.toLowerCase().substring(0, 1).toCharArray();
+                spice = 1;
+            }
+
+            int sum = 0;
+            for (char c : numbers) {
+                sum += c;
+            }
+
+            magicNumber.set(sum + spice);
+        } else {
+            magicNumber.set(-1);
+        }
+    }
+
     private static class StyleableProperties {
         private static final CssMetaData<AvatarView, ClipType> CLIP_TYPE = new CssMetaData<>(
                 "-fx-clip-type", new EnumConverter<>(ClipType.class), DEFAULT_CLIP_TYPE) {
@@ -297,6 +368,7 @@ public class AvatarView extends Control {
      * Enumeration representing the type of clipping applied to the avatar.
      */
     public enum ClipType {
+
         /**
          * The avatar is clipped to a circular shape.
          */
