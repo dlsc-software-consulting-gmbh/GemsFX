@@ -55,6 +55,8 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
         textWrapper.prefHeightProperty().bind(avatar.sizeProperty());
         textWrapper.minWidthProperty().bind(avatar.sizeProperty());
         textWrapper.minHeightProperty().bind(avatar.sizeProperty());
+        textWrapper.maxWidthProperty().bind(avatar.sizeProperty());
+        textWrapper.maxHeightProperty().bind(avatar.sizeProperty());
 
         avatar.imageProperty().addListener(it -> updateView());
         avatar.initialsProperty().addListener(it -> updateView());

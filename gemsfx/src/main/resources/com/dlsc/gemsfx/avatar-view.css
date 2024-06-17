@@ -18,6 +18,7 @@
 
 .avatar-view .text-wrapper {
     -fx-background-color: lightgrey;
+    -fx-border-color: red;
 }
 
 .avatar-view .text-wrapper .inner-text {
