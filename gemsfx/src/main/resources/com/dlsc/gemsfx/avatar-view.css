@@ -1,6 +1,4 @@
 .avatar-view {
-    -fx-font-size: 21px;
-    -fx-font-weight: bold;
 }
 
 .avatar-view > .icon-wrapper {
@@ -21,6 +19,8 @@
 
 .avatar-view > .text-wrapper > .initials-text {
     -fx-fill: black;
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
 }
 
 .avatar-view.style0 > .text-wrapper {
