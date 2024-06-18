@@ -1,9 +1,13 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.AvatarView;
+import com.dlsc.gemsfx.AvatarView.AvatarShape;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,6 +25,12 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
     private final ImageView image;
     private final StackPane textWrapper;
     private final StackPane iconWrapper;
+
+    private final ChangeListener<Number> progressChangeListener = (ob, ov, nv) -> {
+        if (nv.intValue() == 1) {
+            updateView();
+        }
+    };
 
     public AvatarViewSkin(AvatarView avatar) {
         super(avatar);
@@ -45,7 +55,7 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
 
         // text avatar
         Text initialsText = new Text();
-        initialsText.getStyleClass().add("inner-text");
+        initialsText.getStyleClass().add("initials-text");
         initialsText.textProperty().bind(avatar.initialsProperty());
 
         textWrapper = new StackPane(initialsText);
@@ -58,41 +68,64 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
         textWrapper.maxWidthProperty().bind(avatar.sizeProperty());
         textWrapper.maxHeightProperty().bind(avatar.sizeProperty());
 
-        avatar.imageProperty().addListener(it -> updateView());
-        avatar.initialsProperty().addListener(it -> updateView());
+        ChangeListener<Image> imageChangeListener = (ob, oldImage, newImage) -> {
+            if (oldImage != null) {
+                oldImage.progressProperty().removeListener(progressChangeListener);
+            }
 
-        createClipBinding();
+            if (newImage != null) {
+                newImage.progressProperty().addListener(progressChangeListener);
+            }
+
+            updateView();
+        };
+
+        avatar.imageProperty().addListener(imageChangeListener);
+
+        Image image = avatar.getImage();
+        if (image != null && image.isBackgroundLoading()) {
+            image.progressProperty().addListener(progressChangeListener);
+        }
+
+        InvalidationListener updateViewListener = it -> updateView();
+        avatar.imageProperty().addListener(updateViewListener);
+        avatar.initialsProperty().addListener(updateViewListener);
+
+        createClipBinding(iconWrapper);
+        createClipBinding(textWrapper);
+        createClipBinding(imageWrapper);
+
         updateView();
     }
 
-    private void createClipBinding() {
+    private void createClipBinding(Node node) {
         AvatarView avatarView = getSkinnable();
-        avatarView.clipProperty().bind(Bindings.createObjectBinding(() -> {
-            AvatarView.ClipType type = avatarView.getClipType();
-            if (type == AvatarView.ClipType.CIRCLE) {
+        node.clipProperty().bind(Bindings.createObjectBinding(() -> {
+            AvatarShape shape = avatarView.getAvatarShape();
+            if (shape == AvatarShape.ROUND) {
                 DoubleBinding sizeBinding = avatarView.sizeProperty().divide(2);
                 Circle clipShape = new Circle();
                 clipShape.centerXProperty().bind(sizeBinding);
                 clipShape.centerYProperty().bind(sizeBinding);
                 clipShape.radiusProperty().bind(sizeBinding);
                 return clipShape;
-            } else { // type == Avatar.ClipType.SQUARE
+            } else { // shape == Avatar.AvatarShape.SQUARE
                 Rectangle rectangle = new Rectangle();
                 rectangle.widthProperty().bind(avatarView.widthProperty());
                 rectangle.heightProperty().bind(avatarView.heightProperty());
-                rectangle.arcWidthProperty().bind(avatarView.roundSizeProperty());
-                rectangle.arcHeightProperty().bind(avatarView.roundSizeProperty());
+                rectangle.arcWidthProperty().bind(avatarView.arcSizeProperty());
+                rectangle.arcHeightProperty().bind(avatarView.arcSizeProperty());
                 return rectangle;
             }
-        }, avatarView.clipTypeProperty()));
+        }, avatarView.avatarShapeProperty()));
     }
 
     private void updateView() {
         AvatarView avatarView = getSkinnable();
         Image img = avatarView.getImage();
 
-        // if there is an image, then we show that
-        if (img != null) {
+        // if there is an image and it has been fully loaded, then we show that
+        if (img != null && (!img.isBackgroundLoading() || img.getProgress() >= 1)) {
             image.fitWidthProperty().bind(avatarView.sizeProperty());
             image.fitHeightProperty().bind(avatarView.sizeProperty());
             getChildren().setAll(imageWrapper);

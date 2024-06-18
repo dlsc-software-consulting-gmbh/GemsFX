@@ -52,8 +52,8 @@ import java.util.Objects;
 public class AvatarView extends Control {
 
     private static final String DEFAULT_STYLE_CLASS = "avatar-view";
-    private static final ClipType DEFAULT_CLIP_TYPE = ClipType.SQUARE;
-    private static final double DEFAULT_ROUND_SIZE = 10;
+    private static final AvatarShape DEFAULT_AVATAR_SHAPE = AvatarShape.SQUARE;
+    private static final double DEFAULT_ARC_SIZE = 10;
     private static final double DEFAULT_SIZE = 50;
 
     public AvatarView() {
@@ -67,7 +67,6 @@ public class AvatarView extends Control {
                 int index = number.intValue() % getNumberOfStyles();
                 getStyleClass().add("style" + index);
             }
-            System.out.println(getStyleClass());
         });
 
         prefWidthProperty().bind(sizeProperty());
@@ -81,6 +80,16 @@ public class AvatarView extends Control {
     public AvatarView(String initials, Image image) {
         this();
         setInitials(initials);
+        setImage(image);
+    }
+
+    public AvatarView(String initials) {
+        this();
+        setInitials(initials);
+    }
+
+    public AvatarView(Image image) {
+        this();
         setImage(image);
     }
 
@@ -163,7 +172,7 @@ public class AvatarView extends Control {
 
     // round size
 
-    private final DoubleProperty roundSize = new StyleableDoubleProperty(DEFAULT_ROUND_SIZE) {
+    private final DoubleProperty arcSize = new StyleableDoubleProperty(DEFAULT_ARC_SIZE) {
         @Override
         public Object getBean() {
             return AvatarView.this;
@@ -171,17 +180,17 @@ public class AvatarView extends Control {
 
         @Override
         public String getName() {
-            return "roundSize";
+            return "arcSize";
         }
 
         @Override
         public CssMetaData<? extends Styleable, Number> getCssMetaData() {
-            return StyleableProperties.ROUND_SIZE;
+            return StyleableProperties.AVATAR_ARC_SIZE;
         }
     };
 
-    public final double getRoundSize() {
-        return roundSize.get();
+    public final double getArcSize() {
+        return arcSize.get();
     }
 
     /**
@@ -193,12 +202,12 @@ public class AvatarView extends Control {
      *
      * @return the round size property
      */
-    public final DoubleProperty roundSizeProperty() {
-        return roundSize;
+    public final DoubleProperty arcSizeProperty() {
+        return arcSize;
     }
 
-    public final void setRoundSize(double roundSize) {
-        this.roundSize.set(roundSize);
+    public final void setArcSize(double arcSize) {
+        this.arcSize.set(arcSize);
     }
 
     // size
@@ -240,12 +249,12 @@ public class AvatarView extends Control {
         this.size.set(size);
     }
 
-    // clip type
+    // shape
 
-    private final StyleableObjectProperty<ClipType> clipType = new StyleableObjectProperty<>(DEFAULT_CLIP_TYPE) {
+    private final StyleableObjectProperty<AvatarShape> avatarShape = new StyleableObjectProperty<>(DEFAULT_AVATAR_SHAPE) {
         @Override
-        public CssMetaData<? extends Styleable, ClipType> getCssMetaData() {
-            return StyleableProperties.CLIP_TYPE;
+        public CssMetaData<? extends Styleable, AvatarShape> getCssMetaData() {
+            return StyleableProperties.AVATAR_SHAPE;
         }
 
         @Override
@@ -255,9 +264,8 @@ public class AvatarView extends Control {
 
         @Override
         public String getName() {
-            return "clipType";
+            return "avatarShape";
         }
-
     };
 
     /**
@@ -268,16 +276,16 @@ public class AvatarView extends Control {
      *
      * @return the clip type property
      */
-    public final ObjectProperty<ClipType> clipTypeProperty() {
-        return this.clipType;
+    public final ObjectProperty<AvatarShape> avatarShapeProperty() {
+        return this.avatarShape;
     }
 
-    public final ClipType getClipType() {
-        return this.clipTypeProperty().get();
+    public final AvatarShape getAvatarShape() {
+        return this.avatarShapeProperty().get();
     }
 
-    public final void setClipType(final ClipType type) {
-        this.clipTypeProperty().set(type);
+    public final void setAvatarShape(final AvatarShape type) {
+        this.avatarShapeProperty().set(type);
     }
 
     private final IntegerProperty magicNumber = new SimpleIntegerProperty(this, "magicNumber", -1);
@@ -307,29 +315,29 @@ public class AvatarView extends Control {
     }
 
     private static class StyleableProperties {
-        private static final CssMetaData<AvatarView, ClipType> CLIP_TYPE = new CssMetaData<>(
-                "-fx-clip-type", new EnumConverter<>(ClipType.class), DEFAULT_CLIP_TYPE) {
+        private static final CssMetaData<AvatarView, AvatarShape> AVATAR_SHAPE = new CssMetaData<>(
+                "-fx-avatar-shape", new EnumConverter<>(AvatarShape.class), DEFAULT_AVATAR_SHAPE) {
             @Override
             public boolean isSettable(AvatarView control) {
-                return !control.clipType.isBound();
+                return !control.avatarShape.isBound();
             }
 
             @Override
-            public StyleableProperty<ClipType> getStyleableProperty(AvatarView control) {
-                return (StyleableProperty<ClipType>) control.clipTypeProperty();
+            public StyleableProperty<AvatarShape> getStyleableProperty(AvatarView control) {
+                return (StyleableProperty<AvatarShape>) control.avatarShapeProperty();
             }
         };
 
-        private static final CssMetaData<AvatarView, Number> ROUND_SIZE =
-                new CssMetaData<>("-fx-round-size", SizeConverter.getInstance(), DEFAULT_ROUND_SIZE) {
+        private static final CssMetaData<AvatarView, Number> AVATAR_ARC_SIZE =
+                new CssMetaData<>("-fx-avatar-arc-size", SizeConverter.getInstance(), DEFAULT_ARC_SIZE) {
                     @Override
                     public boolean isSettable(AvatarView n) {
-                        return !n.roundSize.isBound();
+                        return !n.arcSize.isBound();
                     }
 
                     @Override
                     public StyleableProperty<Number> getStyleableProperty(AvatarView n) {
-                        return (StyleableProperty<Number>) n.roundSizeProperty();
+                        return (StyleableProperty<Number>) n.arcSizeProperty();
                     }
                 };
 
@@ -350,7 +358,7 @@ public class AvatarView extends Control {
 
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
-            Collections.addAll(styleables, CLIP_TYPE, ROUND_SIZE, AVATAR_SIZE);
+            Collections.addAll(styleables, AVATAR_SHAPE, AVATAR_ARC_SIZE, AVATAR_SIZE);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }
@@ -365,17 +373,17 @@ public class AvatarView extends Control {
     }
 
     /**
-     * Enumeration representing the type of clipping applied to the avatar.
+     * Enumeration representing the shape of the avatar.
      */
-    public enum ClipType {
+    public enum AvatarShape {
 
         /**
-         * The avatar is clipped to a circular shape.
+         * The avatar will have a circular shape.
          */
-        CIRCLE,
+        ROUND,
 
         /**
-         * The avatar is clipped to a square or rectangular shape.
+         * The avatar will have a rectangular shape.
          */
         SQUARE
     }

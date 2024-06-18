@@ -1,14 +1,19 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.AvatarView;
+import com.dlsc.gemsfx.AvatarView.AvatarShape;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -27,6 +32,19 @@ public class AvatarViewApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
+        Tab tabA = createTabA();
+        Tab tabB = createTabB();
+
+        TabPane tabPane = new TabPane(tabA, tabB);
+
+        Scene scene = new Scene(tabPane, Color.WHITE);
+        primaryStage.setScene(scene);
+        primaryStage.sizeToScene();
+        primaryStage.setTitle("AvatarView");
+        primaryStage.show();
+    }
+
+    private Tab createTabA() {
         avatarView = new AvatarView();
 
         StackPane avatarViewWrapper = new StackPane(avatarView);
@@ -37,25 +55,55 @@ public class AvatarViewApp extends Application {
         wrapper.setStyle(" -fx-background-color: white;");
         HBox.setHgrow(avatarViewWrapper, Priority.ALWAYS);
 
-        Scene scene = new Scene(wrapper, Color.WHITE);
-        primaryStage.setScene(scene);
-        primaryStage.sizeToScene();
-        primaryStage.setTitle("AvatarView");
-        primaryStage.show();
+        return new Tab("Image / Text / Blank", wrapper);
+    }
+
+    private Tab createTabB() {
+        Node hBox1 = createColorBox(AvatarView.AvatarShape.SQUARE, false, "A", "B", "C", "D", "E");
+        Node hBox2 = createColorBox(AvatarShape.SQUARE, false, "AA", "BB", "CC", "DD", "EE");
+        Node hBox3 = createColorBox(AvatarView.AvatarShape.ROUND, false, "A", "B", "C", "D", "E");
+        Node hBox4 = createColorBox(AvatarShape.ROUND, false, "AA", "BB", "CC", "DD", "EE");
+
+        Node hBox1b = createColorBox(AvatarView.AvatarShape.SQUARE, true, "A", "B", "C", "D", "E");
+        Node hBox2b = createColorBox(AvatarShape.SQUARE, true, "AA", "BB", "CC", "DD", "EE");
+        Node hBox3b = createColorBox(AvatarView.AvatarShape.ROUND, true, "A", "B", "C", "D", "E");
+        Node hBox4b = createColorBox(AvatarShape.ROUND, true, "AA", "BB", "CC", "DD", "EE");
+
+        VBox vBox = new VBox(50, hBox1, hBox2, hBox3, hBox4, hBox1b, hBox2b, hBox3b, hBox4b);
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setPadding(new Insets(20));
+
+        return new Tab("Colors", vBox);
+    }
+
+    private Node createColorBox(AvatarShape shape, boolean dropShadow, String... initials) {
+        HBox hBox = new HBox(20);
+        hBox.setAlignment(Pos.CENTER);
+        hBox.setMaxHeight(Double.MAX_VALUE);
+
+        for (String initial : initials) {
+            AvatarView view = new AvatarView(initial);
+            view.setAvatarShape(shape);
+            if (dropShadow) {
+                view.setEffect(new DropShadow());
+            }
+            hBox.getChildren().add(view);
+        }
+
+        return hBox;
     }
 
     public Node getControlPanel() {
         // clip type
-        Label clipTypeLabel = new Label("Clip Type:");
-
-        ComboBox<AvatarView.ClipType> clipTypeComboBox = new ComboBox<>();
-        clipTypeComboBox.getItems().addAll(AvatarView.ClipType.values());
-        clipTypeComboBox.setValue(AvatarView.ClipType.SQUARE);
-        avatarView.clipTypeProperty().bind(clipTypeComboBox.valueProperty());
-        clipTypeComboBox.setMaxWidth(Double.MAX_VALUE);
+        Label shapeLabel = new Label("Shape:");
+        ComboBox<AvatarShape> shapeComboBox = new ComboBox<>();
+        shapeComboBox.getItems().addAll(AvatarShape.values());
+        shapeComboBox.setValue(AvatarShape.SQUARE);
+        shapeComboBox.setMaxWidth(Double.MAX_VALUE);
+        avatarView.avatarShapeProperty().bind(shapeComboBox.valueProperty());
 
         // Image or Initials
-        Label contentType = new Label("Content Type:");
+        Label contentType = new Label("Content:");
         ComboBox<String> contentComboBox = new ComboBox<>();
         contentComboBox.getItems().addAll("Image", "Initials", "Blank");
         contentComboBox.setValue("Image");
@@ -79,14 +127,14 @@ public class AvatarViewApp extends Application {
         avatarView.initialsProperty().bindBidirectional(initialsTextField.textProperty());
 
         // round size
-        Label roundSizeLabel = new Label("Round Size:");
-        roundSizeLabel.managedProperty().bind(roundSizeLabel.visibleProperty());
-        roundSizeLabel.visibleProperty().bind(clipTypeComboBox.valueProperty().isEqualTo(AvatarView.ClipType.SQUARE));
+        Label arcSizeLabel = new Label("Arc Size:");
+        arcSizeLabel.managedProperty().bind(arcSizeLabel.visibleProperty());
+        arcSizeLabel.visibleProperty().bind(shapeComboBox.valueProperty().isEqualTo(AvatarShape.SQUARE));
 
-        Spinner<Integer> roundSizeSpinner = new Spinner<>(0, 100, 10, 5);
-        avatarView.roundSizeProperty().bind(roundSizeSpinner.valueProperty());
-        roundSizeSpinner.managedProperty().bind(roundSizeSpinner.visibleProperty());
-        roundSizeSpinner.visibleProperty().bind(roundSizeLabel.visibleProperty());
+        Spinner<Integer> arcSizeSpinner = new Spinner<>(0, 100, 10, 5);
+        avatarView.arcSizeProperty().bind(arcSizeSpinner.valueProperty());
+        arcSizeSpinner.managedProperty().bind(arcSizeSpinner.visibleProperty());
+        arcSizeSpinner.visibleProperty().bind(arcSizeLabel.visibleProperty());
 
         // size
         Label sizeLabel = new Label("Size:");
@@ -94,8 +142,8 @@ public class AvatarViewApp extends Application {
         Spinner<Integer> sizeSpinner = new Spinner<>(35, 200, avatarView.getSize(), 5);
         avatarView.sizeProperty().bind(sizeSpinner.valueProperty());
 
-        VBox vBox = new VBox(20, clipTypeLabel, clipTypeComboBox, contentType, contentComboBox, initialsLabel, initialsTextField, roundSizeLabel, roundSizeSpinner, sizeLabel, sizeSpinner);
-        vBox.setStyle("-fx-background-color: #e0e0e0;-fx-padding: 20px;");
+        VBox vBox = new VBox(20, shapeLabel, shapeComboBox, contentType, contentComboBox, initialsLabel, initialsTextField, arcSizeLabel, arcSizeSpinner, sizeLabel, sizeSpinner);
+        vBox.setStyle("-fx-background-color: #e0e0e0; -fx-padding: 20px;");
         HBox.setHgrow(vBox, Priority.NEVER);
         vBox.setAlignment(Pos.CENTER_LEFT);
         return vBox;
