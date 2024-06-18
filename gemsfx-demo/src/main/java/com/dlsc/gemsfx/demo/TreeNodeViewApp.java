@@ -86,7 +86,7 @@ public class TreeNodeViewApp extends Application {
         layoutTypeComboBox.getItems().setAll(TreeNodeView.LayoutType.values());
         layoutTypeComboBox.setValue(TreeNodeView.LayoutType.REGULAR);
         treePane.layoutTypeProperty().bind(layoutTypeComboBox.valueProperty());
-        VBox layoutTypeBox = createControlBox("Layout AvatarShape", layoutTypeComboBox);
+        VBox layoutTypeBox = createControlBox("Layout Type", layoutTypeComboBox);
 
         Button removeButton = new Button("Remove");
         removeButton.setOnAction(e -> {
