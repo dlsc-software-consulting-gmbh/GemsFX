@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -59,27 +60,35 @@ public class AvatarViewApp extends Application {
     }
 
     private Tab createTabB() {
-        Node hBox1 = createColorBox(AvatarView.AvatarShape.SQUARE, false, "A", "B", "C", "D", "E");
-        Node hBox2 = createColorBox(AvatarShape.SQUARE, false, "AA", "BB", "CC", "DD", "EE");
-        Node hBox3 = createColorBox(AvatarView.AvatarShape.ROUND, false, "A", "B", "C", "D", "E");
-        Node hBox4 = createColorBox(AvatarShape.ROUND, false, "AA", "BB", "CC", "DD", "EE");
+        Node hBox1 = createColorBox("Singles", AvatarShape.SQUARE, false, "A", "B", "C", "D", "E");
+        Node hBox2 = createColorBox("Doubles", AvatarShape.SQUARE, false, "AA", "BB", "CC", "DD", "EE");
+        Node hBox3 = createColorBox("Singles (Round)", AvatarShape.ROUND, false, "A", "B", "C", "D", "E");
+        Node hBox4 = createColorBox("Doubles (Round)", AvatarShape.ROUND, false, "AA", "BB", "CC", "DD", "EE");
 
-        Node hBox1b = createColorBox(AvatarView.AvatarShape.SQUARE, true, "A", "B", "C", "D", "E");
-        Node hBox2b = createColorBox(AvatarShape.SQUARE, true, "AA", "BB", "CC", "DD", "EE");
-        Node hBox3b = createColorBox(AvatarView.AvatarShape.ROUND, true, "A", "B", "C", "D", "E");
-        Node hBox4b = createColorBox(AvatarShape.ROUND, true, "AA", "BB", "CC", "DD", "EE");
+        Node hBox1b = createColorBox("Singles (Shadow)", AvatarShape.SQUARE, true, "A", "B", "C", "D", "E");
+        Node hBox2b = createColorBox("Doubles (Shadow)", AvatarShape.SQUARE, true, "AA", "BB", "CC", "DD", "EE");
+        Node hBox3b = createColorBox("Singles (Round, Shadow)", AvatarShape.ROUND, true, "A", "B", "C", "D", "E");
+        Node hBox4b = createColorBox("Doubles (Round, Shadow)", AvatarShape.ROUND, true, "AA", "BB", "CC", "DD", "EE");
 
         VBox vBox = new VBox(50, hBox1, hBox2, hBox3, hBox4, hBox1b, hBox2b, hBox3b, hBox4b);
         vBox.setAlignment(Pos.CENTER);
-        vBox.setPadding(new Insets(20));
+        vBox.setPadding(new Insets(50));
+        vBox.setStyle("-fx-background-color: white;");
 
-        return new Tab("Colors", vBox);
+        ScrollPane scrollPane = new ScrollPane(vBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setPrefHeight(520);
+        return new Tab("Colors", scrollPane);
     }
 
-    private Node createColorBox(AvatarShape shape, boolean dropShadow, String... initials) {
+    private Node createColorBox(String label, AvatarShape shape, boolean dropShadow, String... initials) {
         HBox hBox = new HBox(20);
         hBox.setAlignment(Pos.CENTER);
         hBox.setMaxHeight(Double.MAX_VALUE);
+        Label l = new Label(label);
+        l.setPrefWidth(200);
+        hBox.getChildren().add(l);
 
         for (String initial : initials) {
             AvatarView view = new AvatarView(initial);
