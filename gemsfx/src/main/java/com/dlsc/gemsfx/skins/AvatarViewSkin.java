@@ -51,6 +51,17 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
         imageView.setSmooth(true);
         imageView.setPreserveRatio(true);
 
+        DoubleBinding scale = Bindings.createDoubleBinding(() -> {
+            Image image = avatar.getImage();
+            if (image != null) {
+                return avatar.getSize() / Math.min(image.getWidth(), image.getHeight());
+            }
+            return 1d;
+        }, avatar.sizeProperty(), avatar.imageProperty());
+
+        imageView.scaleXProperty().bind(scale);
+        imageView.scaleYProperty().bind(scale);
+
         imageGroup = new Group(imageView);
 
         imageWrapper = createWrapperStackPane(imageGroup);
@@ -133,11 +144,8 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
         AvatarView avatarView = getSkinnable();
         Image image = avatarView.getImage();
 
-        // if there is an image, and it has been fully loaded, then we show that
         if (image != null && (!image.isBackgroundLoading() || image.getProgress() >= 1)) {
-            DoubleBinding scale = Bindings.createDoubleBinding(() -> avatarView.getSize() / Math.min(image.getWidth(), image.getHeight()), avatarView.sizeProperty());
-            imageView.scaleXProperty().bind(scale);
-            imageView.scaleYProperty().bind(scale);
+            // if there is an image, and it has been fully loaded, then we show the image
             getChildren().setAll(imageWrapper);
         } else if (StringUtils.isNotBlank(avatarView.getInitials())) {
             // if there are initials then show those
