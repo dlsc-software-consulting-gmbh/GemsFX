@@ -21,16 +21,18 @@ import org.apache.commons.lang3.StringUtils;
 
 public class AvatarViewSkin extends SkinBase<AvatarView> {
 
-    private final Group imageWrapper;
-    private final ImageView image;
+    private final StackPane imageWrapper;
     private final StackPane textWrapper;
     private final StackPane iconWrapper;
+
+    private final ImageView imageView;
 
     private final ChangeListener<Number> progressChangeListener = (ob, ov, nv) -> {
         if (nv.intValue() == 1) {
             updateView();
         }
     };
+    private final Group imageGroup;
 
     public AvatarViewSkin(AvatarView avatar) {
         super(avatar);
@@ -39,34 +41,28 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
         Region icon = new Region();
         icon.getStyleClass().add("icon");
 
-        iconWrapper = new StackPane(icon);
+        iconWrapper = createWrapperStackPane(icon);
         iconWrapper.getStyleClass().add("icon-wrapper");
 
         // image avatar
-        image = new ImageView();
-        image.getStyleClass().add("inner-image");
-        image.imageProperty().bind(avatar.imageProperty());
-        image.setSmooth(true);
-        image.setPreserveRatio(true);
+        imageView = new ImageView();
+        imageView.getStyleClass().add("inner-image");
+        imageView.imageProperty().bind(avatar.imageProperty());
+        imageView.setSmooth(true);
+        imageView.setPreserveRatio(true);
 
-        imageWrapper = new Group();
+        imageGroup = new Group(imageView);
+
+        imageWrapper = createWrapperStackPane(imageGroup);
         imageWrapper.getStyleClass().add("image-wrapper");
-        imageWrapper.getChildren().setAll(image);
 
         // text avatar
         Text initialsText = new Text();
         initialsText.getStyleClass().add("initials-text");
         initialsText.textProperty().bind(avatar.initialsProperty());
 
-        textWrapper = new StackPane(initialsText);
+        textWrapper = createWrapperStackPane(initialsText);
         textWrapper.getStyleClass().add("text-wrapper");
-        textWrapper.getChildren().setAll(initialsText);
-        textWrapper.prefWidthProperty().bind(avatar.sizeProperty());
-        textWrapper.prefHeightProperty().bind(avatar.sizeProperty());
-        textWrapper.minWidthProperty().bind(avatar.sizeProperty());
-        textWrapper.minHeightProperty().bind(avatar.sizeProperty());
-        textWrapper.maxWidthProperty().bind(avatar.sizeProperty());
-        textWrapper.maxHeightProperty().bind(avatar.sizeProperty());
 
         ChangeListener<Image> imageChangeListener = (ob, oldImage, newImage) -> {
             if (oldImage != null) {
@@ -98,6 +94,19 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
         updateView();
     }
 
+    private StackPane createWrapperStackPane(Node child) {
+        AvatarView avatar = getSkinnable();
+        StackPane stackPane = new StackPane(child);
+        stackPane.getStyleClass().add("wrapper-stack-pane");
+        stackPane.prefWidthProperty().bind(avatar.sizeProperty());
+        stackPane.prefWidthProperty().bind(avatar.sizeProperty());
+        stackPane.minWidthProperty().bind(avatar.sizeProperty());
+        stackPane.minHeightProperty().bind(avatar.sizeProperty());
+        stackPane.maxWidthProperty().bind(avatar.sizeProperty());
+        stackPane.maxHeightProperty().bind(avatar.sizeProperty());
+        return stackPane;
+    }
+
     private void createClipBinding(Node node) {
         AvatarView avatarView = getSkinnable();
         node.clipProperty().bind(Bindings.createObjectBinding(() -> {
@@ -122,12 +131,13 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
 
     private void updateView() {
         AvatarView avatarView = getSkinnable();
-        Image img = avatarView.getImage();
+        Image image = avatarView.getImage();
 
-        // if there is an image and it has been fully loaded, then we show that
-        if (img != null && (!img.isBackgroundLoading() || img.getProgress() >= 1)) {
-            image.fitWidthProperty().bind(avatarView.sizeProperty());
-            image.fitHeightProperty().bind(avatarView.sizeProperty());
+        // if there is an image, and it has been fully loaded, then we show that
+        if (image != null && (!image.isBackgroundLoading() || image.getProgress() >= 1)) {
+            DoubleBinding scale = Bindings.createDoubleBinding(() -> avatarView.getSize() / Math.min(image.getWidth(), image.getHeight()), avatarView.sizeProperty());
+            imageView.scaleXProperty().bind(scale);
+            imageView.scaleYProperty().bind(scale);
             getChildren().setAll(imageWrapper);
         } else if (StringUtils.isNotBlank(avatarView.getInitials())) {
             // if there are initials then show those
@@ -136,39 +146,5 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
             // no image, no initials, show icon
             getChildren().setAll(iconWrapper);
         }
-    }
-
-    @Override
-    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
-    }
-
-    @Override
-    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
-    }
-
-    @Override
-    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
-    }
-
-    @Override
-    protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
-    }
-
-    @Override
-    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        Border border = getSkinnable().getBorder();
-        double borderInsets = border == null ? 0 : border.getInsets().getLeft() + border.getInsets().getRight();
-        return super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset) + borderInsets;
-    }
-
-    @Override
-    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        Border border = getSkinnable().getBorder();
-        double borderInsets = border == null ? 0 : border.getInsets().getTop() + border.getInsets().getBottom();
-        return super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset) + borderInsets;
     }
 }

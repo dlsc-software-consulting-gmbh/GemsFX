@@ -56,6 +56,10 @@ public class AvatarView extends Control {
     private static final double DEFAULT_ARC_SIZE = 10;
     private static final double DEFAULT_SIZE = 50;
 
+    /**
+     * Constructs a new avatar view with no initials and no image. The
+     * view will fall back to showing the default icon.
+     */
     public AvatarView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         setFocusTraversable(false);
@@ -77,12 +81,26 @@ public class AvatarView extends Control {
         maxHeightProperty().bind(sizeProperty());
     }
 
+    /**
+     * Constructs a new avatar view with the given initials and image. The
+     * view will display the image unless it is null. Should the image be
+     * removed at a later point in time then the initials will be shown.
+     *
+     * @param initials the initials
+     * @param image the image
+     */
     public AvatarView(String initials, Image image) {
         this();
         setInitials(initials);
         setImage(image);
     }
 
+    /**
+     * Constructs a new avatar view with the given initials. If an image gets
+     * added later on then the image will be shown.
+     *
+     * @param initials the initials
+     */
     public AvatarView(String initials) {
         this();
         setInitials(initials);

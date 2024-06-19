@@ -22,12 +22,18 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.scenicview.ScenicView;
+
+import java.util.Objects;
 
 public class AvatarViewApp extends Application {
 
     private AvatarView avatarView;
 
-    private static final Image AVATAR_IMAGE = new Image("https://avatars.githubusercontent.com/u/9534301?v=4", true);
+    private static final Image AVATAR_IMAGE = new Image(Objects.requireNonNull(AvatarViewApp.class.getResource("dirk.jpg")).toExternalForm());
+
+ //   private static final Image AVATAR_IMAGE = new Image("https://wallpapers.com/images/featured-full/4k-oaax18kaapkokaro.jpg", true);
+
     private static final String INITIALS = "LD";
 
     @Override
