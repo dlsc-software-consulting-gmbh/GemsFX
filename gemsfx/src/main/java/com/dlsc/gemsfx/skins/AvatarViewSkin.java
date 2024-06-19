@@ -11,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
@@ -90,10 +89,11 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
         InvalidationListener updateViewListener = it -> updateView();
         avatar.imageProperty().addListener(updateViewListener);
         avatar.initialsProperty().addListener(updateViewListener);
+        avatar.sizeProperty().addListener(it -> updateImageWrapperClip());
+        avatar.avatarShapeProperty().addListener(it -> updateImageWrapperClip());
 
         createClipBinding(iconWrapper);
         createClipBinding(textWrapper);
-        createClipBinding(imageWrapper);
 
         updateView();
     }
@@ -126,49 +126,73 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
 
         // if there is an image and it has been fully loaded, then we show that
         if (img != null && (!img.isBackgroundLoading() || img.getProgress() >= 1)) {
-            image.fitWidthProperty().bind(avatarView.sizeProperty());
-            image.fitHeightProperty().bind(avatarView.sizeProperty());
-            getChildren().setAll(imageWrapper);
+            updateImageWrapperClip();
+            toggleContentNode(imageWrapper);
         } else if (StringUtils.isNotBlank(avatarView.getInitials())) {
             // if there are initials then show those
-            getChildren().setAll(textWrapper);
+            toggleContentNode(textWrapper);
         } else {
             // no image, no initials, show icon
-            getChildren().setAll(iconWrapper);
+            toggleContentNode(iconWrapper);
         }
     }
 
-    @Override
-    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
+    private void toggleContentNode(Node content) {
+        if (getChildren().isEmpty() || getChildren().get(0) != content) {
+            getChildren().setAll(content);
+        }
     }
 
-    @Override
-    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
+    private boolean isImageLoaded() {
+        Image img = getSkinnable().getImage();
+        return img != null && (!img.isBackgroundLoading() || img.getProgress() >= 1);
     }
 
-    @Override
-    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
+    private void updateImageWrapperClip() {
+        AvatarView avatarView = getSkinnable();
+        Image img = avatarView.getImage();
+        if (isImageLoaded()) {
+            image.setFitHeight(-1);
+            image.setFitWidth(-1);
+            double width = img.getWidth();
+            double height = img.getHeight();
+            double avatarSize = avatarView.getSize();
+            boolean isWidthGreaterThanHeight = width > height;
+            double scale = isWidthGreaterThanHeight ? avatarSize / height : avatarSize / width;
+            if (isWidthGreaterThanHeight) {
+                image.setFitHeight(avatarSize);
+            } else {
+                image.setFitWidth(avatarSize);
+            }
+
+            if (avatarView.getAvatarShape() == AvatarView.AvatarShape.SQUARE) {
+                Rectangle rectangle = new Rectangle();
+                rectangle.widthProperty().bind(avatarView.sizeProperty());
+                rectangle.heightProperty().bind(avatarView.sizeProperty());
+                rectangle.arcWidthProperty().bind(avatarView.arcSizeProperty());
+                rectangle.arcHeightProperty().bind(avatarView.arcSizeProperty());
+
+                if (isWidthGreaterThanHeight) {
+                    rectangle.setX((width * scale - avatarSize) / 2);
+                } else {
+                    rectangle.setY((height * scale - avatarSize) / 2);
+                }
+                imageWrapper.setClip(rectangle);
+            } else if (avatarView.getAvatarShape() == AvatarView.AvatarShape.ROUND) {
+                Circle circle = new Circle();
+                circle.radiusProperty().bind(avatarView.sizeProperty().divide(2));
+                if (isWidthGreaterThanHeight) {
+                    circle.setCenterX(width * scale / 2);
+                    circle.setCenterY(avatarSize / 2);
+                } else {
+                    circle.setCenterX(avatarSize / 2);
+                    circle.setCenterY(height * scale / 2);
+                }
+                imageWrapper.setClip(circle);
+            }
+        } else {
+            imageWrapper.setClip(null);
+        }
     }
 
-    @Override
-    protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
-    }
-
-    @Override
-    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        Border border = getSkinnable().getBorder();
-        double borderInsets = border == null ? 0 : border.getInsets().getLeft() + border.getInsets().getRight();
-        return super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset) + borderInsets;
-    }
-
-    @Override
-    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        Border border = getSkinnable().getBorder();
-        double borderInsets = border == null ? 0 : border.getInsets().getTop() + border.getInsets().getBottom();
-        return super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset) + borderInsets;
-    }
 }
