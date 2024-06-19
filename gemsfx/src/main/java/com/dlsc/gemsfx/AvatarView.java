@@ -116,6 +116,11 @@ public class AvatarView extends Control {
         return new AvatarViewSkin(this);
     }
 
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(AvatarView.class.getResource("avatar-view.css")).toExternalForm();
+    }
+
     // number of styles
 
     private final IntegerProperty numberOfStyles = new SimpleIntegerProperty(this, "numberOfStyles", 5);
@@ -129,7 +134,7 @@ public class AvatarView extends Control {
      * for styling the view based on the initials. By default, this value is "5", which means that
      * the view will have styles like this: style0, style1, style2, style3, style4 (but always only
      * one of them). These five styles will use five different background colors. Please be aware that
-     * changing the number of styles requires you to define additional rules as the default agent
+     * changing the number of styles requires you to define additional CSS rules as the default agent
      * stylesheet that ships with this control only supports five different styles out of the box.
      *
      * @return the number of supported styles
@@ -188,7 +193,7 @@ public class AvatarView extends Control {
         imageProperty().set(image);
     }
 
-    // round size
+    // arc size
 
     private final DoubleProperty arcSize = new StyleableDoubleProperty(DEFAULT_ARC_SIZE) {
         @Override
@@ -268,6 +273,22 @@ public class AvatarView extends Control {
     }
 
     // shape
+
+    /**
+     * Enumeration representing the shape of the avatar.
+     */
+    public enum AvatarShape {
+
+        /**
+         * The avatar will have a circular shape.
+         */
+        ROUND,
+
+        /**
+         * The avatar will have a rectangular shape.
+         */
+        SQUARE
+    }
 
     private final StyleableObjectProperty<AvatarShape> avatarShape = new StyleableObjectProperty<>(DEFAULT_AVATAR_SHAPE) {
         @Override
@@ -389,26 +410,4 @@ public class AvatarView extends Control {
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }
-
-    /**
-     * Enumeration representing the shape of the avatar.
-     */
-    public enum AvatarShape {
-
-        /**
-         * The avatar will have a circular shape.
-         */
-        ROUND,
-
-        /**
-         * The avatar will have a rectangular shape.
-         */
-        SQUARE
-    }
-
-    @Override
-    public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(AvatarView.class.getResource("avatar-view.css")).toExternalForm();
-    }
-
 }
