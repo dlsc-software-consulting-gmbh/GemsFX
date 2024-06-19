@@ -25,14 +25,11 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
     private final StackPane textWrapper;
     private final StackPane iconWrapper;
 
-    private final ImageView imageView;
-
     private final ChangeListener<Number> progressChangeListener = (ob, ov, nv) -> {
         if (nv.intValue() == 1) {
             updateView();
         }
     };
-    private final Group imageGroup;
 
     public AvatarViewSkin(AvatarView avatar) {
         super(avatar);
@@ -45,7 +42,7 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
         iconWrapper.getStyleClass().add("icon-wrapper");
 
         // image avatar
-        imageView = new ImageView();
+        ImageView imageView = new ImageView();
         imageView.getStyleClass().add("inner-image");
         imageView.imageProperty().bind(avatar.imageProperty());
         imageView.setSmooth(true);
@@ -62,7 +59,7 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
         imageView.scaleXProperty().bind(scale);
         imageView.scaleYProperty().bind(scale);
 
-        imageGroup = new Group(imageView);
+        Group imageGroup = new Group(imageView);
 
         imageWrapper = createWrapperStackPane(imageGroup);
         imageWrapper.getStyleClass().add("image-wrapper");
