@@ -126,6 +126,30 @@
       "project": "GemsFX",
       "preview": "/preview-calendar-picker.png",
       "classname": "com.dlsc.gemsfx.demo.CalendarPickerApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Date Range View",
+      "desc": "A view for selecting date ranges (start / end date pairs).",
+      "project": "GemsFX",
+      "preview": "/preview-date-range-view.png",
+      "classname": "com.dlsc.gemsfx.demo.DateRangeViewApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Date Range Picker",
+      "desc": "A picker for selecting date ranges (start / end date pairs).",
+      "project": "GemsFX",
+      "preview": "/preview-date-range-picker.png",
+      "classname": "com.dlsc.gemsfx.demo.DateRangePickerApp"
+    },
+    {
+      "category": "gemsfx",
+      "name": "Avatar View",
+      "desc": "A view for displaying user photos or initials.",
+      "project": "GemsFX",
+      "preview": "/preview-avatar-view.png",
+      "classname": "com.dlsc.gemsfx.demo.AvatarViewApp"
     }
   ]
 }
