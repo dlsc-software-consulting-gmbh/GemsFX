@@ -21,7 +21,7 @@
       "desc": "A pane for displaying dialogs.",
       "project": "GemsFX",
       "preview": "/preview-dialogs.png",
-      "classname": "com.dlsc.gemsfx.demo.DialogsApp"
+      "classname": "com.dlsc.gemsfx.demo.DialogPaneApp"
     },
     {
       "category": "gemsfx",
