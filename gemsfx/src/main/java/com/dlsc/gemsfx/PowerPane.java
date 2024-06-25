@@ -67,7 +67,7 @@ public class PowerPane extends StackPane {
     /**
      * Stores the content node / the main view (UI).
      *
-     * @return the content ndoe
+     * @return the content node
      */
     public final ObjectProperty<Node> contentProperty() {
         return content;
