@@ -4,6 +4,9 @@ module com.dlsc.gemsfx.demo {
     requires com.dlsc.gemsfx;
     requires com.dlsc.pdfviewfx;
 
+    requires com.fasterxml.jackson.core;
+    requires com.fasterxml.jackson.databind;
+
     requires javafx.web;
     requires javafx.controls;
 

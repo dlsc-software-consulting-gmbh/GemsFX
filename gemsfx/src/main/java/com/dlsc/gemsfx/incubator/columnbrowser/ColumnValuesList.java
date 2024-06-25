@@ -51,27 +51,15 @@ public class ColumnValuesList<S, T> extends Control {
 	}
 
 	public final Predicate<S> getPredicate() {
-		Predicate<S> predicate = new Predicate<S>() {
-			@Override
-			public boolean test(S item) {
-				TableView<S> table = column.getTableView();
-				Callback<CellDataFeatures<S, T>, ObservableValue<T>> valueFactory = column
-						.getCellValueFactory();
-				ObservableValue<T> value = valueFactory
-						.call(new CellDataFeatures<S, T>(table, column, item));
-
-				MultipleSelectionModel<T> selectionModel = listView
-						.getSelectionModel();
-
-				if (selectionModel.isEmpty()) {
-					return true;
-				}
-
-				return selectionModel.getSelectedItems().contains(
-						value.getValue());
-			}
-		};
-
-		return predicate;
+        return item -> {
+            TableView<S> table = column.getTableView();
+            Callback<CellDataFeatures<S, T>, ObservableValue<T>> valueFactory = column.getCellValueFactory();
+            ObservableValue<T> value = valueFactory.call(new CellDataFeatures<>(table, column, item));
+            MultipleSelectionModel<T> selectionModel = listView.getSelectionModel();
+            if (selectionModel.isEmpty()) {
+                return true;
+            }
+            return selectionModel.getSelectedItems().contains(value.getValue());
+        };
 	}
 }

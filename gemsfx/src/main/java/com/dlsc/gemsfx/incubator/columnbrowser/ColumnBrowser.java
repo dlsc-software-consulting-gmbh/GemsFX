@@ -57,14 +57,13 @@ public class ColumnBrowser<S> extends Control {
         return new ColumnBrowserSkin<>(this);
     }
 
-    private ObservableList<S> items = FXCollections.observableArrayList();
+    private final ObservableList<S> items = FXCollections.observableArrayList();
 
     public final ObservableList<S> getItems() {
         return items;
     }
 
-    private ReadOnlyListWrapper<S> filteredItems = new ReadOnlyListWrapper<>(
-            FXCollections.observableArrayList());
+    private final ReadOnlyListWrapper<S> filteredItems = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
 
     public final ReadOnlyListProperty<S> getFilteredItems() {
         return filteredItems.getReadOnlyProperty();
