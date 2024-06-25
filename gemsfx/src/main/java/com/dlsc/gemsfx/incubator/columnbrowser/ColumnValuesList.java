@@ -5,32 +5,42 @@
  */
 package com.dlsc.gemsfx.incubator.columnbrowser;
 
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.control.*;
-import javafx.scene.control.TableColumn.CellDataFeatures;
-import javafx.util.Callback;
 
+import java.util.Comparator;
 import java.util.function.Predicate;
 
-import static java.util.Objects.requireNonNull;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 
 public class ColumnValuesList<S, T> extends Control {
 
-	private TableColumn<S, T> column;
+	private final ListView<T> listView;
 
-	private ListView<T> listView;
+	public ColumnValuesList() {
+		SortedList<T> sortedList = new SortedList<>(itemsProperty());
+		sortedList.comparatorProperty().bind(comparatorProperty());
 
-	private ColumnBrowser<S> browser;
-
-	public ColumnValuesList(ColumnBrowser<S> browser, TableColumn<S, T> column) {
-		requireNonNull(browser);
-		requireNonNull(column);
-
-		this.browser = browser;
-		this.column = column;
-		this.listView = new ListView<>();
+		this.listView = createListView();
+		this.listView.setItems(sortedList);
 		this.listView.getSelectionModel().setSelectionMode(MULTIPLE);
+	}
+
+	public ColumnValuesList(String text) {
+		this();
+		setText(text);
+	}
+
+	protected ListView<T> createListView() {
+		return new ListView<>();
 	}
 
 	@Override
@@ -38,28 +48,63 @@ public class ColumnValuesList<S, T> extends Control {
 		return new ColumnValuesListSkin<>(this);
 	}
 
-	public final ColumnBrowser<S> getColumnBrowser() {
-		return browser;
+	private final ObjectProperty<Comparator<T>> comparator = new SimpleObjectProperty<>(this, "comparator", Comparator.comparing(Object::toString));
+
+	public final Comparator<T> getComparator() {
+		return comparator.get();
 	}
 
-	public final TableColumn<S, T> getColumn() {
-		return column;
+	public final ObjectProperty<Comparator<T>> comparatorProperty() {
+		return comparator;
+	}
+
+	public final void setComparator(Comparator<T> comparator) {
+		this.comparator.set(comparator);
 	}
 
 	public final ListView<T> getListView() {
 		return listView;
 	}
 
+	private final ListProperty<T> items = new SimpleListProperty<>(this, "items", FXCollections.observableArrayList());
+
+	public final ObservableList<T> getItems() {
+		return items.get();
+	}
+
+	public final ListProperty<T> itemsProperty() {
+		return items;
+	}
+
+	public final void setItems(ObservableList<T> items) {
+		this.items.set(items);
+	}
+
+	private final StringProperty text = new SimpleStringProperty(this, "text", "Column");
+
+	public final String getText() {
+		return text.get();
+	}
+
+	public final StringProperty textProperty() {
+		return text;
+	}
+
+	public final void setText(String text) {
+		this.text.set(text);
+	}
+
+	private final ObjectProperty<Predicate<S>> predicate = new SimpleObjectProperty<>(this, "predicate", item -> true);
+
 	public final Predicate<S> getPredicate() {
-        return item -> {
-            TableView<S> table = column.getTableView();
-            Callback<CellDataFeatures<S, T>, ObservableValue<T>> valueFactory = column.getCellValueFactory();
-            ObservableValue<T> value = valueFactory.call(new CellDataFeatures<>(table, column, item));
-            MultipleSelectionModel<T> selectionModel = listView.getSelectionModel();
-            if (selectionModel.isEmpty()) {
-                return true;
-            }
-            return selectionModel.getSelectedItems().contains(value.getValue());
-        };
+		return predicate.get();
+	}
+
+	public final ObjectProperty<Predicate<S>> predicateProperty() {
+		return predicate;
+	}
+
+	public final void setPredicate(Predicate<S> predicate) {
+		this.predicate.set(predicate);
 	}
 }

@@ -7,13 +7,15 @@ package com.dlsc.gemsfx.incubator.columnbrowser;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyListProperty;
-import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableView;
@@ -23,33 +25,40 @@ import java.util.function.Predicate;
 
 public class ColumnBrowser<S> extends Control {
 
-    private final InvalidationListener filterListener = evt -> filter();
+    private final InvalidationListener filterListener = evt -> updatePredicate();
+
+    private final WeakInvalidationListener weakFilterListener = new WeakInvalidationListener(filterListener);
+
+    private final TableView<S> tableView;
+    private final FilteredList<S> filteredItems;
 
     public ColumnBrowser() {
         getStylesheets().add(Objects.requireNonNull(ColumnBrowser.class.getResource("column-browser-view.css")).toExternalForm());
 
-        tableView.addListener(evt -> getTableView().setItems(getFilteredItems()));
+        filteredItems = new FilteredList<>(itemsProperty());
+        filteredItems.predicateProperty().bind(predicateProperty());
 
-        getColumnValuesLists().addListener((ListChangeListener<ColumnValuesList<S, ?>>) c -> {
+        tableView = createTableView();
+        tableView.setItems(filteredItems);
+
+        getColumnValuesLists().addListener((ListChangeListener<ColumnValuesList<?, ?>>) c -> {
             while (c.next()) {
-                for (ColumnValuesList<S, ?> list : c.getAddedSubList()) {
-                    list.getListView().getSelectionModel().selectedIndexProperty().addListener(filterListener);
+                for (ColumnValuesList<?, ?> list : c.getAddedSubList()) {
+                    list.getListView().getSelectionModel().selectedIndexProperty().addListener(weakFilterListener);
                 }
-                for (ColumnValuesList<S, ?> list : c.getRemoved()) {
-                    list.getListView().getSelectionModel().selectedIndexProperty().removeListener(filterListener);
+                for (ColumnValuesList<?, ?> list : c.getRemoved()) {
+                    list.getListView().getSelectionModel().selectedIndexProperty().removeListener(weakFilterListener);
                 }
             }
         });
 
-        filter();
+        updatePredicate();
 
-        items.addListener((Observable evt) -> filter());
+       items.addListener((Observable evt) -> updatePredicate());
     }
 
-    public ColumnBrowser(TableView<S> tableView) {
-        this();
-
-        setTableView(tableView);
+    protected TableView<S> createTableView() {
+        return new TableView<>();
     }
 
     @Override
@@ -57,30 +66,26 @@ public class ColumnBrowser<S> extends Control {
         return new ColumnBrowserSkin<>(this);
     }
 
-    private final ObservableList<S> items = FXCollections.observableArrayList();
-
-    public final ObservableList<S> getItems() {
-        return items;
-    }
-
-    private final ReadOnlyListWrapper<S> filteredItems = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
-
-    public final ReadOnlyListProperty<S> getFilteredItems() {
-        return filteredItems.getReadOnlyProperty();
-    }
-
-    private final ObjectProperty<TableView<S>> tableView = new SimpleObjectProperty<>(this, "tableView");
-
-    public final ObjectProperty<TableView<S>> tableViewProperty() {
+    public TableView<S> getTableView() {
         return tableView;
     }
 
-    public final TableView<S> getTableView() {
-        return tableView.get();
+    public final FilteredList<S> getFilteredItems() {
+        return filteredItems;
     }
 
-    public final void setTableView(TableView<S> table) {
-        tableView.set(table);
+    private final ListProperty<S> items = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+    public final ObservableList<S> getItems() {
+        return items.get();
+    }
+
+    public final ListProperty<S> itemsProperty() {
+        return items;
+    }
+
+    public final void setItems(ObservableList<S> items) {
+        this.items.set(items);
     }
 
     private final ObservableList<ColumnValuesList<S, ?>> columnValuesLists = FXCollections.observableArrayList();
@@ -89,35 +94,25 @@ public class ColumnBrowser<S> extends Control {
         return columnValuesLists;
     }
 
-    private void filter() {
-        Predicate<S> predicate = createPredicate();
-        if (predicate == null) {
-            filteredItems.setAll(items);
-        } else {
-            filteredItems.setAll(items.filtered(predicate));
-        }
+    private ObjectProperty<Predicate<S>> predicate = new SimpleObjectProperty<>(this, "predicate");
+
+    public Predicate<S> getPredicate() {
+        return predicate.get();
     }
 
-    private Predicate<S> createPredicate() {
-        Predicate<S> predicate = null;
-
-        for (ColumnValuesList<S, ?> list : getColumnValuesLists()) {
-            if (predicate == null) {
-                predicate = list.getPredicate();
-            } else {
-                predicate = predicate.and(list.getPredicate());
-            }
-        }
-
+    public ObjectProperty<Predicate<S>> predicateProperty() {
         return predicate;
     }
 
-    ColumnValuesList<S, ?> getParentValuesList(ColumnValuesList<S, ?> list) {
-        int index = columnValuesLists.indexOf(list);
-        if (index > 0) {
-            return columnValuesLists.get(index - 1);
-        }
+    public void setPredicate(Predicate<S> predicate) {
+        this.predicate.set(predicate);
+    }
 
-        return null;
+    private void updatePredicate() {
+        Predicate<S> predicate = item -> true;
+        for (ColumnValuesList<S, ?> columnValuesList : columnValuesLists) {
+            predicate = predicate.and(columnValuesList.getPredicate());
+        }
+        setPredicate(predicate);
     }
 }

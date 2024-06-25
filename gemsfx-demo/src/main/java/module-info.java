@@ -19,6 +19,7 @@ module com.dlsc.gemsfx.demo {
 
     requires fr.brouillard.oss.cssfx;
     requires net.synedra.validatorfx;
+    requires org.apache.commons.lang3;
 
     exports com.dlsc.gemsfx.demo;
     exports com.dlsc.gemsfx.demo.binding;
