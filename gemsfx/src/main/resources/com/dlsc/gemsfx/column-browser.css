@@ -1,10 +1,15 @@
-.list-header {
-	-fx-padding: 0.0 5.0 0.0 5.0;
+.column-browser-table-view > .split-pane .list-views-box {
+    -fx-min-height: 200px;
+    -fx-max-height: 300px;
+}
+
+.list-view-header {
+	-fx-padding: 5.0 5.0 5.0 5.0;
 	-fx-background-color: -fx-body-color;
 	-fx-border-color: 
-        derive(-fx-base, 80%) 
+        derive(-fx-base, 80%)
         linear-gradient(to bottom, derive(-fx-base,80%) 20%, derive(-fx-base,-10%) 90%)
-        derive(-fx-base, 10%) 
+        derive(-fx-base, 10%)
         linear-gradient(to bottom, derive(-fx-base,80%) 20%, derive(-fx-base,-10%) 90%),
         /* Outer border: */
         transparent -fx-box-border -fx-box-border transparent;

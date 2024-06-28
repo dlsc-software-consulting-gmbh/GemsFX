@@ -3,13 +3,16 @@
  * <p>
  * This file is part of FlexGanttFX.
  */
-package com.dlsc.gemsfx.incubator.columnbrowser;
+package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.skins.ColumnBrowserTableViewSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -23,7 +26,7 @@ import javafx.scene.control.TableView;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-public class ColumnBrowser<S> extends Control {
+public class ColumnBrowserTableView<S> extends Control {
 
     private final InvalidationListener filterListener = evt -> updatePredicate();
 
@@ -32,8 +35,8 @@ public class ColumnBrowser<S> extends Control {
     private final TableView<S> tableView;
     private final FilteredList<S> filteredItems;
 
-    public ColumnBrowser() {
-        getStylesheets().add(Objects.requireNonNull(ColumnBrowser.class.getResource("column-browser-view.css")).toExternalForm());
+    public ColumnBrowserTableView() {
+        getStyleClass().add("column-browser-table-view");
 
         filteredItems = new FilteredList<>(itemsProperty());
         filteredItems.predicateProperty().bind(predicateProperty());
@@ -41,12 +44,12 @@ public class ColumnBrowser<S> extends Control {
         tableView = createTableView();
         tableView.setItems(filteredItems);
 
-        getColumnValuesLists().addListener((ListChangeListener<ColumnValuesList<?, ?>>) c -> {
+        getColumnValuesLists().addListener((ListChangeListener<ColumnBrowserListView<?, ?>>) c -> {
             while (c.next()) {
-                for (ColumnValuesList<?, ?> list : c.getAddedSubList()) {
+                for (ColumnBrowserListView<?, ?> list : c.getAddedSubList()) {
                     list.getListView().getSelectionModel().selectedIndexProperty().addListener(weakFilterListener);
                 }
-                for (ColumnValuesList<?, ?> list : c.getRemoved()) {
+                for (ColumnBrowserListView<?, ?> list : c.getRemoved()) {
                     list.getListView().getSelectionModel().selectedIndexProperty().removeListener(weakFilterListener);
                 }
             }
@@ -62,8 +65,13 @@ public class ColumnBrowser<S> extends Control {
     }
 
     @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(ColumnBrowserTableView.class.getResource("column-browser.css")).toExternalForm();
+    }
+
+    @Override
     protected Skin<?> createDefaultSkin() {
-        return new ColumnBrowserSkin<>(this);
+        return new ColumnBrowserTableViewSkin<>(this);
     }
 
     public TableView<S> getTableView() {
@@ -72,6 +80,20 @@ public class ColumnBrowser<S> extends Control {
 
     public final FilteredList<S> getFilteredItems() {
         return filteredItems;
+    }
+
+    private final DoubleProperty dividerPosition = new SimpleDoubleProperty(this, "dividerPosition", .2);
+
+    public final double getDividerPosition() {
+        return dividerPosition.get();
+    }
+
+    public final DoubleProperty dividerPositionProperty() {
+        return dividerPosition;
+    }
+
+    public final void setDividerPosition(double dividerPosition) {
+        this.dividerPosition.set(dividerPosition);
     }
 
     private final ListProperty<S> items = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -88,9 +110,9 @@ public class ColumnBrowser<S> extends Control {
         this.items.set(items);
     }
 
-    private final ObservableList<ColumnValuesList<S, ?>> columnValuesLists = FXCollections.observableArrayList();
+    private final ObservableList<ColumnBrowserListView<S, ?>> columnValuesLists = FXCollections.observableArrayList();
 
-    public final ObservableList<ColumnValuesList<S, ?>> getColumnValuesLists() {
+    public final ObservableList<ColumnBrowserListView<S, ?>> getColumnValuesLists() {
         return columnValuesLists;
     }
 
@@ -110,7 +132,7 @@ public class ColumnBrowser<S> extends Control {
 
     private void updatePredicate() {
         Predicate<S> predicate = item -> true;
-        for (ColumnValuesList<S, ?> columnValuesList : columnValuesLists) {
+        for (ColumnBrowserListView<S, ?> columnValuesList : columnValuesLists) {
             predicate = predicate.and(columnValuesList.getPredicate());
         }
         setPredicate(predicate);

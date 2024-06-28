@@ -1,10 +1,6 @@
-/**
- * Copyright (C) 2014, 2015 Dirk Lemmermann Software & Consulting (dlsc.com)
- *
- * This file is part of FlexGanttFX.
- */
-package com.dlsc.gemsfx.incubator.columnbrowser;
+package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.skins.ColumnBrowserListViewSkin;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -14,38 +10,73 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 
-public class ColumnValuesList<S, T> extends Control {
+public class ColumnBrowserListView<S, T> extends Control {
 
 	private final ListView<T> listView;
 
-	public ColumnValuesList() {
+	public ColumnBrowserListView() {
 		SortedList<T> sortedList = new SortedList<>(itemsProperty());
 		sortedList.comparatorProperty().bind(comparatorProperty());
 
 		this.listView = createListView();
 		this.listView.setItems(sortedList);
 		this.listView.getSelectionModel().setSelectionMode(MULTIPLE);
+
+		Label label = new Label();
+		label.getStyleClass().add("list-view-header");
+		label.setMinWidth(0);
+		label.setMaxWidth(Double.MAX_VALUE);
+		label.textProperty().bind(textProperty());
+		label.setOnMouseClicked(evt -> listView.getSelectionModel().clearSelection());
+
+		setHeader(label);
 	}
 
-	public ColumnValuesList(String text) {
+	public ColumnBrowserListView(String text) {
 		this();
 		setText(text);
 	}
 
-	protected ListView<T> createListView() {
-		return new ListView<>();
+	@Override
+	protected Skin<?> createDefaultSkin() {
+		return new ColumnBrowserListViewSkin<>(this);
 	}
 
 	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new ColumnValuesListSkin<>(this);
+	public String getUserAgentStylesheet() {
+		return Objects.requireNonNull(ColumnBrowserTableView.class.getResource("column-browser.css")).toExternalForm();
+	}
+
+	protected ListView<T> createListView() {
+        return new ListView<>();
+	}
+
+	private final ObjectProperty<Node> header = new SimpleObjectProperty<>(this, "header");
+
+	public final Node getHeader() {
+		return header.get();
+	}
+
+	/**
+	 * A node / view that will be shown at the top of the list view.
+	 *
+	 * @return a header node / view
+	 */
+	public final ObjectProperty<Node> headerProperty() {
+		return header;
+	}
+
+	public final void setHeader(Node header) {
+		this.header.set(header);
 	}
 
 	private final ObjectProperty<Comparator<T>> comparator = new SimpleObjectProperty<>(this, "comparator", Comparator.comparing(Object::toString));

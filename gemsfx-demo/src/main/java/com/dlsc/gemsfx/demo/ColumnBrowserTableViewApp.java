@@ -1,7 +1,8 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.incubator.columnbrowser.ColumnBrowser;
-import com.dlsc.gemsfx.incubator.columnbrowser.ColumnValuesList;
+import com.dlsc.gemsfx.ColumnBrowserListView;
+import com.dlsc.gemsfx.ColumnBrowserTableView;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -26,12 +27,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.prefs.Preferences;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang3.StringUtils;
 
-public class ColumnBrowserApp extends Application {
+public class ColumnBrowserTableViewApp extends Application {
 
     @Override
     public void start(Stage stage) {
@@ -45,7 +47,7 @@ public class ColumnBrowserApp extends Application {
         castColumn.setCellValueFactory(new PropertyValueFactory<>("cast"));
         yearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
 
-        ColumnBrowser<Movie> columnBrowser = new ColumnBrowser<>();
+        ColumnBrowserTableView<Movie> columnBrowser = new ColumnBrowserTableView<>();
         List<Movie> movies = parseMoviesFile();
         System.out.println("number of movies: " + movies.size());
         columnBrowser.getItems().setAll(movies);
@@ -53,9 +55,9 @@ public class ColumnBrowserApp extends Application {
         TableView<Movie> tableView = columnBrowser.getTableView();
         tableView.getColumns().setAll(List.of(titleColumn, genreColumn, yearColumn, castColumn));
 
-        ColumnValuesList<Movie, String> genreList = new ColumnValuesList<>("Genre");
-        ColumnValuesList<Movie, String> castList = new ColumnValuesList<>("Cast");
-        ColumnValuesList<Movie, Integer> yearList = new ColumnValuesList<>("Year");
+        ColumnBrowserListView<Movie, String> genreList = new ColumnBrowserListView<>("Genre");
+        ColumnBrowserListView<Movie, String> castList = new ColumnBrowserListView<>("Cast");
+        ColumnBrowserListView<Movie, Integer> yearList = new ColumnBrowserListView<>("Year");
 
         genreList.getItems().setAll(movies.stream().flatMap(movie -> movie.getGenreList().stream()).distinct().toList());
         castList.getItems().setAll(movies.stream().flatMap(movie -> movie.getCastList().stream()).distinct().filter(removeMoviesWithBadCastData()).toList());
@@ -147,9 +149,10 @@ public class ColumnBrowserApp extends Application {
 
         stage.setTitle("Column Browser");
         stage.setScene(scene);
-        stage.setWidth(1000);
-        stage.setHeight(850);
         stage.centerOnScreen();
+
+        StageManager.install(stage, Preferences.userNodeForPackage(getClass()).node("column-browser-app14"), 1000, 850);
+
         stage.show();
 
         Platform.runLater(() -> tableView.getSelectionModel().select(0));
@@ -251,7 +254,7 @@ public class ColumnBrowserApp extends Application {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            return objectMapper.readValue(ColumnBrowserApp.class.getResource(name), new TypeReference<>() {
+            return objectMapper.readValue(ColumnBrowserTableViewApp.class.getResource(name), new TypeReference<>() {
             });
         } catch (IOException e) {
             e.printStackTrace();
