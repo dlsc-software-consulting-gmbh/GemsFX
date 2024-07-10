@@ -166,6 +166,33 @@ public class SessionManager {
         };
         addListener(property, listener);
     }
+
+    /**
+     * Unregisters all listeners created by SessionManager for the specified property.
+     *
+     * @param property the property to unregister
+     */
+    public void unregister(Property property) {
+        var listeners = propertyToListeners.get(property);
+        if (listeners != null) {
+            listeners.forEach(listener -> property.removeListener(listener));
+            listeners.clear();
+            propertyToListeners.remove(property);
+        }
+    }
+
+    /**
+     * Unregisters all listeners created by SessionManager.
+     *
+     */
+    public void unregisterAll() {
+        for (var entry : propertyToListeners.entrySet()) {
+            entry.getValue().forEach(listener -> entry.getKey().removeListener(listener));
+            entry.getValue().clear();
+        }
+        propertyToListeners.clear();
+    }
+
     private void addListener(Property property, ChangeListener listener) {
         property.addListener(listener);
         propertyToListeners.computeIfAbsent(property, k -> new ArrayList<>()).add(listener);
