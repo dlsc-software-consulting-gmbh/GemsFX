@@ -30,7 +30,8 @@ public class CalendarPickerSkin extends ToggleVisibilityComboBoxSkin<CalendarPic
 
         picker.valueProperty().addListener(it -> {
             if (view != null) {
-                view.setYearMonth(YearMonth.from(picker.getValue()));
+                LocalDate date = picker.getValue();
+                view.setYearMonth(date == null ? YearMonth.now() : YearMonth.from(date));
             }
         });
 

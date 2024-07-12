@@ -61,7 +61,10 @@ public class CalendarPickerApp extends Application {
         HBox buttonDisplayBox = new HBox(10, buttonDisplayLabel, buttonDisplayComboBox);
         buttonDisplayBox.setAlignment(Pos.CENTER_LEFT);
 
-        VBox vBox = new VBox(10, popupButtons, calendarPicker, valueLabel, editable, disable, disabledWeekendBox, showTodayButton, buttonDisplayBox);
+        Button clearDateButton = new Button("Clear Date");
+        clearDateButton.setOnAction(evt -> calendarPicker.setValue(null));
+
+        VBox vBox = new VBox(10, popupButtons, calendarPicker, valueLabel, editable, disable, disabledWeekendBox, showTodayButton, clearDateButton, buttonDisplayBox);
         vBox.setAlignment(Pos.TOP_LEFT);
         vBox.setPadding(new Insets(20));
 
