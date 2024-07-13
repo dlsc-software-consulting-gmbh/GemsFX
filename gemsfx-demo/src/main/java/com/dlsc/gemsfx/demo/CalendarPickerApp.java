@@ -26,7 +26,7 @@ public class CalendarPickerApp extends Application {
         calendarPicker.setValue(LocalDate.now());
 
         Label valueLabel = new Label();
-        valueLabel.textProperty().bind(Bindings.createStringBinding(() -> calendarPicker.getConverter().toString(calendarPicker.getValue()), calendarPicker.valueProperty()));
+        valueLabel.textProperty().bind(Bindings.createStringBinding(() -> calendarPicker.getValue() == null ? "No Date Selected" : calendarPicker.getConverter().toString(calendarPicker.getValue()), calendarPicker.valueProperty()));
 
         CheckBox editable = new CheckBox("Editable");
         editable.selectedProperty().bindBidirectional(calendarPicker.editableProperty());
@@ -61,7 +61,10 @@ public class CalendarPickerApp extends Application {
         HBox buttonDisplayBox = new HBox(10, buttonDisplayLabel, buttonDisplayComboBox);
         buttonDisplayBox.setAlignment(Pos.CENTER_LEFT);
 
-        VBox vBox = new VBox(10, popupButtons, calendarPicker, valueLabel, editable, disable, disabledWeekendBox, showTodayButton, buttonDisplayBox);
+        Button clearDateButton = new Button("Clear Date");
+        clearDateButton.setOnAction(evt -> calendarPicker.setValue(null));
+
+        VBox vBox = new VBox(10, popupButtons, calendarPicker, valueLabel, clearDateButton, editable, disable, disabledWeekendBox, showTodayButton, buttonDisplayBox);
         vBox.setAlignment(Pos.TOP_LEFT);
         vBox.setPadding(new Insets(20));
 
