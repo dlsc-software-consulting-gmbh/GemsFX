@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import javafx.beans.property.*;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -46,10 +47,10 @@ public class SessionManager {
     public void register(String path, DoubleProperty property) {
         LOG.fine("registering double property at path " + path);
         property.set(preferences.getDouble(path, property.get()));
-        initializePreferences(path, property);
-        var listener = (ChangeListener<Number>) (it, oldValue, newValue) -> {
+        putPropertyValueIntoPreferences(path, property);
+        ChangeListener<Double> listener = (it, oldValue, newValue) -> {
             if (newValue != null) {
-                preferences.putDouble(path, newValue.doubleValue());
+                preferences.putDouble(path, newValue);
             } else {
                 preferences.remove(path);
             }
@@ -68,10 +69,10 @@ public class SessionManager {
     public void register(String path, IntegerProperty property) {
         LOG.fine("registering integer property at path " + path);
         property.set(preferences.getInt(path, property.get()));
-        initializePreferences(path, property);
-        var listener = (ChangeListener<Number>) (it, oldValue, newValue) -> {
+        putPropertyValueIntoPreferences(path, property);
+        ChangeListener<Integer> listener = (it, oldValue, newValue) -> {
             if (newValue != null) {
-                preferences.putInt(path, newValue.intValue());
+                preferences.putInt(path, newValue);
             } else {
                 preferences.remove(path);
             }
@@ -90,10 +91,10 @@ public class SessionManager {
     public void register(String path, FloatProperty property) {
         LOG.fine("registering float property at path " + path);
         property.set(preferences.getFloat(path, property.get()));
-        initializePreferences(path, property);
-        var listener = (ChangeListener<Number>) (it, oldValue, newValue) -> {
+        putPropertyValueIntoPreferences(path, property);
+        ChangeListener<Float> listener = (it, oldValue, newValue) -> {
             if (newValue != null) {
-                preferences.putFloat(path, newValue.floatValue());
+                preferences.putFloat(path, newValue);
             } else {
                 preferences.remove(path);
             }
@@ -112,10 +113,10 @@ public class SessionManager {
     public void register(String path, LongProperty property) {
         LOG.fine("registering long property at path " + path);
         property.set(preferences.getLong(path, property.get()));
-        initializePreferences(path, property);
-        var listener = (ChangeListener<Number>) (it, oldValue, newValue) -> {
+        putPropertyValueIntoPreferences(path, property);
+        ChangeListener<Long> listener = (it, oldValue, newValue) -> {
             if (newValue != null) {
-                preferences.putLong(path, newValue.longValue());
+                preferences.putLong(path, newValue);
             } else {
                 preferences.remove(path);
             }
@@ -134,8 +135,8 @@ public class SessionManager {
     public void register(String path, BooleanProperty property) {
         LOG.fine("registering boolean property at path " + path);
         property.set(preferences.getBoolean(path, property.get()));
-        initializePreferences(path, property);
-        var listener = (ChangeListener<Boolean>) (it, oldValue, newValue) -> {
+        putPropertyValueIntoPreferences(path, property);
+        ChangeListener<Boolean> listener = (it, oldValue, newValue) -> {
             if (newValue != null) {
                 preferences.putBoolean(path, newValue);
             } else {
@@ -156,8 +157,8 @@ public class SessionManager {
     public void register(String path, StringProperty property) {
         LOG.fine("registering string property at path " + path);
         property.set(preferences.get(path, property.get()));
-        initializePreferences(path, property);
-        var listener = (ChangeListener<String>) (it, oldValue, newValue) -> {
+        putPropertyValueIntoPreferences(path, property);
+        ChangeListener<String> listener = (it, oldValue, newValue) -> {
             if (newValue != null) {
                 preferences.put(path, newValue);
             } else {
@@ -173,7 +174,7 @@ public class SessionManager {
      * @param property the property to unregister
      */
     public void unregister(Property property) {
-        var listeners = propertyToListeners.get(property);
+        ArrayList<ChangeListener> listeners = propertyToListeners.get(property);
         if (listeners != null) {
             listeners.forEach(listener -> property.removeListener(listener));
             listeners.clear();
@@ -186,7 +187,7 @@ public class SessionManager {
      *
      */
     public void unregisterAll() {
-        for (var entry : propertyToListeners.entrySet()) {
+        for (Map.Entry<Property, ArrayList<ChangeListener>> entry : propertyToListeners.entrySet()) {
             entry.getValue().forEach(listener -> entry.getKey().removeListener(listener));
             entry.getValue().clear();
         }
@@ -198,8 +199,8 @@ public class SessionManager {
         propertyToListeners.computeIfAbsent(property, k -> new ArrayList<>()).add(listener);
     }
 
-    private void initializePreferences(String path, Property property) {
-        var value = property.getValue();
+    private void putPropertyValueIntoPreferences(String path, Property property) {
+        Object value = property.getValue();
         if (value instanceof Boolean b) {
             preferences.putBoolean(path, b);
         } else if (value instanceof Double d) {
