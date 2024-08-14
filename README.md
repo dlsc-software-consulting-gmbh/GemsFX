@@ -426,6 +426,11 @@ another.
 
 ![MultiColumnListView](gemsfx/docs/multi-column-list-view.png)
 
+## Text View
+
+The TextView control can be used for displaying multi-line text. It includes the ability to select and 
+copy text. Limitation: the user can select only words, not parts of a word.
+
 ## Running the demos
 
 You can run the demos using Maven by typing any of the following lines into your
