@@ -6,6 +6,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.MapChangeListener;
+import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
@@ -31,7 +32,11 @@ public class TextView extends Control {
     public TextView() {
         getStyleClass().add("text-view");
 
-        listenPropertySelectedTextChanged();
+        getProperties().addListener((MapChangeListener<Object, Object>) change -> {
+            if (change.getKey().equals("selected.text")) {
+                selectedText.set((String) change.getValueAdded());
+            }
+        });
 
         addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
             if (KeyCodeCombination.keyCombination("shortcut+c").match(evt)) {
@@ -51,10 +56,13 @@ public class TextView extends Control {
 
         setOnContextMenuRequested(evt -> {
             if (getContextMenu() == null) {
-                // i18n approach copied from TextInputControlBehavior
-                MenuItem copyItem = new MenuItem("Copy");
-                copyItem.setOnAction(e -> copySelection());
-                ContextMenu contextMenu = new ContextMenu(copyItem);
+                MenuItem copySelectionItem = new MenuItem("Copy Selection");
+                copySelectionItem.setOnAction(e -> copySelection());
+
+                MenuItem copyAllItem = new MenuItem("Copy All");
+                copyAllItem.setOnAction(e -> copyAll());
+
+                ContextMenu contextMenu = new ContextMenu(copyAllItem, copySelectionItem);
                 setContextMenu(contextMenu);
                 contextMenu.show(this, evt.getScreenX(), evt.getScreenY());
             }
@@ -72,6 +80,11 @@ public class TextView extends Control {
     }
 
     @Override
+    public Orientation getContentBias() {
+        return Orientation.HORIZONTAL;
+    }
+
+    @Override
     protected Skin<?> createDefaultSkin() {
         return new TextViewSkin(this);
     }
@@ -86,9 +99,21 @@ public class TextView extends Control {
      * that applications can implement their own logic.
      */
     public void copySelection() {
+        doCopy(getSelectedText());
+    }
+
+    /**
+     * Copy the entire text to the clipboard. This method is intentionally non-final so
+     * that applications can implement their own logic.
+     */
+    public void copyAll() {
+        doCopy(getText());
+    }
+
+    private void doCopy(String text) {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
-        content.putString(getSelectedText());
+        content.putString(text);
         clipboard.setContent(content);
     }
 
@@ -98,6 +123,8 @@ public class TextView extends Control {
     public final void clearSelection() {
         selectedText.set(null);
     }
+
+    // text
 
     private final StringProperty text = new SimpleStringProperty(this, "text");
 
@@ -118,6 +145,8 @@ public class TextView extends Control {
         textProperty().set(text);
     }
 
+    // selected text
+
     private final ReadOnlyStringWrapper selectedText = new ReadOnlyStringWrapper(this, "selectedText");
 
     /**
@@ -131,14 +160,5 @@ public class TextView extends Control {
 
     public final ReadOnlyStringProperty selectedTextProperty() {
         return selectedText.getReadOnlyProperty();
-    }
-
-    // listeners
-    private void listenPropertySelectedTextChanged() {
-        getProperties().addListener((MapChangeListener<Object, Object>) change -> {
-            if (change.getKey().equals("selected.text")) {
-                selectedText.set((String) change.getValueAdded());
-            }
-        });
     }
 }

@@ -88,11 +88,9 @@ public class TextViewSkin extends SkinBase<TextView> {
         getChildren().addAll(selectionContainer, textsContainer);
     }
 
-
     @Override
-    protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
-        textsContainer.resizeRelocate(contentX, contentY, contentWidth, contentHeight);
-        selectionContainer.resizeRelocate(contentX, contentY, contentWidth, contentHeight);
+    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return textsContainer.prefHeight(width - leftInset - rightInset);
     }
 
     /**

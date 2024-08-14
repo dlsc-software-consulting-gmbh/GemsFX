@@ -18,6 +18,7 @@ public class TextViewApp extends Application {
     @Override
     public void start(Stage stage) {
         TextView textView = new TextView("Lorem ipsum dolor sit amet consectetur adipiscing elit nunc hendrerit purus, nisi dapibus primis nibh volutpat fringilla ad nisl urna posuere, cubilia sagittis egestas pharetra sociis montes nullam netus erat. Fusce mauris condimentum neque morbi nunc ligula pretium vehicula nulla, platea dictum mus sapien pulvinar eget porta mi praesent, orci hac dignissim suscipit imperdiet sem per a. Mauris pellentesque dui vitae velit netus venenatis diam felis urna ultrices, potenti pretium sociosqu eros dictumst dis aenean nibh cursus, leo sagittis integer nullam malesuada aliquet et metus vulputate. Interdum facilisis congue ac proin libero mus ullamcorper mauris leo imperdiet eleifend porta, posuere dignissim erat tincidunt vehicula habitant taciti porttitor scelerisque laoreet neque. Habitant etiam cubilia tempor inceptos ad aptent est et varius, vitae imperdiet phasellus feugiat class purus curabitur ullamcorper maecenas, venenatis mollis fusce cras leo eros metus proin. Fusce aenean sociosqu dis habitant mi sapien inceptos, orci lacinia nisi nascetur convallis at erat sociis, purus integer arcu feugiat sollicitudin libero.");
+
         textView.setPrefWidth(400);
         HBox.setHgrow(textView, Priority.ALWAYS);
 
@@ -32,8 +33,8 @@ public class TextViewApp extends Application {
         Button clear = new Button("Clear Selection");
         clear.setOnAction(evt -> textView.clearSelection());
 
-        Button copy = new Button("Copy Selection to Clipboard");
-        copy.setOnAction(evt -> textView.copySelection());
+        Button copyAll = new Button("Copy entire text to clipboard");
+        copyAll.setOnAction(evt -> textView.copyAll());
 
         ColumnConstraints col1 = new ColumnConstraints();
         col1.setPercentWidth(25);
@@ -57,7 +58,7 @@ public class TextViewApp extends Application {
         controls.add(selectedText, 1, 1);
 
         controls.add(clear, 1, 2);
-        controls.add(copy, 1, 3);
+        controls.add(copyAll, 1, 3);
 
         HBox hBox = new HBox(10, textView, controls);
         hBox.setPadding(new Insets(20));
