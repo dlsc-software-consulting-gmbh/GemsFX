@@ -31,6 +31,7 @@
 
     <properties>
         <main.class>com.dlsc.gemsfx.demo.TimePickerApp</main.class>
+        <deploy.skip>true</deploy.skip>
     </properties>
 
     <build>
