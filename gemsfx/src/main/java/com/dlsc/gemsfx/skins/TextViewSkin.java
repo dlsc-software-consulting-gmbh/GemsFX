@@ -1,6 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.CustomLabel;
+import com.dlsc.gemsfx.TextView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
@@ -23,50 +23,58 @@ import java.util.TreeSet;
 /**
  * A custom label Skin that allows you to select a text to be copied to the clipboard
  */
-public class CustomLabelSkin extends SkinBase<CustomLabel> {
+public class TextViewSkin extends SkinBase<TextView> {
 
     private static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
+
     /**
-     * Panels that will be used as main by the custom label skin
+     * Panel that will be used as for rendering the actual text of the view.
      */
     private final TextFlow textsContainer = new TextFlow();
+
+    /**
+     * Lays out the selection nodes.
+     */
     private final Pane selectionContainer = new Pane();
 
     /**
      * Arrangement of the words contained in the text
      */
     private final List<Text> texts = new ArrayList<>();
+
     /**
      * Set of indices of the words that have been selected
      */
     private final Set<Integer> selectedIndices = new TreeSet<>();
+
     /**
-     * String property used to automatically change the text of the CustomLabel
+     * String property used to automatically change the text of the TextView
      */
     private final StringProperty selectedText = new SimpleStringProperty();
 
     /**
-     * Instances a new Custom Label Skin, value CustomLabel
+     * Instances a new Custom Label Skin, value TextView
      */
-    public CustomLabelSkin(CustomLabel control) {
+    public TextViewSkin(TextView control) {
         super(control);
 
         textsContainer.getStyleClass().add("text-container");
         selectionContainer.getStyleClass().add("selection-container");
 
-        selectedText.addListener(obs -> control.getProperties().put("selectedText", selectedText.get()));
+        selectedText.addListener(obs -> control.getProperties().put("selected.text", selectedText.get()));
 
         SelectionHandler selectionHandler = new SelectionHandler();
         control.setOnMouseDragged(selectionHandler);
         control.setOnMousePressed(selectionHandler);
         control.setOnMouseReleased(selectionHandler);
         control.textProperty().addListener(obs -> buildView(control.getText()));
-        buildView(control.getText());
         control.selectedTextProperty().addListener(obs -> {
             if (control.getSelectedText() == null) {
                 clearSelection();
             }
         });
+
+        buildView(control.getText());
 
         /*
          * Defines the overlays of the main panels
@@ -92,64 +100,58 @@ public class CustomLabelSkin extends SkinBase<CustomLabel> {
      */
     private void buildView(String text) {
         texts.clear();
+
         if (text != null && !text.isEmpty()) {
+
             StringBuilder spaces = new StringBuilder();
             StringBuilder word = new StringBuilder();
             StringBuilder special = new StringBuilder();
+
             for (int i = 0; i < text.length(); i++) {
                 char character = text.charAt(i);
                 if (isSpaceCharacter(character)) {
                     spaces.append(character);
                     if (!word.isEmpty()) {
                         addText(word);
-                    }
-                    else if (!special.isEmpty()) {
+                    } else if (!special.isEmpty()) {
                         addText(special);
                     }
-                }
-                else if (isSpecialCharacter(character)) {
+                } else if (isSpecialCharacter(character)) {
                     special.append(character);
                     if (!word.isEmpty()) {
                         addText(word);
-                    }
-                    else if (!spaces.isEmpty()) {
+                    } else if (!spaces.isEmpty()) {
                         addText(spaces);
                     }
-                }
-                else if (isLineBreakCharacter(character)) {
+                } else if (isLineBreakCharacter(character)) {
                     if (!word.isEmpty()) {
                         addText(word);
-                    }
-                    else if (!spaces.isEmpty()) {
+                    } else if (!spaces.isEmpty()) {
                         addText(spaces);
-                    }
-                    else if (!special.isEmpty()) {
+                    } else if (!special.isEmpty()) {
                         addText(special);
                     }
                     StringBuilder line = new StringBuilder();
                     line.append(character);
                     addText(line);
-                }
-                else {
+                } else {
                     word.append(character);
                     if (!spaces.isEmpty()) {
                         addText(spaces);
-                    }
-                    else if (!special.isEmpty()) {
+                    } else if (!special.isEmpty()) {
                         addText(special);
                     }
                 }
             }
             if (!word.isEmpty()) {
                 addText(word);
-            }
-            else if (!special.isEmpty()) {
+            } else if (!special.isEmpty()) {
                 addText(special);
-            }
-            else if (!spaces.isEmpty()) {
+            } else if (!spaces.isEmpty()) {
                 addText(spaces);
             }
         }
+
         textsContainer.getChildren().setAll(texts);
         clearSelection();
     }
@@ -174,7 +176,7 @@ public class CustomLabelSkin extends SkinBase<CustomLabel> {
 
         for (int index : selectedIndices) {
             if (index < 0 || index > texts.size()) {
-                continue; // Just for safety
+                continue;
             }
 
             Text text = texts.get(index);
@@ -258,26 +260,27 @@ public class CustomLabelSkin extends SkinBase<CustomLabel> {
         public void handle(MouseEvent evt) {
             if (evt.getEventType() == MouseEvent.MOUSE_DRAGGED) {
                 handleMouseDragged(evt);
-            }
-            else if (evt.getEventType() == MouseEvent.MOUSE_PRESSED) {
+            } else if (evt.getEventType() == MouseEvent.MOUSE_PRESSED) {
                 handleMousePressed(evt);
-            }
-            else if (evt.getEventType() == MouseEvent.MOUSE_RELEASED) {
+            } else if (evt.getEventType() == MouseEvent.MOUSE_RELEASED) {
                 handleMouseReleased(evt);
             }
 
         }
 
         private void handleMouseDragged(MouseEvent evt) {
-            if (evt.getPickResult().getIntersectedNode() instanceof Text) {
-                Text text = (Text) evt.getPickResult().getIntersectedNode();
+            if (evt.getPickResult().getIntersectedNode() instanceof Text text) {
                 addSelectedIndex(texts.indexOf(text));
             }
         }
 
         private void handleMousePressed(MouseEvent evt) {
-            if (evt.getPickResult().getIntersectedNode() instanceof Text) {
-                Text text = (Text) evt.getPickResult().getIntersectedNode();
+            if (evt.isPopupTrigger()) {
+                return;
+            }
+            getSkinnable().requestFocus();
+
+            if (evt.getPickResult().getIntersectedNode() instanceof Text text) {
                 int index = texts.indexOf(text);
                 if (index >= 0) {
                     firstIndex = index;
@@ -290,6 +293,9 @@ public class CustomLabelSkin extends SkinBase<CustomLabel> {
         }
 
         private void handleMouseReleased(MouseEvent evt) {
+            if (evt.isPopupTrigger()) {
+                return;
+            }
             firstIndex = null;
         }
 

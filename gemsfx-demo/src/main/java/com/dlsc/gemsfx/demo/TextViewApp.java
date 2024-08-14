@@ -1,6 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.CustomLabel;
+import com.dlsc.gemsfx.TextView;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -13,28 +13,27 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
-public class CustomLabelApp extends Application {
+public class TextViewApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        CustomLabel customLabel = new CustomLabel("Lorem ipsum dolor sit amet consectetur adipiscing elit nunc hendrerit purus, nisi dapibus primis nibh volutpat fringilla ad nisl urna posuere, cubilia sagittis egestas pharetra sociis montes nullam netus erat. Fusce mauris condimentum neque morbi nunc ligula pretium vehicula nulla, platea dictum mus sapien pulvinar eget porta mi praesent, orci hac dignissim suscipit imperdiet sem per a. Mauris pellentesque dui vitae velit netus venenatis diam felis urna ultrices, potenti pretium sociosqu eros dictumst dis aenean nibh cursus, leo sagittis integer nullam malesuada aliquet et metus vulputate." +
-                "Interdum facilisis congue ac proin libero mus ullamcorper mauris leo imperdiet eleifend porta, posuere dignissim erat tincidunt vehicula habitant taciti porttitor scelerisque laoreet neque. Habitant etiam cubilia tempor inceptos ad aptent est et varius, vitae imperdiet phasellus feugiat class purus curabitur ullamcorper maecenas, venenatis mollis fusce cras leo eros metus proin. Fusce aenean sociosqu dis habitant mi sapien inceptos, orci lacinia nisi nascetur convallis at erat sociis, purus integer arcu feugiat sollicitudin libero.");
-        customLabel.setPrefWidth(400);
-        HBox.setHgrow(customLabel, Priority.ALWAYS);
+        TextView textView = new TextView("Lorem ipsum dolor sit amet consectetur adipiscing elit nunc hendrerit purus, nisi dapibus primis nibh volutpat fringilla ad nisl urna posuere, cubilia sagittis egestas pharetra sociis montes nullam netus erat. Fusce mauris condimentum neque morbi nunc ligula pretium vehicula nulla, platea dictum mus sapien pulvinar eget porta mi praesent, orci hac dignissim suscipit imperdiet sem per a. Mauris pellentesque dui vitae velit netus venenatis diam felis urna ultrices, potenti pretium sociosqu eros dictumst dis aenean nibh cursus, leo sagittis integer nullam malesuada aliquet et metus vulputate. Interdum facilisis congue ac proin libero mus ullamcorper mauris leo imperdiet eleifend porta, posuere dignissim erat tincidunt vehicula habitant taciti porttitor scelerisque laoreet neque. Habitant etiam cubilia tempor inceptos ad aptent est et varius, vitae imperdiet phasellus feugiat class purus curabitur ullamcorper maecenas, venenatis mollis fusce cras leo eros metus proin. Fusce aenean sociosqu dis habitant mi sapien inceptos, orci lacinia nisi nascetur convallis at erat sociis, purus integer arcu feugiat sollicitudin libero.");
+        textView.setPrefWidth(400);
+        HBox.setHgrow(textView, Priority.ALWAYS);
 
         TextArea textField = new TextArea();
         textField.setWrapText(true);
-        textField.textProperty().bindBidirectional(customLabel.textProperty());
+        textField.textProperty().bindBidirectional(textView.textProperty());
 
         Label selectedText = new Label();
         selectedText.setWrapText(true);
-        selectedText.textProperty().bind(customLabel.selectedTextProperty());
+        selectedText.textProperty().bind(textView.selectedTextProperty());
 
         Button clear = new Button("Clear Selection");
-        clear.setOnAction(evt -> customLabel.clearSelection());
+        clear.setOnAction(evt -> textView.clearSelection());
 
         Button copy = new Button("Copy Selection to Clipboard");
-        copy.setOnAction(evt -> customLabel.copySelectionToClipboard());
+        copy.setOnAction(evt -> textView.copySelection());
 
         ColumnConstraints col1 = new ColumnConstraints();
         col1.setPercentWidth(25);
@@ -60,7 +59,7 @@ public class CustomLabelApp extends Application {
         controls.add(clear, 1, 2);
         controls.add(copy, 1, 3);
 
-        HBox hBox = new HBox(10, customLabel, controls);
+        HBox hBox = new HBox(10, textView, controls);
         hBox.setPadding(new Insets(20));
 
         stage.setScene(new Scene(hBox));

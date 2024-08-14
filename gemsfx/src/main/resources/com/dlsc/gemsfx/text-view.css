@@ -1,0 +1,23 @@
+.text-view {
+
+}
+
+.text-view > .text-container {
+
+}
+
+.text-view > .text-container > .text {
+}
+
+.text-view > .text-container > .text:selected {
+    -fx-background: -fx-selection-bar;
+    -fx-fill: -fx-selection-bar-text;
+}
+
+.text-view > .selection-container {
+
+}
+
+.text-view > .selection-container > .selection {
+    -fx-background-color: -fx-selection-bar;
+}
