@@ -267,13 +267,16 @@ public class TextViewSkin extends SkinBase<TextView> {
         }
 
         private void handleMouseDragged(MouseEvent evt) {
+            if (!evt.isPrimaryButtonDown() || evt.isPopupTrigger()) {
+                return;
+            }
             if (evt.getPickResult().getIntersectedNode() instanceof Text text) {
                 addSelectedIndex(texts.indexOf(text));
             }
         }
 
         private void handleMousePressed(MouseEvent evt) {
-            if (evt.isPopupTrigger()) {
+            if (!evt.isPrimaryButtonDown() || evt.isPopupTrigger()) {
                 return;
             }
             getSkinnable().requestFocus();
@@ -291,7 +294,7 @@ public class TextViewSkin extends SkinBase<TextView> {
         }
 
         private void handleMouseReleased(MouseEvent evt) {
-            if (evt.isPopupTrigger()) {
+            if (!evt.isPrimaryButtonDown() || evt.isPopupTrigger()) {
                 return;
             }
             firstIndex = null;
