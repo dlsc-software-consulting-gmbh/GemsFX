@@ -1,326 +1,185 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TextView;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.css.PseudoClass;
-import javafx.event.EventHandler;
-import javafx.geometry.Rectangle2D;
+import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SkinBase;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-/**
- * A custom label Skin that allows you to select a text to be copied to the clipboard
- */
 public class TextViewSkin extends SkinBase<TextView> {
 
-    private static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
+    private final SelectableText selectableText = new SelectableText();
 
-    /**
-     * Panel that will be used as for rendering the actual text of the view.
-     */
-    private final TextFlow textsContainer = new TextFlow();
-
-    /**
-     * Lays out the selection nodes.
-     */
-    private final Pane selectionContainer = new Pane();
-
-    /**
-     * Arrangement of the words contained in the text
-     */
-    private final List<Text> texts = new ArrayList<>();
-
-    /**
-     * Set of indices of the words that have been selected
-     */
-    private final Set<Integer> selectedIndices = new TreeSet<>();
-
-    /**
-     * String property used to automatically change the text of the TextView
-     */
-    private final StringProperty selectedText = new SimpleStringProperty();
-
-    /**
-     * Instances a new Custom Label Skin, value TextView
-     */
     public TextViewSkin(TextView control) {
         super(control);
 
-        textsContainer.getStyleClass().add("text-container");
-        selectionContainer.getStyleClass().add("selection-container");
-
-        selectedText.addListener(obs -> control.getProperties().put("selected.text", selectedText.get()));
-
-        SelectionHandler selectionHandler = new SelectionHandler();
-        control.setOnMouseDragged(selectionHandler);
-        control.setOnMousePressed(selectionHandler);
-        control.setOnMouseReleased(selectionHandler);
-        control.textProperty().addListener(obs -> buildView(control.getText()));
-        control.selectedTextProperty().addListener(obs -> {
-            if (control.getSelectedText() == null) {
-                clearSelection();
+        control.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+            if (KeyCodeCombination.keyCombination("shortcut+c").match(evt)) {
+                control.copySelection();
+            } else if (KeyCodeCombination.keyCombination("shortcut+a").match(evt)) {
+                selectableText.selectAll();
+            } else if (KeyCodeCombination.keyCombination("backspace").match(evt)) {
+                selectableText.removeSelection("shortcut");
             }
         });
 
-        buildView(control.getText());
+        getChildren().setAll(selectableText);
 
-        /*
-         * Defines the overlays of the main panels
-         */
-        selectionContainer.toBack();
-        textsContainer.toFront();
+        control.focusedProperty().addListener(it -> {
+            ContextMenu contextMenu = control.getContextMenu();
+            if (contextMenu != null && contextMenu.isShowing()) {
+                return;
+            }
 
-        control.widthProperty().addListener((obs, oldV, newV) -> buildSelection());
-        control.heightProperty().addListener((obs, oldV, newV) -> buildSelection());
-
-        getChildren().addAll(selectionContainer, textsContainer);
+            if (!control.isFocused()) {
+                selectableText.removeSelection("focus lost");
+            }
+        });
     }
 
     @Override
     protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return textsContainer.prefHeight(width - leftInset - rightInset);
+        return selectableText.prefHeight(width - leftInset - rightInset);
     }
 
-    /**
-     * Separates a text into words and indexes
-     */
-    private void buildView(String text) {
-        texts.clear();
+    private final class SelectableText extends TextFlow {
 
-        if (text != null && !text.isEmpty()) {
+        private final Path wrappingPath = new Path();
 
-            StringBuilder spaces = new StringBuilder();
-            StringBuilder word = new StringBuilder();
-            StringBuilder special = new StringBuilder();
+        private int mouseDragStartPos = -1;
+        private int selectionStartPos = -1;
+        private int selectionEndPos = -1;
+        private final Text text = new Text();
 
-            for (int i = 0; i < text.length(); i++) {
-                char character = text.charAt(i);
-                if (isSpaceCharacter(character)) {
-                    spaces.append(character);
-                    if (!word.isEmpty()) {
-                        addText(word);
-                    } else if (!special.isEmpty()) {
-                        addText(special);
-                    }
-                } else if (isSpecialCharacter(character)) {
-                    special.append(character);
-                    if (!word.isEmpty()) {
-                        addText(word);
-                    } else if (!spaces.isEmpty()) {
-                        addText(spaces);
-                    }
-                } else if (isLineBreakCharacter(character)) {
-                    if (!word.isEmpty()) {
-                        addText(word);
-                    } else if (!spaces.isEmpty()) {
-                        addText(spaces);
-                    } else if (!special.isEmpty()) {
-                        addText(special);
-                    }
-                    StringBuilder line = new StringBuilder();
-                    line.append(character);
-                    addText(line);
+        public SelectableText() {
+            super();
+
+            setCursor(Cursor.TEXT);
+            setPrefWidth(Region.USE_PREF_SIZE);
+
+            text.textProperty().bind(getSkinnable().textProperty());
+            text.getStyleClass().add("text");
+
+            setText(text);
+
+            wrappingPath.setManaged(false);
+            wrappingPath.fillProperty().bind(getSkinnable().highlightFillProperty());
+            wrappingPath.strokeProperty().bind(getSkinnable().highlightStrokeProperty());
+
+            getStyleClass().add("selectable-text");
+            initListeners();
+        }
+
+        public void selectAll() {
+            String t = text.getText();
+            if (StringUtils.isNotBlank(t)) {
+                selectionStartPos = 0;
+                selectionEndPos = t.length();
+                performSelection();
+            }
+        }
+
+        private void initListeners() {
+            setOnMousePressed(e -> {
+                getSkinnable().requestFocus();
+
+                if (!e.isPrimaryButtonDown() || e.isPopupTrigger()) {
+                    return;
+                }
+
+                removeSelection("mouse pressed");
+
+                HitInfo hit = hitTest(new Point2D(e.getX(), e.getY()));
+
+                if (e.isPrimaryButtonDown() && e.getClickCount() == 2) {
+                    // TODO: Double-click selection
+                    return;
                 } else {
-                    word.append(character);
-                    if (!spaces.isEmpty()) {
-                        addText(spaces);
-                    } else if (!special.isEmpty()) {
-                        addText(special);
-                    }
+                    mouseDragStartPos = hit.getCharIndex();
+                }
+            });
+
+            setOnMouseDragged(e -> {
+                if (e.isStillSincePress() || !e.isPrimaryButtonDown()) {
+                    return;
+                }
+                HitInfo hit = hitTest(new Point2D(e.getX(), e.getY()));
+
+                selectionStartPos = Math.min(mouseDragStartPos, hit.getCharIndex());
+                selectionEndPos = Math.max(mouseDragStartPos, hit.getCharIndex());
+
+                performSelection();
+            });
+
+            setOnMouseReleased(e -> {
+                if (!e.getButton().equals(MouseButton.PRIMARY) || e.isPopupTrigger()) {
+                    return;
+                }
+                getSkinnable().getProperties().put("selected.text", getSelectedTextAsString());
+                mouseDragStartPos = -1;
+            });
+
+            widthProperty().addListener((obs, old, val) -> removeSelection("width changed"));
+            heightProperty().addListener((obs, old, val) -> removeSelection("height changed"));
+        }
+
+        private void performSelection() {
+            text.setSelectionStart(selectionStartPos);
+            text.setSelectionEnd(selectionEndPos);
+
+            PathElement[] selectionRange = rangeShape(selectionStartPos, selectionEndPos);
+            wrappingPath.getElements().setAll(selectionRange);
+
+            getSkinnable().getProperties().put("selected.text", getSelectedTextAsString());
+        }
+
+        public void setText(Text text) {
+            if (text != null) {
+                text.setSelectionFill(getSkinnable().getHighlightTextFill());
+            }
+            getChildren().setAll(wrappingPath);
+            getChildren().addAll(text);
+        }
+
+        public void clear() {
+            getChildren().setAll(wrappingPath);
+        }
+
+        public String getSelectedTextAsString() {
+            StringBuilder content = getTextFlowContentAsString();
+            return selectionStartPos >= 0 && selectionEndPos > selectionStartPos
+                    ? content.substring(selectionStartPos, selectionEndPos)
+                    : null;
+        }
+
+        private StringBuilder getTextFlowContentAsString() {
+            StringBuilder sb = new StringBuilder();
+            for (Node node : getChildren()) {
+                if (node instanceof Text t) {
+                    sb.append(t.getText());
                 }
             }
-            if (!word.isEmpty()) {
-                addText(word);
-            } else if (!special.isEmpty()) {
-                addText(special);
-            } else if (!spaces.isEmpty()) {
-                addText(spaces);
-            }
+            return sb;
         }
 
-        textsContainer.getChildren().setAll(texts);
-        clearSelection();
-    }
-
-    private void addText(StringBuilder text) {
-        Text textNode = new Text();
-        textNode.setText(text.toString());
-        textNode.getStyleClass().add("text");
-        texts.add(textNode);
-        text.setLength(0);
-    }
-
-    /**
-     * Iterate over the indices to separate them into regions, which overlap the text
-     */
-    private void buildSelection() {
-        StringBuilder selection = new StringBuilder();
-        Map<Double, List<Rectangle2D>> rectangles = new HashMap<>();
-        List<Region> regions = new ArrayList<>();
-
-        texts.forEach(t -> t.pseudoClassStateChanged(SELECTED, false));
-
-        for (int index : selectedIndices) {
-            if (index < 0 || index > texts.size()) {
-                continue;
-            }
-
-            Text text = texts.get(index);
-            text.pseudoClassStateChanged(SELECTED, true);
-            selection.append(text.getText());
-
-            double x = text.getLayoutX();
-            double y = text.getLayoutY();
-            double w = text.getBoundsInLocal().getWidth();
-            double h = text.getBoundsInLocal().getHeight();
-
-            String txt = text.getText();
-            char[] chars = txt.toCharArray();
-
-            if (isLineBreakCharacter(chars[0])) {
-                w = 5;
-            }
-
-            List<Rectangle2D> temp = rectangles.computeIfAbsent(y, ay -> new ArrayList<>());
-            temp.add(new Rectangle2D(x, y, w, h));
-        }
-
-        for (Double y : rectangles.keySet()) {
-            List<Rectangle2D> temp = rectangles.get(y);
-
-            double x = Double.MAX_VALUE;
-            double height = 0;
-            double width = 0;
-
-            for (Rectangle2D r : temp) {
-                if (r.getMinX() < x) {
-                    x = r.getMinX();
-                }
-
-                if (r.getHeight() > height) {
-                    height = r.getHeight();
-                }
-
-                width += r.getWidth();
-            }
-
-            Region region = new Region();
-            region.setLayoutY(y);
-            region.setLayoutX(x);
-            region.setPrefWidth(width);
-            region.setPrefHeight(height);
-            region.getStyleClass().add("selection");
-
-            regions.add(region);
-        }
-
-        selectedText.set(selection.isEmpty() ? null : selection.toString());
-        selectionContainer.getChildren().setAll(regions);
-    }
-
-    private void clearSelection() {
-        selectedIndices.clear();
-        buildSelection();
-    }
-
-    private static boolean isSpaceCharacter(char character) {
-        return character == ' ';
-    }
-
-    private static boolean isSpecialCharacter(char character) {
-        return character == '.' || character == ',' || character == ';' || character == ':';
-    }
-
-    private static boolean isLineBreakCharacter(char character) {
-        return character == '\n';
-    }
-
-    /**
-     * Anonymous class to control mouse events
-     */
-    private class SelectionHandler implements EventHandler<MouseEvent> {
-
-        private Integer firstIndex;
-
-        @Override
-        public void handle(MouseEvent evt) {
-            if (evt.getEventType() == MouseEvent.MOUSE_DRAGGED) {
-                handleMouseDragged(evt);
-            } else if (evt.getEventType() == MouseEvent.MOUSE_PRESSED) {
-                handleMousePressed(evt);
-            } else if (evt.getEventType() == MouseEvent.MOUSE_RELEASED) {
-                handleMouseReleased(evt);
-            }
-
-        }
-
-        private void handleMouseDragged(MouseEvent evt) {
-            if (!evt.isPrimaryButtonDown() || evt.isPopupTrigger()) {
-                return;
-            }
-            if (evt.getPickResult().getIntersectedNode() instanceof Text text) {
-                addSelectedIndex(texts.indexOf(text));
-            }
-        }
-
-        private void handleMousePressed(MouseEvent evt) {
-            if (!evt.isPrimaryButtonDown() || evt.isPopupTrigger()) {
-                return;
-            }
-            getSkinnable().requestFocus();
-
-            if (evt.getPickResult().getIntersectedNode() instanceof Text text) {
-                int index = texts.indexOf(text);
-                if (index >= 0) {
-                    firstIndex = index;
-                }
-
-            }
-
-            selectedIndices.clear();
-            buildSelection();
-        }
-
-        private void handleMouseReleased(MouseEvent evt) {
-            if (!evt.isPrimaryButtonDown() || evt.isPopupTrigger()) {
-                return;
-            }
-            firstIndex = null;
-        }
-
-        /**
-         * From an initial and final index, creates a route of the intermediate indexes to avoid skipping indexes
-         */
-        private void addSelectedIndex(int index) {
-            if (index >= 0 && index < texts.size() && firstIndex != null) {
-                selectedIndices.clear();
-                selectedIndices.add(index);
-
-                if (firstIndex > index) {
-                    for (int i = firstIndex; i > index; i--) {
-                        selectedIndices.add(i);
-                    }
-                }
-                else {
-                    for (int i = firstIndex; i < index; i++) {
-                        selectedIndices.add(i);
-                    }
-                }
-
-                buildSelection();
-            }
+        private void removeSelection(String reason) {
+            getSkinnable().getProperties().put("selected.text", null);
+            selectionStartPos = -1;
+            selectionEndPos = -1;
+            text.setSelectionStart(selectionStartPos);
+            text.setSelectionEnd(selectionEndPos);
+            wrappingPath.getElements().clear();
         }
     }
 }

@@ -1,21 +1,37 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.TextViewSkin;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.WritableValue;
 import javafx.collections.MapChangeListener;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.PaintConverter;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Skin;
+import javafx.scene.control.SkinBase;
+import javafx.scene.control.TextInputControl;
+import javafx.scene.control.skin.TextInputControlSkin;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.TextFlow;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -32,25 +48,11 @@ public class TextView extends Control {
     public TextView() {
         getStyleClass().add("text-view");
 
+        setFocusTraversable(false);
+
         getProperties().addListener((MapChangeListener<Object, Object>) change -> {
             if (change.getKey().equals("selected.text")) {
                 selectedText.set((String) change.getValueAdded());
-            }
-        });
-
-        addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
-            if (KeyCodeCombination.keyCombination("shortcut+c").match(evt)) {
-                copySelection();
-            }
-        });
-
-        focusWithinProperty().addListener(it -> {
-            ContextMenu contextMenu = getContextMenu();
-            if (contextMenu != null && contextMenu.isShowing()) {
-                return;
-            }
-            if (!isFocusWithin()) {
-                clearSelection();
             }
         });
 
@@ -111,17 +113,11 @@ public class TextView extends Control {
     }
 
     private void doCopy(String text) {
+        System.out.println("copying selection to clipboard: " + text);
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
         content.putString(text);
         clipboard.setContent(content);
-    }
-
-    /**
-     * Removes the current selection.
-     */
-    public final void clearSelection() {
-        selectedText.set(null);
     }
 
     // text
@@ -160,5 +156,187 @@ public class TextView extends Control {
 
     public final ReadOnlyStringProperty selectedTextProperty() {
         return selectedText.getReadOnlyProperty();
+    }
+
+    // highlight fill
+
+    /**
+     * The fill to use for the text when highlighted.
+     */
+    private final ObjectProperty<Paint> highlightFill = new StyleableObjectProperty<>(Color.DODGERBLUE) {
+
+        @Override
+        public Object getBean() {
+            return this;
+        }
+
+        @Override
+        public String getName() {
+            return "highlightFill";
+        }
+
+        @Override
+        public CssMetaData<TextView, Paint> getCssMetaData() {
+            return StyleableProperties.HIGHLIGHT_FILL;
+        }
+    };
+
+    /**
+     * The fill {@code Paint} used for the background of selected text.
+     *
+     * @param value the highlight fill
+     */
+    public final void setHighlightFill(Paint value) {
+        highlightFill.set(value);
+    }
+
+    public final Paint getHighlightFill() {
+        return highlightFill.get();
+    }
+
+    public final ObjectProperty<Paint> highlightFillProperty() {
+        return highlightFill;
+    }
+
+    // highlight stroke
+
+    /**
+     * The fill to use for the text when highlighted.
+     */
+    private final ObjectProperty<Paint> highlightStroke = new StyleableObjectProperty<>(Color.TRANSPARENT) {
+
+        @Override
+        public Object getBean() {
+            return this;
+        }
+
+        @Override
+        public String getName() {
+            return "highlightStroke";
+        }
+
+        @Override
+        public CssMetaData<TextView, Paint> getCssMetaData() {
+            return StyleableProperties.HIGHLIGHT_STROKE;
+        }
+    };
+
+    /**
+     * The fill {@code Paint} used for the background of selected text.
+     *
+     * @param value the highlight fill
+     */
+    public final void setHighlightStroke(Paint value) {
+        highlightStroke.set(value);
+    }
+
+    public final Paint getHighlightStroke() {
+        return highlightStroke.get();
+    }
+
+    public final ObjectProperty<Paint> highlightStrokeProperty() {
+        return highlightStroke;
+    }
+
+    // highlight text fill
+
+    /**
+     * The fill {@code Paint} used for the foreground of selected text.
+     */
+    private final ObjectProperty<Paint> highlightTextFill = new StyleableObjectProperty<>(Color.WHITE) {
+
+        @Override
+        public Object getBean() {
+            return this;
+        }
+
+        @Override
+        public String getName() {
+            return "highlightTextFill";
+        }
+
+        @Override
+        public CssMetaData<TextView, Paint> getCssMetaData() {
+            return StyleableProperties.HIGHLIGHT_TEXT_FILL;
+        }
+    };
+
+    /**
+     * The fill {@code Paint} used for the foreground of selected text.
+     *
+     * @param value the highlight text fill
+     */
+    public final void setHighlightTextFill(Paint value) {
+        highlightTextFill.set(value);
+    }
+
+    public final Paint getHighlightTextFill() {
+        return highlightTextFill.get();
+    }
+
+    public final ObjectProperty<Paint> highlightTextFillProperty() {
+        return highlightTextFill;
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<TextView, Paint> HIGHLIGHT_TEXT_FILL = new CssMetaData<>(
+                "-fx-highlight-text-fill", PaintConverter.getInstance(), Color.RED) {
+
+            @Override
+            public boolean isSettable(TextView n) {
+                return !n.highlightTextFill.isBound();
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public StyleableProperty<Paint> getStyleableProperty(TextView n) {
+                return (StyleableProperty<Paint>) n.highlightTextFill;
+            }
+        };
+
+        private static final CssMetaData<TextView, Paint> HIGHLIGHT_FILL = new CssMetaData<>(
+                "-fx-highlight-fill", PaintConverter.getInstance(), Color.OLIVE
+        ) {
+
+            @Override
+            public boolean isSettable(TextView c) {
+                return c.highlightFill.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Paint> getStyleableProperty(TextView c) {
+                return (StyleableProperty<Paint>) c.highlightFillProperty();
+            }
+        };
+
+        private static final CssMetaData<TextView, Paint> HIGHLIGHT_STROKE = new CssMetaData<>(
+                "-fx-highlight-stroke", PaintConverter.getInstance(), Color.RED
+        ) {
+
+            @Override
+            public boolean isSettable(TextView c) {
+                return !c.highlightStroke.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Paint> getStyleableProperty(TextView c) {
+                return (StyleableProperty<Paint>) c.highlightStroke;
+            }
+        };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(TextFlow.getClassCssMetaData());
+            styleables.add(HIGHLIGHT_FILL);
+            styleables.add(HIGHLIGHT_STROKE);
+            styleables.add(HIGHLIGHT_TEXT_FILL);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
     }
 }
