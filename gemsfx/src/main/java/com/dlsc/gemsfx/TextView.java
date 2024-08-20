@@ -36,9 +36,13 @@ import java.util.Objects;
 
 /**
  * A text view that allows you to display multiline text and supports the selection of
- * text (words only), which can then be copied to the clipboard. The user can copy the
- * selected text view the OS-specific shortcut for copying content (for example, CTRL-C
- * on Windows or Command-C on Mac). Additionally, a context menu is available for copying.
+ * text, which can then be copied to the clipboard. The user can copy the selected text
+ * via the OS-specific shortcut for copying content (for example, CTRL-C on Windows or
+ * Command-C on Mac). Additionally, a context menu is available for copying.
+ * <p>
+ *     The user can select text by pressing and dragging the mouse, or by double clicking
+ *     on a word. A triple click selects an entire paragraph.
+ * </p>
  */
 public class TextView extends Control {
 
@@ -113,7 +117,6 @@ public class TextView extends Control {
     }
 
     private void doCopy(String text) {
-        System.out.println("copying selection to clipboard: " + text);
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
         content.putString(text);
@@ -163,7 +166,7 @@ public class TextView extends Control {
     /**
      * The fill to use for the text when highlighted.
      */
-    private final ObjectProperty<Paint> highlightFill = new StyleableObjectProperty<>(Color.DODGERBLUE) {
+    private final ObjectProperty<Paint> highlightFill = new StyleableObjectProperty<>(Color.BLUE) {
 
         @Override
         public Object getBean() {
@@ -281,11 +284,11 @@ public class TextView extends Control {
     private static class StyleableProperties {
 
         private static final CssMetaData<TextView, Paint> HIGHLIGHT_TEXT_FILL = new CssMetaData<>(
-                "-fx-highlight-text-fill", PaintConverter.getInstance(), Color.RED) {
+                "-fx-highlight-text-fill", PaintConverter.getInstance(), Color.TRANSPARENT) {
 
             @Override
-            public boolean isSettable(TextView n) {
-                return !n.highlightTextFill.isBound();
+            public boolean isSettable(TextView c) {
+                return !c.highlightTextFill.isBound();
             }
 
             @Override
@@ -296,12 +299,12 @@ public class TextView extends Control {
         };
 
         private static final CssMetaData<TextView, Paint> HIGHLIGHT_FILL = new CssMetaData<>(
-                "-fx-highlight-fill", PaintConverter.getInstance(), Color.OLIVE
+                "-fx-highlight-fill", PaintConverter.getInstance(), Color.TRANSPARENT
         ) {
 
             @Override
             public boolean isSettable(TextView c) {
-                return c.highlightFill.isBound();
+                return !c.highlightFill.isBound();
             }
 
             @Override
@@ -311,7 +314,7 @@ public class TextView extends Control {
         };
 
         private static final CssMetaData<TextView, Paint> HIGHLIGHT_STROKE = new CssMetaData<>(
-                "-fx-highlight-stroke", PaintConverter.getInstance(), Color.RED
+                "-fx-highlight-stroke", PaintConverter.getInstance(), Color.TRANSPARENT
         ) {
 
             @Override
@@ -328,7 +331,7 @@ public class TextView extends Control {
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
 
         static {
-            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(TextFlow.getClassCssMetaData());
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>();
             styleables.add(HIGHLIGHT_FILL);
             styleables.add(HIGHLIGHT_STROKE);
             styleables.add(HIGHLIGHT_TEXT_FILL);
@@ -336,7 +339,12 @@ public class TextView extends Control {
         }
     }
 
+    @Override
+    protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
-        return StyleableProperties.STYLEABLES;
+        return TextView.StyleableProperties.STYLEABLES;
     }
 }

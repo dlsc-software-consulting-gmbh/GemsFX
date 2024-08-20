@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TextView;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -19,10 +20,12 @@ import org.apache.commons.lang3.StringUtils;
 
 public class TextViewSkin extends SkinBase<TextView> {
 
-    private final SelectableText selectableText = new SelectableText();
+    private final SelectableText selectableText;
 
     public TextViewSkin(TextView control) {
         super(control);
+
+        selectableText = new SelectableText(control);
 
         control.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
             if (KeyCodeCombination.keyCombination("shortcut+c").match(evt)) {
@@ -30,7 +33,7 @@ public class TextViewSkin extends SkinBase<TextView> {
             } else if (KeyCodeCombination.keyCombination("shortcut+a").match(evt)) {
                 selectableText.selectAll();
             } else if (KeyCodeCombination.keyCombination("backspace").match(evt)) {
-                selectableText.removeSelection("shortcut");
+                selectableText.removeSelection();
             }
         });
 
@@ -43,9 +46,14 @@ public class TextViewSkin extends SkinBase<TextView> {
             }
 
             if (!control.isFocused()) {
-                selectableText.removeSelection("focus lost");
+                selectableText.removeSelection();
             }
         });
+    }
+
+    @Override
+    protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return selectableText.minHeight(width - leftInset - rightInset);
     }
 
     @Override
@@ -53,29 +61,37 @@ public class TextViewSkin extends SkinBase<TextView> {
         return selectableText.prefHeight(width - leftInset - rightInset);
     }
 
-    private final class SelectableText extends TextFlow {
+    @Override
+    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return selectableText.maxHeight(width - leftInset - rightInset);
+    }
+
+    private static final class SelectableText extends TextFlow {
 
         private final Path wrappingPath = new Path();
+        private final TextView textView;
 
         private int mouseDragStartPos = -1;
         private int selectionStartPos = -1;
         private int selectionEndPos = -1;
         private final Text text = new Text();
 
-        public SelectableText() {
+        public SelectableText(TextView textView) {
             super();
+
+            this.textView = textView;
 
             setCursor(Cursor.TEXT);
             setPrefWidth(Region.USE_PREF_SIZE);
 
-            text.textProperty().bind(getSkinnable().textProperty());
-            text.getStyleClass().add("text");
+            text.textProperty().bind(textView.textProperty());
+            text.selectionFillProperty().bind(textView.highlightTextFillProperty());
 
             setText(text);
 
             wrappingPath.setManaged(false);
-            wrappingPath.fillProperty().bind(getSkinnable().highlightFillProperty());
-            wrappingPath.strokeProperty().bind(getSkinnable().highlightStrokeProperty());
+            wrappingPath.fillProperty().bind(textView.highlightFillProperty());
+            wrappingPath.strokeProperty().bind(textView.highlightStrokeProperty());
 
             getStyleClass().add("selectable-text");
             initListeners();
@@ -92,21 +108,40 @@ public class TextViewSkin extends SkinBase<TextView> {
 
         private void initListeners() {
             setOnMousePressed(e -> {
-                getSkinnable().requestFocus();
+                textView.requestFocus();
 
                 if (!e.isPrimaryButtonDown() || e.isPopupTrigger()) {
                     return;
                 }
 
-                removeSelection("mouse pressed");
-
                 HitInfo hit = hitTest(new Point2D(e.getX(), e.getY()));
 
-                if (e.isPrimaryButtonDown() && e.getClickCount() == 2) {
-                    // TODO: Double-click selection
-                    return;
+                int charIndex = hit.getCharIndex();
+                if (!e.isShiftDown()) {
+                    removeSelection();
+
+                    if (e.isPrimaryButtonDown()) {
+                        switch (e.getClickCount()) {
+                            case 1:
+                                mouseDragStartPos = charIndex;
+                                break;
+                            case 2:
+                                selectWord(hit);
+                                break;
+                            case 3:
+                                selectParagraph(hit);
+                                break;
+                        }
+                    }
                 } else {
-                    mouseDragStartPos = hit.getCharIndex();
+                    if (charIndex >= mouseDragStartPos) {
+                        selectionStartPos = mouseDragStartPos;
+                        selectionEndPos = charIndex + 1;
+                    } else {
+                        selectionStartPos = charIndex;
+                        selectionEndPos = mouseDragStartPos + 1;
+                    }
+                    performSelection();
                 }
             });
 
@@ -116,8 +151,9 @@ public class TextViewSkin extends SkinBase<TextView> {
                 }
                 HitInfo hit = hitTest(new Point2D(e.getX(), e.getY()));
 
-                selectionStartPos = Math.min(mouseDragStartPos, hit.getCharIndex());
-                selectionEndPos = Math.max(mouseDragStartPos, hit.getCharIndex());
+                int charIndex = hit.getCharIndex();
+                selectionStartPos = Math.min(mouseDragStartPos, charIndex);
+                selectionEndPos = Math.max(mouseDragStartPos, charIndex) + 1;
 
                 performSelection();
             });
@@ -126,28 +162,84 @@ public class TextViewSkin extends SkinBase<TextView> {
                 if (!e.getButton().equals(MouseButton.PRIMARY) || e.isPopupTrigger()) {
                     return;
                 }
-                getSkinnable().getProperties().put("selected.text", getSelectedTextAsString());
-                mouseDragStartPos = -1;
+                textView.getProperties().put("selected.text", getSelectedTextAsString());
             });
 
-            widthProperty().addListener((obs, old, val) -> removeSelection("width changed"));
-            heightProperty().addListener((obs, old, val) -> removeSelection("height changed"));
+            widthProperty().addListener((obs, old, val) -> removeSelection());
+            heightProperty().addListener((obs, old, val) -> removeSelection());
+        }
+
+        private void selectWord(HitInfo hit) {
+            int charIndex = hit.getCharIndex();
+            StringBuilder string = getTextFlowContentAsString();
+
+            int startIndex = -1;
+            int endIndex = -1;
+
+            for (int i = charIndex; i < string.length(); i++) {
+                endIndex = i;
+                char c = string.charAt(i);
+                if (!(Character.isAlphabetic(c) || Character.isDigit(c)) || Character.isWhitespace(c)) {
+                    break;
+                }
+            }
+
+            for (int i = charIndex; i >= 0; i--) {
+                startIndex = i;
+                char c = string.charAt(i);
+                if (!(Character.isAlphabetic(c) || Character.isDigit(c)) || Character.isWhitespace(c)) {
+                    startIndex++;
+                    break;
+                }
+            }
+
+            if (startIndex > -1 && endIndex > startIndex) {
+                selectionStartPos = startIndex;
+                selectionEndPos = endIndex;
+                performSelection();
+            }
+        }
+
+        private void selectParagraph(HitInfo hit) {
+            int charIndex = hit.getCharIndex();
+            StringBuilder string = getTextFlowContentAsString();
+
+            int startIndex = -1;
+            int endIndex = -1;
+
+            for (int i = charIndex; i < string.length(); i++) {
+                endIndex = i;
+                char c = string.charAt(i);
+                if (c == '\n' || c == '\r') {
+                    break;
+                }
+            }
+
+            for (int i = charIndex; i >= 0; i--) {
+                if (string.charAt(i) == '\n') {
+                    break;
+                }
+                startIndex = i;
+            }
+
+            if (startIndex > -1 && endIndex > startIndex) {
+                selectionStartPos = startIndex;
+                selectionEndPos = endIndex + 1;
+                performSelection();
+            }
         }
 
         private void performSelection() {
             text.setSelectionStart(selectionStartPos);
-            text.setSelectionEnd(selectionEndPos);
+            text.setSelectionEnd(Math.min(selectionEndPos, getTextFlowContentAsString().length() + 1));
 
             PathElement[] selectionRange = rangeShape(selectionStartPos, selectionEndPos);
             wrappingPath.getElements().setAll(selectionRange);
 
-            getSkinnable().getProperties().put("selected.text", getSelectedTextAsString());
+            textView.getProperties().put("selected.text", getSelectedTextAsString());
         }
 
         public void setText(Text text) {
-            if (text != null) {
-                text.setSelectionFill(getSkinnable().getHighlightTextFill());
-            }
             getChildren().setAll(wrappingPath);
             getChildren().addAll(text);
         }
@@ -159,7 +251,7 @@ public class TextViewSkin extends SkinBase<TextView> {
         public String getSelectedTextAsString() {
             StringBuilder content = getTextFlowContentAsString();
             return selectionStartPos >= 0 && selectionEndPos > selectionStartPos
-                    ? content.substring(selectionStartPos, selectionEndPos)
+                    ? content.substring(selectionStartPos, Math.min(selectionEndPos, content.length()))
                     : null;
         }
 
@@ -173,8 +265,8 @@ public class TextViewSkin extends SkinBase<TextView> {
             return sb;
         }
 
-        private void removeSelection(String reason) {
-            getSkinnable().getProperties().put("selected.text", null);
+        private void removeSelection() {
+            textView.getProperties().put("selected.text", null);
             selectionStartPos = -1;
             selectionEndPos = -1;
             text.setSelectionStart(selectionStartPos);
