@@ -84,6 +84,7 @@ public class TextViewSkin extends SkinBase<TextView> {
             setCursor(Cursor.TEXT);
             setPrefWidth(Region.USE_PREF_SIZE);
 
+            text.getStyleClass().add("text");
             text.textProperty().bind(textView.textProperty());
             text.selectionFillProperty().bind(textView.highlightTextFillProperty());
 
@@ -231,7 +232,7 @@ public class TextViewSkin extends SkinBase<TextView> {
 
         private void performSelection() {
             text.setSelectionStart(selectionStartPos);
-            text.setSelectionEnd(Math.min(selectionEndPos, getTextFlowContentAsString().length() + 1));
+            text.setSelectionEnd(Math.min(selectionEndPos, getTextFlowContentAsString().length()));
 
             PathElement[] selectionRange = rangeShape(selectionStartPos, selectionEndPos);
             wrappingPath.getElements().setAll(selectionRange);
