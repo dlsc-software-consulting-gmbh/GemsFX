@@ -6,7 +6,6 @@ import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.WritableValue;
 import javafx.collections.MapChangeListener;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
@@ -18,16 +17,10 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
-import javafx.scene.control.TextInputControl;
-import javafx.scene.control.skin.TextInputControlSkin;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.TextFlow;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -331,7 +324,7 @@ public class TextView extends Control {
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
 
         static {
-            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>();
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
             styleables.add(HIGHLIGHT_FILL);
             styleables.add(HIGHLIGHT_STROKE);
             styleables.add(HIGHLIGHT_TEXT_FILL);
