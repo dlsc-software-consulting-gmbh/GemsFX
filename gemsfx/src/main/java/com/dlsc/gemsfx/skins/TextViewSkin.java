@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TextView;
-import javafx.beans.InvalidationListener;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -173,6 +172,9 @@ public class TextViewSkin extends SkinBase<TextView> {
         private void selectWord(HitInfo hit) {
             int charIndex = hit.getCharIndex();
             StringBuilder string = getTextFlowContentAsString();
+            if (isInvalidIndex(string, charIndex)) {
+                return;
+            }
 
             int startIndex = -1;
             int endIndex = -1;
@@ -204,6 +206,9 @@ public class TextViewSkin extends SkinBase<TextView> {
         private void selectParagraph(HitInfo hit) {
             int charIndex = hit.getCharIndex();
             StringBuilder string = getTextFlowContentAsString();
+            if (isInvalidIndex(string, charIndex)) {
+                return;
+            }
 
             int startIndex = -1;
             int endIndex = -1;
@@ -273,6 +278,10 @@ public class TextViewSkin extends SkinBase<TextView> {
             text.setSelectionStart(selectionStartPos);
             text.setSelectionEnd(selectionEndPos);
             wrappingPath.getElements().clear();
+        }
+
+        private boolean isInvalidIndex(StringBuilder string, int charIndex) {
+            return string.isEmpty() || charIndex < 0 || charIndex >= string.length();
         }
     }
 }
