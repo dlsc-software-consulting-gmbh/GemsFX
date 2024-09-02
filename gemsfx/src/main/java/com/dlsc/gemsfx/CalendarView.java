@@ -22,8 +22,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -34,10 +32,12 @@ import javafx.collections.ObservableSet;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
 import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.EnumConverter;
+import javafx.css.converter.SizeConverter;
 import javafx.scene.control.Cell;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -86,8 +86,23 @@ public class CalendarView extends Control {
     private static final MonthDisplayMode DEFAULT_MONTH_DISPLAY_MODE = MonthDisplayMode.TEXT_ONLY;
     private static final boolean DEFAULT_SHOW_TODAY = true;
     private static final boolean DEFAULT_SHOW_WEEK_NUMBERS = false;
-    private YearMonthView yearMonthView;
+    private static final boolean DEFAULT_DISABLE_PREVIOUS_MONTH_BUTTON = false;
+    private static final boolean DEFAULT_DISABLE_NEXT_MONTH_BUTTON = false;
+    private static final boolean DEFAULT_DISABLE_PREVIOUS_YEAR_BUTTON = false;
+    private static final boolean DEFAULT_DISABLE_NEXT_YEAR_BUTTON = false;
+    private static final boolean DEFAULT_DISABLE_MONTH_DROPDOWN_BUTTON = false;
+    private static final boolean DEFAULT_DISABLE_YEAR_DROPDOWN_BUTTON = false;
+    private static final boolean DEFAULT_MONTH_SELECTION_VIEW_ENABLED = true;
+    private static final boolean DEFAULT_YEAR_SELECTION_VIEW_ENABLED = true;
+    private static final boolean DEFAULT_SHOW_MONTH = true;
+    private static final boolean DEFAULT_SHOW_YEAR = true;
+    private static final boolean DEFAULT_SHOW_TODAY_BUTTON = false;
+    private static final boolean DEFAULT_SHOW_MONTH_ARROWS = true;
+    private static final boolean DEFAULT_MARK_SELECTED_DAYS_OF_PREVIOUS_OR_NEXT_MONTH = true;
+    private static final boolean DEFAULT_SHOW_DAYS_OF_PREVIOUS_OR_NEXT_MONTH = true;
+    private static final double DEFAULT_WEEK_NUMBER_COLUMN_WIDTH = 16;
 
+    private YearMonthView yearMonthView;
     private YearView yearView;
 
     /**
@@ -223,10 +238,10 @@ public class CalendarView extends Control {
         return showWeekNumbers == null ? DEFAULT_SHOW_WEEK_NUMBERS : showWeekNumbers.get();
     }
 
-    private final BooleanProperty markSelectedDaysOfPreviousOrNextMonth = new SimpleBooleanProperty(this, "markSelectedDaysOfPreviousOrNextMonth", true);
+    private BooleanProperty markSelectedDaysOfPreviousOrNextMonth;
 
     public final boolean isMarkSelectedDaysOfPreviousOrNextMonth() {
-        return markSelectedDaysOfPreviousOrNextMonth.get();
+        return markSelectedDaysOfPreviousOrNextMonth == null ? DEFAULT_MARK_SELECTED_DAYS_OF_PREVIOUS_OR_NEXT_MONTH : markSelectedDaysOfPreviousOrNextMonth.get();
     }
 
     /**
@@ -236,17 +251,35 @@ public class CalendarView extends Control {
      * @return true if days not belonging to the current month will be marked selected
      */
     public final BooleanProperty markSelectedDaysOfPreviousOrNextMonthProperty() {
+        if (markSelectedDaysOfPreviousOrNextMonth == null) {
+            markSelectedDaysOfPreviousOrNextMonth = new StyleableBooleanProperty(DEFAULT_MARK_SELECTED_DAYS_OF_PREVIOUS_OR_NEXT_MONTH) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "markSelectedDaysOfPreviousOrNextMonth";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.MARK_SELECTED_DAYS_OF_PREVIOUS_OR_NEXT_MONTH;
+                }
+            };
+        }
         return markSelectedDaysOfPreviousOrNextMonth;
     }
 
     public final void setMarkSelectedDaysOfPreviousOrNextMonth(boolean markSelectedDaysOfPreviousOrNextMonth) {
-        this.markSelectedDaysOfPreviousOrNextMonth.set(markSelectedDaysOfPreviousOrNextMonth);
+        markSelectedDaysOfPreviousOrNextMonthProperty().set(markSelectedDaysOfPreviousOrNextMonth);
     }
 
-    private final BooleanProperty showDaysOfPreviousOrNextMonth = new SimpleBooleanProperty(this, "showDaysOfPreviousOrNextMonth", true);
+    private BooleanProperty showDaysOfPreviousOrNextMonth;
 
     public final boolean isShowDaysOfPreviousOrNextMonth() {
-        return showDaysOfPreviousOrNextMonth.get();
+        return showDaysOfPreviousOrNextMonth == null ? DEFAULT_SHOW_DAYS_OF_PREVIOUS_OR_NEXT_MONTH : showDaysOfPreviousOrNextMonth.get();
     }
 
     /**
@@ -256,11 +289,29 @@ public class CalendarView extends Control {
      * @return true if the calendar will be filled up with days of the previous and the next month
      */
     public final BooleanProperty showDaysOfPreviousOrNextMonthProperty() {
+        if (showDaysOfPreviousOrNextMonth == null) {
+            showDaysOfPreviousOrNextMonth = new StyleableBooleanProperty(DEFAULT_SHOW_DAYS_OF_PREVIOUS_OR_NEXT_MONTH) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "showDaysOfPreviousOrNextMonth";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.SHOW_DAYS_OF_PREVIOUS_OR_NEXT_MONTH;
+                }
+            };
+        }
         return showDaysOfPreviousOrNextMonth;
     }
 
     public final void setShowDaysOfPreviousOrNextMonth(boolean showDaysOfPreviousOrNextMonth) {
-        this.showDaysOfPreviousOrNextMonth.set(showDaysOfPreviousOrNextMonth);
+        showDaysOfPreviousOrNextMonthProperty().set(showDaysOfPreviousOrNextMonth);
     }
 
     private final ObjectProperty<LocalDate> today = new SimpleObjectProperty<>(this, "today", LocalDate.now());
@@ -309,7 +360,7 @@ public class CalendarView extends Control {
             showToday = new StyleableBooleanProperty(DEFAULT_SHOW_TODAY) {
                 @Override
                 public Object getBean() {
-                    return this;
+                    return CalendarView.this;
                 }
 
                 @Override
@@ -344,10 +395,10 @@ public class CalendarView extends Control {
         showTodayProperty().set(show);
     }
 
-    private final BooleanProperty disablePreviousMonthButton = new SimpleBooleanProperty(this, "disablePreviousMonth");
+    private BooleanProperty disablePreviousMonthButton;
 
     public final boolean isDisablePreviousMonthButton() {
-        return disablePreviousMonthButton.get();
+        return disablePreviousMonthButton == null ? DEFAULT_DISABLE_PREVIOUS_MONTH_BUTTON : disablePreviousMonthButton.get();
     }
 
     /**
@@ -359,17 +410,35 @@ public class CalendarView extends Control {
      * @return true if the button used for going to the next month is currently disabled
      */
     public final BooleanProperty disablePreviousMonthButtonProperty() {
+        if (disablePreviousMonthButton == null) {
+            disablePreviousMonthButton = new StyleableBooleanProperty(DEFAULT_DISABLE_PREVIOUS_MONTH_BUTTON) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "disablePreviousMonthButton";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.DISABLE_PREVIOUS_MONTH_BUTTON;
+                }
+            };
+        }
         return disablePreviousMonthButton;
     }
 
     public final void setDisablePreviousMonthButton(boolean disablePreviousMonthButton) {
-        this.disablePreviousMonthButton.set(disablePreviousMonthButton);
+        disablePreviousMonthButtonProperty().set(disablePreviousMonthButton);
     }
 
-    private final BooleanProperty disableNextMonthButton = new SimpleBooleanProperty(this, "disablePreviousMonth");
+    private BooleanProperty disableNextMonthButton;
 
     public final boolean isDisableNextMonthButton() {
-        return disableNextMonthButton.get();
+        return disableNextMonthButton == null ? DEFAULT_DISABLE_NEXT_MONTH_BUTTON : disableNextMonthButton.get();
     }
 
     /**
@@ -381,17 +450,35 @@ public class CalendarView extends Control {
      * @return true if the button used for going to the next month is currently disabled
      */
     public final BooleanProperty disableNextMonthButtonProperty() {
+        if (disableNextMonthButton == null) {
+            disableNextMonthButton = new StyleableBooleanProperty(DEFAULT_DISABLE_NEXT_MONTH_BUTTON) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "disableNextMonthButton";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.DISABLE_NEXT_MONTH_BUTTON;
+                }
+            };
+        }
         return disableNextMonthButton;
     }
 
     public final void setDisableNextMonthButton(boolean disableNextMonthButton) {
-        this.disableNextMonthButton.set(disableNextMonthButton);
+        disableNextMonthButtonProperty().set(disableNextMonthButton);
     }
 
-    private final BooleanProperty disableNextYearButton = new SimpleBooleanProperty(this, "disableNextYearButton");
+    private BooleanProperty disableNextYearButton;
 
     public final boolean isDisableNextYearButton() {
-        return disableNextYearButton.get();
+        return disableNextYearButton == null ? DEFAULT_DISABLE_NEXT_YEAR_BUTTON : disableNextYearButton.get();
     }
 
     /**
@@ -403,6 +490,24 @@ public class CalendarView extends Control {
      * @return true if the button used for going to the next year is currently disabled
      */
     public final BooleanProperty disableNextYearButtonProperty() {
+        if (disableNextYearButton == null) {
+            disableNextYearButton = new StyleableBooleanProperty(DEFAULT_DISABLE_NEXT_YEAR_BUTTON) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "disableNextYearButton";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.DISABLE_NEXT_YEAR_BUTTON;
+                }
+            };
+        }
         return disableNextYearButton;
     }
 
@@ -410,10 +515,10 @@ public class CalendarView extends Control {
         this.disableNextYearButton.set(disableNextYearButton);
     }
 
-    private final BooleanProperty disablePreviousYearButton = new SimpleBooleanProperty(this, "disablePreviousYearButton");
+    private BooleanProperty disablePreviousYearButton;
 
     public final boolean isDisablePreviousYearButton() {
-        return disablePreviousYearButton.get();
+        return disablePreviousYearButton == null ? DEFAULT_DISABLE_PREVIOUS_YEAR_BUTTON : disablePreviousYearButton.get();
     }
 
     /**
@@ -425,17 +530,35 @@ public class CalendarView extends Control {
      * @return true if the button used for going to the next year is currently disabled
      */
     public final BooleanProperty disablePreviousYearButtonProperty() {
+        if (disablePreviousYearButton == null) {
+            disablePreviousYearButton = new StyleableBooleanProperty(DEFAULT_DISABLE_PREVIOUS_YEAR_BUTTON) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "disablePreviousYearButton";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.DISABLE_PREVIOUS_YEAR_BUTTON;
+                }
+            };
+        }
         return disablePreviousYearButton;
     }
 
     public final void setDisablePreviousYearButton(boolean disablePreviousYearButton) {
-        this.disablePreviousYearButton.set(disablePreviousYearButton);
+        disablePreviousYearButtonProperty().set(disablePreviousYearButton);
     }
 
-    public final BooleanProperty disableMonthDropdownButton = new SimpleBooleanProperty(this, "disableMonthDropdownButton", false);
+    private BooleanProperty disableMonthDropdownButton;
 
     public final boolean isDisableMonthDropdownButton() {
-        return disableMonthDropdownButton.get();
+        return disableMonthDropdownButton == null ? DEFAULT_DISABLE_MONTH_DROPDOWN_BUTTON : disableMonthDropdownButton.get();
     }
 
     /**
@@ -444,17 +567,35 @@ public class CalendarView extends Control {
      * @return true if the button used for showing the month selection view should be disabled
      */
     public final BooleanProperty disableMonthDropdownButtonProperty() {
+        if (disableMonthDropdownButton == null) {
+            disableMonthDropdownButton = new StyleableBooleanProperty(DEFAULT_DISABLE_MONTH_DROPDOWN_BUTTON) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "disableMonthDropdownButton";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.DISABLE_MONTH_DROPDOWN_BUTTON;
+                }
+            };
+        }
         return disableMonthDropdownButton;
     }
 
     public final void setDisableMonthDropdownButton(boolean disableMonthDropdownButton) {
-        this.disableMonthDropdownButton.set(disableMonthDropdownButton);
+        disableMonthDropdownButtonProperty().set(disableMonthDropdownButton);
     }
 
-    public final BooleanProperty disableYearDropdownButton = new SimpleBooleanProperty(this, "disableYearDropdownButton", false);
+    private BooleanProperty disableYearDropdownButton;
 
     public final boolean isDisableYearDropdownButton() {
-        return disableYearDropdownButton.get();
+        return disableYearDropdownButton == null ? DEFAULT_DISABLE_YEAR_DROPDOWN_BUTTON : disableYearDropdownButton.get();
     }
 
     /**
@@ -463,11 +604,29 @@ public class CalendarView extends Control {
      * @return true if the button used for showing the year selection view should be disabled
      */
     public final BooleanProperty disableYearDropdownButtonProperty() {
+        if (disableYearDropdownButton == null) {
+            disableYearDropdownButton = new StyleableBooleanProperty(DEFAULT_DISABLE_YEAR_DROPDOWN_BUTTON) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "disableYearDropdownButton";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.DISABLE_YEAR_DROPDOWN_BUTTON;
+                }
+            };
+        }
         return disableYearDropdownButton;
     }
 
     public final void setDisableYearDropdownButton(boolean disableYearDropdownButton) {
-        this.disableYearDropdownButton.set(disableYearDropdownButton);
+        disableYearDropdownButtonProperty().set(disableYearDropdownButton);
     }
 
     private final ObjectProperty<Callback<LocalDate, Boolean>> dateFilter = new SimpleObjectProperty<>(this, "dateFilter");
@@ -563,10 +722,10 @@ public class CalendarView extends Control {
         return cellFactoryProperty().get();
     }
 
-    private final BooleanProperty monthSelectionViewEnabled = new SimpleBooleanProperty(this, "monthSelectionViewEnabled", true);
+    private BooleanProperty monthSelectionViewEnabled;
 
     public final boolean isMonthSelectionViewEnabled() {
-        return monthSelectionViewEnabled.get();
+        return monthSelectionViewEnabled == null ? DEFAULT_MONTH_SELECTION_VIEW_ENABLED : monthSelectionViewEnabled.get();
     }
 
     /**
@@ -577,13 +736,35 @@ public class CalendarView extends Control {
      * @see YearMonthView
      */
     public final BooleanProperty monthSelectionViewEnabledProperty() {
+        if (monthSelectionViewEnabled == null) {
+            monthSelectionViewEnabled = new StyleableBooleanProperty(DEFAULT_MONTH_SELECTION_VIEW_ENABLED) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "monthSelectionViewEnabled";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.MONTH_SELECTION_VIEW_ENABLED;
+                }
+            };
+        }
         return monthSelectionViewEnabled;
     }
 
-    private final BooleanProperty yearSelectionViewEnabled = new SimpleBooleanProperty(this, "yearSelectionViewEnabled", true);
+    public final void setMonthSelectionViewEnabled(boolean monthSelectionViewEnabled) {
+        monthSelectionViewEnabledProperty().set(monthSelectionViewEnabled);
+    }
+
+    private BooleanProperty yearSelectionViewEnabled;
 
     public final boolean isYearSelectionViewEnabled() {
-        return yearSelectionViewEnabled.get();
+        return yearSelectionViewEnabled == null ? DEFAULT_YEAR_SELECTION_VIEW_ENABLED : yearSelectionViewEnabled.get();
     }
 
     /**
@@ -594,35 +775,83 @@ public class CalendarView extends Control {
      * @see YearView
      */
     public final BooleanProperty yearSelectionViewEnabledProperty() {
+        if (yearSelectionViewEnabled == null) {
+            yearSelectionViewEnabled = new StyleableBooleanProperty(DEFAULT_YEAR_SELECTION_VIEW_ENABLED) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "yearSelectionViewEnabled";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.YEAR_SELECTION_VIEW_ENABLED;
+                }
+            };
+        }
         return yearSelectionViewEnabled;
     }
 
     public final void setYearSelectionViewEnabled(boolean yearSelectionViewEnabled) {
-        this.yearSelectionViewEnabled.set(yearSelectionViewEnabled);
+        yearSelectionViewEnabledProperty().set(yearSelectionViewEnabled);
     }
 
-    public final void setMonthSelectionViewEnabled(boolean monthSelectionViewEnabled) {
-        this.monthSelectionViewEnabled.set(monthSelectionViewEnabled);
+    private BooleanProperty showMonth;
+
+    public final boolean isShowMonth() {
+        return showMonth == null ? DEFAULT_SHOW_MONTH : showMonth.get();
     }
 
-    private final BooleanProperty showMonth = new SimpleBooleanProperty(this, "showMonth", true);
+    /**
+     * Returns the BooleanProperty that controls the visibility of the month display in the header.
+     * This property impacts whether the month name and month navigation controls are shown.
+     *
+     * @return the BooleanProperty associated with the visibility of the month display.
+     * <p>
+     * When set to false:
+     * - Hides the month label at the top of the calendar.
+     * - Disables the visibility of buttons for month navigation (e.g., arrows or dropdown buttons).
+     * <p>
+     * When set to true:
+     * - Displays the month at the top of the calendar.
+     * - The visibility of the dropdown button for changing months is determined by the {@link MonthDisplayMode}.
+     * If the mode is {@link  MonthDisplayMode#TEXT_AND_DROPDOWN}, the dropdown button is displayed.
+     * - The visibility of the month navigation arrows is independent of this property and is controlled by the {#showMonthArrows} property.
+     */
+    public final BooleanProperty showMonthProperty() {
+        if (showMonth == null) {
+            showMonth = new StyleableBooleanProperty(DEFAULT_SHOW_MONTH) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
 
-    public boolean isShowMonth() {
-        return showMonth.get();
-    }
+                @Override
+                public String getName() {
+                    return "showMonth";
+                }
 
-    public BooleanProperty showMonthProperty() {
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.SHOW_MONTH;
+                }
+            };
+        }
         return showMonth;
     }
 
-    public void setShowMonth(boolean showMonth) {
-        this.showMonth.set(showMonth);
+    public final void setShowMonth(boolean showMonth) {
+        showMonthProperty().set(showMonth);
     }
 
-    private final BooleanProperty showYear = new SimpleBooleanProperty(this, "showYear", true);
+    private BooleanProperty showYear;
 
     public final boolean isShowYear() {
-        return showYear.get();
+        return showYear == null ? DEFAULT_SHOW_YEAR : showYear.get();
     }
 
     /**
@@ -631,14 +860,32 @@ public class CalendarView extends Control {
      * @return true if the year is shown in the header
      */
     public final BooleanProperty showYearProperty() {
+        if (showYear == null) {
+            showYear = new StyleableBooleanProperty(DEFAULT_SHOW_YEAR) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "showYear";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.SHOW_YEAR;
+                }
+            };
+        }
         return showYear;
     }
 
     public final void setShowYear(boolean showYear) {
-        this.showYear.set(showYear);
+        showYearProperty().set(showYear);
     }
 
-    private final BooleanProperty showTodayButton = new SimpleBooleanProperty(this, "showTodayButton");
+    private BooleanProperty showTodayButton;
 
     /**
      * Show or hide a button to quickly go to today's date.
@@ -646,6 +893,24 @@ public class CalendarView extends Control {
      * @return true if the button will be shown
      */
     public final BooleanProperty showTodayButtonProperty() {
+        if (showTodayButton == null) {
+            showTodayButton = new StyleableBooleanProperty(DEFAULT_SHOW_TODAY_BUTTON) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "showTodayButton";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.SHOW_TODAY_BUTTON;
+                }
+            };
+        }
         return showTodayButton;
     }
 
@@ -664,10 +929,10 @@ public class CalendarView extends Control {
      * @return true if the button is shown
      */
     public final boolean isShowTodayButton() {
-        return showTodayButtonProperty().get();
+        return showTodayButton == null ? DEFAULT_SHOW_TODAY_BUTTON : showTodayButton.get();
     }
 
-    private final BooleanProperty showMonthArrows = new SimpleBooleanProperty(this, "showMonthArrows", true);
+    private BooleanProperty showMonthArrows;
 
     /**
      * Shows or hides the arrows to change the month.
@@ -675,6 +940,24 @@ public class CalendarView extends Control {
      * @return true if the arrows will be shown
      */
     public final BooleanProperty showMonthArrowsProperty() {
+        if (showMonthArrows == null) {
+            showMonthArrows = new StyleableBooleanProperty(DEFAULT_SHOW_MONTH_ARROWS) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "showMonthArrows";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.SHOW_MONTH_ARROWS;
+                }
+            };
+        }
         return showMonthArrows;
     }
 
@@ -693,7 +976,7 @@ public class CalendarView extends Control {
      * @return true if the arrows will be shown
      */
     public final boolean isShowMonthArrows() {
-        return showMonthArrowsProperty().get();
+        return showMonthArrows == null ? DEFAULT_SHOW_MONTH_ARROWS : showMonthArrows.get();
     }
 
     private final ObjectProperty<SelectionModel> selectionModel = new SimpleObjectProperty<>(this, "selectionModel", new SelectionModel());
@@ -710,18 +993,36 @@ public class CalendarView extends Control {
         this.selectionModel.set(selectionModel);
     }
 
-    private final DoubleProperty weekNumberColumnWidth = new SimpleDoubleProperty(this, "weekNumberColumnWidth", 16);
+    private DoubleProperty weekNumberColumnWidth;
 
     public final double getWeekNumberColumnWidth() {
-        return weekNumberColumnWidth.get();
+        return weekNumberColumnWidth == null ? DEFAULT_WEEK_NUMBER_COLUMN_WIDTH : weekNumberColumnWidth.get();
     }
 
     public final DoubleProperty weekNumberColumnWidthProperty() {
+        if (weekNumberColumnWidth == null) {
+            weekNumberColumnWidth = new StyleableDoubleProperty(DEFAULT_WEEK_NUMBER_COLUMN_WIDTH) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "weekNumberColumnWidth";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+                    return StyleableProperties.WEEK_NUMBER_COLUMN_WIDTH;
+                }
+            };
+        }
         return weekNumberColumnWidth;
     }
 
     public final void setWeekNumberColumnWidth(double weekNumberColumnWidth) {
-        this.weekNumberColumnWidth.set(weekNumberColumnWidth);
+        weekNumberColumnWidthProperty().set(weekNumberColumnWidth);
     }
 
     /**
@@ -1146,11 +1447,224 @@ public class CalendarView extends Control {
             }
         };
 
+        private static final CssMetaData<CalendarView, Boolean> DISABLE_PREVIOUS_MONTH_BUTTON = new CssMetaData<>(
+                "-fx-disable-previous-month-button", BooleanConverter.getInstance(), DEFAULT_DISABLE_PREVIOUS_MONTH_BUTTON) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.disablePreviousMonthButton == null || !control.disablePreviousMonthButton.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.disablePreviousMonthButtonProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> DISABLE_NEXT_MONTH_BUTTON = new CssMetaData<>(
+                "-fx-disable-next-month-button", BooleanConverter.getInstance(), DEFAULT_DISABLE_NEXT_MONTH_BUTTON) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.disableNextMonthButton == null || !control.disableNextMonthButton.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.disableNextMonthButtonProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> DISABLE_NEXT_YEAR_BUTTON = new CssMetaData<>(
+                "-fx-disable-next-year-button", BooleanConverter.getInstance(), DEFAULT_DISABLE_NEXT_YEAR_BUTTON) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.disableNextYearButton == null || !control.disableNextYearButton.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.disableNextYearButtonProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> DISABLE_PREVIOUS_YEAR_BUTTON = new CssMetaData<>(
+                "-fx-disable-previous-year-button", BooleanConverter.getInstance(), DEFAULT_DISABLE_PREVIOUS_YEAR_BUTTON) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.disablePreviousYearButton == null || !control.disablePreviousYearButton.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.disablePreviousYearButtonProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> DISABLE_MONTH_DROPDOWN_BUTTON = new CssMetaData<>(
+                "-fx-disable-month-dropdown-button", BooleanConverter.getInstance(), DEFAULT_DISABLE_MONTH_DROPDOWN_BUTTON) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.disableMonthDropdownButton == null || !control.disableMonthDropdownButton.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.disableMonthDropdownButtonProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> DISABLE_YEAR_DROPDOWN_BUTTON = new CssMetaData<>(
+                "-fx-disable-year-dropdown-button", BooleanConverter.getInstance(), DEFAULT_DISABLE_YEAR_DROPDOWN_BUTTON) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.disableYearDropdownButton == null || !control.disableYearDropdownButton.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.disableYearDropdownButtonProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> MONTH_SELECTION_VIEW_ENABLED = new CssMetaData<>(
+                "-fx-month-selection-view-enabled", BooleanConverter.getInstance(), DEFAULT_MONTH_SELECTION_VIEW_ENABLED) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.monthSelectionViewEnabled == null || !control.monthSelectionViewEnabled.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.monthSelectionViewEnabledProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> YEAR_SELECTION_VIEW_ENABLED = new CssMetaData<>(
+                "-fx-year-selection-view-enabled", BooleanConverter.getInstance(), DEFAULT_YEAR_SELECTION_VIEW_ENABLED) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.yearSelectionViewEnabled == null || !control.yearSelectionViewEnabled.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.yearSelectionViewEnabledProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> SHOW_MONTH = new CssMetaData<>(
+                "-fx-show-month", BooleanConverter.getInstance(), DEFAULT_SHOW_MONTH) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.showMonth == null || !control.showMonth.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.showMonthProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> SHOW_YEAR = new CssMetaData<>(
+                "-fx-show-year", BooleanConverter.getInstance(), DEFAULT_SHOW_YEAR) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.showYear == null || !control.showYear.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.showYearProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> SHOW_TODAY_BUTTON = new CssMetaData<>(
+                "-fx-show-today-button", BooleanConverter.getInstance(), DEFAULT_SHOW_TODAY_BUTTON) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.showTodayButton == null || !control.showTodayButton.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.showTodayButtonProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> SHOW_MONTH_ARROWS = new CssMetaData<>(
+                "-fx-show-month-arrows", BooleanConverter.getInstance(), DEFAULT_SHOW_MONTH_ARROWS) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.showMonthArrows == null || !control.showMonthArrows.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.showMonthArrowsProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> MARK_SELECTED_DAYS_OF_PREVIOUS_OR_NEXT_MONTH = new CssMetaData<>(
+                "-fx-mark-selected-days-of-previous-or-next-month", BooleanConverter.getInstance(), DEFAULT_MARK_SELECTED_DAYS_OF_PREVIOUS_OR_NEXT_MONTH) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.markSelectedDaysOfPreviousOrNextMonth == null || !control.markSelectedDaysOfPreviousOrNextMonth.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.markSelectedDaysOfPreviousOrNextMonthProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Boolean> SHOW_DAYS_OF_PREVIOUS_OR_NEXT_MONTH = new CssMetaData<>(
+                "-fx-show-days-of-previous-or-next-month", BooleanConverter.getInstance(), DEFAULT_SHOW_DAYS_OF_PREVIOUS_OR_NEXT_MONTH) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.showDaysOfPreviousOrNextMonth == null || !control.showDaysOfPreviousOrNextMonth.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.showDaysOfPreviousOrNextMonthProperty();
+            }
+        };
+
+        private static final CssMetaData<CalendarView, Number> WEEK_NUMBER_COLUMN_WIDTH = new CssMetaData<>(
+                "-fx-week-number-column-width", SizeConverter.getInstance(), DEFAULT_WEEK_NUMBER_COLUMN_WIDTH) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.weekNumberColumnWidth == null || !control.weekNumberColumnWidth.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Number> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Number>) control.weekNumberColumnWidthProperty();
+            }
+        };
+
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
 
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
-            Collections.addAll(styleables, YEAR_DISPLAY_MODE, MONTH_DISPLAY_MODE, SHOW_TODAY, SHOW_WEEK_NUMBERS);
+            Collections.addAll(styleables, YEAR_DISPLAY_MODE, MONTH_DISPLAY_MODE, SHOW_TODAY, SHOW_WEEK_NUMBERS, DISABLE_PREVIOUS_MONTH_BUTTON, DISABLE_NEXT_MONTH_BUTTON,
+                    DISABLE_NEXT_YEAR_BUTTON, DISABLE_PREVIOUS_YEAR_BUTTON, DISABLE_MONTH_DROPDOWN_BUTTON, DISABLE_YEAR_DROPDOWN_BUTTON, MONTH_SELECTION_VIEW_ENABLED,
+                    YEAR_SELECTION_VIEW_ENABLED, SHOW_MONTH, SHOW_YEAR, SHOW_TODAY_BUTTON, SHOW_MONTH_ARROWS, MARK_SELECTED_DAYS_OF_PREVIOUS_OR_NEXT_MONTH,
+                    SHOW_DAYS_OF_PREVIOUS_OR_NEXT_MONTH, WEEK_NUMBER_COLUMN_WIDTH);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }
