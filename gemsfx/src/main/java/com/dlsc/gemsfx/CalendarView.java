@@ -85,6 +85,7 @@ public class CalendarView extends Control {
     private static final YearDisplayMode DEFAULT_YEAR_DISPLAY_MODE = YearDisplayMode.TEXT_ONLY;
     private static final MonthDisplayMode DEFAULT_MONTH_DISPLAY_MODE = MonthDisplayMode.TEXT_ONLY;
     private static final boolean DEFAULT_SHOW_TODAY = true;
+    private static final boolean DEFAULT_SHOW_WEEK_NUMBERS = false;
     private YearMonthView yearMonthView;
 
     private YearView yearView;
@@ -175,7 +176,7 @@ public class CalendarView extends Control {
         return weekendDays;
     }
 
-    private final BooleanProperty showWeekNumbers = new SimpleBooleanProperty(this, "showWeekNumbers");
+    private BooleanProperty showWeekNumbers;
 
     /**
      * Controls whether the view will show week numbers.
@@ -183,6 +184,24 @@ public class CalendarView extends Control {
      * @return true if week numbers are shown
      */
     public final BooleanProperty showWeekNumbersProperty() {
+        if (showWeekNumbers == null) {
+            showWeekNumbers = new StyleableBooleanProperty(DEFAULT_SHOW_WEEK_NUMBERS) {
+                @Override
+                public Object getBean() {
+                    return CalendarView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "showWeekNumbers";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.SHOW_WEEK_NUMBERS;
+                }
+            };
+        }
         return showWeekNumbers;
     }
 
@@ -201,7 +220,7 @@ public class CalendarView extends Control {
      * @return true if week numbers will be shown
      */
     public final boolean isShowWeekNumbers() {
-        return showWeekNumbersProperty().get();
+        return showWeekNumbers == null ? DEFAULT_SHOW_WEEK_NUMBERS : showWeekNumbers.get();
     }
 
     private final BooleanProperty markSelectedDaysOfPreviousOrNextMonth = new SimpleBooleanProperty(this, "markSelectedDaysOfPreviousOrNextMonth", true);
@@ -1113,11 +1132,25 @@ public class CalendarView extends Control {
             }
         };
 
+        private static final CssMetaData<CalendarView, Boolean> SHOW_WEEK_NUMBERS = new CssMetaData<>(
+                "-fx-show-week-numbers", BooleanConverter.getInstance(), DEFAULT_SHOW_WEEK_NUMBERS) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.showWeekNumbers == null || !control.showWeekNumbers.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.showWeekNumbersProperty();
+            }
+        };
+
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
 
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
-            Collections.addAll(styleables, YEAR_DISPLAY_MODE, MONTH_DISPLAY_MODE, SHOW_TODAY);
+            Collections.addAll(styleables, YEAR_DISPLAY_MODE, MONTH_DISPLAY_MODE, SHOW_TODAY, SHOW_WEEK_NUMBERS);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }
