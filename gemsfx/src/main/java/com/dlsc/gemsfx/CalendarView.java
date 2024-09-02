@@ -33,8 +33,10 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.EnumConverter;
 import javafx.scene.control.Cell;
 import javafx.scene.control.Control;
@@ -82,6 +84,7 @@ public class CalendarView extends Control {
 
     private static final YearDisplayMode DEFAULT_YEAR_DISPLAY_MODE = YearDisplayMode.TEXT_ONLY;
     private static final MonthDisplayMode DEFAULT_MONTH_DISPLAY_MODE = MonthDisplayMode.TEXT_ONLY;
+    private static final boolean DEFAULT_SHOW_TODAY = true;
     private YearMonthView yearMonthView;
 
     private YearView yearView;
@@ -241,8 +244,6 @@ public class CalendarView extends Control {
         this.showDaysOfPreviousOrNextMonth.set(showDaysOfPreviousOrNextMonth);
     }
 
-    private final BooleanProperty showToday = new SimpleBooleanProperty(this, "showToday", true);
-
     private final ObjectProperty<LocalDate> today = new SimpleObjectProperty<>(this, "today", LocalDate.now());
 
     /**
@@ -274,6 +275,8 @@ public class CalendarView extends Control {
         return todayProperty().get();
     }
 
+    private BooleanProperty showToday;
+
     /**
      * A flag used to indicate that the view will mark the area that represents
      * the value of {@link #todayProperty()}. By default, this area will be
@@ -283,6 +286,24 @@ public class CalendarView extends Control {
      * @return true if today will be shown differently
      */
     public final BooleanProperty showTodayProperty() {
+        if (showToday == null) {
+            showToday = new StyleableBooleanProperty(DEFAULT_SHOW_TODAY) {
+                @Override
+                public Object getBean() {
+                    return this;
+                }
+
+                @Override
+                public String getName() {
+                    return "showToday";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.SHOW_TODAY;
+                }
+            };
+        }
         return showToday;
     }
 
@@ -292,7 +313,7 @@ public class CalendarView extends Control {
      * @return true if today will be highlighted visually
      */
     public final boolean isShowToday() {
-        return showTodayProperty().get();
+        return showToday == null ? DEFAULT_SHOW_TODAY : showToday.get();
     }
 
     /**
@@ -1078,11 +1099,25 @@ public class CalendarView extends Control {
             }
         };
 
+        private static final CssMetaData<CalendarView, Boolean> SHOW_TODAY = new CssMetaData<>(
+                "-fx-show-today", BooleanConverter.getInstance(), DEFAULT_SHOW_TODAY) {
+
+            @Override
+            public boolean isSettable(CalendarView control) {
+                return control.showToday == null || !control.showToday.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(CalendarView control) {
+                return (StyleableProperty<Boolean>) control.showTodayProperty();
+            }
+        };
+
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
 
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
-            Collections.addAll(styleables, YEAR_DISPLAY_MODE, MONTH_DISPLAY_MODE);
+            Collections.addAll(styleables, YEAR_DISPLAY_MODE, MONTH_DISPLAY_MODE, SHOW_TODAY);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }
