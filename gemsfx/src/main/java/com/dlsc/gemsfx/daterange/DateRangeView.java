@@ -128,6 +128,7 @@ public class DateRangeView extends Control {
         if (startCalendarView == null) {
             startCalendarView = createCalendar();
             startCalendarView.setYearMonth(YearMonth.now());
+            startCalendarView.getStyleClass().add("start-calendar");
         }
         return startCalendarView;
     }
@@ -142,6 +143,7 @@ public class DateRangeView extends Control {
         if (endCalendarView == null) {
             endCalendarView = createCalendar();
             endCalendarView.setYearMonth(YearMonth.now().plusMonths(1));
+            endCalendarView.getStyleClass().add("end-calendar");
         }
         return endCalendarView;
     }
