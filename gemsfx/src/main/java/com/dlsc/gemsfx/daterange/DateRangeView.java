@@ -47,7 +47,7 @@ public class DateRangeView extends Control {
         endCalendarView = getEndCalendarView();
         endCalendarView.setSelectionModel(selectionModel);
 
-        DateRangePreset todayRange = createTodayRange();
+        DateRangePreset todayRange = createTodayRangePreset();
         getPresets().addAll(todayRange, createYesterdayPreset(), createThisWeekPreset(), createThisMonthPreset(), createLastMonthPreset());
         setValue(todayRange.getDateRangeSupplier().get());
     }
@@ -320,7 +320,7 @@ public class DateRangeView extends Control {
         return presets;
     }
 
-    private DateRangePreset createTodayRange() {
+    private DateRangePreset createTodayRangePreset() {
         return new DateRangePreset("Today", () -> new DateRange("Today", LocalDate.now()));
     }
 
