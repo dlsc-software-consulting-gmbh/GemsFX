@@ -30,6 +30,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
+import javafx.css.PseudoClass;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -78,6 +79,10 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
     private static final String RANGE_END_DATE = "range-end";
     private static final String RANGE_DATE = "range-date";
     private static final String DROPDOWN = "dropdown";
+
+    private static final PseudoClass HEADER_LEFT_PSEUDO_CLASS = PseudoClass.getPseudoClass("left");
+    private static final PseudoClass HEADER_CENTER_PSEUDO_CLASS = PseudoClass.getPseudoClass("center");
+    private static final PseudoClass HEADER_RIGHT_PSEUDO_CLASS = PseudoClass.getPseudoClass("right");
 
     private final Label monthLabel;
 
@@ -249,8 +254,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         Spacer rightSpacer = new Spacer();
         rightSpacer.getStyleClass().add("right");
 
-        updateHeader(header, previousArrowButton, leftSpacer, yearSpinnerBox, rightSpacer, nextMonthArrowButton);
-        view.headerLayoutProperty().addListener(it -> updateHeader(header, previousArrowButton, leftSpacer, yearSpinnerBox, rightSpacer, nextMonthArrowButton));
+        view.headerLayoutProperty().subscribe(headerLayout -> updateHeader(header, previousArrowButton, leftSpacer, yearSpinnerBox, rightSpacer, nextMonthArrowButton));
 
         InvalidationListener updateViewListener = evt -> updateView();
         view.yearMonthProperty().addListener(evt -> {
@@ -353,15 +357,22 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
     }
 
     private void updateHeader(HBox header, StackPane previousArrowButton, Spacer leftSpacer, VBox yearSpinnerBox, Spacer rightSpacer, StackPane nextMonthArrowButton) {
+        header.pseudoClassStateChanged(HEADER_LEFT_PSEUDO_CLASS, false);
+        header.pseudoClassStateChanged(HEADER_CENTER_PSEUDO_CLASS, false);
+        header.pseudoClassStateChanged(HEADER_RIGHT_PSEUDO_CLASS, false);
+
         switch (getSkinnable().getHeaderLayout()) {
             case CENTER:
                 header.getChildren().setAll(previousArrowButton, leftSpacer, monthLabel, yearLabel, yearSpinnerBox, rightSpacer, nextMonthArrowButton);
+                header.pseudoClassStateChanged(HEADER_CENTER_PSEUDO_CLASS, true);
                 break;
             case LEFT:
                 header.getChildren().setAll(monthLabel, yearLabel, yearSpinnerBox, rightSpacer, previousArrowButton, nextMonthArrowButton);
+                header.pseudoClassStateChanged(HEADER_LEFT_PSEUDO_CLASS, true);
                 break;
             case RIGHT:
                 header.getChildren().setAll(previousArrowButton, nextMonthArrowButton, leftSpacer, monthLabel, yearLabel);
+                header.pseudoClassStateChanged(HEADER_RIGHT_PSEUDO_CLASS, true);
                 break;
         }
     }
