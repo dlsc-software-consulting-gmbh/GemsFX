@@ -254,8 +254,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
         Spacer rightSpacer = new Spacer();
         rightSpacer.getStyleClass().add("right");
 
-        updateHeader(header, previousArrowButton, leftSpacer, yearSpinnerBox, rightSpacer, nextMonthArrowButton);
-        view.headerLayoutProperty().addListener(it -> updateHeader(header, previousArrowButton, leftSpacer, yearSpinnerBox, rightSpacer, nextMonthArrowButton));
+        view.headerLayoutProperty().subscribe(headerLayout -> updateHeader(header, previousArrowButton, leftSpacer, yearSpinnerBox, rightSpacer, nextMonthArrowButton));
 
         InvalidationListener updateViewListener = evt -> updateView();
         view.yearMonthProperty().addListener(evt -> {
