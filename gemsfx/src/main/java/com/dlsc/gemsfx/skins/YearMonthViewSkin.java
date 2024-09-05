@@ -64,18 +64,7 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
 
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-pane");
-        gridPane.add(new MonthBox(Month.JANUARY, control), 0, 0);
-        gridPane.add(new MonthBox(Month.FEBRUARY, control), 2, 0);
-        gridPane.add(new MonthBox(Month.MARCH, control), 0, 1);
-        gridPane.add(new MonthBox(Month.APRIL, control), 2, 1);
-        gridPane.add(new MonthBox(Month.MAY, control), 0, 2);
-        gridPane.add(new MonthBox(Month.JUNE, control), 2, 2);
-        gridPane.add(new MonthBox(Month.JULY, control), 0, 3);
-        gridPane.add(new MonthBox(Month.AUGUST, control), 2, 3);
-        gridPane.add(new MonthBox(Month.SEPTEMBER, control), 0, 4);
-        gridPane.add(new MonthBox(Month.OCTOBER, control), 2, 4);
-        gridPane.add(new MonthBox(Month.NOVEMBER, control), 0, 5);
-        gridPane.add(new MonthBox(Month.DECEMBER, control), 2, 5);
+        addMonthBoxToGridPane(gridPane, control);
 
         Region divider = new Region();
         divider.getStyleClass().add("divider");
@@ -129,6 +118,14 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
                 updateMonthBoxes(control.getValue(), gridPane);
             }
         });
+    }
+
+    private void addMonthBoxToGridPane(GridPane gridPane, YearMonthView control) {
+        for (Month month : Month.values()) {
+            int columnIndex = (month.getValue() % 2 == 0) ? 2 : 0;
+            int rowIndex = (month.getValue() - 1) / 2;
+            gridPane.add(new MonthBox(month, control), columnIndex, rowIndex);
+        }
     }
 
     /**
