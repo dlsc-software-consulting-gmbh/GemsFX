@@ -4,10 +4,10 @@ import com.dlsc.gemsfx.YearMonthView;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.css.PseudoClass;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.ColumnConstraints;
@@ -25,13 +25,18 @@ import java.time.YearMonth;
 
 public class YearMonthViewSkin extends SkinBase<YearMonthView> {
 
+    private static final PseudoClass MONTH_SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
+
     private final ObjectProperty<Integer> year = new SimpleObjectProperty<>(this, "year");
+    private final ObjectProperty<Month> selectedMonth = new SimpleObjectProperty<>(this, "selectedMonth");
 
     public YearMonthViewSkin(YearMonthView control) {
         super(control);
-
-        year.set(control.getValue().getYear());
-        control.valueProperty().addListener(it -> year.set(control.getValue().getYear()));
+        
+        control.valueProperty().subscribe(value -> {
+            year.set(value.getYear());
+            selectedMonth.set(value.getMonth());
+        });
 
         Label yearLabel = new Label();
         yearLabel.getStyleClass().add("year-label");
@@ -60,18 +65,18 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
 
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-pane");
-        gridPane.add(createMonth(Month.JANUARY), 0, 0);
-        gridPane.add(createMonth(Month.FEBRUARY), 2, 0);
-        gridPane.add(createMonth(Month.MARCH), 0, 1);
-        gridPane.add(createMonth(Month.APRIL), 2, 1);
-        gridPane.add(createMonth(Month.MAY), 0, 2);
-        gridPane.add(createMonth(Month.JUNE), 2, 2);
-        gridPane.add(createMonth(Month.JULY), 0, 3);
-        gridPane.add(createMonth(Month.AUGUST), 2, 3);
-        gridPane.add(createMonth(Month.SEPTEMBER), 0, 4);
-        gridPane.add(createMonth(Month.OCTOBER), 2, 4);
-        gridPane.add(createMonth(Month.NOVEMBER), 0, 5);
-        gridPane.add(createMonth(Month.DECEMBER), 2, 5);
+        gridPane.add(new MonthBox(Month.JANUARY, control), 0, 0);
+        gridPane.add(new MonthBox(Month.FEBRUARY, control), 2, 0);
+        gridPane.add(new MonthBox(Month.MARCH, control), 0, 1);
+        gridPane.add(new MonthBox(Month.APRIL, control), 2, 1);
+        gridPane.add(new MonthBox(Month.MAY, control), 0, 2);
+        gridPane.add(new MonthBox(Month.JUNE, control), 2, 2);
+        gridPane.add(new MonthBox(Month.JULY, control), 0, 3);
+        gridPane.add(new MonthBox(Month.AUGUST, control), 2, 3);
+        gridPane.add(new MonthBox(Month.SEPTEMBER, control), 0, 4);
+        gridPane.add(new MonthBox(Month.OCTOBER, control), 2, 4);
+        gridPane.add(new MonthBox(Month.NOVEMBER, control), 0, 5);
+        gridPane.add(new MonthBox(Month.DECEMBER, control), 2, 5);
 
         Region divider = new Region();
         divider.getStyleClass().add("divider");
@@ -112,39 +117,51 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
         container.setClip(clip);
 
         getChildren().add(container);
+
+        // Updates the pseudo-class state based on whether the month of the box matches the newly selected month.
+        selectedMonth.subscribe(monthSelected ->
+                gridPane.getChildren().stream()
+                        .filter(node -> node instanceof MonthBox)
+                        .map(node -> (MonthBox) node)
+                        .forEach(box -> box.pseudoClassStateChanged(MONTH_SELECTED_PSEUDO_CLASS, box.getMonth() == monthSelected))
+        );
     }
 
-    private Node createMonth(Month month) {
-        Label monthLabel = new Label(getSkinnable().getConverter().toString(month));
-        monthLabel.getStyleClass().add("month-label");
-        monthLabel.setMinWidth(Region.USE_PREF_SIZE);
-        monthLabel.setMaxWidth(Region.USE_PREF_SIZE);
+    private class MonthBox extends VBox {
 
-        YearMonthView view = getSkinnable();
+        private final Month month;
 
-        Region selectionIndicator = new Region();
-        selectionIndicator.visibleProperty().bind(Bindings.createBooleanBinding(() -> view.getValue().equals(YearMonth.of(year.get(), month)), view.valueProperty(), year));
-        selectionIndicator.getStyleClass().add("selection-indicator");
+        public MonthBox(Month month, YearMonthView view) {
+            getStyleClass().add("month-box");
 
-        VBox box = new VBox(monthLabel, selectionIndicator);
-        box.setMaxWidth(Region.USE_PREF_SIZE);
-        box.setAlignment(Pos.CENTER);
-        box.getStyleClass().add("month-box");
-        box.setOnMouseClicked(evt -> view.setValue(YearMonth.of(year.get(), month.getValue())));
-        box.disableProperty().bind(Bindings.createObjectBinding(() -> {
-            YearMonth earliestMonth = view.getEarliestMonth();
-            if (earliestMonth != null && YearMonth.of(view.getValue().getYear(), month.getValue()).isBefore(earliestMonth)) {
-                return true;
-            }
-            YearMonth latestMonth = view.getLatestMonth();
-            if (latestMonth != null && YearMonth.of(view.getValue().getYear(), month.getValue()).isAfter(latestMonth)) {
-                return true;
-            }
-            return false;
-        }, view.earliestMonthProperty(), view.latestMonthProperty(), view.valueProperty()));
+            this.month = month;
 
-        GridPane.setMargin(box, new Insets(10, 30, 10, 30));
+            Label monthLabel = new Label(view.getConverter().toString(month));
+            monthLabel.getStyleClass().add("month-label");
+            monthLabel.setMinWidth(Region.USE_PREF_SIZE);
+            monthLabel.setMaxWidth(Region.USE_PREF_SIZE);
 
-        return box;
+            Region indicator = new Region();
+            indicator.getStyleClass().add("indicator");
+
+            getChildren().setAll(monthLabel, indicator);
+            GridPane.setMargin(this, new Insets(10, 30, 10, 30));
+
+            setMaxWidth(Region.USE_PREF_SIZE);
+            setAlignment(Pos.CENTER);
+            setOnMouseClicked(evt -> view.setValue(YearMonth.of(year.get(), month.getValue())));
+            disableProperty().bind(Bindings.createObjectBinding(() -> {
+                YearMonth earliestMonth = view.getEarliestMonth();
+                if (earliestMonth != null && YearMonth.of(view.getValue().getYear(), month.getValue()).isBefore(earliestMonth)) {
+                    return true;
+                }
+                YearMonth latestMonth = view.getLatestMonth();
+                return latestMonth != null && YearMonth.of(view.getValue().getYear(), month.getValue()).isAfter(latestMonth);
+            }, view.earliestMonthProperty(), view.latestMonthProperty(), view.valueProperty()));
+        }
+
+        public final Month getMonth() {
+            return month;
+        }
     }
 }
