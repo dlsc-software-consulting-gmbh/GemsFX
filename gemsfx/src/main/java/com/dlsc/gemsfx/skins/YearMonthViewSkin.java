@@ -30,7 +30,7 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
     private static final PseudoClass CURRENT_MONTH_PSEUDO_CLASS = PseudoClass.getPseudoClass("current");
 
     private final ObjectProperty<Integer> year = new SimpleObjectProperty<>(this, "year");
-    private boolean updatingMonthBox = false;
+    private boolean updatingMonthBox;
 
     public YearMonthViewSkin(YearMonthView control) {
         super(control);
