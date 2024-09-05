@@ -20,23 +20,22 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 
+import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 
 public class YearMonthViewSkin extends SkinBase<YearMonthView> {
 
-    private static final PseudoClass MONTH_SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
+    private static final PseudoClass SELECTED_MONTH_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
+    private static final PseudoClass CURRENT_MONTH_PSEUDO_CLASS = PseudoClass.getPseudoClass("current");
 
     private final ObjectProperty<Integer> year = new SimpleObjectProperty<>(this, "year");
-    private final ObjectProperty<Month> selectedMonth = new SimpleObjectProperty<>(this, "selectedMonth");
+    private boolean updatingMonthBox = false;
 
     public YearMonthViewSkin(YearMonthView control) {
         super(control);
-        
-        control.valueProperty().subscribe(value -> {
-            year.set(value.getYear());
-            selectedMonth.set(value.getMonth());
-        });
+
+        year.set(control.getValue().getYear());
 
         Label yearLabel = new Label();
         yearLabel.getStyleClass().add("year-label");
@@ -118,13 +117,35 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
 
         getChildren().add(container);
 
-        // Updates the pseudo-class state based on whether the month of the box matches the newly selected month.
-        selectedMonth.subscribe(monthSelected ->
-                gridPane.getChildren().stream()
-                        .filter(node -> node instanceof MonthBox)
-                        .map(node -> (MonthBox) node)
-                        .forEach(box -> box.pseudoClassStateChanged(MONTH_SELECTED_PSEUDO_CLASS, box.getMonth() == monthSelected))
-        );
+        control.valueProperty().subscribe(value -> {
+            updatingMonthBox = true;
+            year.set(value.getYear());
+            updateMonthBoxes(value, gridPane);
+            updatingMonthBox = false;
+        });
+
+        year.addListener(it -> {
+            if (!updatingMonthBox) {
+                updateMonthBoxes(control.getValue(), gridPane);
+            }
+        });
+    }
+
+    /**
+     * Updates the pseudo-class state of the MonthBoxes.
+     */
+    private void updateMonthBoxes(YearMonth value, GridPane gridPane) {
+        Month selectedMonth = value.getMonth();
+        int currentYear = LocalDate.now().getYear();
+        Month currentMonth = LocalDate.now().getMonth();
+
+        gridPane.getChildren().stream()
+                .filter(node -> node instanceof MonthBox)
+                .map(node -> (MonthBox) node)
+                .forEach(box -> {
+                    box.pseudoClassStateChanged(SELECTED_MONTH_PSEUDO_CLASS, box.getMonth() == selectedMonth);
+                    box.pseudoClassStateChanged(CURRENT_MONTH_PSEUDO_CLASS, box.getMonth() == currentMonth && year.get() == currentYear);
+                });
     }
 
     private class MonthBox extends VBox {
