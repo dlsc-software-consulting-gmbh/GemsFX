@@ -61,8 +61,8 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
 
         filtersPane.getStyleClass().add("filters");
         filtersPane.prefWrapLengthProperty().bind(view.widthProperty());
-        filtersPane.visibleProperty().bind(Bindings.isNotEmpty(filtersPane.getChildren()));
-        filtersPane.managedProperty().bind(Bindings.isNotEmpty(filtersPane.getChildren()));
+        filtersPane.visibleProperty().bind(Bindings.isNotEmpty(view.getFilters()));
+        filtersPane.managedProperty().bind(Bindings.isNotEmpty(view.getFilters()));
         filtersPane.setMinHeight(Region.USE_PREF_SIZE);
 
         searchTextField.visibleProperty().bind(view.textFilterProviderProperty().isNotNull());
