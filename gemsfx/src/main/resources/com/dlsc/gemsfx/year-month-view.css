@@ -17,10 +17,15 @@
     -fx-cursor: hand;
 }
 
-.year-month-view > .container > .grid-pane .month-box .selection-indicator {
+.year-month-view > .container > .grid-pane .month-box > .indicator {
+    visibility: hidden;
     -fx-pref-height: 2px;
     -fx-background-color: -fx-text-background-color;
     -fx-background-insets: 0px -2px 0px -2px;
+}
+
+.year-month-view > .container > .grid-pane .month-box:selected > .indicator {
+    visibility: visible;
 }
 
 .year-month-view > .container > .grid-pane .divider {
