@@ -4,13 +4,19 @@ import com.dlsc.gemsfx.YearView;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.event.Event;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 
 import java.time.LocalDate;
@@ -164,6 +170,8 @@ public class YearViewSkin extends SkinBase<YearView> {
         Region selectionIndicator = new Region();
         selectionIndicator.visibleProperty().bind(Bindings.createBooleanBinding(() -> view.getYear() == year, view.valueProperty()));
         selectionIndicator.getStyleClass().add("selection-indicator");
+        selectionIndicator.setMinHeight(Region.USE_PREF_SIZE);
+        VBox.setVgrow(selectionIndicator, Priority.NEVER);
 
         VBox box = new VBox(yearLabel, selectionIndicator);
         box.setMaxWidth(Region.USE_PREF_SIZE);

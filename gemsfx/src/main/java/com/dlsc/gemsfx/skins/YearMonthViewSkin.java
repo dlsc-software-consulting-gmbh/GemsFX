@@ -161,6 +161,8 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
 
             Region indicator = new Region();
             indicator.getStyleClass().add("indicator");
+            indicator.setMinHeight(Region.USE_PREF_SIZE);
+            VBox.setVgrow(indicator, Priority.NEVER);
 
             getChildren().setAll(monthLabel, indicator);
             GridPane.setMargin(this, new Insets(10, 30, 10, 30));
