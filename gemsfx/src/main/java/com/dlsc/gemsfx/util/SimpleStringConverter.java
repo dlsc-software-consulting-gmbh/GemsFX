@@ -43,6 +43,7 @@ import java.util.Optional;
  * @param <T> the type of the object to be converted.
  */
 public class SimpleStringConverter<T> extends StringConverter<T> {
+
     private final Callback<T, String> valueToStringCallback;
 
     public SimpleStringConverter() {
