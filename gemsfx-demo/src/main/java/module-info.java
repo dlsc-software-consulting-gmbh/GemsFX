@@ -1,4 +1,4 @@
-module com.dlsc.gemsfx.demo {
+open module com.dlsc.gemsfx.demo {
     requires java.prefs;
 
     requires com.dlsc.gemsfx;

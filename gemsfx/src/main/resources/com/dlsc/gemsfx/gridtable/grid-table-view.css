@@ -1,0 +1,49 @@
+.grid-table-view {
+    -fx-background-color: white;
+    -fx-table-cell-border-color: -fx-box-border;
+}
+
+.grid-table-view .column-header {
+    -fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-selection-bar-text;
+    -fx-padding: 0.166667em;
+    -fx-alignment: center;
+    -fx-pref-height: 3em;
+    -fx-min-height: 3em;
+    -fx-max-height: 3em;
+}
+
+.grid-table-view .column-header.last {
+    -fx-border-width: 1px;
+}
+
+.grid-table-view .column-header-background {
+}
+
+.grid-table-view .row-background {
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-table-cell-border-color, -fx-background;
+    -fx-background-insets: 0px, 0px 0px 1px 0px;
+}
+
+.grid-table-view .row-background.odd {
+    -fx-background: -fx-control-inner-background-alt;
+}
+
+.grid-table-view .row-background.last,
+.grid-table-view .row-background.only {
+    -fx-border-color: -fx-table-cell-border-color;
+    -fx-border-width: 0px 1px 1px 1px;
+}
+
+.grid-table-view .grid-table-cell {
+    -fx-padding: 10px 5px 10px 5px;
+    -fx-border-color: -fx-table-cell-border-color;
+    -fx-border-width: 0px 1px 0px 0px;
+}
+
+.grid-table-view .grid-table-cell.first {
+    -fx-border-width: 0px 1px 0px 1px;
+}
