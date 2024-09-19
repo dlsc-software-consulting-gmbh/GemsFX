@@ -31,6 +31,10 @@ public class PagingControls extends Control {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
         setMessageLabelProvider(view -> {
+            if (getPageCount() == 1) {
+                return "Showing all items";
+            }
+
             int startIndex = (view.getPage() * getPageSize()) + 1;
             int endIndex = startIndex + getPageSize() - 1;
 
@@ -66,6 +70,26 @@ public class PagingControls extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(PagingControls.class.getResource("paging-view.css")).toExternalForm();
+    }
+
+    public enum MessageLabelStrategy {
+        HIDE,
+        SHOW_WHEN_NEEDED,
+        ALWAYS_SHOW
+    }
+
+    private final ObjectProperty<MessageLabelStrategy> messageLabelStrategy = new SimpleObjectProperty<>(this, "messageLabelStrategy", MessageLabelStrategy.SHOW_WHEN_NEEDED);
+
+    public final MessageLabelStrategy getMessageLabelStrategy() {
+        return messageLabelStrategy.get();
+    }
+
+    public final ObjectProperty<MessageLabelStrategy> messageLabelStrategyProperty() {
+        return messageLabelStrategy;
+    }
+
+    public final void setMessageLabelStrategy(MessageLabelStrategy messageLabelStrategy) {
+        this.messageLabelStrategy.set(messageLabelStrategy);
     }
 
     private final BooleanProperty showMaxPage = new SimpleBooleanProperty(this, "showMaxButton");
@@ -138,20 +162,6 @@ public class PagingControls extends Control {
 
     public final void setTotalItemCount(int totalItemCount) {
         this.totalItemCount.set(totalItemCount);
-    }
-
-    private final BooleanProperty showMessageLabel = new SimpleBooleanProperty(this, "showMessageLabel", true);
-
-    public final boolean getShowMessageLabel() {
-        return showMessageLabel.get();
-    }
-
-    public final BooleanProperty showMessageLabelProperty() {
-        return showMessageLabel;
-    }
-
-    public final void setShowMessageLabel(boolean showMessageLabel) {
-        this.showMessageLabel.set(showMessageLabel);
     }
 
     private final ReadOnlyIntegerWrapper pageCount = new ReadOnlyIntegerWrapper(this, "pageCount", 0);

@@ -1,15 +1,18 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PagingControls;
+import com.dlsc.gemsfx.PagingControls.MessageLabelStrategy;
 import com.dlsc.gemsfx.Spacer;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -60,9 +63,6 @@ public class PagingControlsApp extends Application {
         Label pageCountLabel = new Label();
         pageCountLabel.textProperty().bind(Bindings.createStringBinding(() -> "Page count: " + pagingControls.getPageCount(), pagingControls.pageCountProperty()));
 
-        CheckBox showItemCounter = new CheckBox("Show item counter");
-        showItemCounter.selectedProperty().bindBidirectional(pagingControls.showMessageLabelProperty());
-
         CheckBox showGotoFirstPageButton = new CheckBox("First page button");
         showGotoFirstPageButton.selectedProperty().bindBidirectional(pagingControls.showGotoFirstPageButtonProperty());
 
@@ -72,13 +72,25 @@ public class PagingControlsApp extends Application {
         CheckBox showMaxPage = new CheckBox("Show max page");
         showMaxPage.selectedProperty().bindBidirectional(pagingControls.showMaxPageProperty());
 
+        ChoiceBox<MessageLabelStrategy> strategyChoiceBox = new ChoiceBox<>();
+        strategyChoiceBox.getItems().addAll(MessageLabelStrategy.values());
+        strategyChoiceBox.valueProperty().bindBidirectional(pagingControls.messageLabelStrategyProperty());
+
         ChoiceBox<Integer> maxPageIndicatorsBox = new ChoiceBox<>();
         maxPageIndicatorsBox.getItems().setAll(List.of(1, 2, 5, 10));
         maxPageIndicatorsBox.valueProperty().bindBidirectional(pagingControls.maxPageIndicatorsCountProperty().asObject());
 
-        HBox hbox = new HBox(20, pageLabel, pageCountLabel, new Spacer(), showGotoFirstPageButton, showGotoLastPageButton, showMaxPage, showItemCounter, new Label("# Indicators: "), maxPageIndicatorsBox);
+        HBox strategyBox = new HBox(5, new Label("Label strategy: "), strategyChoiceBox);
+        strategyBox.setAlignment(Pos.CENTER_LEFT);
 
-        VBox vBox = new VBox(10, pagingControls, hbox);
+        HBox indicatorBox = new HBox(5, new Label("# Indicators: "), maxPageIndicatorsBox);
+        indicatorBox.setAlignment(Pos.CENTER_LEFT);
+
+        FlowPane flowPane = new FlowPane(pageLabel, pageCountLabel, new Spacer(), showGotoFirstPageButton, showGotoLastPageButton, showMaxPage, strategyBox, indicatorBox);
+        flowPane.setVgap(10);
+        flowPane.setHgap(20);
+
+        VBox vBox = new VBox(10, pagingControls, flowPane);
         vBox.setMaxHeight(Region.USE_PREF_SIZE);
 
         return vBox;

@@ -9,7 +9,7 @@
     -fx-spacing: 2px;
 }
 
-.paging-view > .hbox .counter-label {
+.paging-view > .hbox .message-label {
 }
 
 .paging-view > .hbox .page-button {
