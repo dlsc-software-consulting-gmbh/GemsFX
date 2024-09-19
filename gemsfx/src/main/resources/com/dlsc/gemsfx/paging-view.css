@@ -1,0 +1,57 @@
+.paging-view {
+    -fx-alignment: center-left;
+    -fx-padding: 5px 0px 0px 0px;
+    -fx-spacing: 2px;
+}
+
+.paging-view > .hbox {
+    -fx-alignment: center-left;
+    -fx-spacing: 2px;
+}
+
+.paging-view > .hbox .counter-label {
+}
+
+.paging-view > .hbox .page-button {
+    -fx-padding: 5px;
+    -fx-background-color: transparent;
+    -fx-background-radius: 1000px;
+    -fx-border-radius: 1000px;
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+    -fx-border-color: transparent;
+}
+
+.paging-view .page-button:hover {
+    -fx-background: derive(-fx-selection-bar, +50%);
+    -fx-background-color: -fx-background;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.paging-view .page-button.current {
+    -fx-background: -fx-selection-bar;
+    -fx-background-color: -fx-background;
+    -fx-text-fill: -fx-selection-bar-text;
+    -fx-padding: 5px;
+    -fx-background-radius: 1000px;
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+}
+
+.paging-view .spacer {
+}
+
+.paging-view .nav-button {
+    -fx-padding: 5px;
+    -fx-background-color: transparent;
+    -fx-content-display: graphic-only;
+}
+
+.paging-view .nav-button .ikonli-font-icon {
+    -fx-icon-size: 24px;
+    -fx-icon-color: -fx-text-background-color;
+}
+
+.paging-view .nav-button:hover .ikonli-font-icon {
+    -fx-icon-color: -fx-text-background-color;
+}
