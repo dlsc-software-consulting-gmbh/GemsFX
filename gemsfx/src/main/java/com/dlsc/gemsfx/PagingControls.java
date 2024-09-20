@@ -21,6 +21,9 @@ import javafx.util.Callback;
 
 import java.util.Objects;
 
+/**
+ * A control for navigating paged information, for example, a paged database table view.
+ */
 public class PagingControls extends Control {
 
     private static final String DEFAULT_STYLE_CLASS = "paging-view";
@@ -28,6 +31,9 @@ public class PagingControls extends Control {
 
     private final IntegerProperty startPage = new SimpleIntegerProperty();
 
+    /**
+     * Constructs a new instance.
+     */
     public PagingControls() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
@@ -87,6 +93,12 @@ public class PagingControls extends Control {
         return showPreviousNextPageButton.get();
     }
 
+    /**
+     * A flag used to determine whether the control will display arrow buttons to
+     * go to the next or the previous page.
+     *
+     * @return a boolean property to control the visibility of the previous / next buttons
+     */
     public final BooleanProperty showPreviousNextPageButtonProperty() {
         return showPreviousNextPageButton;
     }
@@ -97,21 +109,44 @@ public class PagingControls extends Control {
 
     private final ObjectProperty<HPos> alignment = new SimpleObjectProperty<>(this, "alignment", HPos.RIGHT);
 
-    public HPos getAlignment() {
+    public final HPos getAlignment() {
         return alignment.get();
     }
 
-    public ObjectProperty<HPos> alignmentProperty() {
+    /**
+     * The alignment property controls where in the view the paging buttons will appear: left,
+     * center, middle.
+     *
+     * @return the alignment / the position of the paging buttons
+     */
+    public final ObjectProperty<HPos> alignmentProperty() {
         return alignment;
     }
 
-    public void setAlignment(HPos alignment) {
+    public final void setAlignment(HPos alignment) {
         this.alignment.set(alignment);
     }
 
+    /**
+     * A list of possible strategies for showing / hiding the message label.
+     *
+     * @see #messageLabelStrategyProperty()
+     */
     public enum MessageLabelStrategy {
+
+        /**
+         * Always hide the message label.
+         */
         HIDE,
+
+        /**
+         * Show the message label when needed, usually when the total item count is larger than zero.
+         */
         SHOW_WHEN_NEEDED,
+
+        /**
+         * Always show the message label, even when there are no items in the controlled view.
+         */
         ALWAYS_SHOW
     }
 
@@ -121,6 +156,13 @@ public class PagingControls extends Control {
         return messageLabelStrategy.get();
     }
 
+    /**
+     * The message label strategy controls whether the message label will appear in
+     * certain situations, for example, when there are no items currently in the view
+     * that is being controlled by these pagination controls.
+     *
+     * @return the strategy used to show or hide the message label
+     */
     public final ObjectProperty<MessageLabelStrategy> messageLabelStrategyProperty() {
         return messageLabelStrategy;
     }
@@ -135,6 +177,12 @@ public class PagingControls extends Control {
         return showMaxPage.get();
     }
 
+    /**
+     * A boolean property used to control whether the view will display a separate / special button
+     * for the "last" page (for quick access / quick jumping to the end).
+     *
+     * @return a flag used for showing / hiding the max page button
+     */
     public final BooleanProperty showMaxPageProperty() {
         return showMaxPage;
     }
@@ -149,6 +197,12 @@ public class PagingControls extends Control {
         return maxPageDivider.get();
     }
 
+    /**
+     * Stores the node that will be placed between the regular page buttons and the page button
+     * that represents the "last" page. This is usually a label showing "...".
+     *
+     * @return a node for separating the "max page" button, usually a label showing "..."
+     */
     public final ObjectProperty<Node> maxPageDividerProperty() {
         return maxPageDivider;
     }
@@ -163,6 +217,12 @@ public class PagingControls extends Control {
         return messageLabelProvider.get();
     }
 
+    /**
+     * A message label provider is used to customize the messages shown by the message label
+     * of this control, for example, "Showing items 11 to 20 of a total of 1000 items".
+     *
+     * @return the message label provider
+     */
     public final ObjectProperty<Callback<PagingControls, String>> messageLabelProviderProperty() {
         return messageLabelProvider;
     }
@@ -171,18 +231,37 @@ public class PagingControls extends Control {
         this.messageLabelProvider.set(messageLabelProvider);
     }
 
+    /**
+     * Sets the page index to zero.
+     */
     public void firstPage() {
         setPage(0);
     }
 
+    /**
+     * Sets the page index to the page count minus one.
+     *
+     * @see #pageProperty()
+     * @see #pageCountProperty()
+     */
     public void lastPage() {
         setPage(getPageCount() - 1);
     }
 
+    /**
+     * Increments the page index.
+     *
+     * @see #pageProperty()
+     */
     public void nextPage() {
         setPage(Math.min(getPageCount() - 1, getPage() + 1));
     }
 
+    /**
+     * Decrements the page index.
+     *
+     * @see #pageProperty()
+     */
     public void previousPage() {
         setPage(Math.max(0, getPage() - 1));
     }
@@ -193,6 +272,12 @@ public class PagingControls extends Control {
         return totalItemCount.get();
     }
 
+    /**
+     * The total number of items (rows) displayed by the control that utilizes
+     * this pagination control for paging.
+     *
+     * @return the total number of items in the view
+     */
     public final IntegerProperty totalItemCountProperty() {
         return totalItemCount;
     }
@@ -207,6 +292,15 @@ public class PagingControls extends Control {
         return pageCount.get();
     }
 
+    /**
+     * A read-only property that stores the number of pages that are required for the given
+     * number of items and the given page size.
+     *
+     * @see #totalItemCountProperty()
+     * @see #pageSizeProperty()
+     *
+     * @return a read-only integer property storing the number of required pages
+     */
     public final ReadOnlyIntegerProperty pageCountProperty() {
         return pageCount.getReadOnlyProperty();
     }
@@ -217,6 +311,12 @@ public class PagingControls extends Control {
         return maxPageIndicatorsCount.get();
     }
 
+    /**
+     * The maximum number of page indicators / buttons that will be shown at any time
+     * by this control.
+     *
+     * @return the number of page buttons shown by the control
+     */
     public final IntegerProperty maxPageIndicatorsCountProperty() {
         return maxPageIndicatorsCount;
     }
@@ -231,6 +331,11 @@ public class PagingControls extends Control {
         return page.get();
     }
 
+    /**
+     * The index of the currently showing page.
+     *
+     * @return the number of the currently showing page
+     */
     public final IntegerProperty pageProperty() {
         return page;
     }
@@ -245,16 +350,18 @@ public class PagingControls extends Control {
         return pageSize.get();
     }
 
+    /**
+     * The number of items shown per page of the control that is being controlled
+     * by the pagination control.
+     *
+     * @return the number of items per page
+     */
     public final IntegerProperty pageSizeProperty() {
         return pageSize;
     }
 
     public final void setPageSize(int pageSize) {
         this.pageSize.set(pageSize);
-    }
-
-    public void refresh() {
-        startPage.set(0);
     }
 
     private final BooleanProperty showFirstLastPageButton = new SimpleBooleanProperty(this, "showFirstLastPageButton", true);
@@ -267,6 +374,12 @@ public class PagingControls extends Control {
         return showFirstLastPageButton.get();
     }
 
+    /**
+     * A flag used to determine whether the control will display arrow buttons to
+     * go directly to the first or the last page.
+     *
+     * @return a boolean property to control the visibility of the first / last buttons
+     */
     public final BooleanProperty showFirstLastPageButtonProperty() {
         return showFirstLastPageButton;
     }
