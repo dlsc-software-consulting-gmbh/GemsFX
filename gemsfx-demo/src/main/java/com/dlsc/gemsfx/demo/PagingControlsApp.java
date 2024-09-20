@@ -25,12 +25,13 @@ public class PagingControlsApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        VBox vBox1 = createSection(10, 221, false);
-        VBox vBox2 = createSection(15, 45, false);
-        VBox vBox3 = createSection(20, 1000, true);
-        VBox vBox4 = createSection(5, 5, false);
+        VBox vBox1 = createSection(10, 221, false, MessageLabelStrategy.SHOW_WHEN_NEEDED);
+        VBox vBox2 = createSection(15, 45, false, MessageLabelStrategy.SHOW_WHEN_NEEDED);
+        VBox vBox3 = createSection(20, 1000, true, MessageLabelStrategy.SHOW_WHEN_NEEDED);
+        VBox vBox4 = createSection(5, 5, false, MessageLabelStrategy.ALWAYS_SHOW);
+        VBox vBox5 = createSection(5, 0, false, MessageLabelStrategy.ALWAYS_SHOW);
 
-        VBox all = new VBox(20, vBox1, vBox2, vBox3, vBox4);
+        VBox all = new VBox(20, vBox1, vBox2, vBox3, vBox4, vBox5);
 
         StackPane stackPane = new StackPane(all);
         stackPane.setPadding(new Insets(50, 50, 50, 50));
@@ -45,9 +46,9 @@ public class PagingControlsApp extends Application {
         CSSFX.start(scene);
     }
 
-    private static VBox createSection(int pageSize, int itemCount, boolean showFirstLastButtons) {
+    private static VBox createSection(int pageSize, int itemCount, boolean showFirstLastButtons, MessageLabelStrategy messageLabelStrategy) {
         PagingControls pagingControls = new PagingControls();
-
+        pagingControls.setMessageLabelStrategy(messageLabelStrategy);
         pagingControls.setTotalItemCount(itemCount);
         pagingControls.setPageSize(pageSize);
 
