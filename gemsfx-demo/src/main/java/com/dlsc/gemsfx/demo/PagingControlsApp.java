@@ -6,6 +6,9 @@ import com.dlsc.gemsfx.Spacer;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -23,6 +26,8 @@ import java.util.List;
 
 public class PagingControlsApp extends Application {
 
+    private final ObjectProperty<HPos> alignmentProperty = new SimpleObjectProperty<>(HPos.RIGHT);
+
     @Override
     public void start(Stage stage) {
         VBox vBox1 = createSection(10, 221, false, MessageLabelStrategy.SHOW_WHEN_NEEDED);
@@ -31,29 +36,34 @@ public class PagingControlsApp extends Application {
         VBox vBox4 = createSection(5, 5, false, MessageLabelStrategy.ALWAYS_SHOW);
         VBox vBox5 = createSection(5, 0, false, MessageLabelStrategy.ALWAYS_SHOW);
 
-        VBox all = new VBox(20, vBox1, vBox2, vBox3, vBox4, vBox5);
+        ChoiceBox<HPos> alignmentChoiceBox = new ChoiceBox<>();
+        alignmentChoiceBox.getItems().setAll(HPos.values());
+        alignmentChoiceBox.valueProperty().bindBidirectional(alignmentProperty);
+
+        VBox all = new VBox(20, alignmentChoiceBox, vBox1, vBox2, vBox3, vBox4, vBox5);
 
         StackPane stackPane = new StackPane(all);
         stackPane.setPadding(new Insets(50, 50, 50, 50));
 
         Scene scene = new Scene(stackPane);
+
+        CSSFX.start(stackPane);
+
         stage.setScene(scene);
         stage.centerOnScreen();
         stage.sizeToScene();
         stage.setTitle("Paging View");
         stage.show();
-
-        CSSFX.start(scene);
     }
 
-    private static VBox createSection(int pageSize, int itemCount, boolean showFirstLastButtons, MessageLabelStrategy messageLabelStrategy) {
+    private VBox createSection(int pageSize, int itemCount, boolean showFirstLastButtons, MessageLabelStrategy messageLabelStrategy) {
         PagingControls pagingControls = new PagingControls();
+        pagingControls.alignmentProperty().bind(alignmentProperty);
         pagingControls.setMessageLabelStrategy(messageLabelStrategy);
         pagingControls.setTotalItemCount(itemCount);
         pagingControls.setPageSize(pageSize);
 
-        pagingControls.setShowGotoFirstPageButton(showFirstLastButtons);
-        pagingControls.setShowGotoLastPageButton(showFirstLastButtons);
+        pagingControls.setShowFirstLastPageButton(showFirstLastButtons);
 
         pagingControls.setStyle("-fx-border-color: black; -fx-padding: 20px");
         pagingControls.setPrefWidth(800);
@@ -64,14 +74,14 @@ public class PagingControlsApp extends Application {
         Label pageCountLabel = new Label();
         pageCountLabel.textProperty().bind(Bindings.createStringBinding(() -> "Page count: " + pagingControls.getPageCount(), pagingControls.pageCountProperty()));
 
-        CheckBox showGotoFirstPageButton = new CheckBox("First page button");
-        showGotoFirstPageButton.selectedProperty().bindBidirectional(pagingControls.showGotoFirstPageButtonProperty());
-
-        CheckBox showGotoLastPageButton = new CheckBox("Last page button");
-        showGotoLastPageButton.selectedProperty().bindBidirectional(pagingControls.showGotoLastPageButtonProperty());
+        CheckBox showFirstLastPageButton = new CheckBox("Show first / last page buttons");
+        showFirstLastPageButton.selectedProperty().bindBidirectional(pagingControls.showFirstLastPageButtonProperty());
 
         CheckBox showMaxPage = new CheckBox("Show max page");
         showMaxPage.selectedProperty().bindBidirectional(pagingControls.showMaxPageProperty());
+
+        CheckBox showPreviousNextButton = new CheckBox("Show prev / next buttons");
+        showPreviousNextButton.selectedProperty().bindBidirectional(pagingControls.showPreviousNextPageButtonProperty());
 
         ChoiceBox<MessageLabelStrategy> strategyChoiceBox = new ChoiceBox<>();
         strategyChoiceBox.getItems().addAll(MessageLabelStrategy.values());
@@ -87,7 +97,7 @@ public class PagingControlsApp extends Application {
         HBox indicatorBox = new HBox(5, new Label("# Indicators: "), maxPageIndicatorsBox);
         indicatorBox.setAlignment(Pos.CENTER_LEFT);
 
-        FlowPane flowPane = new FlowPane(pageLabel, pageCountLabel, new Spacer(), showGotoFirstPageButton, showGotoLastPageButton, showMaxPage, strategyBox, indicatorBox);
+        FlowPane flowPane = new FlowPane(pageLabel, pageCountLabel, new Spacer(), showFirstLastPageButton, showPreviousNextButton, showMaxPage, strategyBox, indicatorBox);
         flowPane.setVgap(10);
         flowPane.setHgap(20);
 

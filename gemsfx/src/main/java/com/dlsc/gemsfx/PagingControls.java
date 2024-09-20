@@ -10,6 +10,7 @@ import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -31,6 +32,10 @@ public class PagingControls extends Control {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
         setMessageLabelProvider(view -> {
+            if (getPageCount() == 0) {
+                return "No items";
+            }
+
             if (getPageCount() == 1) {
                 return "Showing all items";
             }
@@ -60,6 +65,10 @@ public class PagingControls extends Control {
             }
             return count;
         }, totalItemCountProperty(), pageSizeProperty()));
+
+        Label separator = new Label("...");
+        separator.getStyleClass().add("max-page-separator");
+        setMaxPageDivider(separator);
     }
 
     @Override
@@ -70,6 +79,34 @@ public class PagingControls extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(PagingControls.class.getResource("paging-view.css")).toExternalForm();
+    }
+
+    private final BooleanProperty showPreviousNextPageButton = new SimpleBooleanProperty(this, "showPreviousNextButton", true);
+
+    public final boolean getShowPreviousNextPageButton() {
+        return showPreviousNextPageButton.get();
+    }
+
+    public final BooleanProperty showPreviousNextPageButtonProperty() {
+        return showPreviousNextPageButton;
+    }
+
+    public final void setShowPreviousNextPageButton(boolean showPreviousNextPageButton) {
+        this.showPreviousNextPageButton.set(showPreviousNextPageButton);
+    }
+
+    private final ObjectProperty<HPos> alignment = new SimpleObjectProperty<>(this, "alignment", HPos.RIGHT);
+
+    public HPos getAlignment() {
+        return alignment.get();
+    }
+
+    public ObjectProperty<HPos> alignmentProperty() {
+        return alignment;
+    }
+
+    public void setAlignment(HPos alignment) {
+        this.alignment.set(alignment);
     }
 
     public enum MessageLabelStrategy {
@@ -106,18 +143,18 @@ public class PagingControls extends Control {
         this.showMaxPage.set(showMaxPage);
     }
 
-    private final ObjectProperty<Node> maxPageDividerNode = new SimpleObjectProperty<>(this, "maxPageDividerNode", new Label("..."));
+    private final ObjectProperty<Node> maxPageDivider = new SimpleObjectProperty<>(this, "maxPageDivider");
 
-    public final Node getMaxPageDividerNode() {
-        return maxPageDividerNode.get();
+    public final Node getMaxPageDivider() {
+        return maxPageDivider.get();
     }
 
-    public final ObjectProperty<Node> maxPageDividerNodeProperty() {
-        return maxPageDividerNode;
+    public final ObjectProperty<Node> maxPageDividerProperty() {
+        return maxPageDivider;
     }
 
-    public final void setMaxPageDividerNode(Node maxPageDividerNode) {
-        this.maxPageDividerNode.set(maxPageDividerNode);
+    public final void setMaxPageDivider(Node maxPageDivider) {
+        this.maxPageDivider.set(maxPageDivider);
     }
 
     private final ObjectProperty<Callback<PagingControls, String>> messageLabelProvider = new SimpleObjectProperty<>(this, "messageLabelProvider");
@@ -164,7 +201,7 @@ public class PagingControls extends Control {
         this.totalItemCount.set(totalItemCount);
     }
 
-    private final ReadOnlyIntegerWrapper pageCount = new ReadOnlyIntegerWrapper(this, "pageCount", 0);
+    private final ReadOnlyIntegerWrapper pageCount = new ReadOnlyIntegerWrapper(this, "pageCount");
 
     public final int getPageCount() {
         return pageCount.get();
@@ -220,31 +257,17 @@ public class PagingControls extends Control {
         startPage.set(0);
     }
 
-    private final BooleanProperty showGotoFirstPageButton = new SimpleBooleanProperty(this, "showGotoFirstPageButton", true);
+    private final BooleanProperty showFirstLastPageButton = new SimpleBooleanProperty(this, "showFirstLastPageButton", true);
 
-    public final boolean isShowGotoFirstPageButton() {
-        return showGotoFirstPageButton.get();
+    public final void setShowFirstLastPageButton(boolean showFirstLastPageButton) {
+        this.showFirstLastPageButton.set(showFirstLastPageButton);
     }
 
-    public final BooleanProperty showGotoFirstPageButtonProperty() {
-        return showGotoFirstPageButton;
+    public final boolean isShowFirstLastPageButton() {
+        return showFirstLastPageButton.get();
     }
 
-    public final void setShowGotoFirstPageButton(boolean showGotoFirstPageButton) {
-        this.showGotoFirstPageButton.set(showGotoFirstPageButton);
-    }
-
-    private final BooleanProperty showGotoLastPageButton = new SimpleBooleanProperty(this, "showGotoLastPageButton", true);
-
-    public final boolean isShowGotoLastPageButton() {
-        return showGotoLastPageButton.get();
-    }
-
-    public final BooleanProperty showGotoLastPageButtonProperty() {
-        return showGotoLastPageButton;
-    }
-
-    public final void setShowGotoLastPageButton(boolean showGotoLastPageButton) {
-        this.showGotoLastPageButton.set(showGotoLastPageButton);
+    public final BooleanProperty showFirstLastPageButtonProperty() {
+        return showFirstLastPageButton;
     }
 }

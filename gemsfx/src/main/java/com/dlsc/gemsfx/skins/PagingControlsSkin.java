@@ -2,17 +2,19 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.PagingControls;
 import com.dlsc.gemsfx.Spacer;
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -22,7 +24,8 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
     private final IntegerProperty startPage = new SimpleIntegerProperty();
 
-    private final HBox hBox = new HBox();
+    private final HBox pageButtonsBox = new HBox();
+
     private Button lastPageButton;
     private Button nextButton;
     private Button previousButton;
@@ -34,12 +37,16 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
         createButtons();
 
+        pageButtonsBox.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
+        pageButtonsBox.managedProperty().bind(view.pageCountProperty().greaterThan(1));
+
         InvalidationListener buildViewListener = it -> updateView();
 
         view.pageProperty().addListener(buildViewListener);
         view.pageCountProperty().addListener(buildViewListener);
         view.maxPageIndicatorsCountProperty().addListener(buildViewListener);
         view.showMaxPageProperty().addListener(buildViewListener);
+        view.alignmentProperty().addListener(buildViewListener);
         startPage.addListener(buildViewListener);
 
         view.pageProperty().addListener((obs, oldPage, newPage) -> {
@@ -57,12 +64,6 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         });
 
         updateView();
-
-        hBox.getStyleClass().add("hbox");
-        hBox.visibleProperty().bind(view.pageCountProperty().greaterThan(1).or(view.messageLabelStrategyProperty().isEqualTo(PagingControls.MessageLabelStrategy.ALWAYS_SHOW)));
-        hBox.managedProperty().bind(hBox.visibleProperty());
-
-        getChildren().add(hBox);
     }
 
     private void createButtons() {
@@ -71,15 +72,22 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         messageLabel = new Label();
         messageLabel.getStyleClass().add("message-label");
         messageLabel.textProperty().bind(Bindings.createStringBinding(() -> view.getMessageLabelProvider().call(view), view.messageLabelProviderProperty(), view.totalItemCountProperty(), view.pageProperty(), view.pageSizeProperty(), view.pageCountProperty()));
-        messageLabel.visibleProperty().bind(view.messageLabelStrategyProperty().isEqualTo(PagingControls.MessageLabelStrategy.HIDE).not());
+        messageLabel.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
+            PagingControls.MessageLabelStrategy messageLabelStrategy = view.getMessageLabelStrategy();
+            return switch (messageLabelStrategy) {
+                case ALWAYS_SHOW -> true;
+                case HIDE -> false;
+                case SHOW_WHEN_NEEDED -> view.getTotalItemCount() > 0;
+            };
+        }, view.messageLabelStrategyProperty(), view.totalItemCountProperty()));
         messageLabel.managedProperty().bind(messageLabel.visibleProperty());
 
         firstPageButton = createFirstPageButton();
         firstPageButton.setGraphic(new FontIcon(MaterialDesign.MDI_PAGE_FIRST));
-        firstPageButton.getStyleClass().addAll("nav-button", "first");
+        firstPageButton.getStyleClass().addAll("navigation-button", "first-page-button");
         firstPageButton.managedProperty().bind(firstPageButton.visibleProperty());
         firstPageButton.disableProperty().bind(startPage.greaterThan(0).not());
-        firstPageButton.visibleProperty().bind(view.showGotoFirstPageButtonProperty().and(view.pageCountProperty().greaterThan(1)));
+        firstPageButton.visibleProperty().bind(view.showFirstLastPageButtonProperty().and(view.pageCountProperty().greaterThan(1)));
         firstPageButton.setOnAction(evt -> {
             view.setPage(0);
             startPage.set(0);
@@ -87,33 +95,59 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
         previousButton = createPreviousPageButton();
         previousButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT));
-        previousButton.getStyleClass().addAll("nav-button", "previous-button");
+        previousButton.getStyleClass().addAll("navigation-button", "previous-page-button");
         previousButton.setOnAction(evt -> view.setPage(Math.max(0, view.getPage() - 1)));
         previousButton.setMinWidth(Region.USE_PREF_SIZE);
-        previousButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
+        previousButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1).and(view.showPreviousNextPageButtonProperty()));
+        previousButton.managedProperty().bind(view.showPreviousNextPageButtonProperty());
         previousButton.disableProperty().bind(view.pageProperty().greaterThan(0).not());
 
         nextButton = createNextPageButton();
         nextButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT));
-        nextButton.getStyleClass().addAll("nav-button", "next-button");
+        nextButton.getStyleClass().addAll("navigation-button", "next-page-button");
         nextButton.setOnAction(evt -> view.setPage(Math.min(view.getPageCount() - 1, view.getPage() + 1)));
         nextButton.setMinWidth(Region.USE_PREF_SIZE);
-        nextButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
+        nextButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1).and(view.showPreviousNextPageButtonProperty()));
+        nextButton.managedProperty().bind(view.showPreviousNextPageButtonProperty());
         nextButton.disableProperty().bind(view.pageProperty().lessThan(view.getPageCount() - 1).not());
 
         lastPageButton = createLastPageButton();
         lastPageButton.setGraphic(new FontIcon(MaterialDesign.MDI_PAGE_LAST));
-        lastPageButton.getStyleClass().addAll("nav-button", "last");
+        lastPageButton.getStyleClass().addAll("navigation-button", "last-page-button");
         lastPageButton.managedProperty().bind(lastPageButton.visibleProperty());
         lastPageButton.disableProperty().bind(startPage.add(view.getMaxPageIndicatorsCount()).lessThan(view.getPageCount()).not());
-        lastPageButton.visibleProperty().bind(view.showGotoLastPageButtonProperty().and(view.pageCountProperty().greaterThan(1)));
+        lastPageButton.visibleProperty().bind(view.showFirstLastPageButtonProperty().and(view.pageCountProperty().greaterThan(1)));
         lastPageButton.setOnAction(evt -> view.setPage(view.getPageCount() - 1));
     }
 
     private void updateView() {
         PagingControls view = getSkinnable();
 
-        hBox.getChildren().setAll(messageLabel, new Spacer(), firstPageButton, previousButton);
+        Pane pane;
+
+        HPos alignment = view.getAlignment();
+
+        if (alignment.equals(HPos.CENTER)) {
+            pane = new VBox(pageButtonsBox, messageLabel);
+            pane.getStyleClass().add("vertical");
+        } else {
+            pane = new HBox();
+            if (alignment.equals(HPos.RIGHT)) {
+                pane.getChildren().setAll(messageLabel, new Spacer(), pageButtonsBox);
+            } else {
+                pane.getChildren().setAll(pageButtonsBox, new Spacer(), messageLabel);
+            }
+            pane.getStyleClass().add("horizontal");
+        }
+
+        pane.getStyleClass().add("pane");
+
+        getChildren().setAll(pane);
+
+        pageButtonsBox.getStyleClass().add("page-buttons-container");
+        pageButtonsBox.setMaxWidth(Region.USE_PREF_SIZE);
+        pageButtonsBox.managedProperty().bind(pageButtonsBox.visibleProperty());
+        pageButtonsBox.getChildren().setAll(firstPageButton, previousButton);
 
         int pageIndex;
         int startIndex = startPage.get();
@@ -129,20 +163,20 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
             if (pageIndex == view.getPage()) {
                 pageButton.getStyleClass().add("current");
             }
-            hBox.getChildren().add(pageButton);
+            pageButtonsBox.getChildren().add(pageButton);
         }
 
         if (view.isShowMaxPage() && endIndex < view.getPageCount()) {
             // we need to show the "max page" button
             Button pageButton = createPageButton(view.getPageCount() - 1);
             pageButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
-            Node dividerNode = view.getMaxPageDividerNode();
+            Node dividerNode = view.getMaxPageDivider();
             dividerNode.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
-            hBox.getChildren().addAll(dividerNode, pageButton);
+            pageButtonsBox.getChildren().addAll(dividerNode, pageButton);
         }
 
 
-        hBox.getChildren().addAll(nextButton, lastPageButton);
+        pageButtonsBox.getChildren().addAll(nextButton, lastPageButton);
 
         // might have been updated above
         startPage.set(startIndex);
