@@ -26,10 +26,7 @@ import java.util.Objects;
  */
 public class PagingControls extends Control {
 
-    private static final String DEFAULT_STYLE_CLASS = "paging-view";
-    private static final String PAGE_BUTTON = "page-button";
-
-    private final IntegerProperty startPage = new SimpleIntegerProperty();
+    private static final String DEFAULT_STYLE_CLASS = "paging-controls";
 
     /**
      * Constructs a new instance.
@@ -84,7 +81,7 @@ public class PagingControls extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(PagingControls.class.getResource("paging-view.css")).toExternalForm();
+        return Objects.requireNonNull(PagingControls.class.getResource("paging-controls.css")).toExternalForm();
     }
 
     private final BooleanProperty showPreviousNextPageButton = new SimpleBooleanProperty(this, "showPreviousNextButton", true);

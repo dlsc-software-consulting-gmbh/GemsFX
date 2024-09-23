@@ -1,54 +1,54 @@
-.paging-view {
+.paging-controls {
     -fx-alignment: center-left;
     -fx-padding: 5px 0px 0px 0px;
     -fx-spacing: 2px;
 }
 
-.paging-view > .pane {
+.paging-controls > .pane {
 }
 
-.paging-view > .pane.horizontal {
+.paging-controls > .pane.horizontal {
     -fx-spacing: 10px;
     -fx-alignment: center-left;
 }
 
-.paging-view > .pane.vertical {
+.paging-controls > .pane.vertical {
     -fx-spacing: 5px;
     -fx-alignment: center;
 }
 
-.paging-view > .pane > .page-buttons-container {
+.paging-controls > .pane > .page-buttons-container {
     -fx-alignment: center-left;
     -fx-spacing: 2px;
 }
 
-.paging-view > .pane > .message-label {
+.paging-controls > .pane > .message-label {
 }
 
-.paging-view > .pane > .page-buttons-container > .page-button {
+.paging-controls > .pane > .page-buttons-container > .page-button {
     -fx-padding: 2px 5px;
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-min-width: 2em;
 }
 
-.paging-view > .pane > .page-buttons-container > .page-button:hover,
-.paging-view > .pane > .page-buttons-container > .page-button.current {
+.paging-controls > .pane > .page-buttons-container > .page-button:hover,
+.paging-controls > .pane > .page-buttons-container > .page-button.current {
     -fx-background: -fx-selection-bar;
     -fx-background-color: -fx-background;
     -fx-text-fill: -fx-selection-bar-text;
 }
 
-.paging-view > .pane > .spacer {
+.paging-controls > .pane > .spacer {
 }
 
-.paging-view > .pane > .page-buttons-container > .navigation-button {
+.paging-controls > .pane > .page-buttons-container > .navigation-button {
     -fx-padding: 5px;
     -fx-background-color: transparent;
     -fx-content-display: graphic-only;
 }
 
-.paging-view > .pane > .page-buttons-container > .navigation-button .ikonli-font-icon {
+.paging-controls > .pane > .page-buttons-container > .navigation-button .ikonli-font-icon {
     -fx-icon-size: 24px;
     -fx-icon-color: -fx-text-background-color;
 }
