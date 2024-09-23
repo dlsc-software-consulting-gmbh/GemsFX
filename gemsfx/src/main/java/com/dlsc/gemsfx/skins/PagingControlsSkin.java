@@ -109,7 +109,7 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         nextButton.setMinWidth(Region.USE_PREF_SIZE);
         nextButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1).and(view.showPreviousNextPageButtonProperty()));
         nextButton.managedProperty().bind(view.showPreviousNextPageButtonProperty());
-        nextButton.disableProperty().bind(view.pageProperty().lessThan(view.getPageCount() - 1).not());
+        nextButton.disableProperty().bind(view.pageProperty().lessThan(view.pageCountProperty().subtract(1)));
 
         lastPageButton = createLastPageButton();
         lastPageButton.setGraphic(new FontIcon(MaterialDesign.MDI_PAGE_LAST));
