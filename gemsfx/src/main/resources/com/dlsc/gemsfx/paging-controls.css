@@ -8,6 +8,7 @@
 }
 
 .paging-controls > .pane.horizontal {
+    -fx-padding: 0px 0px 0px 5px;
     -fx-spacing: 10px;
     -fx-alignment: center-left;
 }

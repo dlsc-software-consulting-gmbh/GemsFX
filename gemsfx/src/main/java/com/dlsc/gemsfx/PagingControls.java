@@ -17,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 import java.util.Objects;
@@ -34,6 +35,7 @@ public class PagingControls extends Control {
     public PagingControls() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
+        addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> requestFocus());
         setMessageLabelProvider(view -> {
             if (getPageCount() == 0) {
                 return "No items";
@@ -46,7 +48,7 @@ public class PagingControls extends Control {
             int startIndex = (view.getPage() * getPageSize()) + 1;
             int endIndex = startIndex + getPageSize() - 1;
 
-            return "Showing items " +  startIndex + " to " + endIndex + " of " + getTotalItemCount();
+            return "Showing items " + startIndex + " to " + endIndex + " of " + getTotalItemCount();
         });
 
         addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
@@ -69,9 +71,13 @@ public class PagingControls extends Control {
             return count;
         }, totalItemCountProperty(), pageSizeProperty()));
 
-        Label separator = new Label("...");
-        separator.getStyleClass().add("max-page-separator");
-        setMaxPageDivider(separator);
+        Label firstPageDivider = new Label("...");
+        firstPageDivider.getStyleClass().addAll("page-divider", "first-page-divider");
+        setFirstPageDivider(firstPageDivider);
+
+        Label lastPageDivider = new Label("...");
+        lastPageDivider.getStyleClass().addAll("page-divider", "first-page-divider");
+        setLastPageDivider(lastPageDivider);
     }
 
     @Override
@@ -168,44 +174,81 @@ public class PagingControls extends Control {
         this.messageLabelStrategy.set(messageLabelStrategy);
     }
 
-    private final BooleanProperty showMaxPage = new SimpleBooleanProperty(this, "showMaxButton");
+    /**
+     * An enum listing the different ways the control will display or
+     * not display controls to quickly go to the first or the last page.
+     */
+    public enum FirstLastPageDisplayMode {
 
-    public final boolean isShowMaxPage() {
-        return showMaxPage.get();
+        /**
+         * Do not show controls for jumping to the first or last page.
+         */
+        HIDE,
+
+        /**
+         * Show separate controls in front and after the page buttons to
+         * perform the jump.
+         */
+        SHOW_ARROW_BUTTONS,
+
+        /**
+         * Show extra page buttons to perform the jump (1 ... 5 6 7 8 ... 20).
+         */
+        SHOW_PAGE_BUTTONS
+    }
+
+    private final ObjectProperty<FirstLastPageDisplayMode> firstLastPageDisplayMode = new SimpleObjectProperty<>(this, "firstLastPageStrategy");
+
+    public final FirstLastPageDisplayMode getFirstLastPageDisplayMode() {
+        return firstLastPageDisplayMode.get();
+    }
+
+    public final ObjectProperty<FirstLastPageDisplayMode> firstLastPageDisplayModeProperty() {
+        return firstLastPageDisplayMode;
+    }
+
+    public final void setFirstLastPageDisplayMode(FirstLastPageDisplayMode firstLastPageDisplayMode) {
+        this.firstLastPageDisplayMode.set(firstLastPageDisplayMode);
+    }
+
+    private final ObjectProperty<Node> firstPageDivider = new SimpleObjectProperty<>(this, "firstPageDivider");
+
+    public final Node getFirstPageDivider() {
+        return firstPageDivider.get();
     }
 
     /**
-     * A boolean property used to control whether the view will display a separate / special button
-     * for the "last" page (for quick access / quick jumping to the end).
+     * Stores the node that will be placed between the regular page buttons and the page button
+     * that represents the "first" page. This is usually a label showing "...".
      *
-     * @return a flag used for showing / hiding the max page button
+     * @return a node for separating the "first page" button, usually a label showing "..."
      */
-    public final BooleanProperty showMaxPageProperty() {
-        return showMaxPage;
+    public final ObjectProperty<Node> firstPageDividerProperty() {
+        return firstPageDivider;
     }
 
-    public final void setShowMaxPage(boolean showMaxPage) {
-        this.showMaxPage.set(showMaxPage);
+    public final void setFirstPageDivider(Node firstPageDivider) {
+        this.firstPageDivider.set(firstPageDivider);
     }
 
-    private final ObjectProperty<Node> maxPageDivider = new SimpleObjectProperty<>(this, "maxPageDivider");
+    private final ObjectProperty<Node> lastPageDivider = new SimpleObjectProperty<>(this, "firstPageDivider");
 
-    public final Node getMaxPageDivider() {
-        return maxPageDivider.get();
+    public final Node getLastPageDivider() {
+        return lastPageDivider.get();
     }
 
     /**
      * Stores the node that will be placed between the regular page buttons and the page button
      * that represents the "last" page. This is usually a label showing "...".
      *
-     * @return a node for separating the "max page" button, usually a label showing "..."
+     * @return a node for separating the "last page" button, usually a label showing "..."
      */
-    public final ObjectProperty<Node> maxPageDividerProperty() {
-        return maxPageDivider;
+    public final ObjectProperty<Node> lastPageDividerProperty() {
+        return lastPageDivider;
     }
 
-    public final void setMaxPageDivider(Node maxPageDivider) {
-        this.maxPageDivider.set(maxPageDivider);
+    public final void setLastPageDivider(Node lastPageDivider) {
+        this.lastPageDivider.set(lastPageDivider);
     }
 
     private final ObjectProperty<Callback<PagingControls, String>> messageLabelProvider = new SimpleObjectProperty<>(this, "messageLabelProvider");
@@ -293,10 +336,9 @@ public class PagingControls extends Control {
      * A read-only property that stores the number of pages that are required for the given
      * number of items and the given page size.
      *
+     * @return a read-only integer property storing the number of required pages
      * @see #totalItemCountProperty()
      * @see #pageSizeProperty()
-     *
-     * @return a read-only integer property storing the number of required pages
      */
     public final ReadOnlyIntegerProperty pageCountProperty() {
         return pageCount.getReadOnlyProperty();
@@ -359,25 +401,5 @@ public class PagingControls extends Control {
 
     public final void setPageSize(int pageSize) {
         this.pageSize.set(pageSize);
-    }
-
-    private final BooleanProperty showFirstLastPageButton = new SimpleBooleanProperty(this, "showFirstLastPageButton", true);
-
-    public final void setShowFirstLastPageButton(boolean showFirstLastPageButton) {
-        this.showFirstLastPageButton.set(showFirstLastPageButton);
-    }
-
-    public final boolean isShowFirstLastPageButton() {
-        return showFirstLastPageButton.get();
-    }
-
-    /**
-     * A flag used to determine whether the control will display arrow buttons to
-     * go directly to the first or the last page.
-     *
-     * @return a boolean property to control the visibility of the first / last buttons
-     */
-    public final BooleanProperty showFirstLastPageButtonProperty() {
-        return showFirstLastPageButton;
     }
 }

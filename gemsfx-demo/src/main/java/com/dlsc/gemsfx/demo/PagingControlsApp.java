@@ -30,11 +30,11 @@ public class PagingControlsApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        VBox vBox1 = createSection(10, 221, false, MessageLabelStrategy.SHOW_WHEN_NEEDED);
-        VBox vBox2 = createSection(15, 45, false, MessageLabelStrategy.SHOW_WHEN_NEEDED);
-        VBox vBox3 = createSection(20, 1000, true, MessageLabelStrategy.SHOW_WHEN_NEEDED);
-        VBox vBox4 = createSection(5, 5, false, MessageLabelStrategy.ALWAYS_SHOW);
-        VBox vBox5 = createSection(5, 0, false, MessageLabelStrategy.ALWAYS_SHOW);
+        VBox vBox1 = createSection(10, 221, MessageLabelStrategy.SHOW_WHEN_NEEDED, PagingControls.FirstLastPageDisplayMode.HIDE);
+        VBox vBox2 = createSection(15, 45, MessageLabelStrategy.SHOW_WHEN_NEEDED, PagingControls.FirstLastPageDisplayMode.SHOW_ARROW_BUTTONS);
+        VBox vBox3 = createSection(20, 1000, MessageLabelStrategy.SHOW_WHEN_NEEDED, PagingControls.FirstLastPageDisplayMode.SHOW_PAGE_BUTTONS);
+        VBox vBox4 = createSection(5, 5, MessageLabelStrategy.ALWAYS_SHOW, PagingControls.FirstLastPageDisplayMode.HIDE);
+        VBox vBox5 = createSection(5, 0, MessageLabelStrategy.ALWAYS_SHOW, PagingControls.FirstLastPageDisplayMode.HIDE);
 
         ChoiceBox<HPos> alignmentChoiceBox = new ChoiceBox<>();
         alignmentChoiceBox.getItems().setAll(HPos.values());
@@ -49,6 +49,8 @@ public class PagingControlsApp extends Application {
 
         CSSFX.start(stackPane);
 
+        scene.focusOwnerProperty().addListener(it -> System.out.println(scene.getFocusOwner()));
+
         stage.setScene(scene);
         stage.centerOnScreen();
         stage.sizeToScene();
@@ -56,14 +58,13 @@ public class PagingControlsApp extends Application {
         stage.show();
     }
 
-    private VBox createSection(int pageSize, int itemCount, boolean showFirstLastButtons, MessageLabelStrategy messageLabelStrategy) {
+    private VBox createSection(int pageSize, int itemCount, MessageLabelStrategy messageLabelStrategy, PagingControls.FirstLastPageDisplayMode displayMode) {
         PagingControls pagingControls = new PagingControls();
         pagingControls.alignmentProperty().bind(alignmentProperty);
         pagingControls.setMessageLabelStrategy(messageLabelStrategy);
         pagingControls.setTotalItemCount(itemCount);
         pagingControls.setPageSize(pageSize);
-
-        pagingControls.setShowFirstLastPageButton(showFirstLastButtons);
+        pagingControls.setFirstLastPageDisplayMode(displayMode);
 
         pagingControls.setStyle("-fx-border-color: black; -fx-padding: 20px");
         pagingControls.setPrefWidth(800);
@@ -74,11 +75,9 @@ public class PagingControlsApp extends Application {
         Label pageCountLabel = new Label();
         pageCountLabel.textProperty().bind(Bindings.createStringBinding(() -> "Page count: " + pagingControls.getPageCount(), pagingControls.pageCountProperty()));
 
-        CheckBox showFirstLastPageButton = new CheckBox("Show first / last page buttons");
-        showFirstLastPageButton.selectedProperty().bindBidirectional(pagingControls.showFirstLastPageButtonProperty());
-
-        CheckBox showMaxPage = new CheckBox("Show max page");
-        showMaxPage.selectedProperty().bindBidirectional(pagingControls.showMaxPageProperty());
+        ChoiceBox<PagingControls.FirstLastPageDisplayMode> displayModeChoiceBox = new ChoiceBox<>();
+        displayModeChoiceBox.getItems().setAll(PagingControls.FirstLastPageDisplayMode.values());
+        displayModeChoiceBox.valueProperty().bindBidirectional(pagingControls.firstLastPageDisplayModeProperty());
 
         CheckBox showPreviousNextButton = new CheckBox("Show prev / next buttons");
         showPreviousNextButton.selectedProperty().bindBidirectional(pagingControls.showPreviousNextPageButtonProperty());
@@ -91,17 +90,20 @@ public class PagingControlsApp extends Application {
         maxPageIndicatorsBox.getItems().setAll(List.of(1, 2, 5, 10));
         maxPageIndicatorsBox.valueProperty().bindBidirectional(pagingControls.maxPageIndicatorsCountProperty().asObject());
 
+        HBox displayModeBox = new HBox(5, new Label("Display mode: "), displayModeChoiceBox);
+        displayModeBox.setAlignment(Pos.CENTER_LEFT);
+
         HBox strategyBox = new HBox(5, new Label("Label strategy: "), strategyChoiceBox);
         strategyBox.setAlignment(Pos.CENTER_LEFT);
 
         HBox indicatorBox = new HBox(5, new Label("# Indicators: "), maxPageIndicatorsBox);
         indicatorBox.setAlignment(Pos.CENTER_LEFT);
 
-        FlowPane flowPane = new FlowPane(pageLabel, pageCountLabel, new Spacer(), showFirstLastPageButton, showPreviousNextButton, showMaxPage, strategyBox, indicatorBox);
+        FlowPane flowPane = new FlowPane(pageLabel, pageCountLabel, new Spacer(), showPreviousNextButton, displayModeBox, strategyBox, indicatorBox);
         flowPane.setVgap(10);
         flowPane.setHgap(20);
 
-        VBox vBox = new VBox(10, pagingControls, flowPane);
+        VBox vBox = new VBox(10, pagingControls); //, flowPane);
         vBox.setMaxHeight(Region.USE_PREF_SIZE);
 
         return vBox;

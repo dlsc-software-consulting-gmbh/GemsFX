@@ -45,13 +45,13 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         view.pageProperty().addListener(buildViewListener);
         view.pageCountProperty().addListener(buildViewListener);
         view.maxPageIndicatorsCountProperty().addListener(buildViewListener);
-        view.showMaxPageProperty().addListener(buildViewListener);
+        view.firstLastPageDisplayModeProperty().addListener(buildViewListener);
         view.alignmentProperty().addListener(buildViewListener);
+        view.firstPageDividerProperty().addListener(buildViewListener);
         startPage.addListener(buildViewListener);
 
         view.pageProperty().addListener((obs, oldPage, newPage) -> {
             int startPage = this.startPage.get();
-            int totalPages = view.getPageCount();
             int maxPageIndicatorCount = view.getMaxPageIndicatorsCount();
 
             if (newPage.intValue() < startPage) {
@@ -83,17 +83,19 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         messageLabel.managedProperty().bind(messageLabel.visibleProperty());
 
         firstPageButton = createFirstPageButton();
+        firstPageButton.setFocusTraversable(false);
         firstPageButton.setGraphic(new FontIcon(MaterialDesign.MDI_PAGE_FIRST));
         firstPageButton.getStyleClass().addAll("navigation-button", "first-page-button");
         firstPageButton.managedProperty().bind(firstPageButton.visibleProperty());
         firstPageButton.disableProperty().bind(startPage.greaterThan(0).not());
-        firstPageButton.visibleProperty().bind(view.showFirstLastPageButtonProperty().and(view.pageCountProperty().greaterThan(1)));
+        firstPageButton.visibleProperty().bind(view.firstLastPageDisplayModeProperty().isEqualTo(PagingControls.FirstLastPageDisplayMode.SHOW_ARROW_BUTTONS).and(view.pageCountProperty().greaterThan(1)));
         firstPageButton.setOnAction(evt -> {
             view.setPage(0);
             startPage.set(0);
         });
 
         previousButton = createPreviousPageButton();
+        previousButton.setFocusTraversable(false);
         previousButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT));
         previousButton.getStyleClass().addAll("navigation-button", "previous-page-button");
         previousButton.setOnAction(evt -> view.setPage(Math.max(0, view.getPage() - 1)));
@@ -103,6 +105,7 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         previousButton.disableProperty().bind(view.pageProperty().greaterThan(0).not());
 
         nextButton = createNextPageButton();
+        nextButton.setFocusTraversable(false);
         nextButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT));
         nextButton.getStyleClass().addAll("navigation-button", "next-page-button");
         nextButton.setOnAction(evt -> view.setPage(Math.min(view.getPageCount() - 1, view.getPage() + 1)));
@@ -112,11 +115,12 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         nextButton.disableProperty().bind(view.pageProperty().lessThan(view.pageCountProperty().subtract(1)).not());
 
         lastPageButton = createLastPageButton();
+        lastPageButton.setFocusTraversable(false);
         lastPageButton.setGraphic(new FontIcon(MaterialDesign.MDI_PAGE_LAST));
         lastPageButton.getStyleClass().addAll("navigation-button", "last-page-button");
         lastPageButton.managedProperty().bind(lastPageButton.visibleProperty());
         lastPageButton.disableProperty().bind(startPage.add(view.getMaxPageIndicatorsCount()).lessThan(view.getPageCount()).not());
-        lastPageButton.visibleProperty().bind(view.showFirstLastPageButtonProperty().and(view.pageCountProperty().greaterThan(1)));
+        lastPageButton.visibleProperty().bind(view.firstLastPageDisplayModeProperty().isEqualTo(PagingControls.FirstLastPageDisplayMode.SHOW_ARROW_BUTTONS).and(view.pageCountProperty().greaterThan(1)));
         lastPageButton.setOnAction(evt -> view.setPage(view.getPageCount() - 1));
     }
 
@@ -147,9 +151,9 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         pageButtonsBox.getStyleClass().add("page-buttons-container");
         pageButtonsBox.setMaxWidth(Region.USE_PREF_SIZE);
         pageButtonsBox.managedProperty().bind(pageButtonsBox.visibleProperty());
+
         pageButtonsBox.getChildren().setAll(firstPageButton, previousButton);
 
-        int pageIndex;
         int startIndex = startPage.get();
         int endIndex = Math.min(view.getPageCount(), startIndex + view.getMaxPageIndicatorsCount());
 
@@ -157,29 +161,53 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
             startIndex = Math.max(0, endIndex - view.getMaxPageIndicatorsCount());
         }
 
+        addFirstPageButton(view, startIndex);
+        addPageButtons(startIndex, endIndex, view);
+        addLastPageButton(view, endIndex);
+
+        pageButtonsBox.getChildren().addAll(nextButton, lastPageButton);
+
+        // might have been updated above
+        startPage.set(startIndex);
+    }
+
+    private void addPageButtons(int startIndex, int endIndex, PagingControls view) {
+        int pageIndex;
         for (pageIndex = startIndex; pageIndex < endIndex; pageIndex++) {
             Button pageButton = createPageButton(pageIndex);
+            pageButton.setFocusTraversable(false);
             pageButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
             if (pageIndex == view.getPage()) {
                 pageButton.getStyleClass().add("current");
             }
             pageButtonsBox.getChildren().add(pageButton);
         }
+    }
 
-        if (view.isShowMaxPage() && endIndex < view.getPageCount()) {
+    private void addLastPageButton(PagingControls view, int endIndex) {
+        if (view.getFirstLastPageDisplayMode().equals(PagingControls.FirstLastPageDisplayMode.SHOW_PAGE_BUTTONS) && endIndex < view.getPageCount()) {
             // we need to show the "max page" button
             Button pageButton = createPageButton(view.getPageCount() - 1);
+            pageButton.setFocusTraversable(false);
             pageButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
-            Node dividerNode = view.getMaxPageDivider();
+            Node dividerNode = view.getLastPageDivider();
             dividerNode.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
+            dividerNode.setFocusTraversable(false);
             pageButtonsBox.getChildren().addAll(dividerNode, pageButton);
         }
+    }
 
-
-        pageButtonsBox.getChildren().addAll(nextButton, lastPageButton);
-
-        // might have been updated above
-        startPage.set(startIndex);
+    private void addFirstPageButton(PagingControls view, int startIndex) {
+        if (view.getFirstLastPageDisplayMode().equals(PagingControls.FirstLastPageDisplayMode.SHOW_PAGE_BUTTONS) && startIndex > 1) {
+            // we need to show the "max page" button
+            Button pageButton = createPageButton(0);
+            pageButton.setFocusTraversable(false);
+            pageButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
+            Node dividerNode = view.getFirstPageDivider();
+            dividerNode.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
+            dividerNode.setFocusTraversable(false);
+            pageButtonsBox.getChildren().addAll(pageButton, dividerNode);
+        }
     }
 
     protected Button createFirstPageButton() {
