@@ -103,7 +103,7 @@ public class PagingControlsApp extends Application {
         flowPane.setVgap(10);
         flowPane.setHgap(20);
 
-        VBox vBox = new VBox(10, pagingControls); //, flowPane);
+        VBox vBox = new VBox(10, pagingControls, flowPane);
         vBox.setMaxHeight(Region.USE_PREF_SIZE);
 
         return vBox;

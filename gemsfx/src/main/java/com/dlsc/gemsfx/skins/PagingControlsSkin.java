@@ -77,9 +77,9 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
             return switch (messageLabelStrategy) {
                 case ALWAYS_SHOW -> true;
                 case HIDE -> false;
-                case SHOW_WHEN_NEEDED -> view.getTotalItemCount() > 0;
+                case SHOW_WHEN_NEEDED -> view.getTotalItemCount() > view.getPageSize();
             };
-        }, view.messageLabelStrategyProperty(), view.totalItemCountProperty()));
+        }, view.messageLabelStrategyProperty(), view.totalItemCountProperty(), view.pageSizeProperty()));
         messageLabel.managedProperty().bind(messageLabel.visibleProperty());
 
         firstPageButton = createFirstPageButton();

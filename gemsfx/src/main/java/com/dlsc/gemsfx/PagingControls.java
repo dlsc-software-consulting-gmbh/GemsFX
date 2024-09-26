@@ -49,7 +49,6 @@ public class PagingControls extends Control {
             int endIndex = startIndex + getPageSize() - 1;
 
             endIndex = Math.min(endIndex, getTotalItemCount());
-
             return "Showing items " + startIndex + " to " + endIndex + " of " + getTotalItemCount();
         });
 
