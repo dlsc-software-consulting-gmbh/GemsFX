@@ -6,11 +6,19 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+
+import java.util.Random;
 
 public class EmailFieldApp extends Application {
+
+    private final Random random = new Random();
 
     @Override
     public void start(Stage stage) {
@@ -18,6 +26,31 @@ public class EmailFieldApp extends Application {
 
         CheckBox required = new CheckBox("Required");
         required.selectedProperty().bindBidirectional(view.requiredProperty());
+
+        CheckBox autoCompletion = new CheckBox("Auto-Complete Email Suffixes");
+        autoCompletion.selectedProperty().bindBidirectional(view.autoSuffixEnabledProperty());
+
+        CheckBox enableCustomCell = new CheckBox("Enable Custom Cell");
+        enableCustomCell.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                view.setSuffixListCellFactory(param -> new ListCell<>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                            setGraphic(null);
+                        } else {
+                            setText(item + "     (Custom)");
+                            setTextFill(Color.rgb(random.nextInt(210), random.nextInt(210), random.nextInt(210)));
+                            setGraphic(new FontIcon(MaterialDesign.MDI_EMAIL));
+                        }
+                    }
+                });
+            } else {
+                view.setSuffixListCellFactory(null);
+            }
+        });
 
         CheckBox showMailIcon = new CheckBox("Show Mail Icon");
         showMailIcon.selectedProperty().bindBidirectional(view.showMailIconProperty());
@@ -29,9 +62,10 @@ public class EmailFieldApp extends Application {
         invalidTextField.setPromptText("Invalid text for the tooltip");
         view.invalidTextProperty().bind(invalidTextField.textProperty());
 
-        VBox topBox = new VBox(10, required, showMailIcon, showValidationIcon, new Label("Text to show when invalid:"), invalidTextField);
+        VBox topBox = new VBox(10, required, autoCompletion, enableCustomCell, showMailIcon, showValidationIcon, new Label("Text to show when invalid:"), invalidTextField);
 
         VBox box = new VBox(20, topBox, view);
+        box.setPrefWidth(300);
         box.setPadding(new Insets(10));
         Scene scene = new Scene(box);
         stage.setScene(scene);

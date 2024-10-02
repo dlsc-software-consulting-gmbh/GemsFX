@@ -1,13 +1,29 @@
 package com.dlsc.gemsfx;
 
-import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.skins.EmailFieldSkin;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
-import javafx.css.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
+import javafx.css.PseudoClass;
+import javafx.css.SimpleStyleableBooleanProperty;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.scene.control.Control;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+import javafx.util.Callback;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -25,6 +41,7 @@ public class EmailField extends Control {
 
     private static final boolean DEFAULT_SHOW_MAIL_ICON = true;
     private static final boolean DEFAULT_SHOW_VALIDATION_ICON = true;
+    private static final boolean DEFAULT_AUTO_SUFFIX_ENABLED = true;
 
     private static final PseudoClass VALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("valid");
     private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
@@ -82,6 +99,61 @@ public class EmailField extends Control {
 
     public final CustomTextField getEditor() {
         return editor;
+    }
+
+    // suffixList
+
+    private final ObservableList<String> suffixList = FXCollections.observableArrayList(
+            "gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com",
+            "aol.com", "mail.com", "protonmail.com", "gmx.com", "zoho.com", "qq.com",
+            "163.com", "126.com", "yeah.net", "msn.com", "live.com", "me.com"
+    );
+
+    public final ObservableList<String> getSuffixList() {
+        return suffixList;
+    }
+
+    // autoSuffixEnabled
+
+    private BooleanProperty autoSuffixEnabled;
+
+    public final boolean isAutoSuffixEnabled() {
+        return autoSuffixEnabled == null ? DEFAULT_AUTO_SUFFIX_ENABLED : autoSuffixEnabled.get();
+    }
+
+    public final BooleanProperty autoSuffixEnabledProperty() {
+        if (autoSuffixEnabled == null) {
+            autoSuffixEnabled = new SimpleBooleanProperty(this, "autoSuffixEnabled", DEFAULT_AUTO_SUFFIX_ENABLED);
+        }
+        return autoSuffixEnabled;
+    }
+
+    public final void setAutoSuffixEnabled(boolean autoSuffixEnabled) {
+        autoSuffixEnabledProperty().set(autoSuffixEnabled);
+    }
+
+    // Custom cell factory for the ListView in the suggestion popup.
+    private ObjectProperty<Callback<ListView<String>, ListCell<String>>> suffixListCellFactory;
+
+    public final Callback<ListView<String>, ListCell<String>> getSuffixListCellFactory() {
+        return suffixListCellFactory == null ? null : suffixListCellFactory.get();
+    }
+
+    /**
+     * This property holds a cell factory used for customizing the appearance of ListView items
+     * in the suffix list of the suggestion popup. The cell factory defines how each item in the list is displayed.
+     *
+     * @return the property object for the cell factory
+     */
+    public final ObjectProperty<Callback<ListView<String>, ListCell<String>>> suffixListCellFactoryProperty() {
+        if (suffixListCellFactory == null) {
+            suffixListCellFactory = new SimpleObjectProperty<>(this, "suffixListCellFactory");
+        }
+        return suffixListCellFactory;
+    }
+
+    public final void setSuffixListCellFactory(Callback<ListView<String>, ListCell<String>> cellFactory) {
+        suffixListCellFactoryProperty().set(cellFactory);
     }
 
     // required
