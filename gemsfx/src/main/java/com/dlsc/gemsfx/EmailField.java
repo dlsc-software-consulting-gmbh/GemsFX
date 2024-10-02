@@ -126,6 +126,12 @@ public class EmailField extends Control {
         return autoSuffixEnabled == null ? DEFAULT_AUTO_SUFFIX_ENABLED : autoSuffixEnabled.get();
     }
 
+    /**
+     * This property controls whether the email field should automatically suggest email domain suffixes
+     * when the user types '@' in the email address field.
+     *
+     * @return the property object for the auto suffix feature
+     */
     public final BooleanProperty autoSuffixEnabledProperty() {
         if (autoSuffixEnabled == null) {
             autoSuffixEnabled = new SimpleBooleanProperty(this, "autoSuffixEnabled", DEFAULT_AUTO_SUFFIX_ENABLED);
