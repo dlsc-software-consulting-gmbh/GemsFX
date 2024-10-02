@@ -34,8 +34,13 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A specialized control for entering an email address. The control validates
- * the entered text whenever the text property changes.
+ * EmailField is a custom control for inputting and validating email addresses.
+ * It extends the base Control class and provides additional functionalities:
+ * <p>
+ * 1. Automatic email domain suffix suggestions to enhance user experience. <br>
+ * 2. Email address format validation to ensure input validity. <br>
+ * 3. Customizable properties to control the visibility of user interface elements,
+ *    such as mail and validation icons, according to specific user interface requirements.
  */
 public class EmailField extends Control {
 

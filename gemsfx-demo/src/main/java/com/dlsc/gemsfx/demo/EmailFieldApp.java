@@ -27,6 +27,7 @@ public class EmailFieldApp extends Application {
         CheckBox required = new CheckBox("Required");
         required.selectedProperty().bindBidirectional(view.requiredProperty());
 
+        // When user types '@' in the email field, show a list of suggestions
         CheckBox autoCompletion = new CheckBox("Auto-Complete Email Suffixes");
         autoCompletion.selectedProperty().bindBidirectional(view.autoSuffixEnabledProperty());
 
