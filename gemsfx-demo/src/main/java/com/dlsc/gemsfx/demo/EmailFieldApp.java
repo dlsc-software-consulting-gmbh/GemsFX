@@ -28,13 +28,13 @@ public class EmailFieldApp extends Application {
         required.selectedProperty().bindBidirectional(view.requiredProperty());
 
         // When user types '@' in the email field, show a list of suggestions
-        CheckBox autoCompletion = new CheckBox("Auto-Complete Email Suffixes");
-        autoCompletion.selectedProperty().bindBidirectional(view.autoSuffixEnabledProperty());
+        CheckBox autoCompletion = new CheckBox("Auto-Complete Domain");
+        autoCompletion.selectedProperty().bindBidirectional(view.autoDomainCompletionEnabledProperty());
 
         CheckBox enableCustomCell = new CheckBox("Enable Custom Cell");
         enableCustomCell.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
-                view.setSuffixListCellFactory(param -> new ListCell<>() {
+                view.setDomainListCellFactory(param -> new ListCell<>() {
                     @Override
                     protected void updateItem(String item, boolean empty) {
                         super.updateItem(item, empty);
@@ -49,7 +49,7 @@ public class EmailFieldApp extends Application {
                     }
                 });
             } else {
-                view.setSuffixListCellFactory(null);
+                view.setDomainListCellFactory(null);
             }
         });
 

@@ -32,5 +32,5 @@
 }
 
 .email-field .suggestion-popup > .content-pane > .suggestion-list-view {
-    -fx-max-height: 200px;
+    -fx-max-height: 10em;
 }

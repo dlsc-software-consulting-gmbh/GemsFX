@@ -28,13 +28,13 @@ import java.util.Objects;
 public class EmailFieldSkin extends SkinBase<EmailField> {
 
     private final CustomTextField customTextField;
-    private final SuggestionPopup suggestionPopup;
+    private final DomainPopup domainPopup;
 
     public EmailFieldSkin(EmailField field) {
         super(field);
 
         customTextField = field.getEditor();
-        suggestionPopup = new SuggestionPopup();
+        domainPopup = new DomainPopup();
 
         Region mailIcon = new Region();
         mailIcon.getStyleClass().add("mail-icon");
@@ -81,31 +81,42 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
 
         boolean shouldShowPopup = text != null
                 && text.contains("@")
-                && getSkinnable().isAutoSuffixEnabled()
+                && getSkinnable().getAutoDomainCompletionEnabled()
                 && customTextField.isFocused();
 
         if (shouldShowPopup) {
             Platform.runLater(this::showSuggestionPopup);
         } else {
-            suggestionPopup.hide();
+            domainPopup.hide();
         }
     }
 
     private void showSuggestionPopup() {
-        EmailField emailField = getSkinnable();
-
         String text = customTextField.getText();
         int atIndex = text.lastIndexOf('@');
         if (atIndex == -1) {
-            suggestionPopup.hide();
+            domainPopup.hide();
             return;
         }
 
         String enteredText = text.substring(atIndex + 1);
+        boolean exactMatch = false;
+        boolean startsWithMatch = false;
 
-        // if entered suffix is already in the list, do not show suggestions
-        if (emailField.getSuffixList().stream().anyMatch(suffix -> suffix.equals(enteredText))) {
-            suggestionPopup.hide();
+        for (String domain : getSkinnable().getDomainList()) {
+
+            if (StringUtils.startsWithIgnoreCase(domain, enteredText)) {
+                startsWithMatch = true;
+
+                if (StringUtils.equalsIgnoreCase(domain, enteredText)) {
+                    exactMatch = true;
+                    break;
+                }
+            }
+        }
+
+        if (exactMatch || !startsWithMatch) {
+            domainPopup.hide();
             return;
         }
 
@@ -118,34 +129,35 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
                 double popupX = atSymbolBounds.getMaxX();
                 double popupY = atSymbolBounds.getMaxY();
                 Point2D popupLocation = customTextField.localToScreen(popupX, popupY);
-                suggestionPopup.show(customTextField, popupLocation.getX(), textFieldBounds.getMaxY());
+                domainPopup.show(customTextField, popupLocation.getX(), textFieldBounds.getMaxY());
             } else if (textFieldBounds != null) {
-                suggestionPopup.show(customTextField, textFieldBounds.getMinX(), textFieldBounds.getMaxY());
+                domainPopup.show(customTextField, textFieldBounds.getMinX(), textFieldBounds.getMaxY());
             }
         }
     }
 
     private void handleSuggestionSelection(ListView<String> listView) {
-        String selectedSuffix = listView.getSelectionModel().getSelectedItem();
+        String selectedDomain = listView.getSelectionModel().getSelectedItem();
         String text = customTextField.getText();
         int atIndex = text.indexOf('@');
-        if (atIndex != -1 && selectedSuffix != null) {
-            customTextField.replaceText(atIndex + 1, text.length(), selectedSuffix);
+        if (atIndex != -1 && selectedDomain != null) {
+            customTextField.replaceText(atIndex + 1, text.length(), selectedDomain);
             customTextField.positionCaret(customTextField.getText().length());
         }
-        suggestionPopup.hide();
+        domainPopup.hide();
     }
 
     /**
-     * SuggestionPopup is a custom popup control used for displaying suggestions
-     * related to the content of an associated text field. It automatically hides
-     * and adjusts its position as needed.
+     * DomainPopup is a private class that extends PopupControl to create a custom
+     * popup used for displaying domain suggestions in the context of an EmailField component.
+     * <p>
+     * It has properties that automatically fix and hide the popup as needed.
      */
-    private class SuggestionPopup extends PopupControl {
+    private class DomainPopup extends PopupControl {
 
         public static final String DEFAULT_STYLE_CLASS = "suggestion-popup";
 
-        public SuggestionPopup() {
+        public DomainPopup() {
             getStyleClass().add(DEFAULT_STYLE_CLASS);
 
             setAutoFix(true);
@@ -154,16 +166,16 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
 
         @Override
         protected Skin<?> createDefaultSkin() {
-            return new SuggestionPopupSkin(this);
+            return new DomainPopupSkin(this);
         }
     }
 
-    private class SuggestionPopupSkin implements Skin<SuggestionPopup> {
+    private class DomainPopupSkin implements Skin<DomainPopup> {
 
-        private final SuggestionPopup popup;
+        private final DomainPopup popup;
         private final StackPane root;
 
-        public SuggestionPopupSkin(SuggestionPopup popup) {
+        public DomainPopupSkin(DomainPopup popup) {
             this.popup = popup;
 
             // Suggestion list view
@@ -183,7 +195,7 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         }
 
         @Override
-        public SuggestionPopup getSkinnable() {
+        public DomainPopup getSkinnable() {
             return popup;
         }
 
@@ -198,7 +210,7 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
     }
 
     private void initializeSuggestionListView(ListView<String> listView) {
-        FilteredList<String> filteredList = new FilteredList<>(getSkinnable().getSuffixList());
+        FilteredList<String> filteredList = new FilteredList<>(getSkinnable().getDomainList());
         filteredList.predicateProperty().bind(Bindings.createObjectBinding(() -> item -> {
             String text = customTextField.getText();
             int atIndex = text.lastIndexOf('@');
@@ -210,7 +222,7 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         }, customTextField.textProperty()));
 
         listView.setItems(filteredList);
-        listView.cellFactoryProperty().bind(getSkinnable().suffixListCellFactoryProperty());
+        listView.cellFactoryProperty().bind(getSkinnable().domainListCellFactoryProperty());
 
         // Handle mouse click events on list items
         listView.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {

@@ -3,10 +3,12 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.skins.EmailFieldSkin;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -37,16 +39,16 @@ import java.util.Objects;
  * EmailField is a custom control for inputting and validating email addresses.
  * It extends the base Control class and provides additional functionalities:
  * <p>
- * 1. Automatic email domain suffix suggestions to enhance user experience. <br>
+ * 1. Automatic email domain suggestions to enhance user experience. <br>
  * 2. Email address format validation to ensure input validity. <br>
  * 3. Customizable properties to control the visibility of user interface elements,
- *    such as mail and validation icons, according to specific user interface requirements.
+ * such as mail and validation icons, according to specific user interface requirements.
  */
 public class EmailField extends Control {
 
     private static final boolean DEFAULT_SHOW_MAIL_ICON = true;
     private static final boolean DEFAULT_SHOW_VALIDATION_ICON = true;
-    private static final boolean DEFAULT_AUTO_SUFFIX_ENABLED = true;
+    private static final boolean DEFAULT_AUTO_DOMAIN_COMPLETION_ENABLED = true;
 
     private static final PseudoClass VALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("valid");
     private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
@@ -106,65 +108,72 @@ public class EmailField extends Control {
         return editor;
     }
 
-    // suffixList
+    // domainList
 
-    private final ObservableList<String> suffixList = FXCollections.observableArrayList(
-            "gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com",
-            "aol.com", "mail.com", "protonmail.com", "gmx.com", "zoho.com", "qq.com",
-            "163.com", "126.com", "yeah.net", "msn.com", "live.com", "me.com"
-    );
+    private final ListProperty<String> domainList = new SimpleListProperty<>(this, "domainList",
+            FXCollections.observableArrayList("gmail.com", "yahoo.com", "outlook.com", "hotmail.com",
+                    "icloud.com", "aol.com", "mail.com", "protonmail.com", "gmx.com", "zoho.com", "qq.com",
+                    "163.com", "126.com", "yeah.net", "msn.com", "live.com", "me.com"));
 
-    public final ObservableList<String> getSuffixList() {
-        return suffixList;
+    public final ObservableList<String> getDomainList() {
+        return domainList.get();
     }
 
-    // autoSuffixEnabled
-
-    private BooleanProperty autoSuffixEnabled;
-
-    public final boolean isAutoSuffixEnabled() {
-        return autoSuffixEnabled == null ? DEFAULT_AUTO_SUFFIX_ENABLED : autoSuffixEnabled.get();
+    public final ListProperty<String> domainListProperty() {
+        return domainList;
     }
 
-    /**
-     * This property controls whether the email field should automatically suggest email domain suffixes
-     * when the user types '@' in the email address field.
-     *
-     * @return the property object for the auto suffix feature
-     */
-    public final BooleanProperty autoSuffixEnabledProperty() {
-        if (autoSuffixEnabled == null) {
-            autoSuffixEnabled = new SimpleBooleanProperty(this, "autoSuffixEnabled", DEFAULT_AUTO_SUFFIX_ENABLED);
-        }
-        return autoSuffixEnabled;
+    public final void setDomainList(ObservableList<String> domainList) {
+        this.domainList.set(domainList);
     }
 
-    public final void setAutoSuffixEnabled(boolean autoSuffixEnabled) {
-        autoSuffixEnabledProperty().set(autoSuffixEnabled);
-    }
+    // autoDomainCompletionEnabled
 
-    // Custom cell factory for the ListView in the suggestion popup.
-    private ObjectProperty<Callback<ListView<String>, ListCell<String>>> suffixListCellFactory;
+    private BooleanProperty autoDomainCompletionEnabled;
 
-    public final Callback<ListView<String>, ListCell<String>> getSuffixListCellFactory() {
-        return suffixListCellFactory == null ? null : suffixListCellFactory.get();
+    public final boolean getAutoDomainCompletionEnabled() {
+        return autoDomainCompletionEnabled == null ? DEFAULT_AUTO_DOMAIN_COMPLETION_ENABLED : autoDomainCompletionEnabled.get();
     }
 
     /**
-     * This property holds a cell factory used for customizing the appearance of ListView items
-     * in the suffix list of the suggestion popup. The cell factory defines how each item in the list is displayed.
+     * Property for enabling or disabling the auto-completion of email domains.
      *
-     * @return the property object for the cell factory
+     * @return The BooleanProperty representing the state of auto domain completion.
      */
-    public final ObjectProperty<Callback<ListView<String>, ListCell<String>>> suffixListCellFactoryProperty() {
-        if (suffixListCellFactory == null) {
-            suffixListCellFactory = new SimpleObjectProperty<>(this, "suffixListCellFactory");
+    public final BooleanProperty autoDomainCompletionEnabledProperty() {
+        if (autoDomainCompletionEnabled == null) {
+            autoDomainCompletionEnabled = new SimpleBooleanProperty(this, "autoDomainCompletionEnabled", DEFAULT_AUTO_DOMAIN_COMPLETION_ENABLED);
         }
-        return suffixListCellFactory;
+        return autoDomainCompletionEnabled;
     }
 
-    public final void setSuffixListCellFactory(Callback<ListView<String>, ListCell<String>> cellFactory) {
-        suffixListCellFactoryProperty().set(cellFactory);
+    public final void setAutoDomainCompletionEnabled(boolean autoDomainCompletionEnabled) {
+        autoDomainCompletionEnabledProperty().set(autoDomainCompletionEnabled);
+    }
+
+    // domainListCellFactory
+
+    private ObjectProperty<Callback<ListView<String>, ListCell<String>>> domainListCellFactory;
+
+    public final Callback<ListView<String>, ListCell<String>> getDomainListCellFactory() {
+        return domainListCellFactory == null ? null : domainListCellFactory.get();
+    }
+
+    /**
+     * Returns the property for the domain list cell factory.
+     * This property can be used to customize the rendering of the domain suggestions in the ListView.
+     *
+     * @return The ObjectProperty representing the domain list cell factory.
+     */
+    public final ObjectProperty<Callback<ListView<String>, ListCell<String>>> domainListCellFactoryProperty() {
+        if (domainListCellFactory == null) {
+            domainListCellFactory = new SimpleObjectProperty<>(this, "domainListCellFactory");
+        }
+        return domainListCellFactory;
+    }
+
+    public final void setDomainListCellFactory(Callback<ListView<String>, ListCell<String>> cellFactory) {
+        domainListCellFactoryProperty().set(cellFactory);
     }
 
     // required
