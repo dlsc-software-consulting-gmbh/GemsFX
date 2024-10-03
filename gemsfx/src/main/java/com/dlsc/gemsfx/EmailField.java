@@ -1,13 +1,31 @@
 package com.dlsc.gemsfx;
 
-import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.skins.EmailFieldSkin;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
-import javafx.css.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
+import javafx.css.PseudoClass;
+import javafx.css.SimpleStyleableBooleanProperty;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.scene.control.Control;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+import javafx.util.Callback;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -18,13 +36,19 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A specialized control for entering an email address. The control validates
- * the entered text whenever the text property changes.
+ * EmailField is a custom control for inputting and validating email addresses.
+ * It extends the base Control class and provides additional functionalities:
+ * <p>
+ * 1. Automatic email domain suggestions to enhance user experience. <br>
+ * 2. Email address format validation to ensure input validity. <br>
+ * 3. Customizable properties to control the visibility of user interface elements,
+ * such as mail and validation icons, according to specific user interface requirements.
  */
 public class EmailField extends Control {
 
     private static final boolean DEFAULT_SHOW_MAIL_ICON = true;
     private static final boolean DEFAULT_SHOW_VALIDATION_ICON = true;
+    private static final boolean DEFAULT_AUTO_DOMAIN_COMPLETION_ENABLED = true;
 
     private static final PseudoClass VALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("valid");
     private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
@@ -82,6 +106,74 @@ public class EmailField extends Control {
 
     public final CustomTextField getEditor() {
         return editor;
+    }
+
+    // domainList
+
+    private final ListProperty<String> domainList = new SimpleListProperty<>(this, "domainList",
+            FXCollections.observableArrayList("gmail.com", "yahoo.com", "outlook.com", "hotmail.com",
+                    "icloud.com", "aol.com", "mail.com", "protonmail.com", "gmx.com", "zoho.com", "qq.com",
+                    "163.com", "126.com", "yeah.net", "msn.com", "live.com", "me.com"));
+
+    public final ObservableList<String> getDomainList() {
+        return domainList.get();
+    }
+
+    public final ListProperty<String> domainListProperty() {
+        return domainList;
+    }
+
+    public final void setDomainList(ObservableList<String> domainList) {
+        this.domainList.set(domainList);
+    }
+
+    // autoDomainCompletionEnabled
+
+    private BooleanProperty autoDomainCompletionEnabled;
+
+    public final boolean getAutoDomainCompletionEnabled() {
+        return autoDomainCompletionEnabled == null ? DEFAULT_AUTO_DOMAIN_COMPLETION_ENABLED : autoDomainCompletionEnabled.get();
+    }
+
+    /**
+     * Property for enabling or disabling the auto-completion of email domains.
+     *
+     * @return The BooleanProperty representing the state of auto domain completion.
+     */
+    public final BooleanProperty autoDomainCompletionEnabledProperty() {
+        if (autoDomainCompletionEnabled == null) {
+            autoDomainCompletionEnabled = new SimpleBooleanProperty(this, "autoDomainCompletionEnabled", DEFAULT_AUTO_DOMAIN_COMPLETION_ENABLED);
+        }
+        return autoDomainCompletionEnabled;
+    }
+
+    public final void setAutoDomainCompletionEnabled(boolean autoDomainCompletionEnabled) {
+        autoDomainCompletionEnabledProperty().set(autoDomainCompletionEnabled);
+    }
+
+    // domainListCellFactory
+
+    private ObjectProperty<Callback<ListView<String>, ListCell<String>>> domainListCellFactory;
+
+    public final Callback<ListView<String>, ListCell<String>> getDomainListCellFactory() {
+        return domainListCellFactory == null ? null : domainListCellFactory.get();
+    }
+
+    /**
+     * Returns the property for the domain list cell factory.
+     * This property can be used to customize the rendering of the domain suggestions in the ListView.
+     *
+     * @return The ObjectProperty representing the domain list cell factory.
+     */
+    public final ObjectProperty<Callback<ListView<String>, ListCell<String>>> domainListCellFactoryProperty() {
+        if (domainListCellFactory == null) {
+            domainListCellFactory = new SimpleObjectProperty<>(this, "domainListCellFactory");
+        }
+        return domainListCellFactory;
+    }
+
+    public final void setDomainListCellFactory(Callback<ListView<String>, ListCell<String>> cellFactory) {
+        domainListCellFactoryProperty().set(cellFactory);
     }
 
     // required
