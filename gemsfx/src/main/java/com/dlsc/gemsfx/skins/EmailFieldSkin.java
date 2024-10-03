@@ -76,24 +76,22 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         }
     }
 
+    /**
+     * Controls the visibility of the domain suggestion popup based on specific conditions.
+     * <p>
+     * The popup is shown when all the following conditions are met:
+     * - There is no exact domain match with the text entered after the '@' symbol.
+     * - At least one domain in the domain list starts with the entered text (case-insensitive).
+     * - Auto domain completion is enabled.
+     * - The custom text field is currently focused.
+     * <p>
+     * If any of these conditions are not met, the popup will be hidden.
+     */
     private void handleSuggestionPopupVisibility() {
-        String text = customTextField.getText();
-
-        boolean shouldShowPopup = text != null
-                && text.contains("@")
-                && getSkinnable().getAutoDomainCompletionEnabled()
-                && customTextField.isFocused();
-
-        if (shouldShowPopup) {
-            Platform.runLater(this::showSuggestionPopup);
-        } else {
-            domainPopup.hide();
-        }
-    }
-
-    private void showSuggestionPopup() {
-        String text = customTextField.getText();
+        String text = customTextField.textProperty().getValueSafe();
         int atIndex = text.lastIndexOf('@');
+
+        // If no '@' symbol is found, hide the popup and return
         if (atIndex == -1) {
             domainPopup.hide();
             return;
@@ -104,10 +102,8 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         boolean startsWithMatch = false;
 
         for (String domain : getSkinnable().getDomainList()) {
-
             if (StringUtils.startsWithIgnoreCase(domain, enteredText)) {
                 startsWithMatch = true;
-
                 if (StringUtils.equalsIgnoreCase(domain, enteredText)) {
                     exactMatch = true;
                     break;
@@ -115,11 +111,18 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
             }
         }
 
-        if (exactMatch || !startsWithMatch) {
-            domainPopup.hide();
-            return;
-        }
+        boolean shouldShowPopup = !exactMatch && startsWithMatch
+                && getSkinnable().getAutoDomainCompletionEnabled()
+                && customTextField.isFocused();
 
+        if (shouldShowPopup) {
+            Platform.runLater(() -> showSuggestionPopup(atIndex));
+        } else {
+            domainPopup.hide();
+        }
+    }
+
+    private void showSuggestionPopup(int atIndex) {
         // Position the popup
         Bounds textFieldBounds = customTextField.localToScreen(customTextField.getBoundsInLocal());
         TextFieldSkin skin = (TextFieldSkin) customTextField.getSkin();
