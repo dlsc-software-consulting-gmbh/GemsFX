@@ -25,8 +25,15 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.scenicview.ScenicView;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.prefs.Preferences;
@@ -70,6 +77,23 @@ public class DialogPaneApp extends Application {
 
         Button errorWithDetailsButton = new Button("Error with details");
         errorWithDetailsButton.setOnAction(evt -> dialogPane.showError("Error Title", "Error dialog message that can be somewhat longer", "But that is kind of important because the uer has to take errors very seriously.\n\nSome errors might be so bad that the application needs to be restarted because the process ran out of memory or a heap dump was produced somewhere."));
+
+        String errorMessage = "But that is kind of important because the uer has to take errors very seriously.\n\nSome errors might be so bad that the application needs to be restarted because the process ran out of memory or a heap dump was produced somewhere.";
+
+        Runnable sendMailAction = () -> {
+            try {
+                Desktop.getDesktop().mail(new URI("mailto:dlemmermann@gmail.com?subject=Error&body=" + URLEncoder.encode(errorMessage, StandardCharsets.UTF_8).replace("+", "%20")));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        Button errorWithDetailsMailButton = new Button("Error with details (Mail)");
+        errorWithDetailsMailButton.setOnAction(evt -> {
+            dialogPane.showError("Error Title", "Error dialog message that can be somewhat longer", errorMessage, sendMailAction);
+        });
 
         Button errorWithExceptionButton = new Button("Error with exception");
         errorWithExceptionButton.setOnAction(evt -> dialogPane.showError("Error Title", "Error dialog message that can be somewhat longer", new NullPointerException("A fake null pointer exception.")));
@@ -125,8 +149,8 @@ public class DialogPaneApp extends Application {
             later(() -> dialogPane.showError("Error", "An error was encountered while running this application."), 3);
         });
 
-        FlowPane flowPane = new FlowPane(10, 10, blankButton, infoButton, warnButton, errorButton, errorWithDetailsButton, errorWithExceptionButton,
-                confirmButton, inputSingleLineButton, inputMultiLineButton, node1Button, node2Button, busyButton, multipleDialogsButton,
+        FlowPane flowPane = new FlowPane(10, 10, blankButton, infoButton, warnButton, errorButton, errorWithDetailsButton, errorWithDetailsMailButton,
+                errorWithExceptionButton, confirmButton, inputSingleLineButton, inputMultiLineButton, node1Button, node2Button, busyButton, multipleDialogsButton,
                 maxButton);
 
         flowPane.setAlignment(Pos.CENTER);

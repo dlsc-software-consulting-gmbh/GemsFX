@@ -108,6 +108,14 @@
     -fx-icon-color: -fx-text-background-color;
 }
 
+.dialog-pane > .content-pane > .vbox > .content > .error-container {
+    -fx-spacing: 1em;
+}
+
+.dialog-pane > .content-pane > .vbox > .content > .error-container .content {
+    -fx-background-color: yellow !important;
+}
+
 /* ----------------------------------------------------------------------------
  * BusyIndicator
  */

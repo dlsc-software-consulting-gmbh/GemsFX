@@ -407,6 +407,19 @@ public class DialogPane extends Pane {
      * @return the dialog
      */
     public final Dialog<Void> showError(String title, String message, String details) {
+        return showError(title, message, details, null);
+    }
+
+    /**
+     * Creates and shows an error message dialog.
+     *
+     * @param title   the title for the dialog
+     * @param message the main error message
+     * @param details additional details
+     * @param email an optional email address to send the error to
+     * @return the dialog
+     */
+    public final Dialog<Void> showError(String title, String message, String details, Runnable onSend) {
         Dialog<Void> dialog = new Dialog<>(this, Type.ERROR);
         dialog.setTitle(title);
 
@@ -426,16 +439,17 @@ public class DialogPane extends Pane {
             textArea.setPrefColumnCount(80);
             textArea.setResizeHorizontal(true);
             textArea.setResizeVertical(true);
+            textArea.setEditable(false);
             textArea.getStyleClass().add("error-text-area");
 
-            TitledPane titledPane = new TitledPane();
-            titledPane.getStyleClass().add("error-details-titled-pane");
-            titledPane.setText("Details");
-            titledPane.setContent(textArea);
-            titledPane.setPrefHeight(300);
+            Button button = new Button();
+            button.textProperty().bind(sendButtonTextProperty());
+            button.setOnAction(evt -> onSend.run());
+            button.setVisible(onSend != null);
+            button.setManaged(onSend != null);
 
-            VBox content = new VBox(messageLabel, titledPane);
-            content.getStyleClass().add("container");
+            VBox content = new VBox(messageLabel, textArea, button);
+            content.getStyleClass().add("error-container");
             dialog.setContent(content);
 
             FocusUtil.requestFocus(textArea);
@@ -444,6 +458,20 @@ public class DialogPane extends Pane {
         dialog.show();
 
         return dialog;
+    }
+
+    private final StringProperty sendButtonText = new SimpleStringProperty(this, "sendButtonText", "Send");
+
+    public final String getSendButtonText() {
+        return sendButtonText.get();
+    }
+
+    public final StringProperty sendButtonTextProperty() {
+        return sendButtonText;
+    }
+
+    public final void setSendButtonText(String sendButtonText) {
+        this.sendButtonText.set(sendButtonText);
     }
 
     /**
