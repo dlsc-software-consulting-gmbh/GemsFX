@@ -416,7 +416,7 @@ public class DialogPane extends Pane {
      * @param title   the title for the dialog
      * @param message the main error message
      * @param details additional details
-     * @param email an optional email address to send the error to
+     * @param onSend an optional action to send out / forward the error message
      * @return the dialog
      */
     public final Dialog<Void> showError(String title, String message, String details, Runnable onSend) {
@@ -442,13 +442,18 @@ public class DialogPane extends Pane {
             textArea.setEditable(false);
             textArea.getStyleClass().add("error-text-area");
 
-            Button button = new Button();
-            button.textProperty().bind(sendButtonTextProperty());
-            button.setOnAction(evt -> onSend.run());
-            button.setVisible(onSend != null);
-            button.setManaged(onSend != null);
+            if (onSend != null) {
+                ButtonType button = new ButtonType(getSendButtonText(), ButtonBar.ButtonData.LEFT);
+                dialog.setSameWidthButtons(false);
+                dialog.getButtonTypes().add(button);
+                dialog.setOnButtonPressed(buttonType -> {
+                    if (buttonType == button) {
+                        onSend.run();
+                    }
+                });
+            }
 
-            VBox content = new VBox(messageLabel, textArea, button);
+            VBox content = new VBox(messageLabel, textArea);
             content.getStyleClass().add("error-container");
             dialog.setContent(content);
 
