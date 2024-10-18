@@ -227,7 +227,7 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
         int selectedCount = selectedItems.size();
 
         if (selectedCount == 0) {
-            return "No Data";
+            return "";
         } else if (selectedCount == 1) {
             return convertItemToText(selectedItems.get(0));
         } else {

@@ -56,7 +56,7 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
             int selectedCount = selectedRanges.size();
 
             if (selectedCount == 0) {
-                return "No Data";
+                return "";
             } else if (selectedCount == 1) {
                 return convertRangeToText(selectedRanges.get(0));
             } else {

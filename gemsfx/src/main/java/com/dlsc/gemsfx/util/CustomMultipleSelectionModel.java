@@ -325,9 +325,6 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         int index = items.indexOf(obj);
         if (index >= 0) {
             select(index);
-        } else {
-            // Object not in the list, clear selection
-            clearSelection();
         }
     }
 

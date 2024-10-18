@@ -11,7 +11,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class HelloTimeRangePicker extends Application {
+public class TimeRangePickerApp extends Application {
 
     private TimeRangePicker timeRangePicker;
 
