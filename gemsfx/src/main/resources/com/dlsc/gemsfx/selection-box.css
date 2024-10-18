@@ -1,0 +1,68 @@
+.selection-box > .display-label {
+    -fx-padding: 0.36em 0.725em;
+}
+
+/** ---------------------------------
+ * SelectionPopup
+ */
+.selection-popup {
+}
+
+.selection-popup > .content {
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 8, 0.0 , 0 , 0 );
+    -fx-padding: 4px 1px;
+}
+
+.selection-popup:above > .content {
+}
+
+.selection-popup > .content > .extra-buttons-box .extra-button {
+    -fx-background-radius: 2px;
+    -fx-alignment: center-left;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-padding: 4 0 4 26;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.selection-popup > .content > .extra-buttons-box .extra-button:hover {
+    -fx-background-color: -fx-cell-hover-color;
+    -fx-text-fill: -fx-text-inner-color;
+}
+
+.selection-popup > .content > .extra-buttons-box .extra-button:pressed {
+    -fx-background-color: derive(-fx-cell-hover-color, 5%);
+}
+
+.selection-popup > .content > .options-box > .radio-button,
+.selection-popup > .content > .options-box > .check-box {
+    -fx-label-padding: 0 0 0 4px;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-padding: 4 0 4 5;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.selection-popup > .content > .options-box > .radio-button:hover,
+.selection-popup > .content > .options-box > .check-box:hover {
+    -fx-background-color: -fx-cell-hover-color;
+    -fx-text-fill: -fx-text-inner-color;
+}
+
+.selection-popup > .content > .options-box > .radio-button > .radio {
+    -fx-background-color: transparent;
+}
+
+.selection-popup > .content > .options-box > .radio-button > .radio > .dot {
+    -fx-shape: "M7.95837 15L3.20837 10.25L4.39587 9.06249L7.95837 12.625L15.6042 4.97916L16.7917 6.16666L7.95837 15Z";
+}
+
+.selection-popup > .content > .options-box > .radio-button:selected {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-selection-bar;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.selection-popup > .content > .options-box > .radio-button:selected > .radio > .dot {
+    -fx-background-color: -fx-selection-bar-text;
+}
