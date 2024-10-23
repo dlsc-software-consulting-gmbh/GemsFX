@@ -198,7 +198,7 @@ public class PagingControls extends Control {
         SHOW_PAGE_BUTTONS
     }
 
-    private final ObjectProperty<FirstLastPageDisplayMode> firstLastPageDisplayMode = new SimpleObjectProperty<>(this, "firstLastPageStrategy");
+    private final ObjectProperty<FirstLastPageDisplayMode> firstLastPageDisplayMode = new SimpleObjectProperty<>(this, "firstLastPageStrategy", FirstLastPageDisplayMode.SHOW_PAGE_BUTTONS);
 
     public final FirstLastPageDisplayMode getFirstLastPageDisplayMode() {
         return firstLastPageDisplayMode.get();
