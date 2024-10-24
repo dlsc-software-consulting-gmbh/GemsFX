@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.CustomPopupControl;
 import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.util.UIUtil;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -49,6 +50,7 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
     private static final String UPDATE_POPUP_CONTENT = "updatePopupContent";
     private static final String UPDATE_SELECTION_IN_POPUP = "updateSelectionInPopup";
     private static final String UPDATE_EXTRA_BUTTONS_POSITION = "updateExtraButtonsPosition";
+    private static final String SHOW_POPUP_PROPERTY = "showPopup";
 
     private final SelectionBox<T> control;
 
@@ -96,6 +98,16 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
         addListenerToControl();
 
         getChildren().addAll(displayLabel, arrowButton);
+
+        // Check during skin initialization if the popup should be displayed
+        if (control.getProperties().containsKey(SHOW_POPUP_PROPERTY)) {
+            if (Boolean.TRUE.equals(control.getProperties().get(SHOW_POPUP_PROPERTY))) {
+                Platform.runLater(this::showPopup);
+            } else {
+                hidePopup();
+            }
+            control.getProperties().remove(SHOW_POPUP_PROPERTY);
+        }
     }
 
     private void addListenerToControl() {
@@ -150,12 +162,13 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
 
         control.getProperties().addListener((MapChangeListener<Object, Object>) change -> {
             if (change.wasAdded()) {
-                if (change.getKey().equals("showPopup")) {
+                if (change.getKey().equals(SHOW_POPUP_PROPERTY)) {
                     if (Boolean.TRUE.equals(change.getValueAdded())) {
                         showPopup();
                     } else {
                         hidePopup();
                     }
+                    control.getProperties().remove(SHOW_POPUP_PROPERTY);
                 }
             }
         });

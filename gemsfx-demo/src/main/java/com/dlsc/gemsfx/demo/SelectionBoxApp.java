@@ -26,6 +26,8 @@ public class SelectionBoxApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        selectionBox.show();
+
         SplitPane splitPane = new SplitPane();
         splitPane.setDividerPositions(0.7);
         splitPane.getItems().addAll(createControl(), getControlPanel());
@@ -40,6 +42,7 @@ public class SelectionBoxApp extends Application {
     private Region createControl() {
         selectionBox.setPrefWidth(220);
         selectionBox.getItems().addAll("Item 1", "Item 2", "Item 3", "Option A", "Option B", "Option C", "Option D");
+        selectionBox.getSelectionModel().selectFirst();
         // selectionBox.setItemConverter(new SimpleStringConverter<>(s -> ">>" +s));
 
         StackPane wrapper = new StackPane(selectionBox);
@@ -48,6 +51,10 @@ public class SelectionBoxApp extends Application {
     }
 
     private Node getControlPanel() {
+        // show popup button
+        Button showButton = new Button("Show Popup");
+        showButton.setOnAction(e -> selectionBox.show());
+
         // selection mode
         ComboBox<SelectionMode> selectionModeComboBox = new ComboBox<>();
         selectionModeComboBox.getItems().addAll(SelectionMode.SINGLE, SelectionMode.MULTIPLE);
@@ -204,6 +211,7 @@ public class SelectionBoxApp extends Application {
 
         return new SimpleControlPane(
                 "SelectionBox",
+                new SimpleControlPane.ControlItem("Show Popup", showButton),
                 new SimpleControlPane.ControlItem("Selection Mode", selectionModeComboBox),
                 new SimpleControlPane.ControlItem("Show Extra Buttons", visibleExtraButtonsCheckBox),
                 new SimpleControlPane.ControlItem("Change Extra Buttons", changeExtraButtonsButton),
