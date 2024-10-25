@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
 
 import java.util.Optional;
@@ -207,4 +208,11 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
                 Math.max(0, Math.min(autoCompleteWidth, w - autoCompletionX)),
                 h);
     }
+
+    @Override
+    public HitInfo getIndex(double x, double y) {
+        final double leftWidth = leftPane == null ? 0.0 : snapSizeX(leftPane.prefWidth(getSkinnable().getHeight()));
+        return super.getIndex(x - leftWidth, y);
+    }
+
 }
