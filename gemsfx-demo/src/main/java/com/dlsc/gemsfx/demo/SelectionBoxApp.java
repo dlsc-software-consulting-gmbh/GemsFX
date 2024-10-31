@@ -64,6 +64,17 @@ public class SelectionBoxApp extends Application {
         CheckBox visibleExtraButtonsCheckBox = new CheckBox("Show Extra Buttons");
         visibleExtraButtonsCheckBox.selectedProperty().bindBidirectional(selectionBox.showExtraButtonsProperty());
 
+        // prompt text
+        CheckBox promptTextCheckBox = new CheckBox("Change Prompt Text");
+        promptTextCheckBox.setOnAction(evt -> {
+            selectionBox.getSelectionModel().clearSelection();
+            if (promptTextCheckBox.isSelected()) {
+                selectionBox.setPromptText("Select");
+            } else {
+                selectionBox.setPromptText("No Selection");
+            }
+        });
+
         // change extra buttons
         Button changeExtraButtonsButton = new Button("Change Extra Buttons");
         changeExtraButtonsButton.setMaxWidth(Double.MAX_VALUE);
@@ -213,6 +224,7 @@ public class SelectionBoxApp extends Application {
                 "SelectionBox",
                 new SimpleControlPane.ControlItem("Show Popup", showButton),
                 new SimpleControlPane.ControlItem("Selection Mode", selectionModeComboBox),
+                new SimpleControlPane.ControlItem("Change Prompt Text", promptTextCheckBox),
                 new SimpleControlPane.ControlItem("Show Extra Buttons", visibleExtraButtonsCheckBox),
                 new SimpleControlPane.ControlItem("Change Extra Buttons", changeExtraButtonsButton),
                 new SimpleControlPane.ControlItem("Extra Buttons Position", extraButtonsPositionComboBox),

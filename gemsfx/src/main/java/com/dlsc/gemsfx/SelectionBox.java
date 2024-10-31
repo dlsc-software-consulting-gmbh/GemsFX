@@ -8,6 +8,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
@@ -156,7 +158,7 @@ public class SelectionBox<T> extends Control {
      * The button will be styled with the "extra-button" class and will adjust its visibility
      * based on its managed property. The button's maximum width will be set to the maximum double value.
      *
-     * @param text the text to be displayed on the button
+     * @param text   the text to be displayed on the button
      * @param action the action to be executed when the button is clicked
      * @return the created Button instance
      */
@@ -169,9 +171,9 @@ public class SelectionBox<T> extends Control {
      * The created button will be styled with "extra-button" class and will adjust its visibility
      * based on its managed property. The button's maximum width will be set to the maximum double value.
      *
-     * @param text the text to be displayed on the button
+     * @param text    the text to be displayed on the button
      * @param graphic the graphic node to be displayed on the button
-     * @param action the action to be executed when the button is clicked
+     * @param action  the action to be executed when the button is clicked
      * @return the created Button instance
      */
     public Button createExtraButton(String text, Node graphic, Runnable action) {
@@ -253,6 +255,31 @@ public class SelectionBox<T> extends Control {
         return graphic == null ? null : graphic.get();
     }
 
+    // promptText
+
+    private StringProperty promptText;
+
+    /**
+     * Returns the prompt text property of this SelectionBox. The prompt text is an optional
+     * text that can be displayed in the picker when no item is selected.
+     *
+     * @return the StringProperty containing the prompt text.
+     */
+    public final StringProperty promptTextProperty() {
+        if (promptText == null) {
+            promptText = new SimpleStringProperty(this, "promptText");
+        }
+        return promptText;
+    }
+
+    public final void setPromptText(String promptText) {
+        promptTextProperty().set(promptText);
+    }
+
+    public final String getPromptText() {
+        return promptText == null ? null : promptText.get();
+    }
+
     // autoHideOnSelection
 
     private BooleanProperty autoHideOnSelection;
@@ -300,6 +327,9 @@ public class SelectionBox<T> extends Control {
      * For instance, if the selected item collection is {@code [1, 2, 3, 4, 5]}, the converter can format
      * this list to display as "1, 2, 3, 4, 5". By setting a custom converter, it is possible to modify
      * the display to any desired format, such as "1~5".
+     * <p>
+     * If the selected items list is {@code null} or empty, the {@code promptTextProperty()} value will
+     * be used instead, so there is no need to handle these cases within the converter.
      * <p>
      * The {@code selectedItemsConverterProperty} provides a way to bind the display logic to UI components,
      * enabling dynamic updates whenever the selected items change or the converter is redefined.
