@@ -119,6 +119,7 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
 
         control.itemConverterProperty().addListener((obs, oldConverter, newConverter) -> updateDisplayLabelText());
         control.selectedItemsConverterProperty().addListener((obs, oldConverter, newConverter) -> updateDisplayLabelText());
+        control.promptTextProperty().addListener((obs, oldText, newText) -> updateDisplayLabelText());
 
         control.getSelectionModel().selectedItemProperty().addListener(selectItemChangedListener);
         control.getSelectionModel().getSelectedItems().addListener(selectItemsChangeListener);
@@ -227,11 +228,16 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
 
         StringConverter<List<T>> stringConverter = control.getSelectedItemsConverter();
         String text;
-        if (stringConverter != null) {
-            text = stringConverter.toString(selectedItems);
+
+        if (selectedItems.isEmpty()) {
+            text = control.getPromptText();
         } else {
-            // Use default conversion logic
-            text = getDefaultDisplayText(selectedItems);
+            if (stringConverter != null) {
+                text = stringConverter.toString(selectedItems);
+            } else {
+                // Use default conversion logic
+                text = getDefaultDisplayText(selectedItems);
+            }
         }
         displayLabel.setText(text);
     }
@@ -384,7 +390,7 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
         public SelectionPopupSkin(SelectionPopup popup) {
             this.popup = popup;
 
-            contentBox = new VBox(){
+            contentBox = new VBox() {
                 @Override
                 public String getUserAgentStylesheet() {
                     return Objects.requireNonNull(SelectionBox.class.getResource("selection-box.css")).toExternalForm();
