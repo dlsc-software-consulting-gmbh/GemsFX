@@ -24,7 +24,6 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
-import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
 import org.apache.commons.lang3.StringUtils;
@@ -148,55 +147,55 @@ public class FilterView<T> extends Control {
         this.scrollThreshold.set(scrollThreshold);
     }
 
-    private final ObjectProperty<Label> titleLabel = new SimpleObjectProperty<>(this, "titleLabel", new Label());
+    private final ObjectProperty<Node> titleGraphic = new SimpleObjectProperty<>(this, "titleGraphic");
 
-    public final Label getTitleLabel() {
-        return titleLabel.get();
+    public final Node getTitleGraphic() {
+        return titleGraphic.get();
     }
 
     /**
-     * The label instance that will be used for displaying the title of the view.
+     * The graphic node displayed alongside the title label.
      */
-    public final ObjectProperty<Label> titleLabelProperty() {
-        return titleLabel;
+    public final ObjectProperty<Node> titleGraphicProperty() {
+        return titleGraphic;
     }
 
-    public final void setTitleLabel(Label titleLabel) {
-        this.titleLabel.set(titleLabel);
+    public final void setTitleGraphic(Node titleGraphic) {
+        this.titleGraphic.set(titleGraphic);
     }
 
-    private final ObjectProperty<Label> titlePostfixLabel = new SimpleObjectProperty<>(this, "titlePostfixLabel", new Label());
+    private final ObjectProperty<Node> titlePostfixGraphic = new SimpleObjectProperty<>(this, "titlePostfixGraphic");
 
-    public final Label getTitlePostfixLabel() {
-        return titlePostfixLabel.get();
+    public final Node getTitlePostfixGraphic() {
+        return titlePostfixGraphic.get();
     }
 
     /**
-     * The label instance that will be used for displaying the title postfix text of the view.
+     * The graphic node displayed alongside the title postfix label.
      */
-    public final ObjectProperty<Label> titlePostfixLabelProperty() {
-        return titlePostfixLabel;
+    public final ObjectProperty<Node> titlePostfixGraphicProperty() {
+        return titlePostfixGraphic;
     }
 
-    public final void setTitlePostfixLabel(Label titlePostfixLabel) {
-        this.titlePostfixLabel.set(titlePostfixLabel);
+    public final void setTitlePostfixGraphic(Node titlePostfixGraphic) {
+        this.titlePostfixGraphic.set(titlePostfixGraphic);
     }
 
-    private final ObjectProperty<Label> subtitleLabel = new SimpleObjectProperty<>(this, "subtitleLabel", new Label());
+    private final ObjectProperty<Node> subtitleGraphic = new SimpleObjectProperty<>(this, "subtitleGraphic");
 
-    public Label getSubtitleLabel() {
-        return subtitleLabel.get();
+    public Node getSubtitleGraphic() {
+        return subtitleGraphic.get();
     }
 
     /**
-     * The label instance that will be used for displaying the subtitle of the view.
+     * The graphic node displayed alongside the subtitle label.
      */
-    public ObjectProperty<Label> subtitleLabelProperty() {
-        return subtitleLabel;
+    public ObjectProperty<Node> subtitleGraphicProperty() {
+        return subtitleGraphic;
     }
 
-    public void setSubtitleLabel(Label subtitleLabel) {
-        this.subtitleLabel.set(subtitleLabel);
+    public void setSubtitleGraphic(Node subtitleGraphic) {
+        this.subtitleGraphic.set(subtitleGraphic);
     }
 
     private final BooleanProperty showHeader = new SimpleBooleanProperty(this, "showHeader", true);

@@ -5,7 +5,6 @@ import com.dlsc.gemsfx.FilterView;
 import com.dlsc.gemsfx.FilterView.Filter;
 import com.dlsc.gemsfx.SearchTextField;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -39,20 +38,7 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
         super(view);
 
         searchTextField = view.getSearchTextField();
-
-        InvalidationListener updateHeaderListener = it -> updateHeaderBox();
-        view.titleLabelProperty().addListener(updateHeaderListener);
-        view.titlePostfixLabelProperty().addListener(updateHeaderListener);
-        view.subtitleLabelProperty().addListener(updateHeaderListener);
-
-        view.extrasProperty().addListener((obs, oldExtras, newExtras) -> {
-            if (oldExtras != null) {
-                headerBox.getChildren().remove(oldExtras);
-            }
-            if (newExtras != null) {
-                headerBox.getChildren().add(newExtras);
-            }
-        });
+        createHeaderBox();
 
         filterGroupsPane.getStyleClass().add("filter-groups");
         filterGroupsPane.setFillHeight(true);
@@ -106,36 +92,52 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
         headerBox.visibleProperty().bind(view.showHeaderProperty());
         headerBox.managedProperty().bind(view.showHeaderProperty());
 
-        updateHeaderBox();
+        view.extrasProperty().addListener((obs, oldExtras, newExtras) -> {
+            if (oldExtras != null) {
+                headerBox.getChildren().remove(oldExtras);
+            }
+            if (newExtras != null) {
+                headerBox.getChildren().add(newExtras);
+            }
+        });
     }
 
-    private void updateHeaderBox() {
+    private void createHeaderBox() {
         FilterView<T> view = getSkinnable();
 
-        Label titleLabel = view.getTitleLabel();
-        titleLabel.textProperty().bind(view.titleProperty());
+        Label titleLabel = new Label();
         titleLabel.getStyleClass().add("title");
+        titleLabel.textProperty().bind(view.titleProperty());
+        titleLabel.graphicProperty().bind(view.titleGraphicProperty());
+        titleLabel.managedProperty().bind(titleLabel.visibleProperty());
+        titleLabel.visibleProperty().bind(view.titleProperty().isNotEmpty().or(view.titleGraphicProperty().isNotNull()));
 
-        Label titlePostfixLabel = view.getTitlePostfixLabel();
-        titlePostfixLabel.textProperty().bind(view.titlePostfixProperty());
+        Label titlePostfixLabel = new Label();
         titlePostfixLabel.getStyleClass().addAll("title", "title-postfix");
+        titlePostfixLabel.textProperty().bind(view.titlePostfixProperty());
+        titlePostfixLabel.graphicProperty().bind(view.titlePostfixGraphicProperty());
+        titlePostfixLabel.managedProperty().bind(titlePostfixLabel.visibleProperty());
+        titlePostfixLabel.visibleProperty().bind(view.titlePostfixProperty().isNotEmpty().or(view.titlePostfixGraphicProperty().isNotNull()));
 
         HBox titleBox = new HBox(titleLabel, titlePostfixLabel);
         titleBox.getStyleClass().add("title-box");
 
-        Label subtitleLabel = view.getSubtitleLabel();
-        subtitleLabel.textProperty().bind(view.subtitleProperty());
+        Label subtitleLabel = new Label();
         subtitleLabel.getStyleClass().add("subtitle");
+        subtitleLabel.textProperty().bind(view.subtitleProperty());
+        subtitleLabel.graphicProperty().bind(view.subtitleGraphicProperty());
+        subtitleLabel.managedProperty().bind(subtitleLabel.visibleProperty());
+        subtitleLabel.visibleProperty().bind(view.subtitleProperty().isNotEmpty().or(view.subtitleGraphicProperty().isNotNull()));
 
         VBox titleAndSubtitleBox = new VBox(titleBox, subtitleLabel);
         titleAndSubtitleBox.getStyleClass().add("title-subtitle-box");
 
         HBox.setHgrow(titleAndSubtitleBox, Priority.ALWAYS);
 
+        headerBox.getChildren().setAll(titleAndSubtitleBox, searchTextField);
+
         if (view.getExtras() != null) {
-            headerBox.getChildren().setAll(titleAndSubtitleBox, searchTextField, view.getExtras());
-        } else {
-            headerBox.getChildren().setAll(titleAndSubtitleBox, searchTextField);
+            headerBox.getChildren().add(view.getExtras());
         }
     }
 

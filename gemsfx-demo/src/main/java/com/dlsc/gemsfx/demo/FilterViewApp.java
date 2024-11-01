@@ -14,6 +14,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.time.LocalDate;
 
@@ -23,7 +25,12 @@ public class FilterViewApp extends Application {
     public void start(Stage stage) {
         FilterView<Person> filterView = new FilterView<>();
         filterView.setTitle("Title Here");
+        filterView.setTitleGraphic(new FontIcon(MaterialDesign.MDI_FLAG));
         filterView.setSubtitle("Subtitle can be displayed here");
+        filterView.setSubtitleGraphic(new FontIcon(MaterialDesign.MDI_FILTER));
+        // filterView.setTitlePostfix("Postfix");
+        // filterView.setTitlePostfixGraphic(new FontIcon(MaterialDesign.MDI_PEN));
+
         filterView.setTextFilterProvider(text -> person -> person.getFirstName().toLowerCase().contains(text) || person.getLastName().toLowerCase().contains(text));
 
         TableView<Person> tableView = new TableView<>();
