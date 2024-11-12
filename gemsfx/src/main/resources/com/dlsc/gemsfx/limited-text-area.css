@@ -35,6 +35,10 @@
     -fx-icon-color: -fx-mark-color;
 }
 
+.limited-text-area > .content-box .length-indicator .length-label {
+    -fx-font-size: .7em;
+}
+
 .limited-text-area:error > .content-box .length-indicator .length-label {
     -fx-text-fill: #ff5700;
     -fx-font-weight: bold;

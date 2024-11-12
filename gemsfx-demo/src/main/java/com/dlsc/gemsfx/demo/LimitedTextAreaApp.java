@@ -63,7 +63,7 @@ public class LimitedTextAreaApp extends Application {
         Spinner<Integer> minLengthField = new Spinner<>(0, 30, 0, 10);
 
         Label maxLength = new Label("Max Length");
-        Spinner<Integer> maxLengthField = new Spinner<>(30, 200, 30, 10);
+        Spinner<Integer> maxLengthField = new Spinner<>(30, 20000, 30, 10);
         textArea.characterRangeLimitProperty().bind(Bindings.createObjectBinding(
                 () -> new IntegerRange(minLengthField.getValue(), maxLengthField.getValue())
                 , maxLengthField.valueProperty(), minLengthField.valueProperty()));
