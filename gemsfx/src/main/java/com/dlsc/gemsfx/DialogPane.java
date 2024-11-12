@@ -8,6 +8,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -416,7 +417,7 @@ public class DialogPane extends Pane {
      * @param title   the title for the dialog
      * @param message the main error message
      * @param details additional details
-     * @param onSend an optional action to send out / forward the error message
+     * @param onSend  an optional action to send out / forward the error message
      * @return the dialog
      */
     public final Dialog<Void> showError(String title, String message, String details, Runnable onSend) {
@@ -456,8 +457,6 @@ public class DialogPane extends Pane {
             VBox content = new VBox(messageLabel, textArea);
             content.getStyleClass().add("error-container");
             dialog.setContent(content);
-
-            FocusUtil.requestFocus(textArea);
         }
 
         dialog.show();
@@ -625,7 +624,9 @@ public class DialogPane extends Pane {
             textInputControl = textField;
         }
 
-        FocusUtil.requestFocus(textInputControl);
+//        FocusUtil.requestFocus(textInputControl);
+
+        Platform.runLater(textInputControl::requestFocus);
 
         VBox box = new VBox();
         box.getStyleClass().add("prompt-node-wrapper");
@@ -1100,11 +1101,8 @@ public class DialogPane extends Pane {
                 case WARNING:
                     getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
                     break;
-                case INFORMATION:
+                case INFORMATION, ERROR:
                     getButtonTypes().setAll(ButtonType.OK);
-                    break;
-                case ERROR:
-                    getButtonTypes().setAll(ButtonType.CLOSE);
                     break;
                 case CONFIRMATION:
                     getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
@@ -1772,7 +1770,16 @@ public class DialogPane extends Pane {
         private final ChangeListener<Node> focusListener = (o, oldOwner, newOwner) -> {
             if (newOwner != null && !isInsideDialogPane(newOwner.getParent()) && getScene() != null) {
                 if (oldOwner != null && isInsideDialogPane(oldOwner.getParent())) {
-                    oldOwner.requestFocus();
+                    if (getDialog().getType().equals(Type.INPUT)) {
+                        Node node = FocusUtil.findFirstFocusableNode(getDialog().getContent());
+                        if (node != null) {
+                            node.requestFocus();
+                        } else {
+                            oldOwner.requestFocus();
+                        }
+                    } else {
+                        oldOwner.requestFocus();
+                    }
                 } else {
                     requestFocus();
                 }
@@ -1977,10 +1984,11 @@ public class DialogPane extends Pane {
         public DialogButtonBar(Dialog<?> dialog) {
             this.dialog = dialog;
 
-            // Setting the skin eagerly to make sure the focus does not
-            // switch to one of the buttons in the button bar when it
-            // should stay with a node shown by the dialog.
-            setSkin(new ButtonBarSkin(this));
+            if (dialog.getType().equals(Type.INPUT)) {
+                // initializing skin early or the skin will grab the focus later on for one of its buttons instead of
+                // leaving it with the control used for the input
+                setSkin(new ButtonBarSkin(this));
+            }
 
             getStyleClass().add("footer");
 
