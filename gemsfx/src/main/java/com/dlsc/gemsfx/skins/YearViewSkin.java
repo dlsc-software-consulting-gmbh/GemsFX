@@ -91,7 +91,7 @@ public class YearViewSkin extends SkinBase<YearView> {
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(yearView.widthProperty());
         clip.heightProperty().bind(yearView.heightProperty());
-        yearView.setClip(clip);
+        header.setClip(clip);
 
         InvalidationListener buildGridListener = obs -> buildGrid();
         yearView.valueProperty().addListener(buildGridListener);
