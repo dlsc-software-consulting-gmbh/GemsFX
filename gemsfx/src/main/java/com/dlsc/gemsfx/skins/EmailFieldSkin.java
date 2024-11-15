@@ -57,7 +57,6 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         updateTooltipVisibility(field.getInvalidText(), rightIconWrapper, invalidToolTip);
         field.invalidTextProperty().addListener((ob, ov, newValue) -> updateTooltipVisibility(newValue, rightIconWrapper, invalidToolTip));
 
-        customTextField.textProperty().bindBidirectional(field.emailAddressProperty());
         customTextField.promptTextProperty().bind(field.promptTextProperty());
         customTextField.setLeft(leftIconWrapper);
         customTextField.setRight(rightIconWrapper);
@@ -142,7 +141,7 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
     private void handleSuggestionSelection(ListView<String> listView) {
         String selectedDomain = listView.getSelectionModel().getSelectedItem();
         String text = customTextField.getText();
-        int atIndex = text.indexOf('@');
+        int atIndex = text.lastIndexOf('@');
         if (atIndex != -1 && selectedDomain != null) {
             customTextField.replaceText(atIndex + 1, text.length(), selectedDomain);
             customTextField.positionCaret(customTextField.getText().length());
@@ -216,10 +215,12 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         FilteredList<String> filteredList = new FilteredList<>(getSkinnable().getDomainList());
         filteredList.predicateProperty().bind(Bindings.createObjectBinding(() -> item -> {
             String text = customTextField.getText();
-            int atIndex = text.lastIndexOf('@');
-            if (atIndex != -1) {
-                String enteredText = text.substring(atIndex + 1);
-                return StringUtils.startsWithIgnoreCase(item, enteredText);
+            if (text != null) {
+                int atIndex = text.lastIndexOf('@');
+                if (atIndex != -1) {
+                    String enteredText = text.substring(atIndex + 1);
+                    return StringUtils.startsWithIgnoreCase(item, enteredText);
+                }
             }
             return true;
         }, customTextField.textProperty()));

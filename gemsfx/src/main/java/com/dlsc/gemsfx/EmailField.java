@@ -34,15 +34,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringTokenizer;
 
 /**
  * EmailField is a custom control for inputting and validating email addresses.
- * It extends the base Control class and provides additional functionalities:
+ * It provides the following functionalities:
  * <p>
- * 1. Automatic email domain suggestions to enhance user experience. <br>
- * 2. Email address format validation to ensure input validity. <br>
- * 3. Customizable properties to control the visibility of user interface elements,
- * such as mail and validation icons, according to specific user interface requirements.
+ *     <ul>
+ *          <li>Automatic email domain suggestions to enhance user experience.</li>
+ *          <li>Email address format validation to ensure input validity.</li>
+ *          <li>Customizable properties to control the visibility of user interface elements, such as mail and validation icons, according to specific user interface requirements.</li>
+ *     </ul>
+ * </p>
  */
 public class EmailField extends Control {
 
@@ -61,6 +64,9 @@ public class EmailField extends Control {
         }
     };
 
+    /**
+     * Constructs a new email field.
+     */
     public EmailField() {
         getStyleClass().add("email-field");
 
@@ -72,26 +78,78 @@ public class EmailField extends Control {
             }
         });
 
-        valid.bind(Bindings.createBooleanBinding(() -> {
-            if (isRequired()) {
-                return emailValidator.isValid(getEmailAddress());
+        emailAddress.addListener(it -> {
+            if (StringUtils.isNotBlank(getEmailAddress())) {
+                editor.setText(getEmailAddress());
             }
-            return StringUtils.isBlank(getEmailAddress()) || emailValidator.isValid(getEmailAddress());
-        }, emailAddressProperty(), requiredProperty()));
+        });
+
+        supportingMultipleAddresses.addListener((obs, oldV, newV) -> {
+            if (newV) {
+                if (StringUtils.isNotBlank(getEmailAddress())) {
+                    getMultipleEmailAddresses().setAll(getEmailAddress());
+                }
+            } else {
+                if (!getMultipleEmailAddresses().isEmpty()) {
+                    setEmailAddress(getMultipleEmailAddresses().get(0));
+                }
+            }
+        });
+
+        valid.bind(Bindings.createBooleanBinding(() -> {
+            List<String> addresses = new ArrayList<>();
+
+            String text = editor.getText();
+
+            if (isSupportingMultipleAddresses()) {
+                if (isRequired() && StringUtils.isBlank(text)) {
+                    return false;
+                } else {
+                    StringTokenizer st = new StringTokenizer(text, ",");
+
+                    while (st.hasMoreTokens()) {
+                        String token = st.nextToken().trim();
+                        if (!emailValidator.isValid(token)) {
+                            getMultipleEmailAddresses().setAll(addresses);
+                            return false;
+                        }
+
+                        addresses.add(token);
+                    }
+
+                    getMultipleEmailAddresses().setAll(addresses);
+
+                    return true;
+                }
+            } else {
+                boolean valid;
+                if (isRequired()) {
+                    valid = emailValidator.isValid(text);
+                } else {
+                    valid = StringUtils.isBlank(text) || emailValidator.isValid(text);
+                }
+
+                if (valid) {
+                    setEmailAddress(text);
+                } else {
+                    setEmailAddress(null);
+                }
+
+                return valid;
+            }
+        }, editor.textProperty(), requiredProperty()));
 
         updateValidPseudoClass(false);
 
         valid.getReadOnlyProperty().addListener((ob, ov, newValue) -> updateValidPseudoClass(newValue));
     }
 
+    /**
+     * Constructs a new email field with the given initial email address.
+     */
     public EmailField(String emailAddress) {
         this();
         setEmailAddress(emailAddress);
-    }
-
-    private void updateValidPseudoClass(Boolean isValid) {
-        pseudoClassStateChanged(VALID_PSEUDO_CLASS, isValid);
-        pseudoClassStateChanged(INVALID_PSEUDO_CLASS, !isValid);
     }
 
     @Override
@@ -104,6 +162,16 @@ public class EmailField extends Control {
         return Objects.requireNonNull(EmailField.class.getResource("email-field.css")).toExternalForm();
     }
 
+    private void updateValidPseudoClass(Boolean isValid) {
+        pseudoClassStateChanged(VALID_PSEUDO_CLASS, isValid);
+        pseudoClassStateChanged(INVALID_PSEUDO_CLASS, !isValid);
+    }
+
+    /**
+     * Returns the text field used for editing purposes.
+     *
+     * @return the editor text field
+     */
     public final CustomTextField getEditor() {
         return editor;
     }
@@ -119,6 +187,11 @@ public class EmailField extends Control {
         return domainList.get();
     }
 
+    /**
+     * Stores a list of known domains that are often used for email addreses, e.g. gmail.com or outlook.com.
+     *
+     * @return list of known domains
+     */
     public final ListProperty<String> domainListProperty() {
         return domainList;
     }
@@ -126,6 +199,8 @@ public class EmailField extends Control {
     public final void setDomainList(ObservableList<String> domainList) {
         this.domainList.set(domainList);
     }
+
+    // multiple addresses
 
     // autoDomainCompletionEnabled
 
@@ -184,6 +259,12 @@ public class EmailField extends Control {
         return required.get();
     }
 
+    /**
+     * A flag signalling that this is a required field. This flag will be taken into account when
+     * updating the state of the {@link #validProperty()}.
+     *
+     * @return the flag used to determine if the field is required
+     */
     public final BooleanProperty requiredProperty() {
         return required;
     }
@@ -200,6 +281,11 @@ public class EmailField extends Control {
         return promptText.get();
     }
 
+    /**
+     * The prompt text to display by the editor.
+     *
+     * @return the prompt text
+     */
     public final StringProperty promptTextProperty() {
         return promptText;
     }
@@ -216,12 +302,63 @@ public class EmailField extends Control {
         return emailAddress.get();
     }
 
+    /**
+     * Stores a valid email address. This property will only be non-null if the user has entered
+     * a valid email address. This property is only used if the field is configured for entering a
+     * single address. If the field is configured for multiple email addresses then this field will
+     * be unused and the address list can be found in {@link #multipleEmailAddressesProperty()}.
+     *
+     * @return the entered email address
+     */
     public final StringProperty emailAddressProperty() {
         return emailAddress;
     }
 
     public final void setEmailAddress(String emailAddress) {
         this.emailAddress.set(emailAddress);
+    }
+
+    // multiple address support
+
+    private final BooleanProperty supportingMultipleAddresses = new SimpleBooleanProperty(this, "supportingMultipleAddresses");
+
+    public final boolean isSupportingMultipleAddresses() {
+        return supportingMultipleAddresses.get();
+    }
+
+    /**
+     * A control flag used to determine if the user should be able to enter more than one email address
+     * into the field.
+     *
+     * @return a flag used for controlling input behaviour (single vs. multiple email addresses)
+     */
+    public final BooleanProperty supportingMultipleAddressesProperty() {
+        return supportingMultipleAddresses;
+    }
+
+    public final void setSupportingMultipleAddresses(boolean supportingMultipleAddresses) {
+        this.supportingMultipleAddresses.set(supportingMultipleAddresses);
+    }
+
+    private final ListProperty<String> multipleEmailAddresses = new SimpleListProperty<>(this, "multipleEmailAddresses", FXCollections.observableArrayList());
+
+    public final ObservableList<String> getMultipleEmailAddresses() {
+        return multipleEmailAddresses.get();
+    }
+
+    /**
+     * Stores the list of valid email addresses entered by the user. This list is only used when the
+     * field supports entering multiple addresses.
+     *
+     * @return the list of valid email addresses
+     * @see #supportingMultipleAddressesProperty()
+     */
+    public final ListProperty<String> multipleEmailAddressesProperty() {
+        return multipleEmailAddresses;
+    }
+
+    public final void setMultipleEmailAddresses(ObservableList<String> multipleEmailAddresses) {
+        this.multipleEmailAddresses.set(multipleEmailAddresses);
     }
 
     // valid support
@@ -232,12 +369,19 @@ public class EmailField extends Control {
         return valid.get();
     }
 
+    /**
+     * A boolean flag used to indicate whether the field is currently in a valid state. The field is
+     * in a valid state when the entered email addresses are all structurally valid (obviously this does
+     * not mean that they do exist, only that they have the proper format).
+     *
+     * @return a boolean property signalling validity
+     */
     public final ReadOnlyBooleanProperty validProperty() {
         return valid.getReadOnlyProperty();
     }
 
     // Property for the tooltip text displayed when hovering over the icon indicating an invalid email address.
-    private final StringProperty invalidText = new SimpleStringProperty(this, "invalidText", "Email address is invalid.");
+    private final StringProperty invalidText = new SimpleStringProperty(this, "invalidText", "Invalid email address.");
 
     /**
      * Retrieves the tooltip text displayed when the email address validation fails and the user hovers over the invalid icon.

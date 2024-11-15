@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.EmailField;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
@@ -30,6 +31,9 @@ public class EmailFieldApp extends Application {
         // When user types '@' in the email field, show a list of suggestions
         CheckBox autoCompletion = new CheckBox("Auto-Complete Domain");
         autoCompletion.selectedProperty().bindBidirectional(view.autoDomainCompletionEnabledProperty());
+
+        CheckBox multipleAddresses = new CheckBox("Multiple addresses");
+        multipleAddresses.selectedProperty().bindBidirectional(view.supportingMultipleAddressesProperty());
 
         CheckBox enableCustomCell = new CheckBox("Enable Custom Cell");
         enableCustomCell.selectedProperty().addListener((obs, oldVal, newVal) -> {
@@ -63,9 +67,24 @@ public class EmailFieldApp extends Application {
         invalidTextField.setPromptText("Invalid text for the tooltip");
         view.invalidTextProperty().bind(invalidTextField.textProperty());
 
-        VBox topBox = new VBox(10, required, autoCompletion, enableCustomCell, showMailIcon, showValidationIcon, new Label("Text to show when invalid:"), invalidTextField);
+        Label resultLabel = new Label("Entered address(es)");
+        resultLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+            if (view.isValid()) {
+                if (view.isSupportingMultipleAddresses()) {
+                    return String.join(", ", view.getMultipleEmailAddresses());
+                }
+                return view.getEmailAddress();
+            } else {
+                if (view.isSupportingMultipleAddresses()) {
+                    return "Invalid: " + String.join(", ", view.getMultipleEmailAddresses());
+                }
+                return "Invalid " + view.getEmailAddress();
+            }
+        }, view.supportingMultipleAddressesProperty(), view.emailAddressProperty(), view.getMultipleEmailAddresses()));
 
-        VBox box = new VBox(20, topBox, view);
+        VBox topBox = new VBox(10, required, autoCompletion, multipleAddresses, enableCustomCell, showMailIcon, showValidationIcon, new Label("Text to show when invalid:"), invalidTextField);
+
+        VBox box = new VBox(20, topBox, view, resultLabel);
         box.setPrefWidth(300);
         box.setPadding(new Insets(10));
         Scene scene = new Scene(box);
