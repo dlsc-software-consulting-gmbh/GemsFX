@@ -50,6 +50,7 @@ public class TagsField<T> extends SearchField<T> {
         getStyleClass().addAll("text-input", DEFAULT_STYLE_CLASS);
 
         setFocusTraversable(false);
+        setGraphic(null); // remove history button
 
         getEditor().focusedProperty().addListener(it -> {
             if (getEditor().isFocused()) {
