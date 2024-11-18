@@ -106,6 +106,11 @@ public class AvatarView extends Control {
         setInitials(initials);
     }
 
+    /**
+     * Constructs a new avatar view with the given image.
+     *
+     * @param image the image to show
+     */
     public AvatarView(Image image) {
         this();
         setImage(image);

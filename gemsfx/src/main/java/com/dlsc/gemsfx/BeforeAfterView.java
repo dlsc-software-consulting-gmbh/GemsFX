@@ -25,13 +25,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-
+/**
+ * A view capable of managing / displaying two nodes in such a way that the user can show more
+ * or less of each node at the same time. This is very useful to display before and after scenarios.
+ */
 public class BeforeAfterView extends Control {
 
     private static final Orientation DEFAULT_ORIENTATION = Orientation.HORIZONTAL;
     private static final PseudoClass PSEUDO_CLASS_HORIZONTAL = PseudoClass.getPseudoClass("horizontal");
     private static final PseudoClass PSEUDO_CLASS_VERTICAL = PseudoClass.getPseudoClass("vertical");
 
+    /**
+     * Constructs a new view. the two nodes have to be set or bound later.
+     *
+     * @see #beforeProperty()
+     * @see #afterProperty()
+     */
     public BeforeAfterView() {
         getStyleClass().add("before-after-view");
 
@@ -53,17 +62,24 @@ public class BeforeAfterView extends Control {
         updatePseudoClass();
     }
 
-    private void updatePseudoClass() {
-        pseudoClassStateChanged(PSEUDO_CLASS_HORIZONTAL, getOrientation().equals(Orientation.HORIZONTAL));
-        pseudoClassStateChanged(PSEUDO_CLASS_VERTICAL, getOrientation().equals(Orientation.VERTICAL));
-    }
-
+    /**
+     * Constructs a new view with the given before and after nodes.
+     *
+     * @param beforeNode the node showing the "before" state
+     * @param afterNode the node showing the "after" state
+     */
     public BeforeAfterView(Node beforeNode, Node afterNode) {
         this();
         setBefore(beforeNode);
         setAfter(afterNode);
     }
 
+    /**
+     * Constructs a new view with the given before and after images.
+     *
+     * @param beforeImage a "before" image that will be wrapped in an image view
+     * @param afterImage an "after" image that will be wrapped in an image view
+     */
     public BeforeAfterView(Image beforeImage, Image afterImage) {
         this(new ImageView(beforeImage), new ImageView(afterImage));
     }
@@ -71,6 +87,11 @@ public class BeforeAfterView extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new BeforeAfterViewSkin(this);
+    }
+
+    private void updatePseudoClass() {
+        pseudoClassStateChanged(PSEUDO_CLASS_HORIZONTAL, getOrientation().equals(Orientation.HORIZONTAL));
+        pseudoClassStateChanged(PSEUDO_CLASS_VERTICAL, getOrientation().equals(Orientation.VERTICAL));
     }
 
     @Override
@@ -84,6 +105,11 @@ public class BeforeAfterView extends Control {
         return dividerPosition.get();
     }
 
+    /**
+     * Stores the position of the divider within the value range of zero to 1.
+     *
+     * @return the divider position
+     */
     public final DoubleProperty dividerPositionProperty() {
         return dividerPosition;
     }
@@ -91,7 +117,6 @@ public class BeforeAfterView extends Control {
     public final void setDividerPosition(double dividerPosition) {
         this.dividerPosition.set(dividerPosition);
     }
-
 
     private final ObjectProperty<Node> before = new SimpleObjectProperty<>(this, "before", new Label("Before"){
         {
@@ -104,6 +129,11 @@ public class BeforeAfterView extends Control {
         return before.get();
     }
 
+    /**
+     * Stores the node used for displaying the "before" state.
+     *
+     * @return the node used to visualize "before"
+     */
     public final ObjectProperty<Node> beforeProperty() {
         return before;
     }
@@ -124,6 +154,11 @@ public class BeforeAfterView extends Control {
         return after.get();
     }
 
+    /**
+     * Stores the node used for displaying the "after" state.
+     *
+     * @return the node used to visualize "after"
+     */
     public final ObjectProperty<Node> afterProperty() {
         return after;
     }
@@ -139,7 +174,7 @@ public class BeforeAfterView extends Control {
     }
 
     /**
-     * Sets the orientation of the before-after view.
+     * Sets the orientation of the before / after view.
      * <p>
      * Default value is {@link Orientation#HORIZONTAL}
      *
@@ -209,5 +244,4 @@ public class BeforeAfterView extends Control {
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return BeforeAfterView.StyleableProperties.STYLEABLES;
     }
-
 }
