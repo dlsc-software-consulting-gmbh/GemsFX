@@ -83,5 +83,4 @@ public class CircleProgressIndicator extends ArcProgressIndicator {
     public final void setStartAngle(double startAngle) {
         startAngleProperty().set(startAngle);
     }
-
 }

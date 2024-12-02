@@ -15,6 +15,8 @@ import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import java.util.Objects;
+
 public class EnhancedPasswordFieldApp extends Application {
 
     @Override
@@ -49,7 +51,7 @@ public class EnhancedPasswordFieldApp extends Application {
         VBox root = new VBox(echoCharBoxWrapper, tips, passwordField1, new Separator(), passwordField2, new Separator(), passwordField3);
         root.getStyleClass().add("content-box");
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("/com/dlsc/gemsfx/demo/enhanced-password-filed-demo.css").toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/com/dlsc/gemsfx/demo/enhanced-password-filed-demo.css")).toExternalForm());
 
         primaryStage.setScene(scene);
         primaryStage.setTitle("Enhanced Password Field");
