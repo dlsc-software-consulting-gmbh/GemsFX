@@ -66,7 +66,9 @@ public class ArcProgressIndicator extends ProgressIndicator {
             if (progress == 1.0) {
                 return "Completed";
             }
-            return String.format("%.0f%%", progress * 100);
+
+            int percent = (int) Math.floor(progress * 100); // make sure 99.8 becomes 99%, not 100%.
+            return percent + "%";
         }
 
         @Override
