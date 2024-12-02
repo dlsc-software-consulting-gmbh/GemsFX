@@ -1,0 +1,41 @@
+.loading-pane {
+}
+
+.loading-pane > .error-label {
+    -fx-text-fill: red;
+    -fx-alignment: center;
+    -fx-content-display: top;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+}
+
+.loading-pane > .error-label .icon {
+    -size: 1.5em;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+    -fx-shape: "M11.0156 15 L12.9844 15 L12.9844 17.0156 L11.0156 17.0156 L11.0156 15 ZM11.0156 6.9844 L12.9844 6.9844 L12.9844 12.9844 L11.0156 12.9844 L11.0156 6.9844 ZM12 2.0156 Q7.7344 2.1094 4.9219 4.9531 Q2.1094 7.7812 2.0156 12 Q2.1094 16.2656 4.9219 19.0781 Q7.7344 21.8906 12 21.9844 Q16.2656 21.8906 19.0781 19.0781 Q21.8906 16.2656 21.9844 12 Q21.8906 7.7344 19.0781 4.9219 Q16.2656 2.1094 12 2.0156 ZM12 20.0156 Q8.5781 19.9219 6.3281 17.6719 Q4.0781 15.4219 3.9844 12 Q4.0781 8.5781 6.3281 6.3281 Q8.5781 4.0781 12 3.9844 Q15.4219 4.0781 17.6719 6.3281 Q19.9219 8.5781 20.0156 12 Q19.9219 15.4219 17.6719 17.6719 Q15.4219 19.9219 12 20.0156 Z";
+    -fx-fill: red;
+    -fx-background-color: red;
+}
+
+.loading-pane > .progress-indicator-wrapper {
+    -size: 48px;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+}
+
+.loading-pane:small > .progress-indicator-wrapper {
+    -size: 16px;
+}
+
+.loading-pane:medium > .progress-indicator-wrapper {
+    -size: 48px;
+}
+
+.loading-pane:large > .progress-indicator-wrapper {
+    -size: 96px;
+}
