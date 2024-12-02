@@ -3,13 +3,10 @@ package com.dlsc.gemsfx;
 import javafx.animation.Animation.Status;
 import javafx.animation.FadeTransition;
 import javafx.beans.property.*;
-import javafx.geometry.Insets;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
+
+import java.util.Objects;
 
 /**
  * A simple pane that can be used to overlay the UI with a semi-transparent color,
@@ -29,7 +26,6 @@ public class GlassPane extends StackPane {
             }
         });
 
-        setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
         setMouseTransparent(false);
         setVisible(false);
 
@@ -57,6 +53,11 @@ public class GlassPane extends StackPane {
                 setVisible(!newHide);
             }
         });
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(GlassPane.class.getResource("glass-pane.css")).toExternalForm();
     }
 
     private final DoubleProperty blockingOpacity = new SimpleDoubleProperty(this, "blockingOpacity", .5);
