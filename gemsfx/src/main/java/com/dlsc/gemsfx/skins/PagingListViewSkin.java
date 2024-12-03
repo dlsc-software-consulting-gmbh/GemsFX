@@ -44,27 +44,15 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         }
     };
 
-    private final InvalidationListener updateListener = (Observable it) -> updateItems();
-
-    private final WeakInvalidationListener weakUpdateListener = new WeakInvalidationListener(updateListener);
-
-    private final InnerListViewSkin<T> innerListViewSkin;
 
     private final ListView<T> innerListView;
 
     public PagingListViewSkin(PagingListView<T> pagingListView) {
         super(pagingListView);
 
-        innerListView = new ListView<>();
-        innerListView.setPrefHeight(Region.USE_COMPUTED_SIZE);
-        innerListView.cellFactoryProperty().bind(pagingListView.cellFactoryProperty());
-        innerListView.setItems(pagingListView.getUnmodifiableItems());
-        innerListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        innerListView = pagingListView.getListView();
 
         pagingListView.selectionModelProperty().bindBidirectional(innerListView.selectionModelProperty());
-
-        innerListViewSkin = new InnerListViewSkin<>(innerListView, pagingListView);
-        innerListView.setSkin(innerListViewSkin);
 
         pagingControls.pageProperty().bindBidirectional(pagingListView.pageProperty());
         pagingControls.totalItemCountProperty().bindBidirectional(pagingListView.totalItemCountProperty());
@@ -84,11 +72,6 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         // when the underlying data list changes, then we have to recreate the binding for the placeholder
         pagingListView.getUnmodifiableItems().addListener((Observable it) -> bindPlaceholder(null, pagingListView.getPlaceholder()));
 
-        pagingListView.getUnmodifiableItems().addListener(weakUpdateListener);
-        pagingListView.pageSizeProperty().addListener(weakUpdateListener);
-        pagingListView.pageProperty().addListener(weakUpdateListener);
-        pagingListView.cellFactoryProperty().addListener(weakUpdateListener);
-
         pagingListView.usingScrollPaneProperty().addListener(it -> updateView());
         pagingListView.placeholderProperty().addListener(it -> updateView());
 
@@ -96,7 +79,6 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
 
         updateStyleClass();
         updateView();
-        updateItems();
     }
 
     private void updateStyleClass() {
@@ -149,9 +131,5 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         scrollPane.setFitToHeight(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         return scrollPane;
-    }
-
-    private void updateItems() {
-        innerListViewSkin.updateItems();
     }
 }

@@ -1,7 +1,10 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.skins.InnerListViewSkin;
 import com.dlsc.gemsfx.skins.PagingListViewSkin;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -15,6 +18,7 @@ import javafx.scene.control.Cell;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
 
@@ -30,8 +34,22 @@ public class PagingListView<T> extends PagingControlBase {
 
     private final ObservableList<T> unmodifiableItems = FXCollections.unmodifiableObservableList(items);
 
+    private final ListView<T> listView = new ListView<>(items);
+
+    private final InnerListViewSkin<T> innerListViewSkin;
+
+    private final InvalidationListener updateListener = (Observable it) -> updateItems();
+
+    private final WeakInvalidationListener weakUpdateListener = new WeakInvalidationListener(updateListener);
+
     public PagingListView() {
         getStyleClass().add("paging-list-view");
+
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        listView.cellFactoryProperty().bind(cellFactoryProperty());
+
+        innerListViewSkin = new InnerListViewSkin<>(listView, this);
+        listView.setSkin(innerListViewSkin);
 
         loadingService.setOnSucceeded(evt -> {
             List<T> newList = loadingService.getValue();
@@ -60,6 +78,13 @@ public class PagingListView<T> extends PagingControlBase {
                 }
             }
         });
+
+        getUnmodifiableItems().addListener(weakUpdateListener);
+        pageSizeProperty().addListener(weakUpdateListener);
+        pageProperty().addListener(weakUpdateListener);
+        cellFactoryProperty().addListener(weakUpdateListener);
+
+        updateItems();
     }
 
     @Override
@@ -70,6 +95,10 @@ public class PagingListView<T> extends PagingControlBase {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(PagingListView.class.getResource("paging-list-view.css")).toExternalForm();
+    }
+
+    public final ListView<T> getListView() {
+        return listView;
     }
 
     private class LoadingService extends Service<List<T>> {
@@ -218,5 +247,9 @@ public class PagingListView<T> extends PagingControlBase {
             cellFactory = new SimpleObjectProperty<>(this, "cellFactory");
         }
         return cellFactory;
+    }
+
+    private void updateItems() {
+        innerListViewSkin.updateItems();
     }
 }
