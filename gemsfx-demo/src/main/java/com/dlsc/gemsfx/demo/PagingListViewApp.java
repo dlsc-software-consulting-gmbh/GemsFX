@@ -20,13 +20,20 @@ public class PagingListViewApp extends Application {
     public void start(Stage stage) {
         PagingListView<String> pagingListView = new PagingListView<>();
         pagingListView.setPrefWidth(400);
-        pagingListView.setTotalItemCount(30);
-        pagingListView.setPageSize(10);
+        pagingListView.setTotalItemCount(300);
+        pagingListView.setPageSize(15);
         pagingListView.setLoader(lv -> {
+            if (Math.random() > .75) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             List<String> data = new ArrayList<>();
             int offset = lv.getPage() * lv.getPageSize();
             for (int i = 0; i < lv.getPageSize(); i++) {
-                data.add("Item " + (offset + i));
+                data.add("Item " + (offset + i + 1));
             }
             return data;
         });
@@ -34,7 +41,7 @@ public class PagingListViewApp extends Application {
         Button scenicView = new Button("Scenic View");
         scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
 
-        VBox box = new VBox(20, pagingListView, scenicView);
+        VBox box = new VBox(20, pagingListView, new PagingControlsSettingsView(pagingListView), scenicView);
         box.setPadding(new Insets(20));
 
         Scene scene = new Scene(box);

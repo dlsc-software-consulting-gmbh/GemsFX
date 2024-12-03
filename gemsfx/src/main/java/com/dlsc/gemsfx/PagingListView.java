@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.LoadingPane.Status;
 import com.dlsc.gemsfx.skins.InnerListViewSkin;
 import com.dlsc.gemsfx.skins.PagingListViewSkin;
 import javafx.beans.InvalidationListener;
@@ -13,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Cell;
 import javafx.scene.control.ListCell;
@@ -52,6 +54,7 @@ public class PagingListView<T> extends PagingControlBase {
         listView.setSkin(innerListViewSkin);
 
         loadingService.setOnSucceeded(evt -> {
+            loadingStatus.set(Status.OK);
             List<T> newList = loadingService.getValue();
             if (newList != null) {
                 items.setAll(newList);
@@ -59,6 +62,9 @@ public class PagingListView<T> extends PagingControlBase {
                 items.clear();
             }
         });
+
+        loadingService.setOnRunning(evt -> loadingStatus.set(Status.LOADING));
+        loadingService.setOnFailed(evt -> loadingStatus.set(Status.ERROR));
 
         InvalidationListener loadListener = it -> loadingService.restart();
 
@@ -101,6 +107,20 @@ public class PagingListView<T> extends PagingControlBase {
         return listView;
     }
 
+    private final ObjectProperty<Status> loadingStatus = new SimpleObjectProperty<>(this, "loadingStatus", Status.OK);
+
+    public final Status getLoadingStatus() {
+        return loadingStatus.get();
+    }
+
+    public final ObjectProperty<Status> loadingStatusProperty() {
+        return loadingStatus;
+    }
+
+    public final void setLoadingStatus(Status loadingStatus) {
+        this.loadingStatus.set(loadingStatus);
+    }
+
     private class LoadingService extends Service<List<T>> {
 
         @Override
@@ -109,7 +129,11 @@ public class PagingListView<T> extends PagingControlBase {
                 @Override
                 protected List<T> call() {
                     if (!isCancelled()) {
-                        return loader.get().call(PagingListView.this);
+                        Callback<PagingListView<T>, List<T>> loader = PagingListView.this.loader.get();
+                        if (loader == null) {
+                            throw new IllegalArgumentException("data loader can not be null");
+                        }
+                        return loader.call(PagingListView.this);
                     }
                     return Collections.emptyList();
                 }

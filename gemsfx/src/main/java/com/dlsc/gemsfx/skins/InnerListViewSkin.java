@@ -1,36 +1,44 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.PagingListView;
-import javafx.geometry.Orientation;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.skin.ListViewSkin;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+
+import java.util.Objects;
 
 public class InnerListViewSkin<T> extends ListViewSkin<T> {
 
     private final VBox content = new VBox() {
         @Override
-        public Orientation getContentBias() {
-            return Orientation.HORIZONTAL;
+        public String getUserAgentStylesheet() {
+            return Objects.requireNonNull(PagingListView.class.getResource("paging-list-view.css")).toExternalForm();
         }
     };
 
     private final PagingListView<T> pagingListView;
+    private final LoadingPane loadingPane;
 
     public InnerListViewSkin(ListView<T> control, PagingListView<T> pagingListView) {
         super(control);
+
         this.pagingListView = pagingListView;
+
         content.getStyleClass().add("content");
-        getChildren().setAll(content);
+
+        loadingPane = new LoadingPane(content);
+        loadingPane.statusProperty().bind(pagingListView.loadingStatusProperty());
+
+        getChildren().setAll(loadingPane);
         updateItems();
     }
 
     @Override
     protected void layoutChildren(double x, double y, double w, double h) {
-        content.resizeRelocate(x, y, w, h);
+        loadingPane.resizeRelocate(x, y, w, h);
     }
 
     public void updateItems() {
@@ -61,31 +69,31 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
 
     @Override
     protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.minHeight(width) + topInset + bottomInset;
+        return loadingPane.minHeight(width) + topInset + bottomInset;
     }
 
     @Override
     protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.prefHeight(width) + topInset + bottomInset;
+        return loadingPane.prefHeight(width) + topInset + bottomInset;
     }
 
     @Override
     protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.maxHeight(width) + topInset + bottomInset;
+        return loadingPane.maxHeight(width) + topInset + bottomInset;
     }
 
     @Override
     protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.minWidth(height) + leftInset + rightInset;
+        return loadingPane.minWidth(height) + leftInset + rightInset;
     }
 
     @Override
     protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.prefWidth(height) + leftInset + rightInset;
+        return loadingPane.prefWidth(height) + leftInset + rightInset;
     }
 
     @Override
     protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.maxWidth(height) + leftInset + rightInset;
+        return loadingPane.maxWidth(height) + leftInset + rightInset;
     }
 }

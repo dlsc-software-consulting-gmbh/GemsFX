@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.PagingControls;
 import com.dlsc.gemsfx.PagingListView;
 import javafx.beans.InvalidationListener;
@@ -33,7 +34,7 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
 
     private final PagingControls pagingControls = new PagingControls();
 
-    private final StackPane stackPane = new StackPane() {
+    private final LoadingPane stackPane = new LoadingPane() {
         /*
          * Very important or the layout inside PaginationListView will not work due
          * to text wrapping inside AdvancedItemView.
@@ -58,9 +59,12 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         pagingControls.totalItemCountProperty().bindBidirectional(pagingListView.totalItemCountProperty());
         pagingControls.pageSizeProperty().bind(pagingListView.pageSizeProperty());
         pagingControls.maxPageIndicatorsCountProperty().bindBidirectional(pagingListView.maxPageIndicatorsCountProperty());
-        pagingControls.messageLabelStrategyProperty().bind(pagingListView.messageLabelStrategyProperty());
-        pagingControls.setShowPreviousNextPageButton(true);
-        pagingControls.setFirstLastPageDisplayMode(PagingControls.FirstLastPageDisplayMode.SHOW_PAGE_BUTTONS);
+        pagingControls.messageLabelStrategyProperty().bind(pagingListView.messageLabelStrategyProperty());;
+        pagingControls.showPreviousNextPageButtonProperty().bind(pagingListView.showPreviousNextPageButtonProperty());
+        pagingControls.alignmentProperty().bind(pagingListView.alignmentProperty());
+        pagingControls.firstLastPageDisplayModeProperty().bind(pagingListView.firstLastPageDisplayModeProperty());
+        pagingControls.firstPageDividerProperty().bind(pagingListView.firstPageDividerProperty());
+        pagingControls.maxPageIndicatorsCountProperty().bind(pagingListView.maxPageIndicatorsCountProperty());
 
         content.getStyleClass().add("content");
 

@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -8,11 +9,47 @@ import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.util.Callback;
 
 public abstract class PagingControlBase extends Control {
+
+    public PagingControlBase() {
+        setMessageLabelProvider(view -> {
+            if (getPageCount() == 0) {
+                return "No items";
+            }
+
+            if (getPageCount() == 1) {
+                return "Showing all items";
+            }
+
+            int startIndex = (view.getPage() * getPageSize()) + 1;
+            int endIndex = startIndex + getPageSize() - 1;
+
+            endIndex = Math.min(endIndex, getTotalItemCount());
+            return "Showing items " + startIndex + " to " + endIndex + " of " + getTotalItemCount();
+        });
+
+        pageCount.bind(Bindings.createIntegerBinding(() -> {
+            int count = getTotalItemCount() / getPageSize();
+            if (getTotalItemCount() % getPageSize() > 0) {
+                count++;
+            }
+            return count;
+        }, totalItemCountProperty(), pageSizeProperty()));
+
+        Label firstPageDivider = new Label("...");
+        firstPageDivider.getStyleClass().addAll("page-divider", "first-page-divider");
+        setFirstPageDivider(firstPageDivider);
+
+        Label lastPageDivider = new Label("...");
+        lastPageDivider.getStyleClass().addAll("page-divider", "first-page-divider");
+        setLastPageDivider(lastPageDivider);
+    }
 
     private final BooleanProperty showPreviousNextPageButton = new SimpleBooleanProperty(this, "showPreviousNextButton", true);
 
@@ -305,5 +342,25 @@ public abstract class PagingControlBase extends Control {
 
     public final void setPageSize(int pageSize) {
         this.pageSize.set(pageSize);
+    }
+
+    private final ObjectProperty<HPos> alignment = new SimpleObjectProperty<>(this, "alignment", HPos.RIGHT);
+
+    public final HPos getAlignment() {
+        return alignment.get();
+    }
+
+    /**
+     * The alignment property controls where in the view the paging buttons will appear: left,
+     * center, middle.
+     *
+     * @return the alignment / the position of the paging buttons
+     */
+    public final ObjectProperty<HPos> alignmentProperty() {
+        return alignment;
+    }
+
+    public final void setAlignment(HPos alignment) {
+        this.alignment.set(alignment);
     }
 }

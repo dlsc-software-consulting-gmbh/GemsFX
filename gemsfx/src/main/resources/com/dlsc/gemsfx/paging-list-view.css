@@ -1,5 +1,5 @@
-.paging-list-view  .list-view .content > .list-cell:filled:selected,
-.paging-list-view  .list-view .content > .list-cell:filled:selected:hover {
+.paging-list-view .list-view .loading-pane .content > .list-cell:filled:selected,
+.paging-list-view .list-view .loading-pane .content > .list-cell:filled:selected:hover {
     -fx-background: -fx-accent;
     -fx-background-color: -fx-background, -fx-cell-focus-inner-border, -fx-background;
     -fx-background-insets: 0, 1, 2;
