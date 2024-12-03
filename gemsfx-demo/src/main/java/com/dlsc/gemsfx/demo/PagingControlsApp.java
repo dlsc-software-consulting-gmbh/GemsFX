@@ -1,7 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
+import com.dlsc.gemsfx.PagingControlBase.MessageLabelStrategy;
 import com.dlsc.gemsfx.PagingControls;
-import com.dlsc.gemsfx.PagingControls.MessageLabelStrategy;
 import com.dlsc.gemsfx.Spacer;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
