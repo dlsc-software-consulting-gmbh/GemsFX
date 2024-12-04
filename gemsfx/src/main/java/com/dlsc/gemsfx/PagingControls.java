@@ -2,8 +2,6 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.PagingControlsSkin;
 import javafx.scene.control.Skin;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
@@ -22,18 +20,6 @@ public class PagingControls extends PagingControlBase {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
         addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> requestFocus());
-
-        addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
-            if (Objects.equals(evt.getCode(), KeyCode.RIGHT)) {
-                nextPage();
-            } else if (Objects.equals(evt.getCode(), KeyCode.LEFT)) {
-                previousPage();
-            } else if (Objects.equals(evt.getCode(), KeyCode.HOME)) {
-                firstPage();
-            } else if (Objects.equals(evt.getCode(), KeyCode.END)) {
-                lastPage();
-            }
-        });
     }
 
     @Override

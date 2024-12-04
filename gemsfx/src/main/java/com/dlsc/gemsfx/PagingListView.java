@@ -21,8 +21,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
 
 import java.util.Collections;
@@ -87,14 +85,6 @@ public class PagingListView<T> extends PagingControlBase {
         pageSizeProperty().addListener(weakUpdateListener);
         pageProperty().addListener(weakUpdateListener);
         cellFactoryProperty().addListener(weakUpdateListener);
-
-        addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
-            if (evt.getCode() == KeyCode.RIGHT) {
-                nextPage();
-            } else if (evt.getCode() == KeyCode.LEFT) {
-                previousPage();
-            }
-        });
 
         refresh();
     }

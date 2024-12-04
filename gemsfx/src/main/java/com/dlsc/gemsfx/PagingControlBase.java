@@ -12,9 +12,12 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
-import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
+
+import java.util.Objects;
 
 public abstract class PagingControlBase extends Control {
 
@@ -50,6 +53,18 @@ public abstract class PagingControlBase extends Control {
         Region lastPageDivider = new Region();
         lastPageDivider.getStyleClass().addAll("page-divider", "last-page-divider");
         setLastPageDivider(lastPageDivider);
+
+        addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+            if (Objects.equals(evt.getCode(), KeyCode.RIGHT) || Objects.equals(evt.getCode(), KeyCode.PAGE_DOWN)) {
+                nextPage();
+            } else if (Objects.equals(evt.getCode(), KeyCode.LEFT) || Objects.equals(evt.getCode(), KeyCode.PAGE_UP)) {
+                previousPage();
+            } else if (Objects.equals(evt.getCode(), KeyCode.HOME)) {
+                firstPage();
+            } else if (Objects.equals(evt.getCode(), KeyCode.END)) {
+                lastPage();
+            }
+        });
     }
 
     private final BooleanProperty showPreviousNextPageButton = new SimpleBooleanProperty(this, "showPreviousNextButton", true);
