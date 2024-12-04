@@ -4,3 +4,13 @@
     -fx-background-insets: 0;
     -fx-text-fill: white;
 }
+
+.paging-controls > .pane > .page-buttons-container > .button.current {
+    -fx-border-color: derive(red, -30%);
+    -fx-border-radius: 1em;
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button {
+    -fx-content-display: text-only;
+    -fx-padding: 2px 10px;
+}

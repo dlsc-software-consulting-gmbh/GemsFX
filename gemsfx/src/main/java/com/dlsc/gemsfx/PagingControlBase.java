@@ -9,6 +9,8 @@ import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
@@ -387,5 +389,81 @@ public abstract class PagingControlBase extends Control {
 
     public final void setAlignment(HPos alignment) {
         this.alignment.set(alignment);
+    }
+
+    private final StringProperty firstPageText = new SimpleStringProperty(this, "firstPageText", "First");
+
+    public final String getFirstPageText() {
+        return firstPageText.get();
+    }
+
+    /**
+     * The text that will be shown by the "first page" button.
+     *
+     * @return the text of the "first page" button
+     */
+    public final StringProperty firstPageTextProperty() {
+        return firstPageText;
+    }
+
+    public final void setFirstPageText(String firstPageText) {
+        this.firstPageText.set(firstPageText);
+    }
+
+    private final StringProperty lastPageText = new SimpleStringProperty(this, "lastPageText", "Last");
+
+    public final String getLastPageText() {
+        return lastPageText.get();
+    }
+
+    /**
+     * The text that will be shown by the "last page" button.
+     *
+     * @return the text of the "last page" button
+     */
+    public final StringProperty lastPageTextProperty() {
+        return lastPageText;
+    }
+
+    public final void setLastPageText(String lastPageText) {
+        this.lastPageText.set(lastPageText);
+    }
+
+    private final StringProperty previousPageText = new SimpleStringProperty(this, "previousPageText", "Previous");
+
+    public final String getPreviousPageText() {
+        return previousPageText.get();
+    }
+
+    /**
+     * The text that will be shown by the "previous page" button.
+     *
+     * @return the text of the "previous page" button
+     */
+    public final StringProperty previousPageTextProperty() {
+        return previousPageText;
+    }
+
+    public final void setPreviousPageText(String previousPageText) {
+        this.previousPageText.set(previousPageText);
+    }
+
+    private final StringProperty nextPageText = new SimpleStringProperty(this, "nextPageText", "Next");
+
+    public final String getNextPageText() {
+        return nextPageText.get();
+    }
+
+    /**
+     * The text that will be shown by the "next page" button.
+     *
+     * @return the text of the "next page" button
+     */
+    public final StringProperty nextPageTextProperty() {
+        return nextPageText;
+    }
+
+    public final void setNextPageText(String nextPageText) {
+        this.nextPageText.set(nextPageText);
     }
 }

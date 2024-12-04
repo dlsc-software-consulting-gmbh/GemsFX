@@ -7,8 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 /**
- * A simple version of the paging list view that is completely based on a list of tiems, just like a normal
- * list view would be.
+ * A simple version of the paging list view that is completely based on a list of items, just like a normal
+ * list view would be. The view uses an internal data loader that accesses the list to retrieve the items of the
+ * current page.
  *
  * @param <T> the type of items to show in the list view
  */
@@ -38,7 +39,7 @@ public class SimplePagingListView<T> extends PagingListView<T> {
         });
 
         items.addListener((Observable it) -> {
-            ObservableList list = getItems();
+            ObservableList<T> list = getItems();
             if (list != null) {
                 internal = true;
                 try {
@@ -51,12 +52,34 @@ public class SimplePagingListView<T> extends PagingListView<T> {
         });
     }
 
+    /**
+     * Ensures that the given item becomes visible within the list view. This method will only succeed if the
+     * given item is a member of the {@link #getItems()}.
+     *
+     * @param item the item to show
+     */
+    public final void show(T item) {
+        ObservableList<T> items = getItems();
+        if (items != null) {
+            int index = items.indexOf(item);
+            if (index != -1) {
+                setPage(index / getPageSize());
+            }
+        }
+    }
+
     private final ListProperty<T> items = new SimpleListProperty<>(this, "items", FXCollections.observableArrayList());
 
     public final ObservableList<T> getItems() {
         return items.get();
     }
 
+    /**
+     * Stores the data structure to be used by the list view. The internal data loader will simply retrieve the page
+     * items from this list.
+     *
+     * @return the data model feeding the list view
+     */
     public final ListProperty<T> itemsProperty() {
         return items;
     }

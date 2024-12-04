@@ -39,7 +39,7 @@ public class PagingControlsSettingsView extends VBox {
         strategyChoiceBox.valueProperty().bindBidirectional(pagingControls.messageLabelStrategyProperty());
 
         ChoiceBox<Integer> maxPageIndicatorsBox = new ChoiceBox<>();
-        List<Integer> counts = new ArrayList<>(List.of(1, 2, 5, 10));
+        List<Integer> counts = new ArrayList<>(List.of(0, 1, 2, 5, 10));
         if (!counts.contains(pagingControls.getMaxPageIndicatorsCount())) {
             counts.add(pagingControls.getMaxPageIndicatorsCount());
         }

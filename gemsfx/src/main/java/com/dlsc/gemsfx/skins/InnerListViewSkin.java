@@ -2,7 +2,9 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.PagingListView;
+import javafx.beans.Observable;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.skin.ListViewSkin;
@@ -36,13 +38,13 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
         pagingListView.getProperties().addListener((MapChangeListener<? super Object, ? super Object>) change -> {
             if (change.wasAdded()) {
                 if (change.getKey().equals("refresh-items")) {
-                    pagingListView.getProperties().remove("refresh-items");
                     refresh();
                 }
             }
         });
 
         getChildren().setAll(loadingPane);
+
         refresh();
     }
 
@@ -57,7 +59,13 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
         Callback<ListView<T>, ListCell<T>> cellFactory = pagingListView.getCellFactory();
         if (cellFactory != null) {
 
-            for (int index = 0; index < pagingListView.getPageSize(); index++) {
+            int endIndex = pagingListView.getPageSize();
+            if (!pagingListView.isFillLastPage()) {
+                // we do not want to fill the last page
+                endIndex = pagingListView.getUnmodifiableItems().size();
+            }
+
+            for (int index = 0; index < endIndex; index++) {
 
                 ListCell<T> cell = cellFactory.call(getSkinnable());
                 cell.setMaxWidth(Double.MAX_VALUE);

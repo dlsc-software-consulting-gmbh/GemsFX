@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -20,7 +21,7 @@ public class PagingListViewApp extends Application {
     public void start(Stage stage) {
         PagingListView<String> pagingListView = new PagingListView<>();
         pagingListView.setPrefWidth(400);
-        pagingListView.setTotalItemCount(300);
+        pagingListView.setTotalItemCount(305);
         pagingListView.setPageSize(15);
         pagingListView.setLoader(lv -> {
             if (Math.random() > .75) {
@@ -33,7 +34,12 @@ public class PagingListViewApp extends Application {
             List<String> data = new ArrayList<>();
             int offset = lv.getPage() * lv.getPageSize();
             for (int i = 0; i < lv.getPageSize(); i++) {
-                data.add("Item " + (offset + i + 1));
+                int index = offset + i + 1;
+                if (index <= pagingListView.getTotalItemCount()) {
+                    data.add("Item " + (offset + i + 1));
+                } else {
+                    break;
+                }
             }
             return data;
         });
@@ -41,7 +47,10 @@ public class PagingListViewApp extends Application {
         Button scenicView = new Button("Scenic View");
         scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
 
-        VBox box = new VBox(20, pagingListView, new PagingControlsSettingsView(pagingListView), scenicView);
+        CheckBox fillBox = new CheckBox("Fill last page");
+        fillBox.selectedProperty().bindBidirectional(pagingListView.fillLastPageProperty());
+
+        VBox box = new VBox(20, pagingListView, fillBox, new PagingControlsSettingsView(pagingListView), scenicView);
         box.setPadding(new Insets(20));
 
         Scene scene = new Scene(box);

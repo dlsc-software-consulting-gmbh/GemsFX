@@ -3,18 +3,13 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.PagingControls;
 import com.dlsc.gemsfx.PagingListView;
-import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SkinBase;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
@@ -52,8 +47,6 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         super(pagingListView);
 
         innerListView = pagingListView.getListView();
-
-        pagingListView.selectionModelProperty().bindBidirectional(innerListView.selectionModelProperty());
 
         pagingControls.pageProperty().bindBidirectional(pagingListView.pageProperty());
         pagingControls.totalItemCountProperty().bindBidirectional(pagingListView.totalItemCountProperty());

@@ -35,7 +35,12 @@ public class PagingListView<T> extends PagingControlBase {
 
     private final ObservableList<T> unmodifiableItems = FXCollections.unmodifiableObservableList(items);
 
-    private final ListView<T> listView = new ListView<>(items);
+    private final ListView<T> listView = new ListView<>(items) {
+        @Override
+        protected Skin<?> createDefaultSkin() {
+            return new InnerListViewSkin<>(this, PagingListView.this);
+        }
+    };
 
     private final InvalidationListener updateListener = (Observable it) -> refresh();
 
@@ -47,7 +52,7 @@ public class PagingListView<T> extends PagingControlBase {
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.cellFactoryProperty().bind(cellFactoryProperty());
 
-        listView.setSkin( new InnerListViewSkin<>(listView, this));
+        selectionModelProperty().bindBidirectional(listView.selectionModelProperty());
 
         loadingService.setOnSucceeded(evt -> {
             loadingStatus.set(Status.OK);
@@ -81,12 +86,12 @@ public class PagingListView<T> extends PagingControlBase {
             }
         });
 
-        getUnmodifiableItems().addListener(weakUpdateListener);
+        unmodifiableItems.addListener(weakUpdateListener);
+
         pageSizeProperty().addListener(weakUpdateListener);
         pageProperty().addListener(weakUpdateListener);
         cellFactoryProperty().addListener(weakUpdateListener);
-
-        refresh();
+        fillLastPageProperty().addListener(weakUpdateListener);
     }
 
     @Override
@@ -101,6 +106,27 @@ public class PagingListView<T> extends PagingControlBase {
 
     public final ListView<T> getListView() {
         return listView;
+    }
+
+    private final BooleanProperty fillLastPage = new SimpleBooleanProperty(this, "fillLastPage", false);
+
+    public final boolean isFillLastPage() {
+        return fillLastPage.get();
+    }
+
+    /**
+     * The list view might not have enough data to fill its last page with items / cells. This flag can be used
+     * to control whether we want the view to become smaller because of missing items or if we want the view to
+     * fill the page with empty cells.
+     *
+     * @return a flag used to control whether the last page will be filled with empty cells if needed
+     */
+    public final BooleanProperty fillLastPageProperty() {
+        return fillLastPage;
+    }
+
+    public final void setFillLastPage(boolean fillLastPage) {
+        this.fillLastPage.set(fillLastPage);
     }
 
     private final ObjectProperty<Status> loadingStatus = new SimpleObjectProperty<>(this, "loadingStatus", Status.OK);
@@ -206,6 +232,7 @@ public class PagingListView<T> extends PagingControlBase {
      * to configure it to only allow single selection (see
      * {@link MultipleSelectionModel#setSelectionMode(javafx.scene.control.SelectionMode)}
      * for more information).
+     *
      * @param value the MultipleSelectionModel to be used in this ListView
      */
     public final void setSelectionModel(MultipleSelectionModel<T> value) {
@@ -214,6 +241,7 @@ public class PagingListView<T> extends PagingControlBase {
 
     /**
      * Returns the currently installed selection model.
+     *
      * @return the currently installed selection model
      */
     public final MultipleSelectionModel<T> getSelectionModel() {
@@ -225,6 +253,7 @@ public class PagingListView<T> extends PagingControlBase {
      * to select single or multiple items within a ListView, as  well as inspect
      * which items have been selected by the user. Note that it has a generic
      * type that must match the type of the ListView itself.
+     *
      * @return the selectionModel property
      */
     public final ObjectProperty<MultipleSelectionModel<T>> selectionModelProperty() {
@@ -238,6 +267,7 @@ public class PagingListView<T> extends PagingControlBase {
      * Sets a new cell factory to use in the ListView. This forces all old
      * {@link ListCell}'s to be thrown away, and new ListCell's created with
      * the new cell factory.
+     *
      * @param value cell factory to use in this ListView
      */
     public final void setCellFactory(Callback<ListView<T>, ListCell<T>> value) {
@@ -246,6 +276,7 @@ public class PagingListView<T> extends PagingControlBase {
 
     /**
      * Returns the current cell factory.
+     *
      * @return the current cell factory
      */
     public final Callback<ListView<T>, ListCell<T>> getCellFactory() {
@@ -260,6 +291,7 @@ public class PagingListView<T> extends PagingControlBase {
      * which might be usable for representing any item in the ListView.
      *
      * <p>Refer to the {@link Cell} class documentation for more detail.
+     *
      * @return the cell factory property
      */
     public final ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactoryProperty() {
@@ -270,6 +302,7 @@ public class PagingListView<T> extends PagingControlBase {
     }
 
     public void refresh() {
+        getProperties().remove("refresh-items");
         getProperties().put("refresh-items", true);
     }
 }

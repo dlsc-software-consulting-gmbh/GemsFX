@@ -14,10 +14,7 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 public class PagingControlsSkin extends SkinBase<PagingControls> {
 
@@ -27,10 +24,10 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
     private final HBox pageButtonsBox = new HBox();
 
-    private StackPane lastPageButton;
-    private StackPane nextButton;
-    private StackPane previousButton;
-    private StackPane firstPageButton;
+    private Button lastPageButton;
+    private Button nextButton;
+    private Button previousButton;
+    private Button firstPageButton;
     private Label messageLabel;
 
     public PagingControlsSkin(PagingControls view) {
@@ -96,7 +93,9 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         Region nextPageRegion = new Region();
         nextPageRegion.getStyleClass().add("icon");
 
-        firstPageButton = new StackPane(firstPageButtonRegion);
+        firstPageButton = new Button();
+        firstPageButton.textProperty().bind(view.firstPageTextProperty());
+        firstPageButton.setGraphic(firstPageButtonRegion);
         firstPageButton.getStyleClass().addAll("element", "navigation-button", "first-page-button");
         firstPageButton.setMinWidth(Region.USE_PREF_SIZE);
         firstPageButton.managedProperty().bind(firstPageButton.visibleProperty());
@@ -107,7 +106,9 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
             startPage.set(0);
         });
 
-        previousButton = new StackPane(previousPageRegion);
+        previousButton = new Button();
+        previousButton.textProperty().bind(view.previousPageTextProperty());
+        previousButton.setGraphic(previousPageRegion);
         previousButton.getStyleClass().addAll("element", "navigation-button", "previous-page-button");
         previousButton.setOnMouseClicked(evt -> view.setPage(Math.max(0, view.getPage() - 1)));
         previousButton.setMinWidth(Region.USE_PREF_SIZE);
@@ -115,7 +116,9 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         previousButton.managedProperty().bind(view.showPreviousNextPageButtonProperty());
         previousButton.disableProperty().bind(view.pageProperty().greaterThan(0).not());
 
-        nextButton = new StackPane(nextPageRegion);
+        nextButton = new Button();
+        nextButton.textProperty().bind(view.nextPageTextProperty());
+        nextButton.setGraphic(nextPageRegion);
         nextButton.getStyleClass().addAll("element", "navigation-button", "next-page-button");
         nextButton.setOnMouseClicked(evt -> view.setPage(Math.min(view.getPageCount() - 1, view.getPage() + 1)));
         nextButton.setMinWidth(Region.USE_PREF_SIZE);
@@ -123,7 +126,9 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         nextButton.managedProperty().bind(view.showPreviousNextPageButtonProperty());
         nextButton.disableProperty().bind(view.pageProperty().lessThan(view.pageCountProperty().subtract(1)).not());
 
-        lastPageButton = new StackPane(lastPageButtonRegion);
+        lastPageButton = new Button();
+        lastPageButton.textProperty().bind(view.lastPageTextProperty());
+        lastPageButton.setGraphic(lastPageButtonRegion);
         lastPageButton.setMinWidth(Region.USE_PREF_SIZE);
         lastPageButton.getStyleClass().addAll("element", "navigation-button", "last-page-button");
         lastPageButton.managedProperty().bind(lastPageButton.visibleProperty());

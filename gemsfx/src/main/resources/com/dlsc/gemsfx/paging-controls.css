@@ -56,7 +56,6 @@
     -fx-background-color: transparent;
     -fx-background-insets: 0px;
     -fx-background-radius: 2px;
-    -fx-content-display: graphic-only;
     -fx-max-height: infinity;
     -fx-min-width: 1.5em;
 }
@@ -76,9 +75,24 @@
 }
 
 .paging-controls > .pane > .page-buttons-container > .navigation-button {
-    -fx-pref-width: 1em;
-    -fx-pref-height: 1em;
     -fx-padding: 2px;
+    -fx-graphic-text-gap: 10px;
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button.first-page-button {
+    -fx-content-display: left;
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button.previous-page-button {
+    -fx-content-display: left;
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button.last-page-button {
+    -fx-content-display: right;
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button.next-page-button {
+    -fx-content-display: right;
 }
 
 .paging-controls > .pane > .page-buttons-container > .navigation-button > .icon {
