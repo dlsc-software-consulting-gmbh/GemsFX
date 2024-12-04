@@ -14,7 +14,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Cell;
 import javafx.scene.control.ListCell;
@@ -22,6 +21,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
 
 import java.util.Collections;
@@ -38,9 +39,7 @@ public class PagingListView<T> extends PagingControlBase {
 
     private final ListView<T> listView = new ListView<>(items);
 
-    private final InnerListViewSkin<T> innerListViewSkin;
-
-    private final InvalidationListener updateListener = (Observable it) -> updateItems();
+    private final InvalidationListener updateListener = (Observable it) -> refresh();
 
     private final WeakInvalidationListener weakUpdateListener = new WeakInvalidationListener(updateListener);
 
@@ -50,8 +49,7 @@ public class PagingListView<T> extends PagingControlBase {
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.cellFactoryProperty().bind(cellFactoryProperty());
 
-        innerListViewSkin = new InnerListViewSkin<>(listView, this);
-        listView.setSkin(innerListViewSkin);
+        listView.setSkin( new InnerListViewSkin<>(listView, this));
 
         loadingService.setOnSucceeded(evt -> {
             loadingStatus.set(Status.OK);
@@ -69,8 +67,8 @@ public class PagingListView<T> extends PagingControlBase {
         InvalidationListener loadListener = it -> loadingService.restart();
 
         pageProperty().addListener(loadListener);
-        totalItemCountProperty().addListener(loadListener);
         pageSizeProperty().addListener(loadListener);
+        totalItemCountProperty().addListener(loadListener);
         loaderProperty().addListener(loadListener);
 
         setCellFactory(lv -> new ListCell<>() {
@@ -90,7 +88,15 @@ public class PagingListView<T> extends PagingControlBase {
         pageProperty().addListener(weakUpdateListener);
         cellFactoryProperty().addListener(weakUpdateListener);
 
-        updateItems();
+        addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+            if (evt.getCode() == KeyCode.RIGHT) {
+                nextPage();
+            } else if (evt.getCode() == KeyCode.LEFT) {
+                previousPage();
+            }
+        });
+
+        refresh();
     }
 
     @Override
@@ -273,7 +279,7 @@ public class PagingListView<T> extends PagingControlBase {
         return cellFactory;
     }
 
-    private void updateItems() {
-        innerListViewSkin.updateItems();
+    public void refresh() {
+        getProperties().put("refresh-items", true);
     }
 }

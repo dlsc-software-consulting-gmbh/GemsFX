@@ -21,16 +21,20 @@
 .paging-controls > .pane > .page-buttons-container {
     -fx-alignment: center-left;
     -fx-spacing: 2px;
+    -fx-fill-height: true;
 }
 
 .paging-controls > .pane > .message-label {
 }
 
 .paging-controls > .pane > .page-buttons-container > .page-button {
-    -fx-padding: 2px 5px;
+    -fx-padding: 0px;
     -fx-background-color: transparent;
+    -fx-background-insets: 0px;
     -fx-border-color: transparent;
     -fx-min-width: 2em;
+    -fx-max-height: infinity;
+    -fx-background-radius: 2px;
 }
 
 .paging-controls > .pane > .page-buttons-container > .page-button:hover,
@@ -40,16 +44,69 @@
     -fx-text-fill: -fx-selection-bar-text;
 }
 
+.paging-controls > .pane > .page-buttons-container > .page-button:pressed {
+    -fx-background: derive(-fx-selection-bar, -20%);
+}
+
 .paging-controls > .pane > .spacer {
 }
 
 .paging-controls > .pane > .page-buttons-container > .navigation-button {
-    -fx-padding: 5px;
+    -fx-padding: 0px;
     -fx-background-color: transparent;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 2px;
     -fx-content-display: graphic-only;
+    -fx-max-height: infinity;
+    -fx-min-width: 1.5em;
 }
 
-.paging-controls > .pane > .page-buttons-container > .navigation-button .ikonli-font-icon {
-    -fx-icon-size: 24px;
-    -fx-icon-color: -fx-text-background-color;
+.paging-controls > .pane > .page-buttons-container > .navigation-button:hover {
+    -fx-background: -fx-selection-bar;
+    -fx-background-color: -fx-background;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button:hover > .icon {
+    -fx-opacity: 1;
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button:pressed {
+    -fx-background: derive(-fx-selection-bar, -20%);
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button {
+    -fx-pref-width: 1em;
+    -fx-pref-height: 1em;
+    -fx-padding: 2px;
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button > .icon {
+    -fx-background-color: -fx-text-background-color;
+    -fx-scale-shape: false;
+    -fx-opacity: .5;
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button.first-page-button > .icon {
+    -fx-shape: "M6 6 L8.0156 6 L8.0156 18 L6 18 L6 6 ZM18.4219 16.5938 L17.0156 18 L11.0156 12 L17.0156 6 L18.4219 7.4062 L13.8281 12 L18.4219 16.5938 Z";
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button.last-page-button > .icon {
+    -fx-shape: "M15.9844 6 L18 6 L18 18 L15.9844 18 L15.9844 6 ZM5.5781 7.4062 L6.9844 6 L12.9844 12 L6.9844 18 L5.5781 16.5938 L10.1719 12 L5.5781 7.4062 Z";
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button.previous-page-button > .icon {
+    -fx-shape: "M15.4219 16.5938 L10.8281 12 L15.4219 7.4062 L14.0156 6 L8.0156 12 L14.0156 18 L15.4219 16.5938 Z";
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button.next-page-button > .icon {
+    -fx-shape: "M8.5781 16.5938 L13.1719 12 L8.5781 7.4062 L9.9844 6 L15.9844 12 L9.9844 18 L8.5781 16.5938 Z";
+}
+
+.paging-controls > .pane > .page-buttons-container > .page-divider {
+    -fx-background-color: -fx-text-background-color;
+    -fx-shape: "M7.2031 12 Q7.2031 12.625 6.7656 13.0625 Q6.3438 13.4844 5.7188 13.4844 Q5.0938 13.4844 4.6562 13.0625 Q4.2188 12.625 4.2188 12 Q4.2188 11.375 4.6562 10.9531 Q5.0938 10.5156 5.7188 10.5156 Q6.3438 10.5156 6.7656 10.9531 Q7.2031 11.375 7.2031 12 ZM13.4844 12 Q13.4844 12.625 13.0469 13.0625 Q12.625 13.4844 12 13.4844 Q11.375 13.4844 10.9375 13.0625 Q10.5156 12.625 10.5156 12 Q10.5156 11.375 10.9375 10.9531 Q11.375 10.5156 12 10.5156 Q12.625 10.5156 13.0469 10.9531 Q13.4844 11.375 13.4844 12 ZM18.2812 13.4844 Q18.9062 13.4844 19.3594 13.0625 Q19.8281 12.625 19.8281 12 Q19.8281 11.375 19.3594 10.9531 Q18.9062 10.5156 18.2812 10.5156 Q17.6562 10.5156 17.2188 10.9531 Q16.7969 11.375 16.7969 12 Q16.7969 12.625 17.2188 13.0625 Q17.6562 13.4844 18.2812 13.4844 Z";
+    -fx-padding: 5px 10px;
+    -fx-scale-shape: false;
+    -fx-opacity: .5;
 }

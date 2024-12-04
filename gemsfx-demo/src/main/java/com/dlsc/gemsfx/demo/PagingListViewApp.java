@@ -45,6 +45,9 @@ public class PagingListViewApp extends Application {
         box.setPadding(new Insets(20));
 
         Scene scene = new Scene(box);
+
+        scene.focusOwnerProperty().addListener(it -> System.out.println(scene.getFocusOwner()));
+
         stage.setTitle("Paging List View");
         stage.setScene(scene);
         stage.sizeToScene();

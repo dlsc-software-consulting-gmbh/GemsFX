@@ -1,8 +1,6 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.PagingControlsSkin;
-import javafx.beans.binding.Bindings;
-import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;

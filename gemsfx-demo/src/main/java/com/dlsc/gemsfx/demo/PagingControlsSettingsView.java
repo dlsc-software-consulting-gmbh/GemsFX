@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PagingControlsSettingsView extends VBox {
@@ -38,8 +39,14 @@ public class PagingControlsSettingsView extends VBox {
         strategyChoiceBox.valueProperty().bindBidirectional(pagingControls.messageLabelStrategyProperty());
 
         ChoiceBox<Integer> maxPageIndicatorsBox = new ChoiceBox<>();
-        maxPageIndicatorsBox.getItems().setAll(List.of(1, 2, 5, 10));
-        maxPageIndicatorsBox.valueProperty().bindBidirectional(pagingControls.maxPageIndicatorsCountProperty().asObject());
+        List<Integer> counts = new ArrayList<>(List.of(1, 2, 5, 10));
+        if (!counts.contains(pagingControls.getMaxPageIndicatorsCount())) {
+            counts.add(pagingControls.getMaxPageIndicatorsCount());
+        }
+
+        maxPageIndicatorsBox.getItems().setAll(counts);
+        maxPageIndicatorsBox.setValue(pagingControls.getMaxPageIndicatorsCount());
+        maxPageIndicatorsBox.valueProperty().addListener(it -> pagingControls.setMaxPageIndicatorsCount(maxPageIndicatorsBox.getValue()));
 
         HBox displayModeBox = new HBox(5, new Label("Display mode: "), displayModeChoiceBox);
         displayModeBox.setAlignment(Pos.CENTER_LEFT);

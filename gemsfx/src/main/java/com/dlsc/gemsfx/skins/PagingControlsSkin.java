@@ -14,6 +14,7 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -26,10 +27,10 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
     private final HBox pageButtonsBox = new HBox();
 
-    private Button lastPageButton;
-    private Button nextButton;
-    private Button previousButton;
-    private Button firstPageButton;
+    private StackPane lastPageButton;
+    private StackPane nextButton;
+    private StackPane previousButton;
+    private StackPane firstPageButton;
     private Label messageLabel;
 
     public PagingControlsSkin(PagingControls view) {
@@ -48,6 +49,7 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         view.firstLastPageDisplayModeProperty().addListener(buildViewListener);
         view.alignmentProperty().addListener(buildViewListener);
         view.firstPageDividerProperty().addListener(buildViewListener);
+
         startPage.addListener(buildViewListener);
 
         view.pageProperty().addListener((obs, oldPage, newPage) -> {
@@ -82,46 +84,52 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         }, view.messageLabelStrategyProperty(), view.totalItemCountProperty(), view.pageSizeProperty()));
         messageLabel.managedProperty().bind(messageLabel.visibleProperty());
 
-        firstPageButton = createFirstPageButton();
-        firstPageButton.setFocusTraversable(false);
-        firstPageButton.setGraphic(new FontIcon(MaterialDesign.MDI_PAGE_FIRST));
-        firstPageButton.getStyleClass().addAll("navigation-button", "first-page-button");
+        Region firstPageButtonRegion = new Region();
+        firstPageButtonRegion.getStyleClass().add("icon");
+
+        Region lastPageButtonRegion = new Region();
+        lastPageButtonRegion.getStyleClass().add("icon");
+
+        Region previousPageRegion = new Region();
+        previousPageRegion.getStyleClass().add("icon");
+
+        Region nextPageRegion = new Region();
+        nextPageRegion.getStyleClass().add("icon");
+
+        firstPageButton = new StackPane(firstPageButtonRegion);
+        firstPageButton.getStyleClass().addAll("element", "navigation-button", "first-page-button");
+        firstPageButton.setMinWidth(Region.USE_PREF_SIZE);
         firstPageButton.managedProperty().bind(firstPageButton.visibleProperty());
         firstPageButton.disableProperty().bind(startPage.greaterThan(0).not());
         firstPageButton.visibleProperty().bind(view.firstLastPageDisplayModeProperty().isEqualTo(PagingControls.FirstLastPageDisplayMode.SHOW_ARROW_BUTTONS).and(view.pageCountProperty().greaterThan(1)));
-        firstPageButton.setOnAction(evt -> {
+        firstPageButton.setOnMouseClicked(evt -> {
             view.setPage(0);
             startPage.set(0);
         });
 
-        previousButton = createPreviousPageButton();
-        previousButton.setFocusTraversable(false);
-        previousButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_LEFT));
-        previousButton.getStyleClass().addAll("navigation-button", "previous-page-button");
-        previousButton.setOnAction(evt -> view.setPage(Math.max(0, view.getPage() - 1)));
+        previousButton = new StackPane(previousPageRegion);
+        previousButton.getStyleClass().addAll("element", "navigation-button", "previous-page-button");
+        previousButton.setOnMouseClicked(evt -> view.setPage(Math.max(0, view.getPage() - 1)));
         previousButton.setMinWidth(Region.USE_PREF_SIZE);
         previousButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1).and(view.showPreviousNextPageButtonProperty()));
         previousButton.managedProperty().bind(view.showPreviousNextPageButtonProperty());
         previousButton.disableProperty().bind(view.pageProperty().greaterThan(0).not());
 
-        nextButton = createNextPageButton();
-        nextButton.setFocusTraversable(false);
-        nextButton.setGraphic(new FontIcon(MaterialDesign.MDI_CHEVRON_RIGHT));
-        nextButton.getStyleClass().addAll("navigation-button", "next-page-button");
-        nextButton.setOnAction(evt -> view.setPage(Math.min(view.getPageCount() - 1, view.getPage() + 1)));
+        nextButton = new StackPane(nextPageRegion);
+        nextButton.getStyleClass().addAll("element", "navigation-button", "next-page-button");
+        nextButton.setOnMouseClicked(evt -> view.setPage(Math.min(view.getPageCount() - 1, view.getPage() + 1)));
         nextButton.setMinWidth(Region.USE_PREF_SIZE);
         nextButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1).and(view.showPreviousNextPageButtonProperty()));
         nextButton.managedProperty().bind(view.showPreviousNextPageButtonProperty());
         nextButton.disableProperty().bind(view.pageProperty().lessThan(view.pageCountProperty().subtract(1)).not());
 
-        lastPageButton = createLastPageButton();
-        lastPageButton.setFocusTraversable(false);
-        lastPageButton.setGraphic(new FontIcon(MaterialDesign.MDI_PAGE_LAST));
-        lastPageButton.getStyleClass().addAll("navigation-button", "last-page-button");
+        lastPageButton = new StackPane(lastPageButtonRegion);
+        lastPageButton.setMinWidth(Region.USE_PREF_SIZE);
+        lastPageButton.getStyleClass().addAll("element", "navigation-button", "last-page-button");
         lastPageButton.managedProperty().bind(lastPageButton.visibleProperty());
         lastPageButton.disableProperty().bind(startPage.add(view.getMaxPageIndicatorsCount()).lessThan(view.getPageCount()).not());
         lastPageButton.visibleProperty().bind(view.firstLastPageDisplayModeProperty().isEqualTo(PagingControls.FirstLastPageDisplayMode.SHOW_ARROW_BUTTONS).and(view.pageCountProperty().greaterThan(1)));
-        lastPageButton.setOnAction(evt -> view.setPage(view.getPageCount() - 1));
+        lastPageButton.setOnMouseClicked(evt -> view.setPage(view.getPageCount() - 1));
     }
 
     private void updateView() {
@@ -210,26 +218,10 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         }
     }
 
-    protected Button createFirstPageButton() {
-        return new Button();
-    }
-
-    protected Button createLastPageButton() {
-        return new Button();
-    }
-
-    protected Button createPreviousPageButton() {
-        return new Button();
-    }
-
-    protected Button createNextPageButton() {
-        return new Button();
-    }
-
     protected Button createPageButton(int page) {
         Button pageButton = new Button(Integer.toString(page + 1));
         pageButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        pageButton.getStyleClass().add(PAGE_BUTTON);
+        pageButton.getStyleClass().addAll("element", PAGE_BUTTON);
         pageButton.setOnAction(evt -> getSkinnable().setPage(page));
         return pageButton;
     }

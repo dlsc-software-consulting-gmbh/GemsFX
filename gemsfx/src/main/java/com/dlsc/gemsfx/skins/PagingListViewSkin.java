@@ -57,14 +57,14 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
 
         pagingControls.pageProperty().bindBidirectional(pagingListView.pageProperty());
         pagingControls.totalItemCountProperty().bindBidirectional(pagingListView.totalItemCountProperty());
-        pagingControls.pageSizeProperty().bind(pagingListView.pageSizeProperty());
+        pagingControls.pageSizeProperty().bindBidirectional(pagingListView.pageSizeProperty());
         pagingControls.maxPageIndicatorsCountProperty().bindBidirectional(pagingListView.maxPageIndicatorsCountProperty());
-        pagingControls.messageLabelStrategyProperty().bind(pagingListView.messageLabelStrategyProperty());;
-        pagingControls.showPreviousNextPageButtonProperty().bind(pagingListView.showPreviousNextPageButtonProperty());
-        pagingControls.alignmentProperty().bind(pagingListView.alignmentProperty());
-        pagingControls.firstLastPageDisplayModeProperty().bind(pagingListView.firstLastPageDisplayModeProperty());
-        pagingControls.firstPageDividerProperty().bind(pagingListView.firstPageDividerProperty());
-        pagingControls.maxPageIndicatorsCountProperty().bind(pagingListView.maxPageIndicatorsCountProperty());
+        pagingControls.messageLabelStrategyProperty().bindBidirectional(pagingListView.messageLabelStrategyProperty());;
+        pagingControls.showPreviousNextPageButtonProperty().bindBidirectional(pagingListView.showPreviousNextPageButtonProperty());
+        pagingControls.alignmentProperty().bindBidirectional(pagingListView.alignmentProperty());
+        pagingControls.firstLastPageDisplayModeProperty().bindBidirectional(pagingListView.firstLastPageDisplayModeProperty());
+        pagingControls.firstPageDividerProperty().bindBidirectional(pagingListView.firstPageDividerProperty());
+        pagingControls.maxPageIndicatorsCountProperty().bindBidirectional(pagingListView.maxPageIndicatorsCountProperty());
 
         content.getStyleClass().add("content");
 

@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.PagingListView;
+import javafx.collections.MapChangeListener;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.skin.ListViewSkin;
@@ -32,8 +33,17 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
         loadingPane = new LoadingPane(content);
         loadingPane.statusProperty().bind(pagingListView.loadingStatusProperty());
 
+        pagingListView.getProperties().addListener((MapChangeListener<? super Object, ? super Object>) change -> {
+            if (change.wasAdded()) {
+                if (change.getKey().equals("refresh-items")) {
+                    pagingListView.getProperties().remove("refresh-items");
+                    refresh();
+                }
+            }
+        });
+
         getChildren().setAll(loadingPane);
-        updateItems();
+        refresh();
     }
 
     @Override
@@ -41,7 +51,7 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
         loadingPane.resizeRelocate(x, y, w, h);
     }
 
-    public void updateItems() {
+    public void refresh() {
         content.getChildren().clear();
 
         Callback<ListView<T>, ListCell<T>> cellFactory = pagingListView.getCellFactory();

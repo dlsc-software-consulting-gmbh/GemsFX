@@ -13,6 +13,7 @@ import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Region;
 import javafx.util.Callback;
 
 public abstract class PagingControlBase extends Control {
@@ -42,12 +43,12 @@ public abstract class PagingControlBase extends Control {
             return count;
         }, totalItemCountProperty(), pageSizeProperty()));
 
-        Label firstPageDivider = new Label("...");
+        Region firstPageDivider = new Region();
         firstPageDivider.getStyleClass().addAll("page-divider", "first-page-divider");
         setFirstPageDivider(firstPageDivider);
 
-        Label lastPageDivider = new Label("...");
-        lastPageDivider.getStyleClass().addAll("page-divider", "first-page-divider");
+        Region lastPageDivider = new Region();
+        lastPageDivider.getStyleClass().addAll("page-divider", "last-page-divider");
         setLastPageDivider(lastPageDivider);
     }
 
