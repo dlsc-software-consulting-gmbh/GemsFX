@@ -23,7 +23,7 @@ public class SimplePagingListView<T> extends PagingListView<T> {
         setLoader(lv -> {
             int pageSize = getPageSize();
             int index = getPage() * pageSize;
-            return getItems().subList(index, Math.min(index + pageSize, getItems().size() - 1));
+            return getItems().subList(index, Math.min(index + pageSize, getItems().size()));
         });
 
         loaderProperty().addListener(it -> {

@@ -55,13 +55,22 @@ public abstract class PagingControlBase extends Control {
         setLastPageDivider(lastPageDivider);
 
         addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+            // important to check, otherwise this might get called / executed more than once
+            if (evt.isConsumed()) {
+                return;
+            }
+
             if (Objects.equals(evt.getCode(), KeyCode.RIGHT) || Objects.equals(evt.getCode(), KeyCode.PAGE_DOWN)) {
+                evt.consume();
                 nextPage();
             } else if (Objects.equals(evt.getCode(), KeyCode.LEFT) || Objects.equals(evt.getCode(), KeyCode.PAGE_UP)) {
+                evt.consume();
                 previousPage();
             } else if (Objects.equals(evt.getCode(), KeyCode.HOME)) {
+                evt.consume();
                 firstPage();
             } else if (Objects.equals(evt.getCode(), KeyCode.END)) {
+                evt.consume();
                 lastPage();
             }
         });
