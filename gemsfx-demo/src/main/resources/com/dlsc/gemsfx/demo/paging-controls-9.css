@@ -1,3 +1,7 @@
+.paging-controls {
+    -fx-background-color: white;
+}
+
 .paging-controls > .pane > .page-buttons-container > .button {
     -fx-background-color: linear-gradient(#ff5400, #be1d00);
     -fx-background-radius: 30;

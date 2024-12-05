@@ -1,0 +1,28 @@
+.paging-controls {
+    -fx-background-color: white;
+}
+
+.paging-controls > .pane > .page-buttons-container {
+    -fx-spacing: 10px;
+}
+
+.paging-controls > .pane > .page-buttons-container > .button {
+    -fx-background-color: transparent;
+    -fx-border-color: lightgrey;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-padding: 10px 20px;
+    -fx-font-size: 1.5em;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.paging-controls > .pane > .page-buttons-container > .button:hover {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.paging-controls > .pane > .page-buttons-container > .button.current {
+    -fx-background-color: black;
+    -fx-background-radius: 4px;
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
+}

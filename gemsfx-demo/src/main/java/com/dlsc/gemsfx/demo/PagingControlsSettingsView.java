@@ -27,9 +27,9 @@ public class PagingControlsSettingsView extends VBox {
         Label pageCountLabel = new Label();
         pageCountLabel.textProperty().bind(Bindings.createStringBinding(() -> "Page count: " + pagingControls.getPageCount(), pagingControls.pageCountProperty()));
 
-        ChoiceBox<PagingControls.FirstLastPageDisplayMode> displayModeChoiceBox = new ChoiceBox<>();
-        displayModeChoiceBox.getItems().setAll(PagingControls.FirstLastPageDisplayMode.values());
-        displayModeChoiceBox.valueProperty().bindBidirectional(pagingControls.firstLastPageDisplayModeProperty());
+        ChoiceBox<PagingControls.FirstLastPageDisplayMode> firstLastPageDisplayModeBox = new ChoiceBox<>();
+        firstLastPageDisplayModeBox.getItems().setAll(PagingControls.FirstLastPageDisplayMode.values());
+        firstLastPageDisplayModeBox.valueProperty().bindBidirectional(pagingControls.firstLastPageDisplayModeProperty());
 
         CheckBox showPreviousNextButton = new CheckBox("Show prev / next buttons");
         showPreviousNextButton.selectedProperty().bindBidirectional(pagingControls.showPreviousNextPageButtonProperty());
@@ -48,7 +48,7 @@ public class PagingControlsSettingsView extends VBox {
         maxPageIndicatorsBox.setValue(pagingControls.getMaxPageIndicatorsCount());
         maxPageIndicatorsBox.valueProperty().addListener(it -> pagingControls.setMaxPageIndicatorsCount(maxPageIndicatorsBox.getValue()));
 
-        HBox displayModeBox = new HBox(5, new Label("Display mode: "), displayModeChoiceBox);
+        HBox displayModeBox = new HBox(5, new Label("First / last buttons: "), firstLastPageDisplayModeBox);
         displayModeBox.setAlignment(Pos.CENTER_LEFT);
 
         HBox strategyBox = new HBox(5, new Label("Label strategy: "), strategyChoiceBox);

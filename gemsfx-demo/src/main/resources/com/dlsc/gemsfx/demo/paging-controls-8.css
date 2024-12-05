@@ -1,3 +1,7 @@
+.paging-controls {
+    -fx-background-color: white;
+}
+
 .paging-controls > .pane > .page-buttons-container > .element {
     -fx-background-color:
             #3c7fb1,

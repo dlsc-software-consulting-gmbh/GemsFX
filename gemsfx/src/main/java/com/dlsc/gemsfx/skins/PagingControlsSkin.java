@@ -14,6 +14,7 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class PagingControlsSkin extends SkinBase<PagingControls> {
@@ -95,11 +96,11 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
         firstPageButton = new Button();
         firstPageButton.textProperty().bind(view.firstPageTextProperty());
-        firstPageButton.setGraphic(firstPageButtonRegion);
+        firstPageButton.setGraphic(wrapIcon(firstPageButtonRegion));
         firstPageButton.getStyleClass().addAll("element", "navigation-button", "first-page-button");
         firstPageButton.setMinWidth(Region.USE_PREF_SIZE);
         firstPageButton.managedProperty().bind(firstPageButton.visibleProperty());
-        firstPageButton.disableProperty().bind(startPage.greaterThan(0).not());
+        firstPageButton.disableProperty().bind(view.pageProperty().greaterThan(0).not());
         firstPageButton.visibleProperty().bind(view.firstLastPageDisplayModeProperty().isEqualTo(PagingControls.FirstLastPageDisplayMode.SHOW_ARROW_BUTTONS).and(view.pageCountProperty().greaterThan(1)));
         firstPageButton.setOnMouseClicked(evt -> {
             view.setPage(0);
@@ -108,7 +109,7 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
         previousButton = new Button();
         previousButton.textProperty().bind(view.previousPageTextProperty());
-        previousButton.setGraphic(previousPageRegion);
+        previousButton.setGraphic(wrapIcon(previousPageRegion));
         previousButton.getStyleClass().addAll("element", "navigation-button", "previous-page-button");
         previousButton.setOnMouseClicked(evt -> view.setPage(Math.max(0, view.getPage() - 1)));
         previousButton.setMinWidth(Region.USE_PREF_SIZE);
@@ -118,7 +119,7 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
         nextButton = new Button();
         nextButton.textProperty().bind(view.nextPageTextProperty());
-        nextButton.setGraphic(nextPageRegion);
+        nextButton.setGraphic(wrapIcon(nextPageRegion));
         nextButton.getStyleClass().addAll("element", "navigation-button", "next-page-button");
         nextButton.setOnMouseClicked(evt -> view.setPage(Math.min(view.getPageCount() - 1, view.getPage() + 1)));
         nextButton.setMinWidth(Region.USE_PREF_SIZE);
@@ -128,13 +129,19 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
         lastPageButton = new Button();
         lastPageButton.textProperty().bind(view.lastPageTextProperty());
-        lastPageButton.setGraphic(lastPageButtonRegion);
+        lastPageButton.setGraphic(wrapIcon(lastPageButtonRegion));
         lastPageButton.setMinWidth(Region.USE_PREF_SIZE);
         lastPageButton.getStyleClass().addAll("element", "navigation-button", "last-page-button");
         lastPageButton.managedProperty().bind(lastPageButton.visibleProperty());
-        lastPageButton.disableProperty().bind(startPage.add(view.getMaxPageIndicatorsCount()).lessThan(view.getPageCount()).not());
+        lastPageButton.disableProperty().bind(view.pageProperty().add(view.getMaxPageIndicatorsCount()).lessThan(view.getPageCount()).not());
         lastPageButton.visibleProperty().bind(view.firstLastPageDisplayModeProperty().isEqualTo(PagingControls.FirstLastPageDisplayMode.SHOW_ARROW_BUTTONS).and(view.pageCountProperty().greaterThan(1)));
         lastPageButton.setOnMouseClicked(evt -> view.setPage(view.getPageCount() - 1));
+    }
+
+    private Node wrapIcon(Region region) {
+        StackPane stackPane = new StackPane(region);
+        stackPane.getStyleClass().add("icon-wrapper");
+        return stackPane;
     }
 
     private void updateView() {

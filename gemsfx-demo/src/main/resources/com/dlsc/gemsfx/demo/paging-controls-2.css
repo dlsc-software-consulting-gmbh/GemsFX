@@ -1,3 +1,7 @@
+.paging-controls {
+    -fx-background-color: white;
+}
+
 .paging-controls > .pane > .page-buttons-container {
     -fx-spacing: 5px;
 }
@@ -26,4 +30,12 @@
 
 .paging-controls > .pane > .page-buttons-container > .navigation-button {
     -fx-content-display: graphic-only;
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button.previous-page-button  > .icon-wrapper > .icon {
+    -fx-translate-x: -1;
+}
+
+.paging-controls > .pane > .page-buttons-container > .navigation-button.next-page-button  > .icon-wrapper > .icon {
+    -fx-translate-x: 1;
 }
