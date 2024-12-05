@@ -21,8 +21,8 @@ public class PagingListViewApp extends Application {
     public void start(Stage stage) {
         PagingListView<String> pagingListView = new PagingListView<>();
         pagingListView.setPrefWidth(400);
-        pagingListView.setTotalItemCount(305);
-        pagingListView.setPageSize(15);
+        pagingListView.setTotalItemCount(7);
+        pagingListView.setPageSize(10);
         pagingListView.setLoader(lv -> {
             if (Math.random() > .75) {
                 try {
