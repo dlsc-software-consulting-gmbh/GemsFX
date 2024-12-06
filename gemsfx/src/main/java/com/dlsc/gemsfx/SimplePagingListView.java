@@ -21,9 +21,9 @@ public class SimplePagingListView<T> extends PagingListView<T> {
      * Constructs a new list view and sets a loader that uses the data list.
      */
     public SimplePagingListView() {
-        setLoader(lv -> {
-            int pageSize = getPageSize();
-            int index = getPage() * pageSize;
+        setLoader(request -> {
+            int pageSize = request.getPageSize();
+            int index = request.getPage() * pageSize;
             return getItems().subList(index, Math.min(index + pageSize, getItems().size()));
         });
 

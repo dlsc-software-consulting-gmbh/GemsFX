@@ -23,15 +23,17 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PagingListView<T> extends PagingControlBase {
 
     private final LoadingService loadingService = new LoadingService();
 
-    private final ObservableList<T> items = FXCollections.observableArrayList();
+    private final ObservableList<T> items = FXCollections.observableArrayList(new CopyOnWriteArrayList<>());
 
     private final ObservableList<T> unmodifiableItems = FXCollections.unmodifiableObservableList(items);
 
@@ -104,6 +106,11 @@ public class PagingListView<T> extends PagingControlBase {
         return Objects.requireNonNull(PagingListView.class.getResource("paging-list-view.css")).toExternalForm();
     }
 
+    /**
+     * Returns the wrapped list view.
+     *
+     * @return the list view
+     */
     public final ListView<T> getListView() {
         return listView;
     }
@@ -135,6 +142,12 @@ public class PagingListView<T> extends PagingControlBase {
         return loadingStatus.get();
     }
 
+    /**
+     * The loading status used for the wrapped {@link LoadingPane}. The loading pane will appear if the
+     * loader takes a long time to return the new page items.
+     *
+     * @return the loading status
+     */
     public final ObjectProperty<Status> loadingStatusProperty() {
         return loadingStatus;
     }
@@ -148,40 +161,99 @@ public class PagingListView<T> extends PagingControlBase {
         @Override
         protected Task<List<T>> createTask() {
             return new Task<>() {
+
+                final LoadRequest loadRequest = new LoadRequest(getPage(), getPageSize());
+
                 @Override
                 protected List<T> call() {
                     if (!isCancelled()) {
-                        Callback<PagingListView<T>, List<T>> loader = PagingListView.this.loader.get();
+                        Callback<LoadRequest, List<T>> loader = PagingListView.this.loader.get();
                         if (loader == null) {
                             throw new IllegalArgumentException("data loader can not be null");
                         }
-                        return loader.call(PagingListView.this);
+
+                        /*
+                         * Important to wrap in a list, otherwise we can get a concurrent modification
+                         * exception when the result gets applied to the "items" list in the service
+                         * event handler for "success". Not sure why this fixes that issue.
+                         */
+                        return new ArrayList<>(loader.call(loadRequest));
                     }
+
                     return Collections.emptyList();
                 }
             };
         }
     }
 
+    /**
+     * Triggers an explicit reload of the list view.
+     */
     public final void reload() {
         loadingService.restart();
     }
 
+    /**
+     * Returns an unmodifiable observable list with the items shown by the current
+     * page.
+     *
+     * @return the currently shown items
+     */
     public final ObservableList<T> getUnmodifiableItems() {
         return unmodifiableItems;
     }
 
-    private final ObjectProperty<Callback<PagingListView<T>, List<T>>> loader = new SimpleObjectProperty<>(this, "loader");
+    /**
+     * The input parameter for the loader callback.
+     *
+     * @see #loaderProperty()
+     */
+    public static class LoadRequest {
 
-    public Callback<PagingListView<T>, List<T>> getLoader() {
+        private final int page;
+        private final int pageSize;
+
+        /**
+         * Constructs a new load request for the given page and page size.
+         *
+         * @param page     the index of the page (starts with 0)
+         * @param pageSize the size of the page (number of items per page)
+         */
+        public LoadRequest(int page, int pageSize) {
+            this.page = page;
+            this.pageSize = pageSize;
+        }
+
+        /**
+         * The index of the page.
+         *
+         * @return the page index
+         */
+        public int getPage() {
+            return page;
+        }
+
+        /**
+         * The size of the page.
+         *
+         * @return the page size
+         */
+        public int getPageSize() {
+            return pageSize;
+        }
+    }
+
+    private final ObjectProperty<Callback<LoadRequest, List<T>>> loader = new SimpleObjectProperty<>(this, "loader");
+
+    public Callback<LoadRequest, List<T>> getLoader() {
         return loader.get();
     }
 
-    public ObjectProperty<Callback<PagingListView<T>, List<T>>> loaderProperty() {
+    public ObjectProperty<Callback<LoadRequest, List<T>>> loaderProperty() {
         return loader;
     }
 
-    public void setLoader(Callback<PagingListView<T>, List<T>> loader) {
+    public void setLoader(Callback<LoadRequest, List<T>> loader) {
         this.loader.set(loader);
     }
 

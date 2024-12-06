@@ -1,13 +1,14 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.EnhancedLabel;
 import com.dlsc.gemsfx.PagingListView;
 import javafx.application.Application;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
@@ -17,14 +18,16 @@ import java.util.List;
 
 public class PagingListViewApp extends Application {
 
+    private final BooleanProperty simulateDelayProperty = new SimpleBooleanProperty(false);
+
     @Override
     public void start(Stage stage) {
         PagingListView<String> pagingListView = new PagingListView<>();
         pagingListView.setPrefWidth(400);
-        pagingListView.setTotalItemCount(7);
+        pagingListView.setTotalItemCount(205);
         pagingListView.setPageSize(10);
-        pagingListView.setLoader(lv -> {
-            if (Math.random() > .75) {
+        pagingListView.setLoader(loadRequest -> {
+            if (simulateDelayProperty.get()) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -32,8 +35,8 @@ public class PagingListViewApp extends Application {
                 }
             }
             List<String> data = new ArrayList<>();
-            int offset = lv.getPage() * lv.getPageSize();
-            for (int i = 0; i < lv.getPageSize(); i++) {
+            int offset = loadRequest.getPage() * loadRequest.getPageSize();
+            for (int i = 0; i < loadRequest.getPageSize(); i++) {
                 int index = offset + i + 1;
                 if (index <= pagingListView.getTotalItemCount()) {
                     data.add("Item " + (offset + i + 1));
@@ -50,7 +53,12 @@ public class PagingListViewApp extends Application {
         CheckBox fillBox = new CheckBox("Fill last page");
         fillBox.selectedProperty().bindBidirectional(pagingListView.fillLastPageProperty());
 
-        VBox box = new VBox(20, pagingListView, fillBox, new PagingControlsSettingsView(pagingListView), scenicView);
+        CheckBox simulateDelay = new CheckBox("Simulate delay");
+        simulateDelay.selectedProperty().bindBidirectional(simulateDelayProperty);
+
+        HBox settingsBox = new HBox(10, fillBox, simulateDelay);
+
+        VBox box = new VBox(20, pagingListView, settingsBox, new PagingControlsSettingsView(pagingListView), scenicView);
         box.setPadding(new Insets(20));
 
         Scene scene = new Scene(box);
