@@ -25,6 +25,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.layout.Region;
 import javafx.util.Callback;
 import org.apache.commons.lang3.StringUtils;
 
@@ -61,6 +62,8 @@ public class FilterView<T> extends Control {
 
     public FilterView() {
         getStyleClass().add("filter-view");
+
+        setMinHeight(Region.USE_PREF_SIZE);
 
         setFocusTraversable(false);
 
