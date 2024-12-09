@@ -1,3 +1,7 @@
+.paging-list-view .content {
+    -fx-spacing: 5px;
+}
+
 .paging-list-view .list-view .loading-pane .content > .list-cell:filled:selected,
 .paging-list-view .list-view .loading-pane .content > .list-cell:filled:selected:hover {
     -fx-background: -fx-accent;

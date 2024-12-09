@@ -22,7 +22,7 @@ public class PagingControlsSettingsView extends VBox {
         setSpacing(10);
 
         Label pageLabel = new Label();
-        pageLabel.textProperty().bind(Bindings.createStringBinding(() -> "Page Index: " + pagingControls.getPage(), pagingControls.pageProperty()));
+        pageLabel.textProperty().bind(Bindings.createStringBinding(() -> "Page index: " + pagingControls.getPage(), pagingControls.pageProperty()));
 
         Label pageCountLabel = new Label();
         pageCountLabel.textProperty().bind(Bindings.createStringBinding(() -> "Page count: " + pagingControls.getPageCount(), pagingControls.pageCountProperty()));

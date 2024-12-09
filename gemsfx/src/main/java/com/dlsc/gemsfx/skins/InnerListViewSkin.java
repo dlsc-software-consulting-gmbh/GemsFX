@@ -5,9 +5,13 @@ import com.dlsc.gemsfx.PagingListView;
 import javafx.beans.Observable;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.skin.ListViewSkin;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
@@ -53,9 +57,31 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
         loadingPane.resizeRelocate(x, y, w, h);
     }
 
+    private Label placeholderLabel;
+
     public void refresh() {
         content.getChildren().clear();
 
+        if (pagingListView.getTotalItemCount() == 0) {
+            Node placeholder = pagingListView.getPlaceholder();
+            if (placeholder == null) {
+                if (placeholderLabel == null) {
+                    placeholderLabel = new Label("No items");
+                    placeholderLabel.getStyleClass().add("placeholder");
+                    VBox.setVgrow(placeholderLabel, Priority.ALWAYS);
+                }
+                placeholder = placeholderLabel;
+            }
+
+            content.getChildren().add(placeholder);
+            content.setAlignment(Pos.CENTER);
+        } else {
+            buildItems();
+            content.setAlignment(Pos.TOP_LEFT);
+        }
+    }
+
+    private void buildItems() {
         Callback<ListView<T>, ListCell<T>> cellFactory = pagingListView.getCellFactory();
         if (cellFactory != null) {
 

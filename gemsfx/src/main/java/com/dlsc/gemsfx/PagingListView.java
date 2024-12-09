@@ -14,6 +14,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.geometry.Side;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Cell;
 import javafx.scene.control.ListCell;
@@ -94,6 +96,14 @@ public class PagingListView<T> extends PagingControlBase {
         pageProperty().addListener(weakUpdateListener);
         cellFactoryProperty().addListener(weakUpdateListener);
         fillLastPageProperty().addListener(weakUpdateListener);
+        totalItemCountProperty().addListener(weakUpdateListener);
+
+        pagingControlsLocation.addListener((it, oldLocation, newLocation) -> {
+            if (newLocation.equals(Side.LEFT) || newLocation.equals(Side.RIGHT)) {
+                setPagingControlsLocation(Side.BOTTOM);
+                throw new IllegalArgumentException("unsupported location for the paging controls: " + newLocation);
+            }
+        });
     }
 
     @Override
@@ -113,6 +123,45 @@ public class PagingListView<T> extends PagingControlBase {
      */
     public final ListView<T> getListView() {
         return listView;
+    }
+
+    private final ObjectProperty<Side> pagingControlsLocation = new SimpleObjectProperty<>(this, "pagingControlsLocation", Side.BOTTOM);
+
+    public final Side getPagingControlsLocation() {
+        return pagingControlsLocation.get();
+    }
+
+    /**
+     * Controls on which side the paging controls should be located. Currently only {@link Side#TOP} and
+     * {@link Side#BOTTOM} are supported.
+     *
+     * @return the location where the paging controls will be shown
+     */
+    public final ObjectProperty<Side> pagingControlsLocationProperty() {
+        return pagingControlsLocation;
+    }
+
+    public final void setPagingControlsLocation(Side pagingControlsLocation) {
+        this.pagingControlsLocation.set(pagingControlsLocation);
+    }
+
+    private final BooleanProperty showPagingControls = new SimpleBooleanProperty(this, "showPagingControls", true);
+
+    public final boolean isShowPagingControls() {
+        return showPagingControls.get();
+    }
+
+    /**
+     * A flag used to control the visibility of the paging controls (page buttons, previous, next, etc...).
+     *
+     * @return a property that is true if the paging controls should be visible
+     */
+    public final BooleanProperty showPagingControlsProperty() {
+        return showPagingControls;
+    }
+
+    public final void setShowPagingControls(boolean showPagingControls) {
+        this.showPagingControls.set(showPagingControls);
     }
 
     private final BooleanProperty fillLastPage = new SimpleBooleanProperty(this, "fillLastPage", false);
@@ -245,27 +294,25 @@ public class PagingListView<T> extends PagingControlBase {
 
     private final ObjectProperty<Callback<LoadRequest, List<T>>> loader = new SimpleObjectProperty<>(this, "loader");
 
-    public Callback<LoadRequest, List<T>> getLoader() {
+    public final Callback<LoadRequest, List<T>> getLoader() {
         return loader.get();
     }
 
-    public ObjectProperty<Callback<LoadRequest, List<T>>> loaderProperty() {
+    public final ObjectProperty<Callback<LoadRequest, List<T>>> loaderProperty() {
         return loader;
     }
 
-    public void setLoader(Callback<LoadRequest, List<T>> loader) {
+    public final void setLoader(Callback<LoadRequest, List<T>> loader) {
         this.loader.set(loader);
     }
 
-    /**
-     * The {@code Node} to show to the user when the {@code ListView} has no content to show.
-     * This happens when the list model has no data or when a filter has been applied to the list model, resulting in
-     * there being nothing to show the user.
-     *
-     * @since JavaFX 8.0
-     */
     private ObjectProperty<Node> placeholder;
 
+    /**
+     * The {@code Node} to show to the user when the {@code PagingListView} has no content to show.
+     * This happens when the list model has no data or when a filter has been applied to the list model, resulting in
+     * there being nothing to show the user.
+     */
     public final ObjectProperty<Node> placeholderProperty() {
         if (placeholder == null) {
             placeholder = new SimpleObjectProperty<>(this, "placeholder");

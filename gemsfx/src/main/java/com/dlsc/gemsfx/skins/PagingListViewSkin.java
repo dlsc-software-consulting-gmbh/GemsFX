@@ -1,45 +1,28 @@
 package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.PagingControls;
 import com.dlsc.gemsfx.PagingListView;
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.geometry.Orientation;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SkinBase;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
 
     public static final String USING_SCROLL_PANE = "using-scroll-pane";
 
-    private final VBox content = new VBox() {
-        /*
-         * Very important or the layout inside PaginationListView will not work due
-         * to text wrapping inside AdvancedItemView.
-         */
-        @Override
-        public Orientation getContentBias() {
-            return Orientation.HORIZONTAL;
-        }
-    };
+    private final VBox content = new VBox();
 
     private final PagingControls pagingControls = new PagingControls();
 
-    private final LoadingPane stackPane = new LoadingPane() {
-        /*
-         * Very important or the layout inside PaginationListView will not work due
-         * to text wrapping inside AdvancedItemView.
-         */
-        @Override
-        public Orientation getContentBias() {
-            return Orientation.HORIZONTAL;
-        }
-    };
-
+    private final StackPane stackPane = new StackPane();
 
     private final ListView<T> innerListView;
 
@@ -47,6 +30,7 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         super(pagingListView);
 
         innerListView = pagingListView.getListView();
+        VBox.setVgrow(innerListView, Priority.ALWAYS);
 
         pagingControls.pageProperty().bindBidirectional(pagingListView.pageProperty());
         pagingControls.totalItemCountProperty().bindBidirectional(pagingListView.totalItemCountProperty());
@@ -69,8 +53,10 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         // when the underlying data list changes, then we have to recreate the binding for the placeholder
         pagingListView.getUnmodifiableItems().addListener((Observable it) -> bindPlaceholder(null, pagingListView.getPlaceholder()));
 
-        pagingListView.usingScrollPaneProperty().addListener(it -> updateView());
-        pagingListView.placeholderProperty().addListener(it -> updateView());
+        InvalidationListener updateViewListener = it -> updateView();
+        pagingListView.usingScrollPaneProperty().addListener(updateViewListener);
+        pagingListView.placeholderProperty().addListener(updateViewListener);
+        pagingListView.pagingControlsLocationProperty().addListener(updateViewListener);
 
         getChildren().setAll(stackPane);
 
@@ -105,10 +91,18 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
     private void updateView() {
         PagingListView<T> listView = getSkinnable();
 
-        if (listView.isUsingScrollPane()) {
-            content.getChildren().setAll(wrapInScrollPane(innerListView), pagingControls);
+        if (listView.getPagingControlsLocation() == Side.BOTTOM) {
+            if (listView.isUsingScrollPane()) {
+                content.getChildren().setAll(wrapInScrollPane(innerListView), pagingControls);
+            } else {
+                content.getChildren().setAll(innerListView, pagingControls);
+            }
         } else {
-            content.getChildren().setAll(innerListView, pagingControls);
+            if (listView.isUsingScrollPane()) {
+                content.getChildren().setAll(pagingControls, wrapInScrollPane(innerListView));
+            } else {
+                content.getChildren().setAll(pagingControls, innerListView);
+            }
         }
 
         Node placeholder = listView.getPlaceholder();
@@ -127,6 +121,7 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
         return scrollPane;
     }
 }

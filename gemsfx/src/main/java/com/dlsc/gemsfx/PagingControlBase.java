@@ -19,6 +19,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
 
+import java.text.MessageFormat;
 import java.util.Objects;
 
 public abstract class PagingControlBase extends Control {
@@ -30,14 +31,19 @@ public abstract class PagingControlBase extends Control {
             }
 
             if (getPageCount() == 1) {
-                return "Showing all items";
+                int total = getTotalItemCount();
+                if (total == 1) {
+                    return "Showing the only item.";
+                }
+
+                return MessageFormat.format("Showing all {0} items.", getTotalItemCount());
             }
 
             int startIndex = (view.getPage() * getPageSize()) + 1;
             int endIndex = startIndex + getPageSize() - 1;
 
             endIndex = Math.min(endIndex, getTotalItemCount());
-            return "Showing items " + startIndex + " to " + endIndex + " of " + getTotalItemCount();
+            return "Showing items " + startIndex + " to " + endIndex + " of " + getTotalItemCount() + ".";
         });
 
         pageCount.bind(Bindings.createIntegerBinding(() -> {
@@ -47,6 +53,12 @@ public abstract class PagingControlBase extends Control {
             }
             return count;
         }, totalItemCountProperty(), pageSizeProperty()));
+
+        pageCount.addListener(it -> {
+            if (getPageCount() <= getPage()) {
+                setPage(Math.max(0, getPageCount() - 1));
+            }
+        });
 
         Region firstPageDivider = new Region();
         firstPageDivider.getStyleClass().addAll("page-divider", "first-page-divider");
@@ -262,7 +274,7 @@ public abstract class PagingControlBase extends Control {
      * @see #pageProperty()
      */
     public void nextPage() {
-        setPage(Math.min(getPageCount() - 1, getPage() + 1));
+        setPage(Math.max(0, Math.min(getPageCount() - 1, getPage() + 1)));
     }
 
     /**
@@ -271,7 +283,7 @@ public abstract class PagingControlBase extends Control {
      * @see #pageProperty()
      */
     public void previousPage() {
-        setPage(Math.max(0, getPage() - 1));
+        setPage(Math.min(getTotalItemCount() / getPageSize(), Math.max(0, getPage() - 1)));
     }
 
     private final IntegerProperty totalItemCount = new SimpleIntegerProperty(this, "totalItemCount");
