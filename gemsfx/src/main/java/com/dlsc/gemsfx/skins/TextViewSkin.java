@@ -81,7 +81,7 @@ public class TextViewSkin extends SkinBase<TextView> {
             this.textView = textView;
 
             setCursor(Cursor.TEXT);
-            setPrefWidth(Region.USE_PREF_SIZE);
+            setPrefWidth(Region.USE_COMPUTED_SIZE);
 
             text.getStyleClass().add("text");
             text.textProperty().bind(textView.textProperty());
@@ -95,6 +95,16 @@ public class TextViewSkin extends SkinBase<TextView> {
 
             getStyleClass().add("selectable-text");
             initListeners();
+        }
+
+        @Override
+        protected double computePrefHeight(double width) {
+            return super.computePrefHeight(width);
+        }
+
+        @Override
+        protected void layoutChildren() {
+            super.layoutChildren();
         }
 
         public void selectAll() {

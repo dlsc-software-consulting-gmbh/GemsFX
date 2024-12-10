@@ -2,9 +2,8 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.PagingListView;
-import javafx.beans.Observable;
 import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableList;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -20,13 +19,20 @@ import java.util.Objects;
 public class InnerListViewSkin<T> extends ListViewSkin<T> {
 
     private final VBox content = new VBox() {
+
         @Override
         public String getUserAgentStylesheet() {
             return Objects.requireNonNull(PagingListView.class.getResource("paging-list-view.css")).toExternalForm();
         }
+
+        @Override
+        public Orientation getContentBias() {
+            return Orientation.HORIZONTAL;
+        }
     };
 
     private final PagingListView<T> pagingListView;
+
     private final LoadingPane loadingPane;
 
     public InnerListViewSkin(ListView<T> control, PagingListView<T> pagingListView) {
@@ -34,7 +40,7 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
 
         this.pagingListView = pagingListView;
 
-        content.getStyleClass().add("content");
+        content.getStyleClass().add("inner-content");
 
         loadingPane = new LoadingPane(content);
         loadingPane.statusProperty().bind(pagingListView.loadingStatusProperty());
@@ -124,20 +130,5 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
     @Override
     protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return loadingPane.maxHeight(width) + topInset + bottomInset;
-    }
-
-    @Override
-    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return loadingPane.minWidth(height) + leftInset + rightInset;
-    }
-
-    @Override
-    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return loadingPane.prefWidth(height) + leftInset + rightInset;
-    }
-
-    @Override
-    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return loadingPane.maxWidth(height) + leftInset + rightInset;
     }
 }

@@ -3,9 +3,11 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.LoadingPane.Status;
 import com.dlsc.gemsfx.skins.InnerListViewSkin;
 import com.dlsc.gemsfx.skins.PagingListViewSkin;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -14,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -23,6 +26,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
+import javafx.scene.layout.Region;
 import javafx.util.Callback;
 
 import java.util.ArrayList;
@@ -40,9 +44,15 @@ public class PagingListView<T> extends PagingControlBase {
     private final ObservableList<T> unmodifiableItems = FXCollections.unmodifiableObservableList(items);
 
     private final ListView<T> listView = new ListView<>(items) {
+
         @Override
         protected Skin<?> createDefaultSkin() {
             return new InnerListViewSkin<>(this, PagingListView.this);
+        }
+
+        @Override
+        public Orientation getContentBias() {
+            return Orientation.HORIZONTAL;
         }
     };
 
@@ -53,8 +63,10 @@ public class PagingListView<T> extends PagingControlBase {
     public PagingListView() {
         getStyleClass().add("paging-list-view");
 
+        listView.getStyleClass().add("inner-list-view");
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.cellFactoryProperty().bind(cellFactoryProperty());
+        listView.setFixedCellSize(Region.USE_COMPUTED_SIZE);
 
         selectionModelProperty().bindBidirectional(listView.selectionModelProperty());
 
@@ -114,6 +126,17 @@ public class PagingListView<T> extends PagingControlBase {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(PagingListView.class.getResource("paging-list-view.css")).toExternalForm();
+    }
+
+    /**
+     * Overrides content bias as we want height calculations for the cells based on the current width of the
+     * list view.
+     *
+     * @return horizontal orientation
+     */
+    @Override
+    public Orientation getContentBias() {
+        return Orientation.HORIZONTAL;
     }
 
     /**
@@ -217,16 +240,15 @@ public class PagingListView<T> extends PagingControlBase {
                 protected List<T> call() {
                     if (!isCancelled()) {
                         Callback<LoadRequest, List<T>> loader = PagingListView.this.loader.get();
-                        if (loader == null) {
-                            throw new IllegalArgumentException("data loader can not be null");
-                        }
+                        if (loader != null) {
 
-                        /*
-                         * Important to wrap in a list, otherwise we can get a concurrent modification
-                         * exception when the result gets applied to the "items" list in the service
-                         * event handler for "success". Not sure why this fixes that issue.
-                         */
-                        return new ArrayList<>(loader.call(loadRequest));
+                            /*
+                             * Important to wrap in a list, otherwise we can get a concurrent modification
+                             * exception when the result gets applied to the "items" list in the service
+                             * event handler for "success". Not sure why this fixes that issue.
+                             */
+                            return new ArrayList<>(loader.call(loadRequest));
+                        }
                     }
 
                     return Collections.emptyList();
@@ -423,5 +445,45 @@ public class PagingListView<T> extends PagingControlBase {
     public void refresh() {
         getProperties().remove("refresh-items");
         getProperties().put("refresh-items", true);
+    }
+
+    /**
+     * A convenience class to easily provide a loader for paging when the data is given as an
+     * observable list.
+     *
+     * @param <S> the type of the items
+     */
+    public static class SimpleLoader<S> implements Callback<LoadRequest, List<S>> {
+
+        private final ObservableList<S> data;
+        private final PagingListView<S> listView;
+
+        /**
+         * Constructs a new simple loader for the given list view and the given data.
+         *
+         * @param listView the list view where the loader will be used
+         * @param data     the observable list that is providing the data / the items
+         */
+        public SimpleLoader(PagingListView<S> listView, ObservableList<S> data) {
+            this.listView = Objects.requireNonNull(listView);
+            this.data = Objects.requireNonNull(data);
+            listView.totalItemCountProperty().bind(Bindings.size(data));
+        }
+
+        @Override
+        public List<S> call(LoadRequest param) {
+            int page = param.getPage();
+            int pageSize = param.getPageSize();
+            int offset = page * pageSize;
+            return data.subList(offset, Math.min(data.size(), offset + pageSize));
+        }
+
+        public final PagingListView<S> getListView() {
+            return listView;
+        }
+
+        public final ObservableList<S> getData() {
+            return data;
+        }
     }
 }
