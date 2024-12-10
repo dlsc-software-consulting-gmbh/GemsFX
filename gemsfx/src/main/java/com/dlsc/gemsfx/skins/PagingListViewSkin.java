@@ -130,7 +130,6 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
 
     @Override
     protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        System.out.println("w: " + width);
         return stackPane.prefHeight(width) + topInset + bottomInset;
     }
 
