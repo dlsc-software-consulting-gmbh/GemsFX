@@ -287,7 +287,6 @@ public class PagingListView<T> extends PagingControlBase {
                 @Override
                 protected List<T> call() {
                     try {
-                        System.out.println("sleeping " + getLoadDelayInMillis());
                         Thread.sleep(getLoadDelayInMillis());
                     } catch (InterruptedException e) {
                         // do nothing
@@ -297,8 +296,6 @@ public class PagingListView<T> extends PagingControlBase {
                         Callback<LoadRequest, List<T>> loader = PagingListView.this.loader.get();
                         if (loader != null) {
 
-                            actualLoads++;
-                            System.out.println("reloads: " + reloads + ", actual loads: " + actualLoads);
                             /*
                              * Important to wrap in a list, otherwise we can get a concurrent modification
                              * exception when the result gets applied to the "items" list in the service
@@ -306,8 +303,6 @@ public class PagingListView<T> extends PagingControlBase {
                              */
                             return new ArrayList<>(loader.call(loadRequest));
                         }
-                    } else {
-                        System.out.println("was cancelled");
                     }
 
                     return Collections.emptyList();
@@ -316,15 +311,10 @@ public class PagingListView<T> extends PagingControlBase {
         }
     }
 
-    private int reloads;
-    private int actualLoads;
-
     /**
      * Triggers an explicit reload of the list view.
      */
     public final void reload() {
-        reloads++;
-        System.out.println("reloading");
         loadingService.restart();
     }
 
