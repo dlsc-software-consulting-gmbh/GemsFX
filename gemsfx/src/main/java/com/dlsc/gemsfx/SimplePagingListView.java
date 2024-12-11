@@ -1,10 +1,15 @@
 package com.dlsc.gemsfx;
 
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.util.Callback;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple version of the paging list view that is completely based on a list of items, just like a normal
@@ -21,34 +26,11 @@ public class SimplePagingListView<T> extends PagingListView<T> {
      * Constructs a new list view and sets a loader that uses the data list.
      */
     public SimplePagingListView() {
-        setLoader(request -> {
-            int pageSize = request.getPageSize();
-            int index = request.getPage() * pageSize;
-            return getItems().subList(index, Math.min(index + pageSize, getItems().size()));
-        });
-
+        setLoader(new SimpleLoader(this, itemsProperty()));
+        setLoadDelayInMillis(10);
+        setCommitLoadStatusDelay(400);
         loaderProperty().addListener(it -> {
             throw new UnsupportedOperationException("a custom loader can not be used for this list view");
-        });
-
-        totalItemCountProperty().addListener(it -> {
-            if (!internal) {
-                throw new UnsupportedOperationException("the total item count can not be explicitly changed for this list view");
-
-            }
-        });
-
-        items.addListener((Observable it) -> {
-            ObservableList<T> list = getItems();
-            if (list != null) {
-                internal = true;
-                try {
-                    setTotalItemCount(list.size());
-                    setPage(Math.min(getTotalItemCount() / getPageSize(), getPage()));
-                } finally {
-                    internal = false;
-                }
-            }
         });
     }
 
@@ -86,5 +68,50 @@ public class SimplePagingListView<T> extends PagingListView<T> {
 
     public final void setItems(ObservableList<T> items) {
         this.items.set(items);
+    }
+
+    /*
+     * A convenience class to easily provide a loader for paging when the data is given as an
+     * observable list.
+     *
+     * @param <T> the type of the items
+     */
+    private final class SimpleLoader implements Callback<LoadRequest, List<T>> {
+
+        private final ObservableList<T> data;
+        private final PagingListView<T> listView;
+
+        /**
+         * Constructs a new simple loader for the given list view and the given data.
+         *
+         * @param listView the list view where the loader will be used
+         * @param data     the observable list that is providing the data / the items
+         */
+        public SimpleLoader(PagingListView<T> listView, ListProperty<T> data) {
+            this.listView = Objects.requireNonNull(listView);
+            this.data = Objects.requireNonNull(data);
+            this.listView.totalItemCountProperty().bind(Bindings.size(data));
+            this.data.addListener((Observable it) -> {
+                ObservableList<T> list = getData();
+                listView.setPage(Math.min(listView.getTotalItemCount() / listView.getPageSize(), listView.getPage()));
+                listView.reload();
+            });
+        }
+
+        @Override
+        public List<T> call(LoadRequest param) {
+            int page = param.getPage();
+            int pageSize = param.getPageSize();
+            int offset = page * pageSize;
+            return data.subList(offset, Math.min(data.size(), offset + pageSize));
+        }
+
+        public PagingListView<T> getListView() {
+            return listView;
+        }
+
+        public ObservableList<T> getData() {
+            return data;
+        }
     }
 }

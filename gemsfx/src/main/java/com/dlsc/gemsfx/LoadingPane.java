@@ -3,8 +3,10 @@ package com.dlsc.gemsfx;
 import javafx.application.Platform;
 import javafx.beans.DefaultProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -15,7 +17,6 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
-import java.time.Duration;
 import java.util.Objects;
 
 /**
@@ -96,8 +97,8 @@ public class LoadingPane extends StackPane {
         });
 
         commitDelay.addListener(it -> {
-            if (getCommitDelay() == null) {
-                throw new IllegalArgumentException("commit delay can not be null");
+            if (getCommitDelay() < 0) {
+                throw new IllegalArgumentException("commit delay must be greater than or equal to zero");
             }
         });
 
@@ -234,7 +235,7 @@ public class LoadingPane extends StackPane {
             try {
                 if (status.equals(Status.LOADING)) {
                     // only delay the change when switching to the state that represents that loading is currently ongoing.
-                    Thread.sleep(getCommitDelay().toMillis());
+                    Thread.sleep(getCommitDelay());
                 }
                 if (!stopped) {
                     Platform.runLater(() -> committedStatus.set(status));
@@ -249,9 +250,9 @@ public class LoadingPane extends StackPane {
         }
     }
 
-    private final ObjectProperty<Duration> commitDelay = new SimpleObjectProperty<>(this, "commitDelay", Duration.ofMillis(200));
+    private final LongProperty commitDelay = new SimpleLongProperty(this, "commitDelay", 200L);
 
-    public final Duration getCommitDelay() {
+    public final long getCommitDelay() {
         return commitDelay.get();
     }
 
@@ -261,11 +262,11 @@ public class LoadingPane extends StackPane {
      *
      * @return the delay duration in milliseconds
      */
-    public final ObjectProperty<Duration> commitDelayProperty() {
+    public final LongProperty commitDelayProperty() {
         return commitDelay;
     }
 
-    public final void setCommitDelay(Duration commitDelay) {
+    public final void setCommitDelay(long commitDelay) {
         this.commitDelay.set(commitDelay);
     }
 

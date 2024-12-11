@@ -3,14 +3,14 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.LoadingPane.Status;
 import com.dlsc.gemsfx.skins.InnerListViewSkin;
 import com.dlsc.gemsfx.skins.PagingListViewSkin;
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,7 +18,6 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
-import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Cell;
 import javafx.scene.control.ListCell;
@@ -83,8 +82,7 @@ public class PagingListView<T> extends PagingControlBase {
         loadingService.setOnRunning(evt -> loadingStatus.set(Status.LOADING));
         loadingService.setOnFailed(evt -> loadingStatus.set(Status.ERROR));
 
-        InvalidationListener loadListener = it -> loadingService.restart();
-
+        InvalidationListener loadListener = it -> reload();
         pageProperty().addListener(loadListener);
         pageSizeProperty().addListener(loadListener);
         totalItemCountProperty().addListener(loadListener);
@@ -114,6 +112,12 @@ public class PagingListView<T> extends PagingControlBase {
             if (newLocation.equals(Side.LEFT) || newLocation.equals(Side.RIGHT)) {
                 setPagingControlsLocation(Side.BOTTOM);
                 throw new IllegalArgumentException("unsupported location for the paging controls: " + newLocation);
+            }
+        });
+
+        loadDelayInMillis.addListener(it -> {
+            if (getLoadDelayInMillis() < 0) {
+                throw new IllegalArgumentException("load delay must be >= 0");
             }
         });
     }
@@ -228,6 +232,50 @@ public class PagingListView<T> extends PagingControlBase {
         this.loadingStatus.set(loadingStatus);
     }
 
+    private final LongProperty loadDelayInMillis = new SimpleLongProperty(this, "loadDelayInMillis", 200L);
+
+    public final long getLoadDelayInMillis() {
+        return loadDelayInMillis.get();
+    }
+
+    /**
+     * The delay in milliseconds before the loading service will actually try to retrieve the data from (for example)
+     * a backend. This delay is around a few hundred milliseconds by default. Delaying the loading has the advantage
+     * that sudden property changes will not trigger multiple backend queries but will get batched together to a single
+     * reload operation.
+     *
+     * @return the delay before data will actually be loaded
+     */
+    public final LongProperty loadDelayInMillisProperty() {
+        return loadDelayInMillis;
+    }
+
+    public final void setLoadDelayInMillis(long loadDelayInMillis) {
+        this.loadDelayInMillis.set(loadDelayInMillis);
+    }
+
+    private final LongProperty commitLoadStatusDelay = new SimpleLongProperty(this, "commitLoadStatusDelay", 400L);
+
+    public final long getCommitLoadStatusDelay() {
+        return commitLoadStatusDelay.get();
+    }
+
+    /**
+     * The delay in milliseconds before the list view will display the progress indicator for long running
+     * load operations.
+     *
+     * @see LoadingPane#commitDelayProperty()
+     *
+     * @return the commit delay for the nested loading pane
+     */
+    public final LongProperty commitLoadStatusDelayProperty() {
+        return commitLoadStatusDelay;
+    }
+
+    public final void setCommitLoadStatusDelay(long commitLoadStatusDelay) {
+        this.commitLoadStatusDelay.set(commitLoadStatusDelay);
+    }
+
     private class LoadingService extends Service<List<T>> {
 
         @Override
@@ -238,10 +286,19 @@ public class PagingListView<T> extends PagingControlBase {
 
                 @Override
                 protected List<T> call() {
+                    try {
+                        System.out.println("sleeping " + getLoadDelayInMillis());
+                        Thread.sleep(getLoadDelayInMillis());
+                    } catch (InterruptedException e) {
+                        // do nothing
+                    }
+
                     if (!isCancelled()) {
                         Callback<LoadRequest, List<T>> loader = PagingListView.this.loader.get();
                         if (loader != null) {
 
+                            actualLoads++;
+                            System.out.println("reloads: " + reloads + ", actual loads: " + actualLoads);
                             /*
                              * Important to wrap in a list, otherwise we can get a concurrent modification
                              * exception when the result gets applied to the "items" list in the service
@@ -249,6 +306,8 @@ public class PagingListView<T> extends PagingControlBase {
                              */
                             return new ArrayList<>(loader.call(loadRequest));
                         }
+                    } else {
+                        System.out.println("was cancelled");
                     }
 
                     return Collections.emptyList();
@@ -257,10 +316,15 @@ public class PagingListView<T> extends PagingControlBase {
         }
     }
 
+    private int reloads;
+    private int actualLoads;
+
     /**
      * Triggers an explicit reload of the list view.
      */
     public final void reload() {
+        reloads++;
+        System.out.println("reloading");
         loadingService.restart();
     }
 
@@ -442,48 +506,11 @@ public class PagingListView<T> extends PagingControlBase {
         return cellFactory;
     }
 
-    public void refresh() {
+    /**
+     * Triggers a rebuild of the view without reloading data.
+     */
+    public final void refresh() {
         getProperties().remove("refresh-items");
         getProperties().put("refresh-items", true);
-    }
-
-    /**
-     * A convenience class to easily provide a loader for paging when the data is given as an
-     * observable list.
-     *
-     * @param <S> the type of the items
-     */
-    public static class SimpleLoader<S> implements Callback<LoadRequest, List<S>> {
-
-        private final ObservableList<S> data;
-        private final PagingListView<S> listView;
-
-        /**
-         * Constructs a new simple loader for the given list view and the given data.
-         *
-         * @param listView the list view where the loader will be used
-         * @param data     the observable list that is providing the data / the items
-         */
-        public SimpleLoader(PagingListView<S> listView, ObservableList<S> data) {
-            this.listView = Objects.requireNonNull(listView);
-            this.data = Objects.requireNonNull(data);
-            listView.totalItemCountProperty().bind(Bindings.size(data));
-        }
-
-        @Override
-        public List<S> call(LoadRequest param) {
-            int page = param.getPage();
-            int pageSize = param.getPageSize();
-            int offset = page * pageSize;
-            return data.subList(offset, Math.min(data.size(), offset + pageSize));
-        }
-
-        public final PagingListView<S> getListView() {
-            return listView;
-        }
-
-        public final ObservableList<S> getData() {
-            return data;
-        }
     }
 }

@@ -56,7 +56,6 @@
     -fx-background-insets: 0px;
     -fx-background-radius: 2px;
     -fx-max-height: infinity;
-    -fx-min-width: 1.5em;
 }
 
 .paging-controls > .pane > .page-buttons-container > .navigation-button:hover {
@@ -75,7 +74,7 @@
 
 .paging-controls > .pane > .page-buttons-container > .navigation-button {
     -fx-padding: 2px 5px;
-    -fx-graphic-text-gap: 10px;
+    -fx-graphic-text-gap: 5px;
 }
 
 .paging-controls > .pane > .page-buttons-container > .navigation-button.first-page-button {

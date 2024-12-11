@@ -43,6 +43,11 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
         content.getStyleClass().add("inner-content");
 
         loadingPane = new LoadingPane(content);
+
+        /*
+         * Wait at least for the time the loading service is delayed times two.
+         */
+        loadingPane.commitDelayProperty().bind(pagingListView.commitLoadStatusDelayProperty());
         loadingPane.statusProperty().bind(pagingListView.loadingStatusProperty());
 
         pagingListView.getProperties().addListener((MapChangeListener<? super Object, ? super Object>) change -> {

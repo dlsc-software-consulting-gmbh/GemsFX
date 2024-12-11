@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PagingListView;
+import com.dlsc.gemsfx.SimplePagingListView;
 import com.dlsc.gemsfx.TextView;
 import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
@@ -25,7 +26,7 @@ public class TextViewWithPagingListViewApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        PagingListView<String> listView = new PagingListView<>();
+        SimplePagingListView<String> listView = new SimplePagingListView<>();
         listView.setUsingScrollPane(false);
         listView.setPageSize(3);
         listView.setFillLastPage(false);
@@ -35,8 +36,7 @@ public class TextViewWithPagingListViewApp extends Application {
             data.add("Item " + i + "\n\nLorem ipsum dolor sit amet consectetur adipiscing elit nunc hendrerit purus, nisi dapibus primis nibh volutpat fringilla ad nisl urna pos-uere!\nCubilia sagittis egestas pharetra sociis montes nullam netus erat.\n\nFusce mauris condimentum neque morbi nunc ligula pretium vehicula nulla, platea dictum mus sapien pulvinar eget porta mi praesent, orci hac dignissim suscipit imperdiet sem per a.\nMauris pellentesque dui vitae velit netus venenatis diam felis urna ultrices, potenti pretium sociosqu eros dictumst dis aenean nibh cursus, leo sagittis integer nullam malesuada aliquet et metus vulputate. Interdum facilisis congue ac proin libero mus ullamcorper mauris leo imperdiet eleifend porta, posuere dignissim erat tincidunt vehicula habitant taciti porttitor scelerisque laoreet neque. Habitant etiam cubilia tempor inceptos ad aptent est et varius, vitae imperdiet phasellus feugiat class purus curabitur ullamcorper maecenas, venenatis mollis fusce cras leo eros metus proin. Fusce aenean sociosqu dis habitant mi sapien inceptos, orci lacinia nisi nascetur convallis at erat sociis, purus integer arcu feugiat sollicitudin libero.");
         }
 
-        listView.setLoader(new PagingListView.SimpleLoader<>(listView, data));
-
+        listView.setItems(data);
         listView.setCellFactory(lv -> new ListCell<>() {
 
             private final TextView textView = new TextView();
