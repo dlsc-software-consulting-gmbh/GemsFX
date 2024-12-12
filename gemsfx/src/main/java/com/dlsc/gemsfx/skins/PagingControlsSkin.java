@@ -257,8 +257,6 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         pageButtonsGridPane.getColumnConstraints().clear();
 
         double percentageWidth = 100d / (double) column;
-        System.out.println("column: " + column + ", percentage width: " + percentageWidth);
-
         for (int i = 0; i < column; i++) {
             ColumnConstraints con = new ColumnConstraints();
 
