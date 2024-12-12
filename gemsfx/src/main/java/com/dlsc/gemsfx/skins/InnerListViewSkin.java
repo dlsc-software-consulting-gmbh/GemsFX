@@ -115,7 +115,7 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
                 cell.updateSelected(getSkinnable().getSelectionModel().isSelected(index));
                 content.getChildren().add(cell);
 
-                if (index == pagingListView.getPageSize() - 1) {
+                if (index == endIndex - 1) {
                     cell.getStyleClass().add("last");
                 }
             }

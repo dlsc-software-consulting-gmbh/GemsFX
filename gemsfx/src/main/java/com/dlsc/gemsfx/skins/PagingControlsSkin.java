@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.PagingControls;
 import com.dlsc.gemsfx.Spacer;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.HPos;
@@ -99,10 +100,22 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         pageSizeSelectorLabel.visibleProperty().bind(pageSizeSelectorLabel.textProperty().isNotEmpty());
         pageSizeSelectorLabel.managedProperty().bind(pageSizeSelectorLabel.textProperty().isNotEmpty());
 
+        /*
+         * We do not want to see the page size selector if the page sizes shown inside the selector are all bigger
+         * than the total amount of items.
+         */
+        BooleanBinding moreItemsThanMinimumPageSize = Bindings.createBooleanBinding(() -> {
+            int smallestAvailablePageSize = view.getAvailablePageSizes().stream()
+                    .min(Integer::compareTo)
+                    .orElse(1);
+            int totalItemCount = view.getTotalItemCount();
+            return totalItemCount > smallestAvailablePageSize;
+        }, view.totalItemCountProperty(), view.availablePageSizesProperty());
+
         pageSizeSelectorContainer = new HBox(pageSizeSelectorLabel, pageSizeSelector);
         pageSizeSelectorContainer.getStyleClass().add("page-size-container");
-        pageSizeSelectorContainer.visibleProperty().bind(view.showPageSizeSelectorProperty().and(view.totalItemCountProperty().greaterThan(0)));
-        pageSizeSelectorContainer.managedProperty().bind(view.showPageSizeSelectorProperty().and(view.totalItemCountProperty().greaterThan(0)));
+        pageSizeSelectorContainer.visibleProperty().bind(view.showPageSizeSelectorProperty().and(view.totalItemCountProperty().greaterThan(0)).and(moreItemsThanMinimumPageSize));
+        pageSizeSelectorContainer.managedProperty().bind(pageSizeSelectorContainer.visibleProperty());
 
         messageLabel = new Label();
         messageLabel.getStyleClass().add("message-label");
@@ -172,6 +185,18 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         lastPageButton.disableProperty().bind(view.pageProperty().add(view.getMaxPageIndicatorsCount()).lessThan(view.getPageCount()).not());
         lastPageButton.visibleProperty().bind(view.firstLastPageDisplayModeProperty().isEqualTo(PagingControls.FirstLastPageDisplayMode.SHOW_ARROW_BUTTONS).and(view.pageCountProperty().greaterThan(1)));
         lastPageButton.setOnMouseClicked(evt -> view.setPage(view.getPageCount() - 1));
+
+        view.visibleProperty()
+                .bind(pageSizeSelectorContainer.visibleProperty()
+                        .or(pageButtonsBox.visibleProperty())
+                        .or(firstPageButton.visibleProperty())
+                        .or(previousButton.visibleProperty())
+                        .or(nextButton.visibleProperty())
+                        .or(lastPageButton.visibleProperty())
+                        .or(messageLabel.visibleProperty())
+                );
+
+        view.managedProperty().bind(view.visibleProperty());
     }
 
     private Node wrapIcon(Region region) {
