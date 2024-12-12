@@ -33,14 +33,14 @@ public class PagingListViewApp extends Application {
 
     private final BooleanProperty simulateNoData = new SimpleBooleanProperty(false);
 
-    private final IntegerProperty count = new SimpleIntegerProperty(205);
+    private final IntegerProperty count = new SimpleIntegerProperty(12);
 
     @Override
     public void start(Stage stage) {
         PagingListView<String> pagingListView = new PagingListView<>();
         pagingListView.setPrefWidth(600);
         pagingListView.totalItemCountProperty().bind(Bindings.createIntegerBinding(() -> simulateNoData.get() ? 0 : count.get(), simulateNoData, count));
-        pagingListView.setPageSize(10);
+        pagingListView.setPageSize(5);
         pagingListView.setLoader(loadRequest -> {
             if (simulateDelayProperty.get()) {
                 try {

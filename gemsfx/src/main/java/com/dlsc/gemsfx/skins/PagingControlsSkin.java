@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.PagingControlBase;
 import com.dlsc.gemsfx.PagingControls;
 import com.dlsc.gemsfx.Spacer;
 import javafx.beans.InvalidationListener;
@@ -32,6 +33,7 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
     private final IntegerProperty startPage = new SimpleIntegerProperty();
 
     private final HBox pageButtonsBox = new HBox();
+    private final BooleanBinding moreItemsThanMinimumAvailablePageSize;
 
     private Button lastPageButton;
     private Button nextButton;
@@ -44,6 +46,18 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
     public PagingControlsSkin(PagingControls view) {
         super(view);
+
+        /*
+         * We do not want to see the page size selector if the page sizes shown inside the selector are all bigger
+         * than the total amount of items.
+         */
+        moreItemsThanMinimumAvailablePageSize = Bindings.createBooleanBinding(() -> {
+            int smallestAvailablePageSize = view.getAvailablePageSizes().stream()
+                    .min(Integer::compareTo)
+                    .orElse(1);
+            int totalItemCount = view.getTotalItemCount();
+            return totalItemCount > smallestAvailablePageSize;
+        }, view.totalItemCountProperty(), view.availablePageSizesProperty());
 
         createStaticElements();
 
@@ -78,6 +92,21 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         });
 
         updateView();
+
+        BooleanBinding neededBinding = moreItemsThanMinimumAvailablePageSize.and(Bindings.createBooleanBinding(() -> {
+            if (view.getPageCount() > 1) {
+                return true;
+            }
+            if (view.getMessageLabelStrategy().equals(PagingControlBase.MessageLabelStrategy.ALWAYS_SHOW)) {
+                return true;
+            }
+            return false;
+        }, view.pageCountProperty(), view.availablePageSizesProperty(), view.messageLabelStrategyProperty()));
+
+        neededBinding.addListener(it -> {
+            view.getProperties().remove("controls.needed");
+            view.getProperties().put("controls.needed", neededBinding.get());
+        });
     }
 
     private void createStaticElements() {
@@ -102,21 +131,9 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         pageSizeSelectorLabel.visibleProperty().bind(pageSizeSelectorLabel.textProperty().isNotEmpty());
         pageSizeSelectorLabel.managedProperty().bind(pageSizeSelectorLabel.textProperty().isNotEmpty());
 
-        /*
-         * We do not want to see the page size selector if the page sizes shown inside the selector are all bigger
-         * than the total amount of items.
-         */
-        BooleanBinding moreItemsThanMinimumPageSize = Bindings.createBooleanBinding(() -> {
-            int smallestAvailablePageSize = view.getAvailablePageSizes().stream()
-                    .min(Integer::compareTo)
-                    .orElse(1);
-            int totalItemCount = view.getTotalItemCount();
-            return totalItemCount > smallestAvailablePageSize;
-        }, view.totalItemCountProperty(), view.availablePageSizesProperty());
-
         pageSizeSelectorContainer = new HBox(pageSizeSelectorLabel, pageSizeSelector);
         pageSizeSelectorContainer.getStyleClass().add("page-size-container");
-        pageSizeSelectorContainer.visibleProperty().bind(view.showPageSizeSelectorProperty().and(view.totalItemCountProperty().greaterThan(0)).and(moreItemsThanMinimumPageSize));
+        pageSizeSelectorContainer.visibleProperty().bind(view.showPageSizeSelectorProperty().and(view.totalItemCountProperty().greaterThan(0)).and(moreItemsThanMinimumAvailablePageSize));
         pageSizeSelectorContainer.managedProperty().bind(pageSizeSelectorContainer.visibleProperty());
 
         messageLabel = new Label();
@@ -187,21 +204,6 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         lastPageButton.disableProperty().bind(view.pageProperty().add(view.getMaxPageIndicatorsCount()).lessThan(view.getPageCount()).not());
         lastPageButton.visibleProperty().bind(view.firstLastPageDisplayModeProperty().isEqualTo(PagingControls.FirstLastPageDisplayMode.SHOW_ARROW_BUTTONS).and(view.pageCountProperty().greaterThan(1)));
         lastPageButton.setOnMouseClicked(evt -> view.setPage(view.getPageCount() - 1));
-
-        BooleanProperty neededBinding = new SimpleBooleanProperty();
-        neededBinding.bind(pageSizeSelectorContainer.visibleProperty()
-                .or(pageButtonsBox.visibleProperty())
-                .or(firstPageButton.visibleProperty())
-                .or(previousButton.visibleProperty())
-                .or(nextButton.visibleProperty())
-                .or(lastPageButton.visibleProperty())
-                .or(messageLabel.visibleProperty())
-        );
-
-        neededBinding.addListener(it -> {
-            view.getProperties().remove("controls.needed");
-            view.getProperties().put("controls.needed", neededBinding.get());
-        });
     }
 
     private Node wrapIcon(Region region) {
