@@ -206,7 +206,7 @@ public class EmailField extends Control {
 
     private BooleanProperty autoDomainCompletionEnabled;
 
-    public final boolean getAutoDomainCompletionEnabled() {
+    public final boolean isAutoDomainCompletionEnabled() {
         return autoDomainCompletionEnabled == null ? DEFAULT_AUTO_DOMAIN_COMPLETION_ENABLED : autoDomainCompletionEnabled.get();
     }
 

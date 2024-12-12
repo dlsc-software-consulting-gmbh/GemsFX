@@ -111,7 +111,7 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         }
 
         boolean shouldShowPopup = !exactMatch && startsWithMatch
-                && getSkinnable().getAutoDomainCompletionEnabled()
+                && getSkinnable().isAutoDomainCompletionEnabled()
                 && customTextField.isFocused();
 
         if (shouldShowPopup) {

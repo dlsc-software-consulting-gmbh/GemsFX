@@ -150,7 +150,7 @@ public class GridTableCell<S, T> extends Cell<T> {
         return this.transparent;
     }
 
-    public final boolean getTransparent() {
+    public final boolean isTransparent() {
         return transparent == null || transparent.get();
     }
 
