@@ -5,14 +5,12 @@ import com.dlsc.gemsfx.PagingListView;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -44,6 +42,8 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         pagingControls.firstLastPageDisplayModeProperty().bindBidirectional(pagingListView.firstLastPageDisplayModeProperty());
         pagingControls.firstPageDividerProperty().bindBidirectional(pagingListView.firstPageDividerProperty());
         pagingControls.maxPageIndicatorsCountProperty().bindBidirectional(pagingListView.maxPageIndicatorsCountProperty());
+        pagingControls.visibleProperty().bind(pagingControls.neededProperty());
+        pagingControls.managedProperty().bind(pagingControls.neededProperty());
 
         content.getStyleClass().add("content");
 

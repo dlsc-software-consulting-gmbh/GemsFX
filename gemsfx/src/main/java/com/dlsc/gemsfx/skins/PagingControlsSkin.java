@@ -5,7 +5,9 @@ import com.dlsc.gemsfx.Spacer;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
@@ -186,17 +188,20 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         lastPageButton.visibleProperty().bind(view.firstLastPageDisplayModeProperty().isEqualTo(PagingControls.FirstLastPageDisplayMode.SHOW_ARROW_BUTTONS).and(view.pageCountProperty().greaterThan(1)));
         lastPageButton.setOnMouseClicked(evt -> view.setPage(view.getPageCount() - 1));
 
-        view.visibleProperty()
-                .bind(pageSizeSelectorContainer.visibleProperty()
-                        .or(pageButtonsBox.visibleProperty())
-                        .or(firstPageButton.visibleProperty())
-                        .or(previousButton.visibleProperty())
-                        .or(nextButton.visibleProperty())
-                        .or(lastPageButton.visibleProperty())
-                        .or(messageLabel.visibleProperty())
-                );
+        BooleanProperty neededBinding = new SimpleBooleanProperty();
+        neededBinding.bind(pageSizeSelectorContainer.visibleProperty()
+                .or(pageButtonsBox.visibleProperty())
+                .or(firstPageButton.visibleProperty())
+                .or(previousButton.visibleProperty())
+                .or(nextButton.visibleProperty())
+                .or(lastPageButton.visibleProperty())
+                .or(messageLabel.visibleProperty())
+        );
 
-        view.managedProperty().bind(view.visibleProperty());
+        neededBinding.addListener(it -> {
+            view.getProperties().remove("controls.needed");
+            view.getProperties().put("controls.needed", neededBinding.get());
+        });
     }
 
     private Node wrapIcon(Region region) {
