@@ -1,7 +1,7 @@
 .loading-pane {
 }
 
-.loading-pane > .error-label {
+.loading-pane > .error-pane > .error-label {
     -fx-text-fill: red;
     -fx-alignment: center;
     -fx-content-display: top;
@@ -9,7 +9,7 @@
     -fx-text-alignment: center;
 }
 
-.loading-pane > .error-label .icon {
+.loading-pane > .error-pane > .error-label .icon {
     -size: 1.5em;
     -fx-min-width: -size;
     -fx-min-height: -size;

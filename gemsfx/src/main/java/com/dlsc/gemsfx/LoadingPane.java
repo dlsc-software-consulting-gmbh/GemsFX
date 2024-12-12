@@ -2,6 +2,7 @@ package com.dlsc.gemsfx;
 
 import javafx.application.Platform;
 import javafx.beans.DefaultProperty;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
@@ -85,7 +86,6 @@ public class LoadingPane extends StackPane {
         Label errorLabel = new Label();
         errorLabel.getStyleClass().add("error-label");
         errorLabel.setGraphic(icon);
-        errorLabel.visibleProperty().bind(committedStatus.isEqualTo(Status.ERROR));
         errorLabel.textProperty().bind(errorProperty());
 
         setErrorNode(errorLabel);
@@ -117,7 +117,9 @@ public class LoadingPane extends StackPane {
             }
         });
 
-        progressIndicator.addListener(it -> updateView());
+        InvalidationListener updateViewListener = it -> updateView();
+        progressIndicator.addListener(updateViewListener);
+        errorNodeProperty().addListener(updateViewListener);
         updateView();
 
         updatePseudoClass(null, committedStatus.get());
@@ -132,6 +134,11 @@ public class LoadingPane extends StackPane {
     public LoadingPane(Node node) {
         this();
         setContent(node);
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(LoadingPane.class.getResource("loading-pane.css")).toExternalForm();
     }
 
     private void updateView() {
@@ -162,9 +169,9 @@ public class LoadingPane extends StackPane {
 
             if (newNode != null) {
                 newNode.visibleProperty().bind(committedStatus.isEqualTo(Status.OK));
-                getChildren().setAll(newNode, indicatorWrapper, getErrorNode());
+                getChildren().setAll(newNode, indicatorWrapper, wrapErrorNode(getErrorNode()));
             } else {
-                getChildren().setAll(indicatorWrapper, getErrorNode());
+                getChildren().setAll(indicatorWrapper, wrapErrorNode(getErrorNode()));
             }
         });
 
@@ -172,9 +179,11 @@ public class LoadingPane extends StackPane {
         sizeProperty().addListener((obs, oldSize, newSize) -> updatePseudoClass(oldSize, newSize));
     }
 
-    @Override
-    public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(LoadingPane.class.getResource("loading-pane.css")).toExternalForm();
+    private Node wrapErrorNode(Node errorNode) {
+        StackPane errorWrapper = new StackPane(errorNode);
+        errorWrapper.getStyleClass().add("error-pane");
+        errorWrapper.visibleProperty().bind(committedStatus.isEqualTo(Status.ERROR));
+        return errorWrapper;
     }
 
     private final ObjectProperty<Node> errorNode = new SimpleObjectProperty<>(this, "errorNode");
