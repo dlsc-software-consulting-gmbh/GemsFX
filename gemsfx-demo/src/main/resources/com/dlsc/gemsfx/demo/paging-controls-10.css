@@ -2,11 +2,15 @@
     -fx-background-color: white;
 }
 
-.paging-controls > .pane > .page-buttons-container {
+.paging-controls > .pane > .buttons-container {
     -fx-spacing: 10px;
 }
 
-.paging-controls > .pane > .page-buttons-container > .button {
+.paging-controls > .pane > .buttons-container > .grid-pane {
+    -fx-hgap: 10px;
+}
+
+.paging-controls > .pane .element {
     -fx-background-color: transparent;
     -fx-border-color: lightgrey;
     -fx-border-width: 1px;
@@ -16,13 +20,22 @@
     -fx-text-fill: -fx-text-base-color;
 }
 
-.paging-controls > .pane > .page-buttons-container > .button:hover {
+.paging-controls > .pane .button:hover {
     -fx-text-fill: -fx-text-base-color;
 }
 
-.paging-controls > .pane > .page-buttons-container > .button.current {
+.paging-controls > .pane .button.current {
     -fx-background-color: black;
     -fx-background-radius: 4px;
     -fx-border-color: transparent;
     -fx-text-fill: white;
+}
+
+.paging-controls > .pane > .page-size-container > .page-size-label {
+    -fx-font-size: 1.5em;
+    -fx-padding: 0px 20px;
+}
+
+.paging-controls > .pane > .message-label {
+    -fx-font-size: 1.5em;
 }

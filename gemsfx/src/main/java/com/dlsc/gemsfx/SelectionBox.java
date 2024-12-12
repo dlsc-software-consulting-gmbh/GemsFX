@@ -450,7 +450,7 @@ public class SelectionBox<T> extends Control {
         return showExtraButtons;
     }
 
-    public final boolean getShowExtraButtons() {
+    public final boolean isShowExtraButtons() {
         return showExtraButtons == null ? DEFAULT_SHOW_EXTRA_BUTTON : showExtraButtons.get();
     }
 

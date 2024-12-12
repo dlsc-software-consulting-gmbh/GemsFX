@@ -2,11 +2,11 @@
     -fx-background-color: white;
 }
 
-.paging-controls > .pane > .page-buttons-container {
+.paging-controls > .pane > .buttons-container {
     -fx-spacing: 5px;
 }
 
-.paging-controls > .pane > .page-buttons-container > .button {
+.paging-controls > .pane .element {
     -fx-background-color:
             #c3c4c4,
             linear-gradient(#d6d6d6 50%, white 100%),
@@ -15,9 +15,14 @@
     -fx-background-insets: 0,1,1;
     -fx-text-fill: black;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+    -fx-min-width: 2em;
 }
 
-.paging-controls > .pane > .page-buttons-container > .button:current {
+.paging-controls > .pane > .buttons-container > .grid-pane {
+    -fx-hgap: 5px;
+}
+
+.paging-controls > .pane .element:current {
     -fx-background-color:
             red,
             linear-gradient(red 50%, white 100%),
@@ -28,14 +33,14 @@
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
 }
 
-.paging-controls > .pane > .page-buttons-container > .navigation-button {
+.paging-controls > .pane > .buttons-container > .navigation-button {
     -fx-content-display: graphic-only;
 }
 
-.paging-controls > .pane > .page-buttons-container > .navigation-button.previous-page-button  > .icon-wrapper > .icon {
+.paging-controls > .pane > .buttons-container > .navigation-button.previous-page-button  > .icon-wrapper > .icon {
     -fx-translate-x: -1;
 }
 
-.paging-controls > .pane > .page-buttons-container > .navigation-button.next-page-button  > .icon-wrapper > .icon {
+.paging-controls > .pane > .buttons-container > .navigation-button.next-page-button  > .icon-wrapper > .icon {
     -fx-translate-x: 1;
 }

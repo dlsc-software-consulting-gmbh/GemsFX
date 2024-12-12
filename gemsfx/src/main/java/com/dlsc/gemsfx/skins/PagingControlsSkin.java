@@ -9,10 +9,15 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.SkinBase;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -30,11 +35,14 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
     private Button previousButton;
     private Button firstPageButton;
     private Label messageLabel;
+    private HBox pageSizeSelectorContainer;
+    private GridPane pageButtonsGridPane;
+    private int column;
 
     public PagingControlsSkin(PagingControls view) {
         super(view);
 
-        createButtons();
+        createStaticElements();
 
         pageButtonsBox.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
         pageButtonsBox.managedProperty().bind(view.pageCountProperty().greaterThan(1));
@@ -43,10 +51,13 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
         view.pageProperty().addListener(buildViewListener);
         view.pageCountProperty().addListener(buildViewListener);
+        view.pageSizeProperty().addListener(buildViewListener);
+        view.showPageSizeSelectorProperty().addListener(buildViewListener);
         view.maxPageIndicatorsCountProperty().addListener(buildViewListener);
         view.firstLastPageDisplayModeProperty().addListener(buildViewListener);
         view.alignmentProperty().addListener(buildViewListener);
         view.firstPageDividerProperty().addListener(buildViewListener);
+        view.sameWidthPageButtonsProperty().addListener(buildViewListener);
 
         startPage.addListener(buildViewListener);
 
@@ -66,11 +77,36 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         updateView();
     }
 
-    private void createButtons() {
+    private void createStaticElements() {
         PagingControls view = getSkinnable();
+
+        pageButtonsGridPane = new GridPane();
+        pageButtonsGridPane.getStyleClass().add("grid-pane");
+        pageButtonsBox.getChildren().add(pageButtonsGridPane);
+
+        ChoiceBox<Integer> pageSizeSelector = new ChoiceBox<>();
+        pageSizeSelector.getStyleClass().addAll("element", "page-size-choice-box");
+        pageSizeSelector.setMinWidth(Region.USE_PREF_SIZE);
+        pageSizeSelector.setItems(view.availablePageSizesProperty());
+        pageSizeSelector.setValue(view.getPageSize());
+        pageSizeSelector.valueProperty().addListener(it -> view.setPageSize(pageSizeSelector.getValue()));
+        view.pageSizeProperty().addListener(it -> pageSizeSelector.setValue(view.getPageSize()));
+
+        Label pageSizeSelectorLabel = new Label();
+        pageSizeSelectorLabel.getStyleClass().add("page-size-label");
+        pageSizeSelectorLabel.setMinWidth(Region.USE_PREF_SIZE);
+        pageSizeSelectorLabel.textProperty().bind(view.pageSizeSelectorLabelProperty());
+        pageSizeSelectorLabel.visibleProperty().bind(pageSizeSelectorLabel.textProperty().isNotEmpty());
+        pageSizeSelectorLabel.managedProperty().bind(pageSizeSelectorLabel.textProperty().isNotEmpty());
+
+        pageSizeSelectorContainer = new HBox(pageSizeSelectorLabel, pageSizeSelector);
+        pageSizeSelectorContainer.getStyleClass().add("page-size-container");
+        pageSizeSelectorContainer.visibleProperty().bind(view.showPageSizeSelectorProperty().and(view.totalItemCountProperty().greaterThan(0)));
+        pageSizeSelectorContainer.managedProperty().bind(view.showPageSizeSelectorProperty().and(view.totalItemCountProperty().greaterThan(0)));
 
         messageLabel = new Label();
         messageLabel.getStyleClass().add("message-label");
+        messageLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
         messageLabel.textProperty().bind(Bindings.createStringBinding(() -> view.getMessageLabelProvider().call(view), view.messageLabelProviderProperty(), view.totalItemCountProperty(), view.pageProperty(), view.pageSizeProperty(), view.pageCountProperty()));
         messageLabel.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
             PagingControls.MessageLabelStrategy messageLabelStrategy = view.getMessageLabelStrategy();
@@ -152,14 +188,14 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         HPos alignment = view.getAlignment();
 
         if (alignment.equals(HPos.CENTER)) {
-            pane = new VBox(pageButtonsBox, messageLabel);
+            pane = new VBox(pageButtonsBox, messageLabel, pageSizeSelectorContainer);
             pane.getStyleClass().add("vertical");
         } else {
             pane = new HBox();
             if (alignment.equals(HPos.RIGHT)) {
-                pane.getChildren().setAll(messageLabel, new Spacer(), pageButtonsBox);
+                pane.getChildren().setAll(messageLabel, new Spacer(), pageSizeSelectorContainer, pageButtonsBox);
             } else {
-                pane.getChildren().setAll(pageButtonsBox, new Spacer(), messageLabel);
+                pane.getChildren().setAll(pageButtonsBox, pageSizeSelectorContainer, new Spacer(), messageLabel);
             }
             pane.getStyleClass().add("horizontal");
         }
@@ -168,11 +204,11 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
         getChildren().setAll(pane);
 
-        pageButtonsBox.getStyleClass().add("page-buttons-container");
+        pageButtonsBox.getStyleClass().add("buttons-container");
         pageButtonsBox.setMaxWidth(Region.USE_PREF_SIZE);
         pageButtonsBox.managedProperty().bind(pageButtonsBox.visibleProperty());
 
-        pageButtonsBox.getChildren().setAll(firstPageButton, previousButton);
+        pageButtonsBox.getChildren().setAll(firstPageButton, previousButton, pageButtonsGridPane);
 
         int startIndex = startPage.get();
         int endIndex = Math.min(view.getPageCount(), startIndex + view.getMaxPageIndicatorsCount());
@@ -181,9 +217,31 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
             startIndex = Math.max(0, endIndex - view.getMaxPageIndicatorsCount());
         }
 
+        column = 0;
+        pageButtonsGridPane.getChildren().clear();
+
         addFirstPageButton(view, startIndex);
         addPageButtons(startIndex, endIndex, view);
         addLastPageButton(view, endIndex);
+
+        pageButtonsGridPane.getColumnConstraints().clear();
+
+        double percentageWidth = 100d / (double) column;
+        System.out.println("column: " + column + ", percentage width: " + percentageWidth);
+
+        for (int i = 0; i < column; i++) {
+            ColumnConstraints con = new ColumnConstraints();
+
+            if (view.isSameWidthPageButtons()) {
+                con.setPercentWidth(percentageWidth);
+            } else {
+                con.setMinWidth(Region.USE_PREF_SIZE);
+                con.setPrefWidth(Region.USE_COMPUTED_SIZE);
+                con.setMaxWidth(Region.USE_PREF_SIZE);
+            }
+
+            pageButtonsGridPane.getColumnConstraints().add(con);
+        }
 
         pageButtonsBox.getChildren().addAll(nextButton, lastPageButton);
 
@@ -196,11 +254,10 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         for (pageIndex = startIndex; pageIndex < endIndex; pageIndex++) {
             Button pageButton = createPageButton(pageIndex);
             pageButton.setFocusTraversable(false);
-            pageButton.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
             if (pageIndex == view.getPage()) {
                 pageButton.getStyleClass().add("current");
             }
-            pageButtonsBox.getChildren().add(pageButton);
+            addToGridPane(pageButton);
         }
     }
 
@@ -213,7 +270,8 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
             Node dividerNode = view.getLastPageDivider();
             dividerNode.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
             dividerNode.setFocusTraversable(false);
-            pageButtonsBox.getChildren().addAll(dividerNode, pageButton);
+            addToGridPane(dividerNode);
+            addToGridPane(pageButton);
         }
     }
 
@@ -226,13 +284,23 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
             Node dividerNode = view.getFirstPageDivider();
             dividerNode.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
             dividerNode.setFocusTraversable(false);
-            pageButtonsBox.getChildren().addAll(pageButton, dividerNode);
+            addToGridPane(pageButton);
+            addToGridPane(dividerNode);
         }
+    }
+
+    private void addToGridPane(Node node) {
+        pageButtonsGridPane.add(node, column, 0);
+        GridPane.setHgrow(node, Priority.ALWAYS);
+        GridPane.setVgrow(node, Priority.ALWAYS);
+        GridPane.setFillHeight(node, true);
+        column++;
     }
 
     protected Button createPageButton(int page) {
         Button pageButton = new Button(Integer.toString(page + 1));
         pageButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        pageButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         pageButton.getStyleClass().addAll("element", PAGE_BUTTON);
         pageButton.setOnAction(evt -> getSkinnable().setPage(page));
         return pageButton;

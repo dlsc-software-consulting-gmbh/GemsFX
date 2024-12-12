@@ -27,12 +27,18 @@ public class PagingControlsSettingsView extends VBox {
         Label pageCountLabel = new Label();
         pageCountLabel.textProperty().bind(Bindings.createStringBinding(() -> "Page count: " + pagingControls.getPageCount(), pagingControls.pageCountProperty()));
 
+        Label pageSizeLabel = new Label();
+        pageSizeLabel.textProperty().bind(Bindings.createStringBinding(() -> "Page size: " + pagingControls.getPageSize(), pagingControls.pageSizeProperty()));
+
         ChoiceBox<PagingControls.FirstLastPageDisplayMode> firstLastPageDisplayModeBox = new ChoiceBox<>();
         firstLastPageDisplayModeBox.getItems().setAll(PagingControls.FirstLastPageDisplayMode.values());
         firstLastPageDisplayModeBox.valueProperty().bindBidirectional(pagingControls.firstLastPageDisplayModeProperty());
 
         CheckBox showPreviousNextButton = new CheckBox("Show prev / next buttons");
         showPreviousNextButton.selectedProperty().bindBidirectional(pagingControls.showPreviousNextPageButtonProperty());
+
+        CheckBox showPageSizeSelector = new CheckBox("Show page size selector");
+        showPageSizeSelector.selectedProperty().bindBidirectional(pagingControls.showPageSizeSelectorProperty());
 
         ChoiceBox<PagingControlBase.MessageLabelStrategy> strategyChoiceBox = new ChoiceBox<>();
         strategyChoiceBox.getItems().addAll(PagingControlBase.MessageLabelStrategy.values());
@@ -48,6 +54,9 @@ public class PagingControlsSettingsView extends VBox {
         maxPageIndicatorsBox.setValue(pagingControls.getMaxPageIndicatorsCount());
         maxPageIndicatorsBox.valueProperty().addListener(it -> pagingControls.setMaxPageIndicatorsCount(maxPageIndicatorsBox.getValue()));
 
+        CheckBox sameWidthButtonsBox = new CheckBox("Same width page buttons");
+        sameWidthButtonsBox.selectedProperty().bindBidirectional(pagingControls.sameWidthPageButtonsProperty());
+
         HBox displayModeBox = new HBox(5, new Label("First / last buttons: "), firstLastPageDisplayModeBox);
         displayModeBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -57,7 +66,8 @@ public class PagingControlsSettingsView extends VBox {
         HBox indicatorBox = new HBox(5, new Label("# Indicators: "), maxPageIndicatorsBox);
         indicatorBox.setAlignment(Pos.CENTER_LEFT);
 
-        FlowPane flowPane = new FlowPane(pageLabel, pageCountLabel, new Spacer(), showPreviousNextButton, displayModeBox, strategyBox, indicatorBox);
+        FlowPane flowPane = new FlowPane(pageLabel, pageSizeLabel, pageCountLabel, new Spacer(), showPreviousNextButton, showPageSizeSelector, sameWidthButtonsBox,
+                displayModeBox, strategyBox, indicatorBox);
         flowPane.setVgap(10);
         flowPane.setHgap(20);
 

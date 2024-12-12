@@ -2,7 +2,7 @@
     -fx-background-color: white;
 }
 
-.paging-controls > .pane > .page-buttons-container > .element {
+.paging-controls > .pane .element {
     -fx-background-color:
             linear-gradient(#f0ff35, #a9ff00),
             radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);

@@ -3,14 +3,18 @@ package com.dlsc.gemsfx;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
@@ -90,9 +94,96 @@ public abstract class PagingControlBase extends Control {
         });
     }
 
+    private final StringProperty pageSizeSelectorLabel = new SimpleStringProperty(this, "pageSizeSelectorLabel", "Results per page");
+
+    public final String getPageSizeSelectorLabel() {
+        return pageSizeSelectorLabel.get();
+    }
+
+    /**
+     * The text / label shown in front of the page size selector control.
+     *
+     * @see #showPageSizeSelectorProperty()
+     * @see #availablePageSizesProperty()
+     *
+     * @return the label property for the page size selector
+     */
+    public final StringProperty pageSizeSelectorLabelProperty() {
+        return pageSizeSelectorLabel;
+    }
+
+    public final void setPageSizeSelectorLabel(String pageSizeSelectorLabel) {
+        this.pageSizeSelectorLabel.set(pageSizeSelectorLabel);
+    }
+
+    private final ListProperty<Integer> availablePageSizes = new SimpleListProperty<>(this, "availablePageSizes", FXCollections.observableArrayList(5, 10, 15, 20, 30, 40, 50));
+
+    public final ObservableList<Integer> getAvailablePageSizes() {
+        return availablePageSizes.get();
+    }
+
+    /**
+     * A list of available page sizes that will be shown by the page size selector.
+     *
+     * @see #showPageSizeSelectorProperty()
+     * @see #pageSizeSelectorLabelProperty()
+     *
+     * @return a list of available page sizes
+     */
+    public final ListProperty<Integer> availablePageSizesProperty() {
+        return availablePageSizes;
+    }
+
+    public final void setAvailablePageSizes(ObservableList<Integer> availablePageSizes) {
+        this.availablePageSizes.set(availablePageSizes);
+    }
+
+    private final BooleanProperty showPageSizeSelector = new SimpleBooleanProperty(this, "showPageSizeSelector", true);
+
+    public final boolean isShowPageSizeSelector() {
+        return showPageSizeSelector.get();
+    }
+
+    /**
+     * Determines if the control will show a selector UI for choosing different page sizes.
+     *
+     * @see #availablePageSizesProperty()
+     * @see #pageSizeSelectorLabelProperty()
+     *
+     * @return a flag used to determine if the page size selector should be shown or not
+     */
+    public final BooleanProperty showPageSizeSelectorProperty() {
+        return showPageSizeSelector;
+    }
+
+    public final void setShowPageSizeSelector(boolean showPageSizeSelector) {
+        this.showPageSizeSelector.set(showPageSizeSelector);
+    }
+
+    private final BooleanProperty sameWidthPageButtons = new SimpleBooleanProperty(this, "sameWidthPageButtons", false);
+
+    public final boolean isSameWidthPageButtons() {
+        return sameWidthPageButtons.get();
+    }
+
+    /**
+     * A flag used to signal whether the individual page buttons will all have the same width or if their
+     * width can be different based on the page number that they are showing (e.g. the button for page "1" would
+     * be substantially less wide than the button for page "999").
+     *
+     * @return a flag to control the width of the page buttons
+     */
+    public final BooleanProperty sameWidthPageButtonsProperty() {
+        return sameWidthPageButtons;
+    }
+
+    public final void setSameWidthPageButtons(boolean sameWidthPageButtons) {
+        this.sameWidthPageButtons.set(sameWidthPageButtons);
+    }
+
     private final BooleanProperty showPreviousNextPageButton = new SimpleBooleanProperty(this, "showPreviousNextButton", true);
 
-    public final boolean getShowPreviousNextPageButton() {
+    public final boolean isShowPreviousNextPageButton() {
         return showPreviousNextPageButton.get();
     }
 
