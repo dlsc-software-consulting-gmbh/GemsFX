@@ -136,4 +136,19 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
     protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return loadingPane.maxHeight(width) + topInset + bottomInset;
     }
+
+    @Override
+    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return loadingPane.minWidth(height) + leftInset + rightInset;
+    }
+
+    @Override
+    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return loadingPane.prefWidth(height) + leftInset + rightInset;
+    }
+
+    @Override
+    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return loadingPane.maxWidth(height) + leftInset + rightInset;
+    }
 }
