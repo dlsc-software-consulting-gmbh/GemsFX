@@ -40,6 +40,11 @@ public class DateRangeView extends Control {
 
         selectionModel = new SelectionModel();
         selectionModel.setSelectionMode(SelectionModel.SelectionMode.DATE_RANGE);
+        selectionModel.selectionModeProperty().addListener(it -> {
+            if (selectionModel.getSelectionMode() != SelectionModel.SelectionMode.DATE_RANGE) {
+                throw new UnsupportedOperationException("SINGLE_DATE and MULTIPLE_DATES modes are not supported");
+            }
+        });
 
         startCalendarView = getStartCalendarView();
         startCalendarView.setSelectionModel(selectionModel);
