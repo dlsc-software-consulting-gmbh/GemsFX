@@ -32,13 +32,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PagingListView<T> extends PagingControlBase {
 
     private final LoadingService loadingService = new LoadingService();
 
-    private final ObservableList<T> items = FXCollections.observableArrayList(new CopyOnWriteArrayList<>());
+    private final ObservableList<T> items = FXCollections.observableArrayList();
 
     private final ObservableList<T> unmodifiableItems = FXCollections.unmodifiableObservableList(items);
 
