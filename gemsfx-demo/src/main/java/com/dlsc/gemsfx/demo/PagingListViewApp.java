@@ -73,6 +73,9 @@ public class PagingListViewApp extends Application {
         CheckBox simulateDelay = new CheckBox("Simulate delay");
         simulateDelay.selectedProperty().bindBidirectional(simulateDelayProperty);
 
+        CheckBox showPagingControls = new CheckBox("Show paging controls");
+        showPagingControls.selectedProperty().bindBidirectional(pagingListView.showPagingControlsProperty());
+
         ComboBox<Side> location = new ComboBox<>();
         location.getItems().addAll(Side.TOP, Side.BOTTOM);
         location.valueProperty().bindBidirectional(pagingListView.pagingControlsLocationProperty());
@@ -86,7 +89,7 @@ public class PagingListViewApp extends Application {
         Button increaseItemCount = new Button("Increase Count");
         increaseItemCount.setOnAction(evt -> count.set(count.get() + 1));
 
-        HBox settingsBox = new HBox(10, fillBox, simulateDelay, new Label("Location"), location, clearSetData, reduceItemCount, increaseItemCount);
+        HBox settingsBox = new HBox(10, fillBox, simulateDelay, showPagingControls, location, clearSetData, reduceItemCount, increaseItemCount);
         settingsBox.setAlignment(Pos.CENTER_LEFT);
 
         VBox box = new VBox(20, pagingListView, settingsBox, new PagingControlsSettingsView(pagingListView), scenicView);

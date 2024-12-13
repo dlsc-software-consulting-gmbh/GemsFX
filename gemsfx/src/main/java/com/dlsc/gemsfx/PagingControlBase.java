@@ -224,7 +224,7 @@ public abstract class PagingControlBase extends Control {
         ALWAYS_SHOW
     }
 
-    private final ObjectProperty<PagingControls.MessageLabelStrategy> messageLabelStrategy = new SimpleObjectProperty<>(this, "messageLabelStrategy", PagingControls.MessageLabelStrategy.SHOW_WHEN_NEEDED);
+    private final ObjectProperty<PagingControls.MessageLabelStrategy> messageLabelStrategy = new SimpleObjectProperty<>(this, "messageLabelStrategy", MessageLabelStrategy.ALWAYS_SHOW);
 
     public final PagingControls.MessageLabelStrategy getMessageLabelStrategy() {
         return messageLabelStrategy.get();

@@ -41,9 +41,8 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         pagingControls.alignmentProperty().bindBidirectional(pagingListView.alignmentProperty());
         pagingControls.firstLastPageDisplayModeProperty().bindBidirectional(pagingListView.firstLastPageDisplayModeProperty());
         pagingControls.firstPageDividerProperty().bindBidirectional(pagingListView.firstPageDividerProperty());
-        pagingControls.maxPageIndicatorsCountProperty().bindBidirectional(pagingListView.maxPageIndicatorsCountProperty());
-        pagingControls.visibleProperty().bind(pagingControls.neededProperty());
-        pagingControls.managedProperty().bind(pagingControls.neededProperty());
+        pagingControls.visibleProperty().bind(pagingControls.neededProperty().and(pagingListView.showPagingControlsProperty()));
+        pagingControls.managedProperty().bind(pagingControls.neededProperty().and(pagingListView.showPagingControlsProperty()));
 
         content.getStyleClass().add("content");
 
