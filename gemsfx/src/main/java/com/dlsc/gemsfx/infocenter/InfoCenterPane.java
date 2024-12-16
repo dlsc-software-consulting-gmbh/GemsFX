@@ -16,7 +16,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
-import one.jpro.jproutils.treeshowing.TreeShowing;
+import one.jpro.platform.utils.TreeShowing;
 
 /**
  * A pane used for managing a single instance of {@link InfoCenterView}. The pane will show or

@@ -7,10 +7,8 @@ open module com.dlsc.gemsfx.demo {
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
 
-    requires javafx.web;
-    requires javafx.controls;
-
-    requires com.sandec.mdfx;
+    requires one.jpro.platform.utils;
+    requires one.jpro.platform.mdfx;
 
     requires org.scenicview.scenicview;
     requires org.controlsfx.controls;

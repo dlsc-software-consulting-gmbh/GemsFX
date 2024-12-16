@@ -3,7 +3,8 @@ package com.dlsc.gemsfx.util;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import one.jpro.jproutils.treeshowing.TreeShowing;
+import one.jpro.platform.utils.TreeShowing;
+
 import java.util.Objects;
 
 public class FocusUtil {

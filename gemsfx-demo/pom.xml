@@ -107,13 +107,6 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>sandec</id>
-            <url>https://sandec.jfrog.io/artifactory/repo</url>
-        </repository>
-    </repositories>
-
     <dependencies>
 
         <dependency>
@@ -123,9 +116,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sandec</groupId>
-            <artifactId>mdfx</artifactId>
-            <version>0.2.12</version>
+            <groupId>one.jpro.platform</groupId>
+            <artifactId>jpro-mdfx</artifactId>
         </dependency>
 
         <dependency>

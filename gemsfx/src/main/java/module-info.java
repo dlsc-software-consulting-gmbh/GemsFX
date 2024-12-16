@@ -5,7 +5,7 @@ open module com.dlsc.gemsfx {
     requires javafx.swing;
     requires com.github.weisj.jsvg;
 
-    requires jpro.utils.treeshowing;
+    requires one.jpro.platform.utils;
 
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign;
