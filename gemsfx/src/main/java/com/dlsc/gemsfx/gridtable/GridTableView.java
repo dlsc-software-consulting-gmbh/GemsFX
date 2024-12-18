@@ -1,13 +1,16 @@
 package com.dlsc.gemsfx.gridtable;
 
+import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.skins.GridTableViewSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,6 +18,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
@@ -29,6 +34,12 @@ public class GridTableView<S> extends Control {
 
     public GridTableView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        setFocusTraversable(true);
+        addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+            if (evt.getButton() == MouseButton.PRIMARY && evt.isStillSincePress() && evt.getClickCount() == 1) {
+                requestFocus();
+            }
+        });
     }
 
     @Override
@@ -103,5 +114,59 @@ public class GridTableView<S> extends Control {
 
     public final void setMinNumberOfRows(int minNumberOfRows) {
         this.minNumberOfRows.set(minNumberOfRows);
+    }
+
+    // loading status
+
+    private final ObjectProperty<LoadingPane.Status> loadingStatus = new SimpleObjectProperty<>(this, "loadingStatus", LoadingPane.Status.OK);
+
+    public final LoadingPane.Status getLoadingStatus() {
+        return loadingStatus.get();
+    }
+
+    /**
+     * The loading status used for the wrapped {@link LoadingPane}. The loading pane will appear if the
+     * loader takes a long time to return the new page items.
+     *
+     * @return the loading status
+     */
+    public final ObjectProperty<LoadingPane.Status> loadingStatusProperty() {
+        return loadingStatus;
+    }
+
+    public final void setLoadingStatus(LoadingPane.Status loadingStatus) {
+        this.loadingStatus.set(loadingStatus);
+    }
+
+    // commit load status delay
+
+    private final LongProperty commitLoadStatusDelay = new SimpleLongProperty(this, "commitLoadStatusDelay", 400L);
+
+    public final long getCommitLoadStatusDelay() {
+        return commitLoadStatusDelay.get();
+    }
+
+    /**
+     * The delay in milliseconds before the list view will display the progress indicator for long running
+     * load operations.
+     *
+     * @see LoadingPane#commitDelayProperty()
+     *
+     * @return the commit delay for the nested loading pane
+     */
+    public final LongProperty commitLoadStatusDelayProperty() {
+        return commitLoadStatusDelay;
+    }
+
+    public final void setCommitLoadStatusDelay(long commitLoadStatusDelay) {
+        this.commitLoadStatusDelay.set(commitLoadStatusDelay);
+    }
+
+    /**
+     * Triggers a rebuild of the view without reloading data.
+     */
+    public final void refresh() {
+        getProperties().remove("refresh-items");
+        getProperties().put("refresh-items", true);
     }
 }

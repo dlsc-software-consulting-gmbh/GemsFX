@@ -6,6 +6,8 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -66,8 +68,6 @@ public class LoadingPane extends StackPane {
     }
 
     private CommitStatusThread commitStatusThread;
-
-    private final ObjectProperty<Status> committedStatus = new SimpleObjectProperty<>(this, "committedStatus", Status.OK);
 
     /**
      * Constructs a new loading pane.
@@ -184,6 +184,23 @@ public class LoadingPane extends StackPane {
         errorWrapper.getStyleClass().add("error-pane");
         errorWrapper.visibleProperty().bind(committedStatus.isEqualTo(Status.ERROR));
         return errorWrapper;
+    }
+
+    private final ReadOnlyObjectWrapper<Status> committedStatus = new ReadOnlyObjectWrapper<>(this, "committedStatus", Status.OK);
+
+    public final Status getCommittedStatus() {
+        return committedStatus.get();
+    }
+
+    /**
+     * A read-only property that contains the "committed" status value. Applications request a status property
+     * change via the {@link #statusProperty()} which will be delayed via the {@link #commitDelayProperty()}. Once the
+     * delay has passed the control will updated this property.
+     *
+     * @return the read-only property storing the committed status
+     */
+    public final ReadOnlyObjectProperty<Status> committedStatusProperty() {
+        return committedStatus.getReadOnlyProperty();
     }
 
     private final ObjectProperty<Node> errorNode = new SimpleObjectProperty<>(this, "errorNode");

@@ -1,33 +1,46 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.gridtable.GridTableCell;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
 import com.dlsc.gemsfx.gridtable.GridTableView;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import org.controlsfx.control.spreadsheet.Grid;
+
+import java.util.Objects;
 
 /**
  * @param <S> grid table item type
  */
 public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
 
-    private final ListChangeListener listChangeListener = c -> updateView();
-
     private final GridPane gridPane = new GridPane();
+
+    // dummy region
+    private final LoadingPane loadingPane = new LoadingPane(new Region()) {
+        @Override
+        public String getUserAgentStylesheet() {
+            return Objects.requireNonNull(GridTableView.class.getResource("grid-table-view.css")).toExternalForm();
+        }
+    };
 
     public GridTableViewSkin(GridTableView<S> tableView) {
         super(tableView);
 
+        ListChangeListener<S> listChangeListener = c -> updateView();
         tableView.itemsProperty().addListener(listChangeListener);
 
         Bindings.bindContent(gridPane.getColumnConstraints(), tableView.columnsProperty());
@@ -37,6 +50,24 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
 
         getChildren().add(gridPane);
 
+        tableView.getProperties().addListener((MapChangeListener<? super Object, ? super Object>) change -> {
+            if (change.wasAdded()) {
+                if (change.getKey().equals("refresh-items")) {
+                    updateView();
+                }
+            }
+        });
+
+        loadingPane.statusProperty().bindBidirectional(tableView.loadingStatusProperty());
+        loadingPane.commitDelayProperty().bindBidirectional(tableView.commitLoadStatusDelayProperty());
+        loadingPane.visibleProperty().bind(loadingPane.committedStatusProperty().isNotEqualTo(LoadingPane.Status.OK));
+        loadingPane.managedProperty().bind(loadingPane.committedStatusProperty().isNotEqualTo(LoadingPane.Status.OK));
+
+        GridPane.setHgrow(loadingPane, Priority.ALWAYS);
+        GridPane.setVgrow(loadingPane, Priority.ALWAYS);
+        GridPane.setFillHeight(loadingPane, true);
+        GridPane.setFillWidth(loadingPane, true);
+
         updateView();
     }
 
@@ -44,6 +75,8 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
         gridPane.getChildren().clear();
         createHeader();
         createBody();
+        gridPane.add(loadingPane, 0, 1); // row 1, still show the headers
+        loadingPane.toFront();
     }
 
     private void createHeader() {
@@ -56,6 +89,8 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
         headerBackground.getStyleClass().addAll("column-header-background");
         GridPane.setColumnSpan(headerBackground, numberOfColumns);
         gridPane.add(headerBackground, 0, 0);
+
+        GridPane.setColumnSpan(loadingPane, numberOfColumns);
 
         for (int i = 0; i < numberOfColumns; i++) {
 
@@ -108,6 +143,7 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
         }
 
         int numberOfRows = Math.max(items.size(), tableView.getMinNumberOfRows());
+        GridPane.setRowSpan(loadingPane, numberOfRows);
 
         for (int row = 0; row < numberOfRows; row++) {
 

@@ -1,49 +1,104 @@
 .grid-table-view {
-    -fx-background-color: white;
+    -fx-background: white;
+    -fx-background-color: -fx-box-border, -fx-background;
+    -fx-background-insets: 0px, 1px;
     -fx-table-cell-border-color: -fx-box-border;
+    -fx-padding: 1px;
 }
 
-.grid-table-view .column-header {
+.grid-table-view:focused {
+    -fx-background-color: -fx-faint-focus-color, -fx-focus-color, -fx-control-inner-background;
+    -fx-background-insets: -1.4, -0.3, 1;
+    -fx-background-radius: 2, 0, 0;
+}
+
+.grid-table-view > .grid-pane > .column-header {
     -fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-selection-bar-text;
     -fx-padding: 0.166667em;
     -fx-alignment: center;
-    -fx-pref-height: 3em;
-    -fx-min-height: 3em;
-    -fx-max-height: 3em;
+    -fx-pref-height: 2em;
+    -fx-min-height: 2em;
+    -fx-max-height: 2em;
 }
 
-.grid-table-view .column-header.last {
+.grid-table-view > .grid-pane > .column-header.last {
     -fx-border-width: 1px;
 }
 
-.grid-table-view .column-header-background {
+.grid-table-view > .grid-pane > .column-header-background {
 }
 
-.grid-table-view .row-background {
+.grid-table-view > .grid-pane > .row-background {
     -fx-background: -fx-control-inner-background;
     -fx-background-color: -fx-table-cell-border-color, -fx-background;
     -fx-background-insets: 0px, 0px 0px 1px 0px;
 }
 
-.grid-table-view .row-background.odd {
+.grid-table-view > .grid-pane > .row-background.odd {
     -fx-background: -fx-control-inner-background-alt;
 }
 
-.grid-table-view .row-background.last,
-.grid-table-view .row-background.only {
-    -fx-border-color: -fx-table-cell-border-color;
-    -fx-border-width: 0px 1px 1px 1px;
+.grid-table-view > .grid-pane > .row-background.last,
+.grid-table-view > .grid-pane > .row-background.only {
+    -fx-background-insets: 0px, 0px 0px 0px 0px;
 }
 
-.grid-table-view .grid-table-cell {
+.grid-table-view > .grid-pane > .grid-table-cell {
     -fx-padding: 10px 5px 10px 5px;
     -fx-border-color: -fx-table-cell-border-color;
     -fx-border-width: 0px 1px 0px 0px;
 }
 
-.grid-table-view .grid-table-cell.first {
-    -fx-border-width: 0px 1px 0px 1px;
+.grid-table-view > .grid-pane > .grid-table-cell.first {
+    -fx-border-width: 0px 1px 0px 0px;
+}
+
+.grid-table-view > .grid-pane > .grid-table-cell.last {
+    -fx-border-width: 0px 0px 0px 0px;
+}
+
+.grid-table-view > .grid-pane > .loading-pane {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.grid-table-view > .grid-pane > .loading-pane > .error-pane > .error-label {
+    -fx-text-fill: red;
+    -fx-alignment: center;
+    -fx-content-display: top;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+}
+
+.grid-table-view > .grid-pane > .loading-pane > .error-pane > .error-label .icon {
+    -size: 1.5em;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+    -fx-shape: "M11.0156 15 L12.9844 15 L12.9844 17.0156 L11.0156 17.0156 L11.0156 15 ZM11.0156 6.9844 L12.9844 6.9844 L12.9844 12.9844 L11.0156 12.9844 L11.0156 6.9844 ZM12 2.0156 Q7.7344 2.1094 4.9219 4.9531 Q2.1094 7.7812 2.0156 12 Q2.1094 16.2656 4.9219 19.0781 Q7.7344 21.8906 12 21.9844 Q16.2656 21.8906 19.0781 19.0781 Q21.8906 16.2656 21.9844 12 Q21.8906 7.7344 19.0781 4.9219 Q16.2656 2.1094 12 2.0156 ZM12 20.0156 Q8.5781 19.9219 6.3281 17.6719 Q4.0781 15.4219 3.9844 12 Q4.0781 8.5781 6.3281 6.3281 Q8.5781 4.0781 12 3.9844 Q15.4219 4.0781 17.6719 6.3281 Q19.9219 8.5781 20.0156 12 Q19.9219 15.4219 17.6719 17.6719 Q15.4219 19.9219 12 20.0156 Z";
+    -fx-fill: red;
+    -fx-background-color: red;
+}
+
+.grid-table-view > .grid-pane > .loading-pane > .progress-indicator-wrapper {
+    -size: 48px;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+}
+
+.grid-table-view > .grid-pane > .loading-pane:small > .progress-indicator-wrapper {
+    -size: 16px;
+}
+
+.grid-table-view > .grid-pane > .loading-pane:medium > .progress-indicator-wrapper {
+    -size: 48px;
+}
+
+.grid-table-view > .grid-pane > .loading-pane:large > .progress-indicator-wrapper {
+    -size: 96px;
 }
