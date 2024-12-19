@@ -1,13 +1,13 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PagingGridTableView;
+import com.dlsc.gemsfx.SimplePagingGridTableView;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
 import com.dlsc.gemsfx.util.StageManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,8 +19,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -32,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PagingGridTableViewApp extends Application {
+public class SimplePagingGridTableViewApp extends Application {
 
     private final BooleanProperty simulateDelayProperty = new SimpleBooleanProperty(false);
 
@@ -42,26 +40,12 @@ public class PagingGridTableViewApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        List<Movie> movies = parseMovieFiles();
+        List<Movie> movies = parseMovieFiles().subList(0, 8);
 
-        PagingGridTableView<Movie> pagingGridTableView = new PagingGridTableView<>();
+        SimplePagingGridTableView<Movie> pagingGridTableView = new SimplePagingGridTableView<>();
         pagingGridTableView.setPrefWidth(800);
-        pagingGridTableView.totalItemCountProperty().bind(Bindings.createIntegerBinding(() -> simulateNoData.get() ? 0 : movies.size(), simulateNoData));
         pagingGridTableView.setPageSize(10);
-        pagingGridTableView.setLoader(loadRequest -> {
-            if (simulateDelayProperty.get()) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            if (simulateNoData.get()) {
-                return Collections.emptyList();
-            }
-            int offset = loadRequest.getPage() * loadRequest.getPageSize();
-            return movies.subList(offset, Math.min(movies.size(), offset + loadRequest.getPageSize()));
-        });
+        pagingGridTableView.getItems().setAll(movies);
 
         GridTableColumn<Movie, Integer> indexColumn = new GridTableColumn<>("#");
         GridTableColumn<Movie, String> titleColumn = new GridTableColumn<>("Title");
@@ -101,7 +85,7 @@ public class PagingGridTableViewApp extends Application {
         location.valueProperty().bindBidirectional(pagingGridTableView.pagingControlsLocationProperty());
 
         Button clearSetData = new Button("Clear Set Data");
-        clearSetData.setOnAction(evt -> simulateNoData.set(!simulateNoData.get()));
+        clearSetData.setOnAction(evt -> movies.clear());
 
         Button reduceItemCount = new Button("Reduce Count");
         reduceItemCount.setOnAction(evt -> count.set(count.get() - 1));
@@ -119,7 +103,7 @@ public class PagingGridTableViewApp extends Application {
 
         scene.focusOwnerProperty().addListener(it -> System.out.println(scene.getFocusOwner()));
 
-        stage.setTitle("Paging Grid Table View");
+        stage.setTitle("Simple Paging Grid Table View");
         stage.setScene(scene);
         stage.centerOnScreen();
 
@@ -217,7 +201,7 @@ public class PagingGridTableViewApp extends Application {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            return objectMapper.readValue(PagingGridTableViewApp.class.getResource(name), new TypeReference<>() {
+            return objectMapper.readValue(SimplePagingGridTableViewApp.class.getResource(name), new TypeReference<>() {
             });
         } catch (IOException e) {
             e.printStackTrace();

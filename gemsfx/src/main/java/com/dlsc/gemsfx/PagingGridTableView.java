@@ -25,6 +25,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Cell;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class PagingGridTableView<T> extends PagingControlBase {
 
@@ -102,6 +104,8 @@ public class PagingGridTableView<T> extends PagingControlBase {
                 throw new IllegalArgumentException("load delay must be >= 0");
             }
         });
+
+        setPlaceholder(new Label("No items"));
     }
 
     @Override
@@ -385,6 +389,25 @@ public class PagingGridTableView<T> extends PagingControlBase {
 
     public final Node getPlaceholder() {
         return placeholder == null ? null : placeholder.get();
+    }
+
+    private final ObjectProperty<Consumer<T>> onOpenItem = new SimpleObjectProperty<>(this, "onOpenItem");
+
+    public final Consumer<T> getOnOpenItem() {
+        return onOpenItem.get();
+    }
+
+    /**
+     * A callback for opening an item represented by a row in the table view.
+     *
+     * @return a callback for opening table items
+     */
+    public final ObjectProperty<Consumer<T>> onOpenItemProperty() {
+        return onOpenItem;
+    }
+
+    public final void setOnOpenItem(Consumer<T> onOpenItem) {
+        this.onOpenItem.set(onOpenItem);
     }
 
     private final BooleanProperty usingScrollPane = new SimpleBooleanProperty(this, "usingScrollPane", false);

@@ -9,18 +9,21 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import org.controlsfx.control.spreadsheet.Grid;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * @param <S> grid table item type
@@ -123,12 +126,7 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
 
         ObservableList<S> items = tableView.getItems();
 
-        /*
-         * Specifying a minimum number of rows that the application always
-         * shows implies that the application does not want to see the placeholder
-         * when no items are available.
-         */
-        if (items.isEmpty() && tableView.getMinNumberOfRows() == 0) {
+        if (items.isEmpty()) {
             Node placeholder = tableView.getPlaceholder();
             if (placeholder != null) {
                 gridPane.add(placeholder, 0, 1);
@@ -168,6 +166,21 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
 
                 GridTableColumn<S, ?> column = columns.get(col);
                 GridTableCell<S, ?> cellNode = column.createCell(tableView, row);
+                cellNode.hoverProperty().addListener((obs, oldHover, newHover) -> {
+                    rowBackground.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), newHover);
+                });
+
+                cellNode.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                    if (event.getClickCount() == 2 &&
+                            event.getButton() == javafx.scene.input.MouseButton.PRIMARY &&
+                            !event.isConsumed() &&
+                            event.isStillSincePress()) {
+                        Consumer<S> onOpenItem = tableView.getOnOpenItem();
+                        if (onOpenItem != null) {
+                            onOpenItem.accept(cellNode.getRowItem());
+                        }
+                    }
+                });
 
                 if (numberOfColumns == 1) {
                     cellNode.getStyleClass().add("only");

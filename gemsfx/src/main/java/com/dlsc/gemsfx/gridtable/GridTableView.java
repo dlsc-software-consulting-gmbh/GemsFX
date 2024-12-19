@@ -22,6 +22,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * A simple table view implementation based on GridPane.
@@ -98,6 +99,25 @@ public class GridTableView<S> extends Control {
 
     public final void setPlaceholder(Node placeholder) {
         this.placeholder.set(placeholder);
+    }
+
+    private final ObjectProperty<Consumer<S>> onOpenItem = new SimpleObjectProperty<>(this, "onOpenItem");
+
+    public final Consumer<S> getOnOpenItem() {
+        return onOpenItem.get();
+    }
+
+    /**
+     * A callback for opening an item represented by a row in the table view.
+     *
+     * @return a callback for opening table items
+     */
+    public final ObjectProperty<Consumer<S>> onOpenItemProperty() {
+        return onOpenItem;
+    }
+
+    public final void setOnOpenItem(Consumer<S> onOpenItem) {
+        this.onOpenItem.set(onOpenItem);
     }
 
     // min rows

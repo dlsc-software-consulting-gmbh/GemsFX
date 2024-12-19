@@ -38,7 +38,7 @@ public class PagingGridTableViewSkin<T> extends SkinBase<PagingGridTableView<T>>
         pagingControls.totalItemCountProperty().bindBidirectional(pagingGridTableView.totalItemCountProperty());
         pagingControls.pageSizeProperty().bindBidirectional(pagingGridTableView.pageSizeProperty());
         pagingControls.maxPageIndicatorsCountProperty().bindBidirectional(pagingGridTableView.maxPageIndicatorsCountProperty());
-        pagingControls.messageLabelStrategyProperty().bindBidirectional(pagingGridTableView.messageLabelStrategyProperty());;
+        pagingControls.messageLabelStrategyProperty().bindBidirectional(pagingGridTableView.messageLabelStrategyProperty());
         pagingControls.showPreviousNextPageButtonProperty().bindBidirectional(pagingGridTableView.showPreviousNextPageButtonProperty());
         pagingControls.alignmentProperty().bindBidirectional(pagingGridTableView.alignmentProperty());
         pagingControls.firstLastPageDisplayModeProperty().bindBidirectional(pagingGridTableView.firstLastPageDisplayModeProperty());
@@ -50,19 +50,15 @@ public class PagingGridTableViewSkin<T> extends SkinBase<PagingGridTableView<T>>
 
         pagingGridTableView.usingScrollPaneProperty().addListener(it -> updateStyleClass());
 
-        pagingGridTableView.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> bindPlaceholder(oldPlaceholder, newPlaceholder));
-        bindPlaceholder(null, pagingGridTableView.getPlaceholder());
-
-        // when the underlying data list changes, then we have to recreate the binding for the placeholder
-        pagingGridTableView.getUnmodifiableItems().addListener((Observable it) -> bindPlaceholder(null, pagingGridTableView.getPlaceholder()));
-
         InvalidationListener updateViewListener = it -> updateView();
         pagingGridTableView.usingScrollPaneProperty().addListener(updateViewListener);
         pagingGridTableView.placeholderProperty().addListener(updateViewListener);
         pagingGridTableView.pagingControlsLocationProperty().addListener(updateViewListener);
 
+        gridTableView.onOpenItemProperty().bind(pagingGridTableView.onOpenItemProperty());
         gridTableView.loadingStatusProperty().bindBidirectional(pagingGridTableView.loadingStatusProperty());
         gridTableView.commitLoadStatusDelayProperty().bindBidirectional(pagingGridTableView.commitLoadStatusDelayProperty());
+        gridTableView.placeholderProperty().bind(pagingGridTableView.placeholderProperty());
 
         stackPane.getStyleClass().add("stack-pane");
 
@@ -79,20 +75,6 @@ public class PagingGridTableViewSkin<T> extends SkinBase<PagingGridTableView<T>>
             }
         } else {
             content.getStyleClass().remove(USING_SCROLL_PANE);
-        }
-    }
-
-    private void bindPlaceholder(Node oldPlaceholder, Node newPlaceholder) {
-        PagingGridTableView<T> listView = getSkinnable();
-
-        if (oldPlaceholder != null) {
-            oldPlaceholder.visibleProperty().unbind();
-            oldPlaceholder.managedProperty().unbind();
-        }
-
-        if (newPlaceholder != null) {
-            newPlaceholder.visibleProperty().bind(Bindings.createBooleanBinding(() -> listView.getUnmodifiableItems().isEmpty(), listView.getUnmodifiableItems()));
-            newPlaceholder.managedProperty().bind(newPlaceholder.visibleProperty());
         }
     }
 
@@ -113,15 +95,7 @@ public class PagingGridTableViewSkin<T> extends SkinBase<PagingGridTableView<T>>
             }
         }
 
-        Node placeholder = tableView.getPlaceholder();
-        if (placeholder != null) {
-            if (!placeholder.getStyleClass().contains("placeholder")) {
-                placeholder.getStyleClass().add("placeholder");
-            }
-            stackPane.getChildren().setAll(content, placeholder);
-        } else {
-            stackPane.getChildren().setAll(content);
-        }
+        stackPane.getChildren().setAll(content);
     }
 
     private Node wrapInScrollPane(Node node) {
@@ -146,5 +120,20 @@ public class PagingGridTableViewSkin<T> extends SkinBase<PagingGridTableView<T>>
     @Override
     protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return stackPane.maxHeight(width) + topInset + bottomInset;
+    }
+
+    @Override
+    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return stackPane.minWidth(height) + leftInset + rightInset;
+    }
+
+    @Override
+    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return stackPane.prefWidth(height) + leftInset + rightInset;
+    }
+
+    @Override
+    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return stackPane.maxWidth(height) + leftInset + rightInset;
     }
 }

@@ -101,11 +101,16 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
                 return true;
             }
             return false;
-        }, view.pageCountProperty(), view.availablePageSizesProperty(), view.messageLabelStrategyProperty()));
+        },
+                view.pageCountProperty(),
+                view.availablePageSizesProperty(),
+                view.messageLabelStrategyProperty(),
+                view.totalItemCountProperty(),
+                view.pageSizeProperty()));
 
-        neededBinding.addListener(it -> {
+        neededBinding.addListener((obs, oldNeeded, newNeeded) -> {
             view.getProperties().remove("controls.needed");
-            view.getProperties().put("controls.needed", neededBinding.get());
+            view.getProperties().put("controls.needed", newNeeded);
         });
     }
 

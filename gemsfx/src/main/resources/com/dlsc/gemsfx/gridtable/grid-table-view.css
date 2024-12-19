@@ -17,11 +17,8 @@
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-selection-bar-text;
-    -fx-padding: 0.166667em;
+    -fx-padding: 0.416667em;
     -fx-alignment: center;
-    -fx-pref-height: 2em;
-    -fx-min-height: 2em;
-    -fx-max-height: 2em;
 }
 
 .grid-table-view > .grid-pane > .column-header.last {
