@@ -1485,14 +1485,13 @@ public class DialogPane extends Pane {
         }
 
         /**
-         * A method in fluent-api style that sets the given consumer and returns the dialog
-         * again.
+         * Sets a consumer that will be invoked when the dialog is being closed.
          *
-         * @param onCommit the handler
+         * @param onClose the "close dialog" handler
          */
-        public final Dialog<T> onClose(Consumer<ButtonType> onCommit) {
-            Objects.requireNonNull(onCommit, "onCommit handler can not be null");
-            setOnClose(onCommit);
+        public final Dialog<T> onClose(Consumer<ButtonType> onClose) {
+            Objects.requireNonNull(onClose, "onCommit handler can not be null");
+            setOnClose(onClose);
             return this;
         }
 
