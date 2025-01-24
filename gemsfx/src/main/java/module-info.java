@@ -35,4 +35,5 @@ open module com.dlsc.gemsfx {
     exports com.dlsc.gemsfx.treeview;
     exports com.dlsc.gemsfx.treeview.link;
     exports com.dlsc.gemsfx.gridtable;
+    exports com.dlsc.gemsfx.paging;
 }

@@ -1,10 +1,10 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.PagingListView;
+import com.dlsc.gemsfx.paging.PagingListView;
+import com.dlsc.gemsfx.paging.PagingLoadResponse;
 import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -36,7 +36,6 @@ public class PagingListViewApp extends Application {
     public void start(Stage stage) {
         PagingListView<String> pagingListView = new PagingListView<>();
         pagingListView.setPrefWidth(600);
-        pagingListView.totalItemCountProperty().bind(Bindings.createIntegerBinding(() -> simulateNoData.get() ? 0 : count.get(), simulateNoData, count));
         pagingListView.setPageSize(10);
         pagingListView.setLoader(loadRequest -> {
             if (simulateDelayProperty.get()) {
@@ -56,7 +55,7 @@ public class PagingListViewApp extends Application {
                     break;
                 }
             }
-            return data;
+            return new PagingLoadResponse<>(data, simulateNoData.get() ? 0 : count.get());
         });
 
         simulateNoData.addListener(it -> pagingListView.reload());

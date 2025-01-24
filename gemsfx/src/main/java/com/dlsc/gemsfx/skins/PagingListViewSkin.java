@@ -1,7 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.PagingControls;
-import com.dlsc.gemsfx.PagingListView;
+import com.dlsc.gemsfx.paging.PagingControls;
+import com.dlsc.gemsfx.paging.PagingListView;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;

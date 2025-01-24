@@ -1,13 +1,9 @@
 package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.LoadingPane;
-import com.dlsc.gemsfx.PagingControls;
-import com.dlsc.gemsfx.PagingGridTableView;
-import com.dlsc.gemsfx.PagingListView;
+import com.dlsc.gemsfx.paging.PagingControls;
+import com.dlsc.gemsfx.paging.PagingGridTableView;
 import com.dlsc.gemsfx.gridtable.GridTableView;
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;

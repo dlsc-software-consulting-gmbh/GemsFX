@@ -1,7 +1,9 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.PagingGridTableView;
+import com.dlsc.gemsfx.paging.PagingGridTableView;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
+import com.dlsc.gemsfx.paging.PagingLoadRequest;
+import com.dlsc.gemsfx.paging.PagingLoadResponse;
 import com.dlsc.gemsfx.util.StageManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,8 +21,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -46,7 +46,6 @@ public class PagingGridTableViewApp extends Application {
 
         PagingGridTableView<Movie> pagingGridTableView = new PagingGridTableView<>();
         pagingGridTableView.setPrefWidth(800);
-        pagingGridTableView.totalItemCountProperty().bind(Bindings.createIntegerBinding(() -> simulateNoData.get() ? 0 : movies.size(), simulateNoData));
         pagingGridTableView.setPageSize(10);
         pagingGridTableView.setLoader(loadRequest -> {
             if (simulateDelayProperty.get()) {
@@ -57,10 +56,12 @@ public class PagingGridTableViewApp extends Application {
                 }
             }
             if (simulateNoData.get()) {
-                return Collections.emptyList();
+                return new PagingLoadResponse<>(Collections.emptyList(), 0);
             }
+
             int offset = loadRequest.getPage() * loadRequest.getPageSize();
-            return movies.subList(offset, Math.min(movies.size(), offset + loadRequest.getPageSize()));
+            List<Movie> result = movies.subList(offset, Math.min(movies.size(), offset + loadRequest.getPageSize()));
+            return new PagingLoadResponse<>(result, simulateNoData.get() ? 0 : movies.size());
         });
 
         GridTableColumn<Movie, Integer> indexColumn = new GridTableColumn<>("#");

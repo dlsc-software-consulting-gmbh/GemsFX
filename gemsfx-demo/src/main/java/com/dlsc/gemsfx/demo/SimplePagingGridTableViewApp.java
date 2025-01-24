@@ -1,6 +1,5 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.PagingGridTableView;
 import com.dlsc.gemsfx.SimplePagingGridTableView;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
 import com.dlsc.gemsfx.util.StageManager;
@@ -40,7 +39,7 @@ public class SimplePagingGridTableViewApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        List<Movie> movies = parseMovieFiles().subList(0, 8);
+        List<Movie> movies = parseMovieFiles();
 
         SimplePagingGridTableView<Movie> pagingGridTableView = new SimplePagingGridTableView<>();
         pagingGridTableView.setPrefWidth(800);

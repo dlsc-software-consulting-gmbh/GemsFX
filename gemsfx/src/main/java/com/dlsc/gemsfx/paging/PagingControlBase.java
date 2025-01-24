@@ -1,4 +1,4 @@
-package com.dlsc.gemsfx;
+package com.dlsc.gemsfx.paging;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;

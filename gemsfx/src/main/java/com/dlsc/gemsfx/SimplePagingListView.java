@@ -1,5 +1,8 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.paging.PagingListView;
+import com.dlsc.gemsfx.paging.PagingLoadRequest;
+import com.dlsc.gemsfx.paging.PagingLoadResponse;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
@@ -76,7 +79,7 @@ public class SimplePagingListView<T> extends PagingListView<T> {
      *
      * @param <T> the type of the items
      */
-    private final class SimpleLoader implements Callback<LoadRequest, List<T>> {
+    private final class SimpleLoader implements Callback<PagingLoadRequest, PagingLoadResponse<T>> {
 
         private final ObservableList<T> data;
         private final PagingListView<T> listView;
@@ -99,11 +102,11 @@ public class SimplePagingListView<T> extends PagingListView<T> {
         }
 
         @Override
-        public List<T> call(LoadRequest param) {
+        public PagingLoadResponse<T> call(PagingLoadRequest param) {
             int page = param.getPage();
             int pageSize = param.getPageSize();
             int offset = page * pageSize;
-            return data.subList(offset, Math.min(data.size(), offset + pageSize));
+            return new PagingLoadResponse<>(data.subList(offset, Math.min(data.size(), offset + pageSize)), getData().size());
         }
 
         public PagingListView<T> getListView() {

@@ -1,5 +1,8 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.paging.PagingGridTableView;
+import com.dlsc.gemsfx.paging.PagingLoadRequest;
+import com.dlsc.gemsfx.paging.PagingLoadResponse;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
@@ -76,7 +79,7 @@ public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
      *
      * @param <T> the type of the items
      */
-    private final class SimpleLoader implements Callback<LoadRequest, List<T>> {
+    private final class SimpleLoader implements Callback<PagingLoadRequest, PagingLoadResponse<T>> {
 
         private final ObservableList<T> data;
         private final PagingGridTableView<T> gridTableView;
@@ -90,7 +93,6 @@ public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
         public SimpleLoader(PagingGridTableView<T> listView, ListProperty<T> data) {
             this.gridTableView = Objects.requireNonNull(listView);
             this.data = Objects.requireNonNull(data);
-            this.gridTableView.totalItemCountProperty().bind(Bindings.size(data));
             this.data.addListener((Observable it) -> {
                 ObservableList<T> list = getData();
                 listView.setPage(Math.min(listView.getTotalItemCount() / listView.getPageSize(), listView.getPage()));
@@ -99,11 +101,11 @@ public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
         }
 
         @Override
-        public List<T> call(LoadRequest param) {
+        public PagingLoadResponse<T> call(PagingLoadRequest param) {
             int page = param.getPage();
             int pageSize = param.getPageSize();
             int offset = page * pageSize;
-            return data.subList(offset, Math.min(data.size(), offset + pageSize));
+            return new PagingLoadResponse<>(data.subList(offset, Math.min(data.size(), offset + pageSize)), data.size());
         }
 
         public PagingGridTableView<T> getGridTableView() {

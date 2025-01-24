@@ -1,15 +1,12 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.PagingControlBase;
-import com.dlsc.gemsfx.PagingControlBase.MessageLabelStrategy;
-import com.dlsc.gemsfx.PagingControls;
+import com.dlsc.gemsfx.paging.PagingControlBase.MessageLabelStrategy;
+import com.dlsc.gemsfx.paging.PagingControls;
 import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
@@ -17,7 +14,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;

@@ -1,10 +1,8 @@
-package com.dlsc.gemsfx;
+package com.dlsc.gemsfx.paging;
 
 import com.dlsc.gemsfx.skins.PagingControlsSkin;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.MapChangeListener;
 import javafx.scene.control.Skin;
 import javafx.scene.input.MouseEvent;

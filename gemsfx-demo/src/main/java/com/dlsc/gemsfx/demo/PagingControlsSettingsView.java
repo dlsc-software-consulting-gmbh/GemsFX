@@ -1,7 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.PagingControlBase;
-import com.dlsc.gemsfx.PagingControls;
+import com.dlsc.gemsfx.paging.PagingControlBase;
+import com.dlsc.gemsfx.paging.PagingControls;
 import com.dlsc.gemsfx.Spacer;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
