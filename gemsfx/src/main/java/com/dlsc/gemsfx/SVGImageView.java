@@ -16,9 +16,12 @@ import javafx.css.converter.URLConverter;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * A control which can display SVG images.
@@ -30,6 +33,8 @@ import java.util.List;
  * SvgImageView does not support usage in native packaging scenarios.
  */
 public class SVGImageView extends Control {
+    // Matches strings that start with a valid URI scheme
+    private static final Pattern URL_QUICKMATCH = Pattern.compile("^\\p{Alpha}[\\p{Alnum}+.-]*:.*$");
 
     private static final String DEFAULT_STYLE_CLASS = "svg-image-view";
     private static final double DEFAULT_FIT_WIDTH = 0;
@@ -59,6 +64,52 @@ public class SVGImageView extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new SVGImageViewSkin(this);
+    }
+
+    private static String validateUrl(final String url) {
+        if (url == null) {
+            throw new NullPointerException("URL must not be null");
+        }
+
+        if (url.trim().isEmpty()) {
+            throw new IllegalArgumentException("URL must not be empty");
+        }
+
+        try {
+            if (!URL_QUICKMATCH.matcher(url).matches()) {
+                final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+                URL resource;
+                if (url.charAt(0) == '/') {
+                    resource = contextClassLoader.getResource(url.substring(1));
+                } else {
+                    resource = contextClassLoader.getResource(url);
+                }
+                if (resource == null) {
+                    throw new IllegalArgumentException("Invalid URL or resource not found");
+                }
+                return resource.toString();
+            }
+
+            // Use URL constructor for validation
+            return new URL(url).toString();
+        } catch (final IllegalArgumentException | MalformedURLException e) {
+            throw new IllegalArgumentException(constructDetailedExceptionMessage("Invalid URL", e), e);
+        }
+    }
+
+    private static String constructDetailedExceptionMessage(
+            final String mainMessage,
+            final Throwable cause) {
+        if (cause == null) {
+            return mainMessage;
+        }
+
+        final String causeMessage = cause.getMessage();
+        return constructDetailedExceptionMessage(
+                (causeMessage != null)
+                        ? mainMessage + ": " + causeMessage
+                        : mainMessage,
+                cause.getCause());
     }
 
     private final DoubleProperty fitWidth = new StyleableDoubleProperty(DEFAULT_FIT_WIDTH) {
@@ -296,7 +347,7 @@ public class SVGImageView extends Control {
      * @param svgUrl The svg url value.
      */
     public final void setSvgUrl(String svgUrl) {
-        this.svgUrl.set(svgUrl);
+        this.svgUrl.set(validateUrl(svgUrl));
     }
 
     private final BooleanProperty backgroundLoading = new StyleableBooleanProperty(DEFAULT_BACKGROUND_LOADING) {
