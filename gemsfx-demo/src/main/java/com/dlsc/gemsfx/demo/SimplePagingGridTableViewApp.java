@@ -1,6 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.SimplePagingGridTableView;
+import com.dlsc.gemsfx.paging.SimplePagingGridTableView;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
 import com.dlsc.gemsfx.util.StageManager;
 import com.fasterxml.jackson.core.type.TypeReference;

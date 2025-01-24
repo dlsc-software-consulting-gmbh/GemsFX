@@ -75,7 +75,7 @@ public class PagingGridTableView<T> extends PagingControlBase {
 
             List<T> newList = response.getItems();
             if (newList != null) {
-                items.setAll(newList);
+                items.setAll(new ArrayList<>(newList));
             } else {
                 items.clear();
             }

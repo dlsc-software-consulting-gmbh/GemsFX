@@ -1,8 +1,5 @@
-package com.dlsc.gemsfx;
+package com.dlsc.gemsfx.paging;
 
-import com.dlsc.gemsfx.paging.PagingGridTableView;
-import com.dlsc.gemsfx.paging.PagingLoadRequest;
-import com.dlsc.gemsfx.paging.PagingLoadResponse;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
@@ -11,24 +8,24 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Callback;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
- * A simple version of the paging grid table view that is completely based on a list of items, just like a normal
- * table view would be. The view uses an internal data loader that accesses the list to retrieve the items of the
+ * A simple version of the paging list view that is completely based on a list of items, just like a normal
+ * list view would be. The view uses an internal data loader that accesses the list to retrieve the items of the
  * current page.
  *
  * @param <T> the type of items to show in the list view
  */
-public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
+public class SimplePagingListView<T> extends PagingListView<T> {
 
     private boolean internal;
 
     /**
-     * Constructs a new table view and sets a loader that uses the data list.
+     * Constructs a new list view and sets a loader that uses the data list.
      */
-    public SimplePagingGridTableView() {
+    public SimplePagingListView() {
         setLoader(new SimpleLoader(this, itemsProperty()));
         setLoadDelayInMillis(10);
         setCommitLoadStatusDelay(400);
@@ -38,7 +35,7 @@ public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
     }
 
     /**
-     * Ensures that the given item becomes visible within the table view. This method will only succeed if the
+     * Ensures that the given item becomes visible within the list view. This method will only succeed if the
      * given item is a member of the {@link #getItems()}.
      *
      * @param item the item to show
@@ -60,10 +57,10 @@ public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
     }
 
     /**
-     * Stores the data structure to be used by the table view. The internal data loader will simply retrieve the page
+     * Stores the data structure to be used by the list view. The internal data loader will simply retrieve the page
      * items from this list.
      *
-     * @return the data model feeding the table view
+     * @return the data model feeding the list view
      */
     public final ListProperty<T> itemsProperty() {
         return items;
@@ -82,7 +79,7 @@ public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
     private final class SimpleLoader implements Callback<PagingLoadRequest, PagingLoadResponse<T>> {
 
         private final ObservableList<T> data;
-        private final PagingGridTableView<T> gridTableView;
+        private final PagingListView<T> listView;
 
         /**
          * Constructs a new simple loader for the given list view and the given data.
@@ -90,8 +87,8 @@ public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
          * @param listView the list view where the loader will be used
          * @param data     the observable list that is providing the data / the items
          */
-        public SimpleLoader(PagingGridTableView<T> listView, ListProperty<T> data) {
-            this.gridTableView = Objects.requireNonNull(listView);
+        public SimpleLoader(PagingListView<T> listView, ListProperty<T> data) {
+            this.listView = Objects.requireNonNull(listView);
             this.data = Objects.requireNonNull(data);
             this.data.addListener((Observable it) -> {
                 ObservableList<T> list = getData();
@@ -105,11 +102,13 @@ public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
             int page = param.getPage();
             int pageSize = param.getPageSize();
             int offset = page * pageSize;
-            return new PagingLoadResponse<>(data.subList(offset, Math.min(data.size(), offset + pageSize)), data.size());
+
+            // copy into new list to avoid concurrent modification exception
+            return new PagingLoadResponse<>(new ArrayList<>(data.subList(offset, Math.min(data.size(), offset + pageSize))), getData().size());
         }
 
-        public PagingGridTableView<T> getGridTableView() {
-            return gridTableView;
+        public PagingListView<T> getListView() {
+            return listView;
         }
 
         public ObservableList<T> getData() {

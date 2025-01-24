@@ -1,34 +1,30 @@
-package com.dlsc.gemsfx;
+package com.dlsc.gemsfx.paging;
 
-import com.dlsc.gemsfx.paging.PagingListView;
-import com.dlsc.gemsfx.paging.PagingLoadRequest;
-import com.dlsc.gemsfx.paging.PagingLoadResponse;
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Callback;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
- * A simple version of the paging list view that is completely based on a list of items, just like a normal
- * list view would be. The view uses an internal data loader that accesses the list to retrieve the items of the
+ * A simple version of the paging grid table view that is completely based on a list of items, just like a normal
+ * table view would be. The view uses an internal data loader that accesses the list to retrieve the items of the
  * current page.
  *
  * @param <T> the type of items to show in the list view
  */
-public class SimplePagingListView<T> extends PagingListView<T> {
+public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
 
     private boolean internal;
 
     /**
-     * Constructs a new list view and sets a loader that uses the data list.
+     * Constructs a new table view and sets a loader that uses the data list.
      */
-    public SimplePagingListView() {
+    public SimplePagingGridTableView() {
         setLoader(new SimpleLoader(this, itemsProperty()));
         setLoadDelayInMillis(10);
         setCommitLoadStatusDelay(400);
@@ -38,7 +34,7 @@ public class SimplePagingListView<T> extends PagingListView<T> {
     }
 
     /**
-     * Ensures that the given item becomes visible within the list view. This method will only succeed if the
+     * Ensures that the given item becomes visible within the table view. This method will only succeed if the
      * given item is a member of the {@link #getItems()}.
      *
      * @param item the item to show
@@ -60,10 +56,10 @@ public class SimplePagingListView<T> extends PagingListView<T> {
     }
 
     /**
-     * Stores the data structure to be used by the list view. The internal data loader will simply retrieve the page
+     * Stores the data structure to be used by the table view. The internal data loader will simply retrieve the page
      * items from this list.
      *
-     * @return the data model feeding the list view
+     * @return the data model feeding the table view
      */
     public final ListProperty<T> itemsProperty() {
         return items;
@@ -82,22 +78,21 @@ public class SimplePagingListView<T> extends PagingListView<T> {
     private final class SimpleLoader implements Callback<PagingLoadRequest, PagingLoadResponse<T>> {
 
         private final ObservableList<T> data;
-        private final PagingListView<T> listView;
+        private final PagingGridTableView<T> gridTableView;
 
         /**
          * Constructs a new simple loader for the given list view and the given data.
          *
-         * @param listView the list view where the loader will be used
+         * @param tableView the list view where the loader will be used
          * @param data     the observable list that is providing the data / the items
          */
-        public SimpleLoader(PagingListView<T> listView, ListProperty<T> data) {
-            this.listView = Objects.requireNonNull(listView);
+        public SimpleLoader(PagingGridTableView<T> tableView, ListProperty<T> data) {
+            this.gridTableView = Objects.requireNonNull(tableView);
             this.data = Objects.requireNonNull(data);
-            this.listView.totalItemCountProperty().bind(Bindings.size(data));
             this.data.addListener((Observable it) -> {
                 ObservableList<T> list = getData();
-                listView.setPage(Math.min(listView.getTotalItemCount() / listView.getPageSize(), listView.getPage()));
-                listView.reload();
+                tableView.setPage(Math.min(tableView.getTotalItemCount() / tableView.getPageSize(), tableView.getPage()));
+                tableView.reload();
             });
         }
 
@@ -106,11 +101,13 @@ public class SimplePagingListView<T> extends PagingListView<T> {
             int page = param.getPage();
             int pageSize = param.getPageSize();
             int offset = page * pageSize;
-            return new PagingLoadResponse<>(data.subList(offset, Math.min(data.size(), offset + pageSize)), getData().size());
+
+            // copy into new list to avoid concurrent modification exception
+            return new PagingLoadResponse<>(new ArrayList<>(data.subList(offset, Math.min(data.size(), offset + pageSize))), data.size());
         }
 
-        public PagingListView<T> getListView() {
-            return listView;
+        public PagingGridTableView<T> getGridTableView() {
+            return gridTableView;
         }
 
         public ObservableList<T> getData() {

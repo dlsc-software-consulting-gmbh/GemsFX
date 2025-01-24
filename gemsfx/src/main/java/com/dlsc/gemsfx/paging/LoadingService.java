@@ -15,8 +15,8 @@ import java.util.Collections;
 /**
  * A service that performs the actual loading of items for a paging control such as the {@link PagingListView} or the
  * {@link PagingGridTableView}. The service delays the actual loading by a couple of milliseconds so that it can be
- * restarted (cancel, start) when the user changes the page index quickly. This avoids redundant updates.
- * The service binds all of its properties to the paging control that uses it.
+ * restarted (cancel and start) when the user changes the page index quickly. This avoids redundant updates and heavy
+ * query operations. The service binds all of its properties to the paging control that uses it.
  *
  * @see #pageProperty()
  * @see #pageSizeProperty()
@@ -26,8 +26,6 @@ import java.util.Collections;
  * @param <T> the type of items to be shown by the UI
  */
 public class LoadingService<T> extends Service<PagingLoadResponse<T>> {
-
-    private final PagingLoadResponse<T> EMPTY_RESPONSE = new PagingLoadResponse<>(Collections.emptyList(), 0);
 
     @Override
     protected Task<PagingLoadResponse<T>> createTask() {
@@ -56,7 +54,7 @@ public class LoadingService<T> extends Service<PagingLoadResponse<T>> {
                     }
                 }
 
-                return EMPTY_RESPONSE;
+                return PagingLoadResponse.emptyResponse();
             }
         };
     }

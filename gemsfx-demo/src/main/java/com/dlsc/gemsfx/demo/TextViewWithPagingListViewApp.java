@@ -1,6 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.SimplePagingListView;
+import com.dlsc.gemsfx.paging.SimplePagingListView;
 import com.dlsc.gemsfx.TextView;
 import javafx.application.Application;
 import javafx.application.Platform;

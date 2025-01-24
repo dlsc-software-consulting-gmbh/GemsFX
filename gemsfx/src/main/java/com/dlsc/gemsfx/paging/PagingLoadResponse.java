@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.paging;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,5 +36,9 @@ public class PagingLoadResponse<T> {
      */
     public final int getTotalItemCount() {
         return totalItemCount;
+    }
+
+    public static <T> PagingLoadResponse<T> emptyResponse() {
+        return new PagingLoadResponse<>(Collections.emptyList(), 0);
     }
 }
