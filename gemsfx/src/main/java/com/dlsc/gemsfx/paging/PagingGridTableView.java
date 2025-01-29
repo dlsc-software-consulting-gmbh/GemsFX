@@ -45,10 +45,6 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
 
     private final GridTableView<T> gridTableView = new GridTableView<>();
 
-    private final InvalidationListener updateListener = (Observable it) -> refresh();
-
-    private final WeakInvalidationListener weakUpdateListener = new WeakInvalidationListener(updateListener);
-
     public PagingGridTableView() {
         getStyleClass().add("paging-grid-table-view");
 
@@ -90,12 +86,13 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
         totalItemCountProperty().addListener(loadListener);
         loaderProperty().addListener(loadListener);
 
-        unmodifiableItems.addListener(weakUpdateListener);
+        InvalidationListener updateListener = (Observable it) -> refresh();
 
-        pageSizeProperty().addListener(weakUpdateListener);
-        pageProperty().addListener(weakUpdateListener);
-        fillLastPageProperty().addListener(weakUpdateListener);
-        totalItemCountProperty().addListener(weakUpdateListener);
+        getUnmodifiableItems().addListener(updateListener);
+        pageSizeProperty().addListener(updateListener);
+        pageProperty().addListener(updateListener);
+        fillLastPageProperty().addListener(updateListener);
+        totalItemCountProperty().addListener(updateListener);
 
         pagingControlsLocation.addListener((it, oldLocation, newLocation) -> {
             if (newLocation.equals(Side.LEFT) || newLocation.equals(Side.RIGHT)) {
@@ -255,10 +252,11 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
     }
 
     /**
-     * The delay in milliseconds before the list view will display the progress indicator for long running
+     * The delay in milliseconds before the list view will display the progress indicator for long-running
      * load operations.
      *
      * @return the commit delay for the nested loading pane
+     *
      * @see LoadingPane#commitDelayProperty()
      */
     public final LongProperty commitLoadStatusDelayProperty() {
