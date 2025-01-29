@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class PagingGridTableView<T> extends PagingControlBase {
+public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
 
     private final LoadingService<T> loadingService = new LoadingService<>();
 

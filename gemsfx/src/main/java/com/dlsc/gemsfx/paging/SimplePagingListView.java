@@ -26,7 +26,7 @@ public class SimplePagingListView<T> extends PagingListView<T> {
      * Constructs a new list view and sets a loader that uses the data list.
      */
     public SimplePagingListView() {
-        setLoader(new SimpleLoader(this, itemsProperty()));
+        setLoader(new SimpleLoader<>(this, itemsProperty()));
         setLoadDelayInMillis(10);
         setCommitLoadStatusDelay(400);
         loaderProperty().addListener(it -> {
@@ -68,51 +68,5 @@ public class SimplePagingListView<T> extends PagingListView<T> {
 
     public final void setItems(ObservableList<T> items) {
         this.items.set(items);
-    }
-
-    /*
-     * A convenience class to easily provide a loader for paging when the data is given as an
-     * observable list.
-     *
-     * @param <T> the type of the items
-     */
-    private final class SimpleLoader implements Callback<PagingLoadRequest, PagingLoadResponse<T>> {
-
-        private final ObservableList<T> data;
-        private final PagingListView<T> listView;
-
-        /**
-         * Constructs a new simple loader for the given list view and the given data.
-         *
-         * @param listView the list view where the loader will be used
-         * @param data     the observable list that is providing the data / the items
-         */
-        public SimpleLoader(PagingListView<T> listView, ListProperty<T> data) {
-            this.listView = Objects.requireNonNull(listView);
-            this.data = Objects.requireNonNull(data);
-            this.data.addListener((Observable it) -> {
-                ObservableList<T> list = getData();
-                listView.setPage(Math.min(listView.getTotalItemCount() / listView.getPageSize(), listView.getPage()));
-                listView.reload();
-            });
-        }
-
-        @Override
-        public PagingLoadResponse<T> call(PagingLoadRequest param) {
-            int page = param.getPage();
-            int pageSize = param.getPageSize();
-            int offset = page * pageSize;
-
-            // copy into new list to avoid concurrent modification exception
-            return new PagingLoadResponse<>(new ArrayList<>(data.subList(offset, Math.min(data.size(), offset + pageSize))), getData().size());
-        }
-
-        public PagingListView<T> getListView() {
-            return listView;
-        }
-
-        public ObservableList<T> getData() {
-            return data;
-        }
     }
 }

@@ -15,8 +15,6 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Node;
@@ -29,12 +27,10 @@ import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class PagingListView<T> extends PagingControlBase {
+public class PagingListView<T> extends ItemPagingControlBase<T> {
 
     private final LoadingService<T> loadingService = new LoadingService<>();
 

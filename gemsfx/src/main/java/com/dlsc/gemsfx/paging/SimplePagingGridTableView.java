@@ -1,14 +1,9 @@
 package com.dlsc.gemsfx.paging;
 
-import javafx.beans.Observable;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.util.Callback;
-
-import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * A simple version of the paging grid table view that is completely based on a list of items, just like a normal
@@ -25,7 +20,7 @@ public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
      * Constructs a new table view and sets a loader that uses the data list.
      */
     public SimplePagingGridTableView() {
-        setLoader(new SimpleLoader(this, itemsProperty()));
+        setLoader(new SimpleLoader<>(this, itemsProperty()));
         setLoadDelayInMillis(10);
         setCommitLoadStatusDelay(400);
         loaderProperty().addListener(it -> {
@@ -67,51 +62,5 @@ public class SimplePagingGridTableView<T> extends PagingGridTableView<T> {
 
     public final void setItems(ObservableList<T> items) {
         this.items.set(items);
-    }
-
-    /*
-     * A convenience class to easily provide a loader for paging when the data is given as an
-     * observable list.
-     *
-     * @param <T> the type of the items
-     */
-    private final class SimpleLoader implements Callback<PagingLoadRequest, PagingLoadResponse<T>> {
-
-        private final ObservableList<T> data;
-        private final PagingGridTableView<T> gridTableView;
-
-        /**
-         * Constructs a new simple loader for the given list view and the given data.
-         *
-         * @param tableView the list view where the loader will be used
-         * @param data     the observable list that is providing the data / the items
-         */
-        public SimpleLoader(PagingGridTableView<T> tableView, ListProperty<T> data) {
-            this.gridTableView = Objects.requireNonNull(tableView);
-            this.data = Objects.requireNonNull(data);
-            this.data.addListener((Observable it) -> {
-                ObservableList<T> list = getData();
-                tableView.setPage(Math.min(tableView.getTotalItemCount() / tableView.getPageSize(), tableView.getPage()));
-                tableView.reload();
-            });
-        }
-
-        @Override
-        public PagingLoadResponse<T> call(PagingLoadRequest param) {
-            int page = param.getPage();
-            int pageSize = param.getPageSize();
-            int offset = page * pageSize;
-
-            // copy into new list to avoid concurrent modification exception
-            return new PagingLoadResponse<>(new ArrayList<>(data.subList(offset, Math.min(data.size(), offset + pageSize))), data.size());
-        }
-
-        public PagingGridTableView<T> getGridTableView() {
-            return gridTableView;
-        }
-
-        public ObservableList<T> getData() {
-            return data;
-        }
     }
 }

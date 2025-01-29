@@ -59,4 +59,9 @@ public class PagingControls extends PagingControlBase {
     public final ReadOnlyBooleanProperty neededProperty() {
         return needed.getReadOnlyProperty();
     }
+
+    @Override
+    public void reload() {
+        // do nothing ... only needed for the paging list view and the paging table grid view
+    }
 }
