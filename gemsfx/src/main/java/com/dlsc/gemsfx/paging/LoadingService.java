@@ -10,8 +10,6 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.util.Callback;
 
-import java.util.Collections;
-
 /**
  * A service that performs the actual loading of items for a paging control such as the {@link PagingListView} or the
  * {@link PagingGridTableView}. The service delays the actual loading by a couple of milliseconds so that it can be
