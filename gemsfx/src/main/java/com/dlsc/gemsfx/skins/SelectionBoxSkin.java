@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.CustomPopupControl;
 import com.dlsc.gemsfx.SelectionBox;
-import com.dlsc.gemsfx.util.UIUtil;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -15,21 +14,19 @@ import javafx.css.PseudoClass;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Separator;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.util.ArrayList;
@@ -49,7 +46,6 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
 
     private static final String UPDATE_POPUP_CONTENT = "updatePopupContent";
     private static final String UPDATE_SELECTION_IN_POPUP = "updateSelectionInPopup";
-    private static final String UPDATE_EXTRA_BUTTONS_POSITION = "updateExtraButtonsPosition";
     private static final String SHOW_POPUP_PROPERTY = "showPopup";
 
     private final SelectionBox<T> control;
@@ -112,10 +108,6 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
 
     private void addListenerToControl() {
         control.itemsProperty().addListener((obs, oldItems, newItems) -> updatePseudoAndPopupContent());
-
-        control.extraButtonsPositionProperty().addListener((obs, oldPosition, newPosition) -> popup.updateExtraButtonsPosition());
-
-        control.extraButtonsProviderProperty().addListener((obs, oldProvider, newProvider) -> popup.initializePopupContent());
 
         control.itemConverterProperty().addListener((obs, oldConverter, newConverter) -> updateDisplayLabelText());
         control.selectedItemsConverterProperty().addListener((obs, oldConverter, newConverter) -> updateDisplayLabelText());
@@ -352,10 +344,6 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
             getProperties().put(UPDATE_POPUP_CONTENT, true);
         }
 
-        public final void updateExtraButtonsPosition() {
-            getProperties().put(UPDATE_EXTRA_BUTTONS_POSITION, true);
-        }
-
         public final boolean isUpdating() {
             if (getSkin() instanceof SelectionBoxSkin.SelectionPopupSkin currentSkin) {
                 return currentSkin.isUpdating();
@@ -379,10 +367,8 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
     private class SelectionPopupSkin implements Skin<SelectionPopup> {
 
         private final SelectionPopup popup;
-        private final VBox contentBox;
+        private final BorderPane contentPane;
         private final VBox optionsBox;
-        private final VBox extraButtonsBox;
-        private final Separator separator;
 
         // Use indices as keys to handle duplicate items
         private final Map<Integer, BooleanProperty> itemButtonProperties = new LinkedHashMap<>();
@@ -390,14 +376,14 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
         public SelectionPopupSkin(SelectionPopup popup) {
             this.popup = popup;
 
-            contentBox = new VBox() {
+            contentPane = new BorderPane() {
                 @Override
                 public String getUserAgentStylesheet() {
                     return Objects.requireNonNull(SelectionBox.class.getResource("selection-box.css")).toExternalForm();
                 }
             };
-            contentBox.getStyleClass().add("content");
-            contentBox.setPrefWidth(Region.USE_COMPUTED_SIZE);
+            contentPane.getStyleClass().add("content");
+            contentPane.setPrefWidth(Region.USE_COMPUTED_SIZE);
 
             // Selection buttons container
             optionsBox = new VBox();
@@ -406,21 +392,19 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
             optionsBox.managedProperty().bind(optionsBox.visibleProperty());
             optionsBox.visibleProperty().bind(popup.getOwner().itemsProperty().emptyProperty().not());
 
-            // Extra buttons container
-            extraButtonsBox = new VBox();
-            extraButtonsBox.getStyleClass().add("extra-buttons-box");
-            extraButtonsBox.setFillWidth(true);
-            extraButtonsBox.managedProperty().bind(extraButtonsBox.visibleProperty());
-            extraButtonsBox.visibleProperty().bind(popup.getOwner().showExtraButtonsProperty());
+            contentPane.topProperty().bind(control.topProperty());
+            contentPane.bottomProperty().bind(control.bottomProperty());
+            contentPane.leftProperty().bind(control.leftProperty());
+            contentPane.rightProperty().bind(control.rightProperty());
 
-            separator = new Separator();
-            separator.managedProperty().bind(separator.visibleProperty());
-            separator.visibleProperty().bind(extraButtonsBox.visibleProperty().and(optionsBox.visibleProperty()));
+            ScrollPane scrollPane = new ScrollPane(optionsBox);
+            scrollPane.getStyleClass().add("options-scroll-pane");
+            scrollPane.setFitToWidth(true);
+            contentPane.setCenter(scrollPane);
 
             // Initialize the popup content
             updatePopupContent();
             updateSelectionInPopup();
-            updateExtraButtonsPosition();
 
             // Listen to changes in the properties of the popup
             popup.getProperties().addListener((MapChangeListener<Object, Object>) change -> {
@@ -433,40 +417,13 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
                         updateSelectionInPopup();
                         popup.getProperties().remove(UPDATE_SELECTION_IN_POPUP);
                     }
-                    if (change.getKey().equals(UPDATE_EXTRA_BUTTONS_POSITION)) {
-                        updateExtraButtonsPosition();
-                        popup.getProperties().remove(UPDATE_EXTRA_BUTTONS_POSITION);
-                    }
                 }
             });
         }
 
         private void updatePopupContent() {
-            // Clear the content of the popup
-            contentBox.getChildren().clear();
             optionsBox.getChildren().clear();
-            extraButtonsBox.getChildren().clear();
             itemButtonProperties.clear();
-
-            // Extra buttons
-            Callback<MultipleSelectionModel<T>, List<Button>> extraButtonsProvider = popup.getOwner().getExtraButtonsProvider();
-            if (extraButtonsProvider != null) {
-                List<Button> buttons = extraButtonsProvider.call(popup.getOwner().getSelectionModel());
-                if (buttons != null) {
-                    buttons.forEach(button -> {
-                        UIUtil.addClassIfAbsent(button, "extra-button");
-                        if (button.getMaxWidth() == Region.USE_COMPUTED_SIZE && !button.maxWidthProperty().isBound()) {
-                            button.setMaxWidth(Double.MAX_VALUE);
-                        }
-                        button.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-                            if (popup.getOwner().isAutoHideOnSelection()) {
-                                popup.hide();
-                            }
-                        });
-                    });
-                    extraButtonsBox.getChildren().addAll(buttons);
-                }
-            }
 
             // Get items
             List<T> items = popup.getOwner().getItems();
@@ -489,8 +446,6 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
                     optionsBox.getChildren().add(radioButton);
                 }
             }
-
-            updateExtraButtonsPosition();
         }
 
         private RadioButton createRadioButtonItem(T item, ToggleGroup toggleGroup, int index) {
@@ -546,13 +501,6 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
             updating.set(false);
         }
 
-        private void updateExtraButtonsPosition() {
-            switch (control.getExtraButtonsPosition()) {
-                case TOP -> contentBox.getChildren().setAll(extraButtonsBox, separator, optionsBox);
-                case BOTTOM -> contentBox.getChildren().setAll(optionsBox, separator, extraButtonsBox);
-            }
-        }
-
         // updating
 
         private final ReadOnlyBooleanWrapper updating = new ReadOnlyBooleanWrapper(this, "updating", false);
@@ -572,7 +520,7 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
 
         @Override
         public Node getNode() {
-            return contentBox;
+            return contentPane;
         }
 
         @Override

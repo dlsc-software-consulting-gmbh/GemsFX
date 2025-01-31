@@ -3,6 +3,7 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.util.SimpleStringConverter;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.layout.VBox;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -36,35 +37,8 @@ public class DayOfWeekPicker extends SelectionBox<DayOfWeek> {
         // Set Items
         getItems().setAll(getLocalizedDayOrder());
 
-        // Set Extra Buttons Provider
-        setExtraButtonsProvider(model -> switch (model.getSelectionMode()) {
-            case SINGLE -> {
-                // Button tomorrowButton = createExtraButton("Tomorrow", () -> model.clearAndSelect(getItems().indexOf(LocalDate.now().getDayOfWeek().plus(1))));
-                // Button yesterdayButton = createExtraButton("Yesterday", () -> model.clearAndSelect(getItems().indexOf(LocalDate.now().getDayOfWeek().minus(1))));
-                Button todayButton = createExtraButton("Today", () -> model.clearAndSelect(getItems().indexOf(LocalDate.now().getDayOfWeek())));
-                Button clearButton = createExtraButton("Clear", model::clearSelection);
-                yield List.of(clearButton, todayButton);
-            }
-            case MULTIPLE -> {
-                // When clicking on the button, it will clear the current selection and select all weekdays
-                Button weekdaysButton = createExtraButton("Weekdays", () -> {
-                    getSelectionModel().clearSelection();
-                    for (DayOfWeek day : getWeekdays()) {
-                        getSelectionModel().select(day);
-                    }
-                });
-                // When clicking on the button, it will clear the current selection and select all weekend days
-                Button weekendsButton = createExtraButton("Weekends", () -> {
-                    getSelectionModel().clearSelection();
-                    for (DayOfWeek day : getWeekendDays()) {
-                        getSelectionModel().select(day);
-                    }
-                });
-                Button clearButton = createExtraButton("Clear", model::clearSelection);
-                Button anyDayButton = createExtraButton("Any Day", model::selectAll);
-                yield List.of(clearButton, anyDayButton, weekdaysButton, weekendsButton);
-            }
-        });
+        // Add quick selection buttons to the top of the popup
+        setTop(createExtraButtonsBox());
 
         // set item converter
         setItemConverter(new SimpleStringConverter<>(dayOfWeek -> dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())));
@@ -100,6 +74,48 @@ public class DayOfWeekPicker extends SelectionBox<DayOfWeek> {
                 return String.join(", ", rangeStrings);
             }
         }));
+    }
+
+    private VBox createExtraButtonsBox() {
+        Button clearButton = createExtraButton("Clear", () -> getSelectionModel().clearSelection());
+        clearButton.getStyleClass().add("clear-button");
+        clearButton.managedProperty().bind(clearButton.visibleProperty());
+        clearButton.visibleProperty().bind(itemsProperty().isNotNull().and(itemsProperty().emptyProperty().not()));
+
+        Button todayButton = createExtraButton("Today", () -> getSelectionModel().clearAndSelect(getItems().indexOf(LocalDate.now().getDayOfWeek())));
+        todayButton.getStyleClass().add("today-button");
+        todayButton.managedProperty().bind(todayButton.visibleProperty());
+        todayButton.visibleProperty().bind(currentSelectionModeProperty().isEqualTo(SelectionMode.SINGLE));
+
+        Button allButton = createExtraButton("All Days", () -> getSelectionModel().selectAll());
+        allButton.getStyleClass().add("select-all-button");
+        allButton.managedProperty().bind(allButton.visibleProperty());
+        allButton.visibleProperty().bind(currentSelectionModeProperty().isEqualTo(SelectionMode.MULTIPLE));
+
+        Button weekdaysButton = createExtraButton("Weekdays", () -> {
+            getSelectionModel().clearSelection();
+            for (DayOfWeek day : getWeekdays()) {
+                getSelectionModel().select(day);
+            }
+        });
+        weekdaysButton.getStyleClass().add("weekdays-button");
+        weekdaysButton.managedProperty().bind(weekdaysButton.visibleProperty());
+        weekdaysButton.visibleProperty().bind(currentSelectionModeProperty().isEqualTo(SelectionMode.MULTIPLE));
+
+        Button weekendsButton = createExtraButton("Weekends", () -> {
+            getSelectionModel().clearSelection();
+            for (DayOfWeek day : getWeekendDays()) {
+                getSelectionModel().select(day);
+            }
+        });
+        weekendsButton.getStyleClass().add("weekends-button");
+        weekendsButton.managedProperty().bind(weekendsButton.visibleProperty());
+        weekendsButton.visibleProperty().bind(currentSelectionModeProperty().isEqualTo(SelectionMode.MULTIPLE));
+
+        VBox extraButtonsBox = new VBox(clearButton, todayButton, allButton, weekdaysButton, weekendsButton);
+        extraButtonsBox.getStyleClass().addAll("extra-buttons-box");
+
+        return extraButtonsBox;
     }
 
     private List<List<DayOfWeek>> mergeConsecutiveItem(List<DayOfWeek> selectedDays) {
