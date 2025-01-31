@@ -2,14 +2,12 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.paging.PagingGridTableView;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
-import com.dlsc.gemsfx.paging.PagingLoadRequest;
 import com.dlsc.gemsfx.paging.PagingLoadResponse;
 import com.dlsc.gemsfx.util.StageManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;

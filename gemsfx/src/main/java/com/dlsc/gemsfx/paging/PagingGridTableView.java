@@ -81,18 +81,14 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
         loadingService.setOnFailed(evt -> loadingStatus.set(Status.ERROR));
 
         InvalidationListener loadListener = it -> reload();
-        pageProperty().addListener(loadListener);
-        pageSizeProperty().addListener(loadListener);
-        totalItemCountProperty().addListener(loadListener);
-        loaderProperty().addListener(loadListener);
+        pageProperty().addListener(it -> reload("page changed"));
+        pageSizeProperty().addListener(it -> reload("page size changed"));
+        loaderProperty().addListener(it -> reload("loader changed"));
 
-        InvalidationListener updateListener = (Observable it) -> refresh();
+        InvalidationListener refreshListener = (Observable it) -> refresh();
 
-        getUnmodifiableItems().addListener(updateListener);
-        pageSizeProperty().addListener(updateListener);
-        pageProperty().addListener(updateListener);
-        fillLastPageProperty().addListener(updateListener);
-        totalItemCountProperty().addListener(updateListener);
+        getUnmodifiableItems().addListener(refreshListener);
+        fillLastPageProperty().addListener(refreshListener);
 
         pagingControlsLocation.addListener((it, oldLocation, newLocation) -> {
             if (newLocation.equals(Side.LEFT) || newLocation.equals(Side.RIGHT)) {
@@ -270,6 +266,7 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
     /**
      * Triggers an explicit reload of the list view.
      */
+    @Override
     public final void reload() {
         loadingService.restart();
     }

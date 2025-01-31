@@ -6,7 +6,6 @@ import com.dlsc.gemsfx.skins.InnerListViewSkin;
 import com.dlsc.gemsfx.skins.PagingListViewSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
@@ -51,10 +50,6 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
         }
     };
 
-    private final InvalidationListener updateListener = (Observable it) -> refresh();
-
-    private final WeakInvalidationListener weakUpdateListener = new WeakInvalidationListener(updateListener);
-
     public PagingListView() {
         getStyleClass().add("paging-list-view");
 
@@ -89,10 +84,9 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
         loadingService.setOnFailed(evt -> loadingStatus.set(Status.ERROR));
 
         InvalidationListener loadListener = it -> reload();
-        pageProperty().addListener(loadListener);
-        pageSizeProperty().addListener(loadListener);
-        totalItemCountProperty().addListener(loadListener);
-        loaderProperty().addListener(loadListener);
+        pageProperty().addListener(it -> reload("page changed"));
+        pageSizeProperty().addListener(it -> reload("page size changed"));
+        loaderProperty().addListener(it -> reload("loader changed"));
 
         setCellFactory(lv -> new ListCell<>() {
             @Override
@@ -106,13 +100,11 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
             }
         });
 
-        unmodifiableItems.addListener(weakUpdateListener);
+        InvalidationListener refreshListener = (Observable it) -> refresh();
 
-        pageSizeProperty().addListener(weakUpdateListener);
-        pageProperty().addListener(weakUpdateListener);
-        cellFactoryProperty().addListener(weakUpdateListener);
-        fillLastPageProperty().addListener(weakUpdateListener);
-        totalItemCountProperty().addListener(weakUpdateListener);
+        getUnmodifiableItems().addListener(refreshListener);
+        cellFactoryProperty().addListener(refreshListener);
+        fillLastPageProperty().addListener(refreshListener);
 
         pagingControlsLocation.addListener((it, oldLocation, newLocation) -> {
             if (newLocation.equals(Side.LEFT) || newLocation.equals(Side.RIGHT)) {
@@ -282,9 +274,15 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
         this.commitLoadStatusDelay.set(commitLoadStatusDelay);
     }
 
+    private void reload(String reason) {
+        System.out.println("reloading, reason: " + reason);
+        reload();
+    }
+
     /**
      * Triggers an explicit reload of the list view.
      */
+    @Override
     public final void reload() {
         loadingService.restart();
     }
