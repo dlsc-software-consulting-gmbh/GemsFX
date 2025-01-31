@@ -84,9 +84,9 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
         loadingService.setOnFailed(evt -> loadingStatus.set(Status.ERROR));
 
         InvalidationListener loadListener = it -> reload();
-        pageProperty().addListener(it -> reload("page changed"));
-        pageSizeProperty().addListener(it -> reload("page size changed"));
-        loaderProperty().addListener(it -> reload("loader changed"));
+        pageProperty().addListener(loadListener);
+        pageSizeProperty().addListener(loadListener);
+        loaderProperty().addListener(loadListener);
 
         setCellFactory(lv -> new ListCell<>() {
             @Override
