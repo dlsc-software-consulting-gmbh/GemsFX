@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Region;
@@ -23,10 +24,26 @@ import java.util.List;
 public class SelectionBoxApp extends Application {
 
     private final SelectionBox<String> selectionBox = new SelectionBox<>();
+    private final StackPane topNode = new StackPane();
+    private final StackPane bottomNode = new StackPane();
+    private final StackPane leftNode = new StackPane();
+    private final StackPane rightNode = new StackPane();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         selectionBox.show();
+
+        topNode.setStyle("-fx-background-color: lightblue;-fx-padding: 10;");
+        topNode.getChildren().add(new Label("Top"));
+
+        bottomNode.getChildren().add(new Label("Bottom"));
+        bottomNode.setStyle("-fx-background-color: lightcoral;-fx-padding: 10;");
+
+        leftNode.getChildren().add(new Label("Left"));
+        leftNode.setStyle("-fx-background-color: lightgreen;-fx-padding: 10;");
+
+        rightNode.getChildren().add(new Label("Right"));
+        rightNode.setStyle("-fx-background-color: lightyellow;-fx-padding: 10;");
 
         SplitPane splitPane = new SplitPane();
         splitPane.setDividerPositions(0.7);
@@ -60,9 +77,23 @@ public class SelectionBoxApp extends Application {
         selectionModeComboBox.getItems().addAll(SelectionMode.SINGLE, SelectionMode.MULTIPLE);
         selectionModeComboBox.valueProperty().bindBidirectional(selectionBox.getSelectionModel().selectionModeProperty());
 
-        // visible extra buttons
-        CheckBox visibleExtraButtonsCheckBox = new CheckBox("Show Extra Buttons");
-        visibleExtraButtonsCheckBox.selectedProperty().bindBidirectional(selectionBox.showExtraButtonsProperty());
+        // show extra nodes
+        CheckBox showExtraNodesCheckBox = new CheckBox("Show Extra Nodes");
+        // cache the top node
+        Node selectionBoxTop = selectionBox.getTop();
+        showExtraNodesCheckBox.selectedProperty().subscribe(showExtraNodes -> {
+            if (showExtraNodes) {
+                selectionBox.setTop(topNode);
+                selectionBox.setBottom(bottomNode);
+                selectionBox.setLeft(leftNode);
+                selectionBox.setRight(rightNode);
+            } else {
+                selectionBox.setTop(selectionBoxTop);
+                selectionBox.setBottom(null);
+                selectionBox.setLeft(null);
+                selectionBox.setRight(null);
+            }
+        });
 
         // prompt text
         CheckBox promptTextCheckBox = new CheckBox("Change Prompt Text");
@@ -74,27 +105,6 @@ public class SelectionBoxApp extends Application {
                 selectionBox.setPromptText("No Selection");
             }
         });
-
-        // change extra buttons
-        Button changeExtraButtonsButton = new Button("Change Extra Buttons");
-        changeExtraButtonsButton.setMaxWidth(Double.MAX_VALUE);
-        changeExtraButtonsButton.setOnAction(e ->
-                selectionBox.setExtraButtonsProvider(model -> switch (model.getSelectionMode()) {
-                    case SINGLE -> List.of(
-                            selectionBox.createExtraButton("Select Previous", model::selectPrevious),
-                            selectionBox.createExtraButton("Select Next", model::selectNext)
-                    );
-                    case MULTIPLE -> List.of(
-                            selectionBox.createExtraButton("Select First", model::selectFirst),
-                            selectionBox.createExtraButton("Select Last", model::selectLast)
-                    );
-                })
-        );
-
-        // extra buttons position
-        ComboBox<SelectionBox.VerticalPosition> extraButtonsPositionComboBox = new ComboBox<>();
-        extraButtonsPositionComboBox.getItems().addAll(SelectionBox.VerticalPosition.values());
-        extraButtonsPositionComboBox.valueProperty().bindBidirectional(selectionBox.extraButtonsPositionProperty());
 
         // use custom string converter
         CheckBox useCustomStringConverterCheckBox = new CheckBox("Use Custom String Converter");
@@ -224,10 +234,8 @@ public class SelectionBoxApp extends Application {
                 "SelectionBox",
                 new SimpleControlPane.ControlItem("Show Popup", showButton),
                 new SimpleControlPane.ControlItem("Selection Mode", selectionModeComboBox),
+                new SimpleControlPane.ControlItem("Show Extra Nodes", showExtraNodesCheckBox),
                 new SimpleControlPane.ControlItem("Change Prompt Text", promptTextCheckBox),
-                new SimpleControlPane.ControlItem("Show Extra Buttons", visibleExtraButtonsCheckBox),
-                new SimpleControlPane.ControlItem("Change Extra Buttons", changeExtraButtonsButton),
-                new SimpleControlPane.ControlItem("Extra Buttons Position", extraButtonsPositionComboBox),
                 new SimpleControlPane.ControlItem("Use Custom String Converter", useCustomStringConverterCheckBox),
                 new SimpleControlPane.ControlItem("Auto Hide On Select", autoHideOnSelectCheckBox),
                 new SimpleControlPane.ControlItem("Select Method", selectTestButtonsBox),

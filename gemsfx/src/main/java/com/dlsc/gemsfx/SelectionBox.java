@@ -2,9 +2,13 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.SelectionBoxSkin;
 import com.dlsc.gemsfx.util.CustomMultipleSelectionModel;
+import javafx.beans.InvalidationListener;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -16,7 +20,6 @@ import javafx.css.CssMetaData;
 import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableBooleanProperty;
-import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -24,7 +27,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
-import javafx.util.Callback;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 import java.util.ArrayList;
@@ -50,40 +53,35 @@ public class SelectionBox<T> extends Control {
     private static final String DEFAULT_STYLE_CLASS = "selection-box";
     private static final boolean DEFAULT_READ_ONLY = false;
     private static final boolean DEFAULT_SHOW_EXTRA_BUTTON = true;
-    private static final VerticalPosition DEFAULT_EXTRA_BUTTON_POSITION = VerticalPosition.TOP;
-
-    /**
-     * The VerticalPosition enum represents the vertical position options available within a SelectionBox component.
-     * It can be used to specify the position of additional extra buttons, relative to the main items in the SelectionBox.
-     * The available positions are:
-     * <p>
-     * - TOP: Indicates that the extra buttons should be positioned above the main items.
-     * - BOTTOM: Indicates that the extra buttons should be positioned below the main items.
-     */
-    public enum VerticalPosition {
-        TOP, BOTTOM
-    }
 
     public SelectionBox() {
         getStyleClass().setAll("combo-box-base", "combo-box", DEFAULT_STYLE_CLASS);
 
+        // Add quick selection buttons to the top of the popup
+        setTop(createExtraButtonsBox());
+
+        currentSelectionMode.bind(getCurrentSelectionModeBinding());
         // initialize the selection model
         CustomMultipleSelectionModel<T> model = new CustomMultipleSelectionModel<>();
         model.itemsProperty().bind(itemsProperty());
         setSelectionModel(model);
+    }
 
-        // initialize the extra buttons provider
-        setExtraButtonsProvider(selectionModel -> {
-            SelectionMode mode = selectionModel.getSelectionMode();
-            if (mode == SelectionMode.SINGLE) {
-                return List.of(createExtraButton("Clear", selectionModel::clearSelection));
-            } else {
-                return List.of(
-                        createExtraButton("Select All", selectionModel::selectAll),
-                        createExtraButton("Clear", selectionModel::clearSelection)
-                );
-            }
-        });
+    private Node createExtraButtonsBox() {
+        Button clearButton = createExtraButton("Clear", () -> getSelectionModel().clearSelection());
+        clearButton.getStyleClass().add("clear-button");
+        clearButton.managedProperty().bind(clearButton.visibleProperty());
+        clearButton.visibleProperty().bind(itemsProperty().isNotNull().and(itemsProperty().emptyProperty().not()));
+
+        Button selectAllButton = createExtraButton("Select All", () -> getSelectionModel().selectAll());
+        selectAllButton.managedProperty().bind(selectAllButton.visibleProperty());
+        selectAllButton.visibleProperty().bind(currentSelectionModeProperty().isEqualTo(SelectionMode.MULTIPLE));
+        selectAllButton.getStyleClass().add("select-all-button");
+
+        VBox extraButtonsBox = new VBox(clearButton, selectAllButton);
+        extraButtonsBox.getStyleClass().addAll("extra-buttons-box");
+
+        return extraButtonsBox;
     }
 
     @Override
@@ -131,26 +129,68 @@ public class SelectionBox<T> extends Control {
         return itemsProperty().get();
     }
 
-    // extraButtonsProvider
+    // top
 
-    private final ObjectProperty<Callback<MultipleSelectionModel<T>, List<Button>>> extraButtonsProvider = new SimpleObjectProperty<>(this, "extraButtonsProvider");
+    private final ObjectProperty<Node> top = new SimpleObjectProperty<>(this, "top");
 
-    /**
-     * A callback that provides a list of extra buttons based on the selection mode.
-     * The callback is invoked when the control needs to display extra buttons.
-     *
-     * @return the extra buttons provider property
-     */
-    public final ObjectProperty<Callback<MultipleSelectionModel<T>, List<Button>>> extraButtonsProviderProperty() {
-        return extraButtonsProvider;
+    public final ObjectProperty<Node> topProperty() {
+        return top;
     }
 
-    public final Callback<MultipleSelectionModel<T>, List<Button>> getExtraButtonsProvider() {
-        return extraButtonsProviderProperty().get();
+    public final Node getTop() {
+        return topProperty().get();
     }
 
-    public final void setExtraButtonsProvider(Callback<MultipleSelectionModel<T>, List<Button>> extraButtonsProvider) {
-        extraButtonsProviderProperty().set(extraButtonsProvider);
+    public final void setTop(Node top) {
+        topProperty().set(top);
+    }
+
+    // bottom
+
+    private final ObjectProperty<Node> bottom = new SimpleObjectProperty<>(this, "bottom");
+
+    public final ObjectProperty<Node> bottomProperty() {
+        return bottom;
+    }
+
+    public final Node getBottom() {
+        return bottomProperty().get();
+    }
+
+    public final void setBottom(Node bottom) {
+        bottomProperty().set(bottom);
+    }
+
+    // left
+
+    private final ObjectProperty<Node> left = new SimpleObjectProperty<>(this, "left");
+
+    public final ObjectProperty<Node> leftProperty() {
+        return left;
+    }
+
+    public final Node getLeft() {
+        return leftProperty().get();
+    }
+
+    public final void setLeft(Node left) {
+        leftProperty().set(left);
+    }
+
+    // right
+
+    private final ObjectProperty<Node> right = new SimpleObjectProperty<>(this, "right");
+
+    public final ObjectProperty<Node> rightProperty() {
+        return right;
+    }
+
+    public final Node getRight() {
+        return rightProperty().get();
+    }
+
+    public final void setRight(Node right) {
+        rightProperty().set(right);
     }
 
     /**
@@ -185,48 +225,11 @@ public class SelectionBox<T> extends Control {
             if (action != null) {
                 action.run();
             }
+            if (isAutoHideOnSelection()) {
+                hide();
+            }
         });
         return button;
-    }
-
-    // extraButtonsPosition
-
-    private ObjectProperty<VerticalPosition> extraButtonsPosition;
-
-    /**
-     * Returns the ObjectProperty that controls the vertical position of extra buttons in the SelectionBox.
-     * This property determines whether the extra buttons are positioned at the top or bottom relative to the main items.
-     *
-     * @return the ObjectProperty controlling the vertical position of extra buttons.
-     */
-    public final ObjectProperty<VerticalPosition> extraButtonsPositionProperty() {
-        if (extraButtonsPosition == null) {
-            extraButtonsPosition = new StyleableObjectProperty<>(DEFAULT_EXTRA_BUTTON_POSITION) {
-                @Override
-                public Object getBean() {
-                    return SelectionBox.this;
-                }
-
-                @Override
-                public String getName() {
-                    return "extraButtonsPosition";
-                }
-
-                @Override
-                public CssMetaData<? extends Styleable, VerticalPosition> getCssMetaData() {
-                    return StyleableProperties.EXTRA_BUTTONS_POSITION;
-                }
-            };
-        }
-        return extraButtonsPosition;
-    }
-
-    public final VerticalPosition getExtraButtonsPosition() {
-        return extraButtonsPosition == null ? DEFAULT_EXTRA_BUTTON_POSITION : extraButtonsPosition.get();
-    }
-
-    public final void setExtraButtonsPosition(VerticalPosition extraButtonsPosition) {
-        extraButtonsPositionProperty().set(extraButtonsPosition);
     }
 
     // graphic
@@ -418,46 +421,6 @@ public class SelectionBox<T> extends Control {
         readOnlyProperty().set(readOnly);
     }
 
-    // showExtraButtons
-
-    private BooleanProperty showExtraButtons;
-
-    /**
-     * Returns the BooleanProperty that determines whether extra buttons are shown in the SelectionBox.
-     * This property can be styled via CSS.
-     *
-     * @return the BooleanProperty controlling the visibility of extra buttons.
-     */
-    public final BooleanProperty showExtraButtonsProperty() {
-        if (showExtraButtons == null) {
-            showExtraButtons = new StyleableBooleanProperty(DEFAULT_SHOW_EXTRA_BUTTON) {
-                @Override
-                public Object getBean() {
-                    return SelectionBox.this;
-                }
-
-                @Override
-                public String getName() {
-                    return "showExtraButtons";
-                }
-
-                @Override
-                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
-                    return StyleableProperties.SHOW_EXTRA_BUTTONS;
-                }
-            };
-        }
-        return showExtraButtons;
-    }
-
-    public final boolean isShowExtraButtons() {
-        return showExtraButtons == null ? DEFAULT_SHOW_EXTRA_BUTTON : showExtraButtons.get();
-    }
-
-    public final void setShowExtraButtons(boolean showExtraButtons) {
-        showExtraButtonsProperty().set(showExtraButtons);
-    }
-
     // selectionModel
 
     private final ObjectProperty<MultipleSelectionModel<T>> selectionModel = new SimpleObjectProperty<>(this, "selectionModel");
@@ -481,6 +444,90 @@ public class SelectionBox<T> extends Control {
         this.selectionModel.set(selectionModel);
     }
 
+    // currentSelectionMode (read-only)
+
+    private final ReadOnlyObjectWrapper<SelectionMode> currentSelectionMode = new ReadOnlyObjectWrapper<>(this, "currentSelectionMode");
+
+    public final SelectionMode getCurrentSelectionMode() {
+        return currentSelectionMode.get();
+    }
+
+    /**
+     * Provides a read-only property that directly exposes the current
+     * {@link SelectionMode} of this control without requiring multilevel checks
+     * on the underlying {@link javafx.scene.control.MultipleSelectionModel}.
+     * This is particularly convenient for child classes or external consumers
+     * who need to quickly determine whether the mode is
+     * {@link SelectionMode#SINGLE}, {@link SelectionMode#MULTIPLE}, or {@code null}
+     * (in case there is no active selection model).
+     * <p>
+     * To modify the selection mode, call
+     * {@code getSelectionModel().setSelectionMode(...)} directly,
+     * since this property itself is read-only.
+     *
+     * @return a read-only {@link SelectionMode} property
+     */
+    public final ReadOnlyObjectProperty<SelectionMode> currentSelectionModeProperty() {
+        return currentSelectionMode.getReadOnlyProperty();
+    }
+
+    /**
+     * Creates and returns an {@code ObjectBinding} that observes changes to the
+     * {@code selectionModelProperty()} and its associated {@code selectionModeProperty()}.
+     * This binding dynamically updates its value to the current {@code SelectionMode}
+     * of the {@code MultipleSelectionModel} associated with the {@code SelectionBox}.
+     * <p>
+     * The binding ensures that it properly listens to changes in the selection model
+     * and updates accordingly when the selection mode changes, even when the
+     * selection model is replaced.
+     *
+     * @return an {@code ObjectBinding} that provides the current {@code SelectionMode}
+     * of the {@code MultipleSelectionModel}, or {@code null} if no
+     * selection model is set
+     */
+    private ObjectBinding<SelectionMode> getCurrentSelectionModeBinding() {
+        return new ObjectBinding<>() {
+            // Listener for selectionModeProperty
+            private final InvalidationListener selectionModeInvalidationListener = obs -> invalidate();
+            // Stores the old selectionModel
+            private MultipleSelectionModel<T> oldSelectionModel;
+
+            {
+                // Listen to selectionModelProperty changes
+                selectionModelProperty().addListener((observable, oldValue, newValue) -> {
+                    // Remove old listener if exists
+                    if (oldSelectionModel != null) {
+                        oldSelectionModel.selectionModeProperty().removeListener(selectionModeInvalidationListener);
+                    }
+                    // Add listener to the new model if not null
+                    if (newValue != null) {
+                        newValue.selectionModeProperty().addListener(selectionModeInvalidationListener);
+                    }
+                    // Update the reference
+                    oldSelectionModel = newValue;
+                    // Force recalculation
+                    invalidate();
+                });
+
+                // Add listener if there's already a selectionModel
+                if (getSelectionModel() != null) {
+                    oldSelectionModel = getSelectionModel();
+                    oldSelectionModel.selectionModeProperty().addListener(selectionModeInvalidationListener);
+                }
+
+                // Bind to outer property to trigger computeValue
+                bind(selectionModelProperty());
+            }
+
+            @Override
+            protected SelectionMode computeValue() {
+                // Return null if selectionModel is null
+                MultipleSelectionModel<T> sm = getSelectionModel();
+                return (sm == null) ? null : sm.getSelectionMode();
+            }
+        };
+    }
+
     private static class StyleableProperties {
         private static final CssMetaData<SelectionBox, Boolean> READ_ONLY = new CssMetaData<>("-fx-read-only", StyleConverter.getBooleanConverter(), DEFAULT_READ_ONLY) {
 
@@ -495,35 +542,11 @@ public class SelectionBox<T> extends Control {
             }
         };
 
-        private static final CssMetaData<SelectionBox, Boolean> SHOW_EXTRA_BUTTONS = new CssMetaData<>("-fx-show-extra-buttons", StyleConverter.getBooleanConverter(), DEFAULT_SHOW_EXTRA_BUTTON) {
-            @Override
-            public boolean isSettable(SelectionBox styleable) {
-                return styleable.showExtraButtons == null || !styleable.showExtraButtons.isBound();
-            }
-
-            @Override
-            public StyleableProperty<Boolean> getStyleableProperty(SelectionBox SelectionBox) {
-                return (StyleableProperty<Boolean>) SelectionBox.showExtraButtonsProperty();
-            }
-        };
-
-        private static final CssMetaData<SelectionBox, VerticalPosition> EXTRA_BUTTONS_POSITION = new CssMetaData<>("-fx-extra-buttons-position", StyleConverter.getEnumConverter(VerticalPosition.class), DEFAULT_EXTRA_BUTTON_POSITION) {
-            @Override
-            public boolean isSettable(SelectionBox styleable) {
-                return styleable.extraButtonsPosition == null || !styleable.extraButtonsPosition.isBound();
-            }
-
-            @Override
-            public StyleableProperty<VerticalPosition> getStyleableProperty(SelectionBox SelectionBox) {
-                return (StyleableProperty<VerticalPosition>) SelectionBox.extraButtonsPositionProperty();
-            }
-        };
-
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
 
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
-            Collections.addAll(styleables, READ_ONLY, SHOW_EXTRA_BUTTONS, EXTRA_BUTTONS_POSITION);
+            Collections.addAll(styleables, READ_ONLY);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }
