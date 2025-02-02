@@ -6,6 +6,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.scene.Scene;
 import javafx.scene.control.SkinBase;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -36,6 +37,36 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
 
         loadingImage();
         getChildren().add(imageView);
+
+        registerWindowScaleListeners(svgImageView);
+    }
+
+    /**
+     * Registers listeners on the current Scene and its Window for render-scale changes.
+     * <p>
+     * This ensures that when the {@link Scene} or its {@link javafx.stage.Window} changes (e.g., moving
+     * from a normal DPI display to a high DPI/4K display), the renderScaleX and renderScaleY
+     * property listeners will be added or removed appropriately.
+     *
+     * @param svgImageView the SVGImageView whose Scene and Window changes need to be tracked.
+     */
+    private void registerWindowScaleListeners(SVGImageView svgImageView) {
+        Scene scene = svgImageView.getScene();
+        if (scene != null && scene.getWindow() != null) {
+            scene.getWindow().renderScaleXProperty().addListener(weakListener);
+            scene.getWindow().renderScaleYProperty().addListener(weakListener);
+        }
+
+        svgImageView.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (oldScene != null && oldScene.getWindow() != null) {
+                oldScene.getWindow().renderScaleXProperty().removeListener(weakListener);
+                oldScene.getWindow().renderScaleYProperty().removeListener(weakListener);
+            }
+            if (newScene != null && newScene.getWindow() != null) {
+                newScene.getWindow().renderScaleXProperty().addListener(weakListener);
+                newScene.getWindow().renderScaleYProperty().addListener(weakListener);
+            }
+        });
     }
 
     private void loadingImage() {
@@ -50,9 +81,16 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
             return;
         }
 
+        double sX = 1.0;
+        double sY = 1.0;
+        if (skinnable.getScene() != null && skinnable.getScene().getWindow() != null) {
+            sX = skinnable.getScene().getWindow().getRenderScaleX();
+            sY = skinnable.getScene().getWindow().getRenderScaleY();
+        }
+
         if (!skinnable.isBackgroundLoading()) {
             try {
-                Image image = SVGUtil.parseSVGFromUrl(new URI(url).toURL(), skinnable.getFitWidth(), skinnable.getFitHeight());
+                Image image = SVGUtil.parseSVGFromUrl(new URI(url).toURL(), skinnable.getFitWidth() * sX, skinnable.getFitHeight() * sY);
                 imageView.setImage(image);
             } catch (Exception e) {
                 imageView.setImage(null);
