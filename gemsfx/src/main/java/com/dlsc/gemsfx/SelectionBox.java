@@ -52,7 +52,6 @@ public class SelectionBox<T> extends Control {
 
     private static final String DEFAULT_STYLE_CLASS = "selection-box";
     private static final boolean DEFAULT_READ_ONLY = false;
-    private static final boolean DEFAULT_SHOW_EXTRA_BUTTON = true;
 
     public SelectionBox() {
         getStyleClass().setAll("combo-box-base", "combo-box", DEFAULT_STYLE_CLASS);
