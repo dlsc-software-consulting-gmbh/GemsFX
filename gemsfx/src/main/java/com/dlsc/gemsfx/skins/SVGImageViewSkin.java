@@ -101,6 +101,9 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
         }
         if (newWindow != null) {
             attachScaleListeners(newWindow);
+
+            // Force immediate image reload to reflect the new Window's render scale.
+            loadingImage();
         }
     };
 
