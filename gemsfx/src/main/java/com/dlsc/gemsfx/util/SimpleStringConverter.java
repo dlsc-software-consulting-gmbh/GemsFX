@@ -46,8 +46,13 @@ public class SimpleStringConverter<T> extends StringConverter<T> {
 
     private final Callback<T, String> valueToStringCallback;
 
+    /**
+     * Creates a new {@code SimpleStringConverter} with a default callback:
+     * if the object is non-null, its {@code toString()} method is used;
+     * if the object is null, an empty string ("") is returned.
+     */
     public SimpleStringConverter() {
-        this(Object::toString, "");
+        this.valueToStringCallback = value -> value == null ? "" : value.toString();
     }
 
     /**
@@ -76,7 +81,7 @@ public class SimpleStringConverter<T> extends StringConverter<T> {
 
     @Override
     public String toString(T object) {
-        if (this.valueToStringCallback != null && object != null) {
+        if (this.valueToStringCallback != null) {
             return this.valueToStringCallback.call(object);
         }
         return "";
