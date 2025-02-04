@@ -1,7 +1,10 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.util.SimpleStringConverter;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 import java.time.LocalTime;
@@ -38,18 +41,8 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
         // Set time ranges
         getItems().setAll(ranges);
 
-        // set extra buttons
-        setExtraButtonsProvider(model -> switch (model.getSelectionMode()) {
-            case SINGLE -> {
-                Button clearButton = createExtraButton("Clear", getSelectionModel()::clearSelection);
-                yield List.of(clearButton);
-            }
-            case MULTIPLE -> {
-                Button clearButton = createExtraButton("Clear", model::clearSelection);
-                Button selectAllButton = createExtraButton("Select All", model::selectAll);
-                yield List.of(clearButton, selectAllButton);
-            }
-        });
+        // Add quick selection buttons to the top of the popup
+        setTop(createExtraButtonsBox());
 
         // set result converter
         setSelectedItemsConverter(new SimpleStringConverter<>(selectedRanges -> {
@@ -71,6 +64,23 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
                 return String.join(", ", rangeStrings);
             }
         }));
+    }
+
+    private Node createExtraButtonsBox() {
+        Button clearButton = createExtraButton("Clear", getSelectionModel()::clearSelection);
+        clearButton.getStyleClass().add("clear-button");
+        clearButton.managedProperty().bind(clearButton.visibleProperty());
+        clearButton.visibleProperty().bind(itemsProperty().isNotNull().and(itemsProperty().emptyProperty().not()));
+
+        Button selectAllButton = createExtraButton("Select All", getSelectionModel()::selectAll);
+        selectAllButton.getStyleClass().add("select-all-button");
+        selectAllButton.managedProperty().bind(selectAllButton.visibleProperty());
+        selectAllButton.visibleProperty().bind(currentSelectionModeProperty().isEqualTo(SelectionMode.MULTIPLE));
+
+        VBox extraButtonsBox = new VBox(clearButton, selectAllButton);
+        extraButtonsBox.getStyleClass().addAll("extra-buttons-box");
+
+        return extraButtonsBox;
     }
 
     private List<TimeRange> mergeConsecutiveItem(List<TimeRange> ranges) {
