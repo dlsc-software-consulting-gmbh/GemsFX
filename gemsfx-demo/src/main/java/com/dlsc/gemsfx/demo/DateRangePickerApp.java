@@ -14,6 +14,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -58,6 +59,11 @@ public class DateRangePickerApp extends Application {
         CheckBox showIconCheckBox = new CheckBox("Show icon");
         showIconCheckBox.selectedProperty().bindBidirectional(picker.showIconProperty());
 
+        TextField promptTextField = new TextField();
+        promptTextField.setPromptText("Prompt Text");
+        promptTextField.textProperty().bindBidirectional(picker.promptTextProperty());
+        promptTextField.setMaxWidth(Double.MAX_VALUE);
+
         ComboBox<DateTimeFormatter> formattersBox = new ComboBox<>();
         formattersBox.getItems().add(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT));
         formattersBox.getItems().add(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM));
@@ -87,7 +93,7 @@ public class DateRangePickerApp extends Application {
 
         HBox popupButtons = new HBox(10, showPopupButton, hidePopupButton);
 
-        VBox vBox = new VBox(10, picker, comparisonLabel, comboBox, datePicker, choiceBox, calendarPicker, optionsLabel, smallBox, showPresetTitleCheckBox, showIconCheckBox, formattersBox, changePresetsButton, popupButtons, scenicViewButton);
+        VBox vBox = new VBox(10, picker, comparisonLabel, comboBox, datePicker, choiceBox, calendarPicker, optionsLabel, promptTextField, smallBox, showPresetTitleCheckBox, showIconCheckBox, formattersBox, changePresetsButton, popupButtons, scenicViewButton);
 
         vBox.setPadding(new Insets(20));
 

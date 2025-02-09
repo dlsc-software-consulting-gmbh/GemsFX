@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.daterange.DateRange;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.daterange.DateRangeView;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.BooleanBinding;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -46,8 +47,10 @@ public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangeP
         InvalidationListener updateLabelsListener = it -> updateLabels();
         picker.valueProperty().addListener(updateLabelsListener);
         picker.formatterProperty().addListener(updateLabelsListener);
+        picker.promptTextProperty().addListener(updateLabelsListener);
 
         picker.valueProperty().addListener(it -> view.setValue(picker.getValue()));
+
         picker.smallProperty().addListener(it -> updateView());
 
         updateView();
@@ -73,8 +76,10 @@ public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangeP
         titleLabel = new Label();
         titleLabel.getStyleClass().add("title-label");
 
-        titleLabel.visibleProperty().bind(picker.showPresetTitleProperty());
-        titleLabel.managedProperty().bind(picker.showPresetTitleProperty());
+        BooleanBinding showPresetTitleBinding = picker.showPresetTitleProperty().and(picker.promptTextProperty().isEmpty());
+
+        titleLabel.visibleProperty().bind(showPresetTitleBinding);
+        titleLabel.managedProperty().bind(titleLabel.visibleProperty());
 
         rangeLabel = new Label();
         rangeLabel.getStyleClass().add("range-label");
@@ -97,8 +102,8 @@ public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangeP
         } else {
             Region divider = new Region();
             divider.getStyleClass().add("divider");
-            divider.visibleProperty().bind(picker.showPresetTitleProperty());
-            divider.managedProperty().bind(picker.showPresetTitleProperty());
+            divider.visibleProperty().bind(showPresetTitleBinding);
+            divider.managedProperty().bind(divider.visibleProperty());
             pane = new HBox(titleLabel, divider, rangeLabel);
             pane.getStyleClass().add("small");
         }
@@ -124,17 +129,24 @@ public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangeP
     }
 
     private void updateLabels() {
-        DateRange dateRange = getSkinnable().getValue();
-        if (dateRange != null) {
-            if (StringUtils.isNotBlank(dateRange.getTitle())) {
-                titleLabel.setText(dateRange.getTitle());
-            } else {
-                titleLabel.setText(getSkinnable().getCustomRangeText());
-            }
-            rangeLabel.setText(toString(dateRange));
+        DateRangePicker rangePicker = getSkinnable();
+        String promptText = rangePicker.getPromptText();
+        if (StringUtils.isNotBlank(promptText)) {
+            titleLabel.setText(null);
+            rangeLabel.setText(promptText);
         } else {
-            titleLabel.setText("");
-            rangeLabel.setText("");
+            DateRange dateRange = rangePicker.getValue();
+            if (dateRange != null) {
+                if (StringUtils.isNotBlank(dateRange.getTitle())) {
+                    titleLabel.setText(dateRange.getTitle());
+                } else {
+                    titleLabel.setText(rangePicker.getCustomRangeText());
+                }
+                rangeLabel.setText(toString(dateRange));
+            } else {
+                titleLabel.setText("");
+                rangeLabel.setText("");
+            }
         }
     }
 
