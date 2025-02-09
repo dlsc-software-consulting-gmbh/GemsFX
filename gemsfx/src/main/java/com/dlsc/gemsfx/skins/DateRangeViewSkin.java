@@ -150,12 +150,7 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
         HBox.setHgrow(presetsBox, Priority.ALWAYS);
 
         view.valueProperty().addListener((obs, oldRange, newRange) -> {
-            if (newRange != null) {
-                // the start and end dates can be visible in both month views
-                applyRangeToMonthViews(newRange);
-            } else {
-                view.setValue(oldRange);
-            }
+            applyRangeToMonthViews(newRange);
         });
 
         view.getPresets().addListener((Observable it) -> updatePresetsView());
@@ -181,7 +176,7 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
     }
 
     private void updateCalendarLayout() {
-        DateRangeView view  = getSkinnable();
+        DateRangeView view = getSkinnable();
 
         if (view.getOrientation().equals(Orientation.HORIZONTAL)) {
             HBox monthsBox = new HBox(startCalendarView, endCalendarView);
@@ -230,7 +225,7 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
             DateRangePreset rangePreset = presets.get(i);
             Label l = new Label(rangePreset.getTitle());
             l.getStyleClass().add("preset-name-label");
-            l.setOnMouseClicked(evt -> applyRangeToMonthViews(rangePreset.getDateRangeSupplier().get()));
+            l.setOnMouseClicked(evt -> view.setValue(rangePreset.getDateRangeSupplier().get()));
             presetsBox.getChildren().add(l);
 
             if (i < presets.size() - 1) {
