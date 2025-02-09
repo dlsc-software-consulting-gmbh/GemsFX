@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.daterange.DateRangeView;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -11,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
@@ -45,13 +47,18 @@ public class DateRangeViewApp extends Application {
         TextField titleField = new TextField();
         titleField.textProperty().bindBidirectional(view.presetTitleProperty());
 
-        Button applyNull = new Button("Apply null");
-        applyNull.setOnAction(evt -> view.setValue(null));
+        Button clearButton = new Button();
+        clearButton.textProperty().bind(Bindings.createStringBinding(() -> view.getValue() == null ? "Clear" : "Clear " + view.getValue().toString(), view.valueProperty()));
+        clearButton.setOnAction(evt -> view.setValue(null));
+        clearButton.disableProperty().bind(view.valueProperty().isNull());
 
-        FlowPane optionsBox = new FlowPane(10, 10, sideBox, orientationBox, scenicViewButton, titleField, showButtons, showPresets, applyNull);
+        Label valueLabel = new Label();
+        valueLabel.textProperty().bind(Bindings.createStringBinding(() -> view.getValue() == null ? "No value" : "Value: " + view.getValue().toString(), view.valueProperty()));
+
+        FlowPane optionsBox = new FlowPane(10, 10, sideBox, orientationBox, scenicViewButton, titleField, showButtons, showPresets, clearButton);
         optionsBox.setAlignment(Pos.CENTER);
 
-        VBox vBox = new VBox(20, view, optionsBox);
+        VBox vBox = new VBox(20, view, valueLabel, optionsBox);
 
         vBox.setPadding(new Insets(20));
         vBox.setAlignment(Pos.CENTER);

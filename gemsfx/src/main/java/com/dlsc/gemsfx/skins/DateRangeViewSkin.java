@@ -225,7 +225,9 @@ public class DateRangeViewSkin extends SkinBase<DateRangeView> {
             DateRangePreset rangePreset = presets.get(i);
             Label l = new Label(rangePreset.getTitle());
             l.getStyleClass().add("preset-name-label");
-            l.setOnMouseClicked(evt -> view.setValue(rangePreset.getDateRangeSupplier().get()));
+
+            // only apply range to month view, do not update the value object (user will need to commit to it)
+            l.setOnMouseClicked(evt -> applyRangeToMonthViews(rangePreset.getDateRangeSupplier().get()));
             presetsBox.getChildren().add(l);
 
             if (i < presets.size() - 1) {
