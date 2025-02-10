@@ -48,30 +48,40 @@ public class SimpleStringConverter<T> extends StringConverter<T> {
 
     /**
      * Creates a new {@code SimpleStringConverter} with a default callback:
-     * if the object is non-null, its {@code toString()} method is used;
-     * if the object is null, an empty string ("") is returned.
+     * <ul>
+     *   <li>If the object is non-null, its {@code toString()} method is used.</li>
+     *   <li>If the object is null, an empty string ("") is returned.</li>
+     * </ul>
      */
     public SimpleStringConverter() {
-        this.valueToStringCallback = value -> value == null ? "" : value.toString();
+        this(Object::toString, "");
     }
 
     /**
-     * Constructor that requires callers to handle null values themselves.
-     * The provided callback should handle conversion from value to String,
-     * including any necessary null handling.
+     * Creates a new {@code SimpleStringConverter} that uses the given callback to convert non-null
+     * values to strings. This internally leverages the two-argument constructor with an empty string
+     * ("") as the default for null values.
      *
-     * @param valueToStringCallback The callback to convert value to a String.
+     * <ul>
+     *   <li>If the object is non-null, {@code valueToStringCallback} is invoked to produce the string.</li>
+     *   <li>If the object is null, an empty string ("") is returned directly (the callback is not called).</li>
+     * </ul>
+     *
+     * @param valueToStringCallback the callback to convert a non-null value to a String
      */
     public SimpleStringConverter(Callback<T, String> valueToStringCallback) {
-        this.valueToStringCallback = valueToStringCallback;
+        this(valueToStringCallback, "");
     }
 
     /**
      * Constructor that automatically handles null values by returning a default null value string.
-     * If the value is null, the specified nullDefaultValue is returned instead of throwing an error or returning null.
+     * <ul>
+     *   <li>If the object is non-null, the provided callback is used to convert it.</li>
+     *   <li>If the object is null, the specified {@code nullDefaultValue} is returned.</li>
+     * </ul>
      *
-     * @param nonNullValueCallback The callback to convert non-null value to a String.
-     * @param nullDefaultValue The default String value to return if the value is null.
+     * @param nonNullValueCallback The callback to convert a non-null value to a String.
+     * @param nullDefaultValue     The default String value to return if the value is null.
      */
     public SimpleStringConverter(Callback<T, String> nonNullValueCallback, String nullDefaultValue) {
         this.valueToStringCallback = value -> Optional.ofNullable(value)
