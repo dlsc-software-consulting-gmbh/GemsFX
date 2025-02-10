@@ -21,6 +21,9 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 
+/**
+ * The date range view can be used to define a start and an end date via two {@link CalendarView} instances.
+ */
 public class DateRangeView extends Control {
 
     private static final PseudoClass VERTICAL_PSEUDOCLASS_STATE = PseudoClass.getPseudoClass("vertical");
@@ -33,6 +36,9 @@ public class DateRangeView extends Control {
 
     private final SelectionModel selectionModel;
 
+    /**
+     * Constructs a new date range view.
+     */
     public DateRangeView() {
         getStyleClass().add("date-range-view");
 
@@ -69,12 +75,6 @@ public class DateRangeView extends Control {
 
     private ObjectProperty<Orientation> orientation;
 
-    /**
-     * Determines how the start and end calendars will be laid out, either next to each
-     * other (horizontal), or one on top of the other (vertical).
-     *
-     * @return the layout orientation of the two calendar views
-     */
     public final void setOrientation(Orientation value) {
         orientationProperty().set(value);
     }
@@ -83,6 +83,12 @@ public class DateRangeView extends Control {
         return orientation == null ? Orientation.HORIZONTAL : orientation.get();
     }
 
+    /**
+     * Determines how the start and end calendars will be laid out, either next to each
+     * other (horizontal), or one on top of the other (vertical).
+     *
+     * @return the layout orientation of the two calendar views
+     */
     public final ObjectProperty<Orientation> orientationProperty() {
         if (orientation == null) {
             orientation = new StyleableObjectProperty<>(Orientation.HORIZONTAL) {
@@ -220,15 +226,20 @@ public class DateRangeView extends Control {
 
     private final StringProperty presetTitle = new SimpleStringProperty(this, "presetsTitle", "QUICK SELECT");
 
-    public String getPresetTitle() {
+    public final String getPresetTitle() {
         return presetTitle.get();
     }
 
-    public StringProperty presetTitleProperty() {
+    /**
+     * The name used for the title label of the presets section. E.g. "Quick Selection".
+     *
+     * @return the title for the preset section
+     */
+    public final StringProperty presetTitleProperty() {
         return presetTitle;
     }
 
-    public void setPresetTitle(String presetTitle) {
+    public final void setPresetTitle(String presetTitle) {
         this.presetTitle.set(presetTitle);
     }
 
@@ -246,6 +257,12 @@ public class DateRangeView extends Control {
         return presetsLocation.get();
     }
 
+    /**
+     * Defines where the presets will be shown relative to the two calendar views.
+     * Supports left and right side values.
+     *
+     * @return the location of the presets
+     */
     public final ObjectProperty<Side> presetsLocationProperty() {
         return presetsLocation;
     }
@@ -260,6 +277,11 @@ public class DateRangeView extends Control {
         return showPresets.get();
     }
 
+    /**
+     * Controls whether the presets will be shown by the control
+     *
+     * @return controls visibility of the presets section
+     */
     public final BooleanProperty showPresetsProperty() {
         return showPresets;
     }
@@ -274,6 +296,11 @@ public class DateRangeView extends Control {
         return onClose.get();
     }
 
+    /**
+     * A runnable callback that will be invoked when the user closes the control.
+     *
+     * @return the closing callback
+     */
     public final ObjectProperty<Runnable> onCloseProperty() {
         return onClose;
     }
@@ -290,6 +317,11 @@ public class DateRangeView extends Control {
         return value.get();
     }
 
+    /**
+     * Stores the currently selected / defined date range.
+     *
+     * @return the current date range
+     */
     public final ObjectProperty<DateRange> valueProperty() {
         return value;
     }
@@ -321,6 +353,11 @@ public class DateRangeView extends Control {
 
     private final ObservableList<DateRangePreset> presets = FXCollections.observableArrayList();
 
+    /**
+     * The list of currently available presets.
+     *
+     * @return the presets
+     */
     public final ObservableList<DateRangePreset> getPresets() {
         return presets;
     }
