@@ -1,7 +1,8 @@
 package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.CustomPopupControl;
 import com.dlsc.gemsfx.SelectionBox;
+import javafx.animation.FadeTransition;
+import javafx.animation.Transition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -11,11 +12,13 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.css.PseudoClass;
+import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PopupControl;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
@@ -27,6 +30,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import java.util.ArrayList;
@@ -313,14 +317,19 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
     /**
      * Custom popup control to show the items in a popup.
      */
-    private class SelectionPopup extends CustomPopupControl {
+    private class SelectionPopup extends PopupControl {
 
         private static final String DEFAULT_STYLE_CLASS = "selection-popup";
-        private final SelectionBox<T> control;
+        private static final Duration ANIM_DURATION = Duration.millis(200);
+
+        private final SelectionBox<T> owner;
+
+        private Transition showTransition;
+        private Transition hideTransition;
 
         public SelectionPopup(SelectionBox<T> owner) {
             getStyleClass().add(DEFAULT_STYLE_CLASS);
-            this.control = owner;
+            this.owner = owner;
 
             setAutoFix(true);
             setAutoHide(true);
@@ -351,16 +360,73 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
             return false;
         }
 
-        @Override
         public void show(Node node) {
-            super.show(node);
+            Bounds bounds = owner.localToScreen(owner.getLayoutBounds());
+            super.show(node, bounds.getMinX(), bounds.getMaxY());
 
-            Skin<?> skin = getSkin();
-            if (skin != null && skin.getNode() instanceof Region popupContent) {
-                if (!popupContent.minWidthProperty().isBound()) {
-                    popupContent.minWidthProperty().bind(control.widthProperty());
-                }
+            Node popupNode = getSkin().getNode();
+            if (popupNode instanceof Region region) {
+                region.setPrefWidth(bounds.getWidth());
             }
+
+            if (owner.isAnimationEnabled()) {
+                getShowTransition().stop();
+                popupNode.setOpacity(0);
+                getShowTransition().playFromStart();
+            } else {
+                popupNode.setOpacity(1);
+            }
+        }
+
+        @Override
+        public void hide() {
+            if (!isShowing()) {
+                return;
+            }
+            if (owner.isAnimationEnabled()) {
+                getShowTransition().stop();
+                getHideTransition().stop();
+                getHideTransition().playFromStart();
+            } else {
+                super.hide();
+            }
+        }
+
+        private Transition getShowTransition() {
+            if (showTransition == null) {
+                showTransition = createShowTransition();
+            }
+            return showTransition;
+        }
+
+        private Transition createShowTransition() {
+            FadeTransition fade = new FadeTransition(ANIM_DURATION, getSkin().getNode());
+            fade.setFromValue(0);
+            fade.setToValue(1);
+
+            fade.setOnFinished(e -> {
+                getSkin().getNode().setOpacity(1);
+            });
+            return fade;
+        }
+
+        private Transition getHideTransition() {
+            if (hideTransition == null) {
+                hideTransition = createHideTransition();
+            }
+            return hideTransition;
+        }
+
+        private Transition createHideTransition() {
+            FadeTransition fade = new FadeTransition(ANIM_DURATION, getSkin().getNode());
+            fade.setFromValue(1);
+            fade.setToValue(0);
+
+            fade.setOnFinished(e -> {
+                SelectionPopup.super.hide();
+                getSkin().getNode().setOpacity(0);
+            });
+            return fade;
         }
     }
 
@@ -409,11 +475,11 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
             // Listen to changes in the properties of the popup
             popup.getProperties().addListener((MapChangeListener<Object, Object>) change -> {
                 if (change.wasAdded()) {
-                    if (change.getKey().equals(UPDATE_POPUP_CONTENT)) {
+                    if (UPDATE_POPUP_CONTENT.equals(change.getKey())) {
                         updatePopupContent();
                         popup.getProperties().remove(UPDATE_POPUP_CONTENT);
                     }
-                    if (change.getKey().equals(UPDATE_SELECTION_IN_POPUP)) {
+                    if (UPDATE_SELECTION_IN_POPUP.equals(change.getKey())) {
                         updateSelectionInPopup();
                         popup.getProperties().remove(UPDATE_SELECTION_IN_POPUP);
                     }

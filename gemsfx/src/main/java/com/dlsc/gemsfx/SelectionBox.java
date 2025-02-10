@@ -52,6 +52,7 @@ public class SelectionBox<T> extends Control {
 
     private static final String DEFAULT_STYLE_CLASS = "selection-box";
     private static final boolean DEFAULT_READ_ONLY = false;
+    private static final boolean DEFAULT_ANIMATION_ENABLED = false;
 
     public SelectionBox() {
         getStyleClass().setAll("combo-box-base", "combo-box", DEFAULT_STYLE_CLASS);
@@ -527,6 +528,40 @@ public class SelectionBox<T> extends Control {
         };
     }
 
+    // animationEnabled
+
+    private BooleanProperty animationEnabled;
+
+    public final BooleanProperty animationEnabledProperty() {
+        if (animationEnabled == null) {
+            animationEnabled = new StyleableBooleanProperty(DEFAULT_ANIMATION_ENABLED) {
+                @Override
+                public Object getBean() {
+                    return SelectionBox.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "animationEnabled";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.ANIMATION_ENABLED;
+                }
+            };
+        }
+        return animationEnabled;
+    }
+
+    public final boolean isAnimationEnabled() {
+        return animationEnabled == null ? DEFAULT_ANIMATION_ENABLED : animationEnabled.get();
+    }
+
+    public final void setAnimationEnabled(boolean value) {
+        animationEnabledProperty().set(value);
+    }
+
     private static class StyleableProperties {
         private static final CssMetaData<SelectionBox, Boolean> READ_ONLY = new CssMetaData<>("-fx-read-only", StyleConverter.getBooleanConverter(), DEFAULT_READ_ONLY) {
 
@@ -541,11 +576,23 @@ public class SelectionBox<T> extends Control {
             }
         };
 
+        private static final CssMetaData<SelectionBox, Boolean> ANIMATION_ENABLED = new CssMetaData<>("-fx-animation-enabled", StyleConverter.getBooleanConverter(), DEFAULT_ANIMATION_ENABLED) {
+            @Override
+            public boolean isSettable(SelectionBox node) {
+                return node.animationEnabled == null || !node.animationEnabled.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(SelectionBox node) {
+                return (StyleableProperty<Boolean>) node.animationEnabledProperty();
+            }
+        };
+
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
 
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
-            Collections.addAll(styleables, READ_ONLY);
+            Collections.addAll(styleables, READ_ONLY, ANIMATION_ENABLED);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }
