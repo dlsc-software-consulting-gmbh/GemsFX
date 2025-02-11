@@ -230,11 +230,16 @@ public class SelectionBoxApp extends Application {
         itemsButtonsBox.setFillWidth(true);
         itemsButtonsBox.getChildren().addAll(changeItemsButton, replaceItemsButton, addItemsButton, removeItemsButton, clearItemsButton);
 
+        // animation enabled
+        CheckBox animationEnabledCheckBox = new CheckBox("Enable Animation");
+        animationEnabledCheckBox.selectedProperty().bindBidirectional(selectionBox.animationEnabledProperty());
+
         return new SimpleControlPane(
                 "SelectionBox",
                 new SimpleControlPane.ControlItem("Show Popup", showButton),
                 new SimpleControlPane.ControlItem("Selection Mode", selectionModeComboBox),
                 new SimpleControlPane.ControlItem("Show Extra Nodes", showExtraNodesCheckBox),
+                new SimpleControlPane.ControlItem("Enable Animation", animationEnabledCheckBox),
                 new SimpleControlPane.ControlItem("Change Prompt Text", promptTextCheckBox),
                 new SimpleControlPane.ControlItem("Use Custom String Converter", useCustomStringConverterCheckBox),
                 new SimpleControlPane.ControlItem("Auto Hide On Select", autoHideOnSelectCheckBox),
