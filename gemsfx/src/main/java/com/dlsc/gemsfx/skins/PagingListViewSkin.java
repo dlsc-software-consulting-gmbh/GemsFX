@@ -5,11 +5,14 @@ import com.dlsc.gemsfx.paging.PagingListView;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.css.PseudoClass;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SkinBase;
+import javafx.scene.control.skin.ScrollPaneSkin;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -123,8 +126,29 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setSkin(new ScrollPaneSkin(scrollPane) {
+            {
+                listenToScrollBar(getVerticalScrollBar(), true);
+                listenToScrollBar(getHorizontalScrollBar(), false);
+            }
+        });
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
         return scrollPane;
+    }
+
+    private void listenToScrollBar(ScrollBar scrollBar, boolean vertical) {
+        PagingListView<T> listView = getSkinnable();
+        if (vertical) {
+            scrollBar.visibleProperty().addListener((obs, oldVisible, newVisible) -> {
+                listView.pseudoClassStateChanged(PseudoClass.getPseudoClass("vbar-showing"), newVisible);
+            });
+            listView.pseudoClassStateChanged(PseudoClass.getPseudoClass("vbar-showing"), scrollBar.isVisible());
+        } else {
+            scrollBar.visibleProperty().addListener((obs, oldVisible, newVisible) -> {
+                listView.pseudoClassStateChanged(PseudoClass.getPseudoClass("hbar-showing"), newVisible);
+            });
+            listView.pseudoClassStateChanged(PseudoClass.getPseudoClass("hbar-showing"), scrollBar.isVisible());
+        }
     }
 
     @Override
