@@ -1,0 +1,445 @@
+package com.dlsc.gemsfx;
+
+import com.dlsc.gemsfx.daterange.DateRange;
+import com.dlsc.gemsfx.daterange.DateRangePicker;
+import com.dlsc.gemsfx.util.EnumStringConverter;
+import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SelectionModel;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.util.StringConverter;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * A control for creating filters based primarily on the {@link SelectionBox} and the
+ * {@link DateRangePicker}. The control automatically manages a list of {@link ChipView}
+ * instances based on the current selection.
+ */
+public class SimpleFilterView extends HBox {
+
+    private final Map<Node, Map<Object, ChipView<?>>> map = new HashMap<>();
+
+    private boolean clearing;
+
+    private final InvalidationListener changeListener = it -> {
+        if (!clearing && getOnChange() != null) {
+            getOnChange().run();
+        }
+    };
+
+    public SimpleFilterView() {
+        getStyleClass().add("simple-filter-view");
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(SimpleFilterView.class.getResource("simple-filter-view.css")).toExternalForm();
+    }
+
+    /**
+     * Clears all selections and values in the filter view.
+     *
+     * This method iterates through the filter components, such as selection boxes and pickers, and resets
+     * their values or selections to the default state. It also clears any associated mappings and updates
+     * the UI accordingly.
+     *
+     * If an unknown node type is encountered, this method will throw an {@code IllegalStateException}.
+     *
+     * After clearing, if a change listener is defined, it will be executed.
+     *
+     * This operation ensures that the filter view is in a clean state and ready for new inputs or selections.
+     *
+     * Note: During the execution of this method, a flag is set to avoid triggering unwanted actions
+     * due to internal state changes.
+     *
+     * @see #setOnChange(Runnable)
+     *
+     * @throws IllegalStateException - if an unsupported node type is found during iteration.
+     */
+    public final void clear() {
+        clearing = true;
+        try {
+            map.keySet().forEach(node -> {
+                if (node instanceof SelectionBox) {
+                    ((SelectionBox<?>) node).getSelectionModel().clearSelection();
+                } else if (node instanceof DateRangePicker) {
+                    ((DateRangePicker) node).setValue(null);
+                } else if (node instanceof CalendarPicker) {
+                    ((CalendarPicker) node).setValue(null);
+                } else if (node instanceof DatePicker) {
+                    ((DatePicker) node).setValue(null);
+                } else {
+                    throw new IllegalStateException("Unknown node type: " + node.getClass().getName());
+                }
+
+                Map<Object, ChipView<?>> innerMap = map.get(node);
+                if (innerMap != null) {
+                    innerMap.clear();
+                }
+            });
+
+            if (getOnChange() != null) {
+                getOnChange().run();
+            }
+        } finally {
+            clearing = false;
+        }
+    }
+
+    private final ObjectProperty<Runnable> onChange = new SimpleObjectProperty<>(this, "onChange");
+
+    public final Runnable getOnChange() {
+        return onChange.get();
+    }
+
+    /**
+     * Will be invoked whenever anything changes within the filter settings.
+     *
+     * @return the runnable to executed upon change
+     */
+    public final ObjectProperty<Runnable> onChangeProperty() {
+        return onChange;
+    }
+
+    public final void setOnChange(Runnable onChange) {
+        this.onChange.set(onChange);
+    }
+
+    /**
+     * Adds a selection box to the UI with the given prompt name and the values of the given
+     * enum type.
+     *
+     * @param text the prompt text
+     * @param clz the type of the enum
+     * @return the newly added selection box
+     *
+     * @param <T> the enum type
+     */
+    public final <T extends Enum<T>> SelectionBox<T> addSelectionBox(String text, Class<T> clz) {
+        return addSelectionBox(text, clz.getEnumConstants());
+    }
+
+    /**
+     * Adds a selection box to the UI with the given prompt name and the given values.
+     *
+     * @param text the prompt text
+     * @param values the possible values
+     * @return the newly added selection box
+     *
+     * @param <T> the enum type
+     */
+    @SafeVarargs
+    public final <T extends Enum<T>> SelectionBox<T> addSelectionBox(String text, T... values) {
+        SelectionBox<T> selectionBox = addSelectionBox(text);
+        selectionBox.getItems().setAll(values);
+        selectionBox.setItemConverter(new EnumStringConverter<>());
+        return selectionBox;
+    }
+
+    /**
+     * Adds a selection box to the UI with the given prompt name and the list of the
+     * given values.
+     *
+     * @param text the prompt text
+     * @param values the possible values collection
+     * @return the newly added selection box
+     *
+     * @param <T> the type of the items in the selection box
+     */
+    public final <T> SelectionBox<T> addSelectionBox(String text, Collection<T> values) {
+        SelectionBox<T> selectionBox = addSelectionBox(text);
+        selectionBox.getItems().setAll(values);
+        return selectionBox;
+    }
+
+    /**
+     * Adds a selection box to the UI with the given prompt name and the list of the
+     * given values.
+     *
+     * @param text the prompt text
+     * @param values the possible values
+     * @return the newly added selection box
+     *
+     * @param <T> the type of the items in the selection box
+     */
+    @SafeVarargs
+    public final <T> SelectionBox<T> addSelectionBox(String text, T... values) {
+        SelectionBox<T> selectionBox = addSelectionBox(text);
+        selectionBox.getItems().setAll(values);
+        return selectionBox;
+    }
+
+    /**
+     * Adds a selection box to the filter view with the specified prompt text. The selection box
+     * allows users to select multiple items, and the selected items are represented as chips
+     * in the filter view.
+     *
+     * The method initializes the selection box with default properties, sets up listeners to
+     * handle changes in the selected items, and manages the associated chip view for each selected item.
+     * It ensures proper updates to the UI elements when items are added or removed from the selection box.
+     *
+     * @param text the prompt text to display in the selection box
+     * @param <T> the type of the items in the selection box
+     *
+     * @return the newly created and configured {@code SelectionBox} instance
+     */
+    public final <T> SelectionBox<T> addSelectionBox(String text) {
+        SelectionBox<T> box = createSelectionBox();
+        box.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        box.setPromptText(text);
+        box.setMaxWidth(Double.MAX_VALUE);
+        box.getSelectionModel().getSelectedItems().addListener(changeListener);
+
+        ListChangeListener<? super T> l = c -> {
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    c.getAddedSubList().forEach(item -> {
+                        ChipView<T> chip = new ChipView<>();
+                        chip.setValue(item);
+                        chip.textProperty().bind(Bindings.createStringBinding(() -> {
+                            StringConverter<T> itemConverter = box.getItemConverter();
+                            if (itemConverter != null) {
+                                return itemConverter.toString(item);
+                            }
+                            return "";
+                        }, box.itemConverterProperty()));
+                        chip.setOnClose(status -> box.getSelectionModel().clearSelection(box.getItems().indexOf(status)));
+                        getChips().add(chip);
+                        map.computeIfAbsent(box, it -> new HashMap<>()).put(item, chip);
+                    });
+                } else if (c.wasRemoved()) {
+                    c.getRemoved().forEach(item -> {
+                        Map<Object, ChipView<?>> innerMap = map.get(box);
+                        if (innerMap != null) {
+                            ChipView<?> chip = innerMap.remove(item);
+                            if (chip != null) {
+                                getChips().remove(chip);
+                            }
+                        }
+                    });
+                }
+            }
+        };
+
+        box.getSelectionModel().getSelectedItems().addListener(l);
+        getChildren().add(box);
+
+        return box;
+    }
+
+    /**
+     * Creates a new instance of a {@code SelectionBox}. This method serves as a factory for creating
+     * selection boxes, in case customization or modification of the default selection box behavior
+     * is required. Subclasses can override this method to provide a different implementation.
+     *
+     * @param <T> the type of the items that the selection box will manage
+     * @return a new instance of {@code SelectionBox} configured with default settings
+     */
+    protected <T> SelectionBox<T> createSelectionBox() {
+        return new SelectionBox<>();
+    }
+
+    /**
+     * Adds a date range picker to the filter view and configures it with the specified prompt text.
+     * This date range picker allows users to select a range of dates, and selected ranges
+     * are represented as chips in the filter view.
+     *
+     * The method initializes the date range picker, adds listeners to handle changes in selection,
+     * and manages the associated chip view for each selected range.
+     * It ensures proper update of the UI elements when ranges are added or removed.
+     *
+     * @param text the prompt text to display in the date range picker
+     *
+     * @return the newly created and configured {@code DateRangePicker} instance
+     */
+    public final DateRangePicker addDateRangePicker(String text) {
+        DateRangePicker dateRangePicker = createDateRangePicker();
+        dateRangePicker.setValue(null);
+        dateRangePicker.setShowPresetTitle(false);
+        dateRangePicker.setPromptText(text);
+        dateRangePicker.setShowIcon(false);
+        dateRangePicker.valueProperty().addListener(changeListener);
+        dateRangePicker.valueProperty().addListener((obs, oldRange, newRange) -> {
+            if (oldRange != null) {
+                Map<Object, ChipView<?>> innerMap = map.get(dateRangePicker);
+                if (innerMap != null) {
+                    ChipView<?> chip = innerMap.remove(oldRange);
+                    if (chip != null) {
+                        getChips().remove(chip);
+                    }
+                }
+            }
+            if (newRange != null) {
+                ChipView<DateRange> chip = new ChipView<>();
+                chip.setValue(newRange);
+                chip.setText(newRange.toString());
+                chip.setOnClose(it -> dateRangePicker.setValue(null));
+                getChips().add(chip);
+
+                map.computeIfAbsent(dateRangePicker, it -> new HashMap<>()).put(newRange, chip);
+            }
+        });
+
+        getChildren().add(dateRangePicker);
+
+        return dateRangePicker;
+    }
+
+    /**
+     * Factory method for creating the date range picker that will be added to the view. This method
+     * can be overridden to provide a custom date range picker implementations.
+     *
+     * @return a date range picker
+     */
+    protected DateRangePicker createDateRangePicker() {
+        return new DateRangePicker();
+    }
+
+    /**
+     * Adds a calendar picker to the filter view with the specified prompt text. The calendar picker allows
+     * users to select a date, and the selected date is represented as a chip in the filter view.
+     *
+     * The method initializes the calendar picker, sets its default properties, and adds listeners to
+     * handle changes in the selected date. When a date is selected, it is displayed as a chip, and
+     * the chip can be removed by the user, clearing the date from the picker.
+     *
+     * @param text the prompt text to display in the date picker
+     *
+     * @return the newly created and configured {@code DatePicker} instance
+     */
+    public final CalendarPicker addCalendarPicker(String text) {
+        CalendarPicker datePicker = createCalendarPicker();
+        datePicker.setEditable(false);
+        datePicker.setValue(null);
+        datePicker.setPromptText(text);
+        datePicker.valueProperty().addListener(changeListener);
+        datePicker.valueProperty().addListener((obs, oldDate, newDate) -> {
+            if (oldDate != null) {
+                Map<Object, ChipView<?>> innerMap = map.get(datePicker);
+                if (innerMap != null) {
+                    ChipView<?> chip = innerMap.remove(oldDate);
+                    if (chip != null) {
+                        getChips().remove(chip);
+                    }
+                }
+            }
+            if (newDate != null) {
+                ChipView<LocalDate> chip = new ChipView<>();
+                chip.setValue(newDate);
+                chip.setText(newDate.toString());
+                chip.setOnClose(it -> datePicker.setValue(null));
+                getChips().add(chip);
+
+                map.computeIfAbsent(datePicker, it -> new HashMap<>()).put(newDate, chip);
+            }
+        });
+
+        setHgrow(datePicker, Priority.ALWAYS);
+        getChildren().add(datePicker);
+
+        return datePicker;
+    }
+
+    /**
+     * Factory method for creating a new {@code CalendarPicker} instance.
+     * This method is used to instantiate a {@code CalendarPicker} with default properties.
+     * Subclasses can override this method to customize the behavior or appearance of the
+     * {@code CalendarPicker}.
+     *
+     * @return a new instance of {@code CalendarPicker}.
+     */
+    protected CalendarPicker createCalendarPicker() {
+        return new CalendarPicker();
+    }
+
+    /**
+     * Adds a date picker to the filter view with the specified prompt text. The date picker allows
+     * users to select a date, and the selected date is represented as a chip in the filter view.
+     *
+     * The method initializes the date picker, sets its default properties, and adds listeners to
+     * handle changes in the selected date. When a date is selected, it is displayed as a chip, and
+     * the chip can be removed by the user, clearing the date from the picker.
+     *
+     * @param text the prompt text to display in the date picker
+     *
+     * @return the newly created and configured {@code DatePicker} instance
+     */
+    public final DatePicker addDatePicker(String text) {
+        DatePicker datePicker = createDatePicker();
+        datePicker.setEditable(false);
+        datePicker.setValue(null);
+        datePicker.setPromptText(text);
+        datePicker.valueProperty().addListener(changeListener);
+        datePicker.valueProperty().addListener((obs, oldDate, newDate) -> {
+            if (oldDate != null) {
+                Map<Object, ChipView<?>> innerMap = map.get(datePicker);
+                if (innerMap != null) {
+                    ChipView<?> chip = innerMap.remove(oldDate);
+                    if (chip != null) {
+                        getChips().remove(chip);
+                    }
+                }
+            }
+            if (newDate != null) {
+                ChipView<LocalDate> chip = new ChipView<>();
+                chip.setValue(newDate);
+                chip.setText(newDate.toString());
+                chip.setOnClose(it -> datePicker.setValue(null));
+                getChips().add(chip);
+
+                map.computeIfAbsent(datePicker, it -> new HashMap<>()).put(newDate, chip);
+            }
+        });
+
+        getChildren().add(datePicker);
+
+        return datePicker;
+    }
+
+    /**
+     * Factory method for creating a new {@code DatePicker} instance.
+     * This method can be overridden to provide a customized implementation
+     * of the {@code DatePicker}.
+     *
+     * @return a new instance of {@code DatePicker}.
+     */
+    protected DatePicker createDatePicker() {
+        return new DatePicker();
+    }
+
+    private final ListProperty<ChipView<?>> chips = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+    public final ObservableList<ChipView<?>> getChips() {
+        return chips.get();
+    }
+
+    /**
+     * An observable list containing the currently managed chip views. Each chip view represents one selected
+     * filter criteria.
+     *
+     * @return the list of chip views
+     */
+    public final ListProperty<ChipView<?>> chipsProperty() {
+        return chips;
+    }
+
+    public final void setChips(ObservableList<ChipView<?>> chips) {
+        this.chips.set(chips);
+    }
+}

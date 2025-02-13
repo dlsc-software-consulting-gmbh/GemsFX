@@ -1,0 +1,5 @@
+.chips-view-container {
+    -fx-padding: 0.416667em 0em;
+    -fx-hgap: 0.416667em;
+    -fx-vgap: 0.416667em;
+}
