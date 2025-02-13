@@ -5,6 +5,8 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Hyperlink;
@@ -59,6 +61,8 @@ public class ChipsViewContainer extends FlowPane {
         this.chips.set(chips);
     }
 
+    // clearing callback
+
     public final ObjectProperty<Runnable> onClear = new SimpleObjectProperty<>(this, "onClear");
 
     public final Runnable getOnClear() {
@@ -67,6 +71,8 @@ public class ChipsViewContainer extends FlowPane {
 
     /**
      * A callback that will be invoked when the user clicks on the "clear" hyperlink.
+     *
+     * @see #clearTextProperty()
      *
      * @return the "on clear" callback
      */
@@ -78,13 +84,36 @@ public class ChipsViewContainer extends FlowPane {
         this.onClear.set(onClear);
     }
 
+    // clear hyperlink text
+
+    private final StringProperty clearText = new SimpleStringProperty(this, "clearText", "Clear");
+
+    public final String getClearText() {
+        return clearText.get();
+    }
+
+    /**
+     * A property storing the text for the hyperlink that is being used to clear the view.
+     *
+     * @see #onClearProperty()
+     * @return the text property used for the text of the hyperlink used to clear the view
+     */
+    public final StringProperty clearTextProperty() {
+        return clearText;
+    }
+
+    public final void setClearText(String clearText) {
+        this.clearText.set(clearText);
+    }
+
     private void updateChips() {
         getChildren().clear();
 
         getChips().forEach(c -> getChildren().add(c));
 
         if (!getChildren().isEmpty()) {
-            Hyperlink clear = new Hyperlink("Clear");
+            Hyperlink clear = new Hyperlink();
+            clear.textProperty().bind(clearTextProperty());
             clear.visibleProperty().bind(onClear.isNotNull());
             clear.managedProperty().bind(onClear.isNotNull());
             clear.setOnAction(e -> getOnClear().run());
