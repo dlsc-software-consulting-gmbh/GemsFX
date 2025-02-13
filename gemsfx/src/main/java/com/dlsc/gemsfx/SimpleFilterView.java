@@ -33,6 +33,10 @@ import java.util.Objects;
  */
 public class SimpleFilterView extends HBox {
 
+    /*
+     * Internal data structure used to map controls to the chip views used to represent
+     * their selected items.
+     */
     private final Map<Node, Map<Object, ChipView<?>>> map = new HashMap<>();
 
     private boolean clearing;
@@ -43,6 +47,9 @@ public class SimpleFilterView extends HBox {
         }
     };
 
+    /**
+     * Constructs a new instance of {@code SimpleFilterView}.
+     */
     public SimpleFilterView() {
         getStyleClass().add("simple-filter-view");
     }
