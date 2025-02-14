@@ -15,7 +15,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.SelectionModel;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.util.StringConverter;
@@ -23,6 +22,7 @@ import javafx.util.StringConverter;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -212,6 +212,17 @@ public class SimpleFilterView extends HBox {
         box.setPromptText(text);
         box.setMaxWidth(Double.MAX_VALUE);
         box.getSelectionModel().getSelectedItems().addListener(changeListener);
+        box.setSelectedItemsConverter(new StringConverter<>() {
+            @Override
+            public String toString(List<T> object) {
+                return text;
+            }
+
+            @Override
+            public List<T> fromString(String string) {
+                return List.of();
+            }
+        });
 
         ListChangeListener<? super T> l = c -> {
             while (c.next()) {
