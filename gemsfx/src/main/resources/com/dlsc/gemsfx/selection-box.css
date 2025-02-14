@@ -11,7 +11,7 @@
 .selection-popup > .content {
     -fx-background-color: -fx-box-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 8, 0.0, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
     -fx-padding: 4px 1px;
     -fx-max-height: 25em;
     -fx-translate-y: 2px;
@@ -24,7 +24,7 @@
 }
 
 .selection-popup > .content .extra-buttons-box .extra-button {
-    -fx-background-radius: 2px;
+    -fx-background-radius: 0px;
     -fx-alignment: center-left;
     -fx-text-fill: -fx-text-base-color;
     -fx-padding: 4 4 4 26;
@@ -32,12 +32,13 @@
 }
 
 .selection-popup > .content .extra-buttons-box .extra-button:hover {
-    -fx-background-color: -fx-cell-hover-color;
-    -fx-text-fill: -fx-text-inner-color;
+    -fx-background: -fx-selection-bar;
+    -fx-background-color: -fx-background;
+    -fx-text-fill: -fx-selection-bar-text;
 }
 
 .selection-popup > .content .extra-buttons-box .extra-button:pressed {
-    -fx-background-color: derive(-fx-cell-hover-color, 5%);
+    -fx-background-color: derive(-fx-selection-bar, 5%);
 }
 
 .selection-popup > .content > .options-scroll-pane {
@@ -59,16 +60,17 @@
 
 .selection-popup > .content > .options-scroll-pane .options-box > .radio-button,
 .selection-popup > .content > .options-scroll-pane .options-box > .check-box {
+    -fx-background: -fx-control-inner-background;
     -fx-label-padding: 0 0 0 4px;
     -fx-text-fill: -fx-text-base-color;
     -fx-padding: 4px;
-    -fx-background-color: -fx-control-inner-background;
 }
 
 .selection-popup > .content > .options-scroll-pane .options-box > .radio-button:hover,
 .selection-popup > .content > .options-scroll-pane .options-box > .check-box:hover {
-    -fx-background-color: -fx-cell-hover-color;
-    -fx-text-fill: -fx-text-inner-color;
+    -fx-background: -fx-selection-bar;
+    -fx-background-color: -fx-background;
+    -fx-text-fill: -fx-selection-bar-text;
 }
 
 .selection-popup > .content > .options-scroll-pane .options-box > .radio-button > .radio {
