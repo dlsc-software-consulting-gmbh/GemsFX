@@ -17,9 +17,6 @@
     -fx-translate-y: 2px;
 }
 
-.selection-popup:above > .content {
-}
-
 .selection-popup > .content .extra-buttons-box {
     -fx-border-width: 0 0 1px 0;
     -fx-border-color: transparent transparent derive(-fx-background, -20%) transparent;
@@ -30,7 +27,7 @@
     -fx-background-radius: 2px;
     -fx-alignment: center-left;
     -fx-text-fill: -fx-text-base-color;
-    -fx-padding: 4 0 4 26;
+    -fx-padding: 4 4 4 26;
     -fx-background-color: -fx-control-inner-background;
 }
 
@@ -64,7 +61,7 @@
 .selection-popup > .content > .options-scroll-pane .options-box > .check-box {
     -fx-label-padding: 0 0 0 4px;
     -fx-text-fill: -fx-text-base-color;
-    -fx-padding: 4 0 4 5;
+    -fx-padding: 4px;
     -fx-background-color: -fx-control-inner-background;
 }
 
