@@ -366,7 +366,10 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
 
             Node popupNode = getSkin().getNode();
             if (popupNode instanceof Region region) {
-                region.setPrefWidth(bounds.getWidth());
+                region.setPrefWidth(Region.USE_COMPUTED_SIZE);
+                double popupNodeWidth = region.prefWidth(-1);
+                double prefWidth = Math.max(bounds.getWidth(), popupNodeWidth);
+                region.setPrefWidth(prefWidth);
             }
 
             if (owner.isAnimationEnabled()) {
@@ -455,6 +458,7 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
             optionsBox = new VBox();
             optionsBox.getStyleClass().add("options-box");
             optionsBox.setFillWidth(true);
+            optionsBox.setMinWidth(Region.USE_PREF_SIZE);
             optionsBox.managedProperty().bind(optionsBox.visibleProperty());
             optionsBox.visibleProperty().bind(popup.getOwner().itemsProperty().emptyProperty().not());
 
@@ -466,6 +470,13 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
             ScrollPane scrollPane = new ScrollPane(optionsBox);
             scrollPane.getStyleClass().add("options-scroll-pane");
             scrollPane.setFitToWidth(true);
+
+            optionsBox.widthProperty().addListener((obs, oldWidth, newWidth) -> {
+                if (scrollPane.getPrefViewportWidth() == 0.0) {
+                    scrollPane.setPrefViewportWidth(newWidth.doubleValue());
+                }
+            });
+
             contentPane.setCenter(scrollPane);
 
             // Initialize the popup content
