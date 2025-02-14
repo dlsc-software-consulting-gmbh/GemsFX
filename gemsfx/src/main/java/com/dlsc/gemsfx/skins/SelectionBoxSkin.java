@@ -438,6 +438,7 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
         private final SelectionPopup popup;
         private final BorderPane contentPane;
         private final VBox optionsBox;
+        private final ScrollPane scrollPane;
 
         // Use indices as keys to handle duplicate items
         private final Map<Integer, BooleanProperty> itemButtonProperties = new LinkedHashMap<>();
@@ -467,7 +468,7 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
             contentPane.leftProperty().bind(control.leftProperty());
             contentPane.rightProperty().bind(control.rightProperty());
 
-            ScrollPane scrollPane = new ScrollPane(optionsBox);
+            scrollPane = new ScrollPane(optionsBox);
             scrollPane.getStyleClass().add("options-scroll-pane");
             scrollPane.setFitToWidth(true);
 
@@ -499,6 +500,7 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
         }
 
         private void updatePopupContent() {
+            scrollPane.setPrefViewportWidth(0.0);
             optionsBox.getChildren().clear();
             itemButtonProperties.clear();
 
