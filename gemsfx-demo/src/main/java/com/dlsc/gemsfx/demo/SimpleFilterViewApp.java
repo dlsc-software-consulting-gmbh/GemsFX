@@ -5,7 +5,6 @@ import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.SimpleFilterView;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
-import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
@@ -17,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -35,10 +35,11 @@ public class SimpleFilterViewApp extends Application {
         filterView1.addSelectionBox("VPos", VPos.class);
         filterView1.addSelectionBox("Pos", Pos.class);
         filterView1.addSelectionBox("Side", Side.class);
-//        filterView1.addDateRangePicker("Date Range");
-//        filterView1.addCalendarPicker("Date");
+        filterView1.addDateRangePicker("Date Range");
+        filterView1.addCalendarPicker("Date");
         filterView1.layoutModeProperty().bindBidirectional(layoutMode);
-
+        filterView1.getChildren().add(new MenuButton("Test"));
+        
         ChipsViewContainer chipsViewContainer1 = new ChipsViewContainer();
         chipsViewContainer1.setOnClear(filterView1::clear);
         chipsViewContainer1.chipsProperty().bind(filterView1.chipsProperty());
@@ -51,11 +52,9 @@ public class SimpleFilterViewApp extends Application {
         SelectionBox<VPos> vPos = filterView2.addSelectionBox("VPos", VPos.class);
         SelectionBox<Pos> pos = filterView2.addSelectionBox("Pos", Pos.class);
         SelectionBox<Side> side = filterView2.addSelectionBox("Side", Side.class);
-       // filterView2.addDateRangePicker("Date Range");
-        //filterView2.addCalendarPicker("Date");
+        filterView2.addDateRangePicker("Date Range");
+        filterView2.addCalendarPicker("Date");
         filterView2.layoutModeProperty().bindBidirectional(layoutMode);
-
-        hPos.getPseudoClassStates().addListener((Observable it) -> System.out.println(hPos.getPseudoClassStates()));
 
         hPos.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         vPos.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
