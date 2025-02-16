@@ -15,6 +15,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.SelectionMode;
@@ -35,11 +36,11 @@ public class SimpleFilterViewApp extends Application {
         filterView1.addSelectionBox("VPos", VPos.class);
         filterView1.addSelectionBox("Pos", Pos.class);
         filterView1.addSelectionBox("Side", Side.class);
-        filterView1.addDateRangePicker("Date Range");
+//        filterView1.addDateRangePicker("Date Range");
         filterView1.addCalendarPicker("Date");
         filterView1.layoutModeProperty().bindBidirectional(layoutMode);
         filterView1.getChildren().add(new MenuButton("Test"));
-        
+        filterView1.getChildren().add(new DatePicker());
         ChipsViewContainer chipsViewContainer1 = new ChipsViewContainer();
         chipsViewContainer1.setOnClear(filterView1::clear);
         chipsViewContainer1.chipsProperty().bind(filterView1.chipsProperty());
