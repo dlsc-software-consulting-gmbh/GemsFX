@@ -36,7 +36,7 @@ public class SimpleFilterViewApp extends Application {
         filterView1.addSelectionBox("VPos", VPos.class);
         filterView1.addSelectionBox("Pos", Pos.class);
         filterView1.addSelectionBox("Side", Side.class);
-//        filterView1.addDateRangePicker("Date Range");
+        filterView1.addDateRangePicker("Date Range");
         filterView1.addCalendarPicker("Date");
         filterView1.layoutModeProperty().bindBidirectional(layoutMode);
         filterView1.getChildren().add(new MenuButton("Test"));
