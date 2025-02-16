@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.SelectionMode;
@@ -33,6 +34,8 @@ import java.util.Objects;
  */
 public class SimpleFilterView extends HBox {
 
+    private static final PseudoClass COMPACT_PSEUDO_CLASS = PseudoClass.getPseudoClass("compact");
+
     /*
      * Internal data structure used to map controls to the chip views used to represent
      * their selected items.
@@ -52,11 +55,86 @@ public class SimpleFilterView extends HBox {
      */
     public SimpleFilterView() {
         getStyleClass().add("simple-filter-view");
+
+        layoutModeProperty().addListener(it -> updatePseudoClass());
+        updatePseudoClass();
+
+        getChildren().addListener((ListChangeListener<Node>) change -> {
+            int size = getChildren().size();
+            if (size == 1) {
+                updateNodeStyles(getChildren().get(0));
+                getChildren().get(0).getStyleClass().add("only");
+            } else {
+                for (int i = 0; i < getChildren().size(); i++) {
+
+                    Node node = getChildren().get(i);
+                    updateNodeStyles(node);
+
+                    if (i == 0) {
+                        node.getStyleClass().add("first");
+                    } else if (i == size - 1) {
+                        node.getStyleClass().add("last");
+                    } else {
+                        node.getStyleClass().add("middle");
+                    }
+                }
+            }
+        });
+
+        getStylesheets().add(Objects.requireNonNull(SimpleFilterView.class.getResource("simple-filter-view.css")).toExternalForm());
+    }
+
+    private void updateNodeStyles(Node node) {
+        node.getStyleClass().removeAll("first", "middle", "last", "only", "selection-item");
+        node.getStyleClass().add("selection-item");
+    }
+
+    private void updatePseudoClass() {
+        pseudoClassStateChanged(COMPACT_PSEUDO_CLASS, getLayoutMode() == LayoutMode.COMPACT);
     }
 
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(SimpleFilterView.class.getResource("simple-filter-view.css")).toExternalForm();
+    }
+
+    /**
+     * An enumeration of possible layouts supported by the filter view.
+     */
+    public enum LayoutMode {
+
+        /**
+         * The filter elements (selection boxes, date pickers, etc.) will be laid
+         * out one after the other with standard spacing and each element styled in its
+         * own standard way.
+         */
+        STANDARD,
+
+        /**
+         * The filter elements will be laid out right next to each other to create a
+         * compact visualization.
+         * The styling will ensure a unified look of the overall filter view.
+         */
+        COMPACT
+    }
+
+    private final ObjectProperty<LayoutMode> layoutMode = new SimpleObjectProperty<>(this, "layoutMode", LayoutMode.STANDARD);
+
+    public final LayoutMode getLayoutMode() {
+        return layoutMode.get();
+    }
+
+    /**
+     * The layout used by the control, either "standard" or "compact" / "unified".
+     *
+     * @return the layout mode
+     */
+    public final ObjectProperty<LayoutMode> layoutModeProperty() {
+        return layoutMode;
+    }
+
+    public final void setLayoutMode(LayoutMode layoutMode) {
+        this.layoutMode.set(layoutMode);
     }
 
     /**

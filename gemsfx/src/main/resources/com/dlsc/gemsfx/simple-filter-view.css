@@ -1,3 +1,28 @@
 .simple-filter-view {
     -fx-spacing: 0.416667em;
 }
+
+.simple-filter-view:compact {
+    -fx-spacing: 0;
+}
+
+.simple-filter-view:compact .selection-item > .arrow-button {
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+    -fx-background-color: transparent;
+}
+
+.simple-filter-view:compact .selection-item.first {
+    -fx-background-insets: 0 0 0 0, 0, 1, 2;
+    -fx-background-radius: 3px 0px 0px 3px, 3px 0px 0px 3px, 2px 0px 0px 2px, 1px 0px 0px 1px;
+}
+
+.simple-filter-view:compact .selection-item.middle {
+    -fx-background-insets: 0 0 0 0, 0 0 0 0, 1 1 1 0, 2 2 2 0;
+    -fx-background-radius: 0px 0px 0px 0px, 0px 0px 0px 0px, 0px 0px 0px 0px, 0px 0px 0px 0px;
+}
+
+.simple-filter-view:compact .selection-item.last,
+.simple-filter-view:compact .selection-item.last:focused {
+    -fx-background-insets: 0 0 0 0, 0 0 0 0, 1 1 1 0, 2 2 2 0;
+    -fx-background-radius: 0px 3px 3px 0px, 0px 3px 3px 0px, 0px 2px 2px 0px, 0px 1px 1px 0px;
+}
