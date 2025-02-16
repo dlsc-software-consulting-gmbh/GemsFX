@@ -1,8 +1,10 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ChipsViewContainer;
+import com.dlsc.gemsfx.DurationPicker;
 import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.SimpleFilterView;
+import com.dlsc.gemsfx.TimePicker;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
@@ -33,9 +35,12 @@ public class SimpleFilterViewApp extends Application {
     public void start(Stage stage) {
         SimpleFilterView filterView1 = new SimpleFilterView();
         filterView1.addSelectionBox("HPos", HPos.class);
+        filterView1.getChildren().add(new ComboBox<>());
         filterView1.addSelectionBox("VPos", VPos.class);
         filterView1.addSelectionBox("Pos", Pos.class);
+        filterView1.getChildren().add(new DurationPicker());
         filterView1.addSelectionBox("Side", Side.class);
+        filterView1.getChildren().add(new TimePicker());
         filterView1.addDateRangePicker("Date Range");
         filterView1.addCalendarPicker("Date");
         filterView1.layoutModeProperty().bindBidirectional(layoutMode);
