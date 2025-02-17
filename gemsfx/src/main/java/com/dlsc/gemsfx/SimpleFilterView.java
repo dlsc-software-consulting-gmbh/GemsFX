@@ -80,8 +80,6 @@ public class SimpleFilterView extends HBox {
                 }
             }
         });
-
-        getStylesheets().add(Objects.requireNonNull(SimpleFilterView.class.getResource("simple-filter-view.css")).toExternalForm());
     }
 
     private void updateNodeStyles(Node node) {
@@ -286,6 +284,7 @@ public class SimpleFilterView extends HBox {
      */
     public final <T> SelectionBox<T> addSelectionBox(String text) {
         SelectionBox<T> box = createSelectionBox();
+        box.getStylesheets().add(getUserAgentStylesheet());
         box.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         box.setPromptText(text);
         box.setMaxWidth(Double.MAX_VALUE);
@@ -366,6 +365,7 @@ public class SimpleFilterView extends HBox {
      */
     public final DateRangePicker addDateRangePicker(String text) {
         DateRangePicker dateRangePicker = createDateRangePicker();
+        dateRangePicker.getStylesheets().add(getUserAgentStylesheet());
         dateRangePicker.setValue(null);
         dateRangePicker.setShowPresetTitle(false);
         dateRangePicker.setPromptText(text);
@@ -421,6 +421,7 @@ public class SimpleFilterView extends HBox {
      */
     public final CalendarPicker addCalendarPicker(String text) {
         CalendarPicker datePicker = createCalendarPicker();
+        datePicker.getStylesheets().add(getUserAgentStylesheet());
         datePicker.setEditable(false);
         datePicker.setValue(null);
         datePicker.setPromptText(text);
@@ -478,6 +479,7 @@ public class SimpleFilterView extends HBox {
      */
     public final DatePicker addDatePicker(String text) {
         DatePicker datePicker = createDatePicker();
+        datePicker.getStylesheets().add(getUserAgentStylesheet());
         datePicker.setEditable(false);
         datePicker.setValue(null);
         datePicker.setPromptText(text);
