@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Skin;
+import javafx.scene.layout.Region;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -29,12 +30,14 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
      */
     public DateRangePicker() {
         super();
+        getStyleClass().add("date-range-picker");
 
         dateRangeView = getDateRangeView();
 
         setValue(dateRangeView.getValue());
 
-        getStyleClass().add("date-range-picker");
+        setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
     }
 
     @Override

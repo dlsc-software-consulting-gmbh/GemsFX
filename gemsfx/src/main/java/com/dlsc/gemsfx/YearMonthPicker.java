@@ -66,7 +66,8 @@ public class YearMonthPicker extends CustomComboBox<YearMonth> {
             }
         });
 
-        setMaxWidth(Region.USE_PREF_SIZE);
+        setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
         setValue(YearMonth.now());
     }

@@ -154,6 +154,9 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         });
 
         setOnShowPopup(picker -> show());
+
+        setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
     }
 
     private final ReadOnlyBooleanWrapper adjusted = new ReadOnlyBooleanWrapper(this, "adjusted");

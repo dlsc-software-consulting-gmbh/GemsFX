@@ -73,7 +73,8 @@ public class YearPicker extends CustomComboBox<Year> {
             }
         });
 
-        setMaxWidth(Region.USE_PREF_SIZE);
+        setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
         // call last
         setValue(Year.now());

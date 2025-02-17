@@ -27,10 +27,12 @@ import javafx.scene.control.Control;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -54,6 +56,17 @@ public class SelectionBox<T> extends Control {
     private static final boolean DEFAULT_READ_ONLY = false;
     private static final boolean DEFAULT_ANIMATION_ENABLED = false;
 
+    /**
+     * Constructs a new SelectionBox instance. This custom control extends functionality to allow
+     * for enhanced selection capabilities with predefined style classes and quick selection buttons.
+     *
+     * The constructor performs the following operations:
+     * - Sets style classes for the control, including "combo-box-base," "combo-box," and the default style class.
+     * - Adds customizable quick selection buttons to the top of the popup area.
+     * - Binds the current selection mode to an internal selection mode property.
+     * - Initializes a custom multiple selection model, binding it to the items property.
+     * - Configures the component's size to use its preferred size as both minimum and maximum size.
+     */
     public SelectionBox() {
         getStyleClass().setAll("combo-box-base", "combo-box", DEFAULT_STYLE_CLASS);
 
@@ -61,10 +74,36 @@ public class SelectionBox<T> extends Control {
         setTop(createExtraButtonsBox());
 
         currentSelectionMode.bind(getCurrentSelectionModeBinding());
+
         // initialize the selection model
         CustomMultipleSelectionModel<T> model = new CustomMultipleSelectionModel<>();
         model.itemsProperty().bind(itemsProperty());
         setSelectionModel(model);
+
+        setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+    }
+
+    /**
+     * Constructs a new selection box with the specified collection of items.
+     *
+     * @param items the collection of items to populate the SelectionBox
+     */
+    public SelectionBox(Collection<T> items) {
+        this();
+        getItems().setAll(items);
+    }
+
+    /**
+     * Constructs a new selection boxx and populates it with the provided items.
+     *
+     * @param items The initial items to populate the selection box.
+     *              These items will be added to the selection box's list of choices.
+     */
+    @SafeVarargs
+    public SelectionBox(T... items) {
+        this();
+        getItems().setAll(items);
     }
 
     private Node createExtraButtonsBox() {

@@ -1,6 +1,5 @@
 .duration-picker {
     -fx-padding: 0px;
-    -fx-pref-height: 2.1em;
 }
 
 .duration-picker > .box {
@@ -64,11 +63,11 @@
 }
 
 .duration-picker > .box > .fields-box > .separator {
-    -fx-padding: 0px 1px;
+    -fx-padding: 0.333333em 0.083333em;
 }
 
 .duration-picker > .box > .fields-box > .unit-field {
-    -fx-padding: 0px 2px;
+    -fx-padding: 0.333333em 0.166667em 0.333333em 0.166667em;
     -fx-alignment: center;
 }
 

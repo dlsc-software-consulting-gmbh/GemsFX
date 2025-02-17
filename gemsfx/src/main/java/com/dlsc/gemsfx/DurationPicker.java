@@ -28,6 +28,7 @@ public class DurationPicker extends CustomComboBox<Duration> {
     public DurationPicker() {
         getStyleClass().setAll("duration-picker", "text-input");
 
+        setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
         minimumDurationProperty().addListener(it -> {

@@ -5,6 +5,7 @@ import com.dlsc.gemsfx.DurationPicker;
 import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.SimpleFilterView;
 import com.dlsc.gemsfx.TimePicker;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
@@ -34,14 +35,17 @@ public class SimpleFilterViewApp extends Application {
     @Override
     public void start(Stage stage) {
         SimpleFilterView filterView1 = new SimpleFilterView();
+        filterView1.setStyle("-fx-background-color: red; -fx-padding: 1px;");
         filterView1.addSelectionBox("HPos", HPos.class);
-        filterView1.getChildren().add(new ComboBox<>());
+        ComboBox<String> com = new ComboBox<>();
+        com.getItems().addAll("A", "B", "C");
+        filterView1.getChildren().add(com);
+        filterView1.addDateRangePicker("Date Range");
+        filterView1.getChildren().add(new DurationPicker());
         filterView1.addSelectionBox("VPos", VPos.class);
         filterView1.addSelectionBox("Pos", Pos.class);
-        filterView1.getChildren().add(new DurationPicker());
         filterView1.addSelectionBox("Side", Side.class);
         filterView1.getChildren().add(new TimePicker());
-        filterView1.addDateRangePicker("Date Range");
         filterView1.addCalendarPicker("Date");
         filterView1.layoutModeProperty().bindBidirectional(layoutMode);
         filterView1.getChildren().add(new MenuButton("Test"));
@@ -88,6 +92,9 @@ public class SimpleFilterViewApp extends Application {
         StackPane stackPane = new StackPane(box);
 
         Scene scene = new Scene(stackPane);
+
+        StageManager.install(stage, "simple.filter.view.container.demo", 800, 500);
+
         stage.setTitle("Simple Filter / Chips View Container Demo");
         stage.setScene(scene);
         stage.setWidth(800);
