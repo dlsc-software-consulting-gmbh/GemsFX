@@ -10,6 +10,8 @@ import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
@@ -1787,6 +1789,10 @@ public class DialogPane extends Pane {
 
         private final WeakChangeListener<Node> weakFocusListener = new WeakChangeListener<>(focusListener);
 
+        private final InvalidationListener updateStyleClassesListener = (Observable it) -> updateContentPaneStyleClasses();
+
+        private final WeakInvalidationListener weakUpdateStyleClassesListener = new WeakInvalidationListener(updateStyleClassesListener);
+
         public ContentPane(Dialog<?> dialog) {
             this.dialog = Objects.requireNonNull(dialog);
 
@@ -1840,8 +1846,8 @@ public class DialogPane extends Pane {
             footer.setVisible(!blankDialog && dialog.isShowFooter());
             footer.setManaged(!blankDialog && dialog.isShowFooter());
 
-            getStyleClass().setAll("content-pane");
-            getStyleClass().addAll(this.dialog.getStyleClass());
+            dialog.getStyleClass().addListener(weakUpdateStyleClassesListener);
+            updateContentPaneStyleClasses();
 
             VBox box = new VBox();
             box.getStyleClass().add("vbox");
@@ -1854,6 +1860,11 @@ public class DialogPane extends Pane {
             glassPane.fadeInOutProperty().bind(shell.fadeInOutProperty());
 
             getChildren().addAll(box, glassPane);
+        }
+
+        private void updateContentPaneStyleClasses() {
+            getStyleClass().setAll("content-pane");
+            getStyleClass().addAll(this.dialog.getStyleClass());
         }
 
         @Override
