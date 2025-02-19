@@ -3,6 +3,91 @@
 }
 
 /* ----------------------------------------------------------------------------
+ * GridTableView
+ */
+.grid-table-view {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0px, 1px;
+    -fx-table-cell-border-color: -color-border-default;
+    -fx-padding: 1px;
+}
+
+.grid-table-view:focused {
+    -fx-background-color: -color-accent-emphasis, -color-bg-default;
+    -fx-background-insets: -0.3px, 1px;
+    -fx-background-radius: 2px, 0px;
+}
+
+.grid-table-view > .grid-pane > .column-header {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-background-insets: 0, 0 1 1 0;
+    -fx-text-fill: -color-fg-default;
+    -fx-alignment: center-left;
+    -fx-padding: 10px;
+}
+
+.grid-table-view > .grid-pane > .column-header.last {
+    -fx-border-width: 1px;
+}
+
+.grid-table-view > .grid-pane > .column-header-background {
+}
+
+.grid-table-view > .grid-pane > .row-background {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0px, 0px 0px 1px 0px;
+}
+
+.grid-table-view > .grid-pane > .row-background.odd {
+    -fx-background: -color-border-default;
+}
+
+.grid-table-view > .grid-pane > .row-background.last,
+.grid-table-view > .grid-pane > .row-background.only {
+    -fx-background-insets: 0px, 0px 0px 0px 0px;
+}
+
+.grid-table-view > .grid-pane > .grid-table-cell {
+    -fx-padding: 10px 5px;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 0px 0px 0px 0px;
+    -fx-text-fill: -color-fg-default;
+}
+
+.grid-table-view > .grid-pane > .grid-table-cell.first {
+    -fx-border-width: 0px 0px 0px 0px;
+}
+
+.grid-table-view > .grid-pane > .grid-table-cell.last {
+    -fx-border-width: 0px 0px 0px 0px;
+}
+
+.grid-table-view > .grid-pane > .loading-pane {
+    -fx-background-color: -color-bg-default;
+}
+
+.grid-table-view > .grid-pane > .loading-pane > .error-pane > .error-label {
+    -fx-text-fill: -color-danger-emphasis;
+}
+
+.grid-table-view > .grid-pane > .loading-pane > .error-pane > .error-label .icon {
+    -fx-fill: -color-danger-emphasis;
+    -fx-background-color: -color-danger-emphasis;
+}
+
+.grid-table-view > .grid-pane > .loading-pane > .progress-indicator-wrapper {
+}
+
+.grid-table-view > .grid-pane > .loading-pane:small > .progress-indicator-wrapper {
+}
+
+.grid-table-view > .grid-pane > .loading-pane:medium > .progress-indicator-wrapper {
+}
+
+.grid-table-view > .grid-pane > .loading-pane:large > .progress-indicator-wrapper {
+}
+
+/* ----------------------------------------------------------------------------
  * ResizableTextArea
  */
 .resize-corner:h-resize {
@@ -316,7 +401,7 @@
 }
 
 .drawer-stackpane > .drawer > .top > .header > .tool-bar > .container > .button {
-    -fx-background-color: -color-accent-subtle;
+    -fx-background-color: -color-accent-emphasis;
     -fx-text-fill: -color-fg-emphasis;
 }
 
