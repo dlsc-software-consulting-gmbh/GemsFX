@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import atlantafx.base.theme.NordDark;
+import atlantafx.base.theme.NordLight;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -10,7 +11,7 @@ public abstract class GemApplication extends Application {
 
     public GemApplication() {
         if (Boolean.getBoolean("atlantafx")) {
-            setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
+            setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
         }
     }
 
