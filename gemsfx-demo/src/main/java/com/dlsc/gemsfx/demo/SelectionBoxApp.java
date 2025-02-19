@@ -15,15 +15,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
-
-import java.util.List;
 
 public class SelectionBoxApp extends Application {
 
@@ -128,13 +123,22 @@ public class SelectionBoxApp extends Application {
         // use custom string converter
         CheckBox useCustomStringConverterCheckBox = new CheckBox("Use Custom String Converter");
         useCustomStringConverterCheckBox.setSelected(true);
-        useCustomStringConverterCheckBox.selectedProperty().subscribe(newVal -> {
-            if (newVal) {
-                selectionBox.setSelectedItemsConverter(new SimpleStringConverter<>(selectedItems -> selectedItems.size() + " items selected", "Empty"));
-            } else {
-                selectionBox.setSelectedItemsConverter(null);
-            }
-        });
+        selectionBox.selectedItemsConverterProperty().bind(Bindings.createObjectBinding(() -> {
+                    if (useCustomStringConverterCheckBox.isSelected()) {
+                        // No need to consider the case where selectedItems is empty,
+                        // because if nothing is selected, promptText will be displayed.
+                        // You can always return the promptText as well, for example "Select" or "Please choose".
+                        // return "Please choose";  // or return selectionBox.getPromptText();
+                        if (selectionBox.getSelectionModel().getSelectionMode() == SelectionMode.SINGLE) {
+                            return new SimpleStringConverter<>(selectedItems -> "[ " + selectionBox.getSelectionModel().getSelectedItem() + " ]", "No item selected");
+                        } else {
+                            return new SimpleStringConverter<>(selectedItems -> selectedItems.size() + " items selected", "No items selected");
+                        }
+                    } else {
+                        return null;
+                    }
+                },
+                useCustomStringConverterCheckBox.selectedProperty(), selectionBox.getSelectionModel().selectionModeProperty()));
 
         // auto hide on select
         CheckBox autoHideOnSelectCheckBox = new CheckBox("Auto Hide On Select");
