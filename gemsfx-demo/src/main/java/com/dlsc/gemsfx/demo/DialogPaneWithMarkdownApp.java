@@ -26,10 +26,12 @@ import java.util.Objects;
 
 import static com.dlsc.gemsfx.DialogPane.Type.INFORMATION;
 
-public class DialogPaneWithMarkdownApp extends Application {
+public class DialogPaneWithMarkdownApp extends GemApplication {
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         DialogPane dialogPane = new DialogPane();
         dialogPane.setLabelSupplier(() -> {
             Label label = new Label();

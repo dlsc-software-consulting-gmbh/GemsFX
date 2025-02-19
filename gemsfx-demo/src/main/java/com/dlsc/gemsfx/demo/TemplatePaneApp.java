@@ -13,10 +13,12 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-public class TemplatePaneApp extends Application {
+public class TemplatePaneApp extends GemApplication {
 
 	@Override
-	public void start(Stage primaryStage) throws Exception {
+	public void start(Stage primaryStage) {
+		super.start(primaryStage);
+
 		TemplatePane pane = new TemplatePane();
 		fillPane(pane);
 		pane.setStyle("-fx-border-color: black; -fx-border-insets: 20px;");

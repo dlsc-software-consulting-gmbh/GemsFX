@@ -20,12 +20,14 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Objects;
 
-public class SemiCircleProgressIndicatorApp extends Application {
+public class SemiCircleProgressIndicatorApp extends GemApplication {
 
     private StringConverter<Double> customConverter;
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         SemiCircleProgressIndicator progressIndicator = new SemiCircleProgressIndicator();
         delayAutoUpdateProgress(progressIndicator);
 

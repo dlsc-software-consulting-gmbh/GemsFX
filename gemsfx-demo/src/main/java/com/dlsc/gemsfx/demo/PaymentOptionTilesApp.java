@@ -16,10 +16,10 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class PaymentOptionTilesApp extends Application {
+public class PaymentOptionTilesApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         TilePane pane = new TilePane();
         pane.setAlignment(Pos.CENTER);
         pane.setPadding(new Insets(20));

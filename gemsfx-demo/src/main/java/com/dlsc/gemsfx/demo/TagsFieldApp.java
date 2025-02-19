@@ -22,12 +22,14 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-public class TagsFieldApp extends Application {
+public class TagsFieldApp extends GemApplication {
 
     private final List<Country> countries = new ArrayList<>();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         StringTokenizer st = new StringTokenizer(getCountries(), ",");
         while (st.hasMoreTokens()) {
             countries.add(new Country(st.nextToken()));

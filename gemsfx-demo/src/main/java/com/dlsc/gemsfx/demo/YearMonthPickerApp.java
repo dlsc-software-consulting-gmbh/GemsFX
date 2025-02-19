@@ -16,10 +16,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class YearMonthPickerApp extends Application {
+public class YearMonthPickerApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         YearMonthPicker yearMonthPicker = new YearMonthPicker();
 
         Label valueLabel = new Label();

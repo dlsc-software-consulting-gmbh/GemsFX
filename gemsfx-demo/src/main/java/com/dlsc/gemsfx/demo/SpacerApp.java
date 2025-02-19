@@ -9,9 +9,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class SpacerApp extends Application {
+public class SpacerApp extends GemApplication {
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         VBox root = new VBox(10);
         root.setStyle("-fx-padding: 10px;-fx-alignment: top_center;");
 

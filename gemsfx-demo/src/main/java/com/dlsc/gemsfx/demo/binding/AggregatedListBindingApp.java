@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo.binding;
 
 import com.dlsc.gemsfx.binding.AggregatedListBinding;
 import com.dlsc.gemsfx.binding.GeneralAggregatedListBinding;
+import com.dlsc.gemsfx.demo.GemApplication;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  * has a list of scores. We create bindings that calculate the total and average score of all students, as well as the
  * number of students who have at least one failing score.
  */
-public class AggregatedListBindingApp extends Application {
+public class AggregatedListBindingApp extends GemApplication {
 
     private final ObservableList<Student> students = FXCollections.observableArrayList();
     private final TableView<Student> tableView = new TableView<>();
@@ -37,6 +38,8 @@ public class AggregatedListBindingApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         students.add(new Student("Alice", FXCollections.observableArrayList(80, 90, 88)));
         students.add(new Student("Bob", FXCollections.observableArrayList(75, 82, 91)));
         initTableView();

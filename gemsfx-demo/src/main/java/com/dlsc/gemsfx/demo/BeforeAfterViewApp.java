@@ -15,10 +15,12 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-public class BeforeAfterViewApp extends Application {
+public class BeforeAfterViewApp extends GemApplication {
 
     @Override
     public void start(Stage stage) {
+        super.start(stage);
+
         Image beforeImage = new Image(Objects.requireNonNull(BeforeAfterViewApp.class.getResource("berlin/before1.png")).toExternalForm());
         Image afterImage = new Image(Objects.requireNonNull(BeforeAfterViewApp.class.getResource("berlin/after1.png")).toExternalForm());
 

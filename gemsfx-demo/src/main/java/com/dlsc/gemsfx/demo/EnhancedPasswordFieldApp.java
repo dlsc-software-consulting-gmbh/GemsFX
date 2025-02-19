@@ -17,10 +17,11 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.Objects;
 
-public class EnhancedPasswordFieldApp extends Application {
+public class EnhancedPasswordFieldApp extends GemApplication {
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
 
         EnhancedPasswordField passwordField1 = new EnhancedPasswordField();
         passwordField1.setPromptText("Enter your password");

@@ -31,10 +31,12 @@ import javafx.util.StringConverter;
 import java.util.List;
 import java.util.Objects;
 
-public class TreeNodeViewApp extends Application {
+public class TreeNodeViewApp extends GemApplication {
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         TreeNodeView<String> treePane = new TreeNodeView<>();
         treePane.setVgap(50);
         treePane.setHgap(10);

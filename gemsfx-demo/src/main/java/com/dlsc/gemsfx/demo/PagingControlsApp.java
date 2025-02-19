@@ -29,12 +29,12 @@ import org.scenicview.ScenicView;
 
 import java.util.Objects;
 
-public class PagingControlsApp extends Application {
+public class PagingControlsApp extends GemApplication {
 
     private final ObjectProperty<HPos> alignmentProperty = new SimpleObjectProperty<>(HPos.RIGHT);
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         ObjectProperty<Integer> obj = new SimpleObjectProperty<>();
 
         IntegerProperty inti = new SimpleIntegerProperty(10);

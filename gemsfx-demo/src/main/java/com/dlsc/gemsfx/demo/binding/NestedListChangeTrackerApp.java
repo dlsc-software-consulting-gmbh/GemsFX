@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo.binding;
 import com.dlsc.gemsfx.Spacer;
 import com.dlsc.gemsfx.binding.NestedListChangeTracker;
 import com.dlsc.gemsfx.binding.TransformedNestedListBinding;
+import com.dlsc.gemsfx.demo.GemApplication;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
  * student has a list of scores. We create a binding that calculates the total and average score of
  * all students.
  */
-public class NestedListChangeTrackerApp extends Application {
+public class NestedListChangeTrackerApp extends GemApplication {
 
     private final Random random = new Random();
     private ListView<ObservableList<Number>> listView;
@@ -37,6 +38,8 @@ public class NestedListChangeTrackerApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         scores = FXCollections.observableArrayList();
         scores.addAll(FXCollections.observableArrayList(80, 90, 85), FXCollections.observableArrayList(70, 75, 60));
 

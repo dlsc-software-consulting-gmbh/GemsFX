@@ -17,12 +17,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
 
-public class ThreeItemsPaneApp extends Application {
+public class ThreeItemsPaneApp extends GemApplication {
 
     private final ThreeItemsPane pane = new ThreeItemsPane();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         pane.setStyle("-fx-background-color: white; -fx-padding: 5px; -fx-border-color: black;");
         pane.setMaxHeight(Region.USE_PREF_SIZE);
         pane.setSpacing(20);

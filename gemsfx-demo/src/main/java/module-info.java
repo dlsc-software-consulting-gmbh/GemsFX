@@ -4,6 +4,8 @@ open module com.dlsc.gemsfx.demo {
     requires com.dlsc.gemsfx;
     requires com.dlsc.pdfviewfx;
 
+    requires atlantafx.base;
+
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
 

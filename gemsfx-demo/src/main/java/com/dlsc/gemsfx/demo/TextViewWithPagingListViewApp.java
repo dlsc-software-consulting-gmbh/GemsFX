@@ -17,10 +17,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
 
-public class TextViewWithPagingListViewApp extends Application {
+public class TextViewWithPagingListViewApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         SimplePagingListView<String> listView = new SimplePagingListView<>();
         listView.setUsingScrollPane(false);
         listView.setPageSize(3);

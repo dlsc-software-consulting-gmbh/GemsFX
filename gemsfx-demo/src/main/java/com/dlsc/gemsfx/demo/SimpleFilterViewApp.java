@@ -28,12 +28,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
 
-public class SimpleFilterViewApp extends Application {
+public class SimpleFilterViewApp extends GemApplication {
 
     private final ObjectProperty<SimpleFilterView.LayoutMode> layoutMode = new SimpleObjectProperty<>(SimpleFilterView.LayoutMode.STANDARD);
 
     @Override
     public void start(Stage stage) {
+        super.start(stage);
+
         SimpleFilterView filterView1 = new SimpleFilterView();
         filterView1.setStyle("-fx-background-color: red; -fx-padding: 1px;");
         filterView1.addSelectionBox("HPos", HPos.class);

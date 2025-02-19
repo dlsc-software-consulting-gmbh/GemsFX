@@ -29,14 +29,16 @@ import java.util.stream.Collectors;
  * <p>
  * About the HistoryManager, you can refer to: {@link HistoryManager} {@link SearchTextFieldApp}, {@link HistoryManagerApp}
  */
-public class SearchFieldApp extends Application {
+public class SearchFieldApp extends GemApplication {
 
     private StringHistoryManager historyManager;
 
     private final List<Country> countries = new ArrayList<>();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         StringTokenizer st = new StringTokenizer(getCountries(), ",");
         while (st.hasMoreTokens()) {
             countries.add(new Country(st.nextToken()));

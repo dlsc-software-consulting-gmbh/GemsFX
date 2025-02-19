@@ -14,10 +14,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ScrollPaneApp extends Application {
+public class ScrollPaneApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
 
         ComboBox<String> comboBox = new ComboBox<>();
 

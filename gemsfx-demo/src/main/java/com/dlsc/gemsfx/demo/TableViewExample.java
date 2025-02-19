@@ -10,7 +10,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class TableViewExample extends Application {
+public class TableViewExample extends GemApplication {
 
     public static void main(String[] args) {
         launch(args);
@@ -18,6 +18,7 @@ public class TableViewExample extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
 
         TableView tableView = new TableView();
 

@@ -33,7 +33,7 @@ import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
-public class InfoCenterApp extends Application {
+public class InfoCenterApp extends GemApplication {
 
     private static final Image SLACK_IMAGE = loadResourceImage("notification/slack.png");
     private static final Image CALENDAR_IMAGE = loadResourceImage("notification/calendar.png");
@@ -46,7 +46,7 @@ public class InfoCenterApp extends Application {
     private final NotificationGroup<Object, CalendarNotification> calendarGroup = new NotificationGroup<>("Calendar");
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         slackGroup.setSortOrder(0);
         calendarGroup.setSortOrder(1);
         mailGroup.setSortOrder(2);

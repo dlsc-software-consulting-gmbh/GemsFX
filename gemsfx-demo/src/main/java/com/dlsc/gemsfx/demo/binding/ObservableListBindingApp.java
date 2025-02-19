@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo.binding;
 
 import com.dlsc.gemsfx.binding.ObservableValuesListBinding;
+import com.dlsc.gemsfx.demo.GemApplication;
 import javafx.application.Application;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
@@ -21,13 +22,15 @@ import java.util.Random;
  * This demo shows how to use the {@link ObservableValuesListBinding} class to create a binding that
  * calculates the sum and average of a list of observable values.
  */
-public class ObservableListBindingApp extends Application {
+public class ObservableListBindingApp extends GemApplication {
 
     private final Random random = new Random();
     private Label sumLabel1;
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         ObservableList<ObservableValue<Number>> observableValues = FXCollections.observableArrayList();
         observableValues.add(new SimpleIntegerProperty(10));
         observableValues.add(new SimpleIntegerProperty(20));

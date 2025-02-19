@@ -26,7 +26,7 @@ import org.scenicview.ScenicView;
 
 import java.util.Objects;
 
-public class AvatarViewApp extends Application {
+public class AvatarViewApp extends GemApplication {
 
     private AvatarView avatarView;
 
@@ -37,7 +37,8 @@ public class AvatarViewApp extends Application {
     private static final String INITIALS = "LD";
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
 
         Tab tabA = createTabA();
         Tab tabB = createTabB();

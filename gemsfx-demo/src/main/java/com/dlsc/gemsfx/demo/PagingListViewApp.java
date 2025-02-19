@@ -24,7 +24,7 @@ import org.scenicview.ScenicView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PagingListViewApp extends Application {
+public class PagingListViewApp extends GemApplication {
 
     private final BooleanProperty simulateDelayProperty = new SimpleBooleanProperty(false);
 
@@ -33,7 +33,7 @@ public class PagingListViewApp extends Application {
     private final IntegerProperty count = new SimpleIntegerProperty(55);
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         PagingListView<String> pagingListView = new PagingListView<>();
         pagingListView.setPrefWidth(600);
         pagingListView.setPageSize(10);
@@ -85,7 +85,10 @@ public class PagingListViewApp extends Application {
         Button increaseItemCount = new Button("Increase Count");
         increaseItemCount.setOnAction(evt -> count.set(count.get() + 1));
 
-        HBox settingsBox = new HBox(10, fillBox, simulateDelay, showPagingControls, location, clearSetData, reduceItemCount, increaseItemCount);
+        CheckBox useScrollPane = new CheckBox("Use Scroll Pane");
+        useScrollPane.selectedProperty().bindBidirectional(pagingListView.usingScrollPaneProperty());
+
+        HBox settingsBox = new HBox(10, fillBox, simulateDelay, showPagingControls, useScrollPane, location, clearSetData, reduceItemCount, increaseItemCount);
         settingsBox.setAlignment(Pos.CENTER_LEFT);
 
         VBox box = new VBox(20, pagingListView, settingsBox, new PagingControlsSettingsView(pagingListView), scenicView);
@@ -101,8 +104,7 @@ public class PagingListViewApp extends Application {
 
         StageManager.install(stage, "product.list.view");
         stage.show();
-
-        Platform.runLater(stage::sizeToScene);
+        stage.sizeToScene();
     }
 
     public static void main(String[] args) {

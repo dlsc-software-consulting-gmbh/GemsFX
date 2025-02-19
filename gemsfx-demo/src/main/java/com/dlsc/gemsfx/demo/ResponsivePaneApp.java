@@ -15,7 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
-public class ResponsivePaneApp extends Application {
+public class ResponsivePaneApp extends GemApplication {
 
     private final ResponsivePane responsivePane = new ResponsivePane();
 
@@ -24,7 +24,7 @@ public class ResponsivePaneApp extends Application {
     private Region largeSidebar;
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         Label widthLabel = new Label();
         widthLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         widthLabel.setStyle("-fx-background-color: pink; -fx-alignment: center; -fx-padding: 5px 10px;");

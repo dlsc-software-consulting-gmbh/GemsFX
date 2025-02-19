@@ -20,12 +20,13 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class LimitedTextAreaApp extends Application {
+public class LimitedTextAreaApp extends GemApplication {
 
     private final LimitedTextArea textArea = new LimitedTextArea();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
 
         //init the text area
         textArea.setWrapText(true);

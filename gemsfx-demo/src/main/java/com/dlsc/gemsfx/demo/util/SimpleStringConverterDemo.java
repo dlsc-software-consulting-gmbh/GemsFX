@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.demo.util;
 
+import com.dlsc.gemsfx.demo.GemApplication;
 import com.dlsc.gemsfx.util.EnumUtil;
 import com.dlsc.gemsfx.util.SimpleStringConverter;
 import javafx.application.Application;
@@ -20,7 +21,7 @@ import java.time.LocalDate;
  * a default mechanism to handle null values and empty strings.
  * {@link SimpleStringConverter}
  */
-public class SimpleStringConverterDemo extends Application {
+public class SimpleStringConverterDemo extends GemApplication {
 
     public record Task(String description, LocalDate dueDate) {
     }
@@ -38,6 +39,8 @@ public class SimpleStringConverterDemo extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         // Create a ComboBox and populate it with Task objects
         ComboBox<Task> comboBox = new ComboBox<>();
         comboBox.getItems().addAll(

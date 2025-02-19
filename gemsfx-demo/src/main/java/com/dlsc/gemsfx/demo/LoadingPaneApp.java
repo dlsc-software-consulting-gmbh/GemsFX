@@ -16,10 +16,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
 
-public class LoadingPaneApp extends Application {
+public class LoadingPaneApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         Label node = new Label("Some content goes here...");
         node.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         node.setStyle("-fx-background-color: white;");

@@ -10,10 +10,10 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class YearViewApp extends Application {
+public class YearViewApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         YearView view = new YearView();
         view.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 

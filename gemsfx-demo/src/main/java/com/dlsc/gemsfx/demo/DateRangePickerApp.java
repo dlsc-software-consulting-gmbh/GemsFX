@@ -27,10 +27,10 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
 
-public class DateRangePickerApp extends Application {
+public class DateRangePickerApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         DateRangePicker picker = new DateRangePicker();
         picker.setValue(new DateRange("Initial Range", LocalDate.now(), LocalDate.now().plusDays(8)));
 

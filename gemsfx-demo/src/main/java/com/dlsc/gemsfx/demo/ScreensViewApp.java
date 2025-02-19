@@ -19,10 +19,10 @@ import javafx.stage.Stage;
 
 import java.util.prefs.Preferences;
 
-public class ScreensViewApp extends Application {
+public class ScreensViewApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         ScreensView screensView = new ScreensView();
 
         SessionManager sessionManager = new SessionManager(Preferences.userNodeForPackage(ScreensViewApp.class));

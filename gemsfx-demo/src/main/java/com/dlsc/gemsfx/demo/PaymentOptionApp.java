@@ -12,10 +12,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class PaymentOptionApp extends Application {
+public class PaymentOptionApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         PaymentOptionView paymentOptionView = new PaymentOptionView();
 
         ComboBox<Option> optionsBox = new ComboBox<>();

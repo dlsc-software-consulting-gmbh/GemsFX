@@ -20,10 +20,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
 
-public class DateRangeViewApp extends Application {
+public class DateRangeViewApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         DateRangeView view = new DateRangeView();
         view.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 

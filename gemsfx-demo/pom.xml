@@ -110,9 +110,15 @@
     <dependencies>
 
         <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>atlantafx-base</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.12.7.1</version>  <!-- or whatever the latest version is -->
+            <version>2.12.7.1</version>
         </dependency>
 
         <dependency>
