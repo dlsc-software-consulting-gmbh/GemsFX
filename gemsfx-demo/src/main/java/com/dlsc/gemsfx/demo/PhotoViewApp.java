@@ -17,10 +17,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class PhotoViewApp extends Application {
+public class PhotoViewApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         PhotoView photoView = new PhotoView();
 
         StackPane photoViewWrapper = new StackPane(photoView);

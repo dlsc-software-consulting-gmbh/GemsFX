@@ -19,10 +19,10 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.time.LocalDate;
 
-public class FilterViewApp extends Application {
+public class FilterViewApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         FilterView<Person> filterView = new FilterView<>();
         filterView.setTitle("Title Here");
         filterView.setTitleGraphic(new FontIcon(MaterialDesign.MDI_FLAG));

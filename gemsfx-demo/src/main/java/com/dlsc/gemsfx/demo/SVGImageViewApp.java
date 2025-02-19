@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.Objects;
 
-public class SVGImageViewApp extends Application {
+public class SVGImageViewApp extends GemApplication {
 
     /**
      * <a href="https://www.svgrepo.com/svg/288210/phone-call-telephone">telephone svg</a>
@@ -27,7 +27,9 @@ public class SVGImageViewApp extends Application {
     private static final String SVG_URL = "https://www.svgrepo.com/show/288210/phone-call-telephone.svg";
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         SVGImageView imageView = new SVGImageView();
         String svgUrl = Objects.requireNonNull(SVGImageViewApp.class.getResource("microphone.svg")).toExternalForm();
         imageView.setSvgUrl(svgUrl);

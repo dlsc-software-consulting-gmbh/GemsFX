@@ -15,12 +15,13 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class DayOfWeekPickerApp extends Application {
+public class DayOfWeekPickerApp extends GemApplication {
 
     private final DayOfWeekPicker dayOfWeekPicker = new DayOfWeekPicker();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
 
         dayOfWeekPicker.prefWidthProperty().bind(dayOfWeekPicker.getSelectionModel().selectionModeProperty().map(sm -> sm == SelectionMode.SINGLE ? 135 : 160));
         StackPane wrapper = new StackPane(dayOfWeekPicker);

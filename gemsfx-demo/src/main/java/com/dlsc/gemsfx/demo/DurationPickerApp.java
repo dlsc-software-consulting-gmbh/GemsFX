@@ -28,10 +28,12 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
-public class DurationPickerApp extends Application {
+public class DurationPickerApp extends GemApplication {
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         DurationPicker durationPicker = new DurationPicker();
 
         durationPicker.setLabelType(LabelType.SHORT);

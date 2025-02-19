@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SimplePagingGridTableViewApp extends Application {
+public class SimplePagingGridTableViewApp extends GemApplication {
 
     private final BooleanProperty simulateDelayProperty = new SimpleBooleanProperty(false);
 
@@ -38,7 +38,7 @@ public class SimplePagingGridTableViewApp extends Application {
     private final IntegerProperty count = new SimpleIntegerProperty(55);
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         List<Movie> movies = parseMovieFiles();
 
         SimplePagingGridTableView<Movie> pagingGridTableView = new SimplePagingGridTableView<>();

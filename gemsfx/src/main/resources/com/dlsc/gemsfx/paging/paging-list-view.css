@@ -2,8 +2,8 @@
     -fx-spacing: 5px;
 }
 
-.paging-list-view > .stack-pane > .content > .inner-list-view > .loading-pane > .inner-content > .list-cell:filled:selected,
-.paging-list-view > .stack-pane > .content > .inner-list-view > .loading-pane > .inner-content > .list-cell:filled:selected:hover {
+.paging-list-view .list-cell:filled:selected,
+.paging-list-view .list-cell:filled:selected:hover {
     -fx-background: -fx-accent;
     -fx-background-color: -fx-background, -fx-cell-focus-inner-border, -fx-background;
     -fx-background-insets: 0, 1, 2;

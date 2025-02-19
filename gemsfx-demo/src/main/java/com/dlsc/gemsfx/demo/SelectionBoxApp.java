@@ -25,7 +25,7 @@ import javafx.util.StringConverter;
 
 import java.util.List;
 
-public class SelectionBoxApp extends Application {
+public class SelectionBoxApp extends GemApplication {
 
     private final SelectionBox<String> selectionBox = new SelectionBox<>();
     private final StackPane topNode = new StackPane();
@@ -34,7 +34,9 @@ public class SelectionBoxApp extends Application {
     private final StackPane rightNode = new StackPane();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         selectionBox.show();
 
         topNode.setStyle("-fx-background-color: lightblue;-fx-padding: 10;");

@@ -13,10 +13,10 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.scenicview.ScenicView;
 
-public class DrawerStackPaneApp extends Application {
+public class DrawerStackPaneApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         DrawerStackPane drawerStackPane = new DrawerStackPane();
         drawerStackPane.setAnimateDrawer(true);
         drawerStackPane.getToolbarItems().add(new Button("Refresh"));
@@ -93,7 +93,9 @@ public class DrawerStackPaneApp extends Application {
 
         controls.setAlignment(Pos.CENTER_LEFT);
         controls.setStyle("-fx-padding: 10px; -fx-background-color: lightgrey, white; -fx-background-insets: 0px, 1px 0px 0px 0px;");
-
+        if (Application.getUserAgentStylesheet().contains("atlanta")) {
+            controls.setStyle("-fx-padding: 10px; -fx-background-color: -color-border-default, -color-bg-default; -fx-background-insets: 0px, 1px 0px 0px 0px;");
+        }
         BorderPane borderPane = new BorderPane(drawerStackPane);
         borderPane.setBottom(controls);
         borderPane.setPrefHeight(850);
@@ -104,8 +106,6 @@ public class DrawerStackPaneApp extends Application {
         stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
-
-        ScenicView.show(scene);
     }
 
     public static void main(String[] args) {

@@ -18,10 +18,12 @@ import javafx.stage.Stage;
 
 import java.time.LocalDate;
 
-public class CalendarPickerApp extends Application {
+public class CalendarPickerApp extends GemApplication {
 
     @Override
     public void start(Stage stage) {
+        super.start(stage);
+
         CalendarPicker calendarPicker = new CalendarPicker();
         calendarPicker.setValue(LocalDate.now());
 

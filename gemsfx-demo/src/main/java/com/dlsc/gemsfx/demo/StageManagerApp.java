@@ -10,10 +10,10 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class StageManagerApp extends Application {
+public class StageManagerApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
 
         Label label = new Label("Stage Manager Test");
         StackPane stackPane = new StackPane(label);

@@ -4,6 +4,7 @@
 }
 
 .paging-controls > .pane {
+    -fx-fill-height: false;
 }
 
 .paging-controls > .pane.horizontal {
@@ -65,10 +66,6 @@
     -fx-background: -fx-selection-bar;
     -fx-background-color: -fx-background;
     -fx-text-fill: -fx-selection-bar-text;
-}
-
-.paging-controls > .pane > .buttons-container > .navigation-button:hover > .icon {
-    -fx-opacity: 1;
 }
 
 .paging-controls > .pane > .buttons-container > .navigation-button:pressed {

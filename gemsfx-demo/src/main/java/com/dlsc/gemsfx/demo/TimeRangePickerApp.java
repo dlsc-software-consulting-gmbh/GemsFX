@@ -11,12 +11,14 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class TimeRangePickerApp extends Application {
+public class TimeRangePickerApp extends GemApplication {
 
     private TimeRangePicker timeRangePicker;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         timeRangePicker = new TimeRangePicker();
         timeRangePicker.setPrefWidth(200);
         timeRangePicker.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

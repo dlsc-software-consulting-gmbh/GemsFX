@@ -22,12 +22,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.prefs.Preferences;
 
-public class SearchTextFieldApp extends Application {
+public class SearchTextFieldApp extends GemApplication {
 
     private StringHistoryManager stringHistoryManager;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
 
         SearchTextField field = new SearchTextField();
 

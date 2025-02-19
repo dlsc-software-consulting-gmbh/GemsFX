@@ -13,10 +13,12 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-public class BeforeAfterViewApp2 extends Application {
+public class BeforeAfterViewApp2 extends GemApplication {
 
     @Override
     public void start(Stage stage) {
+        super.start(stage);
+
         SettingsPane pane1 = new SettingsPane();
         pane1.setPrefWidth(400);
         pane1.setPadding(new Insets(20));

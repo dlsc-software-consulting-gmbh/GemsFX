@@ -24,12 +24,14 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Objects;
 
-public class CircleProgressIndicatorApp extends Application {
+public class CircleProgressIndicatorApp extends GemApplication {
 
     private StringConverter<Double> customConverter;
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         CircleProgressIndicator progressIndicator = new CircleProgressIndicator();
         delayAutoUpdateProgress(progressIndicator);
 

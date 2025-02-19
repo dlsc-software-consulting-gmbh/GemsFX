@@ -17,10 +17,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
 
-public class TextViewWithListViewApp extends Application {
+public class TextViewWithListViewApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         ListView<String> listView = new ListView<>();
 
         VBox.setVgrow(listView, Priority.ALWAYS);

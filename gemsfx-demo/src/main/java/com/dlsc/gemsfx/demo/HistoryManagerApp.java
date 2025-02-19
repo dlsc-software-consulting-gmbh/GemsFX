@@ -29,10 +29,11 @@ import java.util.prefs.Preferences;
 /**
  * A demo application that shows how to use {@link HistoryButton} and {@link HistoryManager}.
  */
-public class HistoryManagerApp extends Application {
+public class HistoryManagerApp extends GemApplication {
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
 
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);

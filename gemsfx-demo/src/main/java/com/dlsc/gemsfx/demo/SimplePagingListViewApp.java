@@ -12,10 +12,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
 
-public class SimplePagingListViewApp extends Application {
+public class SimplePagingListViewApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         SimplePagingListView<String> pagingListView = new SimplePagingListView<>();
         pagingListView.setPrefWidth(400);
         for (int i = 0; i < 100; i++) {

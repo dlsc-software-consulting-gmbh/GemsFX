@@ -25,10 +25,10 @@ import javafx.stage.Stage;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class StripViewApp extends Application {
+public class StripViewApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         StripView<String> textView = new StripView<>();
         textView.setMinHeight(Region.USE_PREF_SIZE);
         textView.setFadingSize(200);

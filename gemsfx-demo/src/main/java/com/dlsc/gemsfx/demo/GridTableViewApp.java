@@ -24,12 +24,14 @@ import org.scenicview.ScenicView;
 import java.util.List;
 import java.util.Random;
 
-public class GridTableViewApp extends Application {
+public class GridTableViewApp extends GemApplication {
 
     private int index;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         GridTableView<Student> tableView = new GridTableView<>();
         tableView.setMinNumberOfRows(8);
 

@@ -1,0 +1,743 @@
+.root {
+    -fx-mark-highlight-color: red;
+}
+
+/* ----------------------------------------------------------------------------
+ * ResizableTextArea
+ */
+.resize-corner:h-resize {
+}
+
+.resize-corner:v-resize {
+}
+
+.resize-corner:both-resize {
+}
+
+.resize-corner:no-resize {
+}
+
+.resizable-text-area .resize-corner {
+}
+
+.resizable-text-area .resize-corner .resize-icon {
+    -fx-background-color: -color-border-default;
+}
+
+.resizable-text-area .resize-corner:hover .resize-icon {
+    -fx-background-color: -color-border-default;
+}
+
+.resizable-text-area .resize-corner:no-resize .resize-icon {
+}
+
+.resizable-text-area:focused .resize-corner .resize-icon {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.resizable-text-area .scroll-pane {
+}
+
+.resizable-text-area:disabled {
+}
+
+/* ----------------------------------------------------------------------------
+ * DialogPane
+ */
+.dialog-pane {
+    -fx-max-width: Infinity;
+    -fx-max-height: Infinity;
+}
+
+.dialog-pane > .content-pane {
+    -fx-background-color: -color-bg-overlay;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
+}
+
+.dialog-pane > .content-pane .prompt-node-wrapper {
+}
+
+.dialog-pane > .content-pane > .glass-pane {
+}
+
+.dialog-pane > .content-pane > .vbox {
+}
+
+.dialog-pane > .content-pane > .vbox .label {
+}
+
+.dialog-pane > .content-pane > .vbox > .button-bar {
+}
+
+.dialog-pane > .content-pane > .vbox > .button-bar > .button {
+}
+
+.dialog-pane > .content-pane > .vbox > .button-bar > .button:default {
+}
+
+.dialog-pane > .content-pane > .vbox > .header > .title-and-icon-box {
+}
+
+.dialog-pane > .content-pane > .vbox > .header > .title-and-icon-box > .title {
+}
+
+.dialog-pane > .content-pane > .vbox > .header > .title-and-icon-box {
+    -fx-alignment: center;
+}
+
+.dialog-pane > .content-pane > .vbox > .content {
+}
+
+.dialog-pane > .content-pane > .vbox > .content .message-label { /* message label can be on different levels */
+    -fx-max-width: 350px;
+}
+
+.dialog-pane > .content-pane > .vbox > .content.padding {
+    -fx-padding: 30px;
+}
+
+.dialog-pane > .content-pane > .vbox > .header > .close-button {
+    -fx-background-color: rgba(100, 112, 122, 0.2);
+}
+
+.dialog-pane > .content-pane > .close-button:hover {
+    -fx-background-color: rgba(100, 112, 122, 0.4);
+}
+
+.dialog-pane > .content-pane > .close-button:pressed {
+    -fx-background-color: rgba(100, 112, 122, 0.1);
+}
+
+.dialog-pane > .content-pane > .close-button .ikonli-font-icon {
+    -fx-icon-color: -color-fg-default;
+}
+
+.dialog-pane > .content-pane > .vbox > .content > .error-container {
+}
+
+.dialog-pane > .content-pane > .vbox > .content > .error-container .content {
+}
+
+/* ----------------------------------------------------------------------------
+ * BusyIndicator
+ */
+
+.dialog-pane > * > * > * > .dialog-pane-busy-indicator {
+    -size: 100px;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+    -fx-background-color: transparent;
+}
+
+/* ----------------------------------------------------------------------------
+ * CircularProgressIndicator
+ */
+
+.dialog-pane > .content-pane .circular-progress {
+    -indicator-color: white;
+}
+
+.dialog-pane > .content-pane .circular-progress .indicator {
+    -fx-stroke-type: centered;
+    -fx-stroke: -fx-accent;
+    -fx-fill: transparent;
+}
+
+/* ----------------------------------------------------------------------------
+ * Glass Pane
+ */
+.dialog-pane > .glass-pane {
+    -fx-background-color: black;
+}
+
+/* ----------------------------------------------------------------------------
+ * ResizableTextArea
+ */
+.dialog-pane > .content-pane .resizable-text-area .resize-corner {
+    -fx-padding: 0px 2px 2px 0px;
+}
+
+.dialog-pane > .content-pane .resizable-text-area .resize-corner .ikonli-font-icon {
+    -fx-icon-size: 24px;
+    -fx-icon-color: -fx-accent;
+}
+
+/** --------------------------------------------------------------------
+ * PagingListView
+ */
+.paging-list-view > .stack-pane > .content {
+}
+
+.paging-list-view .list-cell:filled:selected,
+.paging-list-view .list-cell:filled:selected:hover {
+    -fx-background-color: -color-accent-subtle;
+}
+
+/** --------------------------------------------------------------------
+ * PagingControls
+ */
+.paging-controls {
+}
+
+.paging-controls > .pane {
+}
+
+.paging-controls > .pane.horizontal {
+}
+
+.paging-controls > .pane.vertical {
+}
+
+.paging-controls > .pane > .message-label {
+}
+
+.paging-controls > .pane > .buttons-container {
+}
+
+.paging-controls > .pane > .buttons-container > .grid-pane {
+}
+
+.paging-controls > .pane > .buttons-container > .grid-pane > .page-button {
+}
+
+.paging-controls > .pane > .buttons-container > .grid-pane > .page-button:hover,
+.paging-controls > .pane > .buttons-container > .grid-pane > .page-button.current {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.paging-controls > .pane > .buttons-container > .grid-pane > .page-button:pressed {
+    -fx-background-color: -color-neutral-emphasis-plus;
+}
+
+.paging-controls > .pane > .spacer {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button:hover {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button:pressed {
+    -fx-background-color: -color-neutral-emphasis-plus;
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button.first-page-button {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button.previous-page-button {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button.last-page-button {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button.next-page-button {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button > .icon-wrapper {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button:hover > .icon-wrapper {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button:focused > .icon-wrapper,
+.paging-controls > .pane > .buttons-container > .navigation-button:pressed > .icon-wrapper {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button > .icon-wrapper > .icon {
+    -fx-background-color: -color-fg-default;
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button:hover > .icon-wrapper > .icon {
+    -fx-background-color: -color-fg-emphasis;
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button.first-page-button > .icon-wrapper > .icon {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button.last-page-button > .icon-wrapper > .icon {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button.previous-page-button > .icon-wrapper > .icon {
+}
+
+.paging-controls > .pane > .buttons-container > .navigation-button.next-page-button > .icon-wrapper > .icon {
+}
+
+.paging-controls > .pane > .buttons-container > .grid-pane > .page-divider {
+    -fx-background-color: -color-fg-subtle;
+}
+
+.paging-controls > .pane > .page-size-container {
+}
+
+.paging-controls > .pane.vertical .page-size-container {
+}
+
+.paging-controls > .pane > .page-size-container > .choice-box {
+}
+
+/** --------------------------------------------------------------------
+ * DrawerStackpane
+ */
+.drawer-stackpane > .drawer {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
+}
+
+.drawer-stackpane {
+}
+
+.drawer-stackpane > .drawer > .top > .header {
+    -fx-spacing: 10;
+    -fx-padding: 3 0 3 0;
+}
+
+.drawer-stackpane > .drawer > .top > .header > .title-label {
+    -fx-font-size: 21px;
+    -fx-graphic-text-gap: 20;
+}
+
+.drawer-stackpane > .drawer > .top > .header > .tool-bar {
+    -fx-padding: 0px;
+    -fx-background-color: transparent;
+}
+
+.drawer-stackpane > .drawer > .top > .header > .tool-bar > .container {
+    -fx-padding: 2px 0px 0px 0px;
+}
+
+.drawer-stackpane > .drawer > .top > .header > .tool-bar > .container > .button {
+    -fx-background-color: -color-accent-subtle;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.drawer-stackpane > .drawer > .top > .drag-handle {
+}
+
+.drawer-stackpane > .drawer > .top > .drag-handle > .handle {
+}
+
+.drawer-stackpane > .drawer > .top > .drag-handle > .handle > .separator {
+    -fx-padding: 0px;
+}
+
+/** --------------------------------------------------------------------
+ * DateRangeView
+ */
+.date-range-view {
+    -fx-background-color: -color-border-default, -color-bg-default;
+}
+
+.date-range-view > .range-view-container {
+}
+
+.date-range-view > .range-view-container > .stack-pane > .months-box {
+}
+
+.date-range-view > .range-view-container > .stack-pane > .to-label {
+    -fx-background-color: -color-border-default, -color-bg-default;
+}
+
+.date-range-view > .range-view-container > .presets-box {
+}
+
+.date-range-view > .range-view-container > .presets-box > .separator {
+    -fx-padding: 0px;
+}
+
+.date-range-view > .range-view-container > .presets-box > .presets-title {
+}
+
+.date-range-view > .range-view-container > .presets-box > .buttons-box {
+}
+
+.date-range-view > .range-view-container > .presets-box > .buttons-box > .apply-button {
+}
+
+.date-range-view > .range-view-container > .presets-box > .buttons-box > .cancel-button {
+}
+
+.date-range-view > .range-view-container > .presets-box > .preset-name-label {
+    -fx-text-fill: -color-accent-fg;
+}
+
+.date-range-view > .range-view-container > .presets-box > .preset-name-label:hover {
+}
+
+.date-range-view > .range-view-container > .presets-box > .separator > .line {
+    -fx-border-color: -color-border-default transparent transparent transparent;
+}
+
+/** --------------------------------------------------------------------
+ * YearMonthView
+ */
+.year-month-view {
+    -fx-border-color: -color-border-default;
+}
+
+.year-month-view > .container > .grid-pane {
+    -fx-background-color: -color-bg-default;
+}
+
+.year-month-view > .container > .grid-pane .month-box {
+}
+
+.year-month-view > .container > .grid-pane .month-box .month-label {
+}
+
+.year-month-view > .container > .grid-pane .month-box > .indicator {
+    -fx-background-color: -color-fg-default;
+}
+
+.year-month-view > .container > .grid-pane .month-box:selected > .indicator {
+}
+
+.year-month-view > .container > .grid-pane .divider {
+    -fx-background-color: -color-border-default;
+}
+
+.year-month-view > .container > .header {
+    -fx-background-color: -color-bg-default;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 10, 0.12, -1, 2);
+}
+
+.year-month-view > .container > .header > .year-label {
+}
+
+.year-month-view > .container > .header > .arrow-button {
+}
+
+.year-month-view > .container > .header > .arrow-button:hover {
+    -fx-background-color: -color-neutral-subtle;
+}
+
+.year-month-view > .container > .header > .arrow-button > .left-arrow,
+.year-month-view > .container > .header > .arrow-button > .right-arrow {
+    -fx-background-color: -color-fg-default;
+    -fx-effect: null;
+}
+
+.year-month-view > .container > .header > .arrow-button > .left-arrow {
+    -fx-background-color: -color-fg-default;
+}
+
+.year-month-view > .container > .header > .arrow-button > .right-arrow {
+    -fx-background-color: -color-fg-default;
+}
+
+/** --------------------------------------------------------------------
+ * YearView
+ */
+.year-view {
+    -fx-border-color: -color-border-default;
+}
+
+.year-view:focused {
+}
+
+.year-view > .grid-pane {
+    -fx-background-color: -color-bg-default;
+}
+
+.year-view > .grid-pane > .year-box {
+}
+
+.year-view > .grid-pane > .year-box > .selection-indicator {
+    -fx-background-color: -color-fg-default;
+}
+
+.year-view > .header {
+    -fx-background-color: -color-bg-default;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 10, 0.12, -1, 2);
+}
+
+.year-view > .header > .year-range-label {
+}
+
+.year-view > .header > .arrow-button {
+}
+
+.year-view > .header > .arrow-button:hover {
+    -fx-background-color: -color-bg-subtle;
+}
+
+.year-view > .header > .arrow-button > .left-arrow,
+.year-view > .header > .arrow-button > .right-arrow {
+    -fx-background-color: -color-fg-default;
+    -fx-effect: null;
+}
+
+.year-view > .header > .arrow-button > .left-arrow {
+}
+
+.year-view > .header > .arrow-button > .right-arrow {
+}
+
+/** --------------------------------------------------------------------
+ * CalendarView
+ */
+.calendar-view {
+    -fx-background-color: -color-border-default, -color-bg-default;
+}
+
+.calendar-view > .container {
+}
+
+.calendar-view > .stack-pane > .container > .footer {
+    -fx-background-color: -color-bg-default;
+}
+
+.calendar-view > .stack-pane > .container > .header {
+    -fx-background-color: -color-bg-default;
+}
+
+.calendar-view > .stack-pane > .container > .header > .date-label {
+}
+
+.calendar-view > .stack-pane > .container > .header > .date-label.dropdown:hover {
+    -fx-background-color: -color-bg-default;
+}
+
+.calendar-view > .stack-pane > .container > .header > .arrow-button {
+}
+
+.calendar-view > .stack-pane > .container > .header > .arrow-button:hover {
+    -fx-background-color: -color-bg-default;
+}
+
+.calendar-view > .stack-pane > .container > .header > .date-label > .dropdown-button > .arrow {
+    -fx-background-color: -color-fg-default;
+}
+
+.calendar-view > .stack-pane > .container > .header > .date-label > .dropdown-button:disabled {
+}
+
+.calendar-view > .stack-pane > .container > .header > .year-spinner {
+}
+
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .decrement-year-button,
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .increment-year-button {
+}
+
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .decrement-year-button:hover,
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .increment-year-button:hover {
+    -fx-background-color: -color-bg-default;
+}
+
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .decrement-year-button:disabled,
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .increment-year-button:disabled {
+}
+
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .increment-year-button > .arrow {
+    -fx-background-color: -color-fg-default;
+}
+
+.calendar-view > .stack-pane > .container > .header > .year-spinner > .decrement-year-button > .arrow {
+    -fx-background-color: -color-fg-default;
+}
+
+.calendar-view > .stack-pane > .container > .header > .previous-month-button:hover,
+.calendar-view > .stack-pane > .container > .header > .next-month-button:hover {
+    -fx-background: -color-bg-default;
+}
+
+.calendar-view > .stack-pane > .container > .header > .previous-month-button:pressed,
+.calendar-view > .stack-pane > .container > .header > .next-month-button:pressed {
+}
+
+.calendar-view > .stack-pane > .container > .header > .previous-month-button:disabled,
+.calendar-view > .stack-pane > .container > .header > .next-month-button:disabled {
+}
+
+.calendar-view > .stack-pane > .container > .header > .previous-month-button,
+.calendar-view > .stack-pane > .container > .header > .next-month-button {
+}
+
+.calendar-view > .stack-pane > .container > .header > .previous-month-button > .arrow {
+    -fx-background-color: -color-fg-default;
+}
+
+.calendar-view > .stack-pane > .container > .header > .next-month-button > .arrow {
+    -fx-background-color: -color-fg-default;
+}
+
+.calendar-view.show-grid-lines > .stack-pane > .container > .weekday-grid-pane,
+.calendar-view.show-grid-lines > .stack-pane > .container > .body-grid-pane {
+}
+
+.calendar-view > .stack-pane > .container > .weekday-grid-pane {
+    -fx-background-color: -color-bg-default;
+}
+
+.calendar-view > .stack-pane > .container > .weekday-grid-pane > .corner {
+    -fx-background-color: -color-bg-default;
+}
+
+.calendar-view > .stack-pane > .container > .weekday-grid-pane > .weekday-name {
+    -fx-background-color: -color-bg-default;
+    -fx-text-fill: -color-fg-default;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane {
+    -fx-background-color: -color-bg-default;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .week-number-label {
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell {
+    -fx-background-color: -color-bg-default;
+    -fx-text-fill: -color-fg-default;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.previous-month {
+    -fx-background-color: -color-neutral-subtle;
+    -fx-text-fill: -color-fg-muted;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.next-month {
+    -fx-background-color: -color-neutral-subtle;
+    -fx-text-fill: -color-fg-muted;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.weekend-day {
+    -fx-background-color: -color-neutral-subtle;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.today {
+    -fx-border-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-default;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected.next-month,
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected.previous-month {
+    -fx-text-fill: -color-fg-subtle;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected.range-start {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected.range-end {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.selected.range-date {
+    -fx-background-color: -color-accent-muted;
+    -fx-text-fill: -color-fg-default;
+}
+
+.calendar-view > .stack-pane > .year-view {
+    -fx-border-width: 0;
+}
+
+.calendar-view > .stack-pane > .year-month-view {
+    -fx-border-width: 0;
+}
+
+/** --------------------------------------------------------------------
+ * SelectionBox
+ */
+.selection-box {
+}
+
+.selection-box > .display-label {
+    -fx-padding: 0.36em 0.725em;
+}
+
+.selection-box .selection-box .selection-popup {
+    -fx-background-color: -color-border-default, -color-bg-default;
+}
+
+.selection-box .selection-popup > .content {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0, 1;
+}
+
+.selection-box .selection-popup > .content .extra-buttons-box {
+    -fx-border-color: transparent transparent -color-border-default transparent;
+}
+
+.selection-box .selection-popup > .content .extra-buttons-box .extra-button {
+    -fx-text-fill: -clor-fg-default;
+    -fx-background-color: -color-bg-default;
+}
+
+.selection-box .selection-popup > .content .extra-buttons-box .extra-button:hover {
+    -fx-background-color: -color-neutral-subtle;
+    -fx-text-fill: -color-fg-default;
+}
+
+.selection-box .selection-popup > .content .extra-buttons-box .extra-button:pressed {
+    -fx-background-color: -color-neutral-subtle;
+    -fx-text-fill: -color-fg-default;
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane {
+    -fx-background-color: -color-bg-default;
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane:focused {
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane .viewport {
+    -fx-background-color: -color-bg-default;
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box {
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button,
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box > .check-box {
+    -fx-background: -color-bg-default;
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button:hover,
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box > .check-box:hover {
+    -fx-background-color: -color-neutral-subtle;
+    -fx-text-fill: -color-fg-default;
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button > .radio {
+    -fx-background-color: -color-bg-default;
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button > .radio > .dot {
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button:selected {
+    -fx-background-color: -color-neutral-subtle;
+    -fx-text-fill: -color-fg-default;
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button:hover > .radio {
+    -fx-background-color: transparent;
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button:hover > .radio > .dot {
+    -fx-background-color: transparent;
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button:selected > .radio {
+    -fx-background-color: transparent;
+}
+
+.selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button:selected > .radio > .dot {
+    -fx-background-color: -color-fg-default;
+}

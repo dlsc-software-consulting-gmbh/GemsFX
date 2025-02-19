@@ -13,10 +13,10 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ExpandingTextAreaApp extends Application {
+public class ExpandingTextAreaApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         TextField textField = new TextField();
         textField.setPromptText("Regular text field");
         textField.setMaxWidth(400);

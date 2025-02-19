@@ -29,10 +29,12 @@ import org.scenicview.ScenicView;
 
 import java.time.LocalDate;
 
-public class CalendarViewApp extends Application {
+public class CalendarViewApp extends GemApplication {
 
     @Override
     public void start(Stage stage) {
+        super.start(stage);
+
         CalendarView calendarView = new CalendarView();
         calendarView.setShowTodayButton(true);
         calendarView.getSelectionModel().setSelectedDate(LocalDate.now().minusWeeks(1));

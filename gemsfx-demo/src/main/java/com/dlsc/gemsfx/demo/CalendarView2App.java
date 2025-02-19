@@ -13,10 +13,11 @@ import javafx.stage.Stage;
 
 import java.time.YearMonth;
 
-public class CalendarView2App extends Application {
+public class CalendarView2App extends GemApplication {
 
     @Override
     public void start(Stage stage) {
+        super.start(stage);
 
         CalendarView calendarView1 = new CalendarView();
         CalendarView calendarView2 = new CalendarView();

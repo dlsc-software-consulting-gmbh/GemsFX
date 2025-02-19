@@ -15,10 +15,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ResizableTextAreaApp extends Application {
+public class ResizableTextAreaApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         TextArea textArea = new TextArea("Standard text area ...");
         textArea.setWrapText(true);
         textArea.setMinHeight(100);
@@ -27,7 +27,6 @@ public class ResizableTextAreaApp extends Application {
         ResizableTextArea resizableTextArea = new ResizableTextArea("Resizable text area ...");
         resizableTextArea.setWrapText(true);
         resizableTextArea.setMinHeight(100);
-        resizableTextArea.pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), true);
 
         VBox box = new VBox(40, textArea, resizableTextArea);
         box.setFillWidth(false);

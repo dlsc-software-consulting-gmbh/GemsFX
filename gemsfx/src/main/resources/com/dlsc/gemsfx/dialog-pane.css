@@ -113,7 +113,6 @@
 }
 
 .dialog-pane > .content-pane > .vbox > .content > .error-container .content {
-    -fx-background-color: yellow !important;
 }
 
 /* ----------------------------------------------------------------------------

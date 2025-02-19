@@ -17,12 +17,12 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.Random;
 
-public class EmailFieldApp extends Application {
+public class EmailFieldApp extends GemApplication {
 
     private final Random random = new Random();
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         EmailField view = new EmailField();
 
         CheckBox required = new CheckBox("Required");

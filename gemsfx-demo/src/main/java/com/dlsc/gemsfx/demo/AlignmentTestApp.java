@@ -33,12 +33,14 @@ import org.scenicview.ScenicView;
 
 import java.time.LocalDate;
 
-public class AlignmentTestApp extends Application {
+public class AlignmentTestApp extends GemApplication {
 
     private final ObjectProperty<SimpleFilterView.LayoutMode> layoutMode = new SimpleObjectProperty<>(SimpleFilterView.LayoutMode.STANDARD);
 
     @Override
     public void start(Stage stage) {
+        super.start(stage);
+
         HBox hbox = new HBox(10);
         hbox.setStyle("-fx-background-color: red; -fx-padding: 1px;");
 

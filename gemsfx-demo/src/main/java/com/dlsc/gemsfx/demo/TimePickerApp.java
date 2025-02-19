@@ -29,10 +29,12 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 
-public class TimePickerApp extends Application {
+public class TimePickerApp extends GemApplication {
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         TimePicker timePicker = new TimePicker();
 
         ComboBox<Format> formatComboBox = new ComboBox<>();

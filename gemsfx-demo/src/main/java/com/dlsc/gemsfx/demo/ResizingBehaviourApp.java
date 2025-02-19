@@ -24,12 +24,12 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.controlsfx.control.CheckComboBox;
 
-public class ResizingBehaviourApp extends Application {
+public class ResizingBehaviourApp extends GemApplication {
 
     private ResizingBehaviour resizingSupport;
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         Label content = new Label("Content");
         content.setMouseTransparent(false);
         content.setStyle("-fx-background-color: orange;");

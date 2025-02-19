@@ -24,10 +24,10 @@ import javafx.util.Callback;
 import java.util.List;
 import java.util.Objects;
 
-public class MultiColumnListViewApp extends Application {
+public class MultiColumnListViewApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { super.start(stage);
         MultiColumnListView<Issue> multiColumnListView = new MultiColumnListView<>();
         multiColumnListView.setCellFactory(listView -> new IssueListCell(multiColumnListView));
         multiColumnListView.getColumns().setAll(createColumns());

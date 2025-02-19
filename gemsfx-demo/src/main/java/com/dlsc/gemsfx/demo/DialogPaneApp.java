@@ -40,10 +40,12 @@ import java.util.prefs.Preferences;
 
 import static com.dlsc.gemsfx.DialogPane.Type.INFORMATION;
 
-public class DialogPaneApp extends Application {
+public class DialogPaneApp extends GemApplication {
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
+
         DialogPane dialogPane = new DialogPane();
 
         Button blankButton = new Button("Blank");

@@ -19,10 +19,12 @@ import org.controlsfx.control.textfield.CustomTextField;
 
 import java.util.Objects;
 
-public class TemplatePaneExampleApp extends Application {
+public class TemplatePaneExampleApp extends GemApplication {
 
 	@Override
-	public void start(Stage primaryStage) throws Exception {
+	public void start(Stage primaryStage) {
+		super.start(primaryStage);
+
 		TemplatePane pane = new TemplatePane();
 		fillPane(pane);
 		pane.setStyle("-fx-border-color: black; -fx-border-insets: 20px;");
