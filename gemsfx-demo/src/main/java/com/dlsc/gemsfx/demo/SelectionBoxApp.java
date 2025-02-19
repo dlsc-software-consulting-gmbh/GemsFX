@@ -19,6 +19,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
@@ -110,11 +111,13 @@ public class SelectionBoxApp extends Application {
         });
 
         // placeholder
-        CheckBox placeholderCheckBox = new CheckBox("Add placeholder when no items");
+        CheckBox placeholderCheckBox = new CheckBox("Add a placeholder when no items");
         placeholderCheckBox.setSelected(true);
         selectionBox.placeholderProperty().bind(Bindings.createObjectBinding(() -> {
             if (placeholderCheckBox.isSelected()) {
-                StackPane stackPane = new StackPane(new Label("No items available"));
+                Label label = new Label("No items available");
+                label.setStyle("-fx-text-fill: #969696;");
+                StackPane stackPane = new StackPane(label);
                 stackPane.setStyle("-fx-background-color: #fcfcfc; -fx-padding: 20px;");
                 return stackPane;
             } else {
