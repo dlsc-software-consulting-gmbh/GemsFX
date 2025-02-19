@@ -130,9 +130,9 @@ public class SelectionBoxApp extends Application {
                         // You can always return the promptText as well, for example "Select" or "Please choose".
                         // return "Please choose";  // or return selectionBox.getPromptText();
                         if (selectionBox.getSelectionModel().getSelectionMode() == SelectionMode.SINGLE) {
-                            return new SimpleStringConverter<>(selectedItems -> "[ " + selectionBox.getSelectionModel().getSelectedItem() + " ]", "No item selected");
+                            return new SimpleStringConverter<>(selectedItems -> "[ " + selectionBox.getSelectionModel().getSelectedItem() + " ]");
                         } else {
-                            return new SimpleStringConverter<>(selectedItems -> selectedItems.size() + " items selected", "No items selected");
+                            return new SimpleStringConverter<>(selectedItems -> selectedItems.size() + " items selected");
                         }
                     } else {
                         return null;
