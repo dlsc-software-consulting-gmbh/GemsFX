@@ -460,8 +460,6 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
             optionsBox.getStyleClass().add("options-box");
             optionsBox.setFillWidth(true);
             optionsBox.setMinWidth(Region.USE_PREF_SIZE);
-            optionsBox.managedProperty().bind(optionsBox.visibleProperty());
-            optionsBox.visibleProperty().bind(popup.getOwner().itemsProperty().emptyProperty().not());
 
             contentPane.topProperty().bind(control.topProperty());
             contentPane.bottomProperty().bind(control.bottomProperty());
@@ -478,7 +476,13 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
                 }
             });
 
-            contentPane.setCenter(scrollPane);
+            // Center If there are no items, show the placeholder, otherwise show the scroll pane
+            contentPane.centerProperty().bind(Bindings.createObjectBinding(() -> {
+                if (popup.getOwner().getItems().isEmpty()) {
+                    return popup.getOwner().getPlaceholder();
+                }
+                return scrollPane;
+            }, popup.getOwner().itemsProperty(), popup.getOwner().placeholderProperty()));
 
             // Initialize the popup content
             updatePopupContent();

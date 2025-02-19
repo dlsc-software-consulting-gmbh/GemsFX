@@ -109,8 +109,6 @@ public class SelectionBox<T> extends Control {
     private Node createExtraButtonsBox() {
         Button clearButton = createExtraButton("Clear", () -> getSelectionModel().clearSelection());
         clearButton.getStyleClass().add("clear-button");
-        clearButton.managedProperty().bind(clearButton.visibleProperty());
-        clearButton.visibleProperty().bind(itemsProperty().isNotNull().and(itemsProperty().emptyProperty().not()));
 
         Button selectAllButton = createExtraButton("Select All", () -> getSelectionModel().selectAll());
         selectAllButton.managedProperty().bind(selectAllButton.visibleProperty());
@@ -119,6 +117,8 @@ public class SelectionBox<T> extends Control {
 
         VBox extraButtonsBox = new VBox(clearButton, selectAllButton);
         extraButtonsBox.getStyleClass().addAll("extra-buttons-box");
+        extraButtonsBox.managedProperty().bind(extraButtonsBox.visibleProperty());
+        extraButtonsBox.visibleProperty().bind(itemsProperty().emptyProperty().not());
 
         return extraButtonsBox;
     }
@@ -230,6 +230,27 @@ public class SelectionBox<T> extends Control {
 
     public final void setRight(Node right) {
         rightProperty().set(right);
+    }
+
+    // placeholder
+
+    private final ObjectProperty<Node> placeholder = new SimpleObjectProperty<>(this, "placeholder");
+
+    /**
+     * Returns the property holding the placeholder node, which is displayed when there are no items.
+     *
+     * @return the placeholder property
+     */
+    public final ObjectProperty<Node> placeholderProperty() {
+        return placeholder;
+    }
+
+    public final Node getPlaceholder() {
+        return placeholderProperty().get();
+    }
+
+    public final void setPlaceholder(Node placeholder) {
+        placeholderProperty().set(placeholder);
     }
 
     /**

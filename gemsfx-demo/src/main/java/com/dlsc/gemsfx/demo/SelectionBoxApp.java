@@ -2,8 +2,10 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.demo.fake.SimpleControlPane;
+import com.dlsc.gemsfx.util.SimpleStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -13,9 +15,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
@@ -106,24 +110,27 @@ public class SelectionBoxApp extends Application {
             }
         });
 
+        // placeholder
+        CheckBox placeholderCheckBox = new CheckBox("Add a placeholder when no items");
+        placeholderCheckBox.setSelected(true);
+        selectionBox.placeholderProperty().bind(Bindings.createObjectBinding(() -> {
+            if (placeholderCheckBox.isSelected()) {
+                Label label = new Label("No items available");
+                label.setStyle("-fx-text-fill: #969696;");
+                StackPane stackPane = new StackPane(label);
+                stackPane.setStyle("-fx-background-color: #fcfcfc; -fx-padding: 20px;");
+                return stackPane;
+            } else {
+                return null;
+            }
+        }, placeholderCheckBox.selectedProperty()));
+
         // use custom string converter
         CheckBox useCustomStringConverterCheckBox = new CheckBox("Use Custom String Converter");
-        useCustomStringConverterCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
+        useCustomStringConverterCheckBox.setSelected(true);
+        useCustomStringConverterCheckBox.selectedProperty().subscribe(newVal -> {
             if (newVal) {
-                selectionBox.setSelectedItemsConverter(new StringConverter<>() {
-                    @Override
-                    public String toString(List<String> object) {
-                        if (object == null || object.isEmpty()) {
-                            return "Empty";
-                        }
-                        return object.stream().map(s -> ">> " + s).reduce((s1, s2) -> s1 + ", " + s2).orElse("");
-                    }
-
-                    @Override
-                    public List<String> fromString(String string) {
-                        return List.of();
-                    }
-                });
+                selectionBox.setSelectedItemsConverter(new SimpleStringConverter<>(selectedItems -> selectedItems.size() + " items selected", "Empty"));
             } else {
                 selectionBox.setSelectedItemsConverter(null);
             }
@@ -239,6 +246,7 @@ public class SelectionBoxApp extends Application {
                 new SimpleControlPane.ControlItem("Show Popup", showButton),
                 new SimpleControlPane.ControlItem("Selection Mode", selectionModeComboBox),
                 new SimpleControlPane.ControlItem("Show Extra Nodes", showExtraNodesCheckBox),
+                new SimpleControlPane.ControlItem("Show Placeholder", placeholderCheckBox),
                 new SimpleControlPane.ControlItem("Enable Animation", animationEnabledCheckBox),
                 new SimpleControlPane.ControlItem("Change Prompt Text", promptTextCheckBox),
                 new SimpleControlPane.ControlItem("Use Custom String Converter", useCustomStringConverterCheckBox),
