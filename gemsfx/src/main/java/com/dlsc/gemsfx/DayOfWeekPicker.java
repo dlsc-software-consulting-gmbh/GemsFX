@@ -79,8 +79,6 @@ public class DayOfWeekPicker extends SelectionBox<DayOfWeek> {
     private VBox createExtraButtonsBox() {
         Button clearButton = createExtraButton("Clear", () -> getSelectionModel().clearSelection());
         clearButton.getStyleClass().add("clear-button");
-        clearButton.managedProperty().bind(clearButton.visibleProperty());
-        clearButton.visibleProperty().bind(itemsProperty().isNotNull().and(itemsProperty().emptyProperty().not()));
 
         Button todayButton = createExtraButton("Today", () -> getSelectionModel().clearAndSelect(getItems().indexOf(LocalDate.now().getDayOfWeek())));
         todayButton.getStyleClass().add("today-button");
@@ -114,6 +112,8 @@ public class DayOfWeekPicker extends SelectionBox<DayOfWeek> {
 
         VBox extraButtonsBox = new VBox(clearButton, todayButton, allButton, weekdaysButton, weekendsButton);
         extraButtonsBox.getStyleClass().addAll("extra-buttons-box");
+        extraButtonsBox.managedProperty().bind(extraButtonsBox.visibleProperty());
+        extraButtonsBox.visibleProperty().bind(itemsProperty().emptyProperty().not());
 
         return extraButtonsBox;
     }

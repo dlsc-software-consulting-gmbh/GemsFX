@@ -69,8 +69,6 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
     private Node createExtraButtonsBox() {
         Button clearButton = createExtraButton("Clear", getSelectionModel()::clearSelection);
         clearButton.getStyleClass().add("clear-button");
-        clearButton.managedProperty().bind(clearButton.visibleProperty());
-        clearButton.visibleProperty().bind(itemsProperty().isNotNull().and(itemsProperty().emptyProperty().not()));
 
         Button selectAllButton = createExtraButton("Select All", getSelectionModel()::selectAll);
         selectAllButton.getStyleClass().add("select-all-button");
@@ -79,6 +77,8 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
 
         VBox extraButtonsBox = new VBox(clearButton, selectAllButton);
         extraButtonsBox.getStyleClass().addAll("extra-buttons-box");
+        extraButtonsBox.managedProperty().bind(extraButtonsBox.visibleProperty());
+        extraButtonsBox.visibleProperty().bind(itemsProperty().emptyProperty().not());
 
         return extraButtonsBox;
     }
