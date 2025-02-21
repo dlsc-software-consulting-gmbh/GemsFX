@@ -1,3 +1,5 @@
 .glass-pane {
+    -fx-max-width: Infinity;
+    -fx-max-height: Infinity;
     -fx-background-color: black;
 }

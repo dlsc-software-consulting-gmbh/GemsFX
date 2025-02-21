@@ -35,7 +35,7 @@ public class ResizableTextAreaSkin extends TextAreaSkin {
     public ResizableTextAreaSkin(ResizableTextArea control) {
         super(control);
 
-        scrollPane = (ScrollPane) getChildren().get(0);
+        scrollPane = (ScrollPane) getChildren().getFirst();
         Region resizeIcon = new Region();
         resizeIcon.getStyleClass().add("resize-icon");
         resizeCorner = new StackPane(resizeIcon);

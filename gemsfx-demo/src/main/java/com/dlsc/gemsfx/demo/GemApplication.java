@@ -9,10 +9,13 @@ import java.util.Objects;
 
 public abstract class GemApplication extends Application {
 
-    public GemApplication() {
+    static {
         if (Boolean.getBoolean("atlantafx")) {
             setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
         }
+    }
+
+    public GemApplication() {
     }
 
     @Override

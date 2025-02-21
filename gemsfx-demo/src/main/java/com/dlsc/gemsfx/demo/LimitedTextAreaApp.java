@@ -19,6 +19,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.scenicview.ScenicView;
 
 public class LimitedTextAreaApp extends GemApplication {
 
@@ -34,7 +35,8 @@ public class LimitedTextAreaApp extends GemApplication {
         textArea.setCharacterRangeLimit(new IntegerRange(0, 30));
         textArea.setPrefHeight(380);
 
-        StackPane wrapper = new StackPane(new VBox(textArea));
+        VBox vBox = new VBox(textArea);
+        StackPane wrapper = new StackPane(vBox);
         wrapper.setPadding(new Insets(20));
 
         SplitPane splitPane = new SplitPane();
@@ -43,8 +45,9 @@ public class LimitedTextAreaApp extends GemApplication {
 
         Scene scene = new Scene(splitPane, 560, 420);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("LimitedTextArea Demo");
+        primaryStage.setTitle("Limited Text Area Demo");
         primaryStage.show();
+
         CSSFX.start();
     }
 
@@ -109,8 +112,10 @@ public class LimitedTextAreaApp extends GemApplication {
         excludedItemsView.setPrefWidth(160);
         Bindings.bindContent(textArea.getExcludedItems(), excludedItemsView.getSelectionModel().getSelectedItems());
 
-        return new VBox(10, lengthDisplayMode, lengthDisplayModeComboBox, warningThreshold, warningThresholdSlider,
+        VBox box = new VBox(10, lengthDisplayMode, lengthDisplayModeComboBox, warningThreshold, warningThresholdSlider,
                 minLength, minLengthField, maxLength, maxLengthField, showBottomCheckBox, excludedItems, excludedItemsView);
+        box.setPadding(new Insets(10));
+        return box;
     }
 
     public static void main(String[] args) {

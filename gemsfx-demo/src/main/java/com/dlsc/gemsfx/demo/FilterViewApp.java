@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -28,10 +29,12 @@ public class FilterViewApp extends GemApplication {
         filterView.setTitleGraphic(new FontIcon(MaterialDesign.MDI_FLAG));
         filterView.setSubtitle("Subtitle can be displayed here");
         filterView.setSubtitleGraphic(new FontIcon(MaterialDesign.MDI_FILTER));
-        // filterView.setTitlePostfix("Postfix");
-        // filterView.setTitlePostfixGraphic(new FontIcon(MaterialDesign.MDI_PEN));
+        filterView.setTitlePostfix("Postfix");
+        filterView.setTitlePostfixGraphic(new FontIcon(MaterialDesign.MDI_PEN));
 
         filterView.setTextFilterProvider(text -> person -> person.getFirstName().toLowerCase().contains(text) || person.getLastName().toLowerCase().contains(text));
+
+        filterView.setExtras(new MenuButton("Extras"));
 
         TableView<Person> tableView = new TableView<>();
 
