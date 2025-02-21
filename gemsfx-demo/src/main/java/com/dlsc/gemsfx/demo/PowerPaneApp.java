@@ -26,6 +26,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import org.controlsfx.control.HiddenSidesPane;
+import org.scenicview.ScenicView;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.Objects;
 
 import static com.dlsc.gemsfx.DialogPane.Type.INFORMATION;
 
-public class PowerPaneApp extends Application {
+public class PowerPaneApp extends GemApplication {
 
     private DialogPane dialogPane;
     private InfoCenterPane infoCenterPane;
@@ -64,6 +65,7 @@ public class PowerPaneApp extends Application {
         infoCenterPane = powerPane.getInfoCenterPane();
 
         PDFView pdfView = new PDFView();
+        pdfView.getStylesheets().add(Objects.requireNonNull(PowerPaneApp.class.getResource("pdf-view-atlanta.css")).toExternalForm());
         pdfView.setStyle("-fx-border-color: black;");
         pdfView.load(Objects.requireNonNull(PowerPaneApp.class.getResourceAsStream("tesla-manual.pdf")));
         powerPane.getDrawerStackPane().setDrawerContent(pdfView);
@@ -75,8 +77,13 @@ public class PowerPaneApp extends Application {
         showDrawerButton.setMaxWidth(Double.MAX_VALUE);
         showDrawerButton.selectedProperty().bindBidirectional(powerPane.getDrawerStackPane().showDrawerProperty());
 
+        Button scenicView = new Button("Scenic View");
+        scenicView.setMaxWidth(Double.MAX_VALUE);
+        scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
+
         VBox controls = new VBox(10,
                 titleLabel,
+                scenicView,
                 new Label("Drawer"),
                 showDrawerButton,
                 new Label("Dialogs"),
@@ -87,7 +94,7 @@ public class PowerPaneApp extends Application {
                 createHiddenSidesPaneControls()
         );
 
-        controls.setStyle("-fx-background-color: aliceblue;");
+        controls.setStyle("-fx-background-color: -color-bg-default;");
         controls.setPadding(new Insets(20));
 
         ScrollPane scrollPane = new ScrollPane(controls);

@@ -3,8 +3,486 @@
 }
 
 /* -----------------------------------------------------------------------------------------------------
+ * TextView
+ */
+
+.text-view {
+    -fx-highlight-fill: -color-neutral-muted;
+    -fx-highlight-text-fill: -color-fg-default;
+    -fx-highlight-stroke: transparent;
+}
+
+.text-view:focused {
+    -fx-highlight-fill: -color-accent-emphasis;
+    -fx-highlight-text-fill: -color-fg-emphasis;
+    -fx-highlight-stroke: transparent;
+}
+
+/* -----------------------------------------------------------------------------------------------------
+ * InfoCenterView
+ */
+.info-center-view {
+}
+
+.info-center-view > .main-pane {
+}
+
+.info-center-view > .main-pane > .default-placeholder {
+}
+
+.info-center-view > .main-pane > .default-placeholder > .label {
+    -fx-text-fill: -color-fg-default;
+}
+
+.info-center-view > .main-pane > .default-placeholder > .label > .ikonli-font-icon {
+    -fx-icon-color: -color-fg-default;
+}
+
+.info-center-view .notification-view .default-icon {
+    -fx-icon-color: -color-accent-fg;
+}
+
+.info-center-view.transparent > .main-pane > .all-groups-container > .pinned-separator {
+    -fx-background-color: rgba(255, 255, 255, .3);
+}
+
+.info-center-view > .main-pane > .top-level-container .scroll-pane {
+}
+
+.info-center-view > .main-pane > .top-level-container .scroll-pane .viewport {
+}
+
+.info-center-view > .main-pane > .all-groups-container {
+}
+
+.info-center-view.transparent > .main-pane > .all-groups-container {
+}
+
+.info-center-view .wrapper {
+    -fx-background-color: rgba(0, 0, 0, .3);
+}
+
+.info-center-view.transparent .wrapper {
+    -fx-background-color: transparent;
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container {
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container.pinned {
+}
+
+.info-center-view.transparent > .main-pane > .all-groups-container .groups-container.pinned {
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view {
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-separator {
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header {
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .group-name-label {
+    -fx-text-fill: -color-fg-default;
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .show-less-button,
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .show-all-button {
+    -fx-background-color: -color-button-bg;
+    -fx-text-fill: -color-button-fg;
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .show-less-button:pressed,
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .show-all-button:pressed {
+    -fx-background-color: -color-button-bg-pressed;
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .pin-button,
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .clear-button {
+    -fx-background-color: -color-button-bg;
+    -fx-text-fill: -color-button-fg;
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .pin-button:pressed,
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .clear-button:pressed {
+    -fx-background-color: -color-button-bg-pressed;
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .clear-button .ikonli-font-icon {
+    -fx-icon-color: -color-button-fg;
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .pin-button .ikonli-font-icon {
+    -fx-icon-color: -color-button-fg;
+}
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .pin-button:selected .ikonli-font-icon {
+}
+
+.info-center-view > .main-pane > .single-group-wrapper {
+}
+
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-header {
+}
+
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-header > .group-name-label {
+    -fx-text-fill: -color-fg-default;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
+}
+
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-header > .close-show-all-button {
+    -fx-background-color: -color-button-bg;
+    -fx-text-fill: rgba(0, 0, 0, .6);
+}
+
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-header > .clear-all-button {
+    -fx-background-color: -color-button-bg;
+}
+
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-header > .clear-all-button .ikonli-font-icon {
+    -fx-icon-color: rgba(0, 0, 0, .6);
+}
+
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view {
+}
+
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view .viewport {
+}
+
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view .notification-list-cell,
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view .notification-list-cell:focused,
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view .notification-list-cell:selected,
+.info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view .notification-list-cell:hover {
+}
+
+.info-center-view .notification-view {
+}
+
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane {
+    -fx-background-color: -color-button-bg;
+}
+
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
+}
+
+.info-center-view .notification-view:expanded > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
+}
+
+.info-center-view .notification-view > .content > .close-icon-wrapper {
+    -fx-background-color: -color-neutral-emphasis-plus, -color-neutral-emphasis;
+    -fx-background-insets: 0px, 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
+}
+
+.info-center-view .notification-view > .content > .close-icon-wrapper:pressed {
+}
+
+.info-center-view .notification-view > .content > .close-icon-wrapper > .ikonli-font-icon {
+}
+
+.info-center-view .notification-view > .content > .close-icon-wrapper > .label {
+}
+
+.info-center-view .notification-view > .content > .close-icon-wrapper.stack:hover {
+}
+
+.info-center-view .notification-view > .content > .close-icon-wrapper.stack:hover > .label {
+}
+
+.info-center-view .notification-view > .content > .close-icon-wrapper.stack:hover > .ikonli-font-icon {
+}
+
+.info-center-view .notification-view > .content {
+    -fx-background-color: -color-neutral-emphasis;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
+}
+
+.info-center-view .notification-view > .content > .text-container {
+}
+
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .title-label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.info-center-view .notification-view > .content > .text-container > .title-time-box > upper-right-pane > .time-label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.info-center-view .notification-view > .content > .text-container > .description-label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box {
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box .button {
+    -fx-background-color: -color-button-bg;
+}
+
+.info-center-view .notification-view > .stack-notification1 {
+}
+
+.info-center-view .notification-view > .stack-notification2 {
+}
+
+.info-center-view > .main-pane > .top-level-container .scroll-bar {
+}
+
+.info-center-view > .main-pane > .top-level-container .scroll-bar .track-background {
+    -fx-background-color: rgba(0, 0, 0, .3);
+}
+
+.info-center-view > .main-pane > .top-level-container .scroll-bar .thumb {
+    -fx-background-color: rgba(0, 0, 0, .8);
+}
+
+.info-center-view > .main-pane > .top-level-container .scroll-bar:vertical .thumb {
+}
+
+.info-center-view > .main-pane > .top-level-container .scroll-bar:horizontal .thumb {
+}
+
+.info-center-view > .main-pane > .top-level-container .scroll-bar .increment-button,
+.info-center-view > .main-pane > .top-level-container .scroll-bar .increment-arrow,
+.info-center-view > .main-pane > .top-level-container .scroll-bar .decrement-button,
+.info-center-view > .main-pane > .top-level-container .scroll-bar .decrement-arrow {
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}
+
+/* -----------------------------------------------------------------------------------------------------
+ * HistoryButton
+ */
+.history-popup.round > .content-pane {
+}
+
+.history-popup.round > .content-pane > .history-list-view {
+}
+
+.history-popup > .content-pane {
+    -fx-background-color: -color-bg-default;
+    -fx-background-insets: 0px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
+}
+
+.history-popup:above > .content-pane {
+    -fx-translate-y: 10px;
+}
+
+.history-popup > .content-pane .popup-left {
+    -fx-background-color: -color-bg-default;
+    -fx-alignment: top-center;
+}
+
+.history-popup > .content-pane > .history-list-view > .placeholder > .label {
+    -fx-text-fill: -color-cell-fg;
+}
+
+.history-popup > .content-pane > .history-list-view {
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    /* No alternate highlighting */
+    -fx-text-fill: -color-cell-fg;
+    -fx-background-color: -color-cell-bg;
+    -fx-cursor: default;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-text-fill: -color-cell-fg-selected;
+    -fx-background-color: -color-cell-bg-selected;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:focused {
+    -fx-background-color: -color-cell-bg;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-text-fill: -color-cell-fg;
+    -fx-background-color: -color-cell-bg;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell .remove-button {
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell:hover {
+    -fx-text-fill: -color-cell-fg;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell:hover .remove-button {
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > removable-list-cell .remove-button .ikonli-font-icon {
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell:hover .remove-button .ikonli-font-icon,
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell:selected .remove-button .ikonli-font-icon,
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell .remove-button:pressed .ikonli-font-icon {
+    -fx-icon-color: -color-cell-fg;
+}
+
+.history-popup > .content-pane > .history-list-view > .virtual-flow > .clipped-container > .sheet > .removable-list-cell:focused .remove-button .ikonli-font-icon {
+    -fx-icon-color: -fx-selection-bar-text;
+}
+
+/* -----------------------------------------------------------------------------------------------------
+ * SearchTextField
+ */
+.search-text-field {
+    -fx-border-color: -color-input-border;
+    -fx-background-color: -color-input-bg;
+}
+
+.search-text-field:focused {
+    -fx-border-color: -color-input-border-focused;
+    -fx-background-color: -color-input-bg-focused;
+}
+
+.search-text-field.round {
+}
+
+.search-text-field > .right-pane > .clear-icon-wrapper {
+}
+
+.search-text-field > .left-pane {
+}
+
+.search-text-field > .left-pane > .history-button {
+    -fx-background-color: transparent;
+    -fx-padding: 2px 3px;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 2px 0 0 2px;
+    -fx-cursor: hand;
+}
+
+.search-text-field > .left-pane > .history-button:hover,
+.search-text-field > .left-pane > .history-button:pressed,
+.search-text-field > .left-pane > .history-button:popup-showing {
+}
+
+.search-text-field.round > .left-pane > .history-button,
+.search-text-field.round > .left-pane > .history-button:hover,
+.search-text-field.round > .left-pane > .history-button:pressed,
+.search-text-field.round > .left-pane > .history-button:focused,
+.search-text-field.round > .left-pane > .history-button:popup-showing {
+    -fx-background-radius: 1000px 0 0 1000px;
+}
+
+.search-text-field > .left-pane > .history-button:disabled-popup,
+.search-text-field > .left-pane > .history-button:disabled-popup:hover,
+.search-text-field > .left-pane > .history-button:disabled-popup:pressed {
+    -fx-cursor: text;
+}
+
+.search-text-field > .left-pane > .history-button:pressed {
+}
+
+.search-text-field > .left-pane > .history-button > .icon {
+    -fx-background-color: -color-input-border;
+}
+
+.search-text-field:focused > .left-pane > .history-button > .icon {
+    -fx-background-color: -color-input-border-focused;
+}
+
+.search-text-field > .left-pane > .history-button:disabled-popup > .icon {
+}
+
+.search-text-field > .right-pane > .clear-icon-wrapper > .ikonli-font-icon {
+    -fx-icon-color: -color-input-border;
+}
+
+.search-text-field:focused > .right-pane > .clear-icon-wrapper > .ikonli-font-icon {
+    -fx-icon-color: -color-input-border-focused;
+}
+
+/* -----------------------------------------------------------------------------------------------------
+ * ArcProgressIndicator
+ */
+.arc-progress-indicator {
+}
+
+.arc-progress-indicator .track-circle {
+    -fx-stroke: -color-border-default;
+}
+
+.arc-progress-indicator .progress-arc {
+    -fx-stroke: -color-accent-emphasis;
+}
+
+.arc-progress-indicator .progress-label {
+}
+
+/* -----------------------------------------------------------------------------------------------------
+ * LimitedTextArea
+ */
+.limited-text-area,
+.limited-text-area:focused {
+    -fx-background-color: transparent;
+    -fx-padding: 0px;
+}
+
+.limited-text-area > .content-box > .content-pane {
+    -fx-border-color: -color-input-border;
+    -fx-background-color: -color-input-bg;
+}
+
+.limited-text-area:focused > .content-box > .content-pane {
+    -fx-border-color: -color-input-border-focused;
+    -fx-background-color: -color-input-bg-focused;
+}
+
+.limited-text-area > .content-box > .bottom-box {
+    -fx-padding: 5px 0px;
+    -fx-alignment: center-left;
+}
+
+.limited-text-area > .content-box > .bottom-box .tips {
+    -fx-text-fill: -color-fg-muted;
+    -fx-font-size: 12px;
+}
+
+.limited-text-area > .content-box > .bottom-box .tips .ikonli-font-icon {
+    -fx-icon-color: -color-fg-muted;
+    -fx-icon-size: 15px;
+}
+
+.limited-text-area:error > .content-box > .bottom-box .tips {
+    -fx-text-fill: -color-fg-muted;
+}
+
+.limited-text-area:error > .content-box > .bottom-box .tips .ikonli-font-icon {
+    -fx-icon-color: -color-fg-muted;
+}
+
+.limited-text-area > .content-box .length-indicator .length-label {
+}
+
+.limited-text-area:error > .content-box .length-indicator .length-label {
+    -fx-text-fill: -color-danger-fg;
+    -fx-font-weight: bold;
+}
+
+.limited-text-area:error > .content-box .length-indicator > .circle-progress-indicator .progress-arc {
+    -fx-stroke: -color-danger-emphasis;
+}
+
+.limited-text-area:warning > .content-box .length-indicator > .circle-progress-indicator > .progress-arc {
+    -fx-stroke: -color-warning-emphasis;
+}
+
+.limited-text-area:error > .content-box > .content-pane,
+.limited-text-area:error:focused > .content-box > .content-pane {
+    -fx-border-color: -color-danger-emphasis;
+}
+
+/* -----------------------------------------------------------------------------------------------------
  * ChipView
  */
+
 .chip-view {
     -fx-background-color: -color-accent-emphasis;
     -fx-background-radius: 3px;
@@ -42,7 +520,7 @@
     -fx-background-color: transparent, -color-accent-muted;
 }
 
-.chip-view > .chip-container > .close-icon:pressed > .ikonli-font-icon{
+.chip-view > .chip-container > .close-icon:pressed > .ikonli-font-icon {
     -fx-icon-color: -color-accent-fg;
 }
 
@@ -54,6 +532,7 @@
 /* ----------------------------------------------------------------------------
  * GridTableView
  */
+
 .grid-table-view {
     -fx-background-color: -color-border-default, -color-bg-default;
     -fx-background-insets: 0px, 1px;
@@ -139,6 +618,7 @@
 /* ----------------------------------------------------------------------------
  * ResizableTextArea
  */
+
 .resize-corner:h-resize {
 }
 
@@ -155,18 +635,18 @@
 }
 
 .resizable-text-area .resize-corner .resize-icon {
-    -fx-background-color: -color-border-default;
+    -fx-background-color: -color-input-border;
 }
 
 .resizable-text-area .resize-corner:hover .resize-icon {
-    -fx-background-color: -color-border-default;
+    -fx-background-color: -color-input-border;
 }
 
 .resizable-text-area .resize-corner:no-resize .resize-icon {
 }
 
 .resizable-text-area:focused .resize-corner .resize-icon {
-    -fx-background-color: -color-accent-emphasis;
+    -fx-background-color: -color-input-border-focused;
 }
 
 .resizable-text-area .scroll-pane {
@@ -178,6 +658,7 @@
 /* ----------------------------------------------------------------------------
  * DialogPane
  */
+
 .dialog-pane {
     -fx-max-width: Infinity;
     -fx-max-height: Infinity;
@@ -282,6 +763,7 @@
 /* ----------------------------------------------------------------------------
  * Glass Pane
  */
+
 .dialog-pane > .glass-pane {
     -fx-background-color: black;
 }
@@ -289,6 +771,7 @@
 /* ----------------------------------------------------------------------------
  * ResizableTextArea
  */
+
 .dialog-pane > .content-pane .resizable-text-area .resize-corner {
     -fx-padding: 0px 2px 2px 0px;
 }
@@ -301,6 +784,7 @@
 /** --------------------------------------------------------------------
  * PagingListView
  */
+
 .paging-list-view > .stack-pane > .content {
 }
 
@@ -312,6 +796,7 @@
 /** --------------------------------------------------------------------
  * PagingControls
  */
+
 .paging-controls {
 }
 
@@ -422,8 +907,9 @@
 /** --------------------------------------------------------------------
  * DrawerStackpane
  */
+
 .drawer-stackpane > .drawer {
-    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-color: -color-border-default, -color-neutral-subtle;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
 }
 
@@ -446,12 +932,31 @@
 }
 
 .drawer-stackpane > .drawer > .top > .header > .tool-bar > .container {
-    -fx-padding: 2px 0px 0px 0px;
+    -fx-padding: 8px 0px 4px 0px;
 }
 
 .drawer-stackpane > .drawer > .top > .header > .tool-bar > .container > .button {
-    -fx-background-color: -color-accent-emphasis;
-    -fx-text-fill: -color-fg-emphasis;
+    -color-button-bg: -color-bg-subtle;
+    -color-button-fg: -color-fg-default;
+    -color-button-border: -color-border-default;
+    -color-button-bg-hover: -color-base-1;
+    -color-button-fg-hover: -color-button-fg;
+    -color-button-border-hover: -color-button-border;
+    -color-button-bg-focused: -color-button-bg;
+    -color-button-fg-focused: -color-button-fg;
+    -color-button-border-focused: -color-accent-emphasis;
+    -color-button-bg-pressed: -color-bg-subtle;
+    -color-button-fg-pressed: -color-button-fg;
+    -color-button-border-pressed: transparent;
+    -color-button-shadow: -color-shadow-default;
+    -fx-background-color: -color-button-border, -color-button-bg;
+    -fx-background-insets: 0, 1px;
+    -fx-background-radius: 1, 0px;
+    -fx-graphic-text-gap: 6px;
+    -fx-text-fill: -color-button-fg;
+    -fx-alignment: CENTER;
+    -fx-padding: 4px 6px 4px 6px;
+    -fx-font-weight: normal;
 }
 
 .drawer-stackpane > .drawer > .top > .drag-handle {
@@ -467,6 +972,7 @@
 /** --------------------------------------------------------------------
  * DateRangeView
  */
+
 .date-range-view {
     -fx-background-color: -color-border-default, -color-bg-default;
 }
@@ -514,6 +1020,7 @@
 /** --------------------------------------------------------------------
  * YearMonthView
  */
+
 .year-month-view {
     -fx-border-color: -color-border-default;
 }
@@ -571,6 +1078,7 @@
 /** --------------------------------------------------------------------
  * YearView
  */
+
 .year-view {
     -fx-border-color: -color-border-default;
 }
@@ -619,6 +1127,7 @@
 /** --------------------------------------------------------------------
  * CalendarView
  */
+
 .calendar-view {
     -fx-background-color: -color-border-default, -color-bg-default;
 }
@@ -788,6 +1297,7 @@
 /** --------------------------------------------------------------------
  * SelectionBox
  */
+
 .selection-box {
 }
 

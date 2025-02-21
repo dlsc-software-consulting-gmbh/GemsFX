@@ -1,5 +1,7 @@
 .dialog-pane {
     -fx-background-color: transparent;
+    -fx-max-width: Infinity;
+    -fx-max-height: Infinity;
 }
 
 .dialog-pane > .content-pane {

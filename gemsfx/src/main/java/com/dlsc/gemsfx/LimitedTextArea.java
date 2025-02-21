@@ -69,13 +69,16 @@ public class LimitedTextArea extends ResizableTextArea {
 
     public LimitedTextArea() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
-
-        getStylesheets().add(Objects.requireNonNull(LimitedTextArea.class.getResource("limited-text-area.css")).toExternalForm());
     }
 
     public LimitedTextArea(String text) {
         this();
         setText(text);
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(LimitedTextArea.class.getResource("limited-text-area.css")).toExternalForm();
     }
 
     @Override
