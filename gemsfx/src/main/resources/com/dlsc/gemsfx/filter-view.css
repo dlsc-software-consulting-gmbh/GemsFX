@@ -5,7 +5,7 @@
 }
 
 .filter-view > .filter-container {
-    -fx-spacing: 25px;
+    -fx-spacing: 10px;
 }
 
 .filter-view > .filter-container > .header-box {
@@ -61,19 +61,4 @@
 .filter-view > .filter-container > .scroll-pane {
     -fx-max-height: 380px;
     -fx-padding: 2px;
-}
-
-.filter-view > .filter-container > .filters {
-    -fx-hgap: 10px;
-    -fx-vgap: 5px;
-    -fx-padding: 0px 0px 0px 0px;
-}
-
-.filter-view > .filter-container > .filters > .clear-filter-label {
-    -fx-underline: true;
-    -fx-cursor: hand;
-    -fx-text-fill: -fx-accent;
-}
-
-.filter-view > .filter-container > .filters > .filter-view .clear-filter-label:hover {
 }

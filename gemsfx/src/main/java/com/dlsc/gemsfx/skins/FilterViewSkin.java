@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.ChipView;
+import com.dlsc.gemsfx.ChipsViewContainer;
 import com.dlsc.gemsfx.FilterView;
 import com.dlsc.gemsfx.FilterView.Filter;
 import com.dlsc.gemsfx.SearchTextField;
@@ -29,7 +30,7 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
 
     private final SearchTextField searchTextField;
     private final HBox filterGroupsPane = new HBox();
-    private final FlowPane filtersPane = new FlowPane();
+    private final ChipsViewContainer filtersPane = new ChipsViewContainer();
     private final HBox headerBox = new HBox();
     private final ScrollPane scrollPane = new ScrollPane();
     private final VBox container;
@@ -69,7 +70,7 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
         scrollPane.contentProperty().bind(
                 Bindings.when(Bindings.size(view.filtersProperty()).greaterThan(view.scrollThresholdProperty()))
                         .then(filtersPane)
-                        .otherwise((FlowPane) null));
+                        .otherwise((ChipsViewContainer) null));
         view.scrollThresholdProperty().addListener(it -> updateFilters());
 
         container = new VBox(headerBox, filterGroupsPane, filtersPane);
@@ -201,7 +202,7 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
     }
 
     private void updateFilters() {
-        filtersPane.getChildren().clear();
+        filtersPane.getChips().clear();
 
         FilterView<T> filterView = getSkinnable();
 
@@ -213,8 +214,8 @@ public class FilterViewSkin<T> extends SkinBase<FilterView<T>> {
                 ChipView<Filter> chipView = new ChipView<>();
                 chipView.setValue(f);
                 chipView.textProperty().bind(f.nameProperty());
-                chipView.setOnClose(filter -> filters.remove(filter));
-                filtersPane.getChildren().add(chipView);
+                chipView.setOnClose(filters::remove);
+                filtersPane.getChips().add(chipView);
             });
 
             String filterText = filterView.getFilterText();
