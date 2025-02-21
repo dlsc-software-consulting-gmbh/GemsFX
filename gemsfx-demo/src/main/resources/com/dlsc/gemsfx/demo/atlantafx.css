@@ -2,6 +2,55 @@
     -fx-mark-highlight-color: red;
 }
 
+/* -----------------------------------------------------------------------------------------------------
+ * ChipView
+ */
+.chip-view {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-background-radius: 3px;
+}
+
+.chip-view > .chip-container {
+}
+
+.chip-view > .chip-container > .label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.chip-view > .chip-container > .close-icon {
+    -fx-background-color: transparent, -color-accent-emphasis;
+    -fx-background-insets: 0px, 2px;
+    -fx-background-radius: 2px;
+    -size: 25;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
+    -fx-min-width: -size;
+    -fx-min-height: -size;
+    -fx-max-width: -size;
+    -fx-max-height: -size;
+}
+
+.chip-view > .chip-container > .close-icon:hover {
+    -fx-background-color: transparent, -color-accent-muted;
+}
+
+.chip-view > .chip-container > .close-icon:hover > .ikonli-font-icon {
+    -fx-icon-color: -color-accent-fg;
+}
+
+.chip-view > .chip-container > .close-icon:pressed {
+    -fx-background-color: transparent, -color-accent-muted;
+}
+
+.chip-view > .chip-container > .close-icon:pressed > .ikonli-font-icon{
+    -fx-icon-color: -color-accent-fg;
+}
+
+.chip-view > .chip-container > .close-icon > .ikonli-font-icon {
+    -fx-icon-size: 12px;
+    -fx-icon-color: -color-fg-emphasis;
+}
+
 /* ----------------------------------------------------------------------------
  * GridTableView
  */
