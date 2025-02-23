@@ -2,10 +2,14 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.PowerPane;
-import com.dlsc.gemsfx.infocenter.*;
+import com.dlsc.gemsfx.infocenter.InfoCenterPane;
+import com.dlsc.gemsfx.infocenter.InfoCenterView;
+import com.dlsc.gemsfx.infocenter.Notification;
+import com.dlsc.gemsfx.infocenter.NotificationAction;
+import com.dlsc.gemsfx.infocenter.NotificationGroup;
+import com.dlsc.gemsfx.infocenter.NotificationView;
 import com.dlsc.pdfviewfx.PDFView;
 import fr.brouillard.oss.cssfx.CSSFX;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -15,11 +19,29 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -42,6 +64,8 @@ public class PowerPaneApp extends GemApplication {
 
     @Override
     public void start(Stage stage) {
+        super.start(stage);
+
         Button testMe = new Button("Test Me");
         PowerPane powerPane = new PowerPane(testMe);
 
