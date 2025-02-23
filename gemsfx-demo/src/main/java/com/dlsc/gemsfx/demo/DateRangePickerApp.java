@@ -5,7 +5,6 @@ import com.dlsc.gemsfx.daterange.DateRange;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.daterange.DateRangePreset;
 import fr.brouillard.oss.cssfx.CSSFX;
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -30,9 +29,12 @@ import java.util.Locale;
 public class DateRangePickerApp extends GemApplication {
 
     @Override
-    public void start(Stage stage) { super.start(stage);
+    public void start(Stage stage) {
+        super.start(stage);
+
         DateRangePicker picker = new DateRangePicker();
         picker.setValue(new DateRange("Initial Range", LocalDate.now(), LocalDate.now().plusDays(8)));
+        picker.setMaxWidth(Double.MAX_VALUE);
 
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.setEditable(false);

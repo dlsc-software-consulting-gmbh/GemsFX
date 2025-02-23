@@ -2,10 +2,119 @@
     -fx-mark-highlight-color: red;
 }
 
+
+/* -----------------------------------------------------------------------------------------------------
+ * CalendarPicker
+ */
+.calendar-picker {
+}
+
+.calendar-picker .popup {
+}
+
+.calendar-picker > .box {
+}
+
+.calendar-picker > .box > .spacer {
+}
+
+.calendar-picker > .box > .arrow-button {
+    -fx-padding: 8px 12px 8px 12px;
+    -fx-background-color: -color-bg-default;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 1px;
+    -fx-border-insets: 0px;
+    -fx-border-radius: 0px;
+}
+
+.calendar-picker:left > .box > .arrow-button {
+    -fx-padding: 8px 12px 8px 12px; /* 6 10 6 8 */
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 1px;
+    -fx-border-insets: 0px;
+    -fx-border-radius: 0px;
+}
+
+.calendar-picker:button-only > .box > .arrow-button {
+    -fx-padding: 8px 12px;
+    -fx-background-color: -color-bg-default;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+}
+
+.calendar-picker > .box > .arrow-button > .arrow {
+    -fx-background-color: -color-fg-default;
+    -fx-background-insets: 0;
+}
+
+.calendar-picker:focused > .box > .arrow-button {
+    -fx-background-color: -color-bg-default;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+    -fx-border-color: -color-accent-emphasis;
+    -fx-border-width: 1px;
+    -fx-border-insets: 0px;
+}
+
+.calendar-picker:left:focused > .box > .arrow-button {
+    -fx-background-radius: 0px;
+    -fx-border-width: 1px;
+    -fx-border-insets: 0px;
+}
+
+.calendar-picker:button-only:focused > .box > .arrow-button {
+    -fx-background-radius: 0px;
+    -fx-border-width: 1px;
+    -fx-border-insets: 0px;
+}
+
+.calendar-picker > .box > .text-field {
+    -fx-padding: 8px 12px;
+}
+
+/* -----------------------------------------------------------------------------------------------------
+ * SimpleFilterView
+ */
+.simple-filter-view {
+}
+
+.simple-filter-view:compact {
+}
+
+.simple-filter-view:compact .selection-item > .arrow-button {
+}
+
+.simple-filter-view:compact .combo-box-base.selection-item.first {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0px, 1px 0px 1px 1px;
+    -fx-background-radius: 1px 0px 0px 1px, 0px;
+}
+
+.simple-filter-view:compact .combo-box-base.selection-item.middle {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0px, 1px 0px 1px 1px;
+    -fx-background-radius: 0px, 0px;
+}
+
+.simple-filter-view:compact .combo-box-base.selection-item.last {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0px, 1px 1px 1px 1px;
+    -fx-background-radius: 0px 1px 1px 0px, 0px;
+}
+
+.simple-filter-view:compact .combo-box-base.selection-item.last .arrow-button {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0px, 1px 1px 1px 1px;
+    -fx-background-radius: 0px 1px 1px 0px, 0px;
+}
+
 /* -----------------------------------------------------------------------------------------------------
  * TextView
  */
-
 .text-view {
     -fx-highlight-fill: -color-neutral-muted;
     -fx-highlight-text-fill: -color-fg-default;
@@ -970,9 +1079,81 @@
 }
 
 /** --------------------------------------------------------------------
+ * DateRangePicker
+ */
+.date-range-picker {
+    -fx-padding: 0;
+}
+
+.date-range-picker .popup {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
+}
+
+.date-range-picker .inner-range-container {
+}
+
+.date-range-picker .inner-range-container.small {
+}
+
+.date-range-picker > .outer-range-container .divider {
+    -fx-pref-width: 1px;
+    -fx-background-color: -color-border-default;
+}
+
+.date-range-picker:focused > .outer-range-container .divider {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.date-range-picker > .outer-range-container {
+    -fx-alignment: center-left;
+}
+
+.date-range-picker > .outer-range-container > .arrow-button {
+    -fx-background-radius: 0px;
+    -fx-padding: 8px 8px 8px 12px;
+}
+
+.date-range-picker > .outer-range-container > .arrow-button > .arrow {
+    -fx-background-color: -color-fg-default;
+    -fx-background-insets: 0;
+}
+
+.date-range-picker > .outer-range-container > .inner-range-container {
+    -fx-padding: 8px 4px;
+}
+
+.date-range-picker > .outer-range-container > .inner-range-container.small {
+    -fx-padding: 0em;
+}
+
+.date-range-picker > .outer-range-container > .inner-range-container > .range-label > .icon-button {
+    -fx-padding: 0em; /* 6 8 6 10 */
+}
+
+.date-range-picker > .outer-range-container > .inner-range-container > .range-label > .icon-button > .icon {
+    -fx-background-color: -color-fg-default;
+    -fx-background-insets: 0;
+}
+
+.date-range-picker > .outer-range-container > .inner-range-container > .title-label {
+    -fx-padding: 0px 8px 0em 8px;
+}
+
+.date-range-picker > .outer-range-container > .inner-range-container > .range-label {
+    -fx-padding: 0px 8px 0em 8px;
+}
+
+.date-range-picker > .outer-range-container > .inner-range-container.small > .title-label {
+    -fx-padding: 8px 12px 8px 12px;
+}
+
+.date-range-picker > .outer-range-container > .inner-range-container.small > .range-label {
+    -fx-padding: 8px 12px 8px 12px;
+}
+
+/** --------------------------------------------------------------------
  * DateRangeView
  */
-
 .date-range-view {
     -fx-background-color: -color-border-default, -color-bg-default;
 }
@@ -1302,7 +1483,7 @@
 }
 
 .selection-box > .display-label {
-    -fx-padding: 0.36em 0.725em;
+    -fx-padding: 8px 12px;
 }
 
 .selection-box .selection-box .selection-popup {
@@ -1311,7 +1492,7 @@
 
 .selection-box .selection-popup > .content {
     -fx-background-color: -color-border-default, -color-bg-default;
-    -fx-background-insets: 0, 1;
+    -fx-background-insets: 0px, 1px;
 }
 
 .selection-box .selection-popup > .content .extra-buttons-box {

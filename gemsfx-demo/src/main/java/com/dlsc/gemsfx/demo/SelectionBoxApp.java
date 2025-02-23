@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.demo.fake.SimpleControlPane;
 import com.dlsc.gemsfx.util.SimpleStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
-import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
@@ -15,15 +14,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
-
-import java.util.List;
 
 public class SelectionBoxApp extends GemApplication {
 
@@ -53,6 +47,7 @@ public class SelectionBoxApp extends GemApplication {
 
         SplitPane splitPane = new SplitPane();
         splitPane.setDividerPositions(0.7);
+        splitPane.setStyle("-fx-background-color: -color-bg-default;");
         splitPane.getItems().addAll(createControl(), getControlPanel());
 
         primaryStage.setTitle("SelectionBox Demo");

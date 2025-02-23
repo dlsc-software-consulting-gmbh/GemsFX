@@ -56,6 +56,8 @@ public class SimpleFilterView extends HBox {
     public SimpleFilterView() {
         getStyleClass().add("simple-filter-view");
 
+        setFillHeight(false);
+
         layoutModeProperty().addListener(it -> updatePseudoClass());
         updatePseudoClass();
 
