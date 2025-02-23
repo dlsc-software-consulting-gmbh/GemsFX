@@ -2,6 +2,96 @@
     -fx-mark-highlight-color: red;
 }
 
+/* -----------------------------------------------------------------------
+ * SearchField
+ */
+.search-field .auto-completion-label {
+    -fx-text-fill: -color-fg-subtle;
+}
+
+.search-field .graphic-wrapper {
+    -fx-background-color: -transparent;
+    -fx-padding: 0px 0px;
+}
+
+.search-field .graphic-wrapper .ikonli-font-icon {
+    -fx-icon-size: 16px;
+    -fx-icon-color: -color-fg-muted;
+}
+
+.search-field .graphic-wrapper .history-button {
+    -fx-background-color: transparent;
+}
+
+.search-field  .graphic-wrapper .history-button:hover,
+.search-field  .graphic-wrapper .history-button:pressed,
+.search-field  .graphic-wrapper .history-button:popup-showing {
+}
+
+.search-field .graphic-wrapper .history-button:disabled-popup,
+.search-field .graphic-wrapper .history-button:disabled-popup:hover,
+.search-field .graphic-wrapper .history-button:disabled-popup:pressed {
+    -fx-cursor: text;
+}
+
+.search-field  .graphic-wrapper .history-button:pressed {
+}
+
+.search-field  .graphic-wrapper .history-button > .icon {
+    -fx-background-color: -color-fg-default;
+}
+
+.search-field  .graphic-wrapper .history-button:disabled-popup > .icon {
+}
+
+/* -----------------------------------------------------------------------
+ * Style based on Modena.css combo-box-popup style
+ */
+.search-field-list-view {
+    -fx-background-color: -color-bg-default;
+    -fx-background-insets: 0px;
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.2) , 12, 0.0 , 0 , 8 );
+    -fx-pref-height: 200px;
+}
+
+.search-field-popup:above .search-field-list-view {
+}
+
+.search-field-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 4 0 4 5;
+    /* No alternate highlighting */
+    -fx-background: -color-bg-default;
+}
+
+.search-field-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-background-color: -color-bg-subtle;
+}
+
+.search-field-list-view  > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.search-field-list-view  > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background-color: -color-list-selected;
+}
+
+.search-field-list-view > .placeholder > .label {
+    -fx-text-fill: -color-fg-subtle;
+}
+
+.search-field-list-view .search-field-list-cell {
+}
+
+.search-field-list-view .search-field-list-cell .text {
+    -fx-fill: -color-fg-default;
+}
+
+.search-field-list-view .search-field-list-cell .text.start {
+}
+
+.search-field-list-view .search-field-list-cell .text.middle {
+    -fx-underline: true;
+}
+
+.search-field-list-view .search-field-list-cell .text.end {
+}
 
 /* -----------------------------------------------------------------------------------------------------
  * CalendarPicker
