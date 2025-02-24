@@ -158,6 +158,7 @@ public class LoadingPane extends StackPane {
         StackPane indicatorWrapper = new StackPane(indicator);
         indicatorWrapper.getStyleClass().add("progress-indicator-wrapper");
         indicatorWrapper.visibleProperty().bind(committedStatus.isEqualTo(Status.LOADING));
+        indicatorWrapper.managedProperty().bind(committedStatus.isEqualTo(Status.LOADING));
 
         // make sure progress indicator thread stops
         indicator.visibleProperty().bind(indicatorWrapper.visibleProperty());
@@ -183,6 +184,7 @@ public class LoadingPane extends StackPane {
         StackPane errorWrapper = new StackPane(errorNode);
         errorWrapper.getStyleClass().add("error-pane");
         errorWrapper.visibleProperty().bind(committedStatus.isEqualTo(Status.ERROR));
+        errorWrapper.managedProperty().bind(committedStatus.isEqualTo(Status.ERROR));
         return errorWrapper;
     }
 
