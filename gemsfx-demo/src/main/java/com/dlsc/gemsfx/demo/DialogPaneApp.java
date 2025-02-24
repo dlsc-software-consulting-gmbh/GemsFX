@@ -205,7 +205,7 @@ public class DialogPaneApp extends GemApplication {
         Button scenicView = new Button("Scenic View");
         scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
 
-        HBox hBox = new HBox(10, new Label("Animation:"), durationBox, new Label("Style:"), styleBox, scenicView);
+        HBox hBox = new HBox(10, new Label("Animation:"), durationBox, new Label("StyleType:"), styleBox, scenicView);
         hBox.setAlignment(Pos.CENTER);
 
         VBox vBox = new VBox(flowPane, hBox);

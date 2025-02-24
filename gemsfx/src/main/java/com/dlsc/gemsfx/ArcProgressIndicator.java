@@ -3,6 +3,7 @@ package com.dlsc.gemsfx;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.CssMetaData;
+import javafx.css.PseudoClass;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -49,11 +50,12 @@ import java.util.Objects;
  *     ArcProgressIndicator progressIndicator = new ArcProgressIndicator(0.0);
  * </pre>
  */
-public class ArcProgressIndicator extends ProgressIndicator {
+public abstract class ArcProgressIndicator extends ProgressIndicator {
 
     private static final String DEFAULT_STYLE_CLASS = "arc-progress-indicator";
     private static final ArcType DEFAULT_PROGRESS_ARC_TYPE = ArcType.OPEN;
     private static final ArcType DEFAULT_TRACK_ARC_TYPE = ArcType.CHORD;
+    private static final StyleType DEFAULT_STYLE_TYPE = StyleType.DEFAULT;
 
     private static final StringConverter<Double> DEFAULT_CONVERTER = new StringConverter<>() {
         @Override
@@ -84,11 +86,16 @@ public class ArcProgressIndicator extends ProgressIndicator {
     public ArcProgressIndicator(double progress) {
         super(progress);
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        styleTypeProperty().addListener((o, oldV, newV) -> {
+            updatePseudoClasses();
+        });
+        updatePseudoClasses();
     }
 
-    @Override
-    public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(ArcProgressIndicator.class.getResource("arc-progress-indicator.css")).toExternalForm();
+    private void updatePseudoClasses() {
+        pseudoClassStateChanged(PseudoClass.getPseudoClass("bold-style"), getStyleType().equals(StyleType.BOLD));
+        pseudoClassStateChanged(PseudoClass.getPseudoClass("thin-style"), getStyleType().equals(StyleType.THIN));
+        pseudoClassStateChanged(PseudoClass.getPseudoClass("sector-style"), getStyleType().equals(StyleType.SECTOR));
     }
 
     private final ObjectProperty<StringConverter<Double>> converter = new SimpleObjectProperty<>(this, "converter", DEFAULT_CONVERTER);
@@ -204,7 +211,66 @@ public class ArcProgressIndicator extends ProgressIndicator {
         trackArcTypeProperty().set(trackArcType);
     }
 
+    public enum StyleType {
+        DEFAULT,
+        BOLD,
+        THIN,
+        SECTOR;
+    }
+
+    private ObjectProperty<StyleType> styleType;
+
+    /**
+     * The style type property defines the visualization type of the arc that is used to display the progress.
+     * Possible values are: default, bold, thin, sector.
+     *
+     * @return the style type property for the progress
+     */
+    public final ObjectProperty<StyleType> styleTypeProperty() {
+        if (styleType == null) {
+            styleType = new StyleableObjectProperty<>(DEFAULT_STYLE_TYPE) {
+                @Override
+                public Object getBean() {
+                    return this;
+                }
+
+                @Override
+                public String getName() {
+                    return "styleType";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, StyleType> getCssMetaData() {
+                    return StyleableProperties.STYLE_TYPE;
+                }
+            };
+        }
+        return styleType;
+    }
+
+    public final StyleType getStyleType() {
+        return styleType == null ? DEFAULT_STYLE_TYPE : styleType.get();
+    }
+
+    public final void setStyleType(StyleType styleType) {
+        styleTypeProperty().set(styleType);
+    }
+
     private static class StyleableProperties {
+
+        private static final CssMetaData<ArcProgressIndicator, StyleType> STYLE_TYPE = new CssMetaData<>(
+                "-fx-style-type", new EnumConverter<>(StyleType.class), DEFAULT_STYLE_TYPE) {
+
+            @Override
+            public StyleableProperty<StyleType> getStyleableProperty(ArcProgressIndicator control) {
+                return (StyleableProperty<StyleType>) control.styleTypeProperty();
+            }
+
+            @Override
+            public boolean isSettable(ArcProgressIndicator control) {
+                return control.styleType == null || !control.styleType.isBound();
+            }
+        };
 
         private static final CssMetaData<ArcProgressIndicator, ArcType> PROGRESS_ARC_TYPE = new CssMetaData<>(
                 "-fx-progress-arc-type", new EnumConverter<>(ArcType.class), DEFAULT_PROGRESS_ARC_TYPE) {

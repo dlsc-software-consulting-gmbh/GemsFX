@@ -3,6 +3,134 @@
 }
 
 /* -----------------------------------------------------------------------
+ * SemiCircleProgressIndicator
+ */
+.semi-circle-progress-indicator {
+}
+
+.semi-circle-progress-indicator .track-circle {
+    -fx-stroke-width: 3px;
+    -fx-stroke: -color-accent-subtle;
+    -fx-fill: transparent;
+}
+
+.semi-circle-progress-indicator .progress-arc {
+    -fx-stroke-width: 3px;
+    -fx-stroke: -color-accent-emphasis;
+    -fx-fill: transparent;
+}
+
+.semi-circle-progress-indicator .progress-label {
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.semi-circle-progress-indicator:bold-style .track-circle {
+    -fx-stroke-width: 10px;
+    -fx-stroke: -color-accent-subtle;
+}
+
+.semi-circle-progress-indicator:bold-style .progress-arc {
+    -fx-stroke-width: 5px;
+    -fx-stroke: -color-accent-emphasis;
+}
+
+.semi-circle-progress-indicator:thin-style .track-circle {
+    -fx-stroke-width: 1px;
+    -fx-stroke: -color-accent-subtle;
+}
+
+.semi-circle-progress-indicator:thin-style .progress-arc {
+    -fx-stroke-width: 1px;
+    -fx-stroke: -color-accent-emphasis;
+}
+
+.circle-progress-indicator:sector-style {
+    -fx-progress-arc-type: ROUND;
+}
+
+.circle-progress-indicator:sector-style .track-circle {
+    -fx-stroke: -color-accent-muted;
+    -fx-stroke-width: 5px;
+}
+
+.semi-circle-progress-indicator:sector-style .progress-arc {
+    -fx-fill: -color-accent-muted;
+    -fx-stroke: -color-accent-muted;
+    -fx-stroke-width: 1px;
+}
+
+.semi-circle-progress-indicator:sector-style:completed .progress-arc {
+    -fx-fill: -color-accent-muted;
+    -fx-stroke: -color-accent-muted;
+    -fx-stroke-width: 1px;
+}
+
+/* -----------------------------------------------------------------------
+ * CircleProgressIndicator
+ */
+.circle-progress-indicator {
+}
+
+.circle-progress-indicator .track-circle {
+    -fx-stroke-width: 3px;
+    -fx-stroke: -color-accent-subtle;
+    -fx-fill: transparent;
+}
+
+.circle-progress-indicator .progress-arc {
+    -fx-stroke-width: 3px;
+    -fx-stroke: -color-accent-emphasis;
+    -fx-fill: transparent;
+}
+
+.circle-progress-indicator .progress-label {
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.circle-progress-indicator:bold-style .track-circle {
+    -fx-stroke-width: 10px;
+    -fx-stroke: -color-accent-subtle;
+}
+
+.circle-progress-indicator:bold-style .progress-arc {
+    -fx-stroke-width: 5px;
+    -fx-stroke: -color-accent-emphasis;
+}
+
+.circle-progress-indicator:thin-style .track-circle {
+    -fx-stroke-width: 1px;
+    -fx-stroke: -color-accent-subtle;
+}
+
+.circle-progress-indicator:thin-style .progress-arc {
+    -fx-stroke-width: 1px;
+    -fx-stroke: -color-accent-emphasis;
+}
+
+.circle-progress-indicator:sector-style {
+    -fx-progress-arc-type: ROUND;
+}
+
+.circle-progress-indicator:sector-style .track-circle {
+    -fx-stroke: -color-accent-muted;
+    -fx-stroke-width: 5px;
+}
+
+.circle-progress-indicator:sector-style .progress-arc {
+    -fx-fill: -color-accent-muted;
+    -fx-stroke: -color-accent-muted;
+    -fx-stroke-width: 1px;
+}
+
+.circle-progress-indicator:sector-style:completed .progress-arc {
+    -fx-fill: -color-accent-muted;
+    -fx-stroke: -color-accent-muted;
+    -fx-stroke-width: 1px;
+}
+
+/* -----------------------------------------------------------------------
  * BeforeAfterView
  */
 .before-after-view {
@@ -158,7 +286,7 @@
 }
 
 /* -----------------------------------------------------------------------
- * Style based on Modena.css combo-box-popup style
+ * StyleType based on Modena.css combo-box-popup style
  */
 .search-field-list-view {
     -fx-background-color: -color-bg-default;
@@ -714,23 +842,6 @@
 
 .search-text-field:focused > .right-pane > .clear-icon-wrapper > .ikonli-font-icon {
     -fx-icon-color: -color-input-border-focused;
-}
-
-/* -----------------------------------------------------------------------------------------------------
- * ArcProgressIndicator
- */
-.arc-progress-indicator {
-}
-
-.arc-progress-indicator .track-circle {
-    -fx-stroke: -color-border-default;
-}
-
-.arc-progress-indicator .progress-arc {
-    -fx-stroke: -color-accent-emphasis;
-}
-
-.arc-progress-indicator .progress-label {
 }
 
 /* -----------------------------------------------------------------------------------------------------

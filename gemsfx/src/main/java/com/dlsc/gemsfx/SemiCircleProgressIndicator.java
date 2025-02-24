@@ -3,6 +3,8 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.skins.SemiCircleProgressIndicatorSkin;
 import javafx.scene.control.Skin;
 
+import java.util.Objects;
+
 /**
  * SemiCircleProgressIndicator is a visual control used to indicate the progress of a task.
  * It represents progress in a semi-circular form, with options to show determinate or indeterminate states.
@@ -54,4 +56,8 @@ public class SemiCircleProgressIndicator extends ArcProgressIndicator {
         return new SemiCircleProgressIndicatorSkin(this);
     }
 
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(SemiCircleProgressIndicator.class.getResource("semi-circle-progress-indicator.css")).toExternalForm();
+    }
 }
