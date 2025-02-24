@@ -11,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.apache.commons.lang3.StringUtils;
 import org.scenicview.ScenicView;
 
 public class DrawerStackPaneApp extends GemApplication {
@@ -93,7 +94,7 @@ public class DrawerStackPaneApp extends GemApplication {
 
         controls.setAlignment(Pos.CENTER_LEFT);
         controls.setStyle("-fx-padding: 10px; -fx-background-color: lightgrey, white; -fx-background-insets: 0px, 1px 0px 0px 0px;");
-        if (Application.getUserAgentStylesheet().contains("atlanta")) {
+        if (StringUtils.contains(Application.getUserAgentStylesheet(), "atlanta")) {
             controls.setStyle("-fx-padding: 10px; -fx-background-color: -color-border-default, -color-bg-default; -fx-background-insets: 0px, 1px 0px 0px 0px;");
         }
         BorderPane borderPane = new BorderPane(drawerStackPane);
