@@ -1,5 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
+import com.dlsc.gemsfx.ArcProgressIndicator;
+import com.dlsc.gemsfx.ArcProgressIndicator.StyleType;
 import com.dlsc.gemsfx.CircleProgressIndicator;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -8,6 +10,7 @@ import javafx.concurrent.Service;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -21,6 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.kordamp.ikonli.javafx.FontIcon;
+import org.scenicview.ScenicView;
 
 import java.util.Objects;
 
@@ -36,18 +40,10 @@ public class CircleProgressIndicatorApp extends GemApplication {
         delayAutoUpdateProgress(progressIndicator);
 
         // styles
-        String[] styles = new String[]{"bold-style", "thin-style", "sector-style", "default-style"};
-        ComboBox<String> styleComboBox = new ComboBox<>();
-        styleComboBox.getItems().addAll(styles);
-        String firstStyle = styles[0];
-        // add style
-        progressIndicator.getStyleClass().add(firstStyle);
+        ComboBox<StyleType> styleComboBox = new ComboBox<>();
+        styleComboBox.getItems().addAll(StyleType.values());
+        styleComboBox.valueProperty().bindBidirectional(progressIndicator.styleTypeProperty());
         styleComboBox.setMaxWidth(Double.MAX_VALUE);
-        styleComboBox.setValue(firstStyle);
-        styleComboBox.valueProperty().addListener(it -> {
-            progressIndicator.getStyleClass().removeAll(styles);
-            progressIndicator.getStyleClass().add(styleComboBox.getValue());
-        });
 
         // start Angle
         Label startAngleLabel = new Label("Start Angle");
@@ -58,14 +54,6 @@ public class CircleProgressIndicatorApp extends GemApplication {
         startAngleValue.textProperty().bind(Bindings.format("%.0f", startAngleSlider.valueProperty()));
         HBox startAngleBox = new HBox(5, startAngleLabel, startAngleSlider, startAngleValue);
         startAngleBox.setAlignment(Pos.CENTER_LEFT);
-
-        // graphic
-        FontIcon graphic = new FontIcon();
-        CheckBox showGraphic = new CheckBox("Show Graphic");
-        showGraphic.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            progressIndicator.setGraphic(newValue ? graphic : null);
-        });
-        showGraphic.setSelected(true);
 
         // string converter
         StringConverter<Double> defaultConvert = progressIndicator.getConverter();
@@ -78,7 +66,11 @@ public class CircleProgressIndicatorApp extends GemApplication {
         indicatorWrapper.getStyleClass().add("indicator-wrapper");
         VBox.setVgrow(indicatorWrapper, Priority.ALWAYS);
 
-        VBox bottom = new VBox(10, showGraphic, customConverterBox, startAngleBox, styleComboBox);
+        Button scenicView = new Button("Scenic View");
+        scenicView.setMaxWidth(Double.MAX_VALUE);
+        scenicView.setOnAction(e -> ScenicView.show(scenicView.getScene()));
+
+        VBox bottom = new VBox(10, customConverterBox, startAngleBox, styleComboBox, scenicView);
         bottom.setAlignment(Pos.CENTER_LEFT);
         bottom.setMaxWidth(Region.USE_PREF_SIZE);
 
@@ -90,9 +82,8 @@ public class CircleProgressIndicatorApp extends GemApplication {
         containerBox.getChildren().addAll(indicatorWrapper, new Separator(), bottom);
 
         Scene scene = new Scene(containerBox, 330, 390);
-        scene.getStylesheets().add(Objects.requireNonNull(CircleProgressIndicatorApp.class.getResource("arc-progress-indicator-demo.css")).toExternalForm());
         primaryStage.setScene(scene);
-        primaryStage.setTitle("CircleProgressIndicator Demo");
+        primaryStage.setTitle("Circle Progress Indicator Demo");
         primaryStage.show();
     }
 

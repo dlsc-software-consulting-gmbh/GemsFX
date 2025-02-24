@@ -1,0 +1,64 @@
+.semi-circle-progress-indicator {
+}
+
+.semi-circle-progress-indicator .track-circle {
+    -fx-stroke-width: 3px;
+    -fx-stroke: -fx-box-border;
+    -fx-fill: transparent;
+}
+
+.semi-circle-progress-indicator .progress-arc {
+    -fx-stroke-width: 3px;
+    -fx-stroke: -fx-accent;
+    -fx-fill: transparent;
+}
+
+.semi-circle-progress-indicator .progress-label {
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.semi-circle-progress-indicator .track-circle {
+    -fx-stroke: lightgrey;
+}
+
+.semi-circle-progress-indicator .progress-arc {
+    -fx-stroke: -fx-accent;
+}
+
+/* --- bold style --- */
+.semi-circle-progress-indicator:bold-style .track-circle {
+    -fx-stroke-width: 10px;
+}
+
+.semi-circle-progress-indicator:bold-style .progress-arc {
+    -fx-stroke-width: 5px;
+}
+
+/** --- thin style --- */
+.semi-circle-progress-indicator:thin-style .track-circle {
+    -fx-stroke-width: 1px;
+}
+
+.semi-circle-progress-indicator:thin-style .progress-arc {
+    -fx-stroke-width: 1px;
+}
+
+/** --- sector style --- */
+.semi-circle-progress-indicator:sector-style {
+    -fx-progress-arc-type: ROUND;
+}
+
+.semi-circle-progress-indicator:sector-style .track-circle {
+    -fx-stroke-width: 5px;
+}
+
+.semi-circle-progress-indicator:sector-style .progress-arc {
+    -fx-fill: lightgrey;
+    -fx-stroke: lightgrey;
+}
+
+.semi-circle-progress-indicator:sector-style:completed .progress-arc {
+    -fx-stroke: lightgrey;
+    -fx-fill: lightgrey;
+}

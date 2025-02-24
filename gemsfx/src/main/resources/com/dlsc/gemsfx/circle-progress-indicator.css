@@ -1,0 +1,64 @@
+.circle-progress-indicator {
+}
+
+.circle-progress-indicator .track-circle {
+    -fx-stroke-width: 3px;
+    -fx-stroke: -fx-box-border;
+    -fx-fill: transparent;
+}
+
+.circle-progress-indicator .progress-arc {
+    -fx-stroke-width: 3px;
+    -fx-stroke: -fx-accent;
+    -fx-fill: transparent;
+}
+
+.circle-progress-indicator .progress-label {
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.circle-progress-indicator .track-circle {
+    -fx-stroke: lightgrey;
+}
+
+.circle-progress-indicator .progress-arc {
+    -fx-stroke: -fx-accent;
+}
+
+/* --- bold style --- */
+.circle-progress-indicator:bold-style .track-circle {
+    -fx-stroke-width: 10px;
+}
+
+.circle-progress-indicator:bold-style .progress-arc {
+    -fx-stroke-width: 5px;
+}
+
+/** --- thin style --- */
+.circle-progress-indicator:thin-style .track-circle {
+    -fx-stroke-width: 1px;
+}
+
+.circle-progress-indicator:thin-style .progress-arc {
+    -fx-stroke-width: 1px;
+}
+
+/** --- sector style --- */
+.circle-progress-indicator:sector-style {
+    -fx-progress-arc-type: ROUND;
+}
+
+.circle-progress-indicator:sector-style .track-circle {
+    -fx-stroke-width: 5px;
+}
+
+.circle-progress-indicator:sector-style .progress-arc {
+    -fx-fill: lightgrey;
+    -fx-stroke: lightgrey;
+}
+
+.circle-progress-indicator:sector-style:completed .progress-arc {
+    -fx-stroke: lightgrey;
+    -fx-fill: lightgrey;
+}

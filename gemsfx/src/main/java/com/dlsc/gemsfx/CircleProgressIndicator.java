@@ -5,6 +5,8 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.Skin;
 
+import java.util.Objects;
+
 /**
  * CircleProgressIndicator is a visual control used to indicate the progress of a task.
  * It represents progress in a circular form, with options to show determinate or indeterminate states.
@@ -59,6 +61,11 @@ public class CircleProgressIndicator extends ArcProgressIndicator {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new CircleProgressIndicatorSkin(this);
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(CircleProgressIndicator.class.getResource("circle-progress-indicator.css")).toExternalForm();
     }
 
     private DoubleProperty startAngle;

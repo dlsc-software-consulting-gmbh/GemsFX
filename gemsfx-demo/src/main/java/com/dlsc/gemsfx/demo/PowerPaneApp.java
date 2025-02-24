@@ -254,7 +254,7 @@ public class PowerPaneApp extends GemApplication {
             }
         });
 
-        HBox hBox = new HBox(10, new Label("Animation:"), durationBox, new Label("Style:"), styleBox);
+        HBox hBox = new HBox(10, new Label("Animation:"), durationBox, new Label("StyleType:"), styleBox);
         hBox.setAlignment(Pos.CENTER);
 
         vBox.getChildren().add(hBox);
