@@ -251,7 +251,7 @@
 }
 
 .search-field .graphic-wrapper {
-    -fx-background-color: -transparent;
+    -fx-background-color: transparent;
     -fx-padding: 0px 0px;
 }
 
@@ -1818,12 +1818,12 @@
 }
 
 .selection-box .selection-popup > .content .extra-buttons-box .extra-button {
-    -fx-text-fill: -clor-fg-default;
+    -fx-text-fill: -color-fg-default;
     -fx-background-color: -color-bg-default;
 }
 
 .selection-box .selection-popup > .content .extra-buttons-box .extra-button:hover {
-    -fx-background-color: -color-neutral-subtle;
+    -fx-background-color: -color-neutral-muted;
     -fx-text-fill: -color-fg-default;
 }
 
@@ -1848,12 +1848,13 @@
 
 .selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button,
 .selection-box .selection-popup > .content > .options-scroll-pane .options-box > .check-box {
-    -fx-background: -color-bg-default;
+    -fx-background-color: -color-bg-default;
+    -fx-text-fill: -color-fg-default;
 }
 
 .selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button:hover,
 .selection-box .selection-popup > .content > .options-scroll-pane .options-box > .check-box:hover {
-    -fx-background-color: -color-neutral-subtle;
+    -fx-background-color: -color-neutral-muted;
     -fx-text-fill: -color-fg-default;
 }
 
