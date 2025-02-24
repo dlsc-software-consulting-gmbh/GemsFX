@@ -23,6 +23,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import org.scenicview.ScenicView;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -35,9 +36,7 @@ public class DurationPickerApp extends GemApplication {
         super.start(primaryStage);
 
         DurationPicker durationPicker = new DurationPicker();
-
         durationPicker.setLabelType(LabelType.SHORT);
-        durationPicker.setMaxWidth(Double.MAX_VALUE);
 
         ZonedDateTime timeA = ZonedDateTime.now();
         ZonedDateTime timeB = ZonedDateTime.now().plusDays(2).plusHours(10).plusMinutes(23).plusSeconds(55);
@@ -219,7 +218,12 @@ public class DurationPickerApp extends GemApplication {
         VBox box2 = new VBox(20, fullWidth, showPopupButtonBox, fillDigitsCheckBox, linkFieldsBox, rollOverBox, gridPane);
         HBox box3 = new HBox(20, showPopupButton, hidePopupButton, zeroButton, nullButton);
 
-        box1.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-background-radius: 2px; -fx-border-color: gray; -fx-border-radius: 2px;");
+        if (Boolean.getBoolean("atlantafx")) {
+            box1.setStyle("-fx-padding: 20px; -fx-background-color: -color-bg-default; -fx-background-radius: 2px; -fx-border-color: -color-border-default; -fx-border-radius: 2px;");
+        } else {
+            box1.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-background-radius: 2px; -fx-border-color: gray; -fx-border-radius: 2px;");
+        }
+
         box2.setStyle(box1.getStyle()); // same style
         box3.setStyle(box2.getStyle()); // same style
 
@@ -248,6 +252,8 @@ public class DurationPickerApp extends GemApplication {
         primaryStage.sizeToScene();
         primaryStage.centerOnScreen();
         primaryStage.show();
+
+        ScenicView.show(scene);
     }
 
     private String humanReadableFormat(Duration duration) {
