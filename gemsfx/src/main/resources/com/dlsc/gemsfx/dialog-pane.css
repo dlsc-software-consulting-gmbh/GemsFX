@@ -135,7 +135,6 @@
  */
 
 .dialog-pane > .content-pane .circular-progress {
-    -indicator-color: white;
 }
 
 .dialog-pane > .content-pane .circular-progress .indicator {
