@@ -23,23 +23,23 @@
 /* --- bold style --- */
 .arc-progress-indicator.bold-style .track-circle {
     -fx-stroke-width: 10px;
-    -fx-stroke: #dadada;
+    -fx-stroke: -color-accent-subtle;
 }
 
 .arc-progress-indicator.bold-style .progress-arc {
     -fx-stroke-width: 5px;
-    -fx-stroke: #67986e;
+    -fx-stroke: -color-accent-emphasis;
 }
 
 /** --- thin style --- */
 .arc-progress-indicator.thin-style .track-circle {
     -fx-stroke-width: 1px;
-    -fx-stroke: #c9c9c9;
+    -fx-stroke: -color-accent-subtle;
 }
 
 .arc-progress-indicator.thin-style .progress-arc {
     -fx-stroke-width: 1px;
-    -fx-stroke: #f87328;
+    -fx-stroke: -color-accent-emphasis;
 }
 
 /** --- sector style --- */
@@ -52,13 +52,15 @@
 }
 
 .arc-progress-indicator.sector-style .progress-arc {
-    -fx-fill: #47bce833;
+    -fx-fill: -color-accent-muted;
+    -fx-stroke: -color-accent-muted;
     -fx-stroke-width: 1px;
 }
 
 .circle-progress-indicator.sector-style:completed .progress-arc {
-    -fx-stroke: #00000001;
-    -fx-fill: radial-gradient(focus-angle 0.0deg, focus-distance 0.0%, center 50.0% 50.0%, radius 50.0%, #47bce833 0.0%, #47bce833 0.6667%, #47bce833 90.5208%, #47bce833 91.8333%, #ffffff08 92.7083%, #ffffff08 100.0%);
+    -fx-fill: -color-accent-muted;
+    -fx-stroke: -color-accent-muted;
+    -fx-stroke-width: 1px;
 }
 
 /** --- custom style --- */
