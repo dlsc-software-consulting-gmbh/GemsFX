@@ -1,5 +1,8 @@
 package com.dlsc.gemsfx.demo;
 
+import atlantafx.base.theme.NordDark;
+import atlantafx.base.theme.NordLight;
+import com.dlsc.gemsfx.App;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterView;
 import com.dlsc.gemsfx.infocenter.Notification;
@@ -26,6 +29,11 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.StringUtils;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.material.Material;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.scenicview.ScenicView;
 
 import java.io.IOException;
@@ -46,7 +54,8 @@ public class InfoCenterApp extends GemApplication {
     private final NotificationGroup<Object, CalendarNotification> calendarGroup = new NotificationGroup<>("Calendar");
 
     @Override
-    public void start(Stage stage) { super.start(stage);
+    public void start(Stage stage) {
+        super.start(stage);
         slackGroup.setSortOrder(0);
         calendarGroup.setSortOrder(1);
         mailGroup.setSortOrder(2);
@@ -55,15 +64,28 @@ public class InfoCenterApp extends GemApplication {
         calendarGroup.maximumNumberOfNotificationsProperty().bind(Bindings.createIntegerBinding(() -> calendarGroup.isPinned() ? 3 : 10, calendarGroup.pinnedProperty()));
         mailGroup.maximumNumberOfNotificationsProperty().bind(Bindings.createIntegerBinding(() -> mailGroup.isPinned() ? 3 : 10, mailGroup.pinnedProperty()));
 
+        boolean atlantafx = Boolean.getBoolean("atlantafx");
         slackGroup.setViewFactory(n -> {
             NotificationView<Object, SlackNotification> view = new NotificationView<>(n);
-            view.setGraphic(createImageView(SLACK_IMAGE));
+            if (atlantafx) {
+                FontIcon graphic = new FontIcon(MaterialDesign.MDI_SLACK);
+                graphic.getStyleClass().addAll("custom-icon", "warning");
+                view.setGraphic(graphic);
+            } else {
+                view.setGraphic(createImageView(SLACK_IMAGE));
+            }
             return view;
         });
 
         calendarGroup.setViewFactory(n -> {
             NotificationView<Object, CalendarNotification> view = new NotificationView<>(n);
-            view.setGraphic(createImageView(CALENDAR_IMAGE));
+            if (atlantafx) {
+                FontIcon graphic = new FontIcon(Material.CALENDAR_TODAY);
+                graphic.getStyleClass().addAll("custom-icon", "danger");
+                view.setGraphic(graphic);
+            } else {
+                view.setGraphic(createImageView(CALENDAR_IMAGE));
+            }
             Region region = new Region();
             region.setMinHeight(200);
             region.setBackground(new Background(new BackgroundImage(MAP_IMAGE, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(100, 100, true, true, false, true))));
@@ -75,7 +97,13 @@ public class InfoCenterApp extends GemApplication {
 
         mailGroup.setViewFactory(n -> {
             NotificationView<Mail, MailNotification> view = new NotificationView<>(n);
-            view.setGraphic(createImageView(MAIL_IMAGE));
+            if (atlantafx) {
+                FontIcon graphic = new FontIcon(MaterialDesign.MDI_EMAIL);
+                graphic.getStyleClass().addAll("custom-icon");
+                view.setGraphic(graphic);
+            } else {
+                view.setGraphic(createImageView(MAIL_IMAGE));
+            }
             return view;
         });
 
@@ -126,11 +154,27 @@ public class InfoCenterApp extends GemApplication {
         scenicView.setOnAction(evt -> ScenicView.show(infoCenterView.getScene()));
         scenicView.setMaxWidth(Double.MAX_VALUE);
 
+        ToggleButton darkMode = new ToggleButton("Dark Mode");
+        darkMode.selectedProperty().addListener(it -> {
+            if (darkMode.isSelected()) {
+                Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
+            } else {
+                Application.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
+            }
+        });
+        darkMode.setMaxWidth(Double.MAX_VALUE);
+        darkMode.setVisible(atlantafx);
+        darkMode.setManaged(atlantafx);
+
         Label counterLabel = new Label();
-        counterLabel.setStyle("-fx-text-fill: white;");
+        if (atlantafx) {
+            counterLabel.setStyle("-fx-text-fill: -color-fg-default;");
+        } else {
+            counterLabel.setStyle("-fx-text-fill: white;");
+        }
         counterLabel.textProperty().bind(Bindings.createStringBinding(() -> "Count: " + infoCenterView.getUnmodifiableNotifications().size(), infoCenterView.getUnmodifiableNotifications()));
 
-        VBox buttonBox = new VBox(10, showNotifications, hideNotifications, pinNotifications, autoOpenGroups, randomNotification, manyNotifications, clearAll, transparentButton, scenicView, counterLabel);
+        VBox buttonBox = new VBox(10, showNotifications, hideNotifications, pinNotifications, autoOpenGroups, randomNotification, manyNotifications, clearAll, transparentButton, darkMode, scenicView, counterLabel);
         buttonBox.getStyleClass().add("button-box");
         buttonBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         buttonBox.setTranslateX(50);
@@ -139,7 +183,12 @@ public class InfoCenterApp extends GemApplication {
         StackPane.setAlignment(buttonBox, Pos.TOP_LEFT);
 
         StackPane background = new StackPane(buttonBox);
-        background.getStyleClass().add("background");
+        if (atlantafx) {
+            background.setStyle("-fx-background-color: -color-neutral-muted;");
+        } else {
+            background.getStyleClass().add("background");
+        }
+
         infoCenterPane.setContent(background);
         infoCenterPane.getStylesheets().add(Objects.requireNonNull(InfoCenterApp.class.getResource("notification/scene.css")).toExternalForm());
 
@@ -152,6 +201,9 @@ public class InfoCenterApp extends GemApplication {
          */
         StackPane root = new StackPane(infoCenterPane);
         Scene scene = new Scene(root);
+        if (atlantafx) {
+            scene.getStylesheets().add(Objects.requireNonNull(InfoCenterApp.class.getResource("infocenterdemo.css")).toExternalForm());
+        }
 
         stage.setScene(scene);
         stage.setWidth(1000);
@@ -159,6 +211,8 @@ public class InfoCenterApp extends GemApplication {
         stage.centerOnScreen();
         stage.setTitle("InfoCenter");
         stage.show();
+
+        infoCenterPane.setPinned(true);
     }
 
     private void assignNotification(Notification<?> notification) {

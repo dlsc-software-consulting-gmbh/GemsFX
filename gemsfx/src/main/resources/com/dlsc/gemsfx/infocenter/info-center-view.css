@@ -291,7 +291,7 @@
     -fx-font-weight: bold;
 }
 
-.info-center-view .notification-view > .content > .text-container > .title-time-box > upper-right-pane > .time-label {
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .time-label {
     -fx-text-fill: gray;
 }
 

@@ -1,0 +1,12 @@
+.custom-icon {
+    -fx-icon-size: 24px;
+    -fx-icon-color: -color-accent-fg;
+}
+
+.custom-icon.warning {
+    -fx-icon-color: -color-warning-fg;
+}
+
+.custom-icon.danger {
+    -fx-icon-color: -color-danger-fg;
+}

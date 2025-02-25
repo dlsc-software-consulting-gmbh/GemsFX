@@ -118,7 +118,10 @@ public class PowerPaneApp extends GemApplication {
                 createHiddenSidesPaneControls()
         );
 
-        controls.setStyle("-fx-background-color: -color-bg-default;");
+        if (Boolean.getBoolean("atlantafx")) {
+            controls.setStyle("-fx-background-color: -color-bg-default;");
+        }
+
         controls.setPadding(new Insets(20));
 
         ScrollPane scrollPane = new ScrollPane(controls);

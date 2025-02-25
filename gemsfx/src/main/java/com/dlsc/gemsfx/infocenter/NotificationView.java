@@ -27,6 +27,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -379,6 +380,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             closeIconWrapper.setOnMouseExited(evt -> requestLayout());
             closeIconWrapper.setOnMouseClicked(evt -> {
                 evt.consume();
+                //noinspection rawtypes
                 NotificationGroup group = notification.getGroup();
                 if (group.isExpanded()) {
                     notification.remove();
@@ -448,6 +450,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             closeIconWrapper.resizeRelocate(0, 0, closeIconWrapper.prefWidth(-1), closeIconWrapper.prefHeight(-1));
         }
 
+        @SuppressWarnings({"rawtypes", "unchecked"})
         private void updateActions(HBox actionsBox) {
             actionsBox.getChildren().clear();
 
@@ -455,6 +458,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             if (!actions.isEmpty()) {
                 actions.forEach(action -> {
                     Button button = new Button();
+                    button.getStyleClass().add("notification-action-button");
                     button.textProperty().bind(action.textProperty());
                     HBox.setHgrow(button, Priority.ALWAYS);
                     button.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -462,20 +466,23 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
                     button.setOnAction(evt -> {
                         fireEvent(new InfoCenterEvent(InfoCenterEvent.HIDE, getNotification()));
 
-                        OnClickBehaviour call = (OnClickBehaviour) action.getOnAction().call(notification);
-                        switch (call) {
-                            case NONE:
-                                break;
-                            case REMOVE:
-                                notification.remove();
-                                break;
-                            case HIDE:
-                                fireEvent(new InfoCenterEvent(InfoCenterEvent.HIDE));
-                                break;
-                            case HIDE_AND_REMOVE:
-                                fireEvent(new InfoCenterEvent(InfoCenterEvent.HIDE));
-                                notification.remove();
-                                break;
+                        Callback onAction = action.getOnAction();
+                        if (onAction != null) {
+                            OnClickBehaviour call = (OnClickBehaviour) onAction.call(notification);
+                            switch (call) {
+                                case NONE:
+                                    break;
+                                case REMOVE:
+                                    notification.remove();
+                                    break;
+                                case HIDE:
+                                    fireEvent(new InfoCenterEvent(InfoCenterEvent.HIDE));
+                                    break;
+                                case HIDE_AND_REMOVE:
+                                    fireEvent(new InfoCenterEvent(InfoCenterEvent.HIDE));
+                                    notification.remove();
+                                    break;
+                            }
                         }
                     });
                     actionsBox.getChildren().add(button);

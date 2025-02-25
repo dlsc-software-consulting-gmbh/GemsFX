@@ -658,11 +658,11 @@
 }
 
 .info-center-view > .main-pane > .default-placeholder > .label {
-    -fx-text-fill: -color-fg-default;
+    -fx-text-fill: -color-fg-emphasis;
 }
 
 .info-center-view > .main-pane > .default-placeholder > .label > .ikonli-font-icon {
-    -fx-icon-color: -color-fg-default;
+    -fx-icon-color: -color-fg-emphasis;
 }
 
 .info-center-view .notification-view .default-icon {
@@ -712,13 +712,19 @@
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .group-name-label {
-    -fx-text-fill: -color-fg-default;
+    -fx-font-size: 1em;
+    -fx-pref-height: 2em;
+    -fx-padding: 0px 10px;
+    -fx-text-fill: -color-fg-muted;
+    -fx-background-color: -color-bg-overlay;
+    -fx-background-radius: 1000px;
+    -fx-effect: null;
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .show-less-button,
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .show-all-button {
-    -fx-background-color: -color-button-bg;
-    -fx-text-fill: -color-button-fg;
+    -fx-background-color: -color-bg-overlay;
+    -fx-text-fill: -color-fg-muted;
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .show-less-button:pressed,
@@ -728,8 +734,8 @@
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .pin-button,
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .clear-button {
-    -fx-background-color: -color-button-bg;
-    -fx-text-fill: -color-button-fg;
+    -fx-background-color: -color-bg-overlay;
+    -fx-text-fill: -color-fg-muted;
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .pin-button:pressed,
@@ -738,11 +744,11 @@
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .clear-button .ikonli-font-icon {
-    -fx-icon-color: -color-button-fg;
+    -fx-icon-color: -color-fg-muted;
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .pin-button .ikonli-font-icon {
-    -fx-icon-color: -color-button-fg;
+    -fx-icon-color: -color-fg-muted;
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .pin-button:selected .ikonli-font-icon {
@@ -755,24 +761,30 @@
 }
 
 .info-center-view > .main-pane > .single-group-wrapper > .single-group-header > .group-name-label {
+    -fx-font-size: 1em;
+    -fx-pref-height: 2em;
+    -fx-padding: 0px 10px;
     -fx-text-fill: -color-fg-default;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
+    -fx-background-color: -color-bg-overlay;
+    -fx-background-radius: 1000px;
+    -fx-effect: null;
 }
 
 .info-center-view > .main-pane > .single-group-wrapper > .single-group-header > .close-show-all-button {
-    -fx-background-color: -color-button-bg;
-    -fx-text-fill: rgba(0, 0, 0, .6);
+    -fx-background-color: -color-bg-overlay;
+    -fx-text-fill: -color-fg-default
 }
 
 .info-center-view > .main-pane > .single-group-wrapper > .single-group-header > .clear-all-button {
-    -fx-background-color: -color-button-bg;
+    -fx-background-color: -color-bg-overlay;
 }
 
 .info-center-view > .main-pane > .single-group-wrapper > .single-group-header > .clear-all-button .ikonli-font-icon {
-    -fx-icon-color: rgba(0, 0, 0, .6);
+    -fx-icon-color: -color-fg-default;
 }
 
 .info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view {
+    -fx-border-width: 0px;
 }
 
 .info-center-view > .main-pane > .single-group-wrapper > .single-group-list-view .viewport {
@@ -798,9 +810,8 @@
 }
 
 .info-center-view .notification-view > .content > .close-icon-wrapper {
-    -fx-background-color: -color-neutral-emphasis-plus, -color-neutral-emphasis;
+    -fx-background-color: -color-border-default, -color-bg-overlay;
     -fx-background-insets: 0px, 1px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
 }
 
 .info-center-view .notification-view > .content > .close-icon-wrapper:pressed {
@@ -822,7 +833,7 @@
 }
 
 .info-center-view .notification-view > .content {
-    -fx-background-color: -color-neutral-emphasis;
+    -fx-background-color: -color-bg-overlay;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
 }
 
@@ -830,15 +841,15 @@
 }
 
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .title-label {
-    -fx-text-fill: -color-fg-emphasis;
+    -fx-text-fill: -color-fg-default;
 }
 
-.info-center-view .notification-view > .content > .text-container > .title-time-box > upper-right-pane > .time-label {
-    -fx-text-fill: -color-fg-emphasis;
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .time-label {
+    -fx-text-fill: -color-fg-default;
 }
 
 .info-center-view .notification-view > .content > .text-container > .description-label {
-    -fx-text-fill: -color-fg-emphasis;
+    -fx-text-fill: -color-fg-default;
 }
 
 .info-center-view .notification-view > .content > .text-container > .actions-box {
@@ -1356,10 +1367,6 @@
     -fx-background-color: transparent;
 }
 
-/* ----------------------------------------------------------------------------
- * CircularProgressIndicator
- */
-
 .dialog-pane > .content-pane .circular-progress {
 }
 
@@ -1369,12 +1376,8 @@
     -fx-fill: transparent;
 }
 
-/* ----------------------------------------------------------------------------
- * Glass Pane
- */
-
 .dialog-pane > .glass-pane {
-    -fx-background-color: black;
+    -fx-background-color: -color-bg-overlay;
 }
 
 /* ----------------------------------------------------------------------------
