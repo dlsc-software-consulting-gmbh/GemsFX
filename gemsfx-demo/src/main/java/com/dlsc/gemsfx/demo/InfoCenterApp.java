@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import atlantafx.base.theme.NordDark;
 import atlantafx.base.theme.NordLight;
-import com.dlsc.gemsfx.App;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterView;
 import com.dlsc.gemsfx.infocenter.Notification;
