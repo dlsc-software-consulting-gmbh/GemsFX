@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.Spacer;
 import com.dlsc.gemsfx.infocenter.InfoCenterEvent;
 import com.dlsc.gemsfx.infocenter.InfoCenterView;
 import com.dlsc.gemsfx.infocenter.Notification;
@@ -236,8 +237,6 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         Label groupNameLabel = new Label();
         groupNameLabel.textProperty().bind(Bindings.createStringBinding(() -> view.getShowAllGroup() != null ? view.getShowAllGroup().getName() : "", view.showAllGroupProperty()));
         groupNameLabel.getStyleClass().add("group-name-label");
-        groupNameLabel.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(groupNameLabel, Priority.ALWAYS);
 
         Button closeShowAllButton = new Button(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"single.group.header.close"));
         closeShowAllButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"single.group.header.close.tip")));
@@ -250,7 +249,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         clearAllButton.setOnAction(evt -> view.getShowAllGroup().getNotifications().clear());
         clearAllButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"single.group.header.remove.all")));
 
-        HBox singleGroupHeader = new HBox(groupNameLabel, closeShowAllButton, clearAllButton);
+        HBox singleGroupHeader = new HBox(groupNameLabel, new Spacer(), closeShowAllButton, clearAllButton);
         singleGroupHeader.getStyleClass().add("single-group-header");
 
         singleGroupContainer = new VBox(singleGroupHeader, singleGroupListView);
@@ -469,8 +468,6 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
 
             Label groupNameLabel = new Label(group.getName());
             groupNameLabel.getStyleClass().add("group-name-label");
-            groupNameLabel.setMaxWidth(Double.MAX_VALUE);
-            HBox.setHgrow(groupNameLabel, Priority.ALWAYS);
 
             Button showLessButton = new Button(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW, "group.header.show.less"));
             showLessButton.getStyleClass().add("show-less-button");
@@ -508,7 +505,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             pinButton.managedProperty().bind(group.pinnableProperty());
             pinButton.selectedProperty().bindBidirectional(group.pinnedProperty());
 
-            headerBox.getChildren().addAll(groupNameLabel, showAllButton, showLessButton, clearButton, pinButton);
+            headerBox.getChildren().addAll(groupNameLabel, new Spacer(), showAllButton, showLessButton, clearButton, pinButton);
             headerBox.visibleProperty().bind(Bindings.createBooleanBinding(() -> group.isExpanded() && group.getNotifications().size() > 1 && group.isShowHeader(), group.expandedProperty(), group.getNotifications()));
 
             group.getNotifications().addListener(weakNotificationsChangedListener);

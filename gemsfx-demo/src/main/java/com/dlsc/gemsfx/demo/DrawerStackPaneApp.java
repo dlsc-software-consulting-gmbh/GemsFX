@@ -94,7 +94,7 @@ public class DrawerStackPaneApp extends GemApplication {
 
         controls.setAlignment(Pos.CENTER_LEFT);
         controls.setStyle("-fx-padding: 10px; -fx-background-color: lightgrey, white; -fx-background-insets: 0px, 1px 0px 0px 0px;");
-        if (StringUtils.contains(Application.getUserAgentStylesheet(), "atlanta")) {
+        if (Boolean.getBoolean("atlantafx")) {
             controls.setStyle("-fx-padding: 10px; -fx-background-color: -color-border-default, -color-bg-default; -fx-background-insets: 0px, 1px 0px 0px 0px;");
         }
         BorderPane borderPane = new BorderPane(drawerStackPane);

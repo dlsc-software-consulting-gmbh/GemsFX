@@ -76,7 +76,9 @@ public class CircleProgressIndicatorApp extends GemApplication {
 
         VBox containerBox = new VBox(20);
         containerBox.getStyleClass().add("container-box");
-        containerBox.setStyle("-fx-background-color: -color-bg-default;");
+        if (Boolean.getBoolean("atlantafx")) {
+            containerBox.setStyle("-fx-background-color: -color-bg-default;");
+        }
         containerBox.setPadding(new Insets(20));
         containerBox.setAlignment(Pos.CENTER);
         containerBox.getChildren().addAll(indicatorWrapper, new Separator(), bottom);

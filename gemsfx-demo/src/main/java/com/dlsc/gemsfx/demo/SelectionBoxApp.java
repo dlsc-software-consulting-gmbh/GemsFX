@@ -47,7 +47,9 @@ public class SelectionBoxApp extends GemApplication {
 
         SplitPane splitPane = new SplitPane();
         splitPane.setDividerPositions(0.7);
-        splitPane.setStyle("-fx-background-color: -color-bg-default;");
+        if (Boolean.getBoolean("atlantafx")) {
+            splitPane.setStyle("-fx-background-color: -color-bg-default;");
+        }
         splitPane.getItems().addAll(createControl(), getControlPanel());
 
         primaryStage.setTitle("SelectionBox Demo");
