@@ -267,5 +267,4 @@ public class EnhancedPasswordField extends PasswordField {
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(EnhancedPasswordField.class.getResource("enhanced-password-field.css")).toExternalForm();
     }
-
 }

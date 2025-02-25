@@ -3,6 +3,188 @@
 }
 
 /* -----------------------------------------------------------------------
+ * EnhancedLabel
+ */
+.enhanced-label:selected {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+/* -----------------------------------------------------------------------
+ * EmailField
+ */
+.email-field {
+}
+
+.email-field:valid {
+}
+
+.email-field:invalid {
+}
+
+.email-field > .custom-text-field > .left-pane > .mail-icon-wrapper {
+}
+
+.email-field > .custom-text-field > .left-pane > .mail-icon-wrapper > .mail-icon {
+    -fx-background-color: -color-fg-muted;
+}
+
+.email-field > .custom-text-field > .right-pane > .validation-icon-wrapper {
+}
+
+.email-field > .custom-text-field > .right-pane > .validation-icon-wrapper > .validation-icon {
+    -fx-background-color: -color-danger-emphasis;
+}
+
+.email-field .suggestion-popup > .content-pane > .suggestion-list-view {
+}
+
+/* -----------------------------------------------------------------------
+ * DurationPicker
+ */
+.duration-picker {
+}
+
+.duration-picker > .box {
+}
+
+.duration-picker > .box > .spacer {
+}
+
+.duration-picker > .box > .edit-button {
+    -fx-padding: 8px 12px;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+}
+
+.duration-picker:left > .box > .edit-button {
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+}
+
+.duration-picker:button-only > .box > .edit-button {
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+}
+
+.duration-picker:focused > .box > .edit-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 0px;
+    -fx-border-insets: 0px;
+}
+
+.duration-picker:left:focused > .box > .edit-button {
+    -fx-background-radius: 0px;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 0px 1px 0px 0px;
+    -fx-border-insets: 0px;
+}
+
+.duration-picker:button-only:focused > .box > .edit-button {
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+    -fx-border-width: 1px;
+    -fx-border-insets: 0px;
+    -fx-border-color: -color-border-default;
+    -fx-padding: 12px 8px;
+}
+
+.duration-picker > .box > .edit-button > .ikonli-font-icon {
+    -fx-icon-code: mdi-timer;
+    -fx-icon-size: 14px;
+    -fx-icon-color: -color-fg-default;
+}
+
+.duration-picker > .box > .fields-box {
+    -fx-padding: 0px 5px;
+}
+
+.duration-picker > .box > .fields-box > .separator {
+    -fx-padding: 0px 2px;
+}
+
+.duration-picker > .box > .fields-box > .unit-field {
+    -fx-padding: 0px;
+    -fx-alignment: center;
+}
+
+.duration-picker > .box > .fields-box > .unit-field.no-label {
+}
+
+.duration-picker > .box > .fields-box > .unit-field.short-label {
+}
+
+.duration-picker > .box > .fields-box > .unit-field.long-label {
+}
+
+.duration-picker > .box > .fields-box > .unit-field:focused {
+    -fx-background-radius: 0px;
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.duration-picker .popup {
+    -fx-background-color: -color-bg-default;
+}
+
+.duration-picker .picker {
+    -fx-cell-size: 30px;
+    -fx-indicator-size: 30px;
+    -fx-padding: 1px;
+    -fx-border-width: 1;
+    -fx-border-color: -color-border-default;
+    -fx-background-color: transparent;
+}
+
+.duration-picker .picker .container {
+    -fx-spacing: 0px;
+    -fx-padding: 0px;
+}
+
+.duration-picker .picker:vertical .segment {
+    -fx-background-color: -color-bg-default;
+    -fx-pref-height: 150;
+    -fx-pref-width: 50;
+    -fx-padding: 0px;
+}
+
+.duration-picker .picker:vertical .segment > .segment-cell {
+    -fx-font-family: null;
+    -fx-text-fill: -color-fg-default;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.duration-picker .picker:vertical .colon {
+    -fx-padding: 0px 2px;
+    -fx-font-family: null;
+    -fx-pref-width: 5;
+    -fx-font-size: 1em;
+    -fx-background-color: transparent;
+}
+
+.duration-picker .picker:vertical > .shadow {
+    -fx-background-color: transparent;
+}
+
+.duration-picker .picker:vertical > .indicator {
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 1px;
+    -fx-border-insets: 0px;
+    -fx-background-color: -color-accent-emphasis;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+}
+
+.duration-picker .picker:vertical .segment-separator {
+    -fx-background-color: -color-border-default;
+}
+
+/* -----------------------------------------------------------------------
  * SemiCircleProgressIndicator
  */
 .semi-circle-progress-indicator {
@@ -1335,12 +1517,12 @@
  * DrawerStackpane
  */
 
+.drawer-stackpane {
+}
+
 .drawer-stackpane > .drawer {
     -fx-background-color: -color-border-default, -color-neutral-subtle;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
-}
-
-.drawer-stackpane {
 }
 
 .drawer-stackpane > .drawer > .top > .header {
