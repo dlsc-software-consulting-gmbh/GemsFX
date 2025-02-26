@@ -24,6 +24,7 @@ public class EmailFieldApp extends GemApplication {
     @Override
     public void start(Stage stage) { super.start(stage);
         EmailField view = new EmailField();
+        view.setPromptText("Enter an email address");
 
         CheckBox required = new CheckBox("Required");
         required.selectedProperty().bindBidirectional(view.requiredProperty());
