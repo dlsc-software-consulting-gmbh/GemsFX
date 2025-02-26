@@ -23,6 +23,8 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
 
     private boolean popupNeedsReconfiguring = true;
 
+    private PopupControl popup;
+
     public CustomComboBoxSkinBase(T control) {
         super(control);
 
@@ -41,8 +43,6 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
         });
 
     }
-
-    private PopupControl popup;
 
     private PopupControl getPopup() {
         if (popup == null) {
@@ -166,7 +166,6 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
                 show();
             }
         });
-
     }
 
     void reconfigurePopup() {

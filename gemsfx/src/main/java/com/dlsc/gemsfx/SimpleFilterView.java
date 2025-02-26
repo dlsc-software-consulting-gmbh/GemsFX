@@ -18,6 +18,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.util.StringConverter;
 
 import java.time.LocalDate;
@@ -56,8 +57,6 @@ public class SimpleFilterView extends HBox {
     public SimpleFilterView() {
         getStyleClass().add("simple-filter-view");
 
-        setFillHeight(false);
-
         layoutModeProperty().addListener(it -> updatePseudoClass());
         updatePseudoClass();
 
@@ -86,7 +85,10 @@ public class SimpleFilterView extends HBox {
 
     private void updateNodeStyles(Node node) {
         node.getStyleClass().removeAll("first", "middle", "last", "only", "selection-item");
-        node.getStyleClass().add("selection-item");
+        node.getStyleClass().addAll("selection-item", "button");
+        if (node instanceof Region) {
+            ((Region) node).setMaxHeight(Double.MAX_VALUE);
+        }
     }
 
     private void updatePseudoClass() {

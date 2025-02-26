@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import atlantafx.base.theme.NordDark;
 import atlantafx.base.theme.NordLight;
-import com.dlsc.gemsfx.App;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterView;
 import com.dlsc.gemsfx.infocenter.Notification;
@@ -29,8 +28,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.apache.commons.lang3.StringUtils;
-import org.controlsfx.glyphfont.FontAwesome;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
