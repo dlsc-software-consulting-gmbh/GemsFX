@@ -51,7 +51,8 @@ public class SimpleFilterViewApp extends GemApplication {
         filterView1.addCalendarPicker("Date");
         filterView1.layoutModeProperty().bindBidirectional(layoutMode);
         filterView1.getChildren().add(new MenuButton("Test"));
-        filterView1.getChildren().add(new DatePicker());
+        //filterView1.getChildren().add(new DatePicker());
+
         ChipsViewContainer chipsViewContainer1 = new ChipsViewContainer();
         chipsViewContainer1.setOnClear(filterView1::clear);
         chipsViewContainer1.chipsProperty().bind(filterView1.chipsProperty());
@@ -91,7 +92,11 @@ public class SimpleFilterViewApp extends GemApplication {
         VBox box = new VBox(20, box1, box2, layoutModeComboBox, scenicView);
         box.setAlignment(Pos.CENTER);
         box.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+
         StackPane stackPane = new StackPane(box);
+        if (Boolean.getBoolean("atlantafx")) {
+            stackPane.setStyle("-fx-background-color: -color-page-base;");
+        }
 
         Scene scene = new Scene(stackPane);
 

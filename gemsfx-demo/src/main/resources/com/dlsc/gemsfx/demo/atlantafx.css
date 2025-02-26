@@ -446,9 +446,9 @@
     -fx-background-color: transparent;
 }
 
-.search-field  .graphic-wrapper .history-button:hover,
-.search-field  .graphic-wrapper .history-button:pressed,
-.search-field  .graphic-wrapper .history-button:popup-showing {
+.search-field .graphic-wrapper .history-button:hover,
+.search-field .graphic-wrapper .history-button:pressed,
+.search-field .graphic-wrapper .history-button:popup-showing {
 }
 
 .search-field .graphic-wrapper .history-button:disabled-popup,
@@ -457,14 +457,14 @@
     -fx-cursor: text;
 }
 
-.search-field  .graphic-wrapper .history-button:pressed {
+.search-field .graphic-wrapper .history-button:pressed {
 }
 
-.search-field  .graphic-wrapper .history-button > .icon {
+.search-field .graphic-wrapper .history-button > .icon {
     -fx-background-color: -color-fg-default;
 }
 
-.search-field  .graphic-wrapper .history-button:disabled-popup > .icon {
+.search-field .graphic-wrapper .history-button:disabled-popup > .icon {
 }
 
 /* -----------------------------------------------------------------------
@@ -473,7 +473,7 @@
 .search-field-list-view {
     -fx-background-color: -color-bg-default;
     -fx-background-insets: 0px;
-    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.2) , 12, 0.0 , 0 , 8 );
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
     -fx-pref-height: 200px;
 }
 
@@ -490,8 +490,8 @@
     -fx-background-color: -color-bg-subtle;
 }
 
-.search-field-list-view  > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
-.search-field-list-view  > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+.search-field-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.search-field-list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
     -fx-background-color: -color-list-selected;
 }
 
@@ -606,20 +606,21 @@
 .simple-filter-view:compact .selection-item > .arrow-button {
 }
 
-.simple-filter-view:compact .combo-box-base.selection-item.first {
-    -fx-background-color: -color-border-default, -color-bg-default;
+.simple-filter-view .selection-item {
+    -fx-background-color: -color-button-border, -color-button-bg;
+}
+
+.simple-filter-view:compact .selection-item.first {
     -fx-background-insets: 0px, 1px 0px 1px 1px;
     -fx-background-radius: 1px 0px 0px 1px, 0px;
 }
 
-.simple-filter-view:compact .combo-box-base.selection-item.middle {
-    -fx-background-color: -color-border-default, -color-bg-default;
+.simple-filter-view:compact .selection-item.middle {
     -fx-background-insets: 0px, 1px 0px 1px 1px;
     -fx-background-radius: 0px, 0px;
 }
 
-.simple-filter-view:compact .combo-box-base.selection-item.last {
-    -fx-background-color: -color-border-default, -color-bg-default;
+.simple-filter-view:compact .selection-item.last {
     -fx-background-insets: 0px, 1px 1px 1px 1px;
     -fx-background-radius: 0px 1px 1px 0px, 0px;
 }
