@@ -1295,6 +1295,7 @@
 }
 
 .dialog-pane > .content-pane > .glass-pane {
+    -fx-background-color: -color-dark;
 }
 
 .dialog-pane > .content-pane > .vbox {
@@ -1378,7 +1379,7 @@
 }
 
 .dialog-pane > .glass-pane {
-    -fx-background-color: -color-bg-overlay;
+    -fx-background-color: -color-dark;
 }
 
 /* ----------------------------------------------------------------------------
