@@ -444,7 +444,8 @@ public class DialogPane extends Pane {
             textArea.setResizeVertical(true);
             textArea.setEditable(false);
             textArea.getStyleClass().add("error-text-area");
-            textArea.setMaxHeight(Double.MAX_VALUE);
+            textArea.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            VBox.setVgrow(textArea, Priority.ALWAYS);
 
             if (onSend != null) {
                 ButtonType button = new ButtonType(getSendButtonText(), ButtonBar.ButtonData.LEFT);
