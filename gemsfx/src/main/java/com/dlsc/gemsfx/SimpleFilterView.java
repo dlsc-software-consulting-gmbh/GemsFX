@@ -306,31 +306,13 @@ public class SimpleFilterView extends HBox {
 
         ListChangeListener<? super T> l = c -> {
             while (c.next()) {
-                if (c.wasAdded()) {
-                    c.getAddedSubList().forEach(item -> {
-                        ChipView<T> chip = new ChipView<>();
-                        chip.setValue(item);
-                        chip.textProperty().bind(Bindings.createStringBinding(() -> {
-                            StringConverter<T> itemConverter = box.getItemConverter();
-                            if (itemConverter != null) {
-                                return itemConverter.toString(item);
-                            }
-                            return "";
-                        }, box.itemConverterProperty()));
-                        chip.setOnClose(status -> box.getSelectionModel().clearSelection(box.getItems().indexOf(status)));
-                        getChips().add(chip);
-                        map.computeIfAbsent(box, it -> new HashMap<>()).put(item, chip);
-                    });
+                if (c.wasReplaced()) {
+                    removeChips(c.getRemoved(), box);
+                    addChips(c.getAddedSubList(), box);
                 } else if (c.wasRemoved()) {
-                    c.getRemoved().forEach(item -> {
-                        Map<Object, ChipView<?>> innerMap = map.get(box);
-                        if (innerMap != null) {
-                            ChipView<?> chip = innerMap.remove(item);
-                            if (chip != null) {
-                                getChips().remove(chip);
-                            }
-                        }
-                    });
+                    removeChips(c.getRemoved(), box);
+                } else if (c.wasAdded()) {
+                    addChips(c.getAddedSubList(), box);
                 }
             }
         };
@@ -339,6 +321,35 @@ public class SimpleFilterView extends HBox {
         getChildren().add(box);
 
         return box;
+    }
+
+    private <T> void removeChips(List<? extends T> removedList, SelectionBox<T> box) {
+        removedList.forEach(item -> {
+            Map<Object, ChipView<?>> innerMap = map.get(box);
+            if (innerMap != null) {
+                ChipView<?> chip = innerMap.remove(item);
+                if (chip != null) {
+                    getChips().remove(chip);
+                }
+            }
+        });
+    }
+
+    private <T> void addChips(List<? extends T> addedList, SelectionBox<T> box) {
+        addedList.forEach(item -> {
+            ChipView<T> chip = new ChipView<>();
+            chip.setValue(item);
+            chip.textProperty().bind(Bindings.createStringBinding(() -> {
+                StringConverter<T> itemConverter = box.getItemConverter();
+                if (itemConverter != null) {
+                    return itemConverter.toString(item);
+                }
+                return "";
+            }, box.itemConverterProperty()));
+            chip.setOnClose(status -> box.getSelectionModel().clearSelection(box.getItems().indexOf(status)));
+            getChips().add(chip);
+            map.computeIfAbsent(box, it -> new HashMap<>()).put(item, chip);
+        });
     }
 
     /**
