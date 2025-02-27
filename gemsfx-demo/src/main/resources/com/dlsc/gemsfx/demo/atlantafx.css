@@ -1614,6 +1614,8 @@
 }
 
 .date-range-picker > .outer-range-container > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0px;
     -fx-background-radius: 0px;
     -fx-padding: 8px 8px 8px 12px;
 }
