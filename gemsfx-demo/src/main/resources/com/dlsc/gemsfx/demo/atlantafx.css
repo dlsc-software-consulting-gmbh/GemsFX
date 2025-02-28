@@ -1226,7 +1226,7 @@
 }
 
 .grid-table-view > .grid-pane > .column-header.last {
-    -fx-border-width: 1px;
+    -fx-background-insets: 0, 0 0 1 0;
 }
 
 .grid-table-view > .grid-pane > .column-header-background {
