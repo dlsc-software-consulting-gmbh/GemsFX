@@ -135,7 +135,10 @@ public class TagsFieldApp extends GemApplication {
             }
         });
 
-        HBox buttonBox = new HBox(10, scenicViewButton, generateButton);
+        Button clearButton = new Button("Clear Tags");
+        clearButton.setOnAction(evt -> field.getTags().clear());
+
+        HBox buttonBox = new HBox(10, scenicViewButton, generateButton, clearButton);
 
         VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, singleSelectionBox, hBox, hBox2, hBox2a, hBox3, hBox4, buttonBox, field);
         vbox.setPadding(new Insets(20));
