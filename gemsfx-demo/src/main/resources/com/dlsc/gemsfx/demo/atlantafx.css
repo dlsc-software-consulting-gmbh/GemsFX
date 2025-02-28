@@ -3,6 +3,55 @@
 }
 
 /* -----------------------------------------------------------------------
+ * TagsField
+ */
+.tags-field {
+    -fx-padding: 0em;
+    -fx-border-color: -color-border-default;
+}
+
+.tags-field:contains-focus {
+    -fx-highlight-fill: -color-accent-emphasis;
+    -fx-highlight-text-fill: -color-fg-emphasis;
+}
+
+.tags-field .graphic-wrapper {
+    -fx-padding: 0em 0em;
+}
+
+.tags-field .graphic-wrapper .ikonli-font-icon {
+    -fx-icon-size: 16px;
+    -fx-icon-color: -color-fg-default;
+}
+
+.tags-field .auto-completion-label {
+    -fx-text-fill: -color-fg-subtle;
+}
+
+.tags-field > .flow-pane {
+}
+
+.tags-field > .flow-pane > .text-field {
+}
+
+.tags-field:filled > .flow-pane > .text-field {
+}
+
+.tags-field > .flow-pane > .tag-view.first {
+}
+
+.tags-field > .flow-pane > .tag-view {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+    -fx-cursor: default;
+}
+
+.tags-field > .flow-pane > .tag-view:selected {
+    -fx-background-color: -color-accent-emphasis, -color-accent-muted;
+    -fx-text-fill: -color-accent-emphasis;
+}
+
+/* -----------------------------------------------------------------------
  * EnhancedLabel
  */
 .enhanced-label:selected {
