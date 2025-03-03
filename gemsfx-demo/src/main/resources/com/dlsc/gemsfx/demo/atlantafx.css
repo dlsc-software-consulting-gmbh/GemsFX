@@ -850,7 +850,7 @@
 }
 
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane {
-    -fx-background-color: -color-button-bg;
+    -fx-background-color: -color-bg-subtle;
 }
 
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
