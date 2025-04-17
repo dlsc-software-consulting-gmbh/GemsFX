@@ -267,15 +267,20 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
 
         if (getSelectionMode() == SelectionMode.SINGLE) {
             select(0);
-        } else {
-            clearSelection();
-            for (int i = 0; i < items.size(); i++) {
-                selectedIndices.add(i);
-                selectedItems.add(items.get(i));
-            }
-            setSelectedIndex(items.size() - 1);
-            setSelectedItem(items.get(items.size() - 1));
+            return;
         }
+
+        int size = items.size();
+        List<Integer> indexList = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            indexList.add(i);
+        }
+
+        selectedIndices.setAll(indexList);
+        selectedItems.setAll(new ArrayList<>(items));
+
+        setSelectedIndex(size - 1);
+        setSelectedItem(items.get(size - 1));
     }
 
     @Override
