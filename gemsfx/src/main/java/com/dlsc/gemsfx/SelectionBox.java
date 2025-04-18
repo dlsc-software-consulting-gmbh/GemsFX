@@ -393,6 +393,15 @@ public class SelectionBox<T> extends Control {
      * <p>
      * If the selected items list is {@code null} or empty, the {@code promptTextProperty()} value will
      * be used instead, so there is no need to handle these cases within the converter.
+     * You can also choose to always return your own string (for example, "Select" or "Please choose")
+     * <pre>{@code
+     * selectionBox.setSelectedItemsConverter(
+     *     new SimpleStringConverter<>(selectedItems -> {
+     *         // return "Select";
+     *         return selectionBox.getPromptText();
+     *     })
+     * );
+     * }</pre>
      * <p>
      * The {@code selectedItemsConverterProperty} provides a way to bind the display logic to UI components,
      * enabling dynamic updates whenever the selected items change or the converter is redefined.
