@@ -248,14 +248,43 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
 
     @Override
     public void selectIndices(int index, int... indices) {
-        if (getSelectionMode() == SelectionMode.SINGLE) {
-            clearAndSelect(index);
-        } else {
-            select(index);
+        ObservableList<T> items = getItems();
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+
+        List<Integer> requestedIndices = new ArrayList<>(1 + (indices == null ? 0 : indices.length));
+        requestedIndices.add(index);
+        if (indices != null) {
             for (int idx : indices) {
-                select(idx);
+                requestedIndices.add(idx);
             }
         }
+
+        List<Integer> validNewIndices = requestedIndices.stream().filter(i -> i >= 0 && i < items.size())
+                .filter(i -> !selectedIndices.contains(i))
+                .distinct()
+                .toList();
+
+        if (validNewIndices.isEmpty()) {
+            return;
+        }
+
+        int lastIndex = validNewIndices.get(validNewIndices.size() - 1);
+
+        // SINGLE SELECTION MODE: select the last valid index
+        if (getSelectionMode() == SelectionMode.SINGLE) {
+            clearAndSelect(lastIndex);
+            return;
+        }
+
+        // MULTIPLE SELECTION MODE: add all valid indices
+        selectedIndices.addAll(validNewIndices);
+        selectedItems.addAll(validNewIndices.stream().map(items::get).toList());
+
+        // Set the last selected item
+        setSelectedIndex(lastIndex);
+        setSelectedItem(items.get(lastIndex));
     }
 
     @Override
