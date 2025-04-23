@@ -41,10 +41,10 @@ public class SessionManagerApp extends Application {
     public void start(Stage primaryStage) {
         // Set up session manager
         SessionManager sessionManager = new SessionManager(Preferences.userNodeForPackage(SessionManagerApp.class));
-        sessionManager.register("session.manager.app5.user.name", userName);
-        sessionManager.register("session.manager.app5.score", score);
-        sessionManager.register("session.manager.app5.dark.mode", darkModeEnabled);
-        sessionManager.register("session.manager.app5.birth.date", birthDateString);
+        sessionManager.register("session.manager.app.user.name", userName);
+        sessionManager.register("session.manager.app.score", score);
+        sessionManager.register("session.manager.app.dark.mode", darkModeEnabled);
+        sessionManager.register("session.manager.app.birth.date", birthDateString);
 
         // UI Elements
 
