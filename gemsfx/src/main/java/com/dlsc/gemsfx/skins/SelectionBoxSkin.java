@@ -25,6 +25,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
@@ -538,13 +539,17 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
             radioButton.setMaxWidth(Double.MAX_VALUE);
             radioButton.setToggleGroup(toggleGroup);
             radioButton.setSelected(popup.getOwner().getSelectionModel().isSelected(index));
-            radioButton.setOnAction(e -> {
-                if (!isUpdating()) {
-                    if (radioButton.isSelected()) {
+            // Use onMouseClicked instead of onAction to ensure click on already-selected item still closes popup
+            radioButton.setOnMouseClicked(e -> {
+                if (!isUpdating() && e.getButton() == MouseButton.PRIMARY) {
+                    boolean alreadySelected = popup.getOwner().getSelectionModel().isSelected(index);
+
+                    if (!alreadySelected) {
                         popup.getOwner().getSelectionModel().clearAndSelect(index);
-                        if (popup.getOwner().isAutoHideOnSelection()) {
-                            popup.hide();
-                        }
+                    }
+
+                    if (popup.getOwner().isAutoHideOnSelection()) {
+                        popup.hide();
                     }
                 }
             });
