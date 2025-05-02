@@ -494,11 +494,9 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
                 if (change.wasAdded()) {
                     if (UPDATE_POPUP_CONTENT.equals(change.getKey())) {
                         updatePopupContent();
-                        popup.getProperties().remove(UPDATE_POPUP_CONTENT);
                     }
                     if (UPDATE_SELECTION_IN_POPUP.equals(change.getKey())) {
                         updateSelectionInPopup();
-                        popup.getProperties().remove(UPDATE_SELECTION_IN_POPUP);
                     }
                 }
             });
@@ -530,6 +528,8 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
                     optionsBox.getChildren().add(radioButton);
                 }
             }
+            // Always clear the update flag to avoid blocking future updates.
+            popup.getProperties().remove(UPDATE_POPUP_CONTENT);
         }
 
         private RadioButton createRadioButtonItem(T item, ToggleGroup toggleGroup, int index) {
@@ -587,6 +587,8 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
             }
 
             updating.set(false);
+            // Always clear the update flag to avoid blocking future updates.
+            popup.getProperties().remove(UPDATE_SELECTION_IN_POPUP);
         }
 
         // updating
