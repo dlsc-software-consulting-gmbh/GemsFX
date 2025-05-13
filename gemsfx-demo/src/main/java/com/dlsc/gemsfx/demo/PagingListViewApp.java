@@ -30,13 +30,11 @@ public class PagingListViewApp extends GemApplication {
 
     private final BooleanProperty simulateNoData = new SimpleBooleanProperty(false);
 
-    private final IntegerProperty count = new SimpleIntegerProperty(55);
+    private final IntegerProperty count = new SimpleIntegerProperty(52);
 
     @Override
     public void start(Stage stage) { super.start(stage);
         PagingListView<String> pagingListView = new PagingListView<>();
-        pagingListView.setPrefWidth(600);
-        pagingListView.setPageSize(10);
         pagingListView.setLoader(loadRequest -> {
             if (simulateDelayProperty.get()) {
                 try {
@@ -49,7 +47,7 @@ public class PagingListViewApp extends GemApplication {
             int offset = loadRequest.getPage() * loadRequest.getPageSize();
             for (int i = 0; i < loadRequest.getPageSize(); i++) {
                 int index = offset + i + 1;
-                if (index <= pagingListView.getTotalItemCount()) {
+                if (index <= count.get()) {
                     data.add("Item " + (offset + i + 1));
                 } else {
                     break;
@@ -57,6 +55,8 @@ public class PagingListViewApp extends GemApplication {
             }
             return new PagingLoadResponse<>(data, simulateNoData.get() ? 0 : count.get());
         });
+        pagingListView.setPrefWidth(600);
+        pagingListView.setPageSize(5);
 
         simulateNoData.addListener(it -> pagingListView.reload());
 
