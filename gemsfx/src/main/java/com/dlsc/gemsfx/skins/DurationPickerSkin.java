@@ -7,13 +7,13 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import javafx.util.Pair;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -25,7 +25,7 @@ public class DurationPickerSkin extends ToggleVisibilityComboBoxSkin<DurationPic
 
     private final HBox box;
     private final Spacer spacer;
-    private final Button editButton;
+    private final StackPane arrowButton;
     private final HBox innerBox = new HBox();
     private final List<DurationUnitField> durationUnitFields = new ArrayList<>();
 
@@ -34,18 +34,19 @@ public class DurationPickerSkin extends ToggleVisibilityComboBoxSkin<DurationPic
     public DurationPickerSkin(DurationPicker picker) {
         super(picker);
 
-        editButton = new Button();
-        editButton.getStyleClass().add("edit-button");
-        editButton.addEventHandler(MouseEvent.MOUSE_ENTERED, this::mouseEntered);
-        editButton.addEventHandler(MouseEvent.MOUSE_EXITED, this::mouseExited);
-        editButton.addEventHandler(MouseEvent.MOUSE_RELEASED, this::mouseReleased);
+        Region arrow = new Region();
+        arrow.getStyleClass().add("arrow");
+        arrow.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
-        editButton.setMaxHeight(Double.MAX_VALUE);
-        editButton.setMaxWidth(Double.MAX_VALUE);
-        editButton.setGraphic(new FontIcon());
-        editButton.setFocusTraversable(false);
-        editButton.visibleProperty().bind(picker.showPopupTriggerButtonProperty());
-        editButton.managedProperty().bind(picker.showPopupTriggerButtonProperty());
+        arrowButton = new StackPane(arrow);
+        arrowButton.getStyleClass().add("arrow-button");
+        arrowButton.addEventHandler(MouseEvent.MOUSE_ENTERED, this::mouseEntered);
+        arrowButton.addEventHandler(MouseEvent.MOUSE_EXITED, this::mouseExited);
+        arrowButton.addEventHandler(MouseEvent.MOUSE_RELEASED, this::mouseReleased);
+
+        arrowButton.setFocusTraversable(false);
+        arrowButton.visibleProperty().bind(picker.showPopupTriggerButtonProperty());
+        arrowButton.managedProperty().bind(picker.showPopupTriggerButtonProperty());
 
         InvalidationListener updateListener = it -> buildView();
         picker.fieldsProperty().addListener(updateListener);
@@ -65,24 +66,34 @@ public class DurationPickerSkin extends ToggleVisibilityComboBoxSkin<DurationPic
         buildView();
     }
 
+    @Override
+    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return box.prefWidth(height) + leftInset + rightInset;
+    }
+
+    @Override
+    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return box.prefHeight(width) + topInset + bottomInset;
+    }
+
     private void updateBox() {
         CustomComboBox.ButtonDisplay value = getSkinnable().getButtonDisplay();
         switch (value) {
             case LEFT:
-                box.getChildren().setAll(editButton, spacer, innerBox);
-                HBox.setHgrow(editButton, Priority.NEVER);
+                box.getChildren().setAll(arrowButton, spacer, innerBox);
+                HBox.setHgrow(arrowButton, Priority.NEVER);
                 break;
             case RIGHT:
-                box.getChildren().setAll(innerBox, spacer, editButton);
-                HBox.setHgrow(editButton, Priority.NEVER);
+                box.getChildren().setAll(innerBox, spacer, arrowButton);
+                HBox.setHgrow(arrowButton, Priority.NEVER);
                 break;
             case BUTTON_ONLY:
-                box.getChildren().setAll(editButton);
-                HBox.setHgrow(editButton, Priority.ALWAYS);
+                box.getChildren().setAll(arrowButton);
+                HBox.setHgrow(arrowButton, Priority.ALWAYS);
                 break;
             case FIELD_ONLY:
                 box.getChildren().setAll(innerBox);
-                HBox.setHgrow(editButton, Priority.NEVER);
+                HBox.setHgrow(arrowButton, Priority.NEVER);
                 break;
         }
     }

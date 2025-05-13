@@ -1,10 +1,12 @@
 package com.dlsc.gemsfx.demo;
 
+import com.dlsc.gemsfx.CalendarPicker;
 import com.dlsc.gemsfx.ChipsViewContainer;
 import com.dlsc.gemsfx.DurationPicker;
 import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.SimpleFilterView;
 import com.dlsc.gemsfx.TimePicker;
+import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
@@ -17,11 +19,13 @@ import javafx.geometry.Side;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -36,8 +40,37 @@ public class SimpleFilterViewApp extends GemApplication {
     public void start(Stage stage) {
         super.start(stage);
 
+        HBox hbox = new HBox(5);
+        hbox.setFillHeight(false);
+        if (Boolean.getBoolean("atlantafx")) {
+            hbox.setStyle("-fx-background-color: -color-danger-emphasis; -fx-padding: 1px;");
+        } else {
+            hbox.setStyle("-fx-background-color: red; -fx-padding: 1px;");
+        }
+        hbox.getChildren().add(new SelectionBox<>(HPos.values()));
+        hbox.getChildren().add(new DatePicker());
+        hbox.getChildren().add(new DateRangePicker());
+        DateRangePicker dateRangePicker = new DateRangePicker();
+        dateRangePicker.setShowPresetTitle(false);
+        dateRangePicker.setPromptText("Range");
+        dateRangePicker.setShowIcon(false);
+        hbox.getChildren().add(dateRangePicker);
+        hbox.getChildren().add(new CalendarPicker());
+        hbox.getChildren().add(new ComboBox<>());
+        hbox.getChildren().add(new TimePicker());
+        hbox.getChildren().add(new DurationPicker());
+        hbox.getChildren().add(new MenuButton("Menu Button"));
+        hbox.getChildren().add(new Button("Button"));
+        hbox.getChildren().add(new ChoiceBox<>());
+
+        VBox box0 = new VBox(5, new Label("Various controls in standard HBox container"), hbox);
+
         SimpleFilterView filterView1 = new SimpleFilterView();
-        filterView1.setStyle("-fx-background-color: red; -fx-padding: 1px;");
+        if (Boolean.getBoolean("atlantafx")) {
+            filterView1.setStyle("-fx-background-color: -color-danger-emphasis; -fx-padding: 1px;");
+        } else {
+            filterView1.setStyle("-fx-background-color: red; -fx-padding: 1px;");
+        }
         filterView1.addSelectionBox("HPos", HPos.class);
         ComboBox<String> com = new ComboBox<>();
         com.getItems().addAll("A", "B", "C");
@@ -57,7 +90,7 @@ public class SimpleFilterViewApp extends GemApplication {
         chipsViewContainer1.setOnClear(filterView1::clear);
         chipsViewContainer1.chipsProperty().bind(filterView1.chipsProperty());
 
-        VBox box1 = new VBox(5, new Label("Boxes with multiple selection support"), filterView1, chipsViewContainer1);
+        VBox box1 = new VBox(5, new Label("Boxes with multiple selection support in SimpleFilterView"), filterView1, chipsViewContainer1);
         box1.setPadding(new Insets(20));
 
         SimpleFilterView filterView2 = new SimpleFilterView();
@@ -78,7 +111,7 @@ public class SimpleFilterViewApp extends GemApplication {
         chipsViewContainer2.setOnClear(filterView2::clear);
         chipsViewContainer2.chipsProperty().bind(filterView2.chipsProperty());
 
-        VBox box2 = new VBox(5, new Label("Boxes with single selection support"), filterView2, chipsViewContainer2);
+        VBox box2 = new VBox(5, new Label("Boxes with single selection support in SimpleFilterView"), filterView2, chipsViewContainer2);
         box2.setPadding(new Insets(20));
 
         ComboBox<SimpleFilterView.LayoutMode> layoutModeComboBox = new ComboBox<>();
@@ -89,7 +122,7 @@ public class SimpleFilterViewApp extends GemApplication {
         Button scenicView = new Button("Scenic View");
         scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
 
-        VBox box = new VBox(20, box1, box2, layoutModeComboBox, scenicView);
+        VBox box = new VBox(20, box0, box1, box2, layoutModeComboBox, scenicView);
         box.setAlignment(Pos.CENTER);
         box.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 

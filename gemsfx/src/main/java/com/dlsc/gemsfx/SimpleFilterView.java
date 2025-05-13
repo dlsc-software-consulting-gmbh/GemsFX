@@ -63,8 +63,8 @@ public class SimpleFilterView extends HBox {
         getChildren().addListener((ListChangeListener<Node>) change -> {
             int size = getChildren().size();
             if (size == 1) {
-                updateNodeStyles(getChildren().get(0));
-                getChildren().get(0).getStyleClass().add("only");
+                updateNodeStyles(getChildren().getFirst());
+                getChildren().getFirst().getStyleClass().add("only");
             } else {
                 for (int i = 0; i < getChildren().size(); i++) {
 
@@ -85,7 +85,7 @@ public class SimpleFilterView extends HBox {
 
     private void updateNodeStyles(Node node) {
         node.getStyleClass().removeAll("first", "middle", "last", "only", "selection-item");
-        node.getStyleClass().addAll("selection-item", "button");
+        node.getStyleClass().add("selection-item");
         if (node instanceof Region) {
             ((Region) node).setMaxHeight(Double.MAX_VALUE);
         }

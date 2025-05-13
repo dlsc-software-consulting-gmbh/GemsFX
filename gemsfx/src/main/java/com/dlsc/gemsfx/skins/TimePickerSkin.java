@@ -122,6 +122,16 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
         getChildren().add(box);
     }
 
+    @Override
+    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return box.prefWidth(height) + leftInset + rightInset;
+    }
+
+    @Override
+    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return box.prefHeight(width) + topInset + bottomInset;
+    }
+
     private void updateFormat() {
         TimePicker picker = getSkinnable();
         if (null == picker.formatProperty().get()) {

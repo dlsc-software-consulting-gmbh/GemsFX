@@ -37,6 +37,7 @@ public class CalendarPickerSkin extends ToggleVisibilityComboBoxSkin<CalendarPic
 
         Region arrow = new Region();
         arrow.getStyleClass().add("arrow");
+        arrow.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
         arrowButton = new StackPane(arrow);
         arrowButton.setFocusTraversable(false);

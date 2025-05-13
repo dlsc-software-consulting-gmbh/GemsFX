@@ -11,26 +11,25 @@
     -fx-pref-width: 0px;
 }
 
-.duration-picker > .box > .edit-button {
-    -fx-pref-width: 27px;
-    -fx-padding: 5px 5px;
+.duration-picker > .box > .arrow-button {
     -fx-cursor: arrow;
     -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
     -fx-background-insets: 1 1 1 0, 1, 2;
     -fx-background-radius: 0 3 3 0, 0 2 2 0, 0 1 1 0;
+    -fx-padding: 8px 12px;
 }
 
-.duration-picker:left > .box > .edit-button {
+.duration-picker:left > .box > .arrow-button {
     -fx-background-insets: 1 0 1 1, 1, 2;
     -fx-background-radius: 3 0 0 3, 2 0 0 2, 1 0 0 1;
 }
 
-.duration-picker:button-only > .box > .edit-button {
+.duration-picker:button-only > .box > .arrow-button {
     -fx-background-insets: 1;
     -fx-background-radius: 3, 2, 1;
 }
 
-.duration-picker:focused > .box > .edit-button {
+.duration-picker:focused > .box > .arrow-button {
     -fx-background-color: -fx-focus-color, -fx-inner-border, -fx-body-color, -fx-faint-focus-color, -fx-body-color;
     -fx-background-insets: 0, 1, 2, 1, 2.6;
     -fx-background-radius: 0 2 2 0, 0 1 1 0, 0 1 1 0, 0 1 1 0;
@@ -39,20 +38,28 @@
     -fx-border-insets: 0 0 0 -1;
 }
 
-.duration-picker:left:focused > .box > .edit-button {
+.duration-picker:left:focused > .box > .arrow-button {
     -fx-background-radius: 2 0 0 2, 1 0 0 1, 1 0 0 1, 1 0 0 1;
     -fx-border-width: 0 1 0 0;
     -fx-border-insets: 0 -1 0 0;
 }
 
-.duration-picker:button-only:focused > .box > .edit-button {
+.duration-picker:button-only:focused > .box > .arrow-button {
     -fx-background-insets: 1, 1, 2, 1;
     -fx-background-radius: 3, 2, 1;
     -fx-border-width: 1;
     -fx-border-insets: -1;
 }
 
-.duration-picker > .box > .edit-button > .ikonli-font-icon {
+.duration-picker > .box > .arrow-button > .arrow {
+    -fx-shape: "M7.0469 18.4688 Q9.0938 20.5312 12 20.5312 Q14.9062 20.5312 16.9375 18.4688 Q18.9844 16.4062 18.9844 13.5 Q18.9844 10.5938 16.9375 8.5625 Q14.9062 6.5156 12 6.5156 Q9.0938 6.5156 7.0469 8.5625 Q5.0156 10.5938 5.0156 13.5 Q5.0156 16.4062 7.0469 18.4688 ZM19.0312 7.9219 Q19.8281 8.9531 20.4062 10.5781 Q21 12.1875 21 13.5 Q21 17.2031 18.375 19.8594 Q15.75 22.5 12 22.5 Q8.25 22.5 5.625 19.8594 Q3 17.2031 3 13.5 Q3 9.7969 5.625 7.1562 Q8.25 4.5 12 4.5 Q13.2656 4.5 14.9219 5.1094 Q16.5938 5.7188 17.625 6.5156 L19.0312 5.0625 Q19.7812 5.6719 20.4375 6.4688 L19.0312 7.9219 ZM11.0156 14.5312 L11.0156 8.5312 L12.9844 8.5312 L12.9844 14.5312 L11.0156 14.5312 ZM15 1.5 L15 3.5156 L9 3.5156 L9 1.5 L15 1.5 Z";
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 6px;
+    -fx-scale-shape: true;
+}
+
+.duration-picker > .box > .arrow-button > .ikonli-font-icon {
     -fx-icon-code: mdi-timer;
     -fx-icon-size: 14px;
     -fx-icon-color: -fx-mark-color;
@@ -83,6 +90,7 @@
 .duration-picker > .box > .fields-box > .unit-field:focused {
     -fx-background-radius: 2px;
     -fx-background-color: -fx-selection-bar;
+    -fx-background-insets: 1px;
     -fx-text-fill: white;
 }
 
@@ -93,7 +101,7 @@
 /* -----------------------------------------------------------------------------------------------------
  * DurationPickerPopupView
  */
-.picker {
+.duration-picker .popup .picker {
     -fx-cell-size: 30px;
     -fx-indicator-size: 30px;
     -fx-padding: 1px;
@@ -102,19 +110,19 @@
     -fx-background-color: -fx-control-inner-background;
 }
 
-.picker .container {
+.duration-picker .popup .picker .container {
     -fx-spacing: 0px;
     -fx-padding: 0px;
 }
 
-.picker:vertical .segment {
+.duration-picker .popup .picker:vertical .segment {
     -fx-background-color: -fx-control-inner-background;
     -fx-pref-height: 150;
     -fx-pref-width: 50;
     -fx-padding: 0px;
 }
 
-.picker:vertical .segment > .segment-cell {
+.duration-picker .popup .picker:vertical .segment > .segment-cell {
     -fx-font-size: 1em;
     -fx-font-family: null;
     -fx-text-fill: black;
@@ -122,7 +130,7 @@
     -fx-background-insets: 0;
 }
 
-.picker:vertical .colon {
+.duration-picker .popup .picker:vertical .colon {
     -fx-padding: 0px 2px;
     -fx-font-family: null;
     -fx-pref-width: 5;
@@ -130,11 +138,11 @@
     -fx-background-color: transparent;
 }
 
-.picker:vertical > .shadow {
+.duration-picker .popup .picker:vertical > .shadow {
     -fx-background-color: transparent;
 }
 
-.picker:vertical > .indicator {
+.duration-picker .popup .picker:vertical > .indicator {
     -fx-border-color: black;
     -fx-border-width: 1;
     -fx-border-insets: 0;
@@ -144,7 +152,7 @@
     -fx-opacity: .4;
 }
 
-.picker:vertical .segment-separator {
+.duration-picker .popup .picker:vertical .segment-separator {
     -fx-background-color: -fx-box-border;
     -fx-pref-width: 1;
     -fx-min-width: 1;

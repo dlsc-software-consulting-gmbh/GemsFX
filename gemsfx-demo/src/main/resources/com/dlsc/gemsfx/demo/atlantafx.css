@@ -1,5 +1,299 @@
-.root {
-    -fx-mark-highlight-color: red;
+/* -----------------------------------------------------------------------
+ * DurationPicker
+ */
+.duration-picker {
+    -fx-padding: 8px 12px;
+}
+
+.duration-picker > .box {
+    -fx-alignment: center;
+    -fx-spacing: 0px;
+}
+
+.duration-picker > .box > .spacer {
+    -fx-pref-width: 0px;
+}
+
+.duration-picker > .box > .arrow-button {
+    -fx-padding: 2px 0px 2px 12px;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+}
+
+.duration-picker:left > .box > .arrow-button {
+    -fx-background-insets: 1 0 1 1, 1, 2;
+    -fx-background-radius: 3 0 0 3, 2 0 0 2, 1 0 0 1;
+}
+
+.duration-picker:button-only > .box > .arrow-button {
+    -fx-background-insets: 1;
+    -fx-background-radius: 3, 2, 1;
+}
+
+.duration-picker:focused > .box > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-border-insets: 0;
+}
+
+.duration-picker:left:focused > .box > .arrow-button {
+    -fx-background-radius: 0px;
+    -fx-border-width: 0;
+    -fx-border-insets: 0;
+}
+
+.duration-picker:button-only:focused > .box > .arrow-button {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+    -fx-border-insets: 0;
+}
+
+.duration-picker > .box > .arrow-button > .arrow {
+    -fx-background-color: -color-fg-muted;
+    -fx-background-insets: 0;
+}
+
+.duration-picker > .box > .fields-box {
+    -fx-padding: 0px;
+}
+
+.duration-picker > .box > .fields-box > .separator {
+    -fx-padding: 0.333333em 0.083333em;
+}
+
+.duration-picker > .box > .fields-box > .unit-field {
+    -fx-padding: 0.333333em 0.166667em 0.333333em 0.166667em;
+    -fx-alignment: center;
+}
+
+.duration-picker > .box > .fields-box > .unit-field.no-label {
+}
+
+.duration-picker > .box > .fields-box > .unit-field.short-label {
+}
+
+.duration-picker > .box > .fields-box > .unit-field.long-label {
+}
+
+.duration-picker > .box > .fields-box > .unit-field:focused {
+    -fx-background-radius: 2px;
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: white;
+}
+
+.duration-picker .popup {
+    -fx-background-color: -color-bg-default;
+}
+
+/* -----------------------------------------------------------------------------------------------------
+ * DurationPickerPopupView
+ */
+.duration-picker .picker {
+    -fx-cell-size: 30px;
+    -fx-indicator-size: 30px;
+    -fx-padding: 1px;
+    -fx-border-width: 1;
+    -fx-border-color: -fx-box-border;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.duration-picker .picker .container {
+    -fx-spacing: 0px;
+    -fx-padding: 0px;
+}
+
+.duration-picker .picker:vertical .segment {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-pref-height: 150;
+    -fx-pref-width: 50;
+    -fx-padding: 0px;
+}
+
+.duration-picker .picker:vertical .segment > .segment-cell {
+    -fx-font-size: 1em;
+    -fx-font-family: null;
+    -fx-text-fill: black;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.duration-picker .picker:vertical .colon {
+    -fx-padding: 0px 2px;
+    -fx-font-family: null;
+    -fx-pref-width: 5;
+    -fx-font-size: 1em;
+    -fx-background-color: transparent;
+}
+
+.duration-picker .picker:vertical > .shadow {
+    -fx-background-color: transparent;
+}
+
+.duration-picker .picker:vertical > .indicator {
+    -fx-border-color: black;
+    -fx-border-width: 1;
+    -fx-border-insets: 0;
+    -fx-background-color: -fx-accent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-opacity: .4;
+}
+
+.duration-picker .picker:vertical .segment-separator {
+    -fx-background-color: -fx-box-border;
+    -fx-pref-width: 1;
+    -fx-min-width: 1;
+    -fx-max-width: 1;
+    -fx-pref-height: 20;
+}
+
+/* -----------------------------------------------------------------------
+ * TimePicker
+ */
+.time-picker {
+    -fx-padding: 8px 12px;
+}
+
+.time-picker > .box {
+    -fx-alignment: center;
+    -fx-spacing: 0px;
+}
+
+.time-picker > .box > .spacer {
+    -fx-pref-width: 0px;
+}
+
+.time-picker > .box > .edit-button {
+    -fx-padding: 0px;
+    -fx-cursor: arrow;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+}
+
+.time-picker:left > .box > .edit-button {
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+}
+
+.time-picker:button-only > .box > .edit-button {
+    -fx-background-insets: 1px;
+    -fx-background-radius: 0px;
+}
+
+.time-picker:focused > .box > .edit-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0px;
+    -fx-border-insets: 0px;
+}
+
+.time-picker:left:focused > .box > .edit-button {
+    -fx-background-radius: 0px;
+    -fx-border-width: 0px;
+    -fx-border-insets: 0px;
+}
+
+.time-picker:button-only:focused > .box > .edit-button {
+    -fx-background-insets: 1px;
+    -fx-background-radius: 0px;
+    -fx-border-width: 1px;
+    -fx-border-insets: 0px;
+}
+
+.time-picker > .box > .edit-button > .ikonli-font-icon {
+    -fx-icon-color: -color-fg-default;
+}
+
+.time-picker > .box > .fields-box {
+    -fx-padding: 0px 5px;
+}
+
+.time-picker > .box > .fields-box > .separator {
+    -fx-padding: 0px 1px;
+}
+
+.time-picker > .box > .fields-box > .separator:empty {
+    -fx-text-fill: -color-fg-muted;
+}
+
+.time-picker > .box > .fields-box > .time-field {
+    -fx-padding: 0em;
+}
+
+.time-picker > .box > .fields-box > .time-field:empty {
+    -fx-text-fill: -color-fg-muted;
+}
+
+.time-picker > .box > .fields-box > .time-field:focused {
+    -fx-background-radius: 2px;
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.time-picker > .box > .fields-box > .time-field.hour {
+}
+
+.time-picker > .box > .fields-box > .time-field.minute {
+}
+
+.time-picker > .box > .fields-box > .time-field.second {
+}
+
+.time-picker > .box > .fields-box > .time-field.millisecond {
+}
+
+/* --------------------------------------------------------------
+ * TimePickerPopup
+ */
+.time-picker-popup {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0, 1;
+}
+
+.time-picker-popup .time-list-view {
+    -fx-border-color: transparent;
+}
+
+.time-picker-popup .time-list-view .list-cell {
+    -fx-background-color: -color-bg-default;
+}
+
+.time-picker-popup .time-list-view .list-cell:focus-within,
+.time-picker-popup .time-list-view .list-cell:selected,
+.time-picker-popup .time-list-view .list-cell:focused,
+.time-picker-popup .time-list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.time-picker-popup .time-list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background-color: -color-bg-default;
+}
+
+.time-picker-popup .time-list-view .list-cell .time-label {
+    -fx-background-color: -color-neutral-subtle;
+    -fx-text-fill: -color-fg-default;
+}
+
+.time-picker-popup .time-list-view .list-cell:hover .time-label {
+    -fx-background-color: -color-neutral-muted;
+    -fx-background-insets: 0;
+    -fx-text-fill: -color-fg-default;
+}
+
+.time-picker-popup .time-list-view .list-cell:selected .time-label {
+    -fx-background-insets: 0;
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.time-picker-popup .time-list-view .vertical-scroll-bar {
+}
+
+.time-picker-popup .time-list-view {
 }
 
 /* -----------------------------------------------------------------------
@@ -101,10 +395,10 @@
 }
 
 .duration-picker > .box > .edit-button {
-    -fx-padding: 8px 12px;
     -fx-background-color: transparent;
     -fx-background-insets: 0px;
     -fx-background-radius: 0px;
+    -fx-padding: 0px 12px;
 }
 
 .duration-picker:left > .box > .edit-button {
@@ -124,6 +418,7 @@
     -fx-border-color: -color-border-default;
     -fx-border-width: 0px;
     -fx-border-insets: 0px;
+    -fx-padding: 0px;
 }
 
 .duration-picker:left:focused > .box > .edit-button {
@@ -139,7 +434,6 @@
     -fx-border-width: 1px;
     -fx-border-insets: 0px;
     -fx-border-color: -color-border-default;
-    -fx-padding: 12px 8px;
 }
 
 .duration-picker > .box > .edit-button > .ikonli-font-icon {
@@ -149,7 +443,7 @@
 }
 
 .duration-picker > .box > .fields-box {
-    -fx-padding: 0px 5px;
+    -fx-padding: 0px;
 }
 
 .duration-picker > .box > .fields-box > .separator {
@@ -180,7 +474,7 @@
     -fx-background-color: -color-bg-default;
 }
 
-.duration-picker .picker {
+.duration-picker .popup .picker {
     -fx-cell-size: 30px;
     -fx-indicator-size: 30px;
     -fx-padding: 1px;
@@ -189,26 +483,26 @@
     -fx-background-color: transparent;
 }
 
-.duration-picker .picker .container {
+.duration-picker .popup .picker .container {
     -fx-spacing: 0px;
     -fx-padding: 0px;
 }
 
-.duration-picker .picker:vertical .segment {
+.duration-picker .popup .picker:vertical .segment {
     -fx-background-color: -color-bg-default;
     -fx-pref-height: 150;
     -fx-pref-width: 50;
     -fx-padding: 0px;
 }
 
-.duration-picker .picker:vertical .segment > .segment-cell {
+.duration-picker .popup .picker:vertical .segment > .segment-cell {
     -fx-font-family: null;
     -fx-text-fill: -color-fg-default;
     -fx-background-color: transparent;
     -fx-background-insets: 0;
 }
 
-.duration-picker .picker:vertical .colon {
+.duration-picker .popup .picker:vertical .colon {
     -fx-padding: 0px 2px;
     -fx-font-family: null;
     -fx-pref-width: 5;
@@ -216,11 +510,11 @@
     -fx-background-color: transparent;
 }
 
-.duration-picker .picker:vertical > .shadow {
+.duration-picker .popup .picker:vertical > .shadow {
     -fx-background-color: transparent;
 }
 
-.duration-picker .picker:vertical > .indicator {
+.duration-picker .popup .picker:vertical > .indicator {
     -fx-border-color: -color-border-default;
     -fx-border-width: 1px;
     -fx-border-insets: 0px;
@@ -229,7 +523,7 @@
     -fx-background-radius: 0px;
 }
 
-.duration-picker .picker:vertical .segment-separator {
+.duration-picker .popup .picker:vertical .segment-separator {
     -fx-background-color: -color-border-default;
 }
 
@@ -572,6 +866,10 @@
     -fx-border-color: -color-border-default;
 }
 
+.calendar-picker:focused {
+    -fx-border-color: -color-accent-emphasis;
+}
+
 .calendar-picker .popup {
 }
 
@@ -582,7 +880,7 @@
 }
 
 .calendar-picker > .box > .arrow-button {
-    -fx-padding: 12px;
+    -fx-padding: 8px 12px;
     -fx-background-color: transparent;
     -fx-background-insets: 0px;
     -fx-background-radius: 0px;
@@ -619,11 +917,11 @@
 }
 
 .calendar-picker:focused > .box > .arrow-button {
-    -fx-background-color: -color-bg-default;
+    -fx-background-color: transparent;
     -fx-background-insets: 0px;
     -fx-background-radius: 0px;
-    -fx-border-color: -color-accent-emphasis;
-    -fx-border-width: 1px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0px;
     -fx-border-insets: 0px;
 }
 
@@ -650,13 +948,14 @@
 }
 
 .simple-filter-view:compact {
+    -fx-spacing: 0px;
 }
 
 .simple-filter-view:compact .selection-item > .arrow-button {
 }
 
 .simple-filter-view .selection-item {
-    -fx-background-color: -color-button-border, -color-button-bg;
+    -fx-background-color: -color-border-default, -color-bg-subtle;
 }
 
 .simple-filter-view:compact .selection-item.first {
@@ -670,13 +969,7 @@
 }
 
 .simple-filter-view:compact .selection-item.last {
-    -fx-background-insets: 0px, 1px 1px 1px 1px;
-    -fx-background-radius: 0px 1px 1px 0px, 0px;
-}
-
-.simple-filter-view:compact .combo-box-base.selection-item.last .arrow-button {
-    -fx-background-color: -color-border-default, -color-bg-default;
-    -fx-background-insets: 0px, 1px 1px 1px 1px;
+    -fx-background-insets: 0px, 1px 1px 1px 0px;
     -fx-background-radius: 0px 1px 1px 0px, 0px;
 }
 
@@ -1670,7 +1963,7 @@
 }
 
 .date-range-picker > .outer-range-container > .arrow-button > .arrow {
-    -fx-background-color: -color-fg-default;
+    -fx-background-color: -color-fg-muted;
     -fx-background-insets: 0;
 }
 

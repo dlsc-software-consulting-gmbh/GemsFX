@@ -12,8 +12,6 @@
 }
 
 .time-picker > .box > .edit-button {
-    -fx-pref-width: 27px;
-    -fx-padding: 5px 5px;
     -fx-cursor: arrow;
     -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
     -fx-background-insets: 1 1 1 0, 1, 2;
