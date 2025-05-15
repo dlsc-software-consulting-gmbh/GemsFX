@@ -21,6 +21,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.scenicview.ScenicView;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -126,9 +127,14 @@ public class StripViewApp extends GemApplication {
         vBox.setAlignment(Pos.TOP_LEFT);
 
         Scene scene = new Scene(vBox);
-        scene.setFill(Color.WHITE);
         scene.getStylesheets().add(Objects.requireNonNull(StripViewApp.class.getResource("fonts.css")).toExternalForm());
-        scene.getStylesheets().add(Objects.requireNonNull(StripViewApp.class.getResource("strip-view-app.css")).toExternalForm());
+
+        weatherView.getStylesheets().add(Objects.requireNonNull(StripViewApp.class.getResource("strip-view-app.css")).toExternalForm());
+        if (Boolean.getBoolean("atlantafx")) {
+            weatherView.getStylesheets().add(Objects.requireNonNull(StripViewApp.class.getResource("strip-view-app-atlantafx.css")).toExternalForm());
+        } else {
+            weatherView.getStylesheets().add(Objects.requireNonNull(StripViewApp.class.getResource("strip-view-app-modena.css")).toExternalForm());
+        }
 
         CSSFX.start();
 
@@ -138,6 +144,8 @@ public class StripViewApp extends GemApplication {
         stage.setHeight(500);
         stage.centerOnScreen();
         stage.show();
+
+//        ScenicView.show(scene);
     }
 
 

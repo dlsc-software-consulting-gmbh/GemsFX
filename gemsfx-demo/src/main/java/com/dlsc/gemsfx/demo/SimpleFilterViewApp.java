@@ -71,7 +71,9 @@ public class SimpleFilterViewApp extends GemApplication {
         } else {
             filterView1.setStyle("-fx-background-color: red; -fx-padding: 1px;");
         }
-        filterView1.addSelectionBox("HPos", HPos.class);
+        SelectionBox<HPos> selectionBox = filterView1.addSelectionBox("HPos", HPos.class);
+        selectionBox.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
         ComboBox<String> com = new ComboBox<>();
         com.getItems().addAll("A", "B", "C");
         filterView1.getChildren().add(com);
@@ -133,14 +135,16 @@ public class SimpleFilterViewApp extends GemApplication {
 
         Scene scene = new Scene(stackPane);
 
-        StageManager.install(stage, "simple.filter.view.container.demo", 800, 500);
-
         stage.setTitle("Simple Filter / Chips View Container Demo");
         stage.setScene(scene);
-        stage.setWidth(800);
+        stage.setWidth(1200);
         stage.setHeight(500);
         stage.centerOnScreen();
+
+        StageManager.install(stage, "simple.filter.view.container.demo", 1200, 500);
+
         stage.show();
+
 
         CSSFX.start();
     }

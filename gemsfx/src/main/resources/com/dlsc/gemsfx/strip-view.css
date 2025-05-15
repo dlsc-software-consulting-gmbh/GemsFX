@@ -2,12 +2,13 @@
     -fx-background-color: -fx-base;
 }
 
-.strip-view > .masked-view > .container > .strip-cell {
+.strip-view > .masked-view > .container > .container > .strip-cell {
     -fx-padding: 10 5 10 5;
 }
 
-.strip-view > .masked-view > .container > .strip-cell:selected {
-    -fx-background-color: -fx-selection-bar;
+.strip-view > .masked-view > .container > .container > .strip-cell:selected {
+    -fx-background: -fx-selection-bar;
+    -fx-background-color: -fx-background;
     -fx-text-fill: -fx-selection-bar-text;
 }
 
