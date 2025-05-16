@@ -74,6 +74,36 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
         updateView();
     }
 
+    @Override
+    protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return gridPane.minHeight(width) + topInset + bottomInset;
+    }
+
+    @Override
+    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return gridPane.prefHeight(width) + topInset + bottomInset;
+    }
+
+    @Override
+    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return gridPane.maxHeight(width) + topInset + bottomInset;
+    }
+
+    @Override
+    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return gridPane.minWidth(height) + leftInset + rightInset;
+    }
+
+    @Override
+    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return gridPane.prefWidth(height) + leftInset + rightInset;
+    }
+
+    @Override
+    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return gridPane.maxWidth(height) + leftInset + rightInset;
+    }
+
     private void updateView() {
         gridPane.getChildren().clear();
         createHeader();
