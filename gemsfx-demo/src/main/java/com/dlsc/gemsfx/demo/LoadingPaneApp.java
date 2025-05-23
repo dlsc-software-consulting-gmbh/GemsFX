@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
@@ -26,7 +27,7 @@ public class LoadingPaneApp extends GemApplication {
         node.setAlignment(Pos.CENTER);
 
         LoadingPane loadingPane = new LoadingPane(node);
-        loadingPane.setPrefSize(800, 600);
+        loadingPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         loadingPane.setStyle("-fx-border-color: black;");
         loadingPane.setError("Some error message...");
 

@@ -53,7 +53,7 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
     public PagingListView() {
         getStyleClass().add("paging-list-view");
 
-        listView.getStyleClass().add("inner-list-view");
+        listView.getStyleClass().addAll("inner-list-view");
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.cellFactoryProperty().bind(cellFactoryProperty());
         listView.setFixedCellSize(Region.USE_COMPUTED_SIZE);

@@ -1869,11 +1869,6 @@ public class DialogPane extends Pane {
             getStyleClass().addAll(this.dialog.getStyleClass());
         }
 
-        @Override
-        public Orientation getContentBias() {
-            return Orientation.VERTICAL;
-        }
-
         private boolean isInsideDialogPane(Parent parent) {
             if (parent == null) {
                 return false;

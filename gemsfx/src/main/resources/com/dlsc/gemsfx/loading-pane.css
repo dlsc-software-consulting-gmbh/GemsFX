@@ -26,6 +26,7 @@
     -fx-min-height: -size;
     -fx-max-width: -size;
     -fx-max-height: -size;
+    -fx-padding: 20px;
 }
 
 .loading-pane:small > .progress-indicator-wrapper {

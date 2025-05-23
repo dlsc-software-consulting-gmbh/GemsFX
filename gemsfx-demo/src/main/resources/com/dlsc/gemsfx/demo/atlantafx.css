@@ -1774,7 +1774,7 @@
 
 .paging-list-view .list-cell:filled:selected,
 .paging-list-view .list-cell:filled:selected:hover {
-    -fx-background-color: -color-accent-subtle;
+    -fx-background-color: -color-cell-bg-selected;
 }
 
 /** --------------------------------------------------------------------
