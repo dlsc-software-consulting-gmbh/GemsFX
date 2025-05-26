@@ -429,7 +429,7 @@ another.
 ## Text View
 
 The TextView control can be used for displaying multi-line text. It includes the ability to select and 
-copy text. Limitation: the user can select only words, not parts of a word.
+copy text.
 
 ## Running the demos
 

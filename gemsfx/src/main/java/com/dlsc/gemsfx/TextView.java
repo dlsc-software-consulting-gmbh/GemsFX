@@ -57,6 +57,7 @@ public class TextView extends Control {
             if (getContextMenu() == null) {
                 MenuItem copySelectionItem = new MenuItem("Copy Selection");
                 copySelectionItem.setOnAction(e -> copySelection());
+                copySelectionItem.visibleProperty().bind(selectedTextProperty().isNotEmpty());
 
                 MenuItem copyAllItem = new MenuItem("Copy All");
                 copyAllItem.setOnAction(e -> copyAll());
@@ -157,13 +158,14 @@ public class TextView extends Control {
     // highlight fill
 
     /**
-     * The fill to use for the text when highlighted.
+     * Defines the {@code Paint} used for the background of the selection highlight.
+     * This is the color or gradient that fills the area behind the selected text.
      */
     private final ObjectProperty<Paint> highlightFill = new StyleableObjectProperty<>(Color.BLUE) {
 
         @Override
         public Object getBean() {
-            return this;
+            return TextView.this;
         }
 
         @Override
@@ -190,6 +192,12 @@ public class TextView extends Control {
         return highlightFill.get();
     }
 
+    /**
+     * The property for the {@code Paint} used for the background of the selection highlight.
+     * This is the color or gradient that fills the area behind the selected text.
+     *
+     * @return the highlight fill property.
+     */
     public final ObjectProperty<Paint> highlightFillProperty() {
         return highlightFill;
     }
@@ -197,13 +205,14 @@ public class TextView extends Control {
     // highlight stroke
 
     /**
-     * The fill to use for the text when highlighted.
+     * Defines the {@code Paint} used for the stroke (outline) of the selection highlight.
+     * This is the color or gradient for the border around the selected text area.
      */
     private final ObjectProperty<Paint> highlightStroke = new StyleableObjectProperty<>(Color.TRANSPARENT) {
 
         @Override
         public Object getBean() {
-            return this;
+            return TextView.this;
         }
 
         @Override
@@ -218,9 +227,9 @@ public class TextView extends Control {
     };
 
     /**
-     * The fill {@code Paint} used for the background of selected text.
+     * Sets the {@code Paint} to be used for the stroke (outline) of the selection highlight.
      *
-     * @param value the highlight fill
+     * @param value the paint to use for the selection highlight's stroke.
      */
     public final void setHighlightStroke(Paint value) {
         highlightStroke.set(value);
@@ -230,6 +239,13 @@ public class TextView extends Control {
         return highlightStroke.get();
     }
 
+    /**
+     * The property for the {@code Paint} used for the stroke (outline) of the selection highlight.
+     * This is the color or gradient for the border around the selected text area.
+     * The default value is {@code Color.TRANSPARENT}.
+     *
+     * @return the highlight stroke property.
+     */
     public final ObjectProperty<Paint> highlightStrokeProperty() {
         return highlightStroke;
     }
@@ -237,13 +253,14 @@ public class TextView extends Control {
     // highlight text fill
 
     /**
-     * The fill {@code Paint} used for the foreground of selected text.
+     * Defines the {@code Paint} used for the foreground (the text itself) of selected text.
+     * This is the color of the text characters when they are part of a selection.
      */
     private final ObjectProperty<Paint> highlightTextFill = new StyleableObjectProperty<>(Color.WHITE) {
 
         @Override
         public Object getBean() {
-            return this;
+            return TextView.this;
         }
 
         @Override
@@ -270,6 +287,12 @@ public class TextView extends Control {
         return highlightTextFill.get();
     }
 
+    /**
+     * The property for the {@code Paint} used for the foreground (the text itself) of selected text.
+     * This is the color of the text characters when they are part of a selection.
+     *
+     * @return the highlight text fill property.
+     */
     public final ObjectProperty<Paint> highlightTextFillProperty() {
         return highlightTextFill;
     }
@@ -292,7 +315,7 @@ public class TextView extends Control {
         };
 
         private static final CssMetaData<TextView, Paint> HIGHLIGHT_FILL = new CssMetaData<>(
-                "-fx-highlight-fill", PaintConverter.getInstance(), Color.TRANSPARENT
+                "-fx-highlight-fill", PaintConverter.getInstance(), Color.BLUE
         ) {
 
             @Override

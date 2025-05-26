@@ -87,7 +87,7 @@ public class TextViewSkin extends SkinBase<TextView> {
             text.textProperty().bind(textView.textProperty());
             text.selectionFillProperty().bind(textView.highlightTextFillProperty());
 
-            setText(text);
+            getChildren().addAll(wrappingPath, text);
 
             wrappingPath.setManaged(false);
             wrappingPath.fillProperty().bind(textView.highlightFillProperty());
@@ -100,11 +100,6 @@ public class TextViewSkin extends SkinBase<TextView> {
         @Override
         protected double computePrefHeight(double width) {
             return super.computePrefHeight(width);
-        }
-
-        @Override
-        protected void layoutChildren() {
-            super.layoutChildren();
         }
 
         public void selectAll() {
@@ -130,18 +125,16 @@ public class TextViewSkin extends SkinBase<TextView> {
                 if (!e.isShiftDown()) {
                     removeSelection();
 
-                    if (e.isPrimaryButtonDown()) {
-                        switch (e.getClickCount()) {
-                            case 1:
-                                mouseDragStartPos = charIndex;
-                                break;
-                            case 2:
-                                selectWord(hit);
-                                break;
-                            case 3:
-                                selectParagraph(hit);
-                                break;
-                        }
+                    switch (e.getClickCount()) {
+                        case 1:
+                            mouseDragStartPos = charIndex;
+                            break;
+                        case 2:
+                            selectWord(hit);
+                            break;
+                        case 3:
+                            selectParagraph(hit);
+                            break;
                     }
                 } else {
                     if (charIndex >= mouseDragStartPos) {
@@ -253,11 +246,6 @@ public class TextViewSkin extends SkinBase<TextView> {
             wrappingPath.getElements().setAll(selectionRange);
 
             textView.getProperties().put("selected.text", getSelectedTextAsString());
-        }
-
-        public void setText(Text text) {
-            getChildren().setAll(wrappingPath);
-            getChildren().addAll(text);
         }
 
         public void clear() {
