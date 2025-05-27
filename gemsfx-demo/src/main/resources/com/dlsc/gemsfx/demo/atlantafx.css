@@ -837,6 +837,10 @@
 
 .search-field .graphic-wrapper .history-button {
     -fx-background-color: transparent;
+    -fx-padding: 2px 3px;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+    -fx-cursor: hand;
 }
 
 .search-field .graphic-wrapper .history-button:hover,
