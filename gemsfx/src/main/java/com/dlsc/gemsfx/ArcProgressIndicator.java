@@ -16,7 +16,6 @@ import javafx.util.StringConverter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * ArcProgressIndicator is a visual control used to indicate the progress of a task.
@@ -149,7 +148,7 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
             progressArcType = new StyleableObjectProperty<>(DEFAULT_PROGRESS_ARC_TYPE) {
                 @Override
                 public Object getBean() {
-                    return this;
+                    return ArcProgressIndicator.this;
                 }
 
                 @Override
@@ -186,7 +185,7 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
             trackArcType = new StyleableObjectProperty<>(DEFAULT_TRACK_ARC_TYPE) {
                 @Override
                 public Object getBean() {
-                    return this;
+                    return ArcProgressIndicator.this;
                 }
 
                 @Override
@@ -231,7 +230,7 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
             styleType = new StyleableObjectProperty<>(DEFAULT_STYLE_TYPE) {
                 @Override
                 public Object getBean() {
-                    return this;
+                    return ArcProgressIndicator.this;
                 }
 
                 @Override

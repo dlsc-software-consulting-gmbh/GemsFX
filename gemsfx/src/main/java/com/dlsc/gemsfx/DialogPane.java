@@ -35,12 +35,18 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.skin.ButtonBarSkin;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -66,7 +72,13 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -2199,7 +2211,7 @@ public class DialogPane extends Pane {
 
                 @Override
                 public Object getBean() {
-                    return this;
+                    return CircularProgressIndicator.this;
                 }
 
                 @Override
@@ -2210,7 +2222,7 @@ public class DialogPane extends Pane {
             indeterminate = new BooleanPropertyBase(false) {
                 @Override
                 public Object getBean() {
-                    return this;
+                    return CircularProgressIndicator.this;
                 }
 
                 @Override
@@ -2232,7 +2244,7 @@ public class DialogPane extends Pane {
 
                 @Override
                 public Object getBean() {
-                    return this;
+                    return CircularProgressIndicator.this;
                 }
 
                 @Override
