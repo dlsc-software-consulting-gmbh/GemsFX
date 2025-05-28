@@ -974,8 +974,21 @@ public class DialogPane extends Pane {
 
         for (ContentPane contentPane : dialogContentPanes) {
 
-            double dialogWidth = Math.min(contentPane.maxWidth(contentHeight), Math.max(contentPane.minWidth(contentHeight), contentPane.prefWidth(contentHeight)));
-            double dialogHeight = Math.min(contentPane.maxHeight(contentWidth), Math.max(contentPane.minHeight(contentWidth), contentPane.prefHeight(contentWidth)));
+            Orientation contentBias = contentPane.getContentBias();
+            if (contentBias == null) {
+                contentBias = Orientation.VERTICAL;
+            }
+
+            double dialogWidth;
+            double dialogHeight;
+
+            if (contentBias == Orientation.HORIZONTAL) {
+                dialogWidth = Math.min(contentPane.maxWidth(Region.USE_COMPUTED_SIZE), Math.max(contentPane.minWidth(Region.USE_COMPUTED_SIZE), contentPane.prefWidth(Region.USE_COMPUTED_SIZE)));
+                dialogHeight = Math.min(contentPane.maxHeight(dialogWidth), Math.max(contentPane.minHeight(dialogWidth), contentPane.prefHeight(dialogWidth)));
+            } else {
+                dialogHeight = Math.min(contentPane.maxHeight(Region.USE_COMPUTED_SIZE), Math.max(contentPane.minHeight(Region.USE_COMPUTED_SIZE), contentPane.prefHeight(Region.USE_COMPUTED_SIZE)));
+                dialogWidth = Math.min(contentPane.maxWidth(dialogHeight), Math.max(contentPane.minWidth(dialogHeight), contentPane.prefWidth(dialogHeight)));
+            }
 
             Dialog<?> dialog = contentPane.getDialog();
 
