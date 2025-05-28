@@ -7,6 +7,10 @@
 .multi-column-list-view > .grid-pane {
 }
 
+.multi-column-list-view > .grid-pane > .list-view {
+    -fx-fixed-cell-size: -1;
+}
+
 .multi-column-list-view > .grid-pane > .list-view .column-list-cell {
 }
 
