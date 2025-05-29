@@ -1,8 +1,17 @@
 package com.dlsc.gemsfx;
 
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
-import javafx.css.*;
+import javafx.css.CssMetaData;
+import javafx.css.PseudoClass;
+import javafx.css.Styleable;
+import javafx.css.StyleableDoubleProperty;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
 import javafx.css.converter.EnumConverter;
 import javafx.css.converter.SizeConverter;
 import javafx.geometry.Insets;
@@ -24,7 +33,6 @@ import java.util.Objects;
  * When the window width is wide, both the large sidebar and the main content pane are shown.
  * Similarly, if the sidebar is positioned at the TOP or BOTTOM, its visibility will be adjusted based on the height of the pane.
  * However, it is also possible to force the sidebar to be displayed regardless of the window size.
- *
  */
 public class ResponsivePane extends Pane {
 
@@ -193,7 +201,7 @@ public class ResponsivePane extends Pane {
 
                 @Override
                 public Object getBean() {
-                    return this;
+                    return ResponsivePane.this;
                 }
 
                 @Override
@@ -240,7 +248,7 @@ public class ResponsivePane extends Pane {
 
                 @Override
                 public Object getBean() {
-                    return this;
+                    return ResponsivePane.this;
                 }
 
                 @Override
@@ -568,7 +576,7 @@ public class ResponsivePane extends Pane {
 
         @Override
         public Object getBean() {
-            return this;
+            return ResponsivePane.this;
         }
 
         @Override
