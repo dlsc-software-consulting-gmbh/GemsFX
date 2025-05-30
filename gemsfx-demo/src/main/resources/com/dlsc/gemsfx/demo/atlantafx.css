@@ -1607,10 +1607,13 @@
 
 .grid-table-view {
     -fx-border-color: -color-border-default;
+    -fx-border-width: 1px;
+    -fx-border-insets: 0px;
     -fx-background-color: -color-bg-default;
-    -fx-background-insets: 0px, 1px;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
     -fx-table-cell-border-color: -color-border-default;
-    -fx-padding: 1px;
+    -fx-padding: 0px;
 }
 
 .grid-table-view:focused,
@@ -1646,6 +1649,14 @@
 .grid-table-view > .grid-pane > .row-background {
     -fx-background-color: -color-border-default, -color-bg-default;
     -fx-background-insets: 0px, 0px 0px 1px 0px;
+}
+
+.grid-table-view > .grid-pane:hover > .row-background:hover {
+    -fx-background-color: -color-border-default, -color-neutral-subtle;
+}
+
+.grid-table-view > .grid-pane:pressed > .row-background:pressed {
+    -fx-background-color: -color-border-default, -color-neutral-muted;
 }
 
 .grid-table-view > .grid-pane > .row-background.odd {
