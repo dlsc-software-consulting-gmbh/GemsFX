@@ -16,10 +16,12 @@ import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.CustomTextField;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -171,6 +173,8 @@ public class SimpleFilterView extends HBox {
                     ((CalendarPicker) node).setValue(null);
                 } else if (node instanceof DatePicker) {
                     ((DatePicker) node).setValue(null);
+                } else if (node instanceof TextField) {
+                    ((TextField) node).setText(null);
                 } else {
                     throw new IllegalStateException("Unknown node type: " + node.getClass().getName());
                 }
@@ -365,6 +369,42 @@ public class SimpleFilterView extends HBox {
     }
 
     /**
+     * Creates a new instance of a textfield.
+     *
+     * @param text the initial prompt text
+     * @return the new text field
+     */
+    public final CustomTextField addTextField(String text) {
+        CustomTextField textField = new CustomTextField();
+        textField.setPromptText(text);
+        textField.setMaxWidth(Double.MAX_VALUE);
+        textField.textProperty().addListener((obs, oldText, newText) -> {
+            if (oldText != null) {
+                Map<Object, ChipView<?>> innerMap = map.get(textField);
+                if (innerMap != null) {
+                    ChipView<?> chip = innerMap.remove(oldText);
+                    if (chip != null) {
+                        getChips().remove(chip);
+                    }
+                }
+            }
+            if (newText != null) {
+                ChipView<String> chip = new ChipView<>();
+                chip.setValue(newText);
+                chip.setText(newText);
+                chip.setOnClose(it -> textField.setText(null));
+                getChips().add(chip);
+
+                map.computeIfAbsent(textField, it -> new HashMap<>()).put(newText, chip);
+            }
+        });
+
+        getChildren().add(textField);
+
+        return textField;
+    }
+
+    /**
      * Adds a date range picker to the filter view and configures it with the specified prompt text.
      * This date range picker allows users to select a range of dates, and selected ranges
      * are represented as chips in the filter view.
@@ -459,7 +499,6 @@ public class SimpleFilterView extends HBox {
             }
         });
 
-        setHgrow(datePicker, Priority.ALWAYS);
         getChildren().add(datePicker);
 
         return datePicker;

@@ -82,6 +82,7 @@ public class SimpleFilterViewApp extends GemApplication {
         filterView1.addSelectionBox("VPos", VPos.class);
         filterView1.addSelectionBox("Pos", Pos.class);
         filterView1.addSelectionBox("Side", Side.class);
+        filterView1.addTextField("Prompt");
         filterView1.getChildren().add(new TimePicker());
         filterView1.addCalendarPicker("Date");
         filterView1.layoutModeProperty().bindBidirectional(layoutMode);
