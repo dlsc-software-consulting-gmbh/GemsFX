@@ -35,6 +35,7 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         innerListView = pagingListView.getListView();
         VBox.setVgrow(innerListView, Priority.ALWAYS);
 
+        pagingControls.availablePageSizesProperty().bind(pagingListView.availablePageSizesProperty());
         pagingControls.pageProperty().bindBidirectional(pagingListView.pageProperty());
         pagingControls.totalItemCountProperty().bindBidirectional(pagingListView.totalItemCountProperty());
         pagingControls.pageSizeProperty().bindBidirectional(pagingListView.pageSizeProperty());
@@ -46,7 +47,6 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         pagingControls.firstPageDividerProperty().bindBidirectional(pagingListView.firstPageDividerProperty());
         pagingControls.visibleProperty().bind(pagingControls.neededProperty().and(pagingListView.showPagingControlsProperty()));
         pagingControls.managedProperty().bind(pagingControls.neededProperty().and(pagingListView.showPagingControlsProperty()));
-        pagingControls.availablePageSizesProperty().bind(pagingListView.availablePageSizesProperty());
 
         content.getStyleClass().add("content");
 
