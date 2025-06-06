@@ -94,7 +94,7 @@ public class DrawerStackPane extends StackPane {
         glassPane.fadeInOutProperty().bind(animateDrawerProperty());
         glassPane.setOnMouseClicked(evt -> {
             if (isAutoHide() && evt.getButton().equals(MouseButton.PRIMARY) && !evt.isConsumed()) {
-                setShowDrawer(false);
+                getOnCloseRequest().run();
             }
         });
 
@@ -117,7 +117,7 @@ public class DrawerStackPane extends StackPane {
 
         headerBox.setOnMouseReleased(evt -> {
             if (startY != -1 && evt.getY() > drawer.getHeight()) {
-                setShowDrawer(false);
+                getOnCloseRequest().run();
                 startY = 0;
             } else {
                 saveDrawerHeightToUserPreferences();
@@ -143,7 +143,7 @@ public class DrawerStackPane extends StackPane {
                     setDrawerHeight(1);
                     saveDrawerHeightToUserPreferences();
                 } else {
-                    setShowDrawer(false);
+                    getOnCloseRequest().run();
                 }
             }
         });
@@ -192,7 +192,7 @@ public class DrawerStackPane extends StackPane {
 
         addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
             if (isShowDrawer() && evt.getCode().equals(KeyCode.ESCAPE)) {
-                setShowDrawer(false);
+                getOnCloseRequest().run();
                 evt.consume();
             }
         });
@@ -396,7 +396,7 @@ public class DrawerStackPane extends StackPane {
         Bindings.bindContent(toolBar.getItems(), toolbarItemsProperty());
 
         Button closeButton = new Button("Close");
-        closeButton.setOnAction(evt -> setShowDrawer(false));
+        closeButton.setOnAction(evt -> getOnCloseRequest().run());
         closeButton.getStyleClass().add("close-button");
         getToolbarItems().add(closeButton);
 
@@ -441,6 +441,26 @@ public class DrawerStackPane extends StackPane {
         if (newExtra != null) {
             headerBox.getChildren().add(newExtra);
         }
+    }
+
+    private final ObjectProperty<Runnable> onCloseRequest = new SimpleObjectProperty<>(this, "onCloseRequest", () -> setShowDrawer(false));
+
+    public Runnable getOnCloseRequest() {
+        return onCloseRequest.get();
+    }
+
+    /**
+     * A callback that will be called when the user clicks on the close button or onto the glass pane. The default
+     * implementation of this callback will eventually call {@link #setShowDrawer(boolean)}.
+     *
+     * @return the callback for closing the drawer
+     */
+    public ObjectProperty<Runnable> onCloseRequestProperty() {
+        return onCloseRequest;
+    }
+
+    public void setOnCloseRequest(Runnable onCloseRequest) {
+        this.onCloseRequest.set(onCloseRequest);
     }
 
     private final ObjectProperty<Runnable> onDrawerClose = new SimpleObjectProperty<>(this, "onDrawerClose");
