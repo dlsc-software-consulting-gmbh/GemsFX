@@ -30,6 +30,7 @@ public class PagingGridTableViewSkin<T> extends SkinBase<PagingGridTableView<T>>
         gridTableView = pagingGridTableView.getGridTableView();
         VBox.setVgrow(gridTableView, Priority.ALWAYS);
 
+        pagingControls.availablePageSizesProperty().bind(pagingGridTableView.availablePageSizesProperty());
         pagingControls.pageProperty().bindBidirectional(pagingGridTableView.pageProperty());
         pagingControls.totalItemCountProperty().bindBidirectional(pagingGridTableView.totalItemCountProperty());
         pagingControls.pageSizeProperty().bindBidirectional(pagingGridTableView.pageSizeProperty());
@@ -41,7 +42,6 @@ public class PagingGridTableViewSkin<T> extends SkinBase<PagingGridTableView<T>>
         pagingControls.firstPageDividerProperty().bindBidirectional(pagingGridTableView.firstPageDividerProperty());
         pagingControls.visibleProperty().bind(pagingControls.neededProperty().and(pagingGridTableView.showPagingControlsProperty()));
         pagingControls.managedProperty().bind(pagingControls.neededProperty().and(pagingGridTableView.showPagingControlsProperty()));
-
         content.getStyleClass().add("content");
 
         pagingGridTableView.usingScrollPaneProperty().addListener(it -> updateStyleClass());
