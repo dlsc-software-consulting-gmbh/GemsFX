@@ -393,4 +393,14 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
     public final void refresh() {
         gridTableView.refresh();
     }
+
+    /**
+     * Fills the table view with (potentially cached) data.
+     *
+     * @param items the items to add to the table view
+     */
+    public final void load(int totalItemCount, List<T> items) {
+        this.items.setAll(items); // setting clears any previous items
+        this.setTotalItemCount(totalItemCount);
+    }
 }

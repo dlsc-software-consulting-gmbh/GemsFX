@@ -426,6 +426,16 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
     }
 
     /**
+     * Fills the list view with (potentially cached) data.
+     *
+     * @param items the items to add to the list view
+     */
+    public final void load(int totalItemCount, List<T> items) {
+        this.items.setAll(items); // setting clears any previous items
+        this.setTotalItemCount(totalItemCount);
+    }
+
+    /**
      * Triggers a rebuild of the view without reloading data.
      */
     public final void refresh() {
