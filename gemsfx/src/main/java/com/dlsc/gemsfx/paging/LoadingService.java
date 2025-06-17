@@ -42,13 +42,10 @@ public class LoadingService<T> extends Service<PagingLoadResponse<T>> {
                 if (!isCancelled()) {
                     Callback<PagingLoadRequest, PagingLoadResponse<T>> loader = getLoader();
                     if (loader != null) {
-
-                        /*
-                         * Important to wrap in a list, otherwise we can get a concurrent modification
-                         * exception when the result gets applied to the "items" list in the service
-                         * event handler for "success". Not sure why this fixes that issue.
-                         */
-                        return loader.call(loadRequest);
+                        PagingLoadResponse<T> response = loader.call(loadRequest);
+                        if (!isCancelled()) {
+                            return response;
+                        }
                     }
                 }
 
