@@ -131,6 +131,16 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
     }
 
     /**
+     * Returns the service responsible for executing the actual loading of the data on a background
+     * thread.
+     *
+     * @return the loading service
+     */
+    public final LoadingService<T> getLoadingService() {
+        return loadingService;
+    }
+
+    /**
      * Overrides content bias as we want height calculations for the cells based on the current width of the
      * list view.
      *

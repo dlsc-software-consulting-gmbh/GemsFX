@@ -116,6 +116,16 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
         return Objects.requireNonNull(PagingGridTableView.class.getResource("paging-grid-table-view.css")).toExternalForm();
     }
 
+    /**
+     * Returns the service responsible for executing the actual loading of the data on a background
+     * thread.
+     *
+     * @return the loading service
+     */
+    public final LoadingService<T> getLoadingService() {
+        return loadingService;
+    }
+
     private final ListProperty<GridTableColumn<T, ?>> columns = new SimpleListProperty<>(this, "columns", FXCollections.observableArrayList());
 
     public final ListProperty<GridTableColumn<T, ?>> columnsProperty() {
@@ -377,7 +387,7 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
 
     /**
      * The SelectionModel provides the API through which it is possible
-     * to select single or multiple items within a ListView, as  well as inspect
+     * to select single or multiple items within a ListView, as well as inspect
      * which items have been selected by the user. Note that it has a generic
      * type that must match the type of the ListView itself.
      *
