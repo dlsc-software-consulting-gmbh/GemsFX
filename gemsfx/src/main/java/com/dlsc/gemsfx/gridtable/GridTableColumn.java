@@ -11,7 +11,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
 import javafx.util.Callback;
@@ -187,6 +189,21 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         cell.setRowItem(rowItem);
         cell.updateItem(item, rowItem == null);
         cell.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        cell.addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, evt -> {
+            if (evt.isConsumed()) {
+                return;
+            }
+
+            Callback<S, ContextMenu> contextMenuCallback = tableView.getOnContextMenuForItemRequested();
+            if (contextMenuCallback != null) {
+                ContextMenu con = contextMenuCallback.call(cell.getRowItem());
+                if (con != null) {
+                    evt.consume();
+                    con.show(cell, evt.getScreenX(), evt.getScreenY());
+                }
+            }
+        });
 
         // step 5: return the cell
         return cell;
