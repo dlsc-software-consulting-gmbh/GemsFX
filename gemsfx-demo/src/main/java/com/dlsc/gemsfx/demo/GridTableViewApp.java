@@ -13,6 +13,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -34,6 +36,9 @@ public class GridTableViewApp extends GemApplication {
 
         GridTableView<Student> tableView = new GridTableView<>();
         tableView.setMinNumberOfRows(8);
+
+        // simple text for context menu callback
+        tableView.setOnContextMenuForItemRequested(student -> new ContextMenu(new MenuItem("Edit")));
 
         GridTableColumn<Student, String> nameColumn = new GridTableColumn<>("Name");
         GridTableColumn<Student, Integer> mathColumn = new GridTableColumn<>("Math");
