@@ -7,7 +7,6 @@ import com.dlsc.gemsfx.gridtable.GridTableView;
 import com.dlsc.gemsfx.skins.PagingGridTableViewSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -19,8 +18,6 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -30,7 +27,6 @@ import javafx.scene.control.Skin;
 import javafx.util.Callback;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -39,9 +35,7 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
 
     private final LoadingService<T> loadingService = new LoadingService<>();
 
-    private final ObservableList<T> items = FXCollections.observableArrayList();
-
-    private final ObservableList<T> unmodifiableItems = FXCollections.unmodifiableObservableList(items);
+    private final ObservableList<T> itemsOnCurrentPage = FXCollections.observableArrayList();
 
     private final GridTableView<T> gridTableView = new GridTableView<>();
 
@@ -49,7 +43,7 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
         getStyleClass().add("paging-grid-table-view");
 
         gridTableView.columnsProperty().bind(columnsProperty());
-        gridTableView.setItems(items);
+        gridTableView.setItems(itemsOnCurrentPage);
         gridTableView.minNumberOfRowsProperty().bind(Bindings.createIntegerBinding(() -> {
             if (isFillLastPage()) {
                 return getPageSize();
@@ -71,9 +65,9 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
 
             List<T> newList = response.getItems();
             if (newList != null) {
-                items.setAll(new ArrayList<>(newList));
+                itemsOnCurrentPage.setAll(new ArrayList<>(newList));
             } else {
-                items.clear();
+                itemsOnCurrentPage.clear();
             }
         });
 
@@ -87,7 +81,7 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
 
         InvalidationListener refreshListener = (Observable it) -> refresh();
 
-        getUnmodifiableItems().addListener(refreshListener);
+        getItemsOnCurrentPage().addListener(refreshListener);
         fillLastPageProperty().addListener(refreshListener);
 
         pagingControlsLocation.addListener((it, oldLocation, newLocation) -> {
@@ -282,13 +276,12 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
     }
 
     /**
-     * Returns an unmodifiable observable list with the items shown by the current
-     * page.
+     * Returns an observable list with the items shown by the current page.
      *
      * @return the currently shown items
      */
-    public final ObservableList<T> getUnmodifiableItems() {
-        return unmodifiableItems;
+    public final ObservableList<T> getItemsOnCurrentPage() {
+        return itemsOnCurrentPage;
     }
 
     private final ObjectProperty<Callback<PagingLoadRequest, PagingLoadResponse<T>>> loader = new SimpleObjectProperty<>(this, "loader");
@@ -410,7 +403,7 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
      * @param items the items to add to the table view
      */
     public final void load(int totalItemCount, List<T> items) {
-        this.items.setAll(items); // setting clears any previous items
+        this.itemsOnCurrentPage.setAll(items); // setting clears any previous items
         this.setTotalItemCount(totalItemCount);
     }
 }
