@@ -2,12 +2,10 @@ package com.dlsc.gemsfx.gridtable;
 
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.skins.GridTableViewSkin;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -16,11 +14,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.util.Callback;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -186,6 +186,25 @@ public class GridTableView<S> extends Control {
 
     public final void setCommitLoadStatusDelay(long commitLoadStatusDelay) {
         this.commitLoadStatusDelay.set(commitLoadStatusDelay);
+    }
+
+    private final ObjectProperty<Callback<S, ContextMenu>> onContextMenuForItemRequested = new SimpleObjectProperty<>(this, "onContextMenuForItemRequested");
+
+    public final Callback<S, ContextMenu> getOnContextMenuForItemRequested() {
+        return onContextMenuForItemRequested.get();
+    }
+
+    /**
+     * An optional callback that can be used to create a context menu for a given item / row.
+     *
+     * @return the callback for creating a context menu for a given item / row.
+     */
+    public final ObjectProperty<Callback<S, ContextMenu>> onContextMenuForItemRequestedProperty() {
+        return onContextMenuForItemRequested;
+    }
+
+    public final void setOnContextMenuForItemRequested(Callback<S, ContextMenu> onContextMenuForItemRequested) {
+        this.onContextMenuForItemRequested.set(onContextMenuForItemRequested);
     }
 
     /**
