@@ -14,13 +14,12 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import org.controlsfx.control.spreadsheet.Grid;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -200,9 +199,9 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
                     rowBackground.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), newHover);
                 });
 
-                cellNode.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                cellNode.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
                     if (event.getClickCount() == 2 &&
-                            event.getButton() == javafx.scene.input.MouseButton.PRIMARY &&
+                            event.getButton() == MouseButton.PRIMARY &&
                             !event.isConsumed() &&
                             event.isStillSincePress()) {
                         Consumer<S> onOpenItem = tableView.getOnOpenItem();
