@@ -1,9 +1,11 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.TextViewSkin;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.MapChangeListener;
@@ -92,6 +94,26 @@ public class TextView extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(TextView.class.getResource("text-view.css")).toExternalForm();
+    }
+
+    private final BooleanProperty disableTextSelectionByMouseClicks = new SimpleBooleanProperty(this, "disableTextSelectionByMouseClicks", false);
+
+    public final boolean isDisableTextSelectionByMouseClicks() {
+        return disableTextSelectionByMouseClicks.get();
+    }
+
+    /**
+     * The text view allows the user to select text elements by double or tripple clicking on it.
+     * This property can be used to disable this behavior.
+     *
+     * @return the "disable selection by mouse clicks" property
+     */
+    public final BooleanProperty disableTextSelectionByMouseClicksProperty() {
+        return disableTextSelectionByMouseClicks;
+    }
+
+    public final void setDisableTextSelectionByMouseClicks(boolean disableTextSelectionByMouseClicks) {
+        this.disableTextSelectionByMouseClicks.set(disableTextSelectionByMouseClicks);
     }
 
     /**

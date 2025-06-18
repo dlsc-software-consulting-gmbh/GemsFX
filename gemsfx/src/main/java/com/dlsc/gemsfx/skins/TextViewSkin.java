@@ -130,10 +130,14 @@ public class TextViewSkin extends SkinBase<TextView> {
                             mouseDragStartPos = charIndex;
                             break;
                         case 2:
-                            selectWord(hit);
+                            if (!textView.isDisableTextSelectionByMouseClicks()) {
+                                selectWord(hit);
+                            }
                             break;
                         case 3:
-                            selectParagraph(hit);
+                            if (!textView.isDisableTextSelectionByMouseClicks()) {
+                                selectParagraph(hit);
+                            }
                             break;
                     }
                 } else {
