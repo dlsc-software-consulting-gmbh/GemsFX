@@ -94,13 +94,17 @@ public class LoadingService<T> extends Service<PagingLoadResponse<T>> {
     /**
      * The delay in milliseconds before the loading service will actually try to retrieve the data from (for example)
      * a backend. This delay is around a few hundred milliseconds by default. Delaying the loading has the advantage
-     * that sudden property changes will not trigger multiple backend queries but will get batched together to a single
+     * that sudden property changes will not trigger multiple backend queries but will get batched together in a single
      * reload operation.
      *
      * @return the delay before data will actually be loaded
      */
     public final LongProperty loadDelayInMillisProperty() {
         return loadDelayInMillis;
+    }
+
+    public final void setLoadDelayInMillis(long loadDelayInMillis) {
+        this.loadDelayInMillis.set(loadDelayInMillis);
     }
 
     private final ObjectProperty<Callback<PagingLoadRequest, PagingLoadResponse<T>>> loader = new SimpleObjectProperty<>(this, "loader");
