@@ -603,11 +603,11 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
                 h += spacing;
             }
 
-            List<Node> notificationViews = getChildren().stream().filter(node -> node instanceof NotificationView).collect(Collectors.toList());
+            List<Node> notificationViews = getChildren().stream().filter(node -> node instanceof NotificationView).toList();
 
             if (!notificationViews.isEmpty()) {
-                // last one is on top
-                Node latestNotification = notificationViews.get(notificationViews.size() - 1);
+                // the last one is on top
+                Node latestNotification = notificationViews.getLast();
                 h += latestNotification.prefHeight(width);
             }
 
@@ -624,6 +624,16 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             h = h + (innerHeight * getExpansionProgress());
 
             return h;
+        }
+
+        @Override
+        protected double computeMinHeight(double width) {
+            return computePrefHeight(width);
+        }
+
+        @Override
+        protected double computeMaxHeight(double width) {
+            return computePrefHeight(width);
         }
 
         @Override
