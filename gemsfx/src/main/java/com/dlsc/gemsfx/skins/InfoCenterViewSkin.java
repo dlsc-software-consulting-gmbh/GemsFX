@@ -45,6 +45,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import one.jpro.platform.utils.TreeShowing;
@@ -409,7 +410,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         }
     }
 
-    class GroupView<T, S extends Notification<T>> extends Pane {
+    class GroupView<T, S extends Notification<T>> extends StackPane {
 
         private final NotificationGroup<T, S> group;
 

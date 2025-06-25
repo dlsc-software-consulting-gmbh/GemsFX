@@ -19,6 +19,7 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,7 @@ import java.util.Objects;
  * Similarly, if the sidebar is positioned at the TOP or BOTTOM, its visibility will be adjusted based on the height of the pane.
  * However, it is also possible to force the sidebar to be displayed regardless of the window size.
  */
-public class ResponsivePane extends Pane {
+public class ResponsivePane extends StackPane {
 
     private static final Side DEFAULT_SIDE = Side.LEFT;
 
