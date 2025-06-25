@@ -15,6 +15,7 @@ import javafx.css.StyleableProperty;
 import javafx.css.converter.EnumConverter;
 import javafx.css.converter.SizeConverter;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
@@ -87,7 +88,7 @@ public class ResponsivePane extends Pane {
 
     public final ObjectProperty<Node> contentProperty() {
         if (content == null) {
-            content = new ResponsivePane.NodeProperty("content");
+            content = new NodeProperty("content");
         }
         return content;
     }
@@ -326,134 +327,118 @@ public class ResponsivePane extends Pane {
 
     @Override
     protected void layoutChildren() {
-        Insets insets = getInsets();
+        final Insets insets = getInsets();
+        final double insideX = snapSpaceX(insets.getLeft());
+        final double insideY = snapSpaceY(insets.getTop());
+        final double insideWidth = snapSizeX(getInsideWidth(getWidth()));
+        final double insideHeight = snapSizeY(getHeight() - insideY - snapSpaceY(insets.getBottom()));
 
-        final double insideWidth = getWidth() - (insets.getLeft() + insets.getRight());
-        final double insideHeight = getHeight() - (insets.getTop() + insets.getBottom());
+        final Node contentNode = getContent();
+        final Node smallSidebarNode = getSmallSidebar();
+        final Node largeSidebarNode = getLargeSidebar();
 
-        Node contentNode = getContent();
-        Node smallSidebarNode = getSmallSidebar();
-        Node largeSidebarNode = getLargeSidebar();
+        final Side side = getSide() == null ? DEFAULT_SIDE : getSide();
+        final boolean isHorizontal = side == Side.LEFT || side == Side.RIGHT;
 
-        double gap = Math.max(0d, getGap());
-        Side side = getSide() == null ? DEFAULT_SIDE : getSide();
-        boolean isSideBarInHorizontal = (side == Side.LEFT || side == Side.RIGHT);
+        final double largeSidebarWidth = computeNodeWidth(largeSidebarNode, -1, false);
+        final double largeSidebarHeight = computeNodeHeight(largeSidebarNode, insideWidth, false);
+        final double smallSidebarWidth = computeNodeWidth(smallSidebarNode, -1, false);
+        final double smallSidebarHeight = computeNodeHeight(smallSidebarNode, insideWidth, false);
+        final double contentMinWidth = computeNodeWidth(contentNode, -1, true);
+        final double contentMinHeight = computeNodeHeight(contentNode, -1, true);
 
-        double prefContentWidth = computeNodeWidth(contentNode, isSideBarInHorizontal);
-        double prefContentHeight = computeNodeHeight(contentNode, isSideBarInHorizontal);
+        final double snappedGap = Math.max(0d, isHorizontal ? snapSpaceX(getGap()) : snapSpaceY(getGap()));
+        final double gapForCheck = (contentNode != null && (smallSidebarNode != null || largeSidebarNode != null)) ? snappedGap : 0;
 
-        double largeSidebarWidth = computeNodeWidth(largeSidebarNode, isSideBarInHorizontal);
-        double largeSidebarHeight = computeNodeHeight(largeSidebarNode, isSideBarInHorizontal);
-
-        double smallSidebarWidth = computeNodeWidth(smallSidebarNode, isSideBarInHorizontal);
-        double smallSidebarHeight = computeNodeHeight(smallSidebarNode, isSideBarInHorizontal);
-
+        Node activeSidebar = null;
         double sidebarWidth = 0;
         double sidebarHeight = 0;
 
-        Node activeSidebar = null;
-        // Check if we can display the large sidebar
-        if (largeSidebarNode != null && isSideBarInHorizontal && insideWidth >= prefContentWidth + largeSidebarWidth + gap) {
-            activeSidebar = largeSidebarNode;
-            sidebarWidth = largeSidebarWidth;
-        } else if (largeSidebarNode != null && !isSideBarInHorizontal && insideHeight >= prefContentHeight + largeSidebarHeight + gap) {
-            activeSidebar = largeSidebarNode;
-            sidebarHeight = largeSidebarHeight;
-        }
-        // Check if we can display the small sidebar
-        else if (smallSidebarNode != null && isSideBarInHorizontal && insideWidth > prefContentWidth + smallSidebarWidth + gap) {
-            activeSidebar = smallSidebarNode;
-            sidebarWidth = smallSidebarWidth;
-        } else if (smallSidebarNode != null && !isSideBarInHorizontal && insideHeight > prefContentHeight + smallSidebarHeight + gap) {
-            activeSidebar = smallSidebarNode;
-            sidebarHeight = smallSidebarHeight;
+        if (isHorizontal) {
+            if (shouldShowSidebar(insideWidth, largeSidebarWidth, contentMinWidth, gapForCheck)) {
+                activeSidebar = largeSidebarNode;
+                sidebarWidth = largeSidebarWidth;
+            } else if (shouldShowSidebar(insideWidth, smallSidebarWidth, contentMinWidth, gapForCheck)) {
+                activeSidebar = smallSidebarNode;
+                sidebarWidth = smallSidebarWidth;
+            }
+        } else { // Vertical
+            if (shouldShowSidebar(insideHeight, largeSidebarHeight, contentMinHeight, gapForCheck)) {
+                activeSidebar = largeSidebarNode;
+                sidebarHeight = largeSidebarHeight;
+            } else if (shouldShowSidebar(insideHeight, smallSidebarHeight, contentMinHeight, gapForCheck)) {
+                activeSidebar = smallSidebarNode;
+                sidebarHeight = smallSidebarHeight;
+            }
         }
 
-        // Layout active sidebar and content
-        double contentStartX = insets.getLeft();
-        double contentStartY = insets.getTop();
+        double contentStartX = insideX;
+        double contentStartY = insideY;
         double contentWidth = insideWidth;
         double contentHeight = insideHeight;
-
         boolean largeSidebarNeedDisplay = false;
+
         if (activeSidebar != null) {
             switch (side) {
                 case LEFT:
-                    activeSidebar.relocate(contentStartX, contentStartY);
-                    activeSidebar.resize(sidebarWidth, insideHeight);
-
-                    // Show large sidebar if it is forced to be displayed
+                    double snappedSidebarWidth = snapSizeX(sidebarWidth);
+                    activeSidebar.resizeRelocate(insideX, insideY, snappedSidebarWidth, insideHeight);
                     if (activeSidebar == smallSidebarNode && largeSidebarNode != null && isForceLargeSidebarDisplay()) {
                         largeSidebarNeedDisplay = true;
-                        // Cover the small sidebar
+                        double snappedLargeSidebarWidth = snapSizeX(largeSidebarWidth);
                         if (isLargeSidebarCoversSmall()) {
-                            largeSidebarNode.relocate(contentStartX, contentStartY);
-                            largeSidebarNode.resize(largeSidebarWidth, insideHeight);
+                            largeSidebarNode.resizeRelocate(insideX, insideY, snappedLargeSidebarWidth, insideHeight);
                         } else {
-                            // Next to the small sidebar
-                            largeSidebarNode.relocate(contentStartX + sidebarWidth, contentStartY);
-                            largeSidebarNode.resize(largeSidebarWidth, insideHeight);
+                            largeSidebarNode.resizeRelocate(insideX + snappedSidebarWidth, insideY, snappedLargeSidebarWidth, insideHeight);
                         }
                     }
-
-                    contentStartX += sidebarWidth + gap;
-                    contentWidth -= sidebarWidth + gap;
+                    contentStartX += snappedSidebarWidth + gapForCheck;
+                    contentWidth -= snappedSidebarWidth + gapForCheck;
                     break;
                 case RIGHT:
-                    activeSidebar.relocate(contentStartX + insideWidth - sidebarWidth, contentStartY);
-                    activeSidebar.resize(sidebarWidth, insideHeight);
-
+                    snappedSidebarWidth = snapSizeX(sidebarWidth);
+                    activeSidebar.resizeRelocate(insideX + insideWidth - snappedSidebarWidth, insideY, snappedSidebarWidth, insideHeight);
                     if (activeSidebar == smallSidebarNode && largeSidebarNode != null && isForceLargeSidebarDisplay()) {
                         largeSidebarNeedDisplay = true;
+                        double snappedLargeSidebarWidth = snapSizeX(largeSidebarWidth);
                         if (isLargeSidebarCoversSmall()) {
-                            largeSidebarNode.relocate(contentStartX + insideWidth - largeSidebarWidth, contentStartY);
-                            largeSidebarNode.resize(largeSidebarWidth, insideHeight);
+                            largeSidebarNode.resizeRelocate(insideX + insideWidth - snappedLargeSidebarWidth, insideY, snappedLargeSidebarWidth, insideHeight);
                         } else {
-                            largeSidebarNode.relocate(contentStartX + insideWidth - largeSidebarWidth - sidebarWidth, contentStartY);
-                            largeSidebarNode.resize(largeSidebarWidth, insideHeight);
+                            largeSidebarNode.resizeRelocate(insideX + insideWidth - snappedLargeSidebarWidth - snappedSidebarWidth, insideY, snappedLargeSidebarWidth, insideHeight);
                         }
                     }
-
-                    contentWidth -= sidebarWidth + gap;
+                    contentWidth -= snappedSidebarWidth + gapForCheck;
                     break;
                 case TOP:
-                    activeSidebar.relocate(contentStartX, contentStartY);
-                    activeSidebar.resize(insideWidth, sidebarHeight);
-
+                    double snappedSidebarHeight = snapSizeY(sidebarHeight);
+                    activeSidebar.resizeRelocate(insideX, insideY, insideWidth, snappedSidebarHeight);
                     if (activeSidebar == smallSidebarNode && largeSidebarNode != null && isForceLargeSidebarDisplay()) {
                         largeSidebarNeedDisplay = true;
+                        double snappedLargeSidebarHeight = snapSizeY(largeSidebarHeight);
                         if (isLargeSidebarCoversSmall()) {
-                            largeSidebarNode.relocate(contentStartX, contentStartY);
-                            largeSidebarNode.resize(insideWidth, largeSidebarHeight);
+                            largeSidebarNode.resizeRelocate(insideX, insideY, insideWidth, snappedLargeSidebarHeight);
                         } else {
-                            largeSidebarNode.relocate(contentStartX, contentStartY + sidebarHeight);
-                            largeSidebarNode.resize(insideWidth, largeSidebarHeight);
+                            largeSidebarNode.resizeRelocate(insideX, insideY + snappedSidebarHeight, insideWidth, snappedLargeSidebarHeight);
                         }
                     }
-
-                    contentStartY += sidebarHeight + gap;
-                    contentHeight -= sidebarHeight + gap;
+                    contentStartY += snappedSidebarHeight + gapForCheck;
+                    contentHeight -= snappedSidebarHeight + gapForCheck;
                     break;
                 case BOTTOM:
-                    activeSidebar.relocate(contentStartX, contentStartY + insideHeight - sidebarHeight);
-                    activeSidebar.resize(insideWidth, sidebarHeight);
-
+                    snappedSidebarHeight = snapSizeY(sidebarHeight);
+                    activeSidebar.resizeRelocate(insideX, insideY + insideHeight - snappedSidebarHeight, insideWidth, snappedSidebarHeight);
                     if (activeSidebar == smallSidebarNode && largeSidebarNode != null && isForceLargeSidebarDisplay()) {
                         largeSidebarNeedDisplay = true;
+                        double snappedLargeSidebarHeight = snapSizeY(largeSidebarHeight);
                         if (isLargeSidebarCoversSmall()) {
-                            largeSidebarNode.relocate(contentStartX, contentStartY + insideHeight - largeSidebarHeight);
-                            largeSidebarNode.resize(insideWidth, largeSidebarHeight);
+                            largeSidebarNode.resizeRelocate(insideX, insideY + insideHeight - snappedLargeSidebarHeight, insideWidth, snappedLargeSidebarHeight);
                         } else {
-                            largeSidebarNode.relocate(contentStartX, contentStartY + insideHeight - largeSidebarHeight - sidebarHeight);
-                            largeSidebarNode.resize(insideWidth, largeSidebarHeight);
+                            largeSidebarNode.resizeRelocate(insideX, insideY + insideHeight - snappedLargeSidebarHeight - snappedSidebarHeight, insideWidth, snappedLargeSidebarHeight);
                         }
                     }
-
-                    contentHeight -= sidebarHeight + gap;
+                    contentHeight -= snappedSidebarHeight + gapForCheck;
                     break;
             }
-            activeSidebar.setVisible(true);
-            activeSidebar.setManaged(true);
         }
 
         pseudoClassStateChanged(SHOWING_NONE_PSEUDOCLASS, activeSidebar == null);
@@ -465,8 +450,7 @@ public class ResponsivePane extends Pane {
         glassPaneNeedHide.set(!largeSidebarNeedDisplay);
 
         if (contentNode != null) {
-            contentNode.relocate(contentStartX, contentStartY);
-            contentNode.resize(contentWidth, contentHeight);
+            contentNode.resizeRelocate(contentStartX, contentStartY, contentWidth, contentHeight);
             if (getChildren().get(0) != contentNode) {
                 ((NodeProperty) contentProperty()).setSuppressLayoutChanges(true);
                 contentNode.toBack();
@@ -476,46 +460,20 @@ public class ResponsivePane extends Pane {
         glassPane.relocate(contentStartX, contentStartY);
         glassPane.resize(contentWidth, contentHeight);
 
-        // Ensure only the active sidebar is visible
-        if (smallSidebarNode != null && activeSidebar != smallSidebarNode) {
-            smallSidebarNode.setVisible(false);
-            smallSidebarNode.setManaged(false);
+        if (smallSidebarNode != null) {
+            smallSidebarNode.setVisible(activeSidebar == smallSidebarNode);
+            smallSidebarNode.setManaged(activeSidebar == smallSidebarNode);
         }
-
-        if (largeSidebarNode != null && activeSidebar != largeSidebarNode) {
-            if (isForceLargeSidebarDisplay()) {
-                largeSidebarNode.setVisible(largeSidebarNeedDisplay);
-                largeSidebarNode.setManaged(largeSidebarNeedDisplay);
-                if (getChildren().get(getChildren().size() - 1) != largeSidebarNode) {
-                    ((NodeProperty) largeSidebarProperty()).setSuppressLayoutChanges(true);
-                    largeSidebarNode.toFront();
-                    ((NodeProperty) largeSidebarProperty()).setSuppressLayoutChanges(false);
-                }
-            } else {
-                largeSidebarNode.setVisible(false);
-                largeSidebarNode.setManaged(false);
+        if (largeSidebarNode != null) {
+            boolean isVisible = (activeSidebar == largeSidebarNode) || largeSidebarNeedDisplay;
+            largeSidebarNode.setVisible(isVisible);
+            largeSidebarNode.setManaged(isVisible);
+            if (isVisible && getChildren().get(getChildren().size() - 1) != largeSidebarNode) {
+                ((NodeProperty) largeSidebarProperty()).setSuppressLayoutChanges(true);
+                largeSidebarNode.toFront();
+                ((NodeProperty) largeSidebarProperty()).setSuppressLayoutChanges(false);
             }
         }
-    }
-
-    private double computeNodeHeight(Node node, boolean isSideBarInHorizontal) {
-        if (node == null || isSideBarInHorizontal) {
-            return 0d;
-        }
-        return boundSize(node.prefHeight(-1), node.minHeight(-1), node.maxHeight(-1));
-    }
-
-    private double computeNodeWidth(Node node, boolean isSideBarInHorizontal) {
-        if (node == null || !isSideBarInHorizontal) {
-            return 0d;
-        }
-        return boundSize(node.prefWidth(-1), node.minWidth(-1), node.maxWidth(-1));
-    }
-
-    private double boundSize(double pref, double min, double max) {
-        double a = Math.max(pref, min);
-        double b = Math.max(min, max);
-        return Math.min(a, b);
     }
 
     private final class NodeProperty extends ObjectPropertyBase<Node> {
@@ -585,4 +543,107 @@ public class ResponsivePane extends Pane {
         }
     }
 
+    private double getInsideWidth(double totalWidth) {
+        if (totalWidth == -1) {
+            return -1;
+        }
+        Insets insets = getInsets();
+        return totalWidth - snapSpaceX(insets.getLeft()) - snapSpaceX(insets.getRight());
+    }
+
+    private boolean shouldShowSidebar(double containerSize, double sidebarSize, double contentMinSize, double gap) {
+        if (sidebarSize <= 0 || containerSize < 0) {
+            return false;
+        }
+        return containerSize >= sidebarSize + contentMinSize + gap;
+    }
+
+    private double computeNodeWidth(Node node, double height, boolean isMin) {
+        if (node == null) {
+            return 0;
+        }
+        return isMin ? node.minWidth(height) : node.prefWidth(height);
+    }
+
+    private double computeNodeHeight(Node node, double width, boolean isMin) {
+        if (node == null) {
+            return 0;
+        }
+        return isMin ? node.minHeight(width) : node.prefHeight(width);
+    }
+
+    @Override
+    public Orientation getContentBias() {
+        Node contentNode = getContent();
+        if (contentNode != null) {
+            return contentNode.getContentBias();
+        }
+        return null;
+    }
+
+    @Override
+    protected double computePrefWidth(double height) {
+        final Insets insets = getInsets();
+        final Side side = getSide();
+        final boolean isHorizontal = side == Side.LEFT || side == Side.RIGHT;
+
+        double contentPrefWidth = computeNodeWidth(getContent(), height, false);
+        double smallSidebarPrefWidth = computeNodeWidth(getSmallSidebar(), isHorizontal ? -1 : height, false);
+        double largeSidebarPrefWidth = computeNodeWidth(getLargeSidebar(), isHorizontal ? -1 : height, false);
+
+        if (isHorizontal) {
+            double sidebarPrefWidth = Math.max(smallSidebarPrefWidth, largeSidebarPrefWidth);
+            double gap = (sidebarPrefWidth > 0 && contentPrefWidth > 0) ? getGap() : 0;
+            return snapSpaceX(insets.getLeft()) + contentPrefWidth + gap + sidebarPrefWidth + snapSpaceX(insets.getRight());
+        } else {
+            double maxChildWidth = Math.max(contentPrefWidth, Math.max(smallSidebarPrefWidth, largeSidebarPrefWidth));
+            return snapSpaceX(insets.getLeft()) + maxChildWidth + snapSpaceX(insets.getRight());
+        }
+    }
+
+    @Override
+    protected double computePrefHeight(double width) {
+        final Insets insets = getInsets();
+        final Side side = getSide();
+        final double insideWidth = getInsideWidth(width);
+        double prefHeight;
+
+        if (side == Side.LEFT || side == Side.RIGHT) {
+            final double largeSidebarWidth = computeNodeWidth(getLargeSidebar(), -1, false);
+            final double smallSidebarWidth = computeNodeWidth(getSmallSidebar(), -1, false);
+            final double contentMinWidth = computeNodeWidth(getContent(), -1, true);
+            final double gap = (getContent() != null && (getSmallSidebar() != null || getLargeSidebar() != null)) ? getGap() : 0;
+
+            double sidebarWidthToConsider = 0;
+            if (shouldShowSidebar(insideWidth, largeSidebarWidth, contentMinWidth, gap)) {
+                sidebarWidthToConsider = largeSidebarWidth;
+            } else if (shouldShowSidebar(insideWidth, smallSidebarWidth, contentMinWidth, gap)) {
+                sidebarWidthToConsider = smallSidebarWidth;
+            }
+
+            double contentWidthForSizing = (insideWidth == -1) ? -1 : Math.max(0, insideWidth - sidebarWidthToConsider - gap);
+            double contentPrefHeight = computeNodeHeight(getContent(), contentWidthForSizing, false);
+            double sidebarPrefHeight = Math.max(computeNodeHeight(getSmallSidebar(), -1, false), computeNodeHeight(getLargeSidebar(), -1, false));
+
+            prefHeight = Math.max(contentPrefHeight, sidebarPrefHeight);
+        } else { // TOP or BOTTOM
+            double contentPrefHeight = computeNodeHeight(getContent(), insideWidth, false);
+            double largeSidebarPrefHeight = computeNodeHeight(getLargeSidebar(), insideWidth, false);
+            double smallSidebarPrefHeight = computeNodeHeight(getSmallSidebar(), insideWidth, false);
+            double maxSidebarHeight = Math.max(largeSidebarPrefHeight, smallSidebarPrefHeight);
+
+            prefHeight = contentPrefHeight;
+            if (maxSidebarHeight > 0 && getContent() != null) {
+                prefHeight += getGap();
+            }
+            prefHeight += maxSidebarHeight;
+        }
+
+        return snapSpaceY(insets.getTop()) + prefHeight + snapSpaceY(insets.getBottom());
+    }
+
+    @Override
+    protected double computeMinHeight(double width) {
+        return computePrefHeight(width);
+    }
 }
