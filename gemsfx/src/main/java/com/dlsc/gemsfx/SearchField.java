@@ -1,26 +1,14 @@
 package com.dlsc.gemsfx;
 
-import com.dlsc.gemsfx.skins.SearchFieldPopup;
-import com.dlsc.gemsfx.skins.SearchFieldSkin;
 import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
+import com.dlsc.gemsfx.skins.SearchFieldPopup;
+import com.dlsc.gemsfx.skins.SearchFieldSkin;
 import javafx.animation.Animation;
 import javafx.animation.RotateTransition;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -29,14 +17,10 @@ import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Skin;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
@@ -55,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -97,7 +82,6 @@ import java.util.function.Consumer;
  * @see #setComparator(Comparator)
  */
 public class SearchField<T> extends Control {
-
     private static final String DEFAULT_STYLE_CLASS = "search-field";
 
     private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER = true;
@@ -112,6 +96,8 @@ public class SearchField<T> extends Control {
 
     private final SearchFieldPopup<T> popup;
     private final HistoryButton<String> historyButton;
+    //User's search text when a searched object is not selected
+    public final StringProperty lastUserText = new SimpleStringProperty();
 
     /**
      * Constructs a new spotlight field. The field will set defaults for the
@@ -142,34 +128,69 @@ public class SearchField<T> extends Control {
         setPlaceholder(new Label("No items found"));
 
         focusedProperty().addListener(it -> {
-            if (isFocused()) {
+            if (isFocused() && !historyButton.isPopupShowing()) {
                 getEditor().requestFocus();
             }
         });
 
         editor.focusedProperty().addListener(it -> {
-            if (!isAutoCommitOnFocusLost()) {
+            if (!isAutoCommitOnFocusLost() && !isFocusWithin()) {
                 if (popup.isShowing()) {
                     popup.hide();
+                    cancel();
+                    return;
                 }
-                return;
             }
 
-            if (!editor.isFocused()) {
+            boolean focused = editor.isFocused();
+            boolean blank = StringUtils.isBlank(editor.getText());
+            boolean showOnBlank = suggestWhenBlank.get();
+            String searchText = editor.getText();
+
+            if (isAutoCommitOnFocusLost() && !focused) {
+
                 // Add the current text to the history if the editor lost focus.
                 if (isAddingItemToHistoryOnFocusLost()) {
-                    addToHistory(editor.getText());
+                    addToHistory(searchText);
                 }
-                commit();
-                if (getSelectedItem() == null) {
-                    editor.setText("");
+
+                T defaultChoice = getSearchDefaultChoice(searchText);
+                if(defaultChoice == null && newItemProducer.get() != null) {
+                    T newItem = newItemProducer.get().call(searchText);
+                    select(newItem);
+                } else
+                    commit();
+            }
+            else if (focused && (showOnBlank || !blank)) {
+                if (!Objects.equals(searchService.text, searchText) || (showOnBlank && blank)) {
+                    restartSearch();
                 } else {
-                    invokeCommitHandler();
+                    popup.showPopup();
                 }
             }
         });
 
+        editor.textProperty().addListener(it -> {
+            //we should always be focused while text is changing?
+            boolean focused = editor.isFocused();
+            boolean blank = StringUtils.isBlank(editor.getText());
+            boolean showOnBlank = suggestWhenBlank.get();
+
+            if (focused && !committing) {
+                if (!blank || showOnBlank) {
+                    restartSearch();
+                } else {
+                    clearSuggestions();
+                }
+            }
+        });
+
+        AtomicBoolean cyclePrevent = new AtomicBoolean(false);
+
         addEventFilter(KeyEvent.KEY_RELEASED, evt -> {
+            if(cyclePrevent.get())
+                return;
+
             KeyCode keyCode = evt.getCode();
 
             // record the history popup showing status before hide.
@@ -181,17 +202,38 @@ public class SearchField<T> extends Control {
             }
 
             boolean releasedEnter = keyCode.equals(KeyCode.ENTER);
+            boolean highlighting = (evt.isShiftDown() && evt.getCode().isArrowKey());
+            boolean highlighted = editor.getAnchor() != editor.getCaretPosition();
+            boolean releasedRightAtEnd = keyCode.equals(KeyCode.RIGHT) && editor.getCaretPosition() == editor.getText().length();
+
             // Add the current text to the history if the user pressed the ENTER key.
             if (releasedEnter && isAddingItemToHistoryOnEnter() && !lastHistoryPopupShowing) {
                 addToHistory(editor.getText());
             }
 
-            if ((keyCode.equals(KeyCode.RIGHT) || releasedEnter) && !lastHistoryPopupShowing) {
-                commit();
+            if ((keyCode.equals(KeyCode.TAB) || (releasedRightAtEnd && !highlighting && !highlighted) || releasedEnter) && !lastHistoryPopupShowing) {
+                T defaultChoice = getSearchDefaultChoice(editor.getText());
+                if(defaultChoice == null && newItemProducer.get() != null) {
+                    T newItem = newItemProducer.get().call(editor.getText());
+                    select(newItem);
+                } else
+                    select(defaultChoice);
+
                 evt.consume();
-                invokeCommitHandler();
-            } else if (keyCode.equals(KeyCode.LEFT)) {
-                editor.positionCaret(Math.max(0, editor.getCaretPosition() - 1));
+            } else if (keyCode.equals(KeyCode.LEFT) && popup.isShowing() && !highlighting) {
+                if(highlighted)
+                    editor.positionCaret(Math.min(editor.getAnchor(), editor.getCaretPosition()));
+                else
+                    editor.positionCaret(Math.max(0, editor.getCaretPosition()) - 1);
+
+                evt.consume();
+            } else if (keyCode.equals(KeyCode.RIGHT) && popup.isShowing() && !highlighting) {
+                if(highlighted)
+                    editor.positionCaret(Math.max(editor.getAnchor(), editor.getCaretPosition()));
+                else
+                    editor.positionCaret(Math.min(editor.getText().length(), editor.getCaretPosition()) + 1);
+
+                evt.consume();
             } else if (keyCode.equals(KeyCode.ESCAPE)) {
                 historyButton.hidePopup();
                 cancel();
@@ -200,6 +242,15 @@ public class SearchField<T> extends Control {
                 editor.selectAll();
                 evt.consume();
             }
+//            else {
+//                cyclePrevent.set(true);
+//                if (keyCode.isArrowKey()) {
+//                    editor.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED,  KeyEvent.CHAR_UNDEFINED, evt.getText(), keyCode, evt.isShiftDown(), evt.isControlDown(), evt.isAltDown(), evt.isMetaDown()));
+//                    editor.fireEvent(new KeyEvent(KeyEvent.KEY_TYPED,    KeyEvent.CHAR_UNDEFINED, evt.getText(), keyCode, evt.isShiftDown(), evt.isControlDown(), evt.isAltDown(), evt.isMetaDown()));
+//                    editor.fireEvent(new KeyEvent(KeyEvent.KEY_RELEASED, KeyEvent.CHAR_UNDEFINED, evt.getText(), keyCode, evt.isShiftDown(), evt.isControlDown(), evt.isAltDown(), evt.isMetaDown()));
+//                }
+//                cyclePrevent.set(false);
+//            }
         });
 
         setMatcher((item, searchText) -> getConverter().toString(item).startsWith(searchText.toLowerCase()));
@@ -226,15 +277,6 @@ public class SearchField<T> extends Control {
 
         fullText.bind(Bindings.createStringBinding(() -> editor.getText() + getAutoCompletedText(), editor.textProperty(), autoCompletedText));
 
-        editor.textProperty().addListener(it -> {
-            if (!committing) {
-                if (StringUtils.isNotBlank(editor.getText())) {
-                    searchService.restart();
-                } else {
-                    update(null);
-                }
-            }
-        });
 
         selectedItem.addListener(it -> {
             T selectedItem = getSelectedItem();
@@ -242,7 +284,7 @@ public class SearchField<T> extends Control {
                 String displayName = getConverter().toString(selectedItem);
                 String text = editor.getText();
 
-                if (StringUtils.isBlank(text)) {
+                if (!getPopup().isShowing() && StringUtils.isBlank(text)) {
                     /*
                      * Looks like the "selected item" was set from outside, and not because of a search.
                      * We are using the "committing" flag so that the listener that responds to editor text
@@ -255,14 +297,10 @@ public class SearchField<T> extends Control {
                         committing = false;
                     }
                 } else {
-                    if (StringUtils.startsWithIgnoreCase(displayName, text)) {
-                        autoCompletedText.set(displayName.substring(text.length()));
-                    } else {
-                        autoCompletedText.set("");
-                    }
+                    updateAutoSuggestionText();
                 }
             } else {
-                autoCompletedText.set("");
+                updateAutoSuggestionText();
             }
         });
 
@@ -321,11 +359,73 @@ public class SearchField<T> extends Control {
         searchService.setOnRunning(evt -> fireEvent(new SearchEvent(SearchEvent.SEARCH_STARTED, searchService.getText())));
 
         searchService.setOnSucceeded(evt -> {
-            update(searchService.getValue());
+            setSuggestions(searchService.getValue());
+            updateAutoSuggestionText();
             fireEvent(new SearchEvent(SearchEvent.SEARCH_FINISHED, searchService.getText()));
         });
 
         searching.bind(searchService.runningProperty());
+    }
+
+    protected void updateAutoSuggestionText() {
+        String searchText = editor.getText();
+
+        T defaultChoice = getSearchDefaultChoice(searchText);
+
+        if(defaultChoice != null) {
+            String suggestionText = getConverter().toString(defaultChoice);
+            if (StringUtils.startsWithIgnoreCase(suggestionText, searchText)) {
+                autoCompletedText.set(suggestionText.substring(searchText.length()));
+                return;
+            }
+        }
+
+        autoCompletedText.set("");
+    }
+
+    private T getSearchDefaultChoice(String searchText) {
+        BiFunction<T, String, Boolean> matcher = getMatcher();
+        T defaultChoice = suggestions.stream().sorted(comparator.get()).filter(item -> matcher.apply(item, searchText)).findFirst().orElse(null);
+
+        if(selectedItem.get() != null && StringUtils.startsWithIgnoreCase(getConverter().toString(defaultChoice), searchText))
+            defaultChoice = selectedItem.get();
+
+        return defaultChoice;
+    }
+
+    public synchronized void restartSearch(){
+        safeInvoke(()->{
+            switch (searchService.getState()) {
+                case READY, SUCCEEDED, FAILED, CANCELLED, RUNNING -> {
+                    try {
+                        searchService.restart();
+                    } catch (Exception ex) {
+                        searchService.text = editor.getText();
+                    }
+                }
+                case SCHEDULED ->
+                    searchService.text = editor.getText();
+            }
+        });
+    }
+
+
+    /**
+     * adds the runnable to the ui queue if not already in the ui thread.
+     * if this is called in the ui thread, the action is taken immediately
+     *
+     * @param r
+     */
+    private static void safeInvoke(Runnable r) {
+        if (!onUIThread()) {
+            Platform.runLater(r);
+        }
+        else {
+            r.run();
+        }
+    }
+    private static boolean onUIThread() {
+        return Thread.currentThread().getName().equals("JavaFX Application Thread");
     }
 
     private void onHistoryItemConfirmed(String historyItem) {
@@ -359,11 +459,9 @@ public class SearchField<T> extends Control {
 
     private void invokeCommitHandler() {
         T selectedItem = getSelectedItem();
-        if (selectedItem != null) {
-            Consumer<T> onCommit = getOnCommit();
-            if (onCommit != null) {
-                onCommit.accept(selectedItem);
-            }
+        Consumer<T> onCommit = getOnCommit();
+        if (onCommit != null) {
+            onCommit.accept(selectedItem);
         }
     }
 
@@ -382,6 +480,7 @@ public class SearchField<T> extends Control {
             if (selectedItem != null) {
                 String text = getConverter().toString(selectedItem);
                 if (text != null) {
+                    lastUserText.set(editor.getText());
                     editor.setText(text);
                     editor.positionCaret(text.length());
 
@@ -397,9 +496,12 @@ public class SearchField<T> extends Control {
             }
 
             getProperties().put("committed", "");
+
+            invokeCommitHandler();
         } finally {
             committing = false;
         }
+
     }
 
     private void addToHistory(String text) {
@@ -430,6 +532,10 @@ public class SearchField<T> extends Control {
 
     public void setOnCommit(Consumer<T> onCommit) {
         this.onCommit.set(onCommit);
+    }
+
+    public boolean isCommitting() {
+        return committing;
     }
 
     private class SearchEventHandlerProperty extends SimpleObjectProperty<EventHandler<SearchEvent>> {
@@ -566,6 +672,26 @@ public class SearchField<T> extends Control {
     }
 
     /**
+     * Shows suggestion popups when the user has not typed yet or has cleared the search text
+     * The default is "false"
+     *
+     * @return true if the popup should show options when the field is blank
+     */
+    public final BooleanProperty suggestWhenBlankProperty() {
+        return suggestWhenBlank;
+    }
+
+    public final void setSuggestWhenBlank(boolean suggestWhenBlank) {
+        this.suggestWhenBlank.set(suggestWhenBlank);
+    }
+
+    public final BooleanProperty suggestWhenBlank = new SimpleBooleanProperty(this, "suggestWhenBlank", false);
+
+    public final boolean isSuggestWhenBlank() {
+        return suggestWhenBlank.get();
+    }
+
+    /**
      * Determines whether to hide the popup window when there are no choices available in the suggestion list.
      * The default value is "false", indicating that the popup does not hide automatically under this condition.
      *
@@ -635,9 +761,9 @@ public class SearchField<T> extends Control {
 
         @Override
         protected Collection<T> call() throws Exception {
-            Thread.sleep(250);
+//            Thread.sleep(250);
 
-            if (!isCancelled() && StringUtils.isNotBlank(searchText)) {
+            if (!isCancelled() && (StringUtils.isNotBlank(searchText) || suggestWhenBlank.get())) {
                 return getSuggestionProvider().call(new SearchFieldSuggestionRequest() {
                     @Override
                     public boolean isCancelled() {
@@ -659,46 +785,40 @@ public class SearchField<T> extends Control {
      * Cancels the current search in progress.
      */
     public final void cancel() {
-        searchService.cancel();
         getProperties().put("cancelled", "");
-        setSelectedItem(null);
-        setText("");
+        if(popup.isShowing())
+            popup.hide();
+//        setSelectedItem(null);
+//        setText("");
+        searchService.cancel();
     }
 
+    protected void clearSuggestions(){
+        suggestions.clear();
+    }
     /**
      * Updates the control with the newly found list of suggestions. The suggestions
      * are provided by a background search service.
      *
      * @param newSuggestions the new suggestions to use for the field
      */
-    protected void update(Collection<T> newSuggestions) {
-        if (newSuggestions == null) {
-            suggestions.clear();
+    protected void setSuggestions(Collection<T> newSuggestions) {
+        if (newSuggestions == null || newSuggestions.isEmpty()) {
+            clearSuggestions();
             return;
         }
 
         suggestions.setAll(newSuggestions);
 
         String searchText = editor.getText();
+
         if (StringUtils.isNotBlank(searchText)) {
             try {
-                BiFunction<T, String, Boolean> matcher = getMatcher();
-
+                T defaultChoice = getSearchDefaultChoice(searchText);
                 newItem.set(false);
 
-                newSuggestions.stream().filter(item -> matcher.apply(item, searchText)).findFirst().ifPresentOrElse(selectedItem::set, () -> {
-                    if (StringUtils.isNotBlank(searchText)) {
-                        Callback<String, T> itemProducer = getNewItemProducer();
-                        if (itemProducer != null) {
-                            newItem.set(true);
-                            selectedItem.set(itemProducer.call(searchText));
-                        } else {
-                            selectedItem.set(null);
-                        }
-                    } else {
-                        selectedItem.set(null);
-                    }
-                });
+                selectedItem.set(defaultChoice);
+
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

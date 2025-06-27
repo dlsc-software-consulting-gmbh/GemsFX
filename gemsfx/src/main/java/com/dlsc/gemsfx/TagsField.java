@@ -130,12 +130,12 @@ public class TagsField<T> extends SearchField<T> {
      * @param newSuggestions the new suggestions to use for the field
      */
     @Override
-    protected void update(Collection<T> newSuggestions) {
+    protected void setSuggestions(Collection<T> newSuggestions) {
         if (newSuggestions != null) {
             newSuggestions.removeAll(getTags());
         }
 
-        super.update(newSuggestions);
+        super.setSuggestions(newSuggestions);
     }
 
     private final ListProperty<T> tags = new SimpleListProperty<>(this, "tags", FXCollections.observableArrayList());

@@ -123,6 +123,7 @@ public class SearchFieldEditorSkin<T> extends TextFieldSkin {
 
     @Override
     protected void layoutChildren(double x, double y, double w, double h) {
+//        super.layoutChildren(x,y,w,h);
         double fullHeight = h + snappedTopInset() + snappedBottomInset();
 
         double leftWidth = leftPane == null ? 0.0 : snapSizeX(leftPane.prefWidth(fullHeight));

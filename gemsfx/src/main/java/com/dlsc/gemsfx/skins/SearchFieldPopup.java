@@ -7,6 +7,7 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.CustomPopupControl;
 import com.dlsc.gemsfx.SearchField;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
@@ -15,6 +16,8 @@ import javafx.scene.control.Skin;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SearchFieldPopup<T> extends CustomPopupControl {
 
@@ -37,9 +40,15 @@ public class SearchFieldPopup<T> extends CustomPopupControl {
         MapChangeListener<? super Object, ? super Object> l = change -> {
             if (change.wasAdded()) {
                 if (change.getKey().equals("committed") || change.getKey().equals("cancelled")) {
-                    hide();
-                    searchField.getProperties().remove("committed");
-                    searchField.getProperties().remove("cancelled");
+                    try {
+                        blockingInvoke(()->{
+                            hide();
+                            searchField.getProperties().remove("committed");
+                            searchField.getProperties().remove("cancelled");
+                        });
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         };
@@ -47,7 +56,7 @@ public class SearchFieldPopup<T> extends CustomPopupControl {
         searchField.getProperties().addListener(l);
 
         searchField.addEventHandler(SearchField.SearchEvent.SEARCH_FINISHED, evt -> {
-            if ((!searchField.getSuggestions().isEmpty() || searchField.getPlaceholder() != null) && StringUtils.isNotBlank(searchField.getEditor().getText())) {
+            if ((!searchField.getSuggestions().isEmpty() || searchField.getPlaceholder() != null) && (StringUtils.isNotBlank(searchField.getEditor().getText()) || searchField.suggestWhenBlank.get())) {
 
                 // assuming that we don't have to show it
                 boolean showIt = false;
@@ -66,8 +75,14 @@ public class SearchFieldPopup<T> extends CustomPopupControl {
                 }
 
                 if (showIt) {
-                    show(searchField);
-                    selectFirstSuggestion();
+                    showPopup();
+//                    selectFirstSuggestion();
+//                    if(!wasShown) {
+//                        if(!searchField.getEditor().isFocused()) {
+//                            searchField.getEditor().requestFocus();
+//                            searchField.getEditor().selectEnd();
+//                        }
+//                    }
                 } else {
                     hide();
                 }
@@ -75,6 +90,34 @@ public class SearchFieldPopup<T> extends CustomPopupControl {
                 hide();
             }
         });
+    }
+
+    /**
+     * block on the current thread until the ui invocation has completed.
+     * this is mostly useful for starting transitions or modifying ui elements off the ui thread
+     *
+     * @param r
+     */
+    public static void blockingInvoke(Runnable r) throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+
+
+        if (!Thread.currentThread().getName().equals("JavaFX Application Thread")) {
+            Platform.runLater(() -> {
+                r.run();
+                latch.countDown();
+            });
+        }
+        else {
+            r.run();
+            latch.countDown();
+        }
+
+        latch.await();
+    }
+
+    public void showPopup(){
+        show(searchField);
     }
 
     public SearchField<T> getSearchField() {
@@ -90,7 +133,7 @@ public class SearchFieldPopup<T> extends CustomPopupControl {
      * by pressing enter immediately.
      */
     private void selectFirstSuggestion() {
-        SearchFieldPopupSkin<T> skin = (SearchFieldPopupSkin) getSkin();
+        SearchFieldPopupSkin<?> skin = (SearchFieldPopupSkin<?>) getSkin();
         ListView<?> listView = (ListView<?>) skin.getNode();
         if (listView.getItems() != null && !listView.getItems().isEmpty()) {
             listView.getSelectionModel().select(0);
