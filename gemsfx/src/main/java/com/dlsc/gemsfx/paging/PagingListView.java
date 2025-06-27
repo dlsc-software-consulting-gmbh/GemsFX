@@ -31,8 +31,6 @@ import java.util.Objects;
 
 public class PagingListView<T> extends ItemPagingControlBase<T> {
 
-    private final LoadingService<T> loadingService = new LoadingService<>();
-
     private final ObservableList<T> items = FXCollections.observableArrayList();
 
     private final ObservableList<T> unmodifiableItems = FXCollections.unmodifiableObservableList(items);
@@ -60,28 +58,44 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
 
         selectionModelProperty().bindBidirectional(listView.selectionModelProperty());
 
-        loadingService.pageProperty().bind(pageProperty());
-        loadingService.pageSizeProperty().bind(pageSizeProperty());
-        loadingService.loadDelayInMillisProperty().bind(loadDelayInMillisProperty());
-        loadingService.loaderProperty().bind(loaderProperty());
-        loadingService.setOnSucceeded(evt -> {
-            loadingStatus.set(Status.OK);
+        loadingService.addListener((obs, oldService, newService) ->  {
+            if (oldService != null) {
+                oldService.pageProperty().unbind();
+                oldService.pageSizeProperty().unbind();
+                oldService.loadDelayInMillisProperty().unbind();
+                oldService.loaderProperty().unbind();
+                oldService.setOnSucceeded(null);
+                oldService.setOnRunning(null);
+                oldService.setOnFailed(null);
+            }
 
-            PagingLoadResponse<T> response = loadingService.getValue();
+            if (newService != null) {
+                newService.pageProperty().bind(pageProperty());
+                newService.pageSizeProperty().bind(pageSizeProperty());
+                newService.loadDelayInMillisProperty().bind(loadDelayInMillisProperty());
+                newService.loaderProperty().bind(loaderProperty());
+                newService.setOnSucceeded(evt -> {
+                    loadingStatus.set(Status.OK);
 
-            // update the total item count
-            setTotalItemCount(response.getTotalItemCount());
+                    PagingLoadResponse<T> response = newService.getValue();
 
-            List<T> newList = response.getItems();
-            if (newList != null) {
-                items.setAll(newList);
-            } else {
-                items.clear();
+                    // update the total item count
+                    setTotalItemCount(response.getTotalItemCount());
+
+                    List<T> newList = response.getItems();
+                    if (newList != null) {
+                        items.setAll(newList);
+                    } else {
+                        items.clear();
+                    }
+                });
+
+                newService.setOnRunning(evt -> loadingStatus.set(Status.LOADING));
+                newService.setOnFailed(evt -> loadingStatus.set(Status.ERROR));
             }
         });
 
-        loadingService.setOnRunning(evt -> loadingStatus.set(Status.LOADING));
-        loadingService.setOnFailed(evt -> loadingStatus.set(Status.ERROR));
+        setLoadingService(new LoadingService<>());
 
         InvalidationListener loadListener = it -> reload();
         pageProperty().addListener(loadListener);
@@ -130,16 +144,25 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
         return Objects.requireNonNull(PagingListView.class.getResource("paging-list-view.css")).toExternalForm();
     }
 
+    private final ObjectProperty<LoadingService<T>> loadingService = new SimpleObjectProperty<>(this, "loadingService");
+
     /**
      * Returns the service responsible for executing the actual loading of the data on a background
      * thread.
      *
      * @return the loading service
      */
-    public final LoadingService<T> getLoadingService() {
+    public final ObjectProperty<LoadingService<T>> loadingServiceProperty() {
         return loadingService;
     }
 
+    public final void setLoadingService(LoadingService<T> loadingService) {
+        this.loadingService.set(loadingService);
+    }
+
+    public final LoadingService<T> getLoadingService() {
+        return loadingService.get();
+    }
     /**
      * Overrides content bias as we want height calculations for the cells based on the current width of the
      * list view.
@@ -294,7 +317,7 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
      */
     @Override
     public final void reload() {
-        loadingService.restart();
+        getLoadingService().restart();
     }
 
     /**

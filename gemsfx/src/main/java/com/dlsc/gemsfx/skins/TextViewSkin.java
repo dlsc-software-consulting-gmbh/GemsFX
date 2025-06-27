@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TextView;
+import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -52,7 +53,7 @@ public class TextViewSkin extends SkinBase<TextView> {
 
     @Override
     protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return selectableText.minHeight(width - leftInset - rightInset);
+        return selectableText.prefHeight(width - leftInset - rightInset);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class TextViewSkin extends SkinBase<TextView> {
 
     @Override
     protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return selectableText.maxHeight(width - leftInset - rightInset);
+        return selectableText.prefHeight(width - leftInset - rightInset);
     }
 
     private static final class SelectableText extends TextFlow {
@@ -73,6 +74,7 @@ public class TextViewSkin extends SkinBase<TextView> {
         private int mouseDragStartPos = -1;
         private int selectionStartPos = -1;
         private int selectionEndPos = -1;
+
         private final Text text = new Text();
 
         public SelectableText(TextView textView) {
@@ -81,7 +83,6 @@ public class TextViewSkin extends SkinBase<TextView> {
             this.textView = textView;
 
             setCursor(Cursor.TEXT);
-            setPrefWidth(Region.USE_COMPUTED_SIZE);
 
             text.getStyleClass().add("text");
             text.textProperty().bind(textView.textProperty());
@@ -95,11 +96,6 @@ public class TextViewSkin extends SkinBase<TextView> {
 
             getStyleClass().add("selectable-text");
             initListeners();
-        }
-
-        @Override
-        protected double computePrefHeight(double width) {
-            return super.computePrefHeight(width);
         }
 
         public void selectAll() {

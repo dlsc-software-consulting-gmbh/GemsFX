@@ -18,6 +18,7 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Worker;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -26,15 +27,11 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
-
-    private final LoadingService<T> loadingService = new LoadingService<>();
-
     private final ObservableList<T> itemsOnCurrentPage = FXCollections.observableArrayList();
 
     private final GridTableView<T> gridTableView = new GridTableView<>();
@@ -51,28 +48,46 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
             return 0;
         }, fillLastPageProperty(), pageSizeProperty()));
 
-        loadingService.pageProperty().bind(pageProperty());
-        loadingService.pageSizeProperty().bind(pageSizeProperty());
-        loadingService.loadDelayInMillisProperty().bind(loadDelayInMillisProperty());
-        loadingService.loaderProperty().bind(loaderProperty());
-        loadingService.setOnSucceeded(evt -> {
-            loadingStatus.set(Status.OK);
+        loadingService.addListener((obs, oldService, newService) ->  {
+            if (oldService != null) {
+                oldService.pageProperty().unbind();
+                oldService.pageSizeProperty().unbind();
+                oldService.loadDelayInMillisProperty().unbind();
+                oldService.loaderProperty().unbind();
+                oldService.setOnSucceeded(null);
+                oldService.setOnRunning(null);
+                oldService.setOnFailed(null);
+            }
 
-            PagingLoadResponse<T> response = loadingService.getValue();
+            if (newService != null) {
+                newService.pageProperty().bind(pageProperty());
+                newService.pageSizeProperty().bind(pageSizeProperty());
+                newService.loadDelayInMillisProperty().bind(loadDelayInMillisProperty());
+                newService.loaderProperty().bind(loaderProperty());
 
-            // update the total item count
-            setTotalItemCount(response.getTotalItemCount());
+                // new service might have already run ... let's update the loading status based on its state
+                Worker.State state = newService.getState();
+                if (state == Worker.State.RUNNING) {
+                    loadingStatus.set(Status.LOADING);
+                } else if (state == Worker.State.FAILED) {
+                    loadingStatus.set(Status.ERROR);
+                } else {
+                    loadingStatus.set(Status.OK);
+                }
 
-            List<T> newList = response.getItems();
-            if (newList != null) {
-                itemsOnCurrentPage.setAll(new ArrayList<>(newList));
-            } else {
-                itemsOnCurrentPage.clear();
+                processService(newService);
+
+                newService.setOnSucceeded(evt -> {
+                    loadingStatus.set(Status.OK);
+                    processService(newService);
+                });
+
+                newService.setOnRunning(evt -> loadingStatus.set(Status.LOADING));
+                newService.setOnFailed(evt -> loadingStatus.set(Status.ERROR));
             }
         });
 
-        loadingService.setOnRunning(evt -> loadingStatus.set(Status.LOADING));
-        loadingService.setOnFailed(evt -> loadingStatus.set(Status.ERROR));
+        setLoadingService(new LoadingService<>());
 
         InvalidationListener loadListener = it -> reload();
         pageProperty().addListener(loadListener);
@@ -100,6 +115,24 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
         setPlaceholder(new Label("No items"));
     }
 
+    private void processService(LoadingService<T> service) {
+        PagingLoadResponse<T> response = service.getValue();
+
+        if (response != null) {
+            // update the total item count
+            setTotalItemCount(response.getTotalItemCount());
+
+            List<T> newList = response.getItems();
+            if (newList != null) {
+                itemsOnCurrentPage.setAll(newList);
+            } else {
+                itemsOnCurrentPage.clear();
+            }
+        } else {
+            itemsOnCurrentPage.clear();
+        }
+    }
+
     @Override
     protected Skin<?> createDefaultSkin() {
         return new PagingGridTableViewSkin<>(this);
@@ -110,14 +143,24 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
         return Objects.requireNonNull(PagingGridTableView.class.getResource("paging-grid-table-view.css")).toExternalForm();
     }
 
+    private final ObjectProperty<LoadingService<T>> loadingService = new SimpleObjectProperty<>(this, "loadingService");
+
     /**
      * Returns the service responsible for executing the actual loading of the data on a background
      * thread.
      *
      * @return the loading service
      */
-    public final LoadingService<T> getLoadingService() {
+    public final ObjectProperty<LoadingService<T>> loadingServiceProperty() {
         return loadingService;
+    }
+
+    public final void setLoadingService(LoadingService<T> loadingService) {
+        this.loadingService.set(loadingService);
+    }
+
+    public final LoadingService<T> getLoadingService() {
+        return loadingService.get();
     }
 
     private final ListProperty<GridTableColumn<T, ?>> columns = new SimpleListProperty<>(this, "columns", FXCollections.observableArrayList());
@@ -256,7 +299,6 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
      * load operations.
      *
      * @return the commit delay for the nested loading pane
-     *
      * @see LoadingPane#commitDelayProperty()
      */
     public final LongProperty commitLoadStatusDelayProperty() {
@@ -272,7 +314,7 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
      */
     @Override
     public final void reload() {
-        loadingService.restart();
+        getLoadingService().restart();
     }
 
     /**
