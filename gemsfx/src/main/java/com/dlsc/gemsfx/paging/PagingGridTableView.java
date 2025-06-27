@@ -60,6 +60,8 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
             }
 
             if (newService != null) {
+                processService(newService);
+
                 newService.pageProperty().bind(pageProperty());
                 newService.pageSizeProperty().bind(pageSizeProperty());
                 newService.loadDelayInMillisProperty().bind(loadDelayInMillisProperty());
@@ -75,8 +77,6 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
                     loadingStatus.set(Status.OK);
                 }
 
-                processService(newService);
-
                 newService.setOnSucceeded(evt -> {
                     loadingStatus.set(Status.OK);
                     processService(newService);
@@ -89,7 +89,12 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
 
         setLoadingService(new LoadingService<>());
 
-        InvalidationListener loadListener = it -> reload();
+        InvalidationListener loadListener = it -> {
+            if (!processingService) {
+                reload();
+            }
+        };
+
         pageProperty().addListener(loadListener);
         pageSizeProperty().addListener(loadListener);
         loaderProperty().addListener(loadListener);
@@ -115,21 +120,31 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
         setPlaceholder(new Label("No items"));
     }
 
+    private boolean processingService;
+
     private void processService(LoadingService<T> service) {
-        PagingLoadResponse<T> response = service.getValue();
+        processingService = true;
+        try {
+            setPageSize(service.getPageSize());
+            setPage(service.getPage());
 
-        if (response != null) {
-            // update the total item count
-            setTotalItemCount(response.getTotalItemCount());
+            PagingLoadResponse<T> response = service.getValue();
 
-            List<T> newList = response.getItems();
-            if (newList != null) {
-                itemsOnCurrentPage.setAll(newList);
+            if (response != null) {
+                // update the total item count
+                setTotalItemCount(response.getTotalItemCount());
+
+                List<T> newList = response.getItems();
+                if (newList != null) {
+                    itemsOnCurrentPage.setAll(newList);
+                } else {
+                    itemsOnCurrentPage.clear();
+                }
             } else {
                 itemsOnCurrentPage.clear();
             }
-        } else {
-            itemsOnCurrentPage.clear();
+        } finally {
+            processingService = false;
         }
     }
 
