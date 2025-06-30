@@ -17,10 +17,8 @@ import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
@@ -59,7 +57,7 @@ import java.util.function.Consumer;
  * The search field requires proper configuration to work correctly:
  *
  * <ol>
- * <li><b>Suggestion Provider</b> - a callback that returns a collection of items for a given search field suggestion request. The suggestion provider is invoked asynchronously via JavaFX concurrency API (service & task). The suggestion provider gets invoked slightly delayed whenever the user types some text into the field. If the user types again the current search gets cancelled and a new search gets initiated. As long as the user types fast enough the actual search will not be performed.</li>
+ * <li><b>Suggestion Provider</b> - a callback that returns a collection of items for a given search field suggestion request. The suggestion provider is invoked asynchronously via JavaFX concurrency API (service &amp; task). The suggestion provider gets invoked slightly delayed whenever the user types some text into the field. If the user types again the current search gets cancelled and a new search gets initiated. As long as the user types fast enough the actual search will not be performed.</li>
  * <li><b>Converter</b> - the converter is used to convert the items found in the suggestions list to text. This is just a standard StringConverter instance (only the toString() method needs to be implemented).</li>
  * <li><b>Cell Factory</b> - a standard list cell factory / callback used for the ListView instance shown in the popup that presents the suggested items. The default cell factory should be sufficient for most use cases. It simply displays the name of the items via the help of the string converter. However, it also underlines the text match in the name.</li>
  * <li><b>Matcher</b> - a function taking two arguments that will be applied to the suggested items to find "perfect matches" for the given search text (entered by the user). The function takes an item and the search text as input and returns a boolean. The first perfect match found will be used to autocomplete the text of the search field.</li>
@@ -98,6 +96,20 @@ public class SearchField<T> extends Control {
     private final HistoryButton<String> historyButton;
     //User's search text when a searched object is not selected
     public final StringProperty lastUserText = new SimpleStringProperty();
+
+    /**
+     * <p>
+     * Search delay in milliseconds.
+     * Depending on your filter queries, this allows for searches to be more efficient by not running a search while the user is continuously typing though the search popup will be less responsive.
+     * </p>
+     * <p>
+     * By setting this to 0, searches will take place immediately at all times.
+     * </p>
+     * <p>
+     * A typical delay may be less than a second. 100-250.
+     * </p>
+     */
+    public final LongProperty searchDelayMs = new SimpleLongProperty(0);
 
     /**
      * Constructs a new spotlight field. The field will set defaults for the
@@ -761,7 +773,8 @@ public class SearchField<T> extends Control {
 
         @Override
         protected Collection<T> call() throws Exception {
-//            Thread.sleep(250);
+            if(searchDelayMs.get()>0)
+                Thread.sleep(searchDelayMs.get());
 
             if (!isCancelled() && (StringUtils.isNotBlank(searchText) || suggestWhenBlank.get())) {
                 return getSuggestionProvider().call(new SearchFieldSuggestionRequest() {
