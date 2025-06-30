@@ -143,4 +143,14 @@ public class SearchFieldPopup<T> extends CustomPopupControl {
     protected Skin<?> createDefaultSkin() {
         return new SearchFieldPopupSkin<>(this);
     }
+
+    public T selectedItem() {
+        SearchFieldPopupSkin<?> skin = (SearchFieldPopupSkin<?>) getSkin();
+        ListView<?> listView = (ListView<?>) skin.getNode();
+        if (listView.getItems() != null && !listView.getItems().isEmpty()) {
+            //noinspection unchecked
+            return (T) listView.getSelectionModel().getSelectedItem();
+        } else
+            return null;
+    }
 }

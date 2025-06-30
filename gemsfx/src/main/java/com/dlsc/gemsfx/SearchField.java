@@ -224,12 +224,18 @@ public class SearchField<T> extends Control {
             }
 
             if ((keyCode.equals(KeyCode.TAB) || (releasedRightAtEnd && !highlighting && !highlighted) || releasedEnter) && !lastHistoryPopupShowing) {
-                T defaultChoice = getSearchDefaultChoice(editor.getText());
-                if(defaultChoice == null && newItemProducer.get() != null) {
-                    T newItem = newItemProducer.get().call(editor.getText());
-                    select(newItem);
-                } else
-                    select(defaultChoice);
+                T selectedChoice = getPopup().selectedItem();
+                if(selectedChoice != null)
+                    select(selectedChoice);
+                else {
+                    T defaultChoice = getSearchDefaultChoice(editor.getText());
+                    if (defaultChoice == null && newItemProducer.get() != null) {
+                        T newItem = newItemProducer.get().call(editor.getText());
+                        select(newItem);
+                    }
+                    else
+                        select(defaultChoice);
+                }
 
                 evt.consume();
             } else if (keyCode.equals(KeyCode.LEFT) && popup.isShowing() && !highlighting) {
@@ -254,15 +260,6 @@ public class SearchField<T> extends Control {
                 editor.selectAll();
                 evt.consume();
             }
-//            else {
-//                cyclePrevent.set(true);
-//                if (keyCode.isArrowKey()) {
-//                    editor.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED,  KeyEvent.CHAR_UNDEFINED, evt.getText(), keyCode, evt.isShiftDown(), evt.isControlDown(), evt.isAltDown(), evt.isMetaDown()));
-//                    editor.fireEvent(new KeyEvent(KeyEvent.KEY_TYPED,    KeyEvent.CHAR_UNDEFINED, evt.getText(), keyCode, evt.isShiftDown(), evt.isControlDown(), evt.isAltDown(), evt.isMetaDown()));
-//                    editor.fireEvent(new KeyEvent(KeyEvent.KEY_RELEASED, KeyEvent.CHAR_UNDEFINED, evt.getText(), keyCode, evt.isShiftDown(), evt.isControlDown(), evt.isAltDown(), evt.isMetaDown()));
-//                }
-//                cyclePrevent.set(false);
-//            }
         });
 
         setMatcher((item, searchText) -> getConverter().toString(item).startsWith(searchText.toLowerCase()));
@@ -402,6 +399,7 @@ public class SearchField<T> extends Control {
         if(selectedItem.get() != null && StringUtils.startsWithIgnoreCase(getConverter().toString(defaultChoice), searchText))
             defaultChoice = selectedItem.get();
 
+
         return defaultChoice;
     }
 
@@ -416,7 +414,7 @@ public class SearchField<T> extends Control {
                     }
                 }
                 case SCHEDULED ->
-                    searchService.text = editor.getText();
+                        searchService.text = editor.getText();
             }
         });
     }
