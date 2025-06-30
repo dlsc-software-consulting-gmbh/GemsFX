@@ -1,46 +1,50 @@
 package com.dlsc.gemsfx.paging;
 
-import com.dlsc.gemsfx.LoadingPane;
-import com.dlsc.gemsfx.LoadingPane.Status;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
 import com.dlsc.gemsfx.gridtable.GridTableView;
 import com.dlsc.gemsfx.skins.PagingGridTableViewSkin;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Worker;
-import javafx.geometry.Side;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
-import javafx.util.Callback;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
+/**
+ * The {@code PagingGridTableView} class is a control that combines a grid table with paging capabilities.
+ * This class facilitates the display of paginated data in a table format, supporting customizable columns,
+ * adjustable page size, and options to fill the last page with empty rows.
+ *
+ * @param <T> the type of items displayed in the table view
+ */
 public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
-    private final ObservableList<T> itemsOnCurrentPage = FXCollections.observableArrayList();
 
     private final GridTableView<T> gridTableView = new GridTableView<>();
 
+    /**
+     * Default constructor for the {@code PagingGridTableView} class. This initializes the control and binds
+     * necessary properties to manage paging and display of items.
+     * The constructor sets up the following behavior:
+     * - Adds a specific style class named "paging-grid-table-view" to the control.
+     * - Binds the columns of the internal {@code GridTableView} to the {@code columnsProperty} of this control.
+     * - Sets the items of the internal {@code GridTableView} to the items provided by the current page.
+     * - Configures the `minNumberOfRowsProperty` of the internal {@code GridTableView} to ensure the proper
+     *   number of rows are displayed, including empty rows if the last page should be filled.
+     * - Registers a listener on the `minNumberOfRowsProperty` to trigger a refresh when the property changes.
+     * Internally, this class uses the following additional methods and properties:
+     * - {@code columnsProperty()}: Provides access to the grid table's columns.
+     * - {@code getItemsOnCurrentPage()}: Supplies the items to display on the current page.
+     * - {@code fillLastPageProperty()}: Indicates whether the last page should be filled with empty rows if needed.
+     * - {@code pageSizeProperty()}: Defines the number of items per page.
+     * - {@code refresh()}: Rebuilds the view without reloading data.
+     */
     public PagingGridTableView() {
         getStyleClass().add("paging-grid-table-view");
 
         gridTableView.columnsProperty().bind(columnsProperty());
-        gridTableView.setItems(itemsOnCurrentPage);
+        gridTableView.setItems(getItemsOnCurrentPage());
         gridTableView.minNumberOfRowsProperty().bind(Bindings.createIntegerBinding(() -> {
             if (isFillLastPage()) {
                 return getPageSize();
@@ -48,104 +52,7 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
             return 0;
         }, fillLastPageProperty(), pageSizeProperty()));
 
-        loadingService.addListener((obs, oldService, newService) ->  {
-            if (oldService != null) {
-                oldService.pageProperty().unbind();
-                oldService.pageSizeProperty().unbind();
-                oldService.loadDelayInMillisProperty().unbind();
-                oldService.loaderProperty().unbind();
-                oldService.setOnSucceeded(null);
-                oldService.setOnRunning(null);
-                oldService.setOnFailed(null);
-            }
-
-            if (newService != null) {
-                processService(newService);
-
-                newService.pageProperty().bind(pageProperty());
-                newService.pageSizeProperty().bind(pageSizeProperty());
-                newService.loadDelayInMillisProperty().bind(loadDelayInMillisProperty());
-                newService.loaderProperty().bind(loaderProperty());
-
-                // new service might have already run ... let's update the loading status based on its state
-                Worker.State state = newService.getState();
-                if (state == Worker.State.RUNNING) {
-                    loadingStatus.set(Status.LOADING);
-                } else if (state == Worker.State.FAILED) {
-                    loadingStatus.set(Status.ERROR);
-                } else {
-                    loadingStatus.set(Status.OK);
-                }
-
-                newService.setOnSucceeded(evt -> {
-                    loadingStatus.set(Status.OK);
-                    processService(newService);
-                });
-
-                newService.setOnRunning(evt -> loadingStatus.set(Status.LOADING));
-                newService.setOnFailed(evt -> loadingStatus.set(Status.ERROR));
-            }
-        });
-
-        setLoadingService(new LoadingService<>());
-
-        InvalidationListener loadListener = it -> {
-            if (!processingService) {
-                reload();
-            }
-        };
-
-        pageProperty().addListener(loadListener);
-        pageSizeProperty().addListener(loadListener);
-        loaderProperty().addListener(loadListener);
-
-        InvalidationListener refreshListener = (Observable it) -> refresh();
-
-        getItemsOnCurrentPage().addListener(refreshListener);
-        fillLastPageProperty().addListener(refreshListener);
-
-        pagingControlsLocation.addListener((it, oldLocation, newLocation) -> {
-            if (newLocation.equals(Side.LEFT) || newLocation.equals(Side.RIGHT)) {
-                setPagingControlsLocation(Side.BOTTOM);
-                throw new IllegalArgumentException("unsupported location for the paging controls: " + newLocation);
-            }
-        });
-
-        loadDelayInMillis.addListener(it -> {
-            if (getLoadDelayInMillis() < 0) {
-                throw new IllegalArgumentException("load delay must be >= 0");
-            }
-        });
-
-        setPlaceholder(new Label("No items"));
-    }
-
-    private boolean processingService;
-
-    private void processService(LoadingService<T> service) {
-        processingService = true;
-        try {
-            setPageSize(service.getPageSize());
-            setPage(service.getPage());
-
-            PagingLoadResponse<T> response = service.getValue();
-
-            if (response != null) {
-                // update the total item count
-                setTotalItemCount(response.getTotalItemCount());
-
-                List<T> newList = response.getItems();
-                if (newList != null) {
-                    itemsOnCurrentPage.setAll(newList);
-                } else {
-                    itemsOnCurrentPage.clear();
-                }
-            } else {
-                itemsOnCurrentPage.clear();
-            }
-        } finally {
-            processingService = false;
-        }
+        gridTableView.minNumberOfRowsProperty().addListener(it -> refresh());
     }
 
     @Override
@@ -158,28 +65,13 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
         return Objects.requireNonNull(PagingGridTableView.class.getResource("paging-grid-table-view.css")).toExternalForm();
     }
 
-    private final ObjectProperty<LoadingService<T>> loadingService = new SimpleObjectProperty<>(this, "loadingService");
-
-    /**
-     * Returns the service responsible for executing the actual loading of the data on a background
-     * thread.
-     *
-     * @return the loading service
-     */
-    public final ObjectProperty<LoadingService<T>> loadingServiceProperty() {
-        return loadingService;
-    }
-
-    public final void setLoadingService(LoadingService<T> loadingService) {
-        this.loadingService.set(loadingService);
-    }
-
-    public final LoadingService<T> getLoadingService() {
-        return loadingService.get();
-    }
-
     private final ListProperty<GridTableColumn<T, ?>> columns = new SimpleListProperty<>(this, "columns", FXCollections.observableArrayList());
 
+    /**
+     * Provides access to the list property containing the columns of the grid table.
+     *
+     * @return the list property of {@code GridTableColumn<T, ?>} objects representing the columns
+     */
     public final ListProperty<GridTableColumn<T, ?>> columnsProperty() {
         return this.columns;
     }
@@ -193,274 +85,19 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
     }
 
     /**
-     * Returns the wrapped list view.
+     * Returns the wrapped table view.
      *
-     * @return the list view
+     * @return the table view
      */
     public final GridTableView<T> getGridTableView() {
         return gridTableView;
     }
 
-    private final ObjectProperty<Side> pagingControlsLocation = new SimpleObjectProperty<>(this, "pagingControlsLocation", Side.BOTTOM);
-
-    public final Side getPagingControlsLocation() {
-        return pagingControlsLocation.get();
-    }
-
-    /**
-     * Controls on which side the paging controls should be located. Currently only {@link Side#TOP} and
-     * {@link Side#BOTTOM} are supported.
-     *
-     * @return the location where the paging controls will be shown
-     */
-    public final ObjectProperty<Side> pagingControlsLocationProperty() {
-        return pagingControlsLocation;
-    }
-
-    public final void setPagingControlsLocation(Side pagingControlsLocation) {
-        this.pagingControlsLocation.set(pagingControlsLocation);
-    }
-
-    private final BooleanProperty showPagingControls = new SimpleBooleanProperty(this, "showPagingControls", true);
-
-    public final boolean isShowPagingControls() {
-        return showPagingControls.get();
-    }
-
-    /**
-     * A flag used to control the visibility of the paging controls (page buttons, previous, next, etc...).
-     *
-     * @return a property that is true if the paging controls should be visible
-     */
-    public final BooleanProperty showPagingControlsProperty() {
-        return showPagingControls;
-    }
-
-    public final void setShowPagingControls(boolean showPagingControls) {
-        this.showPagingControls.set(showPagingControls);
-    }
-
-    private final BooleanProperty fillLastPage = new SimpleBooleanProperty(this, "fillLastPage", false);
-
-    public final boolean isFillLastPage() {
-        return fillLastPage.get();
-    }
-
-    /**
-     * The list view might not have enough data to fill its last page with items / cells. This flag can be used
-     * to control whether we want the view to become smaller because of missing items or if we want the view to
-     * fill the page with empty cells.
-     *
-     * @return a flag used to control whether the last page will be filled with empty cells if needed
-     */
-    public final BooleanProperty fillLastPageProperty() {
-        return fillLastPage;
-    }
-
-    public final void setFillLastPage(boolean fillLastPage) {
-        this.fillLastPage.set(fillLastPage);
-    }
-
-    private final ObjectProperty<Status> loadingStatus = new SimpleObjectProperty<>(this, "loadingStatus", Status.OK);
-
-    public final Status getLoadingStatus() {
-        return loadingStatus.get();
-    }
-
-    /**
-     * The loading status used for the wrapped {@link LoadingPane}. The loading pane will appear if the
-     * loader takes a long time to return the new page items.
-     *
-     * @return the loading status
-     */
-    public final ObjectProperty<Status> loadingStatusProperty() {
-        return loadingStatus;
-    }
-
-    public final void setLoadingStatus(Status loadingStatus) {
-        this.loadingStatus.set(loadingStatus);
-    }
-
-    private final LongProperty loadDelayInMillis = new SimpleLongProperty(this, "loadDelayInMillis", 200L);
-
-    public final long getLoadDelayInMillis() {
-        return loadDelayInMillis.get();
-    }
-
-    /**
-     * The delay in milliseconds before the loading service will actually try to retrieve the data from (for example)
-     * a backend. This delay is around a few hundred milliseconds by default. Delaying the loading has the advantage
-     * that sudden property changes will not trigger multiple backend queries but will get batched together to a single
-     * reload operation.
-     *
-     * @return the delay before data will actually be loaded
-     */
-    public final LongProperty loadDelayInMillisProperty() {
-        return loadDelayInMillis;
-    }
-
-    public final void setLoadDelayInMillis(long loadDelayInMillis) {
-        this.loadDelayInMillis.set(loadDelayInMillis);
-    }
-
-    private final LongProperty commitLoadStatusDelay = new SimpleLongProperty(this, "commitLoadStatusDelay", 400L);
-
-    public final long getCommitLoadStatusDelay() {
-        return commitLoadStatusDelay.get();
-    }
-
-    /**
-     * The delay in milliseconds before the list view will display the progress indicator for long-running
-     * load operations.
-     *
-     * @return the commit delay for the nested loading pane
-     * @see LoadingPane#commitDelayProperty()
-     */
-    public final LongProperty commitLoadStatusDelayProperty() {
-        return commitLoadStatusDelay;
-    }
-
-    public final void setCommitLoadStatusDelay(long commitLoadStatusDelay) {
-        this.commitLoadStatusDelay.set(commitLoadStatusDelay);
-    }
-
-    /**
-     * Triggers an explicit reload of the list view.
-     */
-    @Override
-    public final void reload() {
-        getLoadingService().restart();
-    }
-
-    /**
-     * Returns an observable list with the items shown by the current page.
-     *
-     * @return the currently shown items
-     */
-    public final ObservableList<T> getItemsOnCurrentPage() {
-        return itemsOnCurrentPage;
-    }
-
-    private final ObjectProperty<Callback<PagingLoadRequest, PagingLoadResponse<T>>> loader = new SimpleObjectProperty<>(this, "loader");
-
-    public final Callback<PagingLoadRequest, PagingLoadResponse<T>> getLoader() {
-        return loader.get();
-    }
-
-    public final ObjectProperty<Callback<PagingLoadRequest, PagingLoadResponse<T>>> loaderProperty() {
-        return loader;
-    }
-
-    public final void setLoader(Callback<PagingLoadRequest, PagingLoadResponse<T>> loader) {
-        this.loader.set(loader);
-    }
-
-    private ObjectProperty<Node> placeholder;
-
-    /**
-     * The {@code Node} to show to the user when the {@code PagingListView} has no content to show.
-     * This happens when the list model has no data or when a filter has been applied to the list model, resulting in
-     * there being nothing to show the user.
-     */
-    public final ObjectProperty<Node> placeholderProperty() {
-        if (placeholder == null) {
-            placeholder = new SimpleObjectProperty<>(this, "placeholder");
-        }
-        return placeholder;
-    }
-
-    public final void setPlaceholder(Node value) {
-        placeholderProperty().set(value);
-    }
-
-    public final Node getPlaceholder() {
-        return placeholder == null ? null : placeholder.get();
-    }
-
-    private final ObjectProperty<Consumer<T>> onOpenItem = new SimpleObjectProperty<>(this, "onOpenItem");
-
-    public final Consumer<T> getOnOpenItem() {
-        return onOpenItem.get();
-    }
-
-    /**
-     * A callback for opening an item represented by a row in the table view.
-     *
-     * @return a callback for opening table items
-     */
-    public final ObjectProperty<Consumer<T>> onOpenItemProperty() {
-        return onOpenItem;
-    }
-
-    public final void setOnOpenItem(Consumer<T> onOpenItem) {
-        this.onOpenItem.set(onOpenItem);
-    }
-
-    private final BooleanProperty usingScrollPane = new SimpleBooleanProperty(this, "usingScrollPane", false);
-
-    public final boolean isUsingScrollPane() {
-        return usingScrollPane.get();
-    }
-
-    public final BooleanProperty usingScrollPaneProperty() {
-        return usingScrollPane;
-    }
-
-    public final void setUsingScrollPane(boolean usingScrollPane) {
-        this.usingScrollPane.set(usingScrollPane);
-    }
-
-    // --- Selection Model
-    private final ObjectProperty<MultipleSelectionModel<T>> selectionModel = new SimpleObjectProperty<>(this, "selectionModel");
-
-    /**
-     * Sets the {@link MultipleSelectionModel} to be used in the ListView.
-     * Despite a ListView requiring a <b>Multiple</b>SelectionModel, it is possible
-     * to configure it to only allow single selection (see
-     * {@link MultipleSelectionModel#setSelectionMode(SelectionMode)}
-     * for more information).
-     *
-     * @param value the MultipleSelectionModel to be used in this ListView
-     */
-    public final void setSelectionModel(MultipleSelectionModel<T> value) {
-        selectionModelProperty().set(value);
-    }
-
-    /**
-     * Returns the currently installed selection model.
-     *
-     * @return the currently installed selection model
-     */
-    public final MultipleSelectionModel<T> getSelectionModel() {
-        return selectionModel == null ? null : selectionModel.get();
-    }
-
-    /**
-     * The SelectionModel provides the API through which it is possible
-     * to select single or multiple items within a ListView, as well as inspect
-     * which items have been selected by the user. Note that it has a generic
-     * type that must match the type of the ListView itself.
-     *
-     * @return the selectionModel property
-     */
-    public final ObjectProperty<MultipleSelectionModel<T>> selectionModelProperty() {
-        return selectionModel;
-    }
-
     /**
      * Triggers a rebuild of the view without reloading data.
      */
+    @Override
     public final void refresh() {
         gridTableView.refresh();
-    }
-
-    /**
-     * Fills the table view with (potentially cached) data.
-     *
-     * @param items the items to add to the table view
-     */
-    public final void load(int totalItemCount, List<T> items) {
-        this.itemsOnCurrentPage.setAll(items); // setting clears any previous items
-        this.setTotalItemCount(totalItemCount);
     }
 }

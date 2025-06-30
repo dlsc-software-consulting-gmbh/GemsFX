@@ -52,11 +52,11 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
 
         pagingListView.usingScrollPaneProperty().addListener(it -> updateStyleClass());
 
-        pagingListView.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> bindPlaceholder(oldPlaceholder, newPlaceholder));
-        bindPlaceholder(null, pagingListView.getPlaceholder());
+        pagingListView.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> bindPlaceholderVisibility(oldPlaceholder, newPlaceholder));
+        bindPlaceholderVisibility(null, pagingListView.getPlaceholder());
 
         // when the underlying data list changes, then we have to recreate the binding for the placeholder
-        pagingListView.getUnmodifiableItems().addListener((Observable it) -> bindPlaceholder(null, pagingListView.getPlaceholder()));
+        pagingListView.getItemsOnCurrentPage().addListener((Observable it) -> bindPlaceholderVisibility(null, pagingListView.getPlaceholder()));
 
         InvalidationListener updateViewListener = it -> updateView();
         pagingListView.usingScrollPaneProperty().addListener(updateViewListener);
@@ -80,7 +80,7 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         }
     }
 
-    private void bindPlaceholder(Node oldPlaceholder, Node newPlaceholder) {
+    private void bindPlaceholderVisibility(Node oldPlaceholder, Node newPlaceholder) {
         PagingListView<T> listView = getSkinnable();
 
         if (oldPlaceholder != null) {
@@ -89,7 +89,7 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         }
 
         if (newPlaceholder != null) {
-            newPlaceholder.visibleProperty().bind(Bindings.createBooleanBinding(() -> listView.getUnmodifiableItems().isEmpty(), listView.getUnmodifiableItems()));
+            newPlaceholder.visibleProperty().bind(Bindings.createBooleanBinding(() -> listView.getItemsOnCurrentPage().isEmpty(), listView.getItemsOnCurrentPage()));
             newPlaceholder.managedProperty().bind(newPlaceholder.visibleProperty());
         }
     }

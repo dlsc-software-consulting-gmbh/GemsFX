@@ -569,9 +569,4 @@ public abstract class PagingControlBase extends Control {
     public final void setNextPageText(String nextPageText) {
         this.nextPageText.set(nextPageText);
     }
-
-    /**
-     * Triggers an explicit reload of the control.
-     */
-    public abstract void reload();
 }
