@@ -635,7 +635,8 @@ public class SearchField<T> extends Control {
 
         @Override
         protected Collection<T> call() throws Exception {
-            Thread.sleep(250);
+            if(searchDelayMs.get()>0)
+                Thread.sleep(searchDelayMs.get());
 
             if (!isCancelled() && StringUtils.isNotBlank(searchText)) {
                 return getSuggestionProvider().call(new SearchFieldSuggestionRequest() {
@@ -1298,6 +1299,28 @@ public class SearchField<T> extends Control {
         historyManagerProperty().set(historyManager);
     }
 
+    /**
+     * <p>
+     * Search delay in milliseconds.
+     * Depending on your filter queries, this allows for searches to be more efficient by not running a search while the user is continuously typing though the search popup will be less responsive.
+     * </p>
+     * <p>
+     * By setting this to 0, searches will take place immediately at all times.
+     * </p>
+     * <p>
+     * A typical delay may be less than a second. 100-250.
+     * </p>
+     */
+    public final LongProperty searchDelayMs = new SimpleLongProperty(this, "searchDelayMs", 250);
+    
+    public final long getSearchDelayMs() {
+        return searchDelayMs.get();
+    }
+
+    public final void setSearchDelayMs(long searchDelayMs) {
+        searchDelayMs.set(searchDelayMs);
+    }
+    
     /**
      * A custom list cell implementation that is capable of underlining the part
      * of the text that matches the user-typed search text. The cell uses a text flow
