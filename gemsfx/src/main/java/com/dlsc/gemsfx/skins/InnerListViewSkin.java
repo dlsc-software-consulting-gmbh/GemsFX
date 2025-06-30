@@ -24,11 +24,6 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
         public String getUserAgentStylesheet() {
             return Objects.requireNonNull(PagingListView.class.getResource("paging-list-view.css")).toExternalForm();
         }
-
-        @Override
-        public Orientation getContentBias() {
-            return Orientation.HORIZONTAL;
-        }
     };
 
     private final PagingListView<T> pagingListView;
@@ -99,7 +94,7 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
             int endIndex = pagingListView.getPageSize();
             if (!pagingListView.isFillLastPage()) {
                 // we do not want to fill the last page
-                endIndex = pagingListView.getUnmodifiableItems().size();
+                endIndex = pagingListView.getItemsOnCurrentPage().size();
             }
 
             for (int index = 0; index < endIndex; index++) {
@@ -107,7 +102,7 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
                 ListCell<T> cell = cellFactory.call(getSkinnable());
                 cell.setMaxWidth(Double.MAX_VALUE);
                 cell.updateListView(getSkinnable());
-                if (index < pagingListView.getUnmodifiableItems().size()) {
+                if (index < pagingListView.getItemsOnCurrentPage().size()) {
                     cell.updateIndex(index);
                 } else {
                     cell.updateIndex(-1);

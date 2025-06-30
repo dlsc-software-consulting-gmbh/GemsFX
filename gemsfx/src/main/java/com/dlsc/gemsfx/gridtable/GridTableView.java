@@ -45,11 +45,6 @@ public class GridTableView<S> extends Control {
     }
 
     @Override
-    public Orientation getContentBias() {
-        return Orientation.HORIZONTAL;
-    }
-
-    @Override
     protected Skin<?> createDefaultSkin() {
         return new GridTableViewSkin<>(this);
     }

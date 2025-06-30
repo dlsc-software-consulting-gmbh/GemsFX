@@ -1,15 +1,9 @@
 package com.dlsc.gemsfx.paging;
 
-import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.util.Callback;
-
-import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * A simple version of the paging list view that is completely based on a list of items, just like a normal
