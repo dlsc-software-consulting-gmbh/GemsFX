@@ -26,7 +26,7 @@
 }
 
 .info-center-view .notification-view .default-icon {
-    -fx-icon-size: 42px;
+    -fx-icon-size: 32px;
     -fx-icon-color: -fx-accent;
     -fx-icon-code: gmi-info;
 }

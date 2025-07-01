@@ -62,17 +62,17 @@ public class InfoCenterApp extends GemApplication {
         mailGroup.maximumNumberOfNotificationsProperty().bind(Bindings.createIntegerBinding(() -> mailGroup.isPinned() ? 3 : 10, mailGroup.pinnedProperty()));
 
         boolean atlantafx = Boolean.getBoolean("atlantafx");
-        slackGroup.setViewFactory(n -> {
-            NotificationView<Object, SlackNotification> view = new NotificationView<>(n);
-            if (atlantafx) {
-                FontIcon graphic = new FontIcon(MaterialDesign.MDI_SLACK);
-                graphic.getStyleClass().addAll("custom-icon", "warning");
-                view.setGraphic(graphic);
-            } else {
-                view.setGraphic(createImageView(SLACK_IMAGE));
-            }
-            return view;
-        });
+//        slackGroup.setViewFactory(n -> {
+//            NotificationView<Object, SlackNotification> view = new NotificationView<>(n);
+//            if (atlantafx) {
+//                FontIcon graphic = new FontIcon(MaterialDesign.MDI_SLACK);
+//                graphic.getStyleClass().addAll("custom-icon", "warning");
+//                view.setGraphic(graphic);
+//            } else {
+//                view.setGraphic(createImageView(SLACK_IMAGE));
+//            }
+//            return view;
+//        });
 
         calendarGroup.setViewFactory(n -> {
             NotificationView<Object, CalendarNotification> view = new NotificationView<>(n);

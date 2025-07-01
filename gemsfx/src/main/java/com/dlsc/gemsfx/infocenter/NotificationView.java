@@ -384,6 +384,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             center.setFillWidth(true);
             center.setAlignment(Pos.CENTER_LEFT);
             center.getStyleClass().add("text-container");
+            HBox.setHgrow(center, Priority.ALWAYS);
             getChildren().add(center);
 
             contentProperty().addListener(it -> updateCenterNode(center));
