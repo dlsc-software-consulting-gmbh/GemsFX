@@ -231,18 +231,11 @@ public class InfoCenterApp extends GemApplication {
     }
 
     private Notification<?> createNotification(boolean randomizeTimeStamp) {
-        Notification notification;
-        switch ((int) (Math.random() * 3)) {
-            case 0:
-                notification = createMailNotification();
-                break;
-            case 1:
-                notification = new SlackNotification("DLSC GmbH\nDirk Lemmermann", "Please send the material I requested.");
-                break;
-            case 2:
-            default:
-                notification = new CalendarNotification("Calendar", "Meeting with shareholders");
-        }
+        Notification notification = switch ((int) (Math.random() * 3)) {
+            case 0 -> createMailNotification();
+            case 1 -> new SlackNotification("DLSC GmbH\nDirk Lemmermann", "Please send the material I requested.");
+            default -> new CalendarNotification("Calendar", "Meeting with shareholders");
+        };
 
         if (randomizeTimeStamp) {
             notification.setDateTime(createTimeStamp());
@@ -252,7 +245,7 @@ public class InfoCenterApp extends GemApplication {
     }
 
     private MailNotification createMailNotification() {
-        Mail mail = new Mail("Purchase Order #8774911", "Dear Mr. Smith, the following order has been received by our service counter.", ZonedDateTime.now());
+        Mail mail = new Mail("Purchase Order #8774911", "Dear Mr. Smith, the following order has been received by our service counter. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.", ZonedDateTime.now());
         MailNotification mailNotification = new MailNotification(mail);
 
         NotificationAction<Mail> openMailAction = new NotificationAction<>("Open", (notification) -> {
@@ -269,8 +262,10 @@ public class InfoCenterApp extends GemApplication {
             return OnClickBehaviour.HIDE_AND_REMOVE;
         });
 
-        mailNotification.getActions().add(openMailAction);
-        mailNotification.getActions().add(deleteMailAction);
+        mailNotification.getActions().addAll(openMailAction, deleteMailAction);
+
+        int random = (int) (Math.random() * 4);
+        mailNotification.setType(Notification.Type.values()[random]);
 
         return mailNotification;
     }

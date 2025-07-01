@@ -33,7 +33,7 @@ public class NotificationGroup<T, S extends Notification<T>> implements Comparab
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(notification -> {
                         notification.setGroup(this);
-                        notification.expandedProperty().bind(expanded);
+                        notification.expandedProperty().bindBidirectional(expanded);
                     });
                 }
             }

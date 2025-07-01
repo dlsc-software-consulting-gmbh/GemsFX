@@ -80,9 +80,9 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
     private final WeakInvalidationListener weakListItemsListener = new WeakInvalidationListener(listItemsListener);
     private final VBox mainPane;
 
-    private VBox unpinnedGroupsContainer = new VBox();
+    private final VBox unpinnedGroupsContainer = new VBox();
 
-    private VBox pinnedGroupsContainer = new VBox();
+    private final VBox pinnedGroupsContainer = new VBox();
 
     public InfoCenterViewSkin(InfoCenterView view) {
         super(view);
@@ -117,6 +117,16 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             @Override
             protected double computePrefHeight(double width) {
                 return unpinnedGroupsContainer.prefHeight(width - getInsets().getLeft() - getInsets().getRight()) + getInsets().getTop() + getInsets().getBottom();
+            }
+
+            @Override
+            protected double computeMinHeight(double width) {
+                return 0;
+            }
+
+            @Override
+            protected double computeMaxHeight(double width) {
+                return Double.MAX_VALUE;
             }
 
             @Override
@@ -210,6 +220,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             public void selectNext() {
             }
         });
+
         singleGroupListView.itemsProperty().addListener((obs, oldItems, newItems) -> {
             if (oldItems != null) {
                 oldItems.removeListener(weakListItemsListener);
@@ -314,7 +325,6 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         updateVisibilities();
         view.showAllGroupProperty().addListener(it -> updateVisibilities());
     }
-
 
     private void addPlaceholderIfNotNull(Node placeholder, BooleanBinding emptyBing) {
         if (placeholder != null) {
@@ -585,11 +595,6 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
                     }
                 }
             }
-        }
-
-        @Override
-        public Orientation getContentBias() {
-            return Orientation.HORIZONTAL;
         }
 
         @Override

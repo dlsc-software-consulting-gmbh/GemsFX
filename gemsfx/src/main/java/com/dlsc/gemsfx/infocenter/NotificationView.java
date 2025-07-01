@@ -63,7 +63,8 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
      */
     public NotificationView(S notification) {
         this.notification = Objects.requireNonNull(notification);
-        getStyleClass().add("notification-view");
+        updateStyle(notification);
+        notification.typeProperty().addListener(it -> updateStyle(notification));
 
         setPickOnBounds(false);
         setMinHeight(Region.USE_PREF_SIZE);
@@ -106,6 +107,16 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
         updateStyleClass();
     }
 
+    private void updateStyle(S notification) {
+        getStyleClass().setAll("notification-view");
+        getStyleClass().add(switch (notification.getType()) {
+            case INFO -> "info";
+            case WARNING -> "warning";
+            case ERROR -> "danger";
+            case SUCCESS -> "success";
+        });
+    }
+
     @Override
     protected double computePrefHeight(double width) {
         double h = contentPane.prefHeight(width - getInsets().getLeft() - getInsets().getRight());
@@ -122,9 +133,20 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
     }
 
     @Override
+    protected double computeMinHeight(double width) {
+        return computePrefHeight(width);
+    }
+
+    @Override
+    protected double computeMaxHeight(double width) {
+        return computePrefHeight(width);
+    }
+
+    @Override
     protected void layoutChildren() {
         double width = getWidth() - getInsets().getLeft() - getInsets().getRight();
         double ph = contentPane.prefHeight(width);
+
         contentPane.resizeRelocate(getInsets().getLeft(), getInsets().getTop(), width, ph);
 
         if (stackNotification1.isVisible()) {
@@ -275,7 +297,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
         timeConverterProperty().set(timeConverter);
     }
 
-    public class ContentPane extends BorderPane {
+    public class ContentPane extends HBox {
 
         private final StackPane closeIconWrapper;
         private final Label timeLabel;
@@ -288,10 +310,16 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
         public ContentPane() {
             getStyleClass().add("content");
 
-            setMinHeight(Region.USE_PREF_SIZE);
             setPickOnBounds(false);
 
-            leftProperty().bind(graphicProperty());
+            graphicProperty().addListener((observable, oldValue, newValue) -> {
+                if (oldValue != null) {
+                    getChildren().remove(oldValue);
+                }
+                if (newValue != null) {
+                    getChildren().addFirst(newValue);
+                }
+            });
 
             Label titleLabel = new Label();
             titleLabel.textProperty().bind(notification.titleProperty());
@@ -342,6 +370,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             descriptionLabel.textProperty().bind(notification.summaryProperty());
             descriptionLabel.getStyleClass().add("description-label");
             descriptionLabel.setWrapText(true);
+            descriptionLabel.setMinHeight(Region.USE_PREF_SIZE);
 
             HBox actionsBox = new HBox();
             actionsBox.getStyleClass().add("actions-box");
@@ -355,8 +384,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             center.setFillWidth(true);
             center.setAlignment(Pos.CENTER_LEFT);
             center.getStyleClass().add("text-container");
-            center.setMinHeight(Region.USE_PREF_SIZE);
-            setCenter(center);
+            getChildren().add(center);
 
             contentProperty().addListener(it -> updateCenterNode(center));
             showContentProperty().addListener(it -> updateCenterNode(center));
@@ -373,6 +401,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
              * specified via CSS. Only one of the two is visible at any time.
              */
             closeIconWrapper = new StackPane(closeIcon, clearAllLabel);
+            closeIconWrapper.setManaged(false);
             closeIconWrapper.setPickOnBounds(false);
             closeIconWrapper.setOpacity(0);
             closeIconWrapper.getStyleClass().add("close-icon-wrapper");

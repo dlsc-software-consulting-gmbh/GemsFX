@@ -395,12 +395,7 @@ public class InfoCenterView extends Control {
     }
 
     private static StackPane createDefaultPlaceholder() {
-        FontIcon graphic = new FontIcon(MaterialDesign.MDI_CREATION);
-        graphic.setIconSize(20);
-        graphic.setIconColor(Color.WHITE);
-
-        Label noNotifications = new Label("No notifications", graphic);
-
+        Label noNotifications = new Label("No notifications");
         StackPane placeholder = new StackPane(noNotifications);
         placeholder.getStyleClass().add("default-placeholder");
         return placeholder;
