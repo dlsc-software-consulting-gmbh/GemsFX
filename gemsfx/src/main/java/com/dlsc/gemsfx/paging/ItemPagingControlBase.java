@@ -126,8 +126,17 @@ public abstract class ItemPagingControlBase<T> extends PagingControlBase {
     private void processService(LoadingService<T> service) {
         processingService = true;
         try {
-            setPageSize(service.getPageSize());
-            setPage(service.getPage());
+            int pageSize = service.getPageSize();
+            if (pageSize != LoadingService.UNDEFINED) {
+                // unused / fresh service ... inherit page size from control
+                setPageSize(pageSize);
+            }
+
+            int page = service.getPage();
+            if (page != LoadingService.UNDEFINED) {
+                // unused / fresh service ... inherit page from control
+                setPage(page);
+            }
 
             PagingLoadResponse<T> response = service.getValue();
 

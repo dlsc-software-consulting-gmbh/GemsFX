@@ -25,6 +25,8 @@ import javafx.util.Callback;
  */
 public class LoadingService<T> extends Service<PagingLoadResponse<T>> {
 
+    public static int UNDEFINED = -1;
+
     @Override
     protected Task<PagingLoadResponse<T>> createTask() {
         return new Task<>() {
@@ -39,7 +41,7 @@ public class LoadingService<T> extends Service<PagingLoadResponse<T>> {
                     // do nothing
                 }
 
-                if (!isCancelled()) {
+                if (!isCancelled() && loadRequest.getPage() != UNDEFINED && loadRequest.getPageSize() != UNDEFINED) {
                     Callback<PagingLoadRequest, PagingLoadResponse<T>> loader = getLoader();
                     if (loader != null) {
                         PagingLoadResponse<T> response = loader.call(loadRequest);
@@ -54,7 +56,7 @@ public class LoadingService<T> extends Service<PagingLoadResponse<T>> {
         };
     }
 
-    private final IntegerProperty page = new SimpleIntegerProperty(this, "page");
+    private final IntegerProperty page = new SimpleIntegerProperty(this, "page", UNDEFINED);
 
     public final int getPage() {
         return page.get();
@@ -69,7 +71,7 @@ public class LoadingService<T> extends Service<PagingLoadResponse<T>> {
         return page;
     }
 
-    private final IntegerProperty pageSize = new SimpleIntegerProperty(this, "pageSize", 10);
+    private final IntegerProperty pageSize = new SimpleIntegerProperty(this, "pageSize", UNDEFINED);
 
     public final int getPageSize() {
         return pageSize.get();

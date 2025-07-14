@@ -129,7 +129,7 @@ public class InfoCenterPaneSkin extends SkinBase<InfoCenterPane> {
         if (content != null) {
             return content.maxWidth(height) + leftInset + rightInset;
         } else {
-            return 0;
+            return Double.MAX_VALUE;
         }
     }
 
@@ -162,7 +162,7 @@ public class InfoCenterPaneSkin extends SkinBase<InfoCenterPane> {
         if (content != null) {
             return content.maxHeight(width) + leftInset + rightInset;
         } else {
-            return 0;
+            return Double.MAX_VALUE;
         }
     }
 

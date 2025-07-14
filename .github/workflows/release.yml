@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
 
       - name: 'Set up Java 21'
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           java-version: 21
           distribution: 'zulu'
@@ -47,14 +47,14 @@ jobs:
 
       - name: 'Release to Maven Central'
         env:
-          MAVEN_USERNAME: ${{ secrets.SONATYPE_WITH_TOKEN_USERNAME }}
-          MAVEN_CENTRAL_TOKEN: ${{ secrets.SONATYPE_WITH_TOKEN_PASSWORD }}
+          MAVEN_USERNAME: ${{ secrets.PUBLISHER_PORTAL_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.PUBLISHER_PORTAL_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           export GPG_TTY=$(tty)
           ./mvnw --no-transfer-progress -B --file pom.xml \
             -Drepository.url=https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git \
-            -Dmaven.site.skip=true -Drelease=true deploy
+            -Dmaven.site.skip=true -Drelease=true deploy  -s ./settings.xml
 
       - name: 'Release to GitHub'
         env:

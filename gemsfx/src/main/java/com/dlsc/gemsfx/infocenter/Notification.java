@@ -18,9 +18,8 @@ import java.util.StringJoiner;
  * A pure model object containing the data for a {@link NotificationView}.
  * Notifications can be added to groups ({@link NotificationGroup}).
  *
- * @see NotificationGroup#getNotifications()
- *
  * @param <T> the type of the user object
+ * @see NotificationGroup#getNotifications()
  */
 public class Notification<T> implements Comparable<Notification<T>> {
 
@@ -29,8 +28,8 @@ public class Notification<T> implements Comparable<Notification<T>> {
     /**
      * Constructs a new notification.
      *
-     * @param title the title that will usually be shown in bold
-     * @param summary a summary text of the noteworthy thing that happened
+     * @param title    the title that will usually be shown in bold
+     * @param summary  a summary text of the noteworthy thing that happened
      * @param dateTime the date and time when the noteworthy thing happened
      */
     public Notification(String title, String summary, ZonedDateTime dateTime) {
@@ -42,7 +41,7 @@ public class Notification<T> implements Comparable<Notification<T>> {
     /**
      * Constructs a new notification.
      *
-     * @param title the title that will usually be shown in bold
+     * @param title   the title that will usually be shown in bold
      * @param summary a summary text of the noteworthy thing that happened
      */
     public Notification(String title, String summary) {
@@ -226,6 +225,33 @@ public class Notification<T> implements Comparable<Notification<T>> {
 
     public final void setOnClick(Callback<Notification<T>, OnClickBehaviour> onClick) {
         this.onClick.set(onClick);
+    }
+
+    public enum Type {
+        INFO,
+        WARNING,
+        ERROR,
+        SUCCESS;
+    }
+
+    private final ObjectProperty<Type> type = new SimpleObjectProperty<>(this, "type", Type.INFO);
+
+    public Type getType() {
+        return type.get();
+    }
+
+    /**
+     * Provides an object property containing the type of this notification. The type represents
+     * the category or severity of the notification, such as INFO, WARNING, ERROR, or SUCCESS.
+     *
+     * @return an {@code ObjectProperty} representing the type of the notification
+     */
+    public ObjectProperty<Type> typeProperty() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type.set(type);
     }
 
     @Override

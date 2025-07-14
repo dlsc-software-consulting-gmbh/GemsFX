@@ -1240,6 +1240,22 @@
 .info-center-view .notification-view {
 }
 
+.info-center-view .notification-view.info .content {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.info-center-view .notification-view.success .content {
+    -fx-background-color: -color-success-emphasis;
+}
+
+.info-center-view .notification-view.warning .content {
+    -fx-background-color: -color-warning-emphasis;
+}
+
+.info-center-view .notification-view.danger .content {
+    -fx-background-color: -color-danger-emphasis;
+}
+
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane {
     -fx-background-color: -color-bg-subtle;
 }
@@ -1255,10 +1271,33 @@
     -fx-background-insets: 0px, 1px;
 }
 
+.info-center-view .notification-view.info > .content > .close-icon-wrapper {
+    -fx-background-color: -color-border-default, -color-accent-emphasis;
+}
+
+.info-center-view .notification-view.warning > .content > .close-icon-wrapper {
+    -fx-background-color: -color-border-default, -color-warning-emphasis;
+}
+
+.info-center-view .notification-view.danger > .content > .close-icon-wrapper {
+    -fx-background-color: -color-border-default, -color-danger-emphasis;
+}
+
+.info-center-view .notification-view.success > .content > .close-icon-wrapper {
+    -fx-background-color: -color-border-default, -color-success-emphasis;
+}
+
 .info-center-view .notification-view > .content > .close-icon-wrapper:pressed {
 }
 
 .info-center-view .notification-view > .content > .close-icon-wrapper > .ikonli-font-icon {
+}
+
+.info-center-view .notification-view.info > .content > .close-icon-wrapper > .ikonli-font-icon,
+.info-center-view .notification-view.warning > .content > .close-icon-wrapper > .ikonli-font-icon,
+.info-center-view .notification-view.danger > .content > .close-icon-wrapper > .ikonli-font-icon,
+.info-center-view .notification-view.success > .content > .close-icon-wrapper> .ikonli-font-icon {
+    -fx-icon-color: -color-fg-emphasis;
 }
 
 .info-center-view .notification-view > .content > .close-icon-wrapper > .label {
@@ -1278,6 +1317,17 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
 }
 
+.info-center-view .notification-view .content .ikonli-font-icon {
+    -fx-icon-color: -color-fg-default;
+}
+
+.info-center-view .notification-view.info .content .ikonli-font-icon,
+.info-center-view .notification-view.warning .content .ikonli-font-icon,
+.info-center-view .notification-view.danger .content .ikonli-font-icon,
+.info-center-view .notification-view.success .content .ikonli-font-icon {
+    -fx-icon-color: -color-fg-emphasis;
+}
+
 .info-center-view .notification-view > .content > .text-container {
 }
 
@@ -1285,12 +1335,33 @@
     -fx-text-fill: -color-fg-default;
 }
 
+.info-center-view .notification-view.info > .content > .text-container > .title-time-box > .title-label,
+.info-center-view .notification-view.warning > .content > .text-container > .title-time-box > .title-label,
+.info-center-view .notification-view.danger > .content > .text-container > .title-time-box > .title-label,
+.info-center-view .notification-view.success > .content > .text-container > .title-time-box > .title-label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .time-label {
     -fx-text-fill: -color-fg-default;
 }
 
+.info-center-view .notification-view.info > .content > .text-container > .title-time-box > .upper-right-pane > .time-label,
+.info-center-view .notification-view.warning > .content > .text-container > .title-time-box > .upper-right-pane > .time-label,
+.info-center-view .notification-view.danger > .content > .text-container > .title-time-box > .upper-right-pane > .time-label,
+.info-center-view .notification-view.success > .content > .text-container > .title-time-box > .upper-right-pane > .time-label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
 .info-center-view .notification-view > .content > .text-container > .description-label {
     -fx-text-fill: -color-fg-default;
+}
+
+.info-center-view .notification-view.info > .content > .text-container > .description-label,
+.info-center-view .notification-view.warning > .content > .text-container > .description-label,
+.info-center-view .notification-view.danger > .content > .text-container > .description-label,
+.info-center-view .notification-view.success > .content > .text-container > .description-label {
+    -fx-text-fill: -color-fg-emphasis;
 }
 
 .info-center-view .notification-view > .content > .text-container > .actions-box {
