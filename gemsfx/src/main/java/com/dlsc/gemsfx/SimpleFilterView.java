@@ -31,9 +31,12 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A control for creating filters based primarily on the {@link SelectionBox} and the
- * {@link DateRangePicker}. The control automatically manages a list of {@link ChipView}
- * instances based on the current selection.
+ * A control for creating filters based on various other controls such as the {@link SelectionBox},
+ * the {@link DateRangePicker}, the {@link SearchTextField}, etc...
+ *
+ * The control automatically manages a list of {@link ChipView} instances based on the current selection.
+ * These chip views can be displayed by the {@link ChipsViewContainer}. To do so bind the observable list
+ * of chips views of the filter view with the one provided by the {@link ChipsViewContainer}.
  */
 public class SimpleFilterView extends HBox {
 
@@ -371,12 +374,49 @@ public class SimpleFilterView extends HBox {
     /**
      * Creates a new instance of a textfield.
      *
-     * @param text the initial prompt text
+     * @param promptText the initial prompt text
      * @return the new text field
      */
-    public final CustomTextField addTextField(String text) {
+    public final CustomTextField addTextField(String promptText) {
         CustomTextField textField = new CustomTextField();
-        textField.setPromptText(text);
+        textField.setPromptText(promptText);
+        textField.setMaxWidth(Double.MAX_VALUE);
+        textField.textProperty().addListener((obs, oldText, newText) -> {
+            if (oldText != null) {
+                Map<Object, ChipView<?>> innerMap = map.get(textField);
+                if (innerMap != null) {
+                    ChipView<?> chip = innerMap.remove(oldText);
+                    if (chip != null) {
+                        getChips().remove(chip);
+                    }
+                }
+            }
+            if (newText != null) {
+                ChipView<String> chip = new ChipView<>();
+                chip.setValue(newText);
+                chip.setText(newText);
+                chip.setOnClose(it -> textField.setText(null));
+                getChips().add(chip);
+
+                map.computeIfAbsent(textField, it -> new HashMap<>()).put(newText, chip);
+            }
+        });
+
+        getChildren().add(textField);
+
+        return textField;
+    }
+
+    /**
+     * Add a new instance of a search text field.
+     *
+     * @see SearchTextField
+     * @param promptText the initial prompt text
+     * @return the new text field
+     */
+    public final SearchTextField addSearchTextField(String promptText) {
+        SearchTextField textField = new SearchTextField();
+        textField.setPromptText(promptText);
         textField.setMaxWidth(Double.MAX_VALUE);
         textField.textProperty().addListener((obs, oldText, newText) -> {
             if (oldText != null) {
@@ -409,7 +449,7 @@ public class SimpleFilterView extends HBox {
      * This date range picker allows users to select a range of dates, and selected ranges
      * are represented as chips in the filter view.
      *
-     * The method initializes the date range picker, adds listeners to handle changes in selection,
+     * The method initialises the date range picker, adds listeners to handle changes in selection,
      * and manages the associated chip view for each selected range.
      * It ensures proper update of the UI elements when ranges are added or removed.
      *

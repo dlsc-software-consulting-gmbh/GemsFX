@@ -87,6 +87,7 @@ public class SimpleFilterViewApp extends GemApplication {
         filterView1.addCalendarPicker("Date");
         filterView1.layoutModeProperty().bindBidirectional(layoutMode);
         filterView1.getChildren().add(new MenuButton("Test"));
+        filterView1.addSearchTextField("Search");
         //filterView1.getChildren().add(new DatePicker());
 
         ChipsViewContainer chipsViewContainer1 = new ChipsViewContainer();
