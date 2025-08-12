@@ -1628,7 +1628,7 @@
  * ChipView
  */
 .chip-view {
-    -fx-background-color: -color-accent-emphasis;
+    -fx-background-color: -color-neutral-emphasis;
     -fx-background-radius: 3px;
 }
 
@@ -1640,7 +1640,7 @@
 }
 
 .chip-view > .chip-container > .close-icon {
-    -fx-background-color: transparent, -color-accent-emphasis;
+    -fx-background-color: transparent, -color-neutral-emphasis;
     -fx-background-insets: 0px, 2px;
     -fx-background-radius: 2px;
     -size: 25;
@@ -1653,24 +1653,28 @@
 }
 
 .chip-view > .chip-container > .close-icon:hover {
-    -fx-background-color: transparent, -color-accent-muted;
+    -fx-background-color: transparent, -color-neutral-muted;
 }
 
 .chip-view > .chip-container > .close-icon:hover > .ikonli-font-icon {
-    -fx-icon-color: -color-accent-fg;
+    -fx-icon-color: -color-neutral-emphasis;
 }
 
 .chip-view > .chip-container > .close-icon:pressed {
-    -fx-background-color: transparent, -color-accent-muted;
+    -fx-background-color: transparent, -color-neutral-muted;
 }
 
 .chip-view > .chip-container > .close-icon:pressed > .ikonli-font-icon {
-    -fx-icon-color: -color-accent-fg;
+    -fx-icon-color: -color-fg-default;
 }
 
 .chip-view > .chip-container > .close-icon > .ikonli-font-icon {
     -fx-icon-size: 12px;
     -fx-icon-color: -color-fg-emphasis;
+}
+
+.chips-view-container > .hyperlink {
+    -fx-text-fill: -color-fg-default;
 }
 
 /* ----------------------------------------------------------------------------
