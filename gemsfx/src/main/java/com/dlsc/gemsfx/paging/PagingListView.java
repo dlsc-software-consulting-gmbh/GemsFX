@@ -59,6 +59,12 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
     public PagingListView() {
         getStyleClass().add("paging-list-view");
 
+        focusedProperty().subscribe(focused -> {
+            if (focused) {
+                listView.requestFocus();
+            }
+        });
+
         listView.getStyleClass().addAll("inner-list-view");
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.cellFactoryProperty().bind(cellFactoryProperty());

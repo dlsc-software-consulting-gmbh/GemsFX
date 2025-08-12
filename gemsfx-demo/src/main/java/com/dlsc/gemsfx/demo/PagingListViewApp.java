@@ -35,6 +35,10 @@ public class PagingListViewApp extends GemApplication {
     @Override
     public void start(Stage stage) { super.start(stage);
         PagingListView<String> pagingListView = new PagingListView<>();
+        pagingListView.getPseudoClassStates().subscribe(() -> {
+            System.out.println(pagingListView.getPseudoClassStates());
+        });
+
         pagingListView.setLoader(loadRequest -> {
             if (simulateDelayProperty.get()) {
                 try {
@@ -96,7 +100,7 @@ public class PagingListViewApp extends GemApplication {
 
         Scene scene = new Scene(box);
 
-        scene.focusOwnerProperty().addListener(it -> System.out.println(scene.getFocusOwner()));
+        scene.focusOwnerProperty().addListener(it -> System.out.println("focus owner: " + scene.getFocusOwner()));
 
         stage.setTitle("Paging List View");
         stage.setScene(scene);

@@ -33,6 +33,7 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
         super(pagingListView);
 
         innerListView = pagingListView.getListView();
+
         VBox.setVgrow(innerListView, Priority.ALWAYS);
 
         pagingControls.availablePageSizesProperty().bind(pagingListView.availablePageSizesProperty());

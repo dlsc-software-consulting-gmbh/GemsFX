@@ -91,24 +91,24 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
 
         updateView();
 
-        BooleanBinding neededBinding = moreItemsThanMinimumAvailablePageSize.and(Bindings.createBooleanBinding(() -> {
-            if (view.getPageCount() > 1) {
-                return true;
-            }
-            if (view.getMessageLabelStrategy().equals(PagingControlBase.MessageLabelStrategy.ALWAYS_SHOW)) {
-                return true;
-            }
-            return false;
-        },
+        BooleanBinding neededBinding = moreItemsThanMinimumAvailablePageSize.or(Bindings.createBooleanBinding(() -> {
+                    if (view.getPageCount() > 1) {
+                        return true;
+                    }
+                    if (view.getMessageLabelStrategy().equals(PagingControlBase.MessageLabelStrategy.ALWAYS_SHOW)) {
+                        return true;
+                    }
+                    return false;
+                },
                 view.pageCountProperty(),
                 view.availablePageSizesProperty(),
                 view.messageLabelStrategyProperty(),
                 view.totalItemCountProperty(),
                 view.pageSizeProperty()));
 
-        neededBinding.addListener((obs, oldNeeded, newNeeded) -> {
+        neededBinding.subscribe(needed -> {
             view.getProperties().remove("controls.needed");
-            view.getProperties().put("controls.needed", newNeeded);
+            view.getProperties().put("controls.needed", needed);
         });
     }
 

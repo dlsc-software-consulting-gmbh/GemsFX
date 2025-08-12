@@ -1961,8 +1961,7 @@
     -fx-border-color: -color-danger-emphasis;
 }
 
-.paging-list-view:focused .list-view,
-.paging-list-view:focus-within .list-view {
+.paging-list-view .list-view:focused {
     -fx-border-color: -color-accent-emphasis;
 }
 
