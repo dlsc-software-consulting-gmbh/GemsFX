@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
+import com.dlsc.gemsfx.paging.PagingControlBase;
 import com.dlsc.gemsfx.paging.PagingGridTableView;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
 import com.dlsc.gemsfx.paging.PagingLoadResponse;
@@ -36,15 +37,18 @@ public class PagingGridTableViewApp extends GemApplication {
 
     private final BooleanProperty simulateNoData = new SimpleBooleanProperty(false);
 
-    private final IntegerProperty count = new SimpleIntegerProperty(55);
+    private final IntegerProperty count = new SimpleIntegerProperty(5);
 
     @Override
     public void start(Stage stage) { super.start(stage);
         List<Movie> movies = parseMovieFiles();
 
         PagingGridTableView<Movie> pagingGridTableView = new PagingGridTableView<>();
+        count.subscribe(c -> pagingGridTableView.reload());
+
         pagingGridTableView.setPrefWidth(800);
-        pagingGridTableView.setPageSize(10);
+        pagingGridTableView.setPageSize(5);
+        pagingGridTableView.setMessageLabelStrategy(PagingControlBase.MessageLabelStrategy.SHOW_WHEN_NEEDED);
         pagingGridTableView.setLoader(loadRequest -> {
             if (simulateDelayProperty.get()) {
                 try {
@@ -59,7 +63,7 @@ public class PagingGridTableViewApp extends GemApplication {
 
             int offset = loadRequest.getPage() * loadRequest.getPageSize();
             List<Movie> result = movies.subList(offset, Math.min(movies.size(), offset + loadRequest.getPageSize()));
-            return new PagingLoadResponse<>(result, simulateNoData.get() ? 0 : movies.size());
+            return new PagingLoadResponse<>(result, simulateNoData.get() ? 0 : count.get());
         });
 
         GridTableColumn<Movie, Integer> indexColumn = new GridTableColumn<>("#");

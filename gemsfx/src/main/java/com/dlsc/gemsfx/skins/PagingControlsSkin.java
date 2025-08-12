@@ -31,7 +31,6 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
     private final IntegerProperty startPage = new SimpleIntegerProperty();
 
     private final HBox pageButtonsBox = new HBox();
-    private final BooleanBinding moreItemsThanMinimumAvailablePageSize;
 
     private Button lastPageButton;
     private Button nextButton;
@@ -42,20 +41,33 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
     private GridPane pageButtonsGridPane;
     private int column;
 
+    /*
+     * We do not want to see the page size selector if the page sizes shown inside the selector are all bigger
+     * than the total number of items.
+     */
+    private final BooleanBinding moreItemsThanMinimumAvailablePageSize = Bindings.createBooleanBinding(() -> {
+        int smallestAvailablePageSize = getSkinnable().getAvailablePageSizes().stream()
+                .min(Integer::compareTo)
+                .orElse(1);
+        int totalItemCount = getSkinnable().getTotalItemCount();
+        return totalItemCount > smallestAvailablePageSize;
+    }, getSkinnable().totalItemCountProperty(), getSkinnable().availablePageSizesProperty());
+
+    // has to be a class field or will be garbage collected (ignore IDEA message to make "local variable")
+    private final BooleanBinding neededBinding = moreItemsThanMinimumAvailablePageSize.or(Bindings.createBooleanBinding(() -> {
+                if (getSkinnable().getPageCount() > 1) {
+                    return true;
+                }
+                return getSkinnable().getMessageLabelStrategy().equals(PagingControlBase.MessageLabelStrategy.ALWAYS_SHOW);
+            },
+            getSkinnable().pageCountProperty(),
+            getSkinnable().availablePageSizesProperty(),
+            getSkinnable().totalItemCountProperty(),
+            getSkinnable().messageLabelStrategyProperty(),
+            getSkinnable().pageSizeProperty()));
+
     public PagingControlsSkin(PagingControls view) {
         super(view);
-
-        /*
-         * We do not want to see the page size selector if the page sizes shown inside the selector are all bigger
-         * than the total amount of items.
-         */
-        moreItemsThanMinimumAvailablePageSize = Bindings.createBooleanBinding(() -> {
-            int smallestAvailablePageSize = view.getAvailablePageSizes().stream()
-                    .min(Integer::compareTo)
-                    .orElse(1);
-            int totalItemCount = view.getTotalItemCount();
-            return totalItemCount > smallestAvailablePageSize;
-        }, view.totalItemCountProperty(), view.availablePageSizesProperty());
 
         createStaticElements();
 
@@ -90,21 +102,6 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         });
 
         updateView();
-
-        BooleanBinding neededBinding = moreItemsThanMinimumAvailablePageSize.or(Bindings.createBooleanBinding(() -> {
-                    if (view.getPageCount() > 1) {
-                        return true;
-                    }
-                    if (view.getMessageLabelStrategy().equals(PagingControlBase.MessageLabelStrategy.ALWAYS_SHOW)) {
-                        return true;
-                    }
-                    return false;
-                },
-                view.pageCountProperty(),
-                view.availablePageSizesProperty(),
-                view.messageLabelStrategyProperty(),
-                view.totalItemCountProperty(),
-                view.pageSizeProperty()));
 
         neededBinding.subscribe(needed -> {
             view.getProperties().remove("controls.needed");

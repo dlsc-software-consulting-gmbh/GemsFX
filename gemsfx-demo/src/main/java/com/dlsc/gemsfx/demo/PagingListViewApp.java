@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
+import com.dlsc.gemsfx.paging.PagingControlBase;
 import com.dlsc.gemsfx.paging.PagingListView;
 import com.dlsc.gemsfx.paging.PagingLoadResponse;
 import com.dlsc.gemsfx.util.StageManager;
@@ -30,14 +31,12 @@ public class PagingListViewApp extends GemApplication {
 
     private final BooleanProperty simulateNoData = new SimpleBooleanProperty(false);
 
-    private final IntegerProperty count = new SimpleIntegerProperty(52);
+    private final IntegerProperty count = new SimpleIntegerProperty(5);
 
     @Override
     public void start(Stage stage) { super.start(stage);
         PagingListView<String> pagingListView = new PagingListView<>();
-        pagingListView.getPseudoClassStates().subscribe(() -> {
-            System.out.println(pagingListView.getPseudoClassStates());
-        });
+        count.addListener(it -> pagingListView.reload());
 
         pagingListView.setLoader(loadRequest -> {
             if (simulateDelayProperty.get()) {
@@ -61,7 +60,8 @@ public class PagingListViewApp extends GemApplication {
         });
         pagingListView.setPrefWidth(600);
         pagingListView.setPageSize(5);
-
+        pagingListView.setMessageLabelStrategy(PagingControlBase.MessageLabelStrategy.SHOW_WHEN_NEEDED);
+        pagingListView.totalItemCountProperty().subscribe(count -> System.out.println("total item count: " + count));
         simulateNoData.addListener(it -> pagingListView.reload());
 
         Button scenicView = new Button("Scenic View");
