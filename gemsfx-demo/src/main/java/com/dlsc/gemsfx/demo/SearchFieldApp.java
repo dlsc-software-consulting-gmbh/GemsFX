@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.SearchField;
 import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
 import fr.brouillard.oss.cssfx.CSSFX;
-import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -78,13 +77,16 @@ public class SearchFieldApp extends GemApplication {
         usePlaceholder.setSelected(true);
         field.placeholderProperty().bind(Bindings.createObjectBinding(() -> usePlaceholder.isSelected() ? new Label("No countries found") : null, usePlaceholder.selectedProperty()));
 
+        CheckBox showSearchWhenEmptyChoiceBox = new CheckBox("Show search options on focus, before text has been typed");
+        showSearchWhenEmptyChoiceBox.selectedProperty().bindBidirectional(field.suggestWhenBlankProperty());
+
         CheckBox hideWithSingleChoiceBox = new CheckBox("Hide popup if it has only the currently selected item in it");
         hideWithSingleChoiceBox.selectedProperty().bindBidirectional(field.hidePopupWithSingleChoiceProperty());
 
         CheckBox hideWithNoChoiceBox = new CheckBox("Hide popup if it has no selectable items in it");
         hideWithNoChoiceBox.selectedProperty().bindBidirectional(field.hidePopupWithNoChoiceProperty());
 
-        CheckBox showSearchIconBox = new CheckBox("Show search icon");
+        CheckBox showSearchIconBox = new CheckBox("Show history icon");
         showSearchIconBox.selectedProperty().bindBidirectional(field.showSearchIconProperty());
 
         CheckBox showLeftRightNodes = new CheckBox("Show extra left & right nodes");
@@ -130,7 +132,7 @@ public class SearchFieldApp extends GemApplication {
         field.leftProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionLeft : null, showLeftRightNodes.selectedProperty()));
         field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, hideWithNoChoiceBox, showSearchIconBox, showLeftRightNodes,
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, showSearchWhenEmptyChoiceBox, hideWithSingleChoiceBox, hideWithNoChoiceBox, showSearchIconBox, showLeftRightNodes,
                 autoCommitOnFocusLostBox, hBox, hBox2, enableHistoryBox, historyControls, field);
         vbox.setPadding(new Insets(20));
 
