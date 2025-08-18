@@ -2003,7 +2003,7 @@
 
 .paging-controls > .pane > .buttons-container > .grid-pane > .page-button:hover,
 .paging-controls > .pane > .buttons-container > .grid-pane > .page-button.current {
-    -fx-background-color: -color-accent-emphasis;
+    -fx-background-color: -color-neutral-emphasis;
     -fx-text-fill: -color-fg-emphasis;
 }
 
@@ -2018,7 +2018,7 @@
 }
 
 .paging-controls > .pane > .buttons-container > .navigation-button:hover {
-    -fx-background-color: -color-accent-emphasis;
+    -fx-background-color: -color-neutral-emphasis;
     -fx-text-fill: -color-fg-emphasis;
 }
 
