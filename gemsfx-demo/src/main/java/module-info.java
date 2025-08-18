@@ -21,6 +21,7 @@ open module com.dlsc.gemsfx.demo {
     requires net.synedra.validatorfx;
     requires org.apache.commons.lang3;
     requires org.kordamp.ikonli.material;
+    requires javafx.controls;
 
     exports com.dlsc.gemsfx.demo;
     exports com.dlsc.gemsfx.demo.binding;

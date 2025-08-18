@@ -20,6 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 
 import java.util.Objects;
@@ -33,6 +34,8 @@ import java.util.function.Consumer;
 public class GridTableView<S> extends Control {
 
     private static final String DEFAULT_STYLE_CLASS = "grid-table-view";
+
+    private final GridPane gridPane = new GridPane();
 
     public GridTableView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
@@ -52,6 +55,20 @@ public class GridTableView<S> extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(GridTableView.class.getResource("grid-table-view.css")).toExternalForm();
+    }
+
+    /**
+     * Returns the grid pane used to display the table.
+     *
+     * @return the grid pane used to display the table.
+     */
+    public final GridPane getGridPane() {
+        return gridPane;
+    }
+
+    @Override
+    public Orientation getContentBias() {
+        return gridPane.getContentBias();
     }
 
     // items

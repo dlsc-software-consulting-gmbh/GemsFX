@@ -29,7 +29,7 @@ import java.util.function.Consumer;
  */
 public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
 
-    private final GridPane gridPane = new GridPane();
+    private final GridPane gridPane;
 
     // dummy region
     private final LoadingPane loadingPane = new LoadingPane(new Region()) {
@@ -41,6 +41,8 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
 
     public GridTableViewSkin(GridTableView<S> tableView) {
         super(tableView);
+
+        gridPane = tableView.getGridPane();
 
         ListChangeListener<S> listChangeListener = c -> updateView();
         tableView.itemsProperty().addListener(listChangeListener);

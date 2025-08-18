@@ -1,5 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
+import com.dlsc.gemsfx.TextView;
+import com.dlsc.gemsfx.gridtable.GridTableCell;
 import com.dlsc.gemsfx.paging.PagingControlBase;
 import com.dlsc.gemsfx.paging.PagingGridTableView;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
@@ -13,14 +15,23 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
@@ -83,6 +94,16 @@ public class PagingGridTableViewApp extends GemApplication {
         indexColumn.setMaxWidth(50);
         castColumn.setMaxWidth(500);
 
+        castColumn.setCellFactory(tableView -> new GridTableCell<>() {
+            {
+                TextView textView = new TextView();
+                textView.textProperty().bind(itemProperty().asString());
+                setGraphic(textView);
+                setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                setWrapText(true);
+            }
+        });
+
         pagingGridTableView.getColumns().setAll(List.of(indexColumn, titleColumn, genreColumn, castColumn, yearColumn));
 
         simulateNoData.addListener(it -> pagingGridTableView.reload());
@@ -115,12 +136,28 @@ public class PagingGridTableViewApp extends GemApplication {
         HBox settingsBox = new HBox(10, fillBox, simulateDelay, showPagingControls, location, clearSetData, reduceItemCount, increaseItemCount);
         settingsBox.setAlignment(Pos.CENTER_LEFT);
 
-        VBox box = new VBox(20, pagingGridTableView, settingsBox, new PagingControlsSettingsView(pagingGridTableView), scenicView);
+//        VBox box = new VBox(20, pagingGridTableView, settingsBox, new PagingControlsSettingsView(pagingGridTableView), scenicView);
+        VBox box = new VBox(20, pagingGridTableView, scenicView);
         box.setPadding(new Insets(20));
+        Tab tab1 = new Tab("Movies");
+        Tab tab2 = new Tab("Lorem Ipsum");
+        tab1.setContent(box);
+        tab2.setContent(new Label("whatever"));
 
-        Scene scene = new Scene(box);
+        TabPane tabPane = new TabPane();
+        tabPane.setMaxHeight(Region.USE_PREF_SIZE);
+        tabPane.setStyle("-fx-background-color: white;");
+        tabPane.getTabs().setAll(tab1, tab2);
 
-        scene.focusOwnerProperty().addListener(it -> System.out.println(scene.getFocusOwner()));
+        pagingGridTableView.getLoadingService().addEventHandler(WorkerStateEvent.ANY, evt -> Platform.runLater(tabPane::requestLayout));
+        VBox vbox = new VBox(tabPane);
+        vbox.setStyle("-fx-background-color: orange;");
+
+        ScrollPane scrollPane = new ScrollPane(vbox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+
+        Scene scene = new Scene(scrollPane);
 
         stage.setTitle("Paging Grid Table View");
         stage.setScene(scene);
