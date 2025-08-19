@@ -324,8 +324,10 @@ public class DialogPane extends Pane {
     }
 
     /**
-     * Makes the given dialog visible in the pane.
+     * Makes the given dialog visible in the pane. A dialog can define a delay duration which will
+     * be used to delay the appearance of the dialog.
      *
+     * @see Dialog#delayProperty()
      * @param dialog the dialog to show
      * @throws IllegalArgumentException when the given dialog belongs to a different dialog pane
      */
@@ -333,19 +335,31 @@ public class DialogPane extends Pane {
         if (dialog.getDialogPane() != this) {
             throw new IllegalArgumentException("the given dialog does not belong to this dialog pane");
         }
-        dialogs.add(dialog);
+        Duration delay = dialog.getDelay();
+        if (delay != null) {
+            Thread thread = Thread.ofVirtual().name("show-dialog-delay").start(() -> {
+                try {
+                    Thread.sleep((long) delay.toMillis());
+                    Platform.runLater(() -> {
+                        if (!dialog.cancelled) {
+                            dialogs.add(dialog);
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } else {
+            dialogs.add(dialog);
+        }
     }
 
     /**
      * Hides the given dialog.
      *
      * @param dialog the dialog to hide
-     * @throws IllegalArgumentException when the given dialog belongs to a different dialog pane
      */
     public void hideDialog(Dialog<?> dialog) {
-        if (!dialogs.contains(dialog)) {
-            throw new IllegalArgumentException("the given dialog does not belong to this dialog pane");
-        }
         dialogs.remove(dialog);
     }
 
@@ -1376,7 +1390,7 @@ public class DialogPane extends Pane {
 
         // delay
 
-        private final ObjectProperty<Duration> delay = new SimpleObjectProperty<>(this, "delay", Duration.ZERO);
+        private final ObjectProperty<Duration> delay = new SimpleObjectProperty<>(this, "delay");
 
         public final Duration getDelay() {
             return delay.get();
@@ -1388,7 +1402,7 @@ public class DialogPane extends Pane {
          * a progress indicator as usually you only want those to appear if a background
          * operation takes a while.
          *
-         * @return the delay before the dialog becomes visible, default is ZERO
+         * @return the delay before the dialog becomes visible, default is null.
          */
         public final ObjectProperty<Duration> delayProperty() {
             return delay;
@@ -1470,10 +1484,13 @@ public class DialogPane extends Pane {
             pane.showDialog(this);
         }
 
+        private boolean cancelled = false;
+
         /**
          * Hides the dialog by cancelling it.
          */
         public void cancel() {
+            cancelled = true;
             pane.hideDialog(this);
             setValue(null);
             commit(ButtonType.CANCEL);
