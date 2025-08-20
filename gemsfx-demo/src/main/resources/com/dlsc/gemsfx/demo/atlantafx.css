@@ -2092,7 +2092,8 @@
 }
 
 .drawer-stackpane > .drawer {
-    -fx-background-color: -color-border-default, -color-neutral-subtle;
+    -fx-background-color: -color-border-default, -color-bg-default, -color-neutral-subtle;
+    -fx-background-insets: 0px, 1px, 1px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
 }
 
