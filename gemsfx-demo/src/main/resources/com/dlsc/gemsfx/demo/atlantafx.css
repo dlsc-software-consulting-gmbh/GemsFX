@@ -1885,7 +1885,7 @@
 }
 
 .dialog-pane > .content-pane > .vbox > .content.padding {
-    -fx-padding: 30px;
+    -fx-padding: 20px;
 }
 
 .dialog-pane > .content-pane > .vbox > .header > .close-button {
