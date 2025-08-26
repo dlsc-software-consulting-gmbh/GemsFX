@@ -53,10 +53,10 @@ public class PagingGridTableViewSkin<T> extends SkinBase<PagingGridTableView<T>>
         pagingGridTableView.placeholderProperty().addListener(updateViewListener);
         pagingGridTableView.pagingControlsLocationProperty().addListener(updateViewListener);
 
-        gridTableView.onOpenItemProperty().bind(pagingGridTableView.onOpenItemProperty());
+        gridTableView.onOpenItemProperty().bindBidirectional(pagingGridTableView.onOpenItemProperty());
         gridTableView.loadingStatusProperty().bindBidirectional(pagingGridTableView.loadingStatusProperty());
         gridTableView.commitLoadStatusDelayProperty().bindBidirectional(pagingGridTableView.commitLoadStatusDelayProperty());
-        gridTableView.placeholderProperty().bind(pagingGridTableView.placeholderProperty());
+        gridTableView.placeholderProperty().bindBidirectional(pagingGridTableView.placeholderProperty());
 
         stackPane.getStyleClass().add("stack-pane");
 
