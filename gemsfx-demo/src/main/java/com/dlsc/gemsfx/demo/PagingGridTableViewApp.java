@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -37,7 +38,7 @@ public class PagingGridTableViewApp extends GemApplication {
 
     private final BooleanProperty simulateNoData = new SimpleBooleanProperty(false);
 
-    private final IntegerProperty count = new SimpleIntegerProperty(5);
+    private final IntegerProperty count = new SimpleIntegerProperty();
 
     @Override
     public void start(Stage stage) { super.start(stage);
@@ -45,6 +46,7 @@ public class PagingGridTableViewApp extends GemApplication {
 
         PagingGridTableView<Movie> pagingGridTableView = new PagingGridTableView<>();
         count.subscribe(c -> pagingGridTableView.reload());
+        count.set(movies.size());
 
         pagingGridTableView.setPrefWidth(800);
         pagingGridTableView.setPageSize(5);
