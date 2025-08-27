@@ -381,6 +381,7 @@ public class SimpleFilterView extends HBox {
         CustomTextField textField = new CustomTextField();
         textField.setPromptText(promptText);
         textField.setMaxWidth(Double.MAX_VALUE);
+        textField.textProperty().addListener(changeListener);
         textField.textProperty().addListener((obs, oldText, newText) -> {
             if (oldText != null) {
                 Map<Object, ChipView<?>> innerMap = map.get(textField);
@@ -418,6 +419,7 @@ public class SimpleFilterView extends HBox {
         SearchTextField textField = new SearchTextField();
         textField.setPromptText(promptText);
         textField.setMaxWidth(Double.MAX_VALUE);
+        textField.textProperty().addListener(changeListener);
         textField.textProperty().addListener((obs, oldText, newText) -> {
             if (oldText != null) {
                 Map<Object, ChipView<?>> innerMap = map.get(textField);
