@@ -21,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.util.StringConverter;
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.textfield.CustomTextField;
 
 import java.time.LocalDate;
@@ -392,7 +393,7 @@ public class SimpleFilterView extends HBox {
                     }
                 }
             }
-            if (newText != null) {
+            if (StringUtils.isNotBlank(newText)) {
                 ChipView<String> chip = new ChipView<>();
                 chip.setValue(newText);
                 chip.setText(newText);
@@ -430,7 +431,7 @@ public class SimpleFilterView extends HBox {
                     }
                 }
             }
-            if (newText != null) {
+            if (StringUtils.isNotBlank(newText)) {
                 ChipView<String> chip = new ChipView<>();
                 chip.setValue(newText);
                 chip.setText(newText);
