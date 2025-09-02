@@ -50,6 +50,15 @@ public class GridTableView<S> extends Control {
     }
 
     @Override
+    public Orientation getContentBias() {
+        ObservableList<Node> children = getChildren();
+        if (children.isEmpty()) {
+            return super.getContentBias();
+        }
+        return children.getFirst().getContentBias();
+    }
+
+    @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(GridTableView.class.getResource("grid-table-view.css")).toExternalForm();
     }

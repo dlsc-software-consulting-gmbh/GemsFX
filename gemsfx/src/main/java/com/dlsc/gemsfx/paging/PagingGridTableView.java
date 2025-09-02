@@ -8,6 +8,7 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Orientation;
 import javafx.scene.control.Skin;
 
 import java.util.Objects;
@@ -63,6 +64,11 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(PagingGridTableView.class.getResource("paging-grid-table-view.css")).toExternalForm();
+    }
+
+    @Override
+    public Orientation getContentBias() {
+        return gridTableView.getContentBias();
     }
 
     private final ListProperty<GridTableColumn<T, ?>> columns = new SimpleListProperty<>(this, "columns", FXCollections.observableArrayList());
