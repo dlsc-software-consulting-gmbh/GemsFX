@@ -180,6 +180,8 @@ public class SimpleFilterView extends HBox {
                     ((DatePicker) node).setValue(null);
                 } else if (node instanceof TextField) {
                     ((TextField) node).setText(null);
+                } else if (node instanceof CheckBox) {
+                    ((CheckBox) node).setSelected(false);
                 } else {
                     throw new IllegalStateException("Unknown node type: " + node.getClass().getName());
                 }
