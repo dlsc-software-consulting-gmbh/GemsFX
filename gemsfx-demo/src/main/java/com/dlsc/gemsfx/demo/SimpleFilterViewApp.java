@@ -85,6 +85,7 @@ public class SimpleFilterViewApp extends GemApplication {
         filterView1.addTextField("Prompt");
         filterView1.getChildren().add(new TimePicker());
         filterView1.addCalendarPicker("Date");
+        filterView1.addCheckBox("Check Box");
         filterView1.layoutModeProperty().bindBidirectional(layoutMode);
         filterView1.getChildren().add(new MenuButton("Test"));
         filterView1.addSearchTextField("Search");

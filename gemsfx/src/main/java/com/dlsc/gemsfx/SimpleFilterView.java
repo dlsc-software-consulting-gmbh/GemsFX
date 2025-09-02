@@ -14,6 +14,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
@@ -329,6 +330,44 @@ public class SimpleFilterView extends HBox {
         getChildren().add(box);
 
         return box;
+    }
+
+    /**
+     * Adds a new CheckBox with the specified text to the control.
+     * The CheckBox is configured with listeners to manage its interaction
+     * with associated chip views and the internal state of the control.
+     *
+     * @param text the text to display alongside the created CheckBox
+     * @return the created CheckBox instance
+     */
+    public final CheckBox addCheckBox(String text) {
+        CheckBox box = createCheckBox();
+        box.setText(text);
+        box.setMaxWidth(Double.MAX_VALUE);
+        box.selectedProperty().addListener(changeListener);
+        box.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (oldVal) {
+                Map<Object, ChipView<?>> innerMap = map.get(box);
+                ChipView<?> chip = innerMap.remove(box);
+                if (chip != null) {
+                    getChips().remove(chip);
+                }
+            }
+            if (newVal) {
+                ChipView<Boolean> chip = new ChipView<>();
+                chip.setValue(newVal);
+                chip.setText(text);
+                chip.setOnClose(it -> box.setSelected(false));
+                getChips().add(chip);
+                map.computeIfAbsent(box, it -> new HashMap<>()).put(box, chip);
+            }
+        });
+        getChildren().add(box);
+        return box;
+    }
+
+    protected CheckBox createCheckBox() {
+        return new CheckBox();
     }
 
     private <T> void removeChips(List<? extends T> removedList, SelectionBox<T> box) {
