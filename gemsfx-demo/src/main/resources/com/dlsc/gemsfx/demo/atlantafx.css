@@ -1053,6 +1053,7 @@
 }
 
 .simple-filter-view .selection-item {
+    -fx-border-width: 0px;
     -fx-background-color: -color-border-default, -color-bg-subtle;
 }
 

@@ -10,3 +10,7 @@
     -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
     -fx-background-color: transparent;
 }
+
+.simple-filter-view .check-box {
+    -fx-padding: 0px 5px;
+}
