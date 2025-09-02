@@ -15,6 +15,13 @@ public class PagingLoadResponse<T> {
     private final List<T> items;
     private final int totalItemCount;
 
+    /**
+     * Constructs a new load response containing the items to display for the requested page
+     * and the total number of available items.
+     *
+     * @param items the list of items of type T to be included in the response; must not be null
+     * @param totalItemCount the total number of items available in the data source
+     */
     public PagingLoadResponse(List<T> items, int totalItemCount) {
         this.items = Objects.requireNonNull(items, "items list can not be null");
         this.totalItemCount = totalItemCount;
@@ -38,6 +45,14 @@ public class PagingLoadResponse<T> {
         return totalItemCount;
     }
 
+    /**
+     * An empty response with no items and no total item count. This is useful
+     * when some preconditions for running a query are not met. Then the loader can
+     * simply return this empty response.
+     *
+     * @return an empty paging load response
+     * @param <T> the type of the items in the empty response
+     */
     public static <T> PagingLoadResponse<T> emptyResponse() {
         return new PagingLoadResponse<>(Collections.emptyList(), 0);
     }
