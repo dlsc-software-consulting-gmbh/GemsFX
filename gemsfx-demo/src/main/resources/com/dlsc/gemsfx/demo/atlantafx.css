@@ -2145,10 +2145,17 @@
 }
 
 .drawer-stackpane > .drawer > .top > .drag-handle > .handle {
+    -fx-spacing: 2px;
 }
 
 .drawer-stackpane > .drawer > .top > .drag-handle > .handle > .separator {
     -fx-padding: 0px;
+}
+
+.drawer-stackpane > .drawer > .top > .drag-handle > .handle > .separator > .line {
+    -fx-max-height: 1px;
+    -fx-background-color: -color-border-default;
+    -fx-border-width: 0px;
 }
 
 /** --------------------------------------------------------------------
