@@ -187,6 +187,7 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         // step 4: configure the cell
         cell.setColumn(this);
         cell.setRowItem(rowItem);
+        cell.setIndex(index);
         cell.updateItem(item, rowItem == null);
         cell.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
