@@ -1055,6 +1055,7 @@
 .simple-filter-view .selection-item {
     -fx-border-width: 0px;
     -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-background-radius: 0px;
 }
 
 .simple-filter-view:compact .selection-item.first {
