@@ -153,6 +153,10 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
         ObservableList<GridTableColumn<S, ?>> columns = tableView.getColumns();
         int numberOfColumns = columns.size();
 
+        if (numberOfColumns == 0) {
+            return;
+        }
+
         ObservableList<S> items = tableView.getItems();
 
         if (items.isEmpty()) {
