@@ -1055,7 +1055,7 @@
 .simple-filter-view .selection-item {
     -fx-border-width: 0px;
     -fx-background-color: -color-border-default, -color-bg-subtle;
-    -fx-background-radius: 0px;
+    -fx-background-radius: 0px, 0px;
 }
 
 .simple-filter-view:compact .selection-item.first {
@@ -1539,22 +1539,22 @@
 }
 
 .search-text-field > .left-pane > .history-button > .icon {
-    -fx-background-color: -color-input-border;
+    -fx-background-color: -color-fg-subtle;
 }
 
 .search-text-field:focused > .left-pane > .history-button > .icon {
-    -fx-background-color: -color-input-border-focused;
+    -fx-background-color: -color-fg-default;
 }
 
 .search-text-field > .left-pane > .history-button:disabled-popup > .icon {
 }
 
 .search-text-field > .right-pane > .clear-icon-wrapper > .ikonli-font-icon {
-    -fx-icon-color: -color-input-border;
+    -fx-icon-color: -color-fg-subtle;
 }
 
 .search-text-field:focused > .right-pane > .clear-icon-wrapper > .ikonli-font-icon {
-    -fx-icon-color: -color-input-border-focused;
+    -fx-icon-color: -color-fg-default;
 }
 
 /* -----------------------------------------------------------------------------------------------------
