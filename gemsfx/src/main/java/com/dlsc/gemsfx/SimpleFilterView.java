@@ -420,7 +420,7 @@ public class SimpleFilterView extends HBox {
      * @return the new text field
      */
     public final CustomTextField addTextField(String promptText) {
-        CustomTextField textField = new CustomTextField();
+        CustomTextField textField = createTextField();
         textField.setPromptText(promptText);
         textField.setMaxWidth(Double.MAX_VALUE);
         textField.textProperty().addListener(changeListener);
@@ -451,6 +451,16 @@ public class SimpleFilterView extends HBox {
     }
 
     /**
+     * Factory method for creating a text field that will be added to the view. This method
+     * can be overridden to provide a custom text field implementation.
+     *
+     * @return a text field
+     */
+    protected CustomTextField createTextField() {
+        return new CustomTextField();
+    }
+
+    /**
      * Add a new instance of a search text field.
      *
      * @see SearchTextField
@@ -458,7 +468,7 @@ public class SimpleFilterView extends HBox {
      * @return the new text field
      */
     public final SearchTextField addSearchTextField(String promptText) {
-        SearchTextField textField = new SearchTextField();
+        SearchTextField textField = createSearchTextField();
         textField.setPromptText(promptText);
         textField.setMaxWidth(Double.MAX_VALUE);
         textField.textProperty().addListener(changeListener);
@@ -486,6 +496,16 @@ public class SimpleFilterView extends HBox {
         getChildren().add(textField);
 
         return textField;
+    }
+
+    /**
+     * Factory method for creating the search text field that will be added to the view. This method
+     * can be overridden to provide a custom search field implementation.
+     *
+     * @return a search text field
+     */
+    protected SearchTextField createSearchTextField() {
+        return new SearchTextField();
     }
 
     /**
@@ -536,7 +556,7 @@ public class SimpleFilterView extends HBox {
 
     /**
      * Factory method for creating the date range picker that will be added to the view. This method
-     * can be overridden to provide a custom date range picker implementations.
+     * can be overridden to provide a custom date range picker implementation.
      *
      * @return a date range picker
      */
