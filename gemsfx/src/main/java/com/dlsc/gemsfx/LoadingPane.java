@@ -113,7 +113,7 @@ public class LoadingPane extends StackPane {
 
             if (newStatus != null) {
                 commitStatusThread = new CommitStatusThread(newStatus);
-                commitStatusThread.start();
+                Thread.ofVirtual().start(commitStatusThread);
             }
         });
 
@@ -246,10 +246,10 @@ public class LoadingPane extends StackPane {
     }
 
     /**
-     * A thread used to delay the actual status change. Delaying is important so that a fast loading process
+     * A thread runnable used to delay the actual status change. Delaying is important so that a fast loading process
      * does not cause a quick flicker inside the UI.
      */
-    private class CommitStatusThread extends Thread {
+    private class CommitStatusThread implements Runnable {
 
         private final Status status;
         private boolean stopped;
