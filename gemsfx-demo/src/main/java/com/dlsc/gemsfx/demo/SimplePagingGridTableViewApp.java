@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -30,8 +31,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class SimplePagingGridTableViewApp extends GemApplication {
-
-    private final BooleanProperty simulateDelayProperty = new SimpleBooleanProperty(false);
 
     private final BooleanProperty simulateNoData = new SimpleBooleanProperty(false);
 
@@ -74,7 +73,7 @@ public class SimplePagingGridTableViewApp extends GemApplication {
         fillBox.selectedProperty().bindBidirectional(pagingGridTableView.fillLastPageProperty());
 
         CheckBox simulateDelay = new CheckBox("Simulate delay");
-        simulateDelay.selectedProperty().bindBidirectional(simulateDelayProperty);
+        pagingGridTableView.getLoadingService().loadDelayInMillisProperty().bind(Bindings.createLongBinding(() -> simulateDelay.isSelected() ? 3000L : 0L, simulateDelay.selectedProperty()));
 
         CheckBox showPagingControls = new CheckBox("Show paging controls");
         showPagingControls.selectedProperty().bindBidirectional(pagingGridTableView.showPagingControlsProperty());
