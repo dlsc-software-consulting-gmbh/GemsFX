@@ -1301,7 +1301,7 @@ public class SearchField<T> extends Control {
     /**
      * A custom list cell implementation that is capable of underlining the part
      * of the text that matches the user-typed search text. The cell uses a text flow
-     * node that is composed of three text nodes. One of the text nodes will be underlined
+     * node composed of three text nodes. One of the text nodes will be underlined
      * and represents the user search text.
      *
      * @param <T> the type of the cell
