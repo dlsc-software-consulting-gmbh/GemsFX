@@ -909,7 +909,6 @@
     -fx-background-color: -color-bg-default;
     -fx-background-insets: 0px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
-    -fx-pref-height: 200px;
 }
 
 .search-field-popup:above .search-field-list-view {

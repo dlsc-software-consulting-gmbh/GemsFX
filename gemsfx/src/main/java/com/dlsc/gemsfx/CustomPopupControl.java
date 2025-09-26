@@ -45,7 +45,7 @@ public class CustomPopupControl extends PopupControl {
 
             show(node, anchorX, anchorY);
         } else {
-            throw new IllegalStateException("Can not show popup. The node must be attached to a scene/window.");
+            throw new IllegalStateException("Can't show popup. The node must be attached to a scene/window.");
         }
     }
 

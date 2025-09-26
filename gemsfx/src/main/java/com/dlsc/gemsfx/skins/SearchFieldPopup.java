@@ -90,7 +90,8 @@ public class SearchFieldPopup<T> extends CustomPopupControl {
      * by pressing enter immediately.
      */
     private void selectFirstSuggestion() {
-        SearchFieldPopupSkin<T> skin = (SearchFieldPopupSkin) getSkin();
+        @SuppressWarnings("rawtypes")
+        SearchFieldPopupSkin skin = (SearchFieldPopupSkin) getSkin();
         ListView<?> listView = (ListView<?>) skin.getNode();
         if (listView.getItems() != null && !listView.getItems().isEmpty()) {
             listView.getSelectionModel().select(0);

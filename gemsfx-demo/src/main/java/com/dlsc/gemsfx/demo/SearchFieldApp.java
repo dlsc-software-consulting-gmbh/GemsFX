@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.SearchField;
 import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
 import fr.brouillard.oss.cssfx.CSSFX;
-import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
