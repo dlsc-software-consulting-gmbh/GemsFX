@@ -39,13 +39,8 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
 
         listView.getStyleClass().add("search-field-list-view");
         listView.cellFactoryProperty().bind(searchField.cellFactoryProperty());
-
-        listView.prefWidthProperty().bind(control.prefWidthProperty());
-        listView.maxWidthProperty().bind(control.maxWidthProperty());
         listView.minWidthProperty().bind(control.minWidthProperty());
-
         listView.placeholderProperty().bind(searchField.placeholderProperty());
-
         listView.getSelectionModel().selectedItemProperty().addListener(it -> control.getSearchField().setSelectedItem(listView.getSelectionModel().getSelectedItem()));
         registerEventListener();
     }
