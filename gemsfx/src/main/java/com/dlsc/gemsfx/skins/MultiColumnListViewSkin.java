@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.MultiColumnListView;
 import com.dlsc.gemsfx.MultiColumnListView.ColumnListCell;
 import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
@@ -38,7 +39,10 @@ public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>>
 
         gridPane.getStyleClass().add("grid-pane");
 
-        getChildren().setAll(gridPane);
+        LoadingPane loadingPane = new LoadingPane(gridPane);
+        loadingPane.statusProperty().bind(view.loadingStatusProperty());
+
+        getChildren().setAll(loadingPane);
     }
 
     private void updateView() {

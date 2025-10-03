@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.LoadingPane.Status;
 import com.dlsc.gemsfx.skins.MultiColumnListViewSkin;
 import com.dlsc.gemsfx.util.ListUtils;
 import javafx.beans.InvalidationListener;
@@ -57,6 +58,20 @@ public class MultiColumnListView<T> extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(MultiColumnListView.class.getResource("multi-column-list-view.css")).toExternalForm();
+    }
+
+    private final ObjectProperty<Status> loadingStatus = new SimpleObjectProperty<>(this, "loadingStatus", Status.OK);
+
+    public final Status getLoadingStatus() {
+        return loadingStatus.get();
+    }
+
+    public final ObjectProperty<Status> loadingStatusProperty() {
+        return loadingStatus;
+    }
+
+    public final void setLoadingStatus(Status loadingStatus) {
+        this.loadingStatus.set(loadingStatus);
     }
 
     private final BooleanProperty showHeaders = new SimpleBooleanProperty(this, "showHeaders", true);

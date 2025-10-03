@@ -4,30 +4,30 @@
 .multi-column-list-view {
 }
 
-.multi-column-list-view > .grid-pane {
+.multi-column-list-view > .loading-pane > .grid-pane {
 }
 
-.multi-column-list-view > .grid-pane > .list-view {
+.multi-column-list-view > .loading-pane > .grid-pane > .list-view {
     -fx-fixed-cell-size: -1;
 }
 
-.multi-column-list-view > .grid-pane > .list-view .column-list-cell {
+.multi-column-list-view > .loading-pane > .grid-pane > .list-view .column-list-cell {
 }
 
-.multi-column-list-view > .grid-pane > .list-view .column-list-cell:from {
+.multi-column-list-view > .loading-pane > .grid-pane > .list-view .column-list-cell:from {
 }
 
-.multi-column-list-view > .grid-pane > .list-view .column-list-cell:to {
+.multi-column-list-view > .loading-pane > .grid-pane > .list-view .column-list-cell:to {
 }
 
-.multi-column-list-view > .grid-pane > .list-view .placeholder:drag-over {
+.multi-column-list-view > .loading-pane > .grid-pane > .list-view .placeholder:drag-over {
     -fx-border-color: -color-border-default;
     -fx-border-width: 2px;
     -fx-border-style: dashed;
     -fx-border-insets: 15px;
 }
 
-.multi-column-list-view > .grid-pane > .column-separator {
+.multi-column-list-view > .loading-pane > .grid-pane > .column-separator {
     -size: 1px;
     -fx-min-width: -size;
     -fx-pref-width: -size;
