@@ -168,6 +168,22 @@ public class GridTableView<S> extends Control {
         this.loadingStatus.set(loadingStatus);
     }
 
+    // loading status indicator size
+
+    private final ObjectProperty<LoadingPane.Size> loadingStatusSize = new SimpleObjectProperty<>(this, "loadingStatusSize", LoadingPane.Size.MEDIUM);
+
+    public final LoadingPane.Size getLoadingStatusSize() {
+        return loadingStatusSize.get();
+    }
+
+    public final ObjectProperty<LoadingPane.Size> loadingStatusSizeProperty() {
+        return loadingStatusSize;
+    }
+
+    public final void setLoadingStatusSize(LoadingPane.Size loadingStatusSize) {
+        this.loadingStatusSize.set(loadingStatusSize);
+    }
+
     // commit load status delay
 
     private final LongProperty commitLoadStatusDelay = new SimpleLongProperty(this, "commitLoadStatusDelay", 400L);

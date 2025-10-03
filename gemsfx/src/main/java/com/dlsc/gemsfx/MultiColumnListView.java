@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.LoadingPane.Size;
 import com.dlsc.gemsfx.LoadingPane.Status;
 import com.dlsc.gemsfx.skins.MultiColumnListViewSkin;
 import com.dlsc.gemsfx.util.ListUtils;
@@ -72,6 +73,20 @@ public class MultiColumnListView<T> extends Control {
 
     public final void setLoadingStatus(Status loadingStatus) {
         this.loadingStatus.set(loadingStatus);
+    }
+
+    private final ObjectProperty<Size> loadingStatusSize = new SimpleObjectProperty<>(this, "loadingStatusSize", Size.MEDIUM);
+
+    public Size getLoadingStatusSize() {
+        return loadingStatusSize.get();
+    }
+
+    public ObjectProperty<Size> loadingStatusSizeProperty() {
+        return loadingStatusSize;
+    }
+
+    public void setLoadingStatusSize(Size loadingStatusSize) {
+        this.loadingStatusSize.set(loadingStatusSize);
     }
 
     private final BooleanProperty showHeaders = new SimpleBooleanProperty(this, "showHeaders", true);

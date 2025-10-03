@@ -61,6 +61,7 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
         });
 
         loadingPane.statusProperty().bindBidirectional(tableView.loadingStatusProperty());
+        loadingPane.sizeProperty().bindBidirectional(tableView.loadingStatusSizeProperty());
         loadingPane.commitDelayProperty().bindBidirectional(tableView.commitLoadStatusDelayProperty());
         loadingPane.visibleProperty().bind(loadingPane.committedStatusProperty().isNotEqualTo(LoadingPane.Status.OK));
         loadingPane.managedProperty().bind(loadingPane.committedStatusProperty().isNotEqualTo(LoadingPane.Status.OK));
