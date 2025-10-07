@@ -117,7 +117,7 @@ import java.util.prefs.Preferences;
  * @see #setFooterFactory(Callback)
  * </p>
  */
-public class DialogPane extends Pane {
+public class DialogPane extends StackPane {
 
     private static final String MESSAGE_LABEL_STYLE_CLASS = "message-label";
 
@@ -133,7 +133,7 @@ public class DialogPane extends Pane {
         } else if (evt.getCode() == KeyCode.ESCAPE) { // hide the last dialog that was opened
             ObservableList<Dialog<?>> dialogs = getDialogs();
             if (!dialogs.isEmpty()) {
-                Dialog<?> dialog = dialogs.get(dialogs.size() - 1);
+                Dialog<?> dialog = dialogs.getLast();
                 dialog.cancel();
                 evt.consume();
             }
