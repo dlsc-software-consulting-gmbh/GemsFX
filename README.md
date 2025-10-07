@@ -8,6 +8,12 @@
 
 GemsFX is a collection of custom controls and utilities for JavaFX.
 
+## AtlantaFX
+If you want to use **_AtlantaFX_** for your application then copy the stylesheet called `atlantafx.css` from the demo module into
+your project. You will need to add it to the list of stylesheets that you are attaching to your application's scene. For
+more information on **_AtlantaFX_** please see the [AtlantaFX](https://github.com/mkpaz/AtlantaFX)
+project.
+
 ## Installation
 Adding GemsFX to your project.
 
