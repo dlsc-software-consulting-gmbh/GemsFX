@@ -1,20 +1,26 @@
 package com.dlsc.gemsfx.infocenter;
 
-import com.dlsc.gemsfx.skins.InfoCenterPaneSkin;
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
-import javafx.scene.control.Skin;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import one.jpro.platform.utils.TreeShowing;
 
@@ -37,7 +43,7 @@ import one.jpro.platform.utils.TreeShowing;
  * </pre>
  * </p>
  */
-public class InfoCenterPane extends Control {
+public class InfoCenterPane extends StackPane {
 
     private static final Duration DEFAULT_SLIDE_IN_DURATION = Duration.millis(200);
     private static final Duration DEFAULT_AUTO_HIDE_DURATION = Duration.seconds(5);
@@ -65,6 +71,10 @@ public class InfoCenterPane extends Control {
     };
 
     private final WeakEventHandler<MouseEvent> weakMouseClickedHandler = new WeakEventHandler<>(mouseClickedHandler);
+
+    private final DoubleProperty visibility = new SimpleDoubleProperty(this, "visibility");
+
+    private final Timeline timeline = new Timeline();
 
     /**
      * Constructs a new pane with no content.
@@ -194,11 +204,27 @@ public class InfoCenterPane extends Control {
         // monitor the mouse cursor
         infoCenterView.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> insideInfoCenter.set(true));
         infoCenterView.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> insideInfoCenter.set(false));
-    }
 
-    @Override
-    protected Skin<?> createDefaultSkin() {
-        return new InfoCenterPaneSkin(this);
+        updateChildren();
+
+        InvalidationListener rebuildListener = observable -> updateChildren();
+        contentProperty().addListener(rebuildListener);
+
+        visibility.addListener(it -> requestLayout());
+
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(widthProperty());
+        clip.heightProperty().bind(heightProperty());
+
+        setClip(clip);
+
+        showInfoCenterProperty().addListener(it -> {
+            if (isShowInfoCenter()) {
+                show();
+            } else {
+                hide();
+            }
+        });
     }
 
     private ObjectProperty<Duration> autoHideDuration;
@@ -275,7 +301,7 @@ public class InfoCenterPane extends Control {
         return infoCenterView;
     }
 
-    private ObjectProperty<Node> content = new SimpleObjectProperty<>(this, "content"); //$NON-NLS-1$
+    private final ObjectProperty<Node> content = new SimpleObjectProperty<>(this, "content"); //$NON-NLS-1$
 
     /**
      * The property that is used to store a reference to the content node. The
@@ -340,5 +366,132 @@ public class InfoCenterPane extends Control {
 
     public final void setShowInfoCenter(boolean showInfoCenter) {
         showInfoCenterProperty().set(showInfoCenter);
+    }
+
+    private void show() {
+        timeline.stop();
+        KeyValue keyValue = new KeyValue(visibility, 1);
+        KeyFrame keyFrame = new KeyFrame(getSlideInDuration(), keyValue);
+        timeline.getKeyFrames().setAll(keyFrame);
+        timeline.play();
+    }
+
+    private void hide() {
+        timeline.stop();
+        KeyValue keyValues = new KeyValue(visibility, 0);
+        KeyFrame keyFrame = new KeyFrame(getSlideInDuration(), keyValues);
+        timeline.getKeyFrames().setAll(keyFrame);
+        timeline.play();
+    }
+
+    private void updateChildren() {
+        getChildren().clear();
+
+        if (getContent() != null) {
+            getChildren().add(getContent());
+        }
+
+        if (getInfoCenterView() != null) {
+            getChildren().add(getInfoCenterView());
+        }
+    }
+
+    @Override
+    protected double computeMinWidth(double height) {
+        Node content = getContent();
+
+        if (content != null) {
+            return content.minWidth(height) + getInsets().getLeft() + getInsets().getRight();
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    protected double computePrefWidth(double height) {
+        Node content = getContent();
+
+        if (content != null) {
+            return content.prefWidth(height) + getInsets().getLeft() + getInsets().getRight();
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    protected double computeMaxWidth(double height) {
+        Node content = getContent();
+
+        if (content != null) {
+            return content.maxWidth(height) + getInsets().getLeft() + getInsets().getRight();
+        } else {
+            return Double.MAX_VALUE;
+        }
+    }
+
+    @Override
+    protected double computeMinHeight(double width) {
+        Node content = getContent();
+
+        if (content != null) {
+            return content.minHeight(width) + getInsets().getTop() + getInsets().getBottom();
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    protected double computePrefHeight(double width) {
+        Node content = getContent();
+
+        if (content != null) {
+            return content.prefHeight(width) + getInsets().getTop() + getInsets().getBottom();
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    protected double computeMaxHeight(double width) {
+        Node content = getContent();
+
+        if (content != null) {
+            return content.maxHeight(width)  + getInsets().getTop() + getInsets().getBottom();
+        } else {
+            return Double.MAX_VALUE;
+        }
+    }
+
+
+    @Override
+    protected void layoutChildren() {
+        Insets insets = getInsets();
+
+        double w = getWidth();
+        double h = getHeight();
+        double contentX = insets.getLeft();
+        double contentY = insets.getTop();
+        double contentWidth = w - insets.getLeft() - insets.getRight();
+        double contentHeight = h - insets.getTop() - insets.getBottom();
+
+        Node content = getContent();
+        if (content != null) {
+            content.resizeRelocate(contentX, contentY, contentWidth, contentHeight);
+        }
+
+        // special layout for the info center view based on the animation progress / visibility
+        InfoCenterView view = getInfoCenterView();
+        if (view != null) {
+            double prefWidth = view.prefWidth(-1);
+            double prefHeight = view.prefHeight(prefWidth);
+            double v = visibility.get();
+            double offset = prefWidth * v;
+            if (view.getShowAllGroup() != null) {
+                view.resizeRelocate(contentX + contentWidth - offset, contentY, prefWidth, contentHeight);
+            } else {
+                view.resizeRelocate(contentX + contentWidth - offset, contentY, prefWidth, Math.min(contentHeight, prefHeight));
+            }
+            view.setVisible(v > 0);
+        }
     }
 }
