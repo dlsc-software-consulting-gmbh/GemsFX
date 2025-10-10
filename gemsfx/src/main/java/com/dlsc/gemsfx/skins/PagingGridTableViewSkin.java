@@ -29,7 +29,6 @@ public class PagingGridTableViewSkin<T> extends SkinBase<PagingGridTableView<T>>
 
         gridTableView = pagingGridTableView.getGridTableView();
         VBox.setVgrow(gridTableView, Priority.ALWAYS);
-        pagingGridTableView.messageLabelStrategyProperty().subscribe(str -> System.out.println(str));
 
         pagingControls.availablePageSizesProperty().bind(pagingGridTableView.availablePageSizesProperty());
         pagingControls.pageProperty().bindBidirectional(pagingGridTableView.pageProperty());
