@@ -112,6 +112,7 @@ public class SearchField<T> extends Control {
 
     private final SearchFieldPopup<T> popup;
     private final HistoryButton<String> historyButton;
+    
 
     /**
      * Constructs a new spotlight field. The field will set defaults for the
@@ -537,6 +538,26 @@ public class SearchField<T> extends Control {
 
     public final boolean isSearching() {
         return searching.get();
+    }
+    
+    public final BooleanProperty searchResultsOnTop = new SimpleBooleanProperty(this, "searchResultsOnTop", true);
+
+    public final boolean isSearchResultsOnTop() {
+        return searchResultsOnTop.get();
+    }
+
+    /**
+     * Shows results matching searched text at the top of the search results, this may be turned off when search item
+     * order has special requirements. The default is "true".
+     *
+     * @return true if the popup showing the list of suggestions will show search matched terms first when available
+     */
+    public final BooleanProperty searchResultsOnTopProperty() {
+        return searchResultsOnTop;
+    }
+
+    public final void setSearchResultsOnTop(boolean searchResultsOnTop) {
+        this.searchResultsOnTop.set(searchResultsOnTop);
     }
 
     private final BooleanProperty hidePopupWithSingleChoice = new SimpleBooleanProperty(this, "hidePopupWithSingleChoice", false);

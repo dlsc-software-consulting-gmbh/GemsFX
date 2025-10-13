@@ -6,6 +6,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.SearchField;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
@@ -66,23 +67,25 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
                 }
             }
 
-            // prefer the suggestions that start with the search term
-            StringConverter<T> converter = searchField.getConverter();
-            String searchText = searchField.getText().toLowerCase();
+            if(searchField.searchResultsOnTop.get()) {
+                // prefer the suggestions that start with the search term
+                StringConverter<T> converter = searchField.getConverter();
+                String searchText = searchField.getText().toLowerCase();
 
-            String text1 = converter.toString(o1).toLowerCase();
-            String text2 = converter.toString(o2).toLowerCase();
+                String text1 = converter.toString(o1).toLowerCase();
+                String text2 = converter.toString(o2).toLowerCase();
 
-            if (text1.startsWith(searchText) && text2.startsWith(searchText)) {
-                return text1.compareTo(text2);
-            }
+                if (text1.startsWith(searchText) && text2.startsWith(searchText)) {
+                    return result;//Both items are on equal footing, trust the custom comparator
+                }
 
-            if (text1.startsWith(searchText)) {
-                result = -1;
-            }
+                if (text1.startsWith(searchText)) {
+                    result = -1;
+                }
 
-            if (text2.startsWith(searchText)) {
-                result = 1;
+                if (text2.startsWith(searchText)) {
+                    result = 1;
+                }
             }
 
             return result;
