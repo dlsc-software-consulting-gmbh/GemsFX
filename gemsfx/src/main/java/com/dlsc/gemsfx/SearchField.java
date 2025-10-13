@@ -181,17 +181,39 @@ public class SearchField<T> extends Control {
             }
 
             boolean releasedEnter = keyCode.equals(KeyCode.ENTER);
+            boolean highlighting = (evt.isShiftDown() && evt.getCode().isArrowKey());
+            boolean highlighted = editor.getAnchor() != editor.getCaretPosition();
+            boolean releasedRightAtEnd = keyCode.equals(KeyCode.RIGHT) && editor.getCaretPosition() == editor.getText().length();
+
             // Add the current text to the history if the user pressed the ENTER key.
             if (releasedEnter && isAddingItemToHistoryOnEnter() && !lastHistoryPopupShowing) {
                 addToHistory(editor.getText());
             }
 
-            if ((keyCode.equals(KeyCode.RIGHT) || releasedEnter) && !lastHistoryPopupShowing) {
-                commit();
+            //sync up user interactions with the text box so that editor text field can keep up.
+            if ((keyCode.equals(KeyCode.TAB) || (releasedRightAtEnd && !highlighting && !highlighted) || releasedEnter) && !lastHistoryPopupShowing) {
+                T defaultChoice = getSearchDefaultChoice(editor.getText());
+                if(defaultChoice == null && newItemProducer.get() != null) {
+                    T newItem = newItemProducer.get().call(editor.getText());
+                    select(newItem);
+                } else
+                    select(defaultChoice);
+
                 evt.consume();
-                invokeCommitHandler();
-            } else if (keyCode.equals(KeyCode.LEFT)) {
-                editor.positionCaret(Math.max(0, editor.getCaretPosition() - 1));
+            } else if (keyCode.equals(KeyCode.LEFT) && popup.isShowing() && !highlighting) {
+                if(highlighted)
+                    editor.positionCaret(Math.min(editor.getAnchor(), editor.getCaretPosition()));
+                else
+                    editor.positionCaret(Math.max(0, editor.getCaretPosition()) - 1);
+
+                evt.consume();
+            } else if (keyCode.equals(KeyCode.RIGHT) && popup.isShowing() && !highlighting) {
+                if(highlighted)
+                    editor.positionCaret(Math.max(editor.getAnchor(), editor.getCaretPosition()));
+                else
+                    editor.positionCaret(Math.min(editor.getText().length(), editor.getCaretPosition()) + 1);
+
+                evt.consume();
             } else if (keyCode.equals(KeyCode.ESCAPE)) {
                 historyButton.hidePopup();
                 cancel();
@@ -328,6 +350,15 @@ public class SearchField<T> extends Control {
         searching.bind(searchService.runningProperty());
     }
 
+    private T getSearchDefaultChoice(String searchText) {
+        BiFunction<T, String, Boolean> matcher = getMatcher();
+        T defaultChoice = suggestions.stream().sorted(comparator.get()).filter(item -> matcher.apply(item, searchText)).findFirst().orElse(null);
+
+        if(selectedItem.get() != null && StringUtils.startsWithIgnoreCase(getConverter().toString(defaultChoice), searchText))
+            defaultChoice = selectedItem.get();
+
+        return defaultChoice;
+    }
     private void onHistoryItemConfirmed(String historyItem) {
         if (historyItem != null) {
             int oldLen = editor.textProperty().getValueSafe().length();
