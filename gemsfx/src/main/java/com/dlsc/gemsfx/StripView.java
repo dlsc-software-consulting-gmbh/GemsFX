@@ -59,8 +59,11 @@ public class StripView<T> extends Control {
         selectedItemProperty().addListener(it -> {
             if (getSelectedItem() != null && isAutoScrolling()) {
                 scrollTo(getSelectedItem());
-                requestLayout();
             }
+
+            // important to remove the property after the scroll operation has been performed,
+            // otherwise we can cause a memory leak.
+            getProperties().remove("scroll.to");
         });
     }
 

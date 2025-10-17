@@ -17,6 +17,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.MapChangeListener;
+import javafx.collections.WeakMapChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -47,6 +49,19 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
     private final Map<T, Node> nodeMap = new HashMap<>();
 
     private final MaskedView maskedView;
+
+    private final MapChangeListener<? super Object, ? super Object> mapChangeListener = change -> {
+        if (change.wasAdded() && change.getKey().equals(SCROLL_TO_KEY)) {
+            @SuppressWarnings("unchecked")
+            T item = (T) change.getValueAdded();
+            getSkinnable().getProperties().remove(SCROLL_TO_KEY); // avoid a memory leak
+            if (item != null) {
+                Platform.runLater(() -> scrollTo(item));
+            }
+        }
+    };
+
+    private final WeakMapChangeListener<? super Object, ? super Object> weakMapChangeListener = new WeakMapChangeListener<>(mapChangeListener);
 
     /**
      * Constructor for all SkinBase instances.
@@ -91,6 +106,8 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
         buildContent();
 
         strip.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
+
+        getSkinnable().getProperties().addListener(weakMapChangeListener);
     }
 
     private void handleKeyPress(KeyEvent event) {
@@ -144,9 +161,6 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
 
         if (node != null) {
             StripView<T> strip = getSkinnable();
-
-            strip.getProperties().remove(SCROLL_TO_KEY);
-
             Bounds nodeBounds = node.localToParent(node.getLayoutBounds());
 
             double x = -nodeBounds.getMinX() + strip.getWidth() / 2 - nodeBounds.getWidth() / 2;
@@ -305,11 +319,5 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
 
         leftBtn.resizeRelocate(contentX, contentY + (contentHeight - leftBtn.prefHeight(-1)) / 2, leftBtn.prefWidth(-1), leftBtn.prefHeight(-1));
         rightBtn.resizeRelocate(contentX + contentWidth - rightBtn.prefWidth(-1), contentY + (contentHeight - rightBtn.prefHeight(-1)) / 2, rightBtn.prefWidth(-1), rightBtn.prefHeight(-1));
-
-        @SuppressWarnings("unchecked")
-        T item = (T) getSkinnable().getProperties().get(SCROLL_TO_KEY);
-        if (item != null) {
-            Platform.runLater(() -> scrollTo(item));
-        }
     }
 }
