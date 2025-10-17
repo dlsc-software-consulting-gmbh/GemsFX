@@ -73,7 +73,7 @@ public class DrawerStackPaneApp extends GemApplication {
         CheckBox maximizeBox = new CheckBox("Maximize");
         maximizeBox.selectedProperty().addListener(it -> {
             if (maximizeBox.isSelected()) {
-                drawerStackPane.setPreferredDrawerWidth(-1);
+                drawerStackPane.setPreferredDrawerWidth(Double.MAX_VALUE);
             } else {
                 drawerStackPane.setPreferredDrawerWidth(800);
             }

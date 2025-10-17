@@ -24,7 +24,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,8 +48,6 @@ import java.util.prefs.Preferences;
 public class DrawerStackPane extends StackPane {
 
     private static final Logger LOG = Logger.getLogger(DrawerStackPane.class.getName());
-
-    private static final int MAXIMIZE = -1;
 
     private GlassPane glassPane;
 
@@ -331,7 +328,7 @@ public class DrawerStackPane extends StackPane {
         double maxDrawerWidth = getWidth() - 2 * getSidePadding();
         double drawerWidth;
 
-        if (getPreferredDrawerWidth() == MAXIMIZE) {
+        if (getPreferredDrawerWidth() == Double.MAX_VALUE) {
             drawerWidth = maxDrawerWidth;
         } else {
             double preferredDrawerWidth = getPreferredDrawerWidth();
@@ -599,7 +596,7 @@ public class DrawerStackPane extends StackPane {
 
     // preferred drawer width support
 
-    private final DoubleProperty preferredDrawerWidth = new SimpleDoubleProperty(this, "preferredDrawerWidth", MAXIMIZE);
+    private final DoubleProperty preferredDrawerWidth = new SimpleDoubleProperty(this, "preferredDrawerWidth", Double.MAX_VALUE);
 
     public final double getPreferredDrawerWidth() {
         return preferredDrawerWidth.get();
