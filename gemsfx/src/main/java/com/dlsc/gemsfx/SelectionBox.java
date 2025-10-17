@@ -98,7 +98,7 @@ public class SelectionBox<T> extends Control {
     }
 
     /**
-     * Constructs a new selection boxx and populates it with the provided items.
+     * Constructs a new selection box and populates it with the provided items.
      *
      * @param items The initial items to populate the selection box.
      *              These items will be added to the selection box's list of choices.
@@ -639,7 +639,14 @@ public class SelectionBox<T> extends Control {
     private ObjectProperty<EventHandler<WindowEvent>> onShowing;
 
     /**
-     * Called before the SearchPopup is shown.
+     * The event handler property invoked <b>before</b> the SelectionPopup is shown.
+     * <p>
+     * This maps to {@link WindowEvent#WINDOW_SHOWING}. Use this to prepare data or UI
+     * state right before the popup becomes visible.
+     * </p>
+     *
+     * @return the property holding the handler invoked before showing the popup
+     * @see WindowEvent#WINDOW_SHOWING
      */
     public final ObjectProperty<EventHandler<WindowEvent>> onShowingProperty() {
         if (onShowing == null) {
@@ -676,7 +683,14 @@ public class SelectionBox<T> extends Control {
     private ObjectProperty<EventHandler<WindowEvent>> onShown;
 
     /**
-     * Called after the SearchPopup is shown.
+     * The event handler property invoked <b>after</b> the SelectionPopup has been shown.
+     * <p>
+     * This maps to {@link WindowEvent#WINDOW_SHOWN}. Use this to run logic that depends
+     * on the popup being visible (e.g., focusing a field inside the popup).
+     * </p>
+     *
+     * @return the property holding the handler invoked after the popup is shown
+     * @see WindowEvent#WINDOW_SHOWN
      */
     public final ObjectProperty<EventHandler<WindowEvent>> onShownProperty() {
         if (onShown == null) {
@@ -713,7 +727,14 @@ public class SelectionBox<T> extends Control {
     private ObjectProperty<EventHandler<WindowEvent>> onHiding;
 
     /**
-     * Called before the SearchPopup is hidden.
+     * The event handler property invoked <b>before</b> the SelectionPopup is hidden.
+     * <p>
+     * This maps to {@link WindowEvent#WINDOW_HIDING}. Use this to validate or persist
+     * a transient state before closing the popup.
+     * </p>
+     *
+     * @return the property holding the handler invoked before the popup is hidden
+     * @see WindowEvent#WINDOW_HIDING
      */
     public final ObjectProperty<EventHandler<WindowEvent>> onHidingProperty() {
         if (onHiding == null) {
@@ -750,7 +771,14 @@ public class SelectionBox<T> extends Control {
     private ObjectProperty<EventHandler<WindowEvent>> onHidden;
 
     /**
-     * Called after the SearchPopup is hidden.
+     * The event handler property invoked <b>after</b> the SelectionPopup has been hidden.
+     * <p>
+     * This maps to {@link WindowEvent#WINDOW_HIDDEN}. Use this to perform cleanup work
+     * after the popup is fully closed.
+     * </p>
+     *
+     * @return the property holding the handler invoked after the popup is hidden
+     * @see WindowEvent#WINDOW_HIDDEN
      */
     public final ObjectProperty<EventHandler<WindowEvent>> onHiddenProperty() {
         if (onHidden == null) {
