@@ -19,6 +19,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -333,7 +334,12 @@ public class DrawerStackPane extends StackPane {
         if (getPreferredDrawerWidth() == MAXIMIZE) {
             drawerWidth = maxDrawerWidth;
         } else {
-            drawerWidth = Math.min(getPreferredDrawerWidth(), maxDrawerWidth);
+            double preferredDrawerWidth = getPreferredDrawerWidth();
+            if (preferredDrawerWidth == Region.USE_PREF_SIZE) {
+                drawerWidth = Math.min(drawer.prefWidth(availableHeight), getWidth());
+            } else {
+                drawerWidth = Math.min(preferredDrawerWidth, maxDrawerWidth);
+            }
         }
 
         double drawerHeight = getDrawerHeight();
@@ -602,7 +608,8 @@ public class DrawerStackPane extends StackPane {
     /**
      * Stores the preferred width of the drawer. Normally this value is equal to -1, which indicates that the
      * drawer should use the entire available width. A value larger than -1 will make the pane use that value
-     * for the width of the drawer.
+     * for the width of the drawer. A value of {@link Region#USE_PREF_SIZE} will make the pane use the preferred
+     * width of the content shown inside the drawer.
      *
      * @return the preferred drawer width
      */

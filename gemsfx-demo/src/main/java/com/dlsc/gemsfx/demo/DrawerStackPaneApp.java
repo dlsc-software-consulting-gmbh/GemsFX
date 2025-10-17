@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +22,7 @@ public class DrawerStackPaneApp extends GemApplication {
         DrawerStackPane drawerStackPane = new DrawerStackPane();
         drawerStackPane.setAnimateDrawer(true);
         drawerStackPane.getToolbarItems().add(new Button("Refresh"));
+        drawerStackPane.setPreferredDrawerWidth(Region.USE_PREF_SIZE);
 
         Label label = new Label("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.   \n" +
                 "\n" +
@@ -46,11 +48,11 @@ public class DrawerStackPaneApp extends GemApplication {
 
         label.setWrapText(true);
         label.setPadding(new Insets(20));
+        label.setPrefWidth(800);
 
         ScrollPane scrollPane = new ScrollPane(label);
         scrollPane.setFitToWidth(true);
 
-        drawerStackPane.setPreferredDrawerWidth(800);
         drawerStackPane.setDrawerContent(scrollPane);
 
         Button showButton = new Button("Show Drawer");
