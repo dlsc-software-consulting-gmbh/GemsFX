@@ -7,6 +7,7 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -21,6 +22,7 @@ import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableBooleanProperty;
 import javafx.css.StyleableProperty;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
@@ -29,6 +31,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.WindowEvent;
 import javafx.util.StringConverter;
 
 import java.util.ArrayList;
@@ -95,7 +98,7 @@ public class SelectionBox<T> extends Control {
     }
 
     /**
-     * Constructs a new selection boxx and populates it with the provided items.
+     * Constructs a new selection box and populates it with the provided items.
      *
      * @param items The initial items to populate the selection box.
      *              These items will be added to the selection box's list of choices.
@@ -629,6 +632,182 @@ public class SelectionBox<T> extends Control {
 
     public final void setAnimationEnabled(boolean value) {
         animationEnabledProperty().set(value);
+    }
+
+    // onShowing
+
+    private ObjectProperty<EventHandler<WindowEvent>> onShowing;
+
+    /**
+     * The event handler property invoked <b>before</b> the SelectionPopup is shown.
+     * <p>
+     * This maps to {@link WindowEvent#WINDOW_SHOWING}. Use this to prepare data or UI
+     * state right before the popup becomes visible.
+     * </p>
+     *
+     * @return the property holding the handler invoked before showing the popup
+     * @see WindowEvent#WINDOW_SHOWING
+     */
+    public final ObjectProperty<EventHandler<WindowEvent>> onShowingProperty() {
+        if (onShowing == null) {
+            onShowing = new ObjectPropertyBase<>() {
+                @Override
+                protected void invalidated() {
+                    setEventHandler(WindowEvent.WINDOW_SHOWING, get());
+                }
+
+                @Override
+                public Object getBean() {
+                    return SelectionBox.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "onShowing";
+                }
+            };
+        }
+        return onShowing;
+    }
+
+    public final void setOnShowing(EventHandler<WindowEvent> value) {
+        onShowingProperty().set(value);
+    }
+
+    public final EventHandler<WindowEvent> getOnShowing() {
+        return onShowing == null ? null : onShowing.get();
+    }
+
+    // onShown
+
+    private ObjectProperty<EventHandler<WindowEvent>> onShown;
+
+    /**
+     * The event handler property invoked <b>after</b> the SelectionPopup has been shown.
+     * <p>
+     * This maps to {@link WindowEvent#WINDOW_SHOWN}. Use this to run logic that depends
+     * on the popup being visible (e.g., focusing a field inside the popup).
+     * </p>
+     *
+     * @return the property holding the handler invoked after the popup is shown
+     * @see WindowEvent#WINDOW_SHOWN
+     */
+    public final ObjectProperty<EventHandler<WindowEvent>> onShownProperty() {
+        if (onShown == null) {
+            onShown = new ObjectPropertyBase<>() {
+                @Override
+                protected void invalidated() {
+                    setEventHandler(WindowEvent.WINDOW_SHOWN, get());
+                }
+
+                @Override
+                public Object getBean() {
+                    return SelectionBox.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "onShown";
+                }
+            };
+        }
+        return onShown;
+    }
+
+    public final void setOnShown(EventHandler<WindowEvent> value) {
+        onShownProperty().set(value);
+    }
+
+    public final EventHandler<WindowEvent> getOnShown() {
+        return onShown == null ? null : onShown.get();
+    }
+
+    // onHiding
+
+    private ObjectProperty<EventHandler<WindowEvent>> onHiding;
+
+    /**
+     * The event handler property invoked <b>before</b> the SelectionPopup is hidden.
+     * <p>
+     * This maps to {@link WindowEvent#WINDOW_HIDING}. Use this to validate or persist
+     * a transient state before closing the popup.
+     * </p>
+     *
+     * @return the property holding the handler invoked before the popup is hidden
+     * @see WindowEvent#WINDOW_HIDING
+     */
+    public final ObjectProperty<EventHandler<WindowEvent>> onHidingProperty() {
+        if (onHiding == null) {
+            onHiding = new ObjectPropertyBase<>() {
+                @Override
+                protected void invalidated() {
+                    setEventHandler(WindowEvent.WINDOW_HIDING, get());
+                }
+
+                @Override
+                public Object getBean() {
+                    return SelectionBox.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "onHiding";
+                }
+            };
+        }
+        return onHiding;
+    }
+
+    public final void setOnHiding(EventHandler<WindowEvent> value) {
+        onHidingProperty().set(value);
+    }
+
+    public final EventHandler<WindowEvent> getOnHiding() {
+        return onHiding == null ? null : onHiding.get();
+    }
+
+    // onHidden
+
+    private ObjectProperty<EventHandler<WindowEvent>> onHidden;
+
+    /**
+     * The event handler property invoked <b>after</b> the SelectionPopup has been hidden.
+     * <p>
+     * This maps to {@link WindowEvent#WINDOW_HIDDEN}. Use this to perform cleanup work
+     * after the popup is fully closed.
+     * </p>
+     *
+     * @return the property holding the handler invoked after the popup is hidden
+     * @see WindowEvent#WINDOW_HIDDEN
+     */
+    public final ObjectProperty<EventHandler<WindowEvent>> onHiddenProperty() {
+        if (onHidden == null) {
+            onHidden = new ObjectPropertyBase<>() {
+                @Override
+                protected void invalidated() {
+                    setEventHandler(WindowEvent.WINDOW_HIDDEN, get());
+                }
+
+                @Override
+                public Object getBean() {
+                    return SelectionBox.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "onHidden";
+                }
+            };
+        }
+        return onHidden;
+    }
+
+    public final void setOnHidden(EventHandler<WindowEvent> value) {
+        onHiddenProperty().set(value);
+    }
+
+    public final EventHandler<WindowEvent> getOnHidden() {
+        return onHidden == null ? null : onHidden.get();
     }
 
     private static class StyleableProperties {

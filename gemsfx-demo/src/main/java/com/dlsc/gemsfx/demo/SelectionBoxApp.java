@@ -31,6 +31,12 @@ public class SelectionBoxApp extends GemApplication {
     public void start(Stage primaryStage) {
         super.start(primaryStage);
 
+        selectionBox.setOnShowing(evt -> System.out.println("On popup showing"));
+        selectionBox.setOnShown(evt -> System.out.println("On popup shown"));
+
+        selectionBox.setOnHiding(evt -> System.out.println("On popup hiding"));
+        selectionBox.setOnHidden(evt -> System.out.println("On popup hidden"));
+
         selectionBox.show();
 
         topNode.setStyle("-fx-background-color: lightblue;-fx-padding: 10;");

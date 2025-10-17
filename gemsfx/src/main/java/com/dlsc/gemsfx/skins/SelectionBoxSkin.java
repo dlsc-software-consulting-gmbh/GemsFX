@@ -73,6 +73,10 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
 
         popup = new SelectionPopup(control);
         popup.showingProperty().subscribe(isShowing -> control.pseudoClassStateChanged(SHOWING_POPUP_PSEUDO_CLASS, isShowing));
+        popup.onShowingProperty().bind(control.onShowingProperty());
+        popup.onShownProperty().bind(control.onShownProperty());
+        popup.onHidingProperty().bind(control.onHidingProperty());
+        popup.onHiddenProperty().bind(control.onHiddenProperty());
 
         displayLabel = new Label();
         displayLabel.getStyleClass().add("display-label");
