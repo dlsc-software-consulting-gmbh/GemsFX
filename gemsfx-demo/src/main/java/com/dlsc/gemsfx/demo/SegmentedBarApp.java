@@ -25,7 +25,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class SegmentedBarApp extends Application {
+public class SegmentedBarApp extends GemApplication {
 
     private final VBox vbox = new VBox(40);
 
@@ -44,7 +44,7 @@ public class SegmentedBarApp extends Application {
     private final ObjectProperty<Orientation> orientation = new SimpleObjectProperty<>(Orientation.HORIZONTAL);
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         hbox.setAlignment(Pos.CENTER);
         vbox.setAlignment(Pos.CENTER);
 
@@ -113,6 +113,7 @@ public class SegmentedBarApp extends Application {
         VBox.setVgrow(contentPane, Priority.ALWAYS);
 
         Scene scene = new Scene(contentWrapper);
+        primaryStage.setTitle("Segmented Bar Demo");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         primaryStage.centerOnScreen();
