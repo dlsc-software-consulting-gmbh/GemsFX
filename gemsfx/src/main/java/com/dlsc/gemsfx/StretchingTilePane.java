@@ -237,7 +237,7 @@ public class StretchingTilePane extends Pane {
 
         for (int i = 0; i < totalLen; i++) {
             Node node = children.get(i);
-            node.resizeRelocate(x, y, w, preferredTileHeight);
+            node.resizeRelocate(snapPositionX(x), snapPositionY(y), snapSizeX(w), snapSizeY(preferredTileHeight));
             x += w + getHgap();
             col++;
             if (col == columnCount) {
