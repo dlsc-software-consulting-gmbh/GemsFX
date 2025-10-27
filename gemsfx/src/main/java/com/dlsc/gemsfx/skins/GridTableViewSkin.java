@@ -42,6 +42,8 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
     public GridTableViewSkin(GridTableView<S> tableView) {
         super(tableView);
 
+        loadingPane.progressIndicatorProperty().bind(tableView.progressIndicatorProperty());
+
         ListChangeListener<S> listChangeListener = c -> updateView();
         tableView.itemsProperty().addListener(listChangeListener);
 
@@ -60,14 +62,14 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
             }
         });
 
-        loadingPane.statusProperty().bindBidirectional(tableView.loadingStatusProperty());
-        loadingPane.sizeProperty().bindBidirectional(tableView.loadingStatusSizeProperty());
-        loadingPane.commitDelayProperty().bindBidirectional(tableView.commitLoadStatusDelayProperty());
+        loadingPane.statusProperty().bind(tableView.loadingStatusProperty());
+        loadingPane.sizeProperty().bind(tableView.loadingStatusSizeProperty());
+        loadingPane.commitDelayProperty().bind(tableView.commitLoadStatusDelayProperty());
         loadingPane.visibleProperty().bind(loadingPane.committedStatusProperty().isNotEqualTo(LoadingPane.Status.OK));
         loadingPane.managedProperty().bind(loadingPane.committedStatusProperty().isNotEqualTo(LoadingPane.Status.OK));
 
-        GridPane.setHgrow(loadingPane, Priority.ALWAYS);
-        GridPane.setVgrow(loadingPane, Priority.ALWAYS);
+        GridPane.setHgrow(loadingPane, Priority.NEVER);
+        GridPane.setVgrow(loadingPane, Priority.NEVER);
         GridPane.setFillHeight(loadingPane, true);
         GridPane.setFillWidth(loadingPane, true);
 

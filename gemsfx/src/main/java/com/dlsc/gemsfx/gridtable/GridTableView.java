@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.gridtable;
 
+import com.dlsc.gemsfx.CircleProgressIndicator;
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.skins.GridTableViewSkin;
 import javafx.beans.property.IntegerProperty;
@@ -17,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Skin;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -61,6 +63,28 @@ public class GridTableView<S> extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(GridTableView.class.getResource("grid-table-view.css")).toExternalForm();
+    }
+
+    // progress indicator
+
+    private final ObjectProperty<ProgressIndicator> progressIndicator = new SimpleObjectProperty<>(this, "progressIndicator", new CircleProgressIndicator());
+
+    public final ProgressIndicator getProgressIndicator() {
+        return progressIndicator.get();
+    }
+
+    /**
+     * The progress indicator that will be used to display percentage progress or the indeterminate state of the
+     * loading progress.
+     *
+     * @return the progress indicator
+     */
+    public final ObjectProperty<ProgressIndicator> progressIndicatorProperty() {
+        return progressIndicator;
+    }
+
+    public final void setProgressIndicator(ProgressIndicator progressIndicator) {
+        this.progressIndicator.set(progressIndicator);
     }
 
     // items

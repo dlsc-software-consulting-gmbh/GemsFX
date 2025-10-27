@@ -22,6 +22,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Skin;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
@@ -59,6 +60,26 @@ public class MultiColumnListView<T> extends Control {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(MultiColumnListView.class.getResource("multi-column-list-view.css")).toExternalForm();
+    }
+
+    private final ObjectProperty<ProgressIndicator> progressIndicator = new SimpleObjectProperty<>(this, "progressIndicator", new CircleProgressIndicator());
+
+    public final ProgressIndicator getProgressIndicator() {
+        return progressIndicator.get();
+    }
+
+    /**
+     * The progress indicator that will be used to display percentage progress or the indeterminate state of the
+     * loading progress.
+     *
+     * @return the progress indicator
+     */
+    public final ObjectProperty<ProgressIndicator> progressIndicatorProperty() {
+        return progressIndicator;
+    }
+
+    public final void setProgressIndicator(ProgressIndicator progressIndicator) {
+        this.progressIndicator.set(progressIndicator);
     }
 
     private final ObjectProperty<Status> loadingStatus = new SimpleObjectProperty<>(this, "loadingStatus", Status.OK);

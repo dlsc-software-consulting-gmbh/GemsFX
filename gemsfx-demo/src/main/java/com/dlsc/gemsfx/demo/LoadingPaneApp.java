@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
+import atlantafx.base.controls.RingProgressIndicator;
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.LoadingPane.Status;
 import fr.brouillard.oss.cssfx.CSSFX;
@@ -11,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -30,6 +32,11 @@ public class LoadingPaneApp extends GemApplication {
         loadingPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         loadingPane.setStyle("-fx-border-color: black;");
         loadingPane.setError("Some error message...");
+
+        if (Boolean.getBoolean("atlantafx")) {
+            RingProgressIndicator progressIndicator = new RingProgressIndicator();
+            loadingPane.setProgressIndicator(progressIndicator);
+        }
 
         ComboBox<Status> statusBox = new ComboBox<>();
         statusBox.getItems().addAll(Status.values());

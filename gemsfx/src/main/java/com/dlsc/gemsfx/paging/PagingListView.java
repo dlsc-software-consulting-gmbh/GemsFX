@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.paging;
 
+import com.dlsc.gemsfx.CircleProgressIndicator;
 import com.dlsc.gemsfx.skins.InnerListViewSkin;
 import com.dlsc.gemsfx.skins.PagingListViewSkin;
 import javafx.beans.InvalidationListener;
@@ -12,6 +13,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.Cell;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
@@ -97,6 +99,26 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(PagingListView.class.getResource("paging-list-view.css")).toExternalForm();
+    }
+
+    private final ObjectProperty<ProgressIndicator> progressIndicator = new SimpleObjectProperty<>(this, "progressIndicator", new CircleProgressIndicator());
+
+    public final ProgressIndicator getProgressIndicator() {
+        return progressIndicator.get();
+    }
+
+    /**
+     * The progress indicator that will be used to display percentage progress or the indeterminate state of the
+     * loading progress.
+     *
+     * @return the progress indicator
+     */
+    public final ObjectProperty<ProgressIndicator> progressIndicatorProperty() {
+        return progressIndicator;
+    }
+
+    public final void setProgressIndicator(ProgressIndicator progressIndicator) {
+        this.progressIndicator.set(progressIndicator);
     }
 
     /**

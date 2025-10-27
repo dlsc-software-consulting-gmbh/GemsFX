@@ -21,22 +21,20 @@
 }
 
 .loading-pane > .progress-indicator-wrapper {
-    -size: 48px;
+    -fx-padding: 20px;
+    -size: 90px;
     -fx-min-width: -size;
     -fx-min-height: -size;
+    -fx-pref-width: -size;
+    -fx-pref-height: -size;
     -fx-max-width: -size;
     -fx-max-height: -size;
-    -fx-padding: 20px;
 }
 
 .loading-pane:small > .progress-indicator-wrapper {
-    -size: 16px;
-}
-
-.loading-pane:medium > .progress-indicator-wrapper {
-    -size: 48px;
+    -size: 60px;
 }
 
 .loading-pane:large > .progress-indicator-wrapper {
-    -size: 96px;
+    -size: 150px;
 }

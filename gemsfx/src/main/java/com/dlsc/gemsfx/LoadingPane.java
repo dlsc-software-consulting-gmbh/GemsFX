@@ -3,6 +3,7 @@ package com.dlsc.gemsfx;
 import javafx.application.Platform;
 import javafx.beans.DefaultProperty;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
@@ -32,6 +33,8 @@ import java.util.Objects;
  */
 @DefaultProperty("content")
 public class LoadingPane extends StackPane {
+
+    private final StackPane indicatorWrapper;
 
     /**
      * The possible states that the loading pane can be in.
@@ -118,12 +121,43 @@ public class LoadingPane extends StackPane {
         });
 
         InvalidationListener updateViewListener = it -> updateView();
-        progressIndicator.addListener(updateViewListener);
+        progressIndicator.addListener((obs, oldIndicator, newIndicator) -> {
+            if (oldIndicator != null) {
+                oldIndicator.progressProperty().unbind();
+            }
+
+            if (newIndicator != null) {
+                newIndicator.progressProperty().bind(progressProperty());
+            }
+
+            updateView();
+        });
+
+        indicatorWrapper = new StackPane();
+        indicatorWrapper.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        indicatorWrapper.getStyleClass().add("progress-indicator-wrapper");
+        indicatorWrapper.visibleProperty().bind(committedStatus.isEqualTo(Status.LOADING));
+        indicatorWrapper.managedProperty().bind(committedStatus.isEqualTo(Status.LOADING));
+
+        contentProperty().addListener((obs, oldNode, newNode) -> {
+            if (oldNode != null) {
+                oldNode.visibleProperty().unbind();
+            }
+
+            if (newNode != null) {
+                newNode.visibleProperty().bind(committedStatus.isEqualTo(Status.OK));
+            }
+
+            updateView();
+        });
+
         errorNodeProperty().addListener(updateViewListener);
-        updateView();
+        committedStatus.addListener((obs, oldStatus, newStatus) -> updatePseudoClass(oldStatus, newStatus));
+        sizeProperty().addListener((obs, oldSize, newSize) -> updatePseudoClass(oldSize, newSize));
 
         updatePseudoClass(null, committedStatus.get());
         updatePseudoClass(null, getSize());
+        updateView();
     }
 
     /**
@@ -142,42 +176,25 @@ public class LoadingPane extends StackPane {
     }
 
     private void updateView() {
-        ProgressIndicator indicator = getProgressIndicator();
-
-        if (indicator == null) {
-            throw new IllegalArgumentException("progress indicator can not be null");
-        }
-
-        indicator.progressProperty().bindBidirectional(progressProperty());
-
         getChildren().clear();
 
         toggleIndicator();
         committedStatus.addListener(it -> toggleIndicator());
 
-        StackPane indicatorWrapper = new StackPane(indicator);
-        indicatorWrapper.getStyleClass().add("progress-indicator-wrapper");
-        indicatorWrapper.visibleProperty().bind(committedStatus.isEqualTo(Status.LOADING));
-        indicatorWrapper.managedProperty().bind(committedStatus.isEqualTo(Status.LOADING));
-
-        // make sure progress indicator thread stops
+        // make sure the progress indicator thread stops
+        ProgressIndicator indicator = getProgressIndicator();
         indicator.visibleProperty().bind(indicatorWrapper.visibleProperty());
+        indicator.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> indicatorWrapper.getWidth() - indicatorWrapper.getInsets().getLeft() - indicatorWrapper.getInsets().getRight(), indicatorWrapper.widthProperty()));
+        indicator.prefHeightProperty().bind(Bindings.createDoubleBinding(() -> indicatorWrapper.getHeight() - indicatorWrapper.getInsets().getTop() - indicatorWrapper.getInsets().getBottom(), indicatorWrapper.heightProperty()));
+        indicator.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        indicatorWrapper.getChildren().setAll(indicator);
 
-        contentProperty().addListener((obs, oldNode, newNode) -> {
-            if (oldNode != null) {
-                oldNode.visibleProperty().unbind();
-            }
-
-            if (newNode != null) {
-                newNode.visibleProperty().bind(committedStatus.isEqualTo(Status.OK));
-                getChildren().setAll(newNode, indicatorWrapper, wrapErrorNode(getErrorNode()));
-            } else {
-                getChildren().setAll(indicatorWrapper, wrapErrorNode(getErrorNode()));
-            }
-        });
-
-        committedStatus.addListener((obs, oldStatus, newStatus) -> updatePseudoClass(oldStatus, newStatus));
-        sizeProperty().addListener((obs, oldSize, newSize) -> updatePseudoClass(oldSize, newSize));
+        Node content = getContent();
+        if (content != null) {
+            getChildren().setAll(content, indicatorWrapper, wrapErrorNode(getErrorNode()));
+        } else {
+            getChildren().setAll(indicatorWrapper, wrapErrorNode(getErrorNode()));
+        }
     }
 
     private Node wrapErrorNode(Node errorNode) {
