@@ -806,7 +806,7 @@ public class DialogPane extends StackPane {
     /**
      * Creates and shows a dialog that shows a busy indicator / busy animation.
      *
-     * @return the create dialog
+     * @return the created dialog
      */
     public final Dialog<Void> showBusyIndicator() {
         BusyIndicator busyIndicator = new BusyIndicator();
