@@ -67,7 +67,7 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
                 }
             }
 
-            if(searchField.searchResultsOnTop.get()) {
+            if (searchField.isSearchResultsOnTop()) {
                 // prefer the suggestions that start with the search term
                 StringConverter<T> converter = searchField.getConverter();
                 String searchText = searchField.getText().toLowerCase();
@@ -76,7 +76,7 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
                 String text2 = converter.toString(o2).toLowerCase();
 
                 if (text1.startsWith(searchText) && text2.startsWith(searchText)) {
-                    return result;//Both items are on equal footing, trust the custom comparator
+                    return result; // both items are on equal footing, trust the custom comparator
                 }
 
                 if (text1.startsWith(searchText)) {

@@ -540,7 +540,7 @@ public class SearchField<T> extends Control {
         return searching.get();
     }
     
-    public final BooleanProperty searchResultsOnTop = new SimpleBooleanProperty(this, "searchResultsOnTop", true);
+    private final BooleanProperty searchResultsOnTop = new SimpleBooleanProperty(this, "searchResultsOnTop", true);
 
     public final boolean isSearchResultsOnTop() {
         return searchResultsOnTop.get();
