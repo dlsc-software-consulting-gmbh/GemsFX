@@ -1542,7 +1542,12 @@ public class DialogPane extends StackPane {
             return this;
         }
 
-        private void commit(ButtonType buttonType) {
+        /**
+         * Programmatic access to closing the dialog with the given button type.
+         *
+         * @param buttonType the type of button pressed
+         */
+        public void commit(ButtonType buttonType) {
             if (onButtonPressed != null) {
                 onButtonPressed.accept(buttonType);
             }
