@@ -1547,7 +1547,12 @@ public class DialogPane extends StackPane {
          *
          * @param buttonType the type of button pressed
          */
-        public void commit(ButtonType buttonType) {
+        public void press(ButtonType buttonType) {
+            pane.hideDialog(this);
+            commit(buttonType);
+        }
+
+        private void commit(ButtonType buttonType) {
             if (onButtonPressed != null) {
                 onButtonPressed.accept(buttonType);
             }
