@@ -112,7 +112,7 @@ public class SearchField<T> extends Control {
 
     private final SearchFieldPopup<T> popup;
     private final HistoryButton<String> historyButton;
-    
+
 
     /**
      * Constructs a new spotlight field. The field will set defaults for the
@@ -191,29 +191,29 @@ public class SearchField<T> extends Control {
                 addToHistory(editor.getText());
             }
 
-            //sync up user interactions with the text box so that editor text field can keep up.
+            // Sync up user interactions with the text box so that the editor text field can keep up.
             if ((keyCode.equals(KeyCode.TAB) || (releasedRightAtEnd && !highlighting && !highlighted) || releasedEnter) && !lastHistoryPopupShowing) {
                 T defaultChoice = getSearchDefaultChoice(editor.getText());
-                if(defaultChoice == null && newItemProducer.get() != null) {
+                if (defaultChoice == null && newItemProducer.get() != null) {
                     T newItem = newItemProducer.get().call(editor.getText());
                     select(newItem);
-                } else
+                } else {
                     select(defaultChoice);
-
+                }
                 evt.consume();
             } else if (keyCode.equals(KeyCode.LEFT) && popup.isShowing() && !highlighting) {
-                if(highlighted)
+                if (highlighted) {
                     editor.positionCaret(Math.min(editor.getAnchor(), editor.getCaretPosition()));
-                else
+                } else {
                     editor.positionCaret(Math.max(0, editor.getCaretPosition()) - 1);
-
+                }
                 evt.consume();
             } else if (keyCode.equals(KeyCode.RIGHT) && popup.isShowing() && !highlighting) {
-                if(highlighted)
+                if (highlighted) {
                     editor.positionCaret(Math.max(editor.getAnchor(), editor.getCaretPosition()));
-                else
+                } else {
                     editor.positionCaret(Math.min(editor.getText().length(), editor.getCaretPosition()) + 1);
-
+                }
                 evt.consume();
             } else if (keyCode.equals(KeyCode.ESCAPE)) {
                 historyButton.hidePopup();
@@ -355,11 +355,12 @@ public class SearchField<T> extends Control {
         BiFunction<T, String, Boolean> matcher = getMatcher();
         T defaultChoice = suggestions.stream().sorted(comparator.get()).filter(item -> matcher.apply(item, searchText)).findFirst().orElse(null);
 
-        if(selectedItem.get() != null && StringUtils.startsWithIgnoreCase(getConverter().toString(defaultChoice), searchText))
+        if (selectedItem.get() != null && StringUtils.startsWithIgnoreCase(getConverter().toString(defaultChoice), searchText))
             defaultChoice = selectedItem.get();
 
         return defaultChoice;
     }
+
     private void onHistoryItemConfirmed(String historyItem) {
         if (historyItem != null) {
             int oldLen = editor.textProperty().getValueSafe().length();
@@ -570,7 +571,7 @@ public class SearchField<T> extends Control {
     public final boolean isSearching() {
         return searching.get();
     }
-    
+
     private final BooleanProperty searchResultsOnTop = new SimpleBooleanProperty(this, "searchResultsOnTop", true);
 
     public final boolean isSearchResultsOnTop() {
