@@ -14,6 +14,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
@@ -36,6 +37,9 @@ public class GridTableViewApp extends GemApplication {
 
         GridTableView<Student> tableView = new GridTableView<>();
         tableView.setMinNumberOfRows(8);
+
+        tableView.setRowHeaderFactory(student -> new Label("Header for student: " + student.getName()));
+        tableView.setRowFooterFactory(student -> new Label("Footer for student: " + student.getName()));
 
         // simple text for context menu callback
         tableView.setOnContextMenuForItemRequested(student -> new ContextMenu(new MenuItem("Edit")));

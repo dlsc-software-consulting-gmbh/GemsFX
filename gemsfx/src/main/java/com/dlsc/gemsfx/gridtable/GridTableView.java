@@ -65,6 +65,36 @@ public class GridTableView<S> extends Control {
         return Objects.requireNonNull(GridTableView.class.getResource("grid-table-view.css")).toExternalForm();
     }
 
+    // row header factory
+    private final ObjectProperty<Callback<S, Node>> rowHeaderFactory = new SimpleObjectProperty<>(this, "rowHeaderFactory");
+
+    public Callback<S, Node> getRowHeaderFactory() {
+        return rowHeaderFactory.get();
+    }
+
+    public ObjectProperty<Callback<S, Node>> rowHeaderFactoryProperty() {
+        return rowHeaderFactory;
+    }
+
+    public void setRowHeaderFactory(Callback<S, Node> rowHeaderFactory) {
+        this.rowHeaderFactory.set(rowHeaderFactory);
+    }
+
+    // row footer factory
+    private final ObjectProperty<Callback<S, Node>> rowFooterFactory = new SimpleObjectProperty<>(this, "rowFooterFactory");
+
+    public Callback<S, Node> getRowFooterFactory() {
+        return rowFooterFactory.get();
+    }
+
+    public ObjectProperty<Callback<S, Node>> rowFooterFactoryProperty() {
+        return rowFooterFactory;
+    }
+
+    public void setRowFooterFactory(Callback<S, Node> rowFooterFactory) {
+        this.rowFooterFactory.set(rowFooterFactory);
+    }
+
     // progress indicator
 
     private final ObjectProperty<ProgressIndicator> progressIndicator = new SimpleObjectProperty<>(this, "progressIndicator", new CircleProgressIndicator());

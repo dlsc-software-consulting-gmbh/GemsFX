@@ -20,6 +20,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.util.Callback;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -179,12 +180,42 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
         int numberOfRows = Math.max(items.size(), tableView.getMinNumberOfRows());
         GridPane.setRowSpan(loadingPane, numberOfRows);
 
+        int gridPaneRow = 1;
+
         for (int row = 0; row < numberOfRows; row++) {
+
+            Node headerNode = null;
+            Node footerNode = null;
+
+            S rowItem = null;
+            if (row < tableView.getItems().size()) { // we might have blank rows (fill rows = true?)
+                rowItem = tableView.getItems().get(row);
+            }
+
+            if (rowItem != null) {
+                // maybe add a header?
+                Callback<S, Node> rowHeaderFactory = tableView.getRowHeaderFactory();
+                if (rowHeaderFactory != null) {
+                    headerNode = rowHeaderFactory.call(rowItem);
+                }
+
+                // maybe add a footer?
+                Callback<S, Node> rowFooterFactory = tableView.getRowFooterFactory();
+                if (rowFooterFactory != null) {
+                    footerNode = rowFooterFactory.call(rowItem);
+                }
+            }
 
             Region rowBackground = new Region();
             rowBackground.getStyleClass().addAll("row-background", "index-" + row, row % 2 == 0 ? "even" : "odd");
             GridPane.setColumnSpan(rowBackground, numberOfColumns);
-            gridPane.add(rowBackground, 0, row + 1);
+            if (headerNode != null && footerNode != null) {
+                GridPane.setRowSpan(rowBackground, 3);
+            } else if (headerNode != null || footerNode != null) {
+                GridPane.setRowSpan(rowBackground, 2);
+            }
+
+            gridPane.add(rowBackground, 0, gridPaneRow);
 
             if (numberOfRows == 1) {
                 rowBackground.getStyleClass().add("only");
@@ -196,6 +227,12 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
                 } else {
                     rowBackground.getStyleClass().add("middle");
                 }
+            }
+
+            if (headerNode != null) {
+                gridPane.add(headerNode, 0, gridPaneRow);
+                GridPane.setColumnSpan(headerNode, numberOfColumns);
+                gridPaneRow++;
             }
 
             for (int col = 0; col < numberOfColumns; col++) {
@@ -239,7 +276,16 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
                     cellNode.getStyleClass().add("row-index-" + row);
                 }
 
-                gridPane.add(cellNode, col, row + 1);
+                gridPane.add(cellNode, col, gridPaneRow);
+
+            }
+
+            gridPaneRow++;
+
+            if (footerNode != null) {
+                gridPane.add(footerNode, 0, gridPaneRow);
+                GridPane.setColumnSpan(footerNode, numberOfColumns);
+                gridPaneRow++;
             }
         }
     }
