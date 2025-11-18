@@ -1893,13 +1893,16 @@ public class DialogPane extends StackPane {
 
             boolean blankDialog = this.dialog.getType().equals(Type.BLANK);
 
-            header.setVisible(!blankDialog && dialog.isShowHeader());
-            header.setManaged(!blankDialog && dialog.isShowHeader());
+            header.visibleProperty().bind(Bindings.createBooleanBinding(() -> !blankDialog && dialog.isShowHeader()
+                    , dialog.showHeaderProperty()));
+            header.managedProperty().bind(header.visibleProperty());
 
             Node footer = getFooterFactory().call(dialog);
             VBox.setVgrow(footer, Priority.NEVER);
-            footer.setVisible(!blankDialog && dialog.isShowFooter());
-            footer.setManaged(!blankDialog && dialog.isShowFooter());
+
+            footer.visibleProperty().bind(Bindings.createBooleanBinding(() -> !blankDialog && dialog.isShowFooter()
+                    , dialog.showFooterProperty()));
+            footer.managedProperty().bind(footer.visibleProperty());
 
             dialog.getStyleClass().addListener(weakUpdateStyleClassesListener);
             updateContentPaneStyleClasses();
