@@ -120,6 +120,9 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
         ObservableList<GridTableColumn<S, ?>> columns = tableView.getColumns();
 
         int numberOfColumns = columns.size();
+        if (numberOfColumns == 0) {
+            return;
+        }
 
         Region headerBackground = new Region();
         headerBackground.getStyleClass().addAll("column-header-background");
