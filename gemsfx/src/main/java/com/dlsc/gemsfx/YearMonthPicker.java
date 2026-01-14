@@ -52,7 +52,7 @@ public class YearMonthPicker extends CustomComboBox<YearMonth> {
             pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), editor.isFocused());
         });
 
-        editor.addEventHandler(KeyEvent.ANY, evt -> {
+        editor.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
             if (evt.getCode().equals(KeyCode.DOWN)) {
                 setValue(getValue().plusMonths(1));
             } else if (evt.getCode().equals(KeyCode.UP)) {
