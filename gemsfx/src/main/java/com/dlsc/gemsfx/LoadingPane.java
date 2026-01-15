@@ -157,6 +157,8 @@ public class LoadingPane extends StackPane {
 
         updatePseudoClass(null, committedStatus.get());
         updatePseudoClass(null, getSize());
+
+        committedStatus.addListener(it -> toggleIndicator());
         updateView();
     }
 
@@ -179,7 +181,6 @@ public class LoadingPane extends StackPane {
         getChildren().clear();
 
         toggleIndicator();
-        committedStatus.addListener(it -> toggleIndicator());
 
         // make sure the progress indicator thread stops
         ProgressIndicator indicator = getProgressIndicator();
