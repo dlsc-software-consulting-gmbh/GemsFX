@@ -73,19 +73,6 @@ public class YearViewSkin extends SkinBase<YearView> {
         gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-pane");
 
-        for (int i = 0; i < 4; i++) {
-            ColumnConstraints col1 = new ColumnConstraints();
-            col1.setPercentWidth(25);
-            gridPane.getColumnConstraints().add(col1);
-        }
-
-        int numberOfRows = 5;
-        for (int i = 0; i < numberOfRows; i++) {
-            RowConstraints row = new RowConstraints();
-            row.setPercentHeight(100d / numberOfRows);
-            gridPane.getRowConstraints().add(row);
-        }
-
         getChildren().addAll(header, gridPane);
 
         Rectangle clip = new Rectangle();
@@ -108,11 +95,32 @@ public class YearViewSkin extends SkinBase<YearView> {
         gridPane.resizeRelocate(contentX, contentY + headerHeight, contentWidth, contentHeight - headerHeight);
     }
 
+    private void updateGridConstraints() {
+        gridPane.getColumnConstraints().clear();
+        gridPane.getRowConstraints().clear();
+
+        int cols = Math.max(1, getSkinnable().getCols());
+        int rows = Math.max(1, getSkinnable().getRows());
+
+        for (int i = 0; i < cols; i++) {
+            ColumnConstraints col = new ColumnConstraints();
+            col.setPercentWidth(100d / cols);
+            gridPane.getColumnConstraints().add(col);
+        }
+
+        for (int i = 0; i < rows; i++) {
+            RowConstraints row = new RowConstraints();
+            row.setPercentHeight(100d / rows);
+            gridPane.getRowConstraints().add(row);
+        }
+    }
+
     private void buildGrid() {
+        updateGridConstraints();
         YearView yearView = getSkinnable();
 
-        int rows = yearView.getRows();
-        int cols = yearView.getCols();
+        int cols = Math.max(1, getSkinnable().getCols());
+        int rows = Math.max(1, getSkinnable().getRows());
 
         final int visibleYears = rows * cols;
 
