@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javafx.beans.value.ChangeListener;
+import javafx.scene.paint.Color;
 
 /**
  * A manager for storing observable values in the user preferences.
@@ -169,6 +170,28 @@ public class SessionManager {
     }
 
     /**
+     * Registers a color property so that any changes made to that property will be
+     * persisted in the user's preferences and restored for the next client session.
+     *
+     * @param path     the path to use for the property (e.g. "divider.location"). Paths must
+     *                 be unique for all persisted properties.
+     * @param property the property to persist and restore across user sessions
+     */
+    public void register(String path, ObjectProperty<Color> property) {
+        LOG.fine("registering color property at path " + path);
+        property.set(Color.web(preferences.get(path, colorToHexRGBA(property.get()))));
+        putPropertyValueIntoPreferences(path, property);
+        ChangeListener<Color> listener = (it, oldValue, newValue) -> {
+            if (newValue != null) {
+                preferences.put(path, colorToHexRGBA(newValue));
+            } else {
+                preferences.remove(path);
+            }
+        };
+        addListener(property, listener);
+    }
+
+    /**
      * Unregisters all listeners created by SessionManager for the specified property.
      *
      * @param property the property to unregister
@@ -198,6 +221,15 @@ public class SessionManager {
         property.addListener(listener);
         propertyToListeners.computeIfAbsent(property, k -> new ArrayList<>()).add(listener);
     }
+    
+    private   String colorToHexRGBA(Color color) {
+        return "%02X%02X%02X%02X".formatted(
+                (int) (color.getRed() * 0xff),
+                (int) (color.getGreen() * 0xff),
+                (int) (color.getBlue() * 0xff),
+                (int) (color.getOpacity() * 0xff)
+        );
+    }
 
     private void putPropertyValueIntoPreferences(String path, Property property) {
         Object value = property.getValue();
@@ -213,6 +245,8 @@ public class SessionManager {
             preferences.putLong(path, l);
         } else if (value instanceof String s) {
             preferences.put(path, s);
+        } else if (value instanceof Color c) {
+            preferences.put(path, colorToHexRGBA(c));
         }
     }
 }
