@@ -39,7 +39,12 @@ public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>>
 
         gridPane.getStyleClass().add("grid-pane");
 
-        LoadingPane loadingPane = new LoadingPane(gridPane);
+        LoadingPane loadingPane = new LoadingPane(gridPane){
+            @Override
+            public String getUserAgentStylesheet() {
+                return null;
+            }
+        };
         loadingPane.statusProperty().bind(view.loadingStatusProperty());
         loadingPane.sizeProperty().bind(view.loadingStatusSizeProperty());
         loadingPane.progressIndicatorProperty().bind(view.progressIndicatorProperty());
