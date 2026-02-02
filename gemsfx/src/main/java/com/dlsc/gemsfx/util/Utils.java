@@ -508,15 +508,15 @@ public class Utils {
     /**
      * This is the fallthrough function that most other functions fall into. It takes
      * care specifically of the repositioning of the item such that it remains onscreen
-     * as best it can, given it's unique qualities.
+     * as best it can, given its unique qualities.
      * <p>
      * As will all other functions, this one returns a Point2D that represents an x,y
      * location that should safely position the item onscreen as best as possible.
      * <p>
-     * Note that <code>width</code> and <height> refer to the width and height of the
+     * Note that <code>width</code> and <code><height/code> refer to the width and height of the
      * node/popup that is needing to be repositioned, not of the parent.
      * <p>
-     * Don't use the BASELINE vpos, it doesn't make sense and would produce wrong result.
+     * Don't use the BASELINE vpos, it doesn't make sense and would produce a wrong result.
      */
     public static Point2D pointRelativeTo(Object parent, double width,
                                           double height, double screenX, double screenY, HPos hpos, VPos vpos) {
