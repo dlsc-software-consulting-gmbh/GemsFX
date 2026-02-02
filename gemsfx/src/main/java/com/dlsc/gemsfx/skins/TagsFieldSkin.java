@@ -2,8 +2,10 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.SearchField.SearchFieldListCell;
 import com.dlsc.gemsfx.TagsField;
+import com.dlsc.gemsfx.util.FocusUtil;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
@@ -12,6 +14,7 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Region;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,19 +45,30 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
         };
 
         flowPane.getStyleClass().add("flow-pane");
-        flowPane.prefWrapLengthProperty().bind(field.widthProperty());
+        flowPane.prefWrapLengthProperty().bind(Bindings.createDoubleBinding(() -> flowPane.getWidth() - flowPane.getInsets().getLeft() - flowPane.getInsets().getRight(), flowPane.widthProperty(), flowPane.insetsProperty()));
 
-        field.getEditor().focusedProperty().addListener(it -> field.pseudoClassStateChanged(CONTAINS_FOCUS, field.getEditor().isFocused()));
+        //FocusUtil.delegateFocus(field, flowPane);
+
+        TextField editor = field.getEditor();
+
+        editor.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> {
+            if (editor.getText().isEmpty()) {
+                return field.getEditorMinWidth();
+            }
+            return field.getEditorPrefWidth();
+        }, editor.widthProperty(), editor.textProperty(), field.editorMinWidthProperty(), field.editorPrefWidthProperty()));
+
+        editor.focusedProperty().addListener(it -> field.pseudoClassStateChanged(CONTAINS_FOCUS, editor.isFocused()));
+        editor.setSkin(new SearchFieldEditorSkin<>(field));
 
         field.getTags().addListener((Observable it) -> pseudoClassStateChanged(FILLED, !field.getTags().isEmpty()));
-        field.getEditor().setSkin(new SearchFieldEditorSkin<>(field));
 
         getChildren().addAll(flowPane);
 
         field.setCellFactory(view -> new SearchFieldListCell<>(field));
 
         field.getTagSelectionModel().getSelectedItems().addListener((Observable it) -> tagViewMap.forEach((key, value) -> value.pseudoClassStateChanged(SELECTED, field.getTagSelectionModel().getSelectedItems().contains(key))));
-        field.getEditor().setOnMouseClicked(evt -> field.getTagSelectionModel().clearSelection());
+        editor.setOnMouseClicked(evt -> field.getTagSelectionModel().clearSelection());
 
         InvalidationListener updateViewListener = it -> updateView();
         field.tagViewFactoryProperty().addListener(updateViewListener);

@@ -3,8 +3,10 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.skins.TagsFieldSkin;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -28,7 +30,7 @@ import java.util.stream.Collectors;
  * of the text input field. The control provides an observable list of the currently
  * added tags. In addition, the field also allows the user to select one or more of
  * the tags. The selection state is provided by the selection model. The field adds
- * and removes tags via undoable commands which means that, for example, a deleted tag
+ * and removes tags via undoable commands, which means that, for example, a deleted tag
  * can be recovered by pressing the standard undo (or redo) shortcut.
  *
  * @param <T> the type of objects to search for and to tag
@@ -322,6 +324,44 @@ public class TagsField<T> extends SearchField<T> {
             cmd.execute();
             undoStack.push(cmd);
         }
+    }
+
+    private final DoubleProperty editorMinWidth = new SimpleDoubleProperty(this, "editorMinWidth", 20);
+
+    public final double getEditorMinWidth() {
+        return editorMinWidth.get();
+    }
+
+    /**
+     * The minimum width of the editor when it is not used.
+     *
+     * @return the minimum width of the editor
+     */
+    public final DoubleProperty editorMinWidthProperty() {
+        return editorMinWidth;
+    }
+
+    public final void setEditorMinWidth(double editorMinWidth) {
+        this.editorMinWidth.set(editorMinWidth);
+    }
+
+    private final DoubleProperty editorPrefWidth = new SimpleDoubleProperty(this, "editorPrefWidth", 200);
+
+    public final double getEditorPrefWidth() {
+        return editorPrefWidth.get();
+    }
+
+    /**
+     * The preferred width of the editor when it is being used.
+     *
+     * @return the preferred width of the editor
+     */
+    public final DoubleProperty editorPrefWidthProperty() {
+        return editorPrefWidth;
+    }
+
+    public final void setEditorPrefWidth(double editorPrefWidth) {
+        this.editorPrefWidth.set(editorPrefWidth);
     }
 
     class TagFieldSelectionModel extends MultipleSelectionModel<T> {

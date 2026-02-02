@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TagsField;
+import com.dlsc.gemsfx.util.SessionManager;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -146,11 +148,15 @@ public class TagsFieldApp extends GemApplication {
         CSSFX.start();
 
         Scene scene = new Scene(vbox);
+        scene.focusOwnerProperty().addListener(it -> System.out.println("owner: " + scene.getFocusOwner()));
+
         primaryStage.setTitle("Tags Field");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         primaryStage.centerOnScreen();
         primaryStage.show();
+
+        StageManager.install(primaryStage, "tagsfieldapp");
     }
 
     public static void main(String[] args) {
