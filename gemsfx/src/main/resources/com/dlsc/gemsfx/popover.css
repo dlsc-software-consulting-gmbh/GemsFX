@@ -3,12 +3,14 @@
 }
 
 .popover > .background {
+    -fx-stroke: transparent;
     -fx-fill: -fx-control-inner-background;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, .2), 6, 0.3, 0, 2);
 }
 
 .popover > .border {
-    -fx-stroke: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 1));
+    -fx-stroke: -fx-color;
+    -fx-fill: transparent;
     -fx-stroke-width: 1;
 }
 
@@ -16,25 +18,25 @@
 }
 
 .popover > .content {
-    -fx-padding: 10px 10px 10px 10px;
 }
 
-.popover > .content > .title > .text {
-    -fx-padding: 6.0 6.0 0.0 6.0;
-    -fx-text-fill: rgba(120, 120, 120, .8);
+.popover > .content > .header {
+    -fx-padding: 5px 10px;
+}
+
+.popover > .content > .header > .title-label {
     -fx-font-weight: bold;
 }
 
-.popover > .content > .title > .icon {
-    -fx-padding: 6.0 0.0 0.0 10.0;
+.popover > .content > .header > .icon {
 }
 
-.popover > .content > .title > .icon > .graphics > .circle {
+.popover > .content > .header > .icon > .graphics > .circle {
     -fx-fill: gray;
     -fx-effect: innershadow(gaussian, rgba(0, 0, 0, .2), 3, 0.5, 1.0, 1.0);
 }
 
-.popover > .content > .title > .icon > .graphics > .line {
+.popover > .content > .header > .icon > .graphics > .line {
     -fx-stroke: white;
     -fx-stroke-width: 2;
 }

@@ -99,7 +99,7 @@ public class PopOverSkin implements Skin<PopOver> {
         title.textProperty().bind(popOver.titleProperty());
         title.setMaxSize(MAX_VALUE, MAX_VALUE);
         title.setAlignment(Pos.CENTER);
-        title.getStyleClass().add("text");
+        title.getStyleClass().add("title-label");
 
         Label closeIcon = new Label();
         closeIcon.setGraphic(createCloseIcon());
@@ -115,7 +115,7 @@ public class PopOverSkin implements Skin<PopOver> {
         titlePane = new StackPane();
         titlePane.getChildren().add(title);
         titlePane.getChildren().add(closeIcon);
-        titlePane.getStyleClass().add("title");
+        titlePane.getStyleClass().add("header");
 
         content = new BorderPane();
         content.setCenter(popOver.getContentNode());

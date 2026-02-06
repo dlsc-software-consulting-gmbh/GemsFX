@@ -143,7 +143,7 @@ public class PopOver extends PopupControl {
          */
         detached.addListener(it -> setAutoHide(!isDetached()));
 
-        setAutoHide(true);
+        setAutoHide(false);
     }
 
     /**
@@ -588,7 +588,7 @@ public class PopOver extends PopupControl {
         }
     }
 
-    // always show header
+    // always show the header
 
     private final BooleanProperty headerAlwaysVisible = new SimpleBooleanProperty(this, "headerAlwaysVisible");
 
@@ -624,7 +624,7 @@ public class PopOver extends PopupControl {
     private final BooleanProperty closeButtonEnabled = new SimpleBooleanProperty(this, "closeButtonEnabled", true);
 
     /**
-     * Determines whether or not the header's close button should be available.
+     * Determines whether the header's close button should be available.
      */
     public final BooleanProperty closeButtonEnabledProperty() {
         return closeButtonEnabled;
@@ -652,8 +652,7 @@ public class PopOver extends PopupControl {
 
     // detach support
 
-    private final BooleanProperty detachable = new SimpleBooleanProperty(this,
-            "detachable", true);
+    private final BooleanProperty detachable = new SimpleBooleanProperty(this, "detachable", true);
 
     /**
      * Determines if the popover is detachable at all.
@@ -698,8 +697,7 @@ public class PopOver extends PopupControl {
     /**
      * Sets the value of the detached property.
      *
-     * @param detached if true the popover will change its apperance to "detached"
-     *                 mode
+     * @param detached if true, the popover will change its appearance to "detached" mode
      * @see #detachedProperty()
      */
     public final void setDetached(boolean detached) {
