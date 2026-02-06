@@ -143,7 +143,7 @@ public class PopOver extends PopupControl {
          */
         detached.addListener(it -> setAutoHide(!isDetached()));
 
-        setAutoHide(false);
+        setAutoHide(true);
     }
 
     /**

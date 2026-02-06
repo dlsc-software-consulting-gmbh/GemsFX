@@ -35,7 +35,6 @@ import javafx.scene.control.Skin;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.HLineTo;
 import javafx.scene.shape.Line;
@@ -331,25 +330,20 @@ public class PopOverSkin implements Skin<PopOver> {
         DoubleProperty cornerProperty = getSkinnable().cornerRadiusProperty();
 
         DoubleProperty arrowSizeProperty = getSkinnable().arrowSizeProperty();
-        DoubleProperty arrowIndentProperty = getSkinnable()
-                .arrowIndentProperty();
+        DoubleProperty arrowIndentProperty = getSkinnable().arrowIndentProperty();
 
         centerYProperty.bind(Bindings.divide(stackPane.heightProperty(), 2));
         centerXProperty.bind(Bindings.divide(stackPane.widthProperty(), 2));
 
-        leftEdgePlusRadiusProperty.bind(Bindings.add(leftEdgeProperty,
-                getSkinnable().cornerRadiusProperty()));
+        leftEdgePlusRadiusProperty.bind(Bindings.add(leftEdgeProperty, getSkinnable().cornerRadiusProperty()));
 
-        topEdgePlusRadiusProperty.bind(Bindings.add(topEdgeProperty,
-                getSkinnable().cornerRadiusProperty()));
+        topEdgePlusRadiusProperty.bind(Bindings.add(topEdgeProperty, getSkinnable().cornerRadiusProperty()));
 
         rightEdgeProperty.bind(stackPane.widthProperty());
-        rightEdgeMinusRadiusProperty.bind(Bindings.subtract(rightEdgeProperty,
-                getSkinnable().cornerRadiusProperty()));
+        rightEdgeMinusRadiusProperty.bind(Bindings.subtract(rightEdgeProperty, getSkinnable().cornerRadiusProperty()));
 
         bottomEdgeProperty.bind(stackPane.heightProperty());
-        bottomEdgeMinusRadiusProperty.bind(Bindings.subtract(
-                bottomEdgeProperty, getSkinnable().cornerRadiusProperty()));
+        bottomEdgeMinusRadiusProperty.bind(Bindings.subtract(bottomEdgeProperty, getSkinnable().cornerRadiusProperty()));
 
         // INIT
         moveTo = new MoveTo();
@@ -360,32 +354,25 @@ public class PopOverSkin implements Skin<PopOver> {
         // TOP EDGE
         //
         lineBTop = new HLineTo();
-        lineBTop.xProperty().bind(
-                Bindings.add(leftEdgePlusRadiusProperty, arrowIndentProperty));
+        lineBTop.xProperty().bind(Bindings.add(leftEdgePlusRadiusProperty, arrowIndentProperty));
 
         lineCTop = new LineTo();
-        lineCTop.xProperty().bind(
-                Bindings.add(lineBTop.xProperty(), arrowSizeProperty));
-        lineCTop.yProperty().bind(
-                Bindings.subtract(topEdgeProperty, arrowSizeProperty));
+        lineCTop.xProperty().bind(Bindings.add(lineBTop.xProperty(), arrowSizeProperty));
+        lineCTop.yProperty().bind(Bindings.subtract(topEdgeProperty, arrowSizeProperty));
 
         lineDTop = new LineTo();
-        lineDTop.xProperty().bind(
-                Bindings.add(lineCTop.xProperty(), arrowSizeProperty));
+        lineDTop.xProperty().bind(Bindings.add(lineCTop.xProperty(), arrowSizeProperty));
         lineDTop.yProperty().bind(topEdgeProperty);
 
         lineETop = new HLineTo();
-        lineETop.xProperty().bind(
-                Bindings.subtract(centerXProperty, arrowSizeProperty));
+        lineETop.xProperty().bind(Bindings.subtract(centerXProperty, arrowSizeProperty));
 
         lineFTop = new LineTo();
         lineFTop.xProperty().bind(centerXProperty);
-        lineFTop.yProperty().bind(
-                Bindings.subtract(topEdgeProperty, arrowSizeProperty));
+        lineFTop.yProperty().bind(Bindings.subtract(topEdgeProperty, arrowSizeProperty));
 
         lineGTop = new LineTo();
-        lineGTop.xProperty().bind(
-                Bindings.add(centerXProperty, arrowSizeProperty));
+        lineGTop.xProperty().bind(Bindings.add(centerXProperty, arrowSizeProperty));
         lineGTop.yProperty().bind(topEdgeProperty);
 
         lineHTop = new HLineTo();
@@ -399,8 +386,7 @@ public class PopOverSkin implements Skin<PopOver> {
                 Bindings.subtract(Bindings.subtract(
                                 rightEdgeMinusRadiusProperty, arrowIndentProperty),
                         arrowSizeProperty));
-        lineITop.yProperty().bind(
-                Bindings.subtract(topEdgeProperty, arrowSizeProperty));
+        lineITop.yProperty().bind(Bindings.subtract(topEdgeProperty, arrowSizeProperty));
 
         lineJTop = new LineTo();
         lineJTop.xProperty().bind(
@@ -416,39 +402,31 @@ public class PopOverSkin implements Skin<PopOver> {
         //
         rightCurveTo = new QuadCurveTo();
         rightCurveTo.xProperty().bind(rightEdgeProperty);
-        rightCurveTo.yProperty().bind(
-                Bindings.add(topEdgeProperty, cornerProperty));
+        rightCurveTo.yProperty().bind(Bindings.add(topEdgeProperty, cornerProperty));
         rightCurveTo.controlXProperty().bind(rightEdgeProperty);
         rightCurveTo.controlYProperty().bind(topEdgeProperty);
 
         lineBRight = new VLineTo();
-        lineBRight.yProperty().bind(
-                Bindings.add(topEdgePlusRadiusProperty, arrowIndentProperty));
+        lineBRight.yProperty().bind(Bindings.add(topEdgePlusRadiusProperty, arrowIndentProperty));
 
         lineCRight = new LineTo();
-        lineCRight.xProperty().bind(
-                Bindings.add(rightEdgeProperty, arrowSizeProperty));
-        lineCRight.yProperty().bind(
-                Bindings.add(lineBRight.yProperty(), arrowSizeProperty));
+        lineCRight.xProperty().bind(Bindings.add(rightEdgeProperty, arrowSizeProperty));
+        lineCRight.yProperty().bind(Bindings.add(lineBRight.yProperty(), arrowSizeProperty));
 
         lineDRight = new LineTo();
         lineDRight.xProperty().bind(rightEdgeProperty);
-        lineDRight.yProperty().bind(
-                Bindings.add(lineCRight.yProperty(), arrowSizeProperty));
+        lineDRight.yProperty().bind(Bindings.add(lineCRight.yProperty(), arrowSizeProperty));
 
         lineERight = new VLineTo();
-        lineERight.yProperty().bind(
-                Bindings.subtract(centerYProperty, arrowSizeProperty));
+        lineERight.yProperty().bind(Bindings.subtract(centerYProperty, arrowSizeProperty));
 
         lineFRight = new LineTo();
-        lineFRight.xProperty().bind(
-                Bindings.add(rightEdgeProperty, arrowSizeProperty));
+        lineFRight.xProperty().bind(Bindings.add(rightEdgeProperty, arrowSizeProperty));
         lineFRight.yProperty().bind(centerYProperty);
 
         lineGRight = new LineTo();
         lineGRight.xProperty().bind(rightEdgeProperty);
-        lineGRight.yProperty().bind(
-                Bindings.add(centerYProperty, arrowSizeProperty));
+        lineGRight.yProperty().bind(Bindings.add(centerYProperty, arrowSizeProperty));
 
         lineHRight = new VLineTo();
         lineHRight.yProperty().bind(
@@ -457,8 +435,7 @@ public class PopOverSkin implements Skin<PopOver> {
                         Bindings.multiply(arrowSizeProperty, 2)));
 
         lineIRight = new LineTo();
-        lineIRight.xProperty().bind(
-                Bindings.add(rightEdgeProperty, arrowSizeProperty));
+        lineIRight.xProperty().bind(Bindings.add(rightEdgeProperty, arrowSizeProperty));
         lineIRight.yProperty().bind(
                 Bindings.subtract(Bindings.subtract(
                                 bottomEdgeMinusRadiusProperty, arrowIndentProperty),
@@ -489,28 +466,22 @@ public class PopOverSkin implements Skin<PopOver> {
                         arrowIndentProperty));
 
         lineCBottom = new LineTo();
-        lineCBottom.xProperty().bind(
-                Bindings.subtract(lineBBottom.xProperty(), arrowSizeProperty));
-        lineCBottom.yProperty().bind(
-                Bindings.add(bottomEdgeProperty, arrowSizeProperty));
+        lineCBottom.xProperty().bind(Bindings.subtract(lineBBottom.xProperty(), arrowSizeProperty));
+        lineCBottom.yProperty().bind(Bindings.add(bottomEdgeProperty, arrowSizeProperty));
 
         lineDBottom = new LineTo();
-        lineDBottom.xProperty().bind(
-                Bindings.subtract(lineCBottom.xProperty(), arrowSizeProperty));
+        lineDBottom.xProperty().bind(Bindings.subtract(lineCBottom.xProperty(), arrowSizeProperty));
         lineDBottom.yProperty().bind(bottomEdgeProperty);
 
         lineEBottom = new HLineTo();
-        lineEBottom.xProperty().bind(
-                Bindings.add(centerXProperty, arrowSizeProperty));
+        lineEBottom.xProperty().bind(Bindings.add(centerXProperty, arrowSizeProperty));
 
         lineFBottom = new LineTo();
         lineFBottom.xProperty().bind(centerXProperty);
-        lineFBottom.yProperty().bind(
-                Bindings.add(bottomEdgeProperty, arrowSizeProperty));
+        lineFBottom.yProperty().bind(Bindings.add(bottomEdgeProperty, arrowSizeProperty));
 
         lineGBottom = new LineTo();
-        lineGBottom.xProperty().bind(
-                Bindings.subtract(centerXProperty, arrowSizeProperty));
+        lineGBottom.xProperty().bind(Bindings.subtract(centerXProperty, arrowSizeProperty));
         lineGBottom.yProperty().bind(bottomEdgeProperty);
 
         lineHBottom = new HLineTo();
@@ -523,12 +494,10 @@ public class PopOverSkin implements Skin<PopOver> {
         lineIBottom.xProperty().bind(
                 Bindings.add(Bindings.add(leftEdgePlusRadiusProperty,
                         arrowIndentProperty), arrowSizeProperty));
-        lineIBottom.yProperty().bind(
-                Bindings.add(bottomEdgeProperty, arrowSizeProperty));
+        lineIBottom.yProperty().bind(Bindings.add(bottomEdgeProperty, arrowSizeProperty));
 
         lineJBottom = new LineTo();
-        lineJBottom.xProperty().bind(
-                Bindings.add(leftEdgePlusRadiusProperty, arrowIndentProperty));
+        lineJBottom.xProperty().bind(Bindings.add(leftEdgePlusRadiusProperty, arrowIndentProperty));
         lineJBottom.yProperty().bind(bottomEdgeProperty);
 
         lineKBottom = new HLineTo();
@@ -539,8 +508,7 @@ public class PopOverSkin implements Skin<PopOver> {
         //
         leftCurveTo = new QuadCurveTo();
         leftCurveTo.xProperty().bind(leftEdgeProperty);
-        leftCurveTo.yProperty().bind(
-                Bindings.subtract(bottomEdgeProperty, cornerProperty));
+        leftCurveTo.yProperty().bind(Bindings.subtract(bottomEdgeProperty, cornerProperty));
         leftCurveTo.controlXProperty().bind(leftEdgeProperty);
         leftCurveTo.controlYProperty().bind(bottomEdgeProperty);
 
@@ -550,29 +518,23 @@ public class PopOverSkin implements Skin<PopOver> {
                         arrowIndentProperty));
 
         lineCLeft = new LineTo();
-        lineCLeft.xProperty().bind(
-                Bindings.subtract(leftEdgeProperty, arrowSizeProperty));
-        lineCLeft.yProperty().bind(
-                Bindings.subtract(lineBLeft.yProperty(), arrowSizeProperty));
+        lineCLeft.xProperty().bind(Bindings.subtract(leftEdgeProperty, arrowSizeProperty));
+        lineCLeft.yProperty().bind(Bindings.subtract(lineBLeft.yProperty(), arrowSizeProperty));
 
         lineDLeft = new LineTo();
         lineDLeft.xProperty().bind(leftEdgeProperty);
-        lineDLeft.yProperty().bind(
-                Bindings.subtract(lineCLeft.yProperty(), arrowSizeProperty));
+        lineDLeft.yProperty().bind(Bindings.subtract(lineCLeft.yProperty(), arrowSizeProperty));
 
         lineELeft = new VLineTo();
-        lineELeft.yProperty().bind(
-                Bindings.add(centerYProperty, arrowSizeProperty));
+        lineELeft.yProperty().bind(Bindings.add(centerYProperty, arrowSizeProperty));
 
         lineFLeft = new LineTo();
-        lineFLeft.xProperty().bind(
-                Bindings.subtract(leftEdgeProperty, arrowSizeProperty));
+        lineFLeft.xProperty().bind(Bindings.subtract(leftEdgeProperty, arrowSizeProperty));
         lineFLeft.yProperty().bind(centerYProperty);
 
         lineGLeft = new LineTo();
         lineGLeft.xProperty().bind(leftEdgeProperty);
-        lineGLeft.yProperty().bind(
-                Bindings.subtract(centerYProperty, arrowSizeProperty));
+        lineGLeft.yProperty().bind(Bindings.subtract(centerYProperty, arrowSizeProperty));
 
         lineHLeft = new VLineTo();
         lineHLeft.yProperty().bind(
@@ -581,16 +543,14 @@ public class PopOverSkin implements Skin<PopOver> {
                         arrowSizeProperty, 2)));
 
         lineILeft = new LineTo();
-        lineILeft.xProperty().bind(
-                Bindings.subtract(leftEdgeProperty, arrowSizeProperty));
+        lineILeft.xProperty().bind(Bindings.subtract(leftEdgeProperty, arrowSizeProperty));
         lineILeft.yProperty().bind(
                 Bindings.add(Bindings.add(topEdgePlusRadiusProperty,
                         arrowIndentProperty), arrowSizeProperty));
 
         lineJLeft = new LineTo();
         lineJLeft.xProperty().bind(leftEdgeProperty);
-        lineJLeft.yProperty().bind(
-                Bindings.add(topEdgePlusRadiusProperty, arrowIndentProperty));
+        lineJLeft.yProperty().bind(Bindings.add(topEdgePlusRadiusProperty, arrowIndentProperty));
 
         lineKLeft = new VLineTo();
         lineKLeft.yProperty().bind(topEdgePlusRadiusProperty);
@@ -606,27 +566,26 @@ public class PopOverSkin implements Skin<PopOver> {
         return getSkinnable().getScene().getWindow();
     }
 
-    private boolean showArrow(PopOver.ArrowLocation location) {
+    private boolean isShowingArrow(PopOver.ArrowLocation location) {
         PopOver.ArrowLocation arrowLocation = getSkinnable().getArrowLocation();
-        return location.equals(arrowLocation) && !getSkinnable().isDetached()
-                && !tornOff;
+        return location.equals(arrowLocation) && !getSkinnable().isDetached() && !tornOff;
     }
 
     private void updatePath() {
         List<PathElement> elements = new ArrayList<>();
         elements.add(moveTo);
 
-        if (showArrow(TOP_LEFT)) {
+        if (isShowingArrow(TOP_LEFT)) {
             elements.add(lineBTop);
             elements.add(lineCTop);
             elements.add(lineDTop);
         }
-        if (showArrow(TOP_CENTER)) {
+        if (isShowingArrow(TOP_CENTER)) {
             elements.add(lineETop);
             elements.add(lineFTop);
             elements.add(lineGTop);
         }
-        if (showArrow(TOP_RIGHT)) {
+        if (isShowingArrow(TOP_RIGHT)) {
             elements.add(lineHTop);
             elements.add(lineITop);
             elements.add(lineJTop);
@@ -634,17 +593,17 @@ public class PopOverSkin implements Skin<PopOver> {
         elements.add(lineKTop);
         elements.add(rightCurveTo);
 
-        if (showArrow(RIGHT_TOP)) {
+        if (isShowingArrow(RIGHT_TOP)) {
             elements.add(lineBRight);
             elements.add(lineCRight);
             elements.add(lineDRight);
         }
-        if (showArrow(RIGHT_CENTER)) {
+        if (isShowingArrow(RIGHT_CENTER)) {
             elements.add(lineERight);
             elements.add(lineFRight);
             elements.add(lineGRight);
         }
-        if (showArrow(RIGHT_BOTTOM)) {
+        if (isShowingArrow(RIGHT_BOTTOM)) {
             elements.add(lineHRight);
             elements.add(lineIRight);
             elements.add(lineJRight);
@@ -652,17 +611,17 @@ public class PopOverSkin implements Skin<PopOver> {
         elements.add(lineKRight);
         elements.add(bottomCurveTo);
 
-        if (showArrow(BOTTOM_RIGHT)) {
+        if (isShowingArrow(BOTTOM_RIGHT)) {
             elements.add(lineBBottom);
             elements.add(lineCBottom);
             elements.add(lineDBottom);
         }
-        if (showArrow(BOTTOM_CENTER)) {
+        if (isShowingArrow(BOTTOM_CENTER)) {
             elements.add(lineEBottom);
             elements.add(lineFBottom);
             elements.add(lineGBottom);
         }
-        if (showArrow(BOTTOM_LEFT)) {
+        if (isShowingArrow(BOTTOM_LEFT)) {
             elements.add(lineHBottom);
             elements.add(lineIBottom);
             elements.add(lineJBottom);
@@ -670,17 +629,17 @@ public class PopOverSkin implements Skin<PopOver> {
         elements.add(lineKBottom);
         elements.add(leftCurveTo);
 
-        if (showArrow(LEFT_BOTTOM)) {
+        if (isShowingArrow(LEFT_BOTTOM)) {
             elements.add(lineBLeft);
             elements.add(lineCLeft);
             elements.add(lineDLeft);
         }
-        if (showArrow(LEFT_CENTER)) {
+        if (isShowingArrow(LEFT_CENTER)) {
             elements.add(lineELeft);
             elements.add(lineFLeft);
             elements.add(lineGLeft);
         }
-        if (showArrow(LEFT_TOP)) {
+        if (isShowingArrow(LEFT_TOP)) {
             elements.add(lineHLeft);
             elements.add(lineILeft);
             elements.add(lineJLeft);
