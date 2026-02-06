@@ -1,0 +1,11 @@
+.popover {
+    -fx-arrow-size: 24px;
+}
+
+.popover .background {
+    -fx-fill: beige;
+}
+
+.popover .content {
+    -fx-background-color: beige;
+}
