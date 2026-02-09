@@ -77,9 +77,6 @@ public class SearchFieldApp extends GemApplication {
         usePlaceholder.setSelected(true);
         field.placeholderProperty().bind(Bindings.createObjectBinding(() -> usePlaceholder.isSelected() ? new Label("No countries found") : null, usePlaceholder.selectedProperty()));
 
-        CheckBox searchResultsOnTopBox = new CheckBox("Search results on top");
-        searchResultsOnTopBox.selectedProperty().bindBidirectional(field.searchResultsOnTopProperty());
-
         CheckBox hideWithSingleChoiceBox = new CheckBox("Hide popup if it has only the currently selected item in it");
         hideWithSingleChoiceBox.selectedProperty().bindBidirectional(field.hidePopupWithSingleChoiceProperty());
 
@@ -132,7 +129,7 @@ public class SearchFieldApp extends GemApplication {
         field.leftProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionLeft : null, showLeftRightNodes.selectedProperty()));
         field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, searchResultsOnTopBox, usePlaceholder, hideWithSingleChoiceBox, hideWithNoChoiceBox, showSearchIconBox, showLeftRightNodes,
+        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, hideWithNoChoiceBox, showSearchIconBox, showLeftRightNodes,
                 autoCommitOnFocusLostBox, hBox, hBox2, enableHistoryBox, historyControls, field);
         vbox.setPadding(new Insets(20));
 

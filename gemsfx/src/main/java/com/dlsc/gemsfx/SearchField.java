@@ -113,7 +113,6 @@ public class SearchField<T> extends Control {
     private final SearchFieldPopup<T> popup;
     private final HistoryButton<String> historyButton;
 
-
     /**
      * Constructs a new spotlight field. The field will set defaults for the
      * matcher, the converter, the cell factory, and the comparator. It will
@@ -182,39 +181,17 @@ public class SearchField<T> extends Control {
             }
 
             boolean releasedEnter = keyCode.equals(KeyCode.ENTER);
-            boolean highlighting = (evt.isShiftDown() && evt.getCode().isArrowKey());
-            boolean highlighted = editor.getAnchor() != editor.getCaretPosition();
-            boolean releasedRightAtEnd = keyCode.equals(KeyCode.RIGHT) && editor.getCaretPosition() == editor.getText().length();
-
             // Add the current text to the history if the user pressed the ENTER key.
             if (releasedEnter && isAddingItemToHistoryOnEnter() && !lastHistoryPopupShowing) {
                 addToHistory(editor.getText());
             }
 
-            // Sync up user interactions with the text box so that the editor text field can keep up.
-            if ((keyCode.equals(KeyCode.TAB) || (releasedRightAtEnd && !highlighting && !highlighted) || releasedEnter) && !lastHistoryPopupShowing) {
-                T defaultChoice = getSearchDefaultChoice(editor.getText());
-                if (defaultChoice == null && newItemProducer.get() != null) {
-                    T newItem = newItemProducer.get().call(editor.getText());
-                    select(newItem);
-                } else {
-                    select(defaultChoice);
-                }
+            if ((keyCode.equals(KeyCode.RIGHT) || releasedEnter) && !lastHistoryPopupShowing) {
+                commit();
                 evt.consume();
-            } else if (keyCode.equals(KeyCode.LEFT) && popup.isShowing() && !highlighting) {
-                if (highlighted) {
-                    editor.positionCaret(Math.min(editor.getAnchor(), editor.getCaretPosition()));
-                } else {
-                    editor.positionCaret(Math.max(0, editor.getCaretPosition()) - 1);
-                }
-                evt.consume();
-            } else if (keyCode.equals(KeyCode.RIGHT) && popup.isShowing() && !highlighting) {
-                if (highlighted) {
-                    editor.positionCaret(Math.max(editor.getAnchor(), editor.getCaretPosition()));
-                } else {
-                    editor.positionCaret(Math.min(editor.getText().length(), editor.getCaretPosition()) + 1);
-                }
-                evt.consume();
+                invokeCommitHandler();
+            } else if (keyCode.equals(KeyCode.LEFT)) {
+                editor.positionCaret(Math.max(0, editor.getCaretPosition() - 1));
             } else if (keyCode.equals(KeyCode.ESCAPE)) {
                 historyButton.hidePopup();
                 cancel();
@@ -349,16 +326,6 @@ public class SearchField<T> extends Control {
         });
 
         searching.bind(searchService.runningProperty());
-    }
-
-    private T getSearchDefaultChoice(String searchText) {
-        BiFunction<T, String, Boolean> matcher = getMatcher();
-        T defaultChoice = suggestions.stream().sorted(comparator.get()).filter(item -> matcher.apply(item, searchText)).findFirst().orElse(null);
-
-        if (selectedItem.get() != null && StringUtils.startsWithIgnoreCase(getConverter().toString(defaultChoice), searchText))
-            defaultChoice = selectedItem.get();
-
-        return defaultChoice;
     }
 
     private void onHistoryItemConfirmed(String historyItem) {
@@ -570,26 +537,6 @@ public class SearchField<T> extends Control {
 
     public final boolean isSearching() {
         return searching.get();
-    }
-
-    private final BooleanProperty searchResultsOnTop = new SimpleBooleanProperty(this, "searchResultsOnTop", true);
-
-    public final boolean isSearchResultsOnTop() {
-        return searchResultsOnTop.get();
-    }
-
-    /**
-     * Shows results matching searched text at the top of the search results, this may be turned off when search item
-     * order has special requirements. The default is "true".
-     *
-     * @return true if the popup showing the list of suggestions will show search matched terms first when available
-     */
-    public final BooleanProperty searchResultsOnTopProperty() {
-        return searchResultsOnTop;
-    }
-
-    public final void setSearchResultsOnTop(boolean searchResultsOnTop) {
-        this.searchResultsOnTop.set(searchResultsOnTop);
     }
 
     private final BooleanProperty hidePopupWithSingleChoice = new SimpleBooleanProperty(this, "hidePopupWithSingleChoice", false);
