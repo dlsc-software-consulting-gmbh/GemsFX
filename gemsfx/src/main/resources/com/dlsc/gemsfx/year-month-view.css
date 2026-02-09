@@ -3,7 +3,7 @@
 }
 
 .year-month-view > .container > .grid-pane {
-    -fx-background: -fx-control-inner-background-alt;
+    -fx-background: -fx-control-inner-background;
     -fx-background-color: -fx-background;
     -fx-hgap: 10px;
 }
@@ -80,4 +80,9 @@
     -fx-padding: 0.333333em 0.25em 0.333333em 0.166667em; /* 4 3 4 2 */
     -fx-shape: "M2.998-0.07L3-1.499l2.998,4L3,6.501l-0.002-1.43l1.976-2.57L2.998-0.07z";
     -fx-scale-shape: true;
+}
+
+.year-month-view.popover {
+    -fx-background: -fx-control-inner-background;
+    -fx-border-width: 0px;
 }

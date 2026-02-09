@@ -541,41 +541,27 @@ public class PopOver extends PopupControl {
     }
 
     private double computeXOffset() {
-        switch (getArrowLocation()) {
-            case TOP_LEFT:
-            case BOTTOM_LEFT:
-                return getCornerRadius() + getArrowIndent() + getArrowSize();
-            case TOP_CENTER:
-            case BOTTOM_CENTER:
-                return getContentNode().prefWidth(-1) / 2;
-            case TOP_RIGHT:
-            case BOTTOM_RIGHT:
-                return getContentNode().prefWidth(-1) - getArrowIndent()
-                        - getCornerRadius() - getArrowSize();
-            default:
-                return 0;
-        }
+        return switch (getArrowLocation()) {
+            case TOP_LEFT, BOTTOM_LEFT -> getCornerRadius() + getArrowIndent() + getArrowSize();
+            case TOP_CENTER, BOTTOM_CENTER -> getContentNode().prefWidth(-1) / 2;
+            case TOP_RIGHT, BOTTOM_RIGHT -> getContentNode().prefWidth(-1) - getArrowIndent()
+                    - getCornerRadius() - getArrowSize();
+            default -> 0;
+        };
     }
 
     private double computeYOffset() {
         double prefContentHeight = getContentNode().prefHeight(-1);
 
-        switch (getArrowLocation()) {
-            case LEFT_TOP:
-            case RIGHT_TOP:
-                return getCornerRadius() + getArrowIndent() + getArrowSize();
-            case LEFT_CENTER:
-            case RIGHT_CENTER:
-                return Math.max(prefContentHeight, 2 * (getCornerRadius()
-                        + getArrowIndent() + getArrowSize())) / 2;
-            case LEFT_BOTTOM:
-            case RIGHT_BOTTOM:
-                return Math.max(prefContentHeight - getCornerRadius()
-                        - getArrowIndent() - getArrowSize(), getCornerRadius()
-                        + getArrowIndent() + getArrowSize());
-            default:
-                return 0;
-        }
+        return switch (getArrowLocation()) {
+            case LEFT_TOP, RIGHT_TOP -> getCornerRadius() + getArrowIndent() + getArrowSize();
+            case LEFT_CENTER, RIGHT_CENTER -> Math.max(prefContentHeight, 2 * (getCornerRadius()
+                    + getArrowIndent() + getArrowSize())) / 2;
+            case LEFT_BOTTOM, RIGHT_BOTTOM -> Math.max(prefContentHeight - getCornerRadius()
+                    - getArrowIndent() - getArrowSize(), getCornerRadius()
+                    + getArrowIndent() + getArrowSize());
+            default -> 0;
+        };
     }
 
     /**
@@ -764,8 +750,6 @@ public class PopOver extends PopupControl {
 
     // arrow indent support
 
-    // TODO: make styleable
-
     private final DoubleProperty arrowIndent = new SimpleDoubleProperty(this, "arrowIndent", 12);
 
     /**
@@ -799,8 +783,6 @@ public class PopOver extends PopupControl {
     }
 
     // radius support
-
-    // TODO: make styleable
 
     private final DoubleProperty cornerRadius = new SimpleDoubleProperty(this, "cornerRadius", 6);
 
@@ -1055,5 +1037,70 @@ public class PopOver extends PopupControl {
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
         return getClassCssMetaData();
+    }
+
+    public static class CalendarPopOver extends PopOver {
+
+        private final CalendarView calendarView = new CalendarView();
+
+        public CalendarPopOver() {
+            getStyleClass().add("calendar-popover");
+            setContentNode(calendarView);
+            calendarView.getStyleClass().add("popover");
+            calendarView.getYearView().getStyleClass().add("popover");
+            calendarView.getYearMonthView().getStyleClass().add("popover");
+        }
+
+        /**
+         * Returns the internally used calendar view.
+         *
+         * @return the actual calendar view
+         */
+        public final CalendarView getCalendarView() {
+            return calendarView;
+        }
+    }
+
+    /**
+     * Shows a specialized popover for selecting a date.
+     *
+     * @param owner the owning node
+     * @return the calendar popover
+     */
+    public static CalendarPopOver showCalendarPopOver(Node owner) {
+        CalendarPopOver popover = new CalendarPopOver();
+        popover.show(owner);
+        return popover;
+    }
+
+    public static class TimePopOver extends PopOver {
+
+        private final TimePicker timePicker = new TimePicker();
+
+        public TimePopOver() {
+            getStyleClass().add("time-popover");
+            setContentNode(timePicker);
+        }
+
+        /**
+         * Returns the internally used calendar view.
+         *
+         * @return the actual calendar view
+         */
+        public final TimePicker getTimePicker() {
+            return timePicker;
+        }
+    }
+
+    /**
+     * Shows a specialized popover for selecting a time.
+     *
+     * @param owner the owning node
+     * @return the time popover
+     */
+    public static TimePopOver showTimePopOver(Node owner) {
+        TimePopOver popover = new TimePopOver();
+        popover.show(owner);
+        return popover;
     }
 }

@@ -40,3 +40,9 @@
     -fx-stroke: white;
     -fx-stroke-width: 2;
 }
+
+.calendar-popover > .content .calendar-view {
+    -fx-border-color: red;
+    -fx-border-width: 1px;
+    -fx-padding: 1px;
+}

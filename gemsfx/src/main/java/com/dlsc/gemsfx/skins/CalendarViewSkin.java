@@ -480,7 +480,7 @@ public class CalendarViewSkin extends SkinBase<CalendarView> {
 
         DayOfWeek dayOfWeek = getFirstDayOfWeek();
         for (int i = 0; i < 7; i++) {
-            dayOfWeekLabels[i] = new Label(dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.getDefault()));
+            dayOfWeekLabels[i] = new Label(dayOfWeek.getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault()));
             dayOfWeekLabels[i].setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             dayOfWeekLabels[i].setAlignment(CENTER);
             dayOfWeekLabels[i].getStyleClass().add(WEEKDAY_NAME);

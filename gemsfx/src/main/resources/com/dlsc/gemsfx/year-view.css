@@ -2,6 +2,10 @@
     -fx-border-color: #e0e0e0;
 }
 
+.year-view.popover {
+    -fx-border-width: 0px;
+}
+
 .year-view:focused {
     -fx-border-color: -fx-accent;
 }
@@ -12,6 +16,10 @@
     -fx-hgap: 10px;
     -fx-vgap: 10px;
     -fx-padding: 10px;
+}
+
+.year-view.popover > .grid-pane {
+    -fx-background: -fx-control-inner-background;
 }
 
 .year-view > .grid-pane > .year-box {
@@ -34,6 +42,11 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 10, 0.12, -1, 2);
 }
 
+.year-view.popover > .header {
+    -fx-padding: 10px 20px;
+    -fx-effect: null;
+}
+
 .year-view > .header > .year-range-label {
     -fx-font-size: 1.1em;
     -fx-alignment: center;
@@ -48,14 +61,6 @@
     -fx-background-color: #eeeeee;
     -fx-background-insets: 0px -2px;
     -fx-background-radius: 2px;
-}
-
-.year-view > .header > .arrow-button > .left-arrow,
-.year-view > .header > .arrow-button > .right-arrow {
-    -fx-background-color: -fx-mark-highlight-color, derive(-fx-base, -45%);
-    -fx-background-insets: 1 0 -1 0, 0;
-    -fx-padding: 0.333333em 0.166667em 0.333333em 0.166667em; /* 4 2 4 2 */
-    -fx-effect: dropshadow(two-pass-box, -fx-shadow-highlight-color, 1, 0.0, 0, 1.4);
 }
 
 .year-view > .header > .arrow-button > .left-arrow {
