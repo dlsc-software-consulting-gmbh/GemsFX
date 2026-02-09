@@ -106,6 +106,7 @@ public class TagsFieldEmailApp extends GemApplication {
         List<EmailAddress> emailAddresses = generateEmailAddresses();
         TagsField<EmailAddress> tagsField = new TagsField<>();
 
+        tagsField.setMatcher((email, text) -> email.getAddress().toLowerCase().contains(text.toLowerCase()));
         tagsField.setNewItemProducer(text -> {
             if (StringUtils.isNotBlank(text)) {
                 return new EmailAddress(text);
@@ -118,6 +119,7 @@ public class TagsFieldEmailApp extends GemApplication {
             String userText = request.getUserText();
             return new ArrayList<>(emailAddresses.stream().filter(email -> email.getAddress().contains(userText.toLowerCase())).toList());
         });
+
         return tagsField;
     }
 

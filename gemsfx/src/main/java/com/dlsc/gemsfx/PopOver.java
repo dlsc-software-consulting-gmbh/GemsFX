@@ -31,22 +31,14 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.skins.PopOverSkin;
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.WeakChangeListener;
-import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
-import javafx.css.StyleableDoubleProperty;
-import javafx.css.StyleableProperty;
-import javafx.css.converter.SizeConverter;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
@@ -55,8 +47,6 @@ import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
@@ -91,8 +81,6 @@ public class PopOver extends PopupControl {
     private static final String DEFAULT_STYLE_CLASS = "popover";
 
     private static final Duration DEFAULT_FADE_DURATION = Duration.seconds(.2);
-
-    private static final double DEFAULT_ARROW_SIZE = 10;
 
     private double targetX;
 
@@ -143,7 +131,15 @@ public class PopOver extends PopupControl {
          */
         detached.addListener(it -> setAutoHide(!isDetached()));
 
-        setAutoHide(false);
+        setOnShown(evt -> {
+            /*
+             * Move the window so that the arrow will end up pointing at the
+             * target coordinates.
+             */
+            adjustWindowLocation();
+        });
+
+        setAutoHide(true);
     }
 
     /**
@@ -190,8 +186,6 @@ public class PopOver extends PopupControl {
                         "content node can not be null");
             }
         }
-
-        ;
     };
 
     /**
@@ -223,33 +217,6 @@ public class PopOver extends PopupControl {
         contentNodeProperty().set(content);
     }
 
-    private final InvalidationListener hideListener = observable -> {
-        if (!isDetached()) {
-            hide(Duration.ZERO);
-        }
-    };
-
-    private final WeakInvalidationListener weakHideListener = new WeakInvalidationListener(
-            hideListener);
-
-    private final ChangeListener<Number> xListener = (value, oldX, newX) -> {
-        if (!isDetached()) {
-            setAnchorX(getAnchorX() + (newX.doubleValue() - oldX.doubleValue()));
-        }
-    };
-
-    private final WeakChangeListener<Number> weakXListener = new WeakChangeListener<>(
-            xListener);
-
-    private final ChangeListener<Number> yListener = (value, oldY, newY) -> {
-        if (!isDetached()) {
-            setAnchorY(getAnchorY() + (newY.doubleValue() - oldY.doubleValue()));
-        }
-    };
-
-    private final WeakChangeListener<Number> weakYListener = new WeakChangeListener<>(
-            yListener);
-
     private Window ownerWindow;
     private final EventHandler<WindowEvent> closePopOverOnOwnerWindowCloseLambda = event -> ownerWindowClosing();
     private final WeakEventHandler<WindowEvent> closePopOverOnOwnerWindowClose = new WeakEventHandler<>(closePopOverOnOwnerWindowCloseLambda);
@@ -271,7 +238,7 @@ public class PopOver extends PopupControl {
     /**
      * Shows the popover in a position relative to the edges of the given owner
      * node. The position is dependent on the arrow location. If the arrow is
-     * pointing to the right then the popover will be placed to the left of the
+     * pointing to the right, then the popover will be placed to the left of the
      * given owner. If the arrow points up then the popover will be placed
      * below the given owner node.
      *
@@ -397,55 +364,11 @@ public class PopOver extends PopupControl {
             fadeInDuration = DEFAULT_FADE_DURATION;
         }
 
-        /*
-         * This is all needed because children windows do not get their x and y
-         * coordinate updated when the owning window gets moved by the user.
-         */
-        if (ownerWindow != null) {
-            ownerWindow.xProperty().removeListener(weakXListener);
-            ownerWindow.yProperty().removeListener(weakYListener);
-            ownerWindow.widthProperty().removeListener(weakHideListener);
-            ownerWindow.heightProperty().removeListener(weakHideListener);
-        }
-
-        ownerWindow = owner.getScene().getWindow();
-        ownerWindow.xProperty().addListener(weakXListener);
-        ownerWindow.yProperty().addListener(weakYListener);
-        ownerWindow.widthProperty().addListener(weakHideListener);
-        ownerWindow.heightProperty().addListener(weakHideListener);
-
-        setOnShown(evt -> {
-
-            /*
-             * The user clicked somewhere into the transparent background. If
-             * this is the case then hide the window (when attached).
-             */
-            getScene().addEventHandler(MOUSE_CLICKED, mouseEvent -> {
-                if (mouseEvent.getTarget().equals(getScene().getRoot())) {
-                    if (!isDetached()) {
-                        hide();
-                    }
-                }
-            });
-
-            /*
-             * Move the window so that the arrow will end up pointing at the
-             * target coordinates.
-             */
-            adjustWindowLocation();
-        });
-
         super.show(owner, x, y);
 
         if (isAnimated()) {
             showFadeInAnimation(fadeInDuration);
         }
-
-        // Bug fix - close popup when owner window is closing
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
-                closePopOverOnOwnerWindowClose);
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
-                closePopOverOnOwnerWindowClose);
     }
 
     private void showFadeInAnimation(Duration fadeInDuration) {
@@ -702,22 +625,7 @@ public class PopOver extends PopupControl {
 
     // arrow size support
 
-    private final DoubleProperty arrowSize = new StyleableDoubleProperty(DEFAULT_ARROW_SIZE) {
-        @Override
-        public Object getBean() {
-            return this;
-        }
-
-        @Override
-        public String getName() {
-            return "arrowSize";
-        }
-
-        @Override
-        public CssMetaData<? extends Styleable, Number> getCssMetaData() {
-            return StyleableProperties.ARROW_SIZE;
-        }
-    };
+    private final DoubleProperty arrowSize = new SimpleDoubleProperty(this, "arrowSize", 10);
 
     /**
      * Controls the size of the arrow. The default value is 10.
@@ -995,43 +903,6 @@ public class PopOver extends PopupControl {
      */
     public final void setAnimated(boolean animated) {
         animatedProperty().set(animated);
-    }
-
-    private static class StyleableProperties {
-
-        private static final CssMetaData<PopupControl.CSSBridge, Number> ARROW_SIZE =
-                new CssMetaData<>("-fx-arrow-size", SizeConverter.getInstance(), DEFAULT_ARROW_SIZE) {
-
-                    @Override
-                    public boolean isSettable(PopupControl.CSSBridge bridge) {
-                        Parent parent = bridge.getParent();
-                        ObservableList<Node> children = parent.getChildrenUnmodifiable();
-                        PopOver popover = (PopOver) children.getFirst().getScene().getWindow();
-                        return !popover.arrowSize.isBound();
-                    }
-
-                    @Override
-                    public StyleableProperty<Number> getStyleableProperty(PopupControl.CSSBridge bridge) {
-//                        Parent parent = bridge.getParent();
-//                        ObservableList<Node> children = parent.getChildrenUnmodifiable();
-//                        PopOver popover = (PopOver) children.getFirst().getScene().getWindow();
-//                        return (StyleableProperty<Number>) popover.arrowSizeProperty();
-                        return null;
-                    }
-                };
-
-        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
-
-        static {
-
-            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Parent.getClassCssMetaData());
-            styleables.add(ARROW_SIZE);
-            STYLEABLES = Collections.unmodifiableList(styleables);
-        }
-    }
-
-    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
-        return PopOver.StyleableProperties.STYLEABLES;
     }
 
     @Override

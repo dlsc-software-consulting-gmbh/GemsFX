@@ -1,6 +1,5 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.PopOver;
 import com.dlsc.gemsfx.PopOver.ArrowLocation;
 import com.dlsc.gemsfx.util.StageManager;
@@ -20,7 +19,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
@@ -33,7 +31,7 @@ public class PopOverApp extends GemApplication {
 
     private final DoubleProperty arrowSize = new SimpleDoubleProperty(10);
 
-    private final ObjectProperty<ArrowLocation> arrowLocation = new SimpleObjectProperty<>(ArrowLocation.TOP_CENTER);
+    private final ObjectProperty<ArrowLocation> arrowLocation = new SimpleObjectProperty<>(ArrowLocation.LEFT_TOP);
 
     @Override
     public void start(Stage stage) {
@@ -63,7 +61,7 @@ public class PopOverApp extends GemApplication {
             pop.arrowLocationProperty().bind(arrowLocation);
         });
 
-        VBox pane = new VBox(20, button, dateButton, timeButton);
+        VBox pane = new VBox(20, dateButton);
         pane.setAlignment(Pos.CENTER);
         VBox.setVgrow(pane, Priority.ALWAYS);
 
