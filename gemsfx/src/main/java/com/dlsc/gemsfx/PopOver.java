@@ -907,11 +907,6 @@ public class PopOver extends PopupControl {
         animatedProperty().set(animated);
     }
 
-    @Override
-    public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
-        return getClassCssMetaData();
-    }
-
     public static class CalendarPopOver extends PopOver {
 
         private final CalendarView calendarView = new CalendarView();
