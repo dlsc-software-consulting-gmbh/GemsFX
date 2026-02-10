@@ -974,6 +974,15 @@ public class PopOver extends PopupControl {
 
     private static final class PopOverRoot extends StackPane {
 
+        /**
+         * Controls the size of the arrow. The default value is 10.
+         *
+         * @return the arrow size property
+         */
+        public DoubleProperty arrowSizeProperty() {
+            return arrowSize;
+        }
+
         private final DoubleProperty arrowSize = new StyleableDoubleProperty(DEFAULT_ARROW_SIZE) {
             @Override
             public Object getBean() {
@@ -990,6 +999,16 @@ public class PopOver extends PopupControl {
                 return StyleableProperties.ARROW_SIZE;
             }
         };
+
+        /**
+         * Controls the distance between the arrow and the corners of the popover.
+         * The default value is 12.
+         *
+         * @return the arrow indent property
+         */
+        public DoubleProperty arrowIndentProperty() {
+            return arrowIndent;
+        }
 
         private final DoubleProperty arrowIndent = new StyleableDoubleProperty(DEFAULT_ARROW_INDENT) {
             @Override
@@ -1008,6 +1027,16 @@ public class PopOver extends PopupControl {
             }
         };
 
+        /**
+         * Returns the corner radius property for the popover.
+         * The default value is 6.
+         *
+         * @return the corner radius property
+         */
+        public DoubleProperty cornerRadiusProperty() {
+            return cornerRadius;
+        }
+
         private final DoubleProperty cornerRadius = new StyleableDoubleProperty(DEFAULT_CORNER_RADIUS) {
             @Override
             public Object getBean() {
@@ -1024,18 +1053,6 @@ public class PopOver extends PopupControl {
                 return StyleableProperties.CORNER_RADIUS;
             }
         };
-
-        public DoubleProperty arrowSizeProperty() {
-            return arrowSize;
-        }
-
-        public DoubleProperty arrowIndentProperty() {
-            return arrowIndent;
-        }
-
-        public DoubleProperty cornerRadiusProperty() {
-            return cornerRadius;
-        }
 
         @Override
         public String getUserAgentStylesheet() {
