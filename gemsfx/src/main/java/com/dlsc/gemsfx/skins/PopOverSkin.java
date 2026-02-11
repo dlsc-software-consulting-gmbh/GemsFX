@@ -53,7 +53,6 @@ public class PopOverSkin implements Skin<PopOver> {
 
     private final Path background;
     private final Path border;
-    private final Rectangle clip = new Rectangle();
 
     private final BorderPane content;
     private final StackPane stackPane;
@@ -68,6 +67,7 @@ public class PopOverSkin implements Skin<PopOver> {
         stackPane = popOver.getRoot();
         stackPane.setPickOnBounds(false);
 
+        Rectangle clip = new Rectangle();
         clip.widthProperty().bind(stackPane.widthProperty());
         clip.heightProperty().bind(stackPane.heightProperty());
         clip.arcHeightProperty().bind(popOver.cornerRadiusProperty().multiply(2));
@@ -82,10 +82,8 @@ public class PopOverSkin implements Skin<PopOver> {
         stackPane.minWidthProperty().bind(
                 Bindings.add(Bindings.multiply(2, popOver.arrowSizeProperty()),
                         Bindings.add(
-                                Bindings.multiply(2,
-                                        popOver.cornerRadiusProperty()),
-                                Bindings.multiply(2,
-                                        popOver.arrowIndentProperty()))));
+                                Bindings.multiply(2, popOver.cornerRadiusProperty()),
+                                Bindings.multiply(2, popOver.arrowIndentProperty()))));
 
         stackPane.minHeightProperty().bind(stackPane.minWidthProperty());
 
