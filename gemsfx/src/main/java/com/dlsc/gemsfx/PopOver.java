@@ -375,9 +375,7 @@ public class PopOver extends PopupControl {
         final Bounds rootBounds = root.getBoundsInParent();
         final Bounds layoutBounds = root.getLayoutBounds();
 
-        final double diff = rootBounds.getWidth() - layoutBounds.getWidth();
-
-        final double rootNodeWidth = rootBounds.getWidth();
+        final double rootNodeWidth = layoutBounds.getWidth();
         final double rootNodeMinX = rootBounds.getMinX();
 
         final double cornerRadius = getCornerRadius();
@@ -386,10 +384,10 @@ public class PopOver extends PopupControl {
 
         return switch (getArrowLocation()) {
             case TOP_LEFT, BOTTOM_LEFT -> cornerRadius + arrowIndent + arrowSize - rootNodeMinX;
-            case TOP_CENTER, BOTTOM_CENTER -> rootNodeWidth / 2;
-            case TOP_RIGHT, BOTTOM_RIGHT -> rootNodeWidth - arrowIndent - cornerRadius - arrowSize - diff - rootNodeMinX;
+            case TOP_CENTER, BOTTOM_CENTER -> rootNodeWidth / 2 - rootNodeMinX;
+            case TOP_RIGHT, BOTTOM_RIGHT -> rootNodeWidth - arrowIndent - cornerRadius - arrowSize - rootNodeMinX;
             case LEFT_TOP, LEFT_CENTER, LEFT_BOTTOM -> rootNodeMinX + arrowSize;
-            case RIGHT_TOP, RIGHT_CENTER, RIGHT_BOTTOM -> rootNodeWidth + rootNodeMinX;
+            case RIGHT_TOP, RIGHT_CENTER, RIGHT_BOTTOM -> -rootNodeMinX + rootNodeWidth + arrowSize;
         };
     }
 
@@ -406,9 +404,7 @@ public class PopOver extends PopupControl {
         final Bounds rootBounds = root.getBoundsInParent();
         final Bounds layoutBounds = root.getLayoutBounds();
 
-        final double diff = rootBounds.getHeight() - layoutBounds.getHeight();
-
-        final double rootNodeHeight = rootBounds.getHeight();
+        final double rootNodeHeight = layoutBounds.getHeight();
         final double rootNodeMinY = rootBounds.getMinY();
 
         final double arrowIndent = getArrowIndent();
@@ -417,9 +413,9 @@ public class PopOver extends PopupControl {
 
         return switch (getArrowLocation()) {
             case LEFT_TOP, RIGHT_TOP -> cornerRadius + arrowIndent + arrowSize - rootNodeMinY;
-            case LEFT_CENTER, RIGHT_CENTER -> rootNodeHeight / 2;
-            case LEFT_BOTTOM, RIGHT_BOTTOM -> rootNodeHeight - cornerRadius - arrowIndent - arrowSize - diff - rootNodeMinY;
-            case BOTTOM_CENTER, BOTTOM_LEFT, BOTTOM_RIGHT -> rootNodeHeight + rootNodeMinY;
+            case LEFT_CENTER, RIGHT_CENTER -> rootNodeHeight / 2 - rootNodeMinY;
+            case LEFT_BOTTOM, RIGHT_BOTTOM -> rootNodeHeight - cornerRadius - arrowIndent - arrowSize - rootNodeMinY;
+            case BOTTOM_CENTER, BOTTOM_LEFT, BOTTOM_RIGHT -> rootNodeHeight - rootNodeMinY + arrowSize;
             case TOP_CENTER, TOP_LEFT, TOP_RIGHT -> rootNodeMinY + arrowSize;
         };
     }
