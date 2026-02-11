@@ -1059,9 +1059,13 @@ public class PopOver extends PopupControl {
             return requireNonNull(PopOver.class.getResource("popover.css")).toExternalForm();
         }
 
+        public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+            return StyleableProperties.STYLEABLES;
+        }
+
         @Override
         public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
-            return StyleableProperties.STYLEABLES;
+            return getClassCssMetaData();
         }
 
         private static class StyleableProperties {
