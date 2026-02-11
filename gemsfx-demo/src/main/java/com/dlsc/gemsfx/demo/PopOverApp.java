@@ -4,9 +4,10 @@ import com.dlsc.gemsfx.PopOver;
 import com.dlsc.gemsfx.PopOver.ArrowLocation;
 import com.dlsc.gemsfx.PopOver.CalendarPopOver;
 import com.dlsc.gemsfx.Spacer;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -35,6 +36,10 @@ public class PopOverApp extends GemApplication {
 
     private final ObjectProperty<Double> arrowIndent = new SimpleObjectProperty<>(12d);
 
+    private final BooleanProperty detachable = new SimpleBooleanProperty(false);
+
+    private final BooleanProperty autoHide = new SimpleBooleanProperty(true);
+
     private final ObjectProperty<ArrowLocation> arrowLocation = new SimpleObjectProperty<>(ArrowLocation.LEFT_TOP);
 
     private CalendarPopOver calendarPopOver;
@@ -48,6 +53,8 @@ public class PopOverApp extends GemApplication {
         popOver.arrowSizeProperty().bind(arrowSize);
         popOver.arrowIndentProperty().bind(arrowIndent);
         popOver.arrowLocationProperty().bind(arrowLocation);
+        popOver.autoHideProperty().bind(autoHide);
+        popOver.detachableProperty().bind(detachable);
 
         Button button = new Button("Show PopOver");
         button.setOnAction(evt -> {
@@ -63,6 +70,9 @@ public class PopOverApp extends GemApplication {
                 calendarPopOver.arrowSizeProperty().bind(arrowSize);
                 calendarPopOver.arrowIndentProperty().bind(arrowIndent);
                 calendarPopOver.arrowLocationProperty().bind(arrowLocation);
+                calendarPopOver.autoHideProperty().bind(autoHide);
+                calendarPopOver.detachableProperty().bind(detachable);
+
                 calendarPopOver.addEventHandler(WindowEvent.WINDOW_HIDING, evt1 -> {
                     LocalDate selectedDate = calendarPopOver.getCalendarView().getSelectionModel().getSelectedDate();
                     if (selectedDate != null) {
@@ -94,10 +104,10 @@ public class PopOverApp extends GemApplication {
         arrowIndentBox.valueProperty().bindBidirectional(arrowIndent);
 
         CheckBox autoHideBox = new CheckBox("Auto Hide");
-        autoHideBox.selectedProperty().bindBidirectional(popOver.autoHideProperty());
+        autoHideBox.selectedProperty().bindBidirectional(autoHide);
 
         CheckBox detachableBox = new CheckBox("Detachable");
-        detachableBox.selectedProperty().bindBidirectional(popOver.detachableProperty());
+        detachableBox.selectedProperty().bindBidirectional(detachable);
 
         Button sceneViewButton = new Button("ScenicView");
         sceneViewButton.setOnAction(evt -> ScenicView.show(pane.getScene()));

@@ -5,7 +5,7 @@
 .popover > .background {
     -fx-stroke: transparent;
     -fx-fill: -fx-control-inner-background;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, .2), 6, 0.3, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0.0, 0, 3);
 }
 
 .popover > .border {

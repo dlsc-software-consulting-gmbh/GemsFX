@@ -59,7 +59,7 @@ public class PopOver extends PopupControl {
 
     private static final String DEFAULT_STYLE_CLASS = "popover";
 
-    private static final Duration DEFAULT_FADE_DURATION = Duration.seconds(.2);
+    private static final Duration DEFAULT_FADE_DURATION = Duration.millis(100);
 
     private static final double DEFAULT_ARROW_SIZE = 10;
     private static final double DEFAULT_ARROW_INDENT = 12;
@@ -172,44 +172,6 @@ public class PopOver extends PopupControl {
         contentNodeProperty().set(content);
     }
 
-    private Window ownerWindow;
-    private final EventHandler<WindowEvent> closePopOverOnOwnerWindowClose = event -> ownerWindowClosing();
-    private final WeakEventHandler<WindowEvent> weakClosePopOverOnOwnerWindowClose = new WeakEventHandler<>(closePopOverOnOwnerWindowClose);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final void show(Window owner) {
-        super.show(owner);
-
-        ownerWindow = owner;
-
-        if (isAnimated()) {
-            showFadeInAnimation(getFadeInDuration());
-        }
-
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, weakClosePopOverOnOwnerWindowClose);
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING, weakClosePopOverOnOwnerWindowClose);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final void show(Window ownerWindow, double anchorX, double anchorY) {
-        super.show(ownerWindow, anchorX, anchorY);
-
-        this.ownerWindow = ownerWindow;
-
-        if (isAnimated()) {
-            showFadeInAnimation(getFadeInDuration());
-        }
-
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, weakClosePopOverOnOwnerWindowClose);
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING, weakClosePopOverOnOwnerWindowClose);
-    }
-
     /**
      * Shows the popover in a position relative to the edges of the given owner
      * node. The position is dependent on the arrow location. If the arrow is
@@ -228,11 +190,11 @@ public class PopOver extends PopupControl {
      * Shows the popover in a position relative to the edges of the given owner
      * node. The position is dependent on the arrow location. If the arrow is
      * pointing to the right, then the popover will be placed to the left of the
-     * given owner. If the arrow points up then the popover will be placed
+     * given owner. If the arrow points up, then the popover will be placed
      * below the given owner node.
      *
      * @param owner  the owner of the popover
-     * @param offset if negative specifies the distance to the owner node or when
+     * @param offset if negative specifies the distance to the owner node, or when
      *               positive specifies the number of pixels that the arrow will
      *               overlap with the owner node (positive values are recommended)
      */
@@ -244,8 +206,6 @@ public class PopOver extends PopupControl {
         }
 
         Bounds bounds = owner.localToScreen(owner.getBoundsInLocal());
-
-        System.out.println("showing, location = " + getArrowLocation());
 
         switch (getArrowLocation()) {
             case BOTTOM_CENTER:
@@ -298,13 +258,8 @@ public class PopOver extends PopupControl {
      * @param fadeInDuration the time it takes for the popover to be fully visible. This duration takes precedence over the fade-in property without setting.
      */
     public final void show(Node owner, double x, double y, Duration fadeInDuration) {
-
-        /*
-         * Calling show() a second time without first closing the popover
-         * causes it to be placed at the wrong location.
-         */
         if (isShowing()) {
-            super.hide();
+            return;
         }
 
         targetX = x;
@@ -321,28 +276,31 @@ public class PopOver extends PopupControl {
         super.show(owner, x, y);
 
         Bounds bounds = getContentNode().getBoundsInParent();
-        System.out.println("bounds: " + bounds);
+
+        Bounds rootBounds = root.getBoundsInParent();
         switch (getArrowLocation()) {
             case TOP_CENTER:
             case TOP_LEFT:
             case TOP_RIGHT:
                 x -= computeXOffset();
-                break;
-            case LEFT_TOP:
-            case LEFT_CENTER:
-            case LEFT_BOTTOM:
-                y -= computeYOffset();
+                y += computeYOffset();
                 break;
             case BOTTOM_CENTER:
             case BOTTOM_LEFT:
             case BOTTOM_RIGHT:
                 x -= computeXOffset();
-                y -= bounds.getHeight();
+                y -= computeYOffset();
+                break;
+            case LEFT_TOP:
+            case LEFT_CENTER:
+            case LEFT_BOTTOM:
+                x += computeXOffset();
+                y -= computeYOffset();
                 break;
             case RIGHT_TOP:
             case RIGHT_BOTTOM:
             case RIGHT_CENTER:
-                x -= bounds.getWidth();
+                x -= computeXOffset();
                 y -= computeYOffset();
                 break;
         }
@@ -366,10 +324,6 @@ public class PopOver extends PopupControl {
         fadeIn.play();
     }
 
-    private void ownerWindowClosing() {
-        hide(Duration.ZERO);
-    }
-
     /**
      * Hides the popover by quickly changing its opacity to 0.
      *
@@ -388,12 +342,6 @@ public class PopOver extends PopupControl {
      * @since 1.0
      */
     public final void hide(Duration fadeOutDuration) {
-        //We must remove EventFilter in order to prevent memory leak.
-        if (ownerWindow != null) {
-            ownerWindow.removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, closePopOverOnOwnerWindowClose);
-            ownerWindow.removeEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowClose);
-        }
-
         if (fadeOutDuration == null) {
             fadeOutDuration = DEFAULT_FADE_DURATION;
         }
@@ -414,29 +362,65 @@ public class PopOver extends PopupControl {
         }
     }
 
+    /*
+     * Calculates how much the popover has to be moved left / right depending on the arrow location. There is some
+     * complexity involved as the "layout bounds" and the "bounds in parent" are different because of the drop shadow
+     * effect that is normally applied to the popover. The other variables are the corner radius, the arrow size, and
+     * the arrow indentation.
+     *
+     * The offset is always relative to the main four handle positions of the owning node. The positons are located in
+     * the center of the top edge, bottom edge, left edge, and right edge.
+     */
     private double computeXOffset() {
-        final double prefContentWidth = getContentNode().prefWidth(-1);
+        final Bounds rootBounds = root.getBoundsInParent();
+        final Bounds layoutBounds = root.getLayoutBounds();
+
+        final double diff = rootBounds.getWidth() - layoutBounds.getWidth();
+
+        final double rootNodeWidth = rootBounds.getWidth();
+        final double rootNodeMinX = rootBounds.getMinX();
+
+        final double cornerRadius = getCornerRadius();
+        final double arrowIndent = getArrowIndent();
+        final double arrowSize = getArrowSize();
+
         return switch (getArrowLocation()) {
-            case TOP_LEFT, BOTTOM_LEFT -> getCornerRadius() + getArrowIndent() + getArrowSize();
-            case TOP_CENTER, BOTTOM_CENTER -> prefContentWidth / 2;
-            case TOP_RIGHT, BOTTOM_RIGHT -> prefContentWidth - getArrowIndent()
-                    - getCornerRadius() - getArrowSize();
-            default -> 0;
+            case TOP_LEFT, BOTTOM_LEFT -> cornerRadius + arrowIndent + arrowSize - rootNodeMinX;
+            case TOP_CENTER, BOTTOM_CENTER -> rootNodeWidth / 2;
+            case TOP_RIGHT, BOTTOM_RIGHT -> rootNodeWidth - arrowIndent - cornerRadius - arrowSize - diff - rootNodeMinX;
+            case LEFT_TOP, LEFT_CENTER, LEFT_BOTTOM -> rootNodeMinX + arrowSize;
+            case RIGHT_TOP, RIGHT_CENTER, RIGHT_BOTTOM -> rootNodeWidth + rootNodeMinX;
         };
     }
 
+    /*
+     * Calculates how much the popover has to be moved up / down depending on the arrow location. There is some
+     * complexity involved as the "layout bounds" and the "bounds in parent" are different because of the drop shadow
+     * effect that is normally applied to the popover. The other variables are the corner radius, the arrow size, and
+     * the arrow indentation.
+     *
+     * The offset is always relative to the main four handle positions of the owning node. The positons are located in
+     * the center of the top edge, bottom edge, left edge, and right edge.
+     */
     private double computeYOffset() {
-        double prefContentHeight = getContentNode().prefHeight(-1);
-        System.out.println("pref height: " + prefContentHeight);
+        final Bounds rootBounds = root.getBoundsInParent();
+        final Bounds layoutBounds = root.getLayoutBounds();
+
+        final double diff = rootBounds.getHeight() - layoutBounds.getHeight();
+
+        final double rootNodeHeight = rootBounds.getHeight();
+        final double rootNodeMinY = rootBounds.getMinY();
+
+        final double arrowIndent = getArrowIndent();
+        final double arrowSize = getArrowSize();
+        final double cornerRadius = getCornerRadius();
 
         return switch (getArrowLocation()) {
-            case LEFT_TOP, RIGHT_TOP -> getCornerRadius() + getArrowIndent() + getArrowSize();
-            case LEFT_CENTER, RIGHT_CENTER -> Math.max(prefContentHeight, 2 * (getCornerRadius()
-                    + getArrowIndent() + getArrowSize())) / 2;
-            case LEFT_BOTTOM, RIGHT_BOTTOM -> Math.max(prefContentHeight - getCornerRadius()
-                    - getArrowIndent() - getArrowSize(), getCornerRadius()
-                    + getArrowIndent() + getArrowSize());
-            default -> 0;
+            case LEFT_TOP, RIGHT_TOP -> cornerRadius + arrowIndent + arrowSize - rootNodeMinY;
+            case LEFT_CENTER, RIGHT_CENTER -> rootNodeHeight / 2;
+            case LEFT_BOTTOM, RIGHT_BOTTOM -> rootNodeHeight - cornerRadius - arrowIndent - arrowSize - diff - rootNodeMinY;
+            case BOTTOM_CENTER, BOTTOM_LEFT, BOTTOM_RIGHT -> rootNodeHeight + rootNodeMinY;
+            case TOP_CENTER, TOP_LEFT, TOP_RIGHT -> rootNodeMinY + arrowSize;
         };
     }
 
@@ -464,7 +448,7 @@ public class PopOver extends PopupControl {
     /**
      * Sets the value of the detachable property.
      *
-     * @param detachable if true then the user can detach / tear off the popover
+     * @param detachable if true, then the user can detach / tear off the popover
      * @see #detachableProperty()
      */
     public final void setDetachable(boolean detachable) {
@@ -643,7 +627,7 @@ public class PopOver extends PopupControl {
     }
 
     /**
-     * All possible arrow locations.
+     * Locations where the arrow of the popover can be placed.
      */
     public enum ArrowLocation {
         LEFT_TOP,
@@ -660,10 +644,10 @@ public class PopOver extends PopupControl {
         BOTTOM_RIGHT;
     }
 
-    private final ObjectProperty<Duration> fadeInDuration = new SimpleObjectProperty<>(DEFAULT_FADE_DURATION);
+    private final ObjectProperty<Duration> fadeInDuration = new SimpleObjectProperty<>(this, "fadeInDuration", DEFAULT_FADE_DURATION);
 
     /**
-     * Stores the fade-in duration. This should be set before calling PopOver.show(..).
+     * Stores the fade-in duration. This should be set before calling PopOver.show(…).
      *
      * @return the fade-in duration property
      */
@@ -671,7 +655,7 @@ public class PopOver extends PopupControl {
         return fadeInDuration;
     }
 
-    private final ObjectProperty<Duration> fadeOutDuration = new SimpleObjectProperty<>(DEFAULT_FADE_DURATION);
+    private final ObjectProperty<Duration> fadeOutDuration = new SimpleObjectProperty<>(this, "fadeOutDuration", DEFAULT_FADE_DURATION);
 
     /**
      * Stores the fade-out duration.
@@ -693,7 +677,7 @@ public class PopOver extends PopupControl {
     }
 
     /**
-     * Sets the value of the fade-in duration property. This should be set before calling PopOver.show(..).
+     * Sets the value of the fade-in duration property. This should be set before calling PopOver.show(...).
      *
      * @param duration the requested fade-in duration
      * @see #fadeInDurationProperty()
@@ -722,7 +706,7 @@ public class PopOver extends PopupControl {
         fadeOutDurationProperty().setValue(duration);
     }
 
-    private final SimpleBooleanProperty animated = new SimpleBooleanProperty(true);
+    private final SimpleBooleanProperty animated = new SimpleBooleanProperty(this, "animated", true);
 
     /**
      * Stores the "animated" flag. If true, then the PopOver will be shown / hidden with a short fade in / out animation.
@@ -746,7 +730,7 @@ public class PopOver extends PopupControl {
     /**
      * Sets the value of the "animated" property.
      *
-     * @param animated if true the PopOver will be shown and hidden with a short fade animation
+     * @param animated if true, the PopOver will be shown and hidden with a short fade animation
      * @see #animatedProperty()
      */
     public final void setAnimated(boolean animated) {
