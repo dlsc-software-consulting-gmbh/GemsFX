@@ -1,8 +1,5 @@
 package com.dlsc.gemsfx.skins;
 
-import static java.lang.Double.MAX_VALUE;
-import static javafx.geometry.Pos.CENTER_LEFT;
-import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.paint.Color.YELLOW;
 import static com.dlsc.gemsfx.PopOver.ArrowLocation.BOTTOM_CENTER;
 import static com.dlsc.gemsfx.PopOver.ArrowLocation.BOTTOM_LEFT;
@@ -27,10 +24,8 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -61,7 +56,6 @@ public class PopOverSkin implements Skin<PopOver> {
     private final Rectangle clip = new Rectangle();
 
     private final BorderPane content;
-    private final StackPane titlePane;
     private final StackPane stackPane;
 
     private Point2D dragStartLocation;
@@ -95,48 +89,14 @@ public class PopOverSkin implements Skin<PopOver> {
 
         stackPane.minHeightProperty().bind(stackPane.minWidthProperty());
 
-        Label title = new Label();
-        title.textProperty().bind(popOver.titleProperty());
-        title.setMaxSize(MAX_VALUE, MAX_VALUE);
-        title.setAlignment(Pos.CENTER);
-        title.getStyleClass().add("title-label");
-
-        Label closeIcon = new Label();
-        closeIcon.setGraphic(createCloseIcon());
-        closeIcon.setMaxSize(MAX_VALUE, MAX_VALUE);
-        closeIcon.setContentDisplay(GRAPHIC_ONLY);
-        closeIcon.visibleProperty().bind(
-                popOver.closeButtonEnabledProperty().and(
-                        popOver.detachedProperty().or(popOver.headerAlwaysVisibleProperty())));
-        closeIcon.getStyleClass().add("icon");
-        closeIcon.setAlignment(CENTER_LEFT);
-        closeIcon.getGraphic().setOnMouseClicked(evt -> popOver.hide());
-
-        titlePane = new StackPane();
-        titlePane.getChildren().add(title);
-        titlePane.getChildren().add(closeIcon);
-        titlePane.getStyleClass().add("header");
-
         content = new BorderPane();
         content.setCenter(popOver.getContentNode());
         content.getStyleClass().add("content");
-
-        if (popOver.isDetached() || popOver.isHeaderAlwaysVisible()) {
-            content.setTop(titlePane);
-        }
 
         if (popOver.isDetached()) {
             popOver.getStyleClass().add(DETACHED_STYLE_CLASS);
             content.getStyleClass().add(DETACHED_STYLE_CLASS);
         }
-
-        popOver.headerAlwaysVisibleProperty().addListener((o, oV, isVisible) -> {
-            if (isVisible) {
-                content.setTop(titlePane);
-            } else if (!popOver.isDetached()) {
-                content.setTop(null);
-            }
-        });
 
         InvalidationListener updatePathAndClipListener = observable -> updatePath();
 
@@ -149,7 +109,6 @@ public class PopOverSkin implements Skin<PopOver> {
             if (newDetached) {
                 popOver.getStyleClass().add(DETACHED_STYLE_CLASS);
                 content.getStyleClass().add(DETACHED_STYLE_CLASS);
-                content.setTop(titlePane);
 
                 switch (getSkinnable().getArrowLocation()) {
                     case LEFT_TOP:
@@ -168,10 +127,6 @@ public class PopOverSkin implements Skin<PopOver> {
             } else {
                 popOver.getStyleClass().remove(DETACHED_STYLE_CLASS);
                 content.getStyleClass().remove(DETACHED_STYLE_CLASS);
-
-                if (!popOver.isHeaderAlwaysVisible()) {
-                    content.setTop(null);
-                }
             }
 
             popOver.sizeToScene();
