@@ -1,6 +1,5 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.PopOver;
 import com.dlsc.gemsfx.PopOver.ArrowLocation;
 import com.dlsc.gemsfx.PopOver.CalendarPopOver;
 import com.dlsc.gemsfx.Spacer;
@@ -8,10 +7,8 @@ import com.dlsc.gemsfx.util.EnumUtil;
 import com.dlsc.gemsfx.util.SimpleStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -34,11 +31,11 @@ import java.util.Objects;
 
 public class PopOverApp extends GemApplication {
 
-    private final DoubleProperty radius = new SimpleDoubleProperty(6d);
+    private final ObjectProperty<Double> radius = new SimpleObjectProperty<>(6d);
 
-    private final DoubleProperty arrowSize = new SimpleDoubleProperty(10d);
+    private final ObjectProperty<Double> arrowSize = new SimpleObjectProperty<>(10d);
 
-    private final DoubleProperty arrowIndent = new SimpleDoubleProperty(12d);
+    private final ObjectProperty<Double> arrowIndent = new SimpleObjectProperty<>(12d);
 
     private final BooleanProperty detachable = new SimpleBooleanProperty(false);
 
@@ -85,15 +82,15 @@ public class PopOverApp extends GemApplication {
 
         ComboBox<Double> radiusBox = new ComboBox<>();
         radiusBox.getItems().addAll(0.0, 6.0, 10.0, 15.0, 20.0, 32.0);
-        radiusBox.valueProperty().bindBidirectional(radius.asObject());
+        radiusBox.valueProperty().bindBidirectional(radius);
 
         ComboBox<Double> arrowSizeBox = new ComboBox<>();
         arrowSizeBox.getItems().addAll(0.0, 5.0, 10.0, 15.0, 20.0, 32.0);
-        arrowSizeBox.valueProperty().bindBidirectional(arrowSize.asObject());
+        arrowSizeBox.valueProperty().bindBidirectional(arrowSize);
 
         ComboBox<Double> arrowIndentBox = new ComboBox<>();
-        arrowIndentBox.getItems().addAll( 0.0, 5.0, 12.0, 15.0);
-        arrowIndentBox.valueProperty().bindBidirectional(arrowIndent.asObject());
+        arrowIndentBox.getItems().addAll(0.0, 5.0, 12.0, 15.0);
+        arrowIndentBox.valueProperty().bindBidirectional(arrowIndent);
 
         CheckBox autoHideBox = new CheckBox("Auto Hide");
         autoHideBox.selectedProperty().bindBidirectional(autoHide);

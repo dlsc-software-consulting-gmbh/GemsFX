@@ -12,20 +12,13 @@ import javafx.css.Styleable;
 import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.SizeConverter;
-import javafx.event.EventHandler;
-import javafx.event.WeakEventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Window;
-import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -69,13 +62,20 @@ public class PopOver extends PopupControl {
 
     private double targetY;
 
-    private final PopOverRoot root = new PopOverRoot();
+    private final StackPane root = new StackPane() {
+        @Override
+        public String getUserAgentStylesheet() {
+            return requireNonNull(PopOver.class.getResource("popover.css")).toExternalForm();
+        }
+    };
 
     /**
      * Creates a popover with a label as the content node.
      */
     public PopOver() {
         super();
+        // Store reference to this PopOver in bridge's properties for CSS access
+        bridge.getProperties().put(PopOver.class, this);
 
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
@@ -496,13 +496,30 @@ public class PopOver extends PopupControl {
 
     // arrow size support
 
+    private final DoubleProperty arrowSize = new StyleableDoubleProperty(DEFAULT_ARROW_SIZE) {
+        @Override
+        public Object getBean() {
+            return PopOver.this;
+        }
+
+        @Override
+        public String getName() {
+            return "arrowSize";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+            return StyleableProperties.ARROW_SIZE;
+        }
+    };
+
     /**
      * Controls the size of the arrow. The default value is 10.
      *
      * @return the arrow size property
      */
     public final DoubleProperty arrowSizeProperty() {
-        return root.arrowSizeProperty();
+        return arrowSize;
     }
 
     /**
@@ -527,6 +544,23 @@ public class PopOver extends PopupControl {
 
     // arrow indent support
 
+    private final DoubleProperty arrowIndent = new StyleableDoubleProperty(DEFAULT_ARROW_INDENT) {
+        @Override
+        public Object getBean() {
+            return PopOver.this;
+        }
+
+        @Override
+        public String getName() {
+            return "arrowIndent";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+            return StyleableProperties.ARROW_INDENT;
+        }
+    };
+
     /**
      * Controls the distance between the arrow and the corners of the popover.
      * The default value is 12.
@@ -534,7 +568,7 @@ public class PopOver extends PopupControl {
      * @return the arrow indent property
      */
     public final DoubleProperty arrowIndentProperty() {
-        return root.arrowIndentProperty();
+        return arrowIndent;
     }
 
     /**
@@ -557,7 +591,24 @@ public class PopOver extends PopupControl {
         arrowIndentProperty().set(size);
     }
 
-    // radius support
+    // corner radius support
+
+    private final DoubleProperty cornerRadius = new StyleableDoubleProperty(DEFAULT_CORNER_RADIUS) {
+        @Override
+        public Object getBean() {
+            return PopOver.this;
+        }
+
+        @Override
+        public String getName() {
+            return "cornerRadius";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+            return StyleableProperties.CORNER_RADIUS;
+        }
+    };
 
     /**
      * Returns the corner radius property for the popover.
@@ -565,7 +616,7 @@ public class PopOver extends PopupControl {
      * @return the corner radius property (default is 6)
      */
     public final DoubleProperty cornerRadiusProperty() {
-        return root.cornerRadiusProperty();
+        return cornerRadius;
     }
 
     /**
@@ -779,152 +830,74 @@ public class PopOver extends PopupControl {
         }
     }
 
-    private static final class PopOverRoot extends StackPane {
+    private static class StyleableProperties {
 
-        /**
-         * Controls the size of the arrow. The default value is 10.
-         *
-         * @return the arrow size property
-         */
-        public DoubleProperty arrowSizeProperty() {
-            return arrowSize;
+        private static final CssMetaData<CSSBridge, Number> ARROW_SIZE =
+                new CssMetaData<>("-fx-arrow-size", SizeConverter.getInstance(), DEFAULT_ARROW_SIZE) {
+                    @Override
+                    public boolean isSettable(CSSBridge cssBridge) {
+                        PopOver popOver = getPopOver(cssBridge);
+                        return popOver != null && !popOver.arrowSize.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(CSSBridge cssBridge) {
+                        PopOver popOver = getPopOver(cssBridge);
+                        return (StyleableProperty<Number>) popOver.arrowSizeProperty();
+                    }
+                };
+
+        private static final CssMetaData<CSSBridge, Number> ARROW_INDENT =
+                new CssMetaData<>("-fx-arrow-indent", SizeConverter.getInstance(), DEFAULT_ARROW_INDENT) {
+                    @Override
+                    public boolean isSettable(CSSBridge cssBridge) {
+                        PopOver popOver = getPopOver(cssBridge);
+                        return popOver != null && !popOver.arrowIndent.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(CSSBridge cssBridge) {
+                        PopOver popOver = getPopOver(cssBridge);
+                        return (StyleableProperty<Number>) popOver.arrowIndentProperty();
+                    }
+                };
+
+        private static final CssMetaData<CSSBridge, Number> CORNER_RADIUS =
+                new CssMetaData<>("-fx-corner-radius", SizeConverter.getInstance(), DEFAULT_CORNER_RADIUS) {
+                    @Override
+                    public boolean isSettable(CSSBridge cssBridge) {
+                        PopOver popOver = getPopOver(cssBridge);
+                        return popOver != null && !popOver.cornerRadius.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(CSSBridge cssBridge) {
+                        PopOver popOver = getPopOver(cssBridge);
+                        return (StyleableProperty<Number>) popOver.cornerRadiusProperty();
+                    }
+                };
+
+        private static PopOver getPopOver(CSSBridge cssBridge) {
+            return (PopOver) cssBridge.getProperties().get(PopOver.class);
         }
 
-        private final DoubleProperty arrowSize = new StyleableDoubleProperty(DEFAULT_ARROW_SIZE) {
-            @Override
-            public Object getBean() {
-                return PopOverRoot.this;
-            }
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
 
-            @Override
-            public String getName() {
-                return "arrowSize";
-            }
-
-            @Override
-            public CssMetaData<PopOverRoot, Number> getCssMetaData() {
-                return StyleableProperties.ARROW_SIZE;
-            }
-        };
-
-        /**
-         * Controls the distance between the arrow and the corners of the popover.
-         * The default value is 12.
-         *
-         * @return the arrow indent property
-         */
-        public DoubleProperty arrowIndentProperty() {
-            return arrowIndent;
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(PopupControl.getClassCssMetaData());
+            styleables.add(ARROW_SIZE);
+            styleables.add(ARROW_INDENT);
+            styleables.add(CORNER_RADIUS);
+            STYLEABLES = Collections.unmodifiableList(styleables);
         }
+    }
 
-        private final DoubleProperty arrowIndent = new StyleableDoubleProperty(DEFAULT_ARROW_INDENT) {
-            @Override
-            public Object getBean() {
-                return PopOverRoot.this;
-            }
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
 
-            @Override
-            public String getName() {
-                return "arrowIndent";
-            }
-
-            @Override
-            public CssMetaData<PopOverRoot, Number> getCssMetaData() {
-                return StyleableProperties.ARROW_INDENT;
-            }
-        };
-
-        /**
-         * Returns the corner radius property for the popover.
-         * The default value is 6.
-         *
-         * @return the corner radius property
-         */
-        public DoubleProperty cornerRadiusProperty() {
-            return cornerRadius;
-        }
-
-        private final DoubleProperty cornerRadius = new StyleableDoubleProperty(DEFAULT_CORNER_RADIUS) {
-            @Override
-            public Object getBean() {
-                return PopOverRoot.this;
-            }
-
-            @Override
-            public String getName() {
-                return "cornerRadius";
-            }
-
-            @Override
-            public CssMetaData<PopOverRoot, Number> getCssMetaData() {
-                return StyleableProperties.CORNER_RADIUS;
-            }
-        };
-
-        @Override
-        public String getUserAgentStylesheet() {
-            return requireNonNull(PopOver.class.getResource("popover.css")).toExternalForm();
-        }
-
-        public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
-            return StyleableProperties.STYLEABLES;
-        }
-
-        @Override
-        public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
-            return getClassCssMetaData();
-        }
-
-        private static class StyleableProperties {
-
-            private static final CssMetaData<PopOverRoot, Number> ARROW_SIZE =
-                    new CssMetaData<>("-fx-arrow-size", SizeConverter.getInstance(), DEFAULT_ARROW_SIZE) {
-                        @Override
-                        public boolean isSettable(PopOverRoot node) {
-                            return !node.arrowSize.isBound();
-                        }
-
-                        @Override
-                        public StyleableProperty<Number> getStyleableProperty(PopOverRoot node) {
-                            return (StyleableProperty<Number>) node.arrowSizeProperty();
-                        }
-                    };
-
-            private static final CssMetaData<PopOverRoot, Number> ARROW_INDENT =
-                    new CssMetaData<>("-fx-arrow-indent", SizeConverter.getInstance(), DEFAULT_ARROW_INDENT) {
-                        @Override
-                        public boolean isSettable(PopOverRoot node) {
-                            return !node.arrowIndent.isBound();
-                        }
-
-                        @Override
-                        public StyleableProperty<Number> getStyleableProperty(PopOverRoot node) {
-                            return (StyleableProperty<Number>) node.arrowIndentProperty();
-                        }
-                    };
-
-            private static final CssMetaData<PopOverRoot, Number> CORNER_RADIUS =
-                    new CssMetaData<>("-fx-corner-radius", SizeConverter.getInstance(), DEFAULT_CORNER_RADIUS) {
-                        @Override
-                        public boolean isSettable(PopOverRoot node) {
-                            return !node.cornerRadius.isBound();
-                        }
-
-                        @Override
-                        public StyleableProperty<Number> getStyleableProperty(PopOverRoot node) {
-                            return (StyleableProperty<Number>) node.cornerRadiusProperty();
-                        }
-                    };
-
-            private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
-
-            static {
-                final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(StackPane.getClassCssMetaData());
-                styleables.add(ARROW_SIZE);
-                styleables.add(ARROW_INDENT);
-                styleables.add(CORNER_RADIUS);
-                STYLEABLES = Collections.unmodifiableList(styleables);
-            }
-        }
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
+        return getClassCssMetaData();
     }
 }
