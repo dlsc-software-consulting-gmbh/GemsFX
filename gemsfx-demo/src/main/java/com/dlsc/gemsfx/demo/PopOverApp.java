@@ -4,6 +4,8 @@ import com.dlsc.gemsfx.PopOver;
 import com.dlsc.gemsfx.PopOver.ArrowLocation;
 import com.dlsc.gemsfx.PopOver.CalendarPopOver;
 import com.dlsc.gemsfx.Spacer;
+import com.dlsc.gemsfx.util.EnumUtil;
+import com.dlsc.gemsfx.util.SimpleStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -50,20 +52,6 @@ public class PopOverApp extends GemApplication {
     public void start(Stage stage) {
         super.start(stage);
 
-        PopOver popOver = new PopOver();
-        popOver.cornerRadiusProperty().bind(radius);
-        popOver.arrowSizeProperty().bind(arrowSize);
-        popOver.arrowIndentProperty().bind(arrowIndent);
-        popOver.arrowLocationProperty().bind(arrowLocation);
-        popOver.autoHideProperty().bindBidirectional(autoHide);
-        popOver.detachableProperty().bindBidirectional(detachable);
-
-        Button button = new Button("Show PopOver");
-        button.setOnAction(evt -> {
-            System.out.println(evt);
-            popOver.show(button);
-        });
-
         Button dateButton = new Button("Pick Date");
         dateButton.setOnAction(evt -> {
             if (calendarPopOver == null) {
@@ -85,13 +73,15 @@ public class PopOverApp extends GemApplication {
             calendarPopOver.show(dateButton);
         });
 
-        VBox pane = new VBox(20, button, dateButton);
+        VBox pane = new VBox(20, dateButton);
         pane.setAlignment(Pos.CENTER);
-        VBox.setVgrow(pane, Priority.ALWAYS);
+        pane.setPrefWidth(500);
+        HBox.setHgrow(pane, Priority.ALWAYS);
 
         ComboBox<ArrowLocation> arrowLocationBox = new ComboBox<>();
         arrowLocationBox.getItems().addAll(ArrowLocation.values());
         arrowLocationBox.valueProperty().bindBidirectional(arrowLocation);
+        arrowLocationBox.setConverter(new SimpleStringConverter<>(EnumUtil::formatEnumNameAsTitleCase));
 
         ComboBox<Double> radiusBox = new ComboBox<>();
         radiusBox.getItems().addAll(0.0, 6.0, 10.0, 15.0, 20.0, 32.0);
@@ -114,12 +104,11 @@ public class PopOverApp extends GemApplication {
         Button sceneViewButton = new Button("ScenicView");
         sceneViewButton.setOnAction(evt -> ScenicView.show(pane.getScene()));
 
-        HBox controls = new HBox(5, arrowLocationBox, new Separator(Orientation.VERTICAL),
-                new Label("Radius:"), radiusBox,
-                new Separator(Orientation.VERTICAL),
-                new Label("Arrow Size:"), arrowSizeBox,
-                new Separator(Orientation.VERTICAL),
-                new Label("Arrow Indent:"), arrowIndentBox,
+        VBox controls = new VBox(10,
+                new VBox(new Label("Arrow Location"), arrowLocationBox),
+                new VBox(new Label("Radius"), radiusBox),
+                new VBox(new Label("Arrow Size"), arrowSizeBox),
+                new VBox(new Label("Arrow Indent"), arrowIndentBox),
                 new Spacer(),
                 sceneViewButton,
                 new Spacer(),
@@ -127,10 +116,10 @@ public class PopOverApp extends GemApplication {
                 autoHideBox);
         controls.setAlignment(Pos.CENTER_LEFT);
 
-        VBox vBox = new VBox(10, pane, new Separator(), controls);
-        vBox.setPadding(new Insets(20));
+        HBox hbox = new HBox(10, pane, new Separator(Orientation.VERTICAL), controls);
+        hbox.setPadding(new Insets(20));
 
-        Scene scene = new Scene(vBox);
+        Scene scene = new Scene(hbox);
         scene.getStylesheets().add(Objects.requireNonNull(PopOverApp.class.getResource("popover-app.css")).toExternalForm());
 
         stage.setTitle("PopOver");
