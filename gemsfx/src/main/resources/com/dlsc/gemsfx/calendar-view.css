@@ -161,7 +161,7 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 10, 0.12, -1, 2);
     -fx-grid-lines-visible: false;
     -fx-hgap: -fx-horizontal-grid-gap;
-    -fx-padding: 0px 10px 10px 10px;
+    -fx-padding: 0px 10px;
 }
 
 .calendar-view.popover > .stack-pane > .container > .weekday-grid-pane {
@@ -184,11 +184,14 @@
     -fx-pref-height: -size;
     -fx-min-width: -size;
     -fx-min-height: -size;
-    -fx-text-fill: grey;
     -fx-font-size: .8em;
     -fx-background: -fx-control-inner-background;
     -fx-background-color: -fx-background;
     -fx-alignment: center;
+}
+
+.calendar-view > .stack-pane > .container > .weekday-grid-pane > .weekday-name .text {
+    -fx-opacity: .8;
 }
 
 .calendar-view > .stack-pane > .container > .body-grid-pane {
@@ -229,7 +232,10 @@
 
 .calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.previous-month {
     -fx-background: rgb(230, 231, 233);
-    -fx-text-fill: grey;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.previous-month .text {
+    -fx-opacity: .5;
 }
 
 .calendar-view.popover > .stack-pane > .container > .body-grid-pane > .date-cell.previous-month {
@@ -239,7 +245,10 @@
 
 .calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.next-month {
     -fx-background: rgb(230, 231, 233);
-    -fx-text-fill: grey;
+}
+
+.calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.next-month .text {
+    -fx-opacity: .5;
 }
 
 .calendar-view.popover > .stack-pane > .container > .body-grid-pane > .date-cell.next-month {
