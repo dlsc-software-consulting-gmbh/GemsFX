@@ -14,9 +14,5 @@
     -fx-stroke-width: 1;
 }
 
-.popover:detached > .border {
-    -fx-stroke: red;
-}
-
 .popover > .content {
 }
