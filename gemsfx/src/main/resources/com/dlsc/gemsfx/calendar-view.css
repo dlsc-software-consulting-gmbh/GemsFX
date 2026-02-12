@@ -239,8 +239,8 @@
 }
 
 .calendar-view.popover > .stack-pane > .container > .body-grid-pane > .date-cell.previous-month {
-    -fx-background: transparent;
-    -fx-opacity: 0.5;
+    -fx-background: -fx-control-inner-background;
+    -fx-opacity: 0.8;
 }
 
 .calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.next-month {
@@ -252,8 +252,8 @@
 }
 
 .calendar-view.popover > .stack-pane > .container > .body-grid-pane > .date-cell.next-month {
-    -fx-background: transparent;
-    -fx-opacity: 0.5;
+    -fx-background: -fx-control-inner-background;
+    -fx-opacity: 0.8;
 }
 
 .calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell.weekend-day {

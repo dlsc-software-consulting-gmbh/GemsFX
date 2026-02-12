@@ -2,6 +2,9 @@
     -fx-background-color: transparent;
 }
 
+.popover:detached {
+}
+
 .popover > .background {
     -fx-stroke: transparent;
     -fx-fill: -fx-control-inner-background;
