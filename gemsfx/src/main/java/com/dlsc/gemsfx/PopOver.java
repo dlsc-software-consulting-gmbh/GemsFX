@@ -8,24 +8,18 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.CssMetaData;
+import javafx.css.PseudoClass;
 import javafx.css.Styleable;
 import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.SizeConverter;
-import javafx.event.EventHandler;
-import javafx.event.WeakEventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Window;
-import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -56,6 +50,7 @@ import static java.util.Objects.requireNonNull;
  * }</pre>
  */
 public class PopOver extends PopupControl {
+    private static final PseudoClass DETACHED_PSEUDO_CLASS = PseudoClass.getPseudoClass("detached");
 
     private static final String DEFAULT_STYLE_CLASS = "popover";
 
@@ -94,7 +89,10 @@ public class PopOver extends PopupControl {
         /*
          * A detached popover should not automatically hide itself.
          */
-        detached.addListener(it -> setAutoHide(!isDetached()));
+        detached.addListener(it -> {
+            root.pseudoClassStateChanged(DETACHED_PSEUDO_CLASS, isDetached());
+            setAutoHide(!isDetached());
+        });
 
         setAutoHide(true);
     }

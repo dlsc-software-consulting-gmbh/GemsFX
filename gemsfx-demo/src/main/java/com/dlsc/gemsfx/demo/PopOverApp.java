@@ -52,25 +52,24 @@ public class PopOverApp extends GemApplication {
     public void start(Stage stage) {
         super.start(stage);
 
+        CalendarPopOver calendarPopOver = new CalendarPopOver();
+        calendarPopOver.cornerRadiusProperty().bind(radius);
+        calendarPopOver.arrowSizeProperty().bind(arrowSize);
+        calendarPopOver.arrowIndentProperty().bind(arrowIndent);
+        calendarPopOver.arrowLocationProperty().bind(arrowLocation);
+        calendarPopOver.autoHideProperty().bindBidirectional(autoHide);
+        calendarPopOver.detachableProperty().bindBidirectional(detachable);
+
         Button dateButton = new Button("Pick Date");
         dateButton.setOnAction(evt -> {
-            if (calendarPopOver == null) {
-                calendarPopOver = new CalendarPopOver();
-                calendarPopOver.cornerRadiusProperty().bind(radius);
-                calendarPopOver.arrowSizeProperty().bind(arrowSize);
-                calendarPopOver.arrowIndentProperty().bind(arrowIndent);
-                calendarPopOver.arrowLocationProperty().bind(arrowLocation);
-                calendarPopOver.autoHideProperty().bindBidirectional(autoHide);
-                calendarPopOver.detachableProperty().bindBidirectional(detachable);
-
-                calendarPopOver.addEventHandler(WindowEvent.WINDOW_HIDING, evt1 -> {
-                    LocalDate selectedDate = calendarPopOver.getCalendarView().getSelectionModel().getSelectedDate();
-                    if (selectedDate != null) {
-                        dateButton.setText(selectedDate.toString());
-                    }
-                });
-            }
             calendarPopOver.show(dateButton);
+        });
+
+        calendarPopOver.addEventHandler(WindowEvent.WINDOW_HIDING, evt1 -> {
+            LocalDate selectedDate = calendarPopOver.getCalendarView().getSelectionModel().getSelectedDate();
+            if (selectedDate != null) {
+                dateButton.setText(selectedDate.toString());
+            }
         });
 
         VBox pane = new VBox(20, dateButton);
@@ -92,7 +91,7 @@ public class PopOverApp extends GemApplication {
         arrowSizeBox.valueProperty().bindBidirectional(arrowSize.asObject());
 
         ComboBox<Double> arrowIndentBox = new ComboBox<>();
-        arrowIndentBox.getItems().addAll( 0.0, 5.0, 12.0, 15.0);
+        arrowIndentBox.getItems().addAll(0.0, 5.0, 12.0, 15.0);
         arrowIndentBox.valueProperty().bindBidirectional(arrowIndent.asObject());
 
         CheckBox autoHideBox = new CheckBox("Auto Hide");
@@ -104,11 +103,24 @@ public class PopOverApp extends GemApplication {
         Button sceneViewButton = new Button("ScenicView");
         sceneViewButton.setOnAction(evt -> ScenicView.show(pane.getScene()));
 
+        ComboBox<String> styleBox = new ComboBox<>();
+        styleBox.getItems().addAll("Default", "Dark", "Red");
+        styleBox.setValue("Default");
+        styleBox.valueProperty().addListener(it -> {
+            calendarPopOver.getStyleClass().removeAll("theme", "red", "dark");
+            if (styleBox.getValue().equals("Dark")) {
+                calendarPopOver.getStyleClass().addAll("theme", "dark");
+            } else if (styleBox.getValue().equals("Red")) {
+                calendarPopOver.getStyleClass().addAll("theme", "red");
+            }
+        });
+
         VBox controls = new VBox(10,
                 new VBox(new Label("Arrow Location"), arrowLocationBox),
                 new VBox(new Label("Radius"), radiusBox),
                 new VBox(new Label("Arrow Size"), arrowSizeBox),
                 new VBox(new Label("Arrow Indent"), arrowIndentBox),
+                new VBox(new Label("Style"), styleBox),
                 new Spacer(),
                 sceneViewButton,
                 new Spacer(),

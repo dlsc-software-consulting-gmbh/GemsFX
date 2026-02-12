@@ -91,11 +91,6 @@ public class PopOverSkin implements Skin<PopOver> {
         content.setCenter(popOver.getContentNode());
         content.getStyleClass().add("content");
 
-        if (popOver.isDetached()) {
-            popOver.getStyleClass().add(DETACHED_STYLE_CLASS);
-            content.getStyleClass().add(DETACHED_STYLE_CLASS);
-        }
-
         InvalidationListener updatePathAndClipListener = observable -> updatePath();
 
         getPopupWindow().xProperty().addListener(updatePathAndClipListener);
@@ -105,9 +100,6 @@ public class PopOverSkin implements Skin<PopOver> {
         popOver.contentNodeProperty().addListener((value, oldContent, newContent) -> content.setCenter(newContent));
         popOver.detachedProperty().addListener((value, oldDetached, newDetached) -> {
             if (newDetached) {
-                popOver.getStyleClass().add(DETACHED_STYLE_CLASS);
-                content.getStyleClass().add(DETACHED_STYLE_CLASS);
-
                 switch (getSkinnable().getArrowLocation()) {
                     case LEFT_TOP:
                     case LEFT_CENTER:
@@ -122,9 +114,6 @@ public class PopOverSkin implements Skin<PopOver> {
                     default:
                         break;
                 }
-            } else {
-                popOver.getStyleClass().remove(DETACHED_STYLE_CLASS);
-                content.getStyleClass().remove(DETACHED_STYLE_CLASS);
             }
 
             popOver.sizeToScene();

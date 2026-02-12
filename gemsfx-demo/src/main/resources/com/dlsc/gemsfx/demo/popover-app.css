@@ -1,3 +1,41 @@
 .popover {
     -fx-arrow-size: 24px;
 }
+
+.popover.dark {
+    -fx-theme-stroke-color: rgb(50, 52, 56);
+    -fx-theme-fill-color: rgb(38, 40, 43);
+}
+
+.popover.red {
+    -fx-base: red;
+    -fx-theme-stroke-color: derive(red, -30%);
+    -fx-theme-fill-color: derive(red, +60%);
+}
+
+.popover.theme > .background {
+    -fx-fill: -fx-theme-fill-color
+}
+
+.popover.theme > .border {
+    -fx-stroke: -fx-theme-stroke-color;
+}
+
+.popover.theme > .content {
+    -fx-background: -fx-theme-fill-color
+}
+
+.popover.theme > .content > .calendar-view {
+    -fx-background: -fx-theme-fill-color
+}
+
+.popover.theme > .content > .calendar-view > .stack-pane > .container > .header,
+.popover.theme > .content > .calendar-view > .stack-pane > .container > .weekday-grid-pane,
+.popover.theme > .content > .calendar-view > .stack-pane > .container > .weekday-grid-pane > .weekday-name,
+.popover.theme > .content > .calendar-view > .stack-pane > .container > .body-grid-pane,
+.popover.theme > .content > .calendar-view > .stack-pane > .container > .body-grid-pane > .date-cell {
+    -fx-background: -fx-theme-fill-color;
+}
+
+.popover.red > .content > .calendar-view > .stack-pane > .container > .weekday-grid-pane > .weekday-name {
+}
