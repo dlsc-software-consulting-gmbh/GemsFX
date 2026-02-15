@@ -103,11 +103,6 @@ public class SearchFieldPopupSkin<T> implements Skin<SearchFieldPopup<T>> {
         T selectedItem = listView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
             searchField.select(selectedItem);
-            searchField.commit();
-            Consumer<T> onCommit = searchField.getOnCommit();
-            if (onCommit != null) {
-                onCommit.accept(selectedItem);
-            }
         }
     }
 

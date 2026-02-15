@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.util.HistoryManager;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.css.PseudoClass;
@@ -67,29 +66,32 @@ public class HistoryButton<T> extends Button {
     }
 
     /**
-     * Shows the popup that includes the list view with the items stored by the history manager.
+     * Toggles visibility of the popup that includes the list view with the items stored by the history manager.
      */
     public void showPopup() {
         Node owner = getOwner();
 
+        boolean hasHistory = getHistoryManager() != null;
+
+        if (hasHistory) {
+            if (popup == null) {
+                popup = new HistoryPopup();
+                popupShowing.bind(popup.showingProperty());
+            }
+
+            if (popup.isShowing()) {
+                hidePopup();
+            }
+            else {
+                popup.show(this);
+            }
+        }
+
+        //begin showing history BEFORE focusing owner, so that owner can sense that history is about to show
         if (owner != null && owner != this && !owner.isFocused()) {
             owner.requestFocus();
         }
 
-        if (getHistoryManager() == null) {
-            return;
-        }
-
-        if (popup == null) {
-            popup = new HistoryPopup();
-            popupShowing.bind(popup.showingProperty());
-        }
-
-        if (popup.isShowing()) {
-            hidePopup();
-        } else {
-            popup.show(this);
-        }
     }
 
     /**
