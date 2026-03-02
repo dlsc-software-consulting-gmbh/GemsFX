@@ -7,12 +7,11 @@ import javafx.beans.InvalidationListener;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-public class PagingGridTableViewSkin<T> extends SkinBase<PagingGridTableView<T>> {
+public class PagingGridTableViewSkin<T> extends GemsSkinBase<PagingGridTableView<T>> {
 
     public static final String USING_SCROLL_PANE = "using-scroll-pane";
 
@@ -45,12 +44,12 @@ public class PagingGridTableViewSkin<T> extends SkinBase<PagingGridTableView<T>>
 
         content.getStyleClass().add("content");
 
-        pagingGridTableView.usingScrollPaneProperty().addListener(it -> updateStyleClass());
+        register(pagingGridTableView.usingScrollPaneProperty(), it -> updateStyleClass());
 
         InvalidationListener updateViewListener = it -> updateView();
-        pagingGridTableView.usingScrollPaneProperty().addListener(updateViewListener);
-        pagingGridTableView.placeholderProperty().addListener(updateViewListener);
-        pagingGridTableView.pagingControlsLocationProperty().addListener(updateViewListener);
+        register(pagingGridTableView.usingScrollPaneProperty(), updateViewListener);
+        register(pagingGridTableView.placeholderProperty(), updateViewListener);
+        register(pagingGridTableView.pagingControlsLocationProperty(), updateViewListener);
 
         gridTableView.onOpenItemProperty().bindBidirectional(pagingGridTableView.onOpenItemProperty());
         gridTableView.loadingStatusProperty().bindBidirectional(pagingGridTableView.loadingStatusProperty());

@@ -9,7 +9,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
-import javafx.scene.control.SkinBase;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
@@ -20,7 +19,7 @@ import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SVGImageViewSkin extends SkinBase<SVGImageView> {
+public class SVGImageViewSkin extends GemsSkinBase<SVGImageView> {
 
     private final Logger LOG = Logger.getLogger(SVGImageViewSkin.class.getName());
 
@@ -78,7 +77,7 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
             attachScaleListeners(window);
         }
 
-        svgImageView.sceneProperty().addListener(sceneChangeListener);
+        register(svgImageView.sceneProperty(), sceneChangeListener);
     }
 
     private void detachWindowScaleListeners() {
@@ -92,7 +91,6 @@ public class SVGImageViewSkin extends SkinBase<SVGImageView> {
                 detachScaleListeners(window);
             }
         }
-        svgImageView.sceneProperty().removeListener(sceneChangeListener);
     }
 
     private final ChangeListener<Window> windowChangeListener = (observable, oldWindow, newWindow) -> {

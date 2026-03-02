@@ -10,7 +10,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
-import javafx.scene.control.SkinBase;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
@@ -34,9 +33,9 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
 
-public class ScreensViewSkin extends SkinBase<ScreensView> {
+public class ScreensViewSkin extends GemsSkinBase<ScreensView> {
 
-    private Group scalingGroup = new Group();
+    private final Group scalingGroup = new Group();
 
     public ScreensViewSkin(ScreensView view) {
         super(view);
@@ -63,12 +62,12 @@ public class ScreensViewSkin extends SkinBase<ScreensView> {
 
         InvalidationListener updateViewListener = (Observable it) -> updateView();
 
-        view.showWallpaperProperty().addListener(updateViewListener);
-        view.showWindowsProperty().addListener(updateViewListener);
-        view.getShapes().addListener(updateViewListener);
+        register(view.showWallpaperProperty(), updateViewListener);
+        register(view.showWindowsProperty(), updateViewListener);
+        register(view.getShapes(), updateViewListener);
 
-        Screen.getScreens().addListener(updateViewListener);
-        Window.getWindows().addListener(updateViewListener);
+        register(Screen.getScreens(), updateViewListener);
+        register(Window.getWindows(), updateViewListener);
 
         updateView();
     }

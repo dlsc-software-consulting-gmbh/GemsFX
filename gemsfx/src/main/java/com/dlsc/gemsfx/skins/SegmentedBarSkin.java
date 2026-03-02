@@ -5,12 +5,11 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.control.SkinBase;
 import javafx.util.Callback;
 
 import java.util.*;
 
-public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<SegmentedBar<T>> {
+public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends GemsSkinBase<SegmentedBar<T>> {
 
     private final Map<T, Node> segmentNodes = new HashMap<>();
 

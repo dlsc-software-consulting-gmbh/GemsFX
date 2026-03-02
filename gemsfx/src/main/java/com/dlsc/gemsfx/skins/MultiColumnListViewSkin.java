@@ -14,7 +14,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.SkinBase;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -23,7 +22,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.util.Callback;
 
-public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>> {
+public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView<T>> {
 
     private final GridPane gridPane = new GridPane();
 
@@ -31,10 +30,10 @@ public class MultiColumnListViewSkin<T> extends SkinBase<MultiColumnListView<T>>
         super(view);
 
         InvalidationListener updateListener = (Observable it) -> updateView();
-        view.columnsProperty().addListener(updateListener);
-        view.showHeadersProperty().addListener(updateListener);
-        view.separatorFactoryProperty().addListener(updateListener);
-        view.listViewFactoryProperty().addListener(updateListener);
+        register(view.columnsProperty(), updateListener);
+        register(view.showHeadersProperty(), updateListener);
+        register(view.separatorFactoryProperty(), updateListener);
+        register(view.listViewFactoryProperty(), updateListener);
         updateView();
 
         gridPane.getStyleClass().add("grid-pane");

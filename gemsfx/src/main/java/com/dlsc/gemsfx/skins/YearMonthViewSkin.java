@@ -9,7 +9,6 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.SkinBase;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -24,7 +23,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 
-public class YearMonthViewSkin extends SkinBase<YearMonthView> {
+public class YearMonthViewSkin extends GemsSkinBase<YearMonthView> {
 
     private static final PseudoClass SELECTED_MONTH_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
     private static final PseudoClass CURRENT_MONTH_PSEUDO_CLASS = PseudoClass.getPseudoClass("current");
@@ -106,12 +105,12 @@ public class YearMonthViewSkin extends SkinBase<YearMonthView> {
 
         getChildren().add(container);
 
-        control.valueProperty().subscribe(value -> {
+        register(control.valueProperty().subscribe(value -> {
             updatingMonthBox = true;
             year.set(value.getYear());
             updateMonthBoxes(value, gridPane);
             updatingMonthBox = false;
-        });
+        }));
 
         year.addListener(it -> {
             if (!updatingMonthBox) {

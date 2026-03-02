@@ -11,7 +11,6 @@ import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.SkinBase;
 import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
@@ -28,7 +27,7 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.function.Supplier;
 
-public class PhotoViewSkin extends SkinBase<PhotoView> {
+public class PhotoViewSkin extends GemsSkinBase<PhotoView> {
 
     public PhotoViewSkin(PhotoView view) {
         super(view);
@@ -149,7 +148,7 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
                 }
             };
 
-            view.photoProperty().addListener(photoChangeListenerForLayout);
+            register(view.photoProperty(), photoChangeListenerForLayout);
             // Apply initial photo state
             Image initialPhoto = view.getPhoto();
             if (initialPhoto != null && initialPhoto.isBackgroundLoading()) {
@@ -195,12 +194,12 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
             rectangle.setEffect(new DropShadow());
             rectangle.setMouseTransparent(true);
 
-            view.clipShapeProperty().addListener(it -> {
+            register(view.clipShapeProperty(), it -> {
                 updateBorderShape();
                 updateClip();
             });
 
-            view.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> updatePlaceholder(oldPlaceholder, newPlaceholder));
+            register(view.placeholderProperty(), (obs, oldPlaceholder, newPlaceholder) -> updatePlaceholder(oldPlaceholder, newPlaceholder));
 
             updateBorderShape();
             updateClip();
@@ -220,11 +219,11 @@ public class PhotoViewSkin extends SkinBase<PhotoView> {
                 }
             };
 
-            view.photoProperty().addListener(photoChangeListenerForCrop);
-            view.photoZoomProperty().addListener(cropListener);
-            view.photoTranslateXProperty().addListener(cropListener);
-            view.photoTranslateYProperty().addListener(cropListener);
-            view.createCroppedImageProperty().addListener(cropListener);
+            register(view.photoProperty(), photoChangeListenerForCrop);
+            register(view.photoZoomProperty(), cropListener);
+            register(view.photoTranslateXProperty(), cropListener);
+            register(view.photoTranslateYProperty(), cropListener);
+            register(view.createCroppedImageProperty(), cropListener);
         }
 
         private void updateBorderShape() {

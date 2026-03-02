@@ -14,7 +14,6 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.control.SkinBase;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -28,7 +27,7 @@ import java.util.function.Consumer;
 /**
  * @param <S> grid table item type
  */
-public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
+public class GridTableViewSkin<S> extends GemsSkinBase<GridTableView<S>> {
 
     private final GridPane gridPane = new GridPane();
 
@@ -46,16 +45,16 @@ public class GridTableViewSkin<S> extends SkinBase<GridTableView<S>> {
         loadingPane.progressIndicatorProperty().bind(tableView.progressIndicatorProperty());
 
         ListChangeListener<S> listChangeListener = c -> updateView();
-        tableView.itemsProperty().addListener(listChangeListener);
+        register(tableView.itemsProperty(), listChangeListener);
 
         Bindings.bindContent(gridPane.getColumnConstraints(), tableView.columnsProperty());
-        tableView.columnsProperty().addListener((Observable it) -> updateView());
+        register(tableView.columnsProperty(), (Observable it) -> updateView());
 
         gridPane.getStyleClass().add("grid-pane");
 
         getChildren().add(gridPane);
 
-        tableView.getProperties().addListener((MapChangeListener<? super Object, ? super Object>) change -> {
+        register(tableView.getProperties(), (MapChangeListener<Object, Object>) change -> {
             if (change.wasAdded()) {
                 if (change.getKey().equals("refresh-items")) {
                     updateView();

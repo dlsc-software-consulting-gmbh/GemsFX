@@ -10,7 +10,6 @@ import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
@@ -19,7 +18,7 @@ import javafx.scene.layout.Region;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
+public class TagsFieldSkin<T> extends GemsSkinBase<TagsField<T>> {
 
     private static final PseudoClass FILLED = PseudoClass.getPseudoClass("filled");
     private static final PseudoClass CONTAINS_FOCUS = PseudoClass.getPseudoClass("contains-focus");
@@ -61,18 +60,18 @@ public class TagsFieldSkin<T> extends SkinBase<TagsField<T>> {
         editor.focusedProperty().addListener(it -> field.pseudoClassStateChanged(CONTAINS_FOCUS, editor.isFocused()));
         editor.setSkin(new SearchFieldEditorSkin<>(field));
 
-        field.getTags().addListener((Observable it) -> pseudoClassStateChanged(FILLED, !field.getTags().isEmpty()));
+        register(field.getTags(), (Observable it) -> pseudoClassStateChanged(FILLED, !field.getTags().isEmpty()));
 
         getChildren().addAll(flowPane);
 
         field.setCellFactory(view -> new SearchFieldListCell<>(field));
 
-        field.getTagSelectionModel().getSelectedItems().addListener((Observable it) -> tagViewMap.forEach((key, value) -> value.pseudoClassStateChanged(SELECTED, field.getTagSelectionModel().getSelectedItems().contains(key))));
+        register(field.getTagSelectionModel().getSelectedItems(), (Observable it) -> tagViewMap.forEach((key, value) -> value.pseudoClassStateChanged(SELECTED, field.getTagSelectionModel().getSelectedItems().contains(key))));
         editor.setOnMouseClicked(evt -> field.getTagSelectionModel().clearSelection());
 
         InvalidationListener updateViewListener = it -> updateView();
-        field.tagViewFactoryProperty().addListener(updateViewListener);
-        field.getTags().addListener(updateViewListener);
+        register(field.tagViewFactoryProperty(), updateViewListener);
+        register(field.getTags(), updateViewListener);
 
         updateView();
     }

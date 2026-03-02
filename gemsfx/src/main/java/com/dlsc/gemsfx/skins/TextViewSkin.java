@@ -6,7 +6,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.SkinBase;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -18,7 +17,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import org.apache.commons.lang3.StringUtils;
 
-public class TextViewSkin extends SkinBase<TextView> {
+public class TextViewSkin extends GemsSkinBase<TextView> {
 
     private final SelectableText selectableText;
 
@@ -27,7 +26,7 @@ public class TextViewSkin extends SkinBase<TextView> {
 
         selectableText = new SelectableText(control);
 
-        control.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+        registerHandler(control, KeyEvent.KEY_PRESSED, evt -> {
             if (KeyCodeCombination.keyCombination("shortcut+c").match(evt)) {
                 control.copySelection();
             } else if (KeyCodeCombination.keyCombination("shortcut+a").match(evt)) {
@@ -39,7 +38,7 @@ public class TextViewSkin extends SkinBase<TextView> {
 
         getChildren().setAll(selectableText);
 
-        control.focusedProperty().addListener(it -> {
+        register(control.focusedProperty(), it -> {
             ContextMenu contextMenu = control.getContextMenu();
             if (contextMenu != null && contextMenu.isShowing()) {
                 return;

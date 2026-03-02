@@ -7,7 +7,6 @@ import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.SkinBase;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -23,7 +22,7 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.Optional;
 
-public class YearViewSkin extends SkinBase<YearView> {
+public class YearViewSkin extends GemsSkinBase<YearView> {
 
     private final Label yearRangeLabel;
     private final HBox header;
@@ -81,9 +80,9 @@ public class YearViewSkin extends SkinBase<YearView> {
         header.setClip(clip);
 
         InvalidationListener buildGridListener = obs -> buildGrid();
-        yearView.valueProperty().addListener(buildGridListener);
-        yearView.rowsProperty().addListener(buildGridListener);
-        yearView.colsProperty().addListener(buildGridListener);
+        register(yearView.valueProperty(), buildGridListener);
+        register(yearView.rowsProperty(), buildGridListener);
+        register(yearView.colsProperty(), buildGridListener);
 
         buildGrid();
     }

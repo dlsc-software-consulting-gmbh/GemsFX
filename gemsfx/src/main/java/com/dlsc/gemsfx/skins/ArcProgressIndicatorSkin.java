@@ -7,12 +7,11 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Label;
-import javafx.scene.control.SkinBase;
 import javafx.scene.shape.Arc;
 import javafx.scene.transform.Rotate;
 import javafx.util.StringConverter;
 
-public abstract class ArcProgressIndicatorSkin<T extends ArcProgressIndicator> extends SkinBase<T> {
+public abstract class ArcProgressIndicatorSkin<T extends ArcProgressIndicator> extends GemsSkinBase<T> {
 
     private static final PseudoClass PSEUDO_CLASS_COMPLETED = PseudoClass.getPseudoClass("completed");
     protected final Label progressLabel = new Label();

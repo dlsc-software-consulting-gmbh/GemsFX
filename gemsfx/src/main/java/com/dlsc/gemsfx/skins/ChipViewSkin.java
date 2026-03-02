@@ -7,11 +7,10 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.SkinBase;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
-public class ChipViewSkin<T> extends SkinBase<ChipView<T>> {
+public class ChipViewSkin<T> extends GemsSkinBase<ChipView<T>> {
 
     public ChipViewSkin(ChipView<T> chip) {
         super(chip);
