@@ -138,6 +138,7 @@ public class PopOver extends PopupControl {
             if (node == null) {
                 throw new IllegalArgumentException("content node can not be null");
             }
+            super.setValue(node);
         }
     };
 
