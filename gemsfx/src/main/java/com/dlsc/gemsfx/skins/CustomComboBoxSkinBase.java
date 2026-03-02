@@ -14,12 +14,11 @@ import javafx.scene.Node;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.control.Skinnable;
 import javafx.scene.layout.Region;
 import javafx.stage.WindowEvent;
 
-public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends SkinBase<T> {
+public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends GemsSkinBase<T> {
 
     private boolean popupNeedsReconfiguring = true;
 
@@ -28,7 +27,7 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
     public CustomComboBoxSkinBase(T control) {
         super(control);
 
-        control.showingProperty().addListener(it -> {
+        register(control.showingProperty(), it -> {
             if (control.isShowing()) {
                 show();
             } else if (popup != null) {
@@ -36,7 +35,7 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
             }
         });
 
-        control.focusedProperty().addListener(it -> {
+        register(control.focusedProperty(), it -> {
             if (!control.isFocused()) {
                 hide();
             }
@@ -148,18 +147,17 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Ski
         });
         popup.setOnAutoHide(this::popupOnAutoHide);
 
-        // Fix for RT-21207
         InvalidationListener layoutPosListener = o -> {
             popupNeedsReconfiguring = true;
             reconfigurePopup();
         };
-        getSkinnable().layoutXProperty().addListener(layoutPosListener);
-        getSkinnable().layoutYProperty().addListener(layoutPosListener);
-        getSkinnable().widthProperty().addListener(layoutPosListener);
-        getSkinnable().heightProperty().addListener(layoutPosListener);
+        register(getSkinnable().layoutXProperty(), layoutPosListener);
+        register(getSkinnable().layoutYProperty(), layoutPosListener);
+        register(getSkinnable().widthProperty(), layoutPosListener);
+        register(getSkinnable().heightProperty(), layoutPosListener);
 
         // RT-36966 - if skinnable's scene becomes null, ensure popup is closed
-        getSkinnable().sceneProperty().addListener(o -> {
+        register(getSkinnable().sceneProperty(), o -> {
             if (((ObservableValue) o).getValue() == null) {
                 hide();
             } else if (getSkinnable().isShowing()) {

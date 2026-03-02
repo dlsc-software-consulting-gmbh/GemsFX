@@ -15,7 +15,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
-import javafx.scene.control.SkinBase;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -25,7 +24,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-public class PagingControlsSkin extends SkinBase<PagingControls> {
+public class PagingControlsSkin extends GemsSkinBase<PagingControls> {
 
     private static final String PAGE_BUTTON = "page-button";
 
@@ -42,7 +41,7 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
     private GridPane pageButtonsGridPane;
     private int column;
 
-    private final InvalidationListener buildViewListener = it -> updateView();
+    private final InvalidationListener buildViewListener;
     private final ChangeListener<Number> pageScrollListener;
 
     /*
@@ -73,6 +72,8 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
     public PagingControlsSkin(PagingControls view) {
         super(view);
 
+        buildViewListener = it -> updateView();
+
         pageScrollListener = (obs, oldPage, newPage) -> {
             int startPage = this.startPage.get();
             int maxPageIndicatorCount = view.getMaxPageIndicatorsCount();
@@ -91,43 +92,26 @@ public class PagingControlsSkin extends SkinBase<PagingControls> {
         pageButtonsBox.visibleProperty().bind(view.pageCountProperty().greaterThan(1));
         pageButtonsBox.managedProperty().bind(view.pageCountProperty().greaterThan(1));
 
-        view.pageProperty().addListener(buildViewListener);
-        view.pageCountProperty().addListener(buildViewListener);
-        view.pageSizeProperty().addListener(buildViewListener);
-        view.showPageSizeSelectorProperty().addListener(buildViewListener);
-        view.maxPageIndicatorsCountProperty().addListener(buildViewListener);
-        view.firstLastPageDisplayModeProperty().addListener(buildViewListener);
-        view.alignmentProperty().addListener(buildViewListener);
-        view.firstPageDividerProperty().addListener(buildViewListener);
-        view.sameWidthPageButtonsProperty().addListener(buildViewListener);
+        register(view.pageProperty(), buildViewListener);
+        register(view.pageCountProperty(), buildViewListener);
+        register(view.pageSizeProperty(), buildViewListener);
+        register(view.showPageSizeSelectorProperty(), buildViewListener);
+        register(view.maxPageIndicatorsCountProperty(), buildViewListener);
+        register(view.firstLastPageDisplayModeProperty(), buildViewListener);
+        register(view.alignmentProperty(), buildViewListener);
+        register(view.firstPageDividerProperty(), buildViewListener);
+        register(view.sameWidthPageButtonsProperty(), buildViewListener);
 
-        startPage.addListener(buildViewListener);
+        register(startPage, buildViewListener);
 
-        view.pageProperty().addListener(pageScrollListener);
+        register(view.pageProperty(), pageScrollListener);
 
         updateView();
 
-        neededBinding.subscribe(needed -> {
+        register(neededBinding.subscribe(needed -> {
             view.getProperties().remove("controls.needed");
             view.getProperties().put("controls.needed", needed);
-        });
-    }
-
-    @Override
-    public void dispose() {
-        PagingControls view = getSkinnable();
-        view.pageProperty().removeListener(buildViewListener);
-        view.pageCountProperty().removeListener(buildViewListener);
-        view.pageSizeProperty().removeListener(buildViewListener);
-        view.showPageSizeSelectorProperty().removeListener(buildViewListener);
-        view.maxPageIndicatorsCountProperty().removeListener(buildViewListener);
-        view.firstLastPageDisplayModeProperty().removeListener(buildViewListener);
-        view.alignmentProperty().removeListener(buildViewListener);
-        view.firstPageDividerProperty().removeListener(buildViewListener);
-        view.sameWidthPageButtonsProperty().removeListener(buildViewListener);
-        startPage.removeListener(buildViewListener);
-        view.pageProperty().removeListener(pageScrollListener);
-        super.dispose();
+        }));
     }
 
     private void createStaticElements() {

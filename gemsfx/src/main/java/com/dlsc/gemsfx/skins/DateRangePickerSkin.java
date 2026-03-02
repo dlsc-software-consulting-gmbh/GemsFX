@@ -50,33 +50,20 @@ public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangeP
             picker.requestFocus();
             picker.show();
         });
-        picker.addEventHandler(MouseEvent.MOUSE_ENTERED, mouseEnteredHandler);
-        picker.addEventHandler(MouseEvent.MOUSE_EXITED, mouseExitedHandler);
-        picker.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedHandler);
+        registerHandler(picker, MouseEvent.MOUSE_ENTERED, mouseEnteredHandler);
+        registerHandler(picker, MouseEvent.MOUSE_EXITED, mouseExitedHandler);
+        registerHandler(picker, MouseEvent.MOUSE_RELEASED, mouseReleasedHandler);
 
-        picker.valueProperty().addListener(updateLabelsListener);
-        picker.formatterProperty().addListener(updateLabelsListener);
-        picker.promptTextProperty().addListener(updateLabelsListener);
+        register(picker.valueProperty(), updateLabelsListener);
+        register(picker.formatterProperty(), updateLabelsListener);
+        register(picker.promptTextProperty(), updateLabelsListener);
 
-        picker.valueProperty().addListener(setValueListener);
+        register(picker.valueProperty(), setValueListener);
 
-        picker.smallProperty().addListener(smallListener);
+        register(picker.smallProperty(), smallListener);
 
         updateView();
         updateLabels();
-    }
-
-    @Override
-    public void dispose() {
-        picker.valueProperty().removeListener(updateLabelsListener);
-        picker.formatterProperty().removeListener(updateLabelsListener);
-        picker.promptTextProperty().removeListener(updateLabelsListener);
-        picker.valueProperty().removeListener(setValueListener);
-        picker.smallProperty().removeListener(smallListener);
-        picker.removeEventHandler(MouseEvent.MOUSE_ENTERED, mouseEnteredHandler);
-        picker.removeEventHandler(MouseEvent.MOUSE_EXITED, mouseExitedHandler);
-        picker.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedHandler);
-        super.dispose();
     }
 
     @Override

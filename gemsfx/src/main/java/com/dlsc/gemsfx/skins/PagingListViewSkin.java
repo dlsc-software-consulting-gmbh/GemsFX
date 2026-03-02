@@ -13,13 +13,12 @@ import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SkinBase;
 import javafx.scene.control.skin.ScrollPaneSkin;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
+public class PagingListViewSkin<T> extends GemsSkinBase<PagingListView<T>> {
 
     public static final String USING_SCROLL_PANE = "using-scroll-pane";
 
@@ -33,7 +32,7 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
 
     private final InvalidationListener updateStyleClassListener = it -> updateStyleClass();
     private final ChangeListener<Node> placeholderChangeListener = (obs, oldPlaceholder, newPlaceholder) -> bindPlaceholderVisibility(oldPlaceholder, newPlaceholder);
-    private final ListChangeListener<Object> itemsOnCurrentPageListener = it -> bindPlaceholderVisibility(null, getSkinnable().getPlaceholder());
+    private final ListChangeListener<T> itemsOnCurrentPageListener = it -> bindPlaceholderVisibility(null, getSkinnable().getPlaceholder());
     private final InvalidationListener updateViewListener = it -> updateView();
 
     public PagingListViewSkin(PagingListView<T> pagingListView) {
@@ -58,35 +57,23 @@ public class PagingListViewSkin<T> extends SkinBase<PagingListView<T>> {
 
         content.getStyleClass().add("content");
 
-        pagingListView.usingScrollPaneProperty().addListener(updateStyleClassListener);
+        register(pagingListView.usingScrollPaneProperty(), updateStyleClassListener);
 
-        pagingListView.placeholderProperty().addListener(placeholderChangeListener);
+        register(pagingListView.placeholderProperty(), placeholderChangeListener);
         bindPlaceholderVisibility(null, pagingListView.getPlaceholder());
 
         // when the underlying data list changes, then we have to recreate the binding for the placeholder
-        pagingListView.getItemsOnCurrentPage().addListener(itemsOnCurrentPageListener);
+        register(pagingListView.getItemsOnCurrentPage(), itemsOnCurrentPageListener);
 
-        pagingListView.usingScrollPaneProperty().addListener(updateViewListener);
-        pagingListView.placeholderProperty().addListener(updateViewListener);
-        pagingListView.pagingControlsLocationProperty().addListener(updateViewListener);
+        register(pagingListView.usingScrollPaneProperty(), updateViewListener);
+        register(pagingListView.placeholderProperty(), updateViewListener);
+        register(pagingListView.pagingControlsLocationProperty(), updateViewListener);
 
         stackPane.getStyleClass().add("stack-pane");
         getChildren().setAll(stackPane);
 
         updateStyleClass();
         updateView();
-    }
-
-    @Override
-    public void dispose() {
-        PagingListView<T> pagingListView = getSkinnable();
-        pagingListView.usingScrollPaneProperty().removeListener(updateStyleClassListener);
-        pagingListView.placeholderProperty().removeListener(placeholderChangeListener);
-        pagingListView.getItemsOnCurrentPage().removeListener(itemsOnCurrentPageListener);
-        pagingListView.usingScrollPaneProperty().removeListener(updateViewListener);
-        pagingListView.placeholderProperty().removeListener(updateViewListener);
-        pagingListView.pagingControlsLocationProperty().removeListener(updateViewListener);
-        super.dispose();
     }
 
     private void updateStyleClass() {

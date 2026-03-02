@@ -37,12 +37,10 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SkinBase;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -57,7 +55,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
+public class InfoCenterViewSkin extends GemsSkinBase<InfoCenterView> {
 
     private final VBox allGroupsContainer;
     private final VBox singleGroupContainer;
@@ -237,7 +235,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             singleGroupListView.setItems(view.getShowAllGroup().getNotifications());
         }
 
-        view.showAllGroupProperty().addListener(it -> {
+        register(view.showAllGroupProperty(), it -> {
             NotificationGroup showAllGroup = view.getShowAllGroup();
             if (showAllGroup != null) {
                 singleGroupListView.setItems(view.getShowAllGroup().getNotifications());
@@ -279,14 +277,14 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
 
         addPlaceholderIfNotNull(view.getPlaceholder(), emptyBinding);
 
-        view.placeholderProperty().addListener((obs, oldVal, newVal) -> {
+        register(view.placeholderProperty(), (obs, oldVal, newVal) -> {
             removePlaceholderIfNotNull(oldVal);
             addPlaceholderIfNotNull(newVal, emptyBinding);
         });
 
         InvalidationListener invalidationListener = (Observable it) -> updateView();
-        view.getUnmodifiablePinnedGroups().addListener(invalidationListener);
-        view.getUnmodifiableUnpinnedGroups().addListener(invalidationListener);
+        register(view.getUnmodifiablePinnedGroups(), invalidationListener);
+        register(view.getUnmodifiableUnpinnedGroups(), invalidationListener);
 
         updateView();
 
@@ -312,7 +310,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
             }
         };
 
-        TreeShowing.treeShowing(view).addListener((p, o, n) -> {
+        register(TreeShowing.treeShowing(view), (p, o, n) -> {
             if (n) {
                 timer.start();
             } else {
@@ -323,7 +321,7 @@ public class InfoCenterViewSkin extends SkinBase<InfoCenterView> {
         timer.start();
 
         updateVisibilities();
-        view.showAllGroupProperty().addListener(it -> updateVisibilities());
+        register(view.showAllGroupProperty(), it -> updateVisibilities());
     }
 
     private void addPlaceholderIfNotNull(Node placeholder, BooleanBinding emptyBing) {

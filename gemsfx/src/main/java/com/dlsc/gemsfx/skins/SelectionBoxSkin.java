@@ -27,7 +27,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -45,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
+public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
 
     private static final PseudoClass READ_ONLY_PSEUDO_CLASS = PseudoClass.getPseudoClass("readonly");
     private static final PseudoClass EMPTY_SELECTION_PSEUDO_CLASS = PseudoClass.getPseudoClass("empty");
@@ -162,32 +161,32 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
     }
 
     private void addListenerToControl() {
-        control.itemsProperty().addListener(itemsChangeListener);
+        register(control.itemsProperty(), itemsChangeListener);
 
-        control.itemConverterProperty().addListener(itemConverterChangeListener);
-        control.selectedItemsConverterProperty().addListener(itemConverterChangeListener);
-        control.promptTextProperty().addListener(itemConverterChangeListener);
+        register(control.itemConverterProperty(), itemConverterChangeListener);
+        register(control.selectedItemsConverterProperty(), itemConverterChangeListener);
+        register(control.promptTextProperty(), itemConverterChangeListener);
 
-        control.getSelectionModel().selectedItemProperty().addListener(selectItemChangedListener);
-        control.getSelectionModel().getSelectedItems().addListener(selectItemsChangeListener);
-        control.getSelectionModel().selectionModeProperty().addListener(selectionModeChangeListener);
+        register(control.getSelectionModel().selectedItemProperty(), selectItemChangedListener);
+        register(control.getSelectionModel().getSelectedItems(), selectItemsChangeListener);
+        register(control.getSelectionModel().selectionModeProperty(), selectionModeChangeListener);
 
-        control.selectionModelProperty().addListener(selectionModelChangeListener);
+        register(control.selectionModelProperty(), selectionModelChangeListener);
 
         // Handle readOnly property
-        control.readOnlyProperty().subscribe(isNowReadOnly -> {
+        register(control.readOnlyProperty().subscribe(isNowReadOnly -> {
             pseudoClassStateChanged(READ_ONLY_PSEUDO_CLASS, isNowReadOnly);
 
             arrowButton.setVisible(!isNowReadOnly);
             if (isNowReadOnly) {
                 popup.hide();
             }
-        });
+        }));
 
         // Add event handler to control to show the popup
-        control.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedHandler);
+        registerHandler(control, MouseEvent.MOUSE_CLICKED, mouseClickedHandler);
 
-        control.getProperties().addListener(propertiesChangeListener);
+        register(control.getProperties(), propertiesChangeListener);
     }
 
     public void showPopup() {
@@ -198,21 +197,6 @@ public class SelectionBoxSkin<T> extends SkinBase<SelectionBox<T>> {
 
     public void hidePopup() {
         popup.hide();
-    }
-
-    @Override
-    public void dispose() {
-        control.itemsProperty().removeListener(itemsChangeListener);
-        control.itemConverterProperty().removeListener(itemConverterChangeListener);
-        control.selectedItemsConverterProperty().removeListener(itemConverterChangeListener);
-        control.promptTextProperty().removeListener(itemConverterChangeListener);
-        control.getSelectionModel().selectedItemProperty().removeListener(selectItemChangedListener);
-        control.getSelectionModel().getSelectedItems().removeListener(selectItemsChangeListener);
-        control.getSelectionModel().selectionModeProperty().removeListener(selectionModeChangeListener);
-        control.selectionModelProperty().removeListener(selectionModelChangeListener);
-        control.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedHandler);
-        control.getProperties().removeListener(propertiesChangeListener);
-        super.dispose();
     }
 
     private void handleSelectionChange() {

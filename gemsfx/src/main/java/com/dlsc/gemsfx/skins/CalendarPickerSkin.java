@@ -38,7 +38,7 @@ public class CalendarPickerSkin extends ToggleVisibilityComboBoxSkin<CalendarPic
     public CalendarPickerSkin(CalendarPicker picker) {
         super(picker);
 
-        picker.valueProperty().addListener(valueChangeListener);
+        register(picker.valueProperty(), valueChangeListener);
 
         Region arrow = new Region();
         arrow.getStyleClass().add("arrow");
@@ -104,7 +104,6 @@ public class CalendarPickerSkin extends ToggleVisibilityComboBoxSkin<CalendarPic
 
     @Override
     public void dispose() {
-        getSkinnable().valueProperty().removeListener(valueChangeListener);
         if (view != null) {
             view.selectionModelProperty().removeListener(selectionModelChangeListener);
             bindSelectionModel(view.getSelectionModel(), null);

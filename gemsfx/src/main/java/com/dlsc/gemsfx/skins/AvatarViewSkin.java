@@ -8,7 +8,6 @@ import javafx.beans.binding.DoubleBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.SkinBase;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Border;
@@ -19,7 +18,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import org.apache.commons.lang3.StringUtils;
 
-public class AvatarViewSkin extends SkinBase<AvatarView> {
+public class AvatarViewSkin extends GemsSkinBase<AvatarView> {
 
     private final StackPane imageWrapper;
     private final StackPane textWrapper;
@@ -84,17 +83,15 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
         textWrapper = createWrapperStackPane(initialsText);
         textWrapper.getStyleClass().add("text-wrapper");
 
-        avatar.imageProperty().addListener(imageChangeListener);
-
-        avatar.imageProperty().addListener(imageChangeListener);
+        register(avatar.imageProperty(), imageChangeListener);
 
         Image image = avatar.getImage();
         if (image != null && image.isBackgroundLoading()) {
             image.progressProperty().addListener(progressChangeListener);
         }
 
-        avatar.imageProperty().addListener(updateViewListener);
-        avatar.initialsProperty().addListener(updateViewListener);
+        register(avatar.imageProperty(), updateViewListener);
+        register(avatar.initialsProperty(), updateViewListener);
 
         createClipBinding(iconWrapper);
         createClipBinding(textWrapper);
@@ -145,9 +142,6 @@ public class AvatarViewSkin extends SkinBase<AvatarView> {
         if (currentImage != null) {
             currentImage.progressProperty().removeListener(progressChangeListener);
         }
-        avatar.imageProperty().removeListener(imageChangeListener);
-        avatar.imageProperty().removeListener(updateViewListener);
-        avatar.initialsProperty().removeListener(updateViewListener);
         super.dispose();
     }
 

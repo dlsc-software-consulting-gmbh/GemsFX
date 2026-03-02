@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.BeforeAfterView;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.control.SkinBase;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -12,7 +11,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.Objects;
 
-public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
+public class BeforeAfterViewSkin extends GemsSkinBase<BeforeAfterView> {
 
     private final StackPane content = new StackPane();
     private final StackPane divider = new StackPane();
@@ -26,6 +25,7 @@ public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
 
     public BeforeAfterViewSkin(BeforeAfterView view) {
         super(view);
+
 
         content.getStyleClass().add("content");
 
@@ -62,25 +62,15 @@ public class BeforeAfterViewSkin extends SkinBase<BeforeAfterView> {
         clip.heightProperty().bind(view.heightProperty());
         content.setClip(clip);
 
-        view.beforeProperty().addListener(updateListener);
-        view.afterProperty().addListener(updateListener);
-        view.orientationProperty().addListener(updateListener);
+        register(view.beforeProperty(), updateListener);
+        register(view.afterProperty(), updateListener);
+        register(view.orientationProperty(), updateListener);
 
-        view.dividerPositionProperty().addListener(dividerPositionListener);
+        register(view.dividerPositionProperty(), dividerPositionListener);
 
         getChildren().addAll(content, divider, handle);
 
         updateView();
-    }
-
-    @Override
-    public void dispose() {
-        BeforeAfterView view = getSkinnable();
-        view.beforeProperty().removeListener(updateListener);
-        view.afterProperty().removeListener(updateListener);
-        view.orientationProperty().removeListener(updateListener);
-        view.dividerPositionProperty().removeListener(dividerPositionListener);
-        super.dispose();
     }
 
     @Override

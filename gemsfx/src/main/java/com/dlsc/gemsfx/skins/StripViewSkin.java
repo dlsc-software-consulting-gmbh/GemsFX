@@ -23,7 +23,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.SkinBase;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -39,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class StripViewSkin<T> extends SkinBase<StripView<T>> {
+public class StripViewSkin<T> extends GemsSkinBase<StripView<T>> {
 
     private static final String SCROLL_TO_KEY = "scroll.to";
 
@@ -65,7 +64,7 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
     private final WeakMapChangeListener<? super Object, ? super Object> weakMapChangeListener = new WeakMapChangeListener<>(mapChangeListener);
 
     private final DoubleProperty translateX = new SimpleDoubleProperty();
-    private final ListChangeListener<Object> itemsChangeListener = it -> buildContent();
+    private final ListChangeListener<T> itemsChangeListener = it -> buildContent();
     private final EventHandler<KeyEvent> keyPressHandler = this::handleKeyPress;
     private final EventHandler<ScrollEvent> scrollHandler = evt -> translateX.set(translateX.get() + evt.getDeltaY());
 
@@ -108,12 +107,12 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
         setupBindings();
         setupEventHandlers();
 
-        strip.itemsProperty().addListener(itemsChangeListener);
+        register(strip.itemsProperty(), itemsChangeListener);
         buildContent();
 
-        strip.addEventFilter(KeyEvent.KEY_PRESSED, keyPressHandler);
+        registerFilter(strip, KeyEvent.KEY_PRESSED, keyPressHandler);
 
-        getSkinnable().getProperties().addListener(weakMapChangeListener);
+        register(getSkinnable().getProperties(), weakMapChangeListener);
     }
 
     private void handleKeyPress(KeyEvent event) {
@@ -281,17 +280,7 @@ public class StripViewSkin<T> extends SkinBase<StripView<T>> {
         leftBtn.setOnMouseClicked(event -> scroll(true));
         rightBtn.setOnMouseClicked(event -> scroll(false));
 
-        getSkinnable().addEventFilter(ScrollEvent.SCROLL, scrollHandler);
-    }
-
-    @Override
-    public void dispose() {
-        StripView<T> strip = getSkinnable();
-        strip.itemsProperty().removeListener(itemsChangeListener);
-        strip.removeEventFilter(KeyEvent.KEY_PRESSED, keyPressHandler);
-        strip.removeEventFilter(ScrollEvent.SCROLL, scrollHandler);
-        strip.getProperties().removeListener(weakMapChangeListener);
-        super.dispose();
+        registerFilter(getSkinnable(), ScrollEvent.SCROLL, scrollHandler);
     }
 
     private void fixTranslate() {

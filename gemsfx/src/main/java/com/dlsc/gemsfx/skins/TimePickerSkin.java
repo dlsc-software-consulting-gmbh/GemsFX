@@ -105,36 +105,24 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
         millisecondField.focusedProperty().addListener(updateFocusListener);
         editButton.focusedProperty().addListener(updateFocusListener);
 
-        picker.hoursSeparatorProperty().addListener(buildViewListener);
-        picker.minutesSeparatorProperty().addListener(buildViewListener);
-        picker.secondsSeparatorProperty().addListener(buildViewListener);
+        register(picker.hoursSeparatorProperty(), buildViewListener);
+        register(picker.minutesSeparatorProperty(), buildViewListener);
+        register(picker.secondsSeparatorProperty(), buildViewListener);
         registerChangeListener(picker.buttonDisplayProperty(), it -> updateBox());
 
         buildView();
 
-        picker.timeProperty().addListener(updateFieldValuesListener);
+        register(picker.timeProperty(), updateFieldValuesListener);
         updateFieldValues();
 
-        picker.formatProperty().addListener(updateFormatListener);
+        register(picker.formatProperty(), updateFormatListener);
 
         updateEmptyPseudoClass();
         updateFormat();
 
-        picker.showingProperty().addListener(showingListener);
+        register(picker.showingProperty(), showingListener);
 
         getChildren().add(box);
-    }
-
-    @Override
-    public void dispose() {
-        TimePicker picker = getSkinnable();
-        picker.hoursSeparatorProperty().removeListener(buildViewListener);
-        picker.minutesSeparatorProperty().removeListener(buildViewListener);
-        picker.secondsSeparatorProperty().removeListener(buildViewListener);
-        picker.timeProperty().removeListener(updateFieldValuesListener);
-        picker.formatProperty().removeListener(updateFormatListener);
-        picker.showingProperty().removeListener(showingListener);
-        super.dispose();
     }
 
     @Override

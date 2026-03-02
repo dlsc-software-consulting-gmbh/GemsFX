@@ -11,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.input.KeyCode;
@@ -25,7 +24,7 @@ import org.controlsfx.control.textfield.CustomTextField;
 
 import java.util.Objects;
 
-public class EmailFieldSkin extends SkinBase<EmailField> {
+public class EmailFieldSkin extends GemsSkinBase<EmailField> {
 
     private final CustomTextField customTextField;
     private final DomainPopup domainPopup;
@@ -59,7 +58,7 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
         invalidToolTip.textProperty().bind(field.invalidTextProperty());
         updateTooltipVisibility(field.getInvalidText(), rightIconWrapper, invalidToolTip);
         invalidTextListener = (ob, ov, newValue) -> updateTooltipVisibility(newValue, rightIconWrapper, invalidToolTip);
-        field.invalidTextProperty().addListener(invalidTextListener);
+        register(field.invalidTextProperty(), invalidTextListener);
 
         customTextField.promptTextProperty().bind(field.promptTextProperty());
         customTextField.setLeft(leftIconWrapper);
@@ -67,20 +66,8 @@ public class EmailFieldSkin extends SkinBase<EmailField> {
 
         getChildren().setAll(customTextField);
 
-        textSubscription = customTextField.textProperty().subscribe(this::handleSuggestionPopupVisibility);
-        focusedSubscription = customTextField.focusedProperty().subscribe(this::handleSuggestionPopupVisibility);
-    }
-
-    @Override
-    public void dispose() {
-        getSkinnable().invalidTextProperty().removeListener(invalidTextListener);
-        if (textSubscription != null) {
-            textSubscription.unsubscribe();
-        }
-        if (focusedSubscription != null) {
-            focusedSubscription.unsubscribe();
-        }
-        super.dispose();
+        textSubscription = register(customTextField.textProperty().subscribe(this::handleSuggestionPopupVisibility));
+        focusedSubscription = register(customTextField.focusedProperty().subscribe(this::handleSuggestionPopupVisibility));
     }
 
     private void updateTooltipVisibility(String invalidText, StackPane node, Tooltip invalidToolTip) {
