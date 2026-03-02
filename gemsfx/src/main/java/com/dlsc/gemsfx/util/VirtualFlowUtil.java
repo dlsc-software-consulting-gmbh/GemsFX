@@ -10,6 +10,8 @@ import javafx.scene.control.skin.VirtualFlow;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -17,6 +19,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * vertical scrolling in sync.
  */
 public class VirtualFlowUtil {
+
+    private static final Logger LOG = Logger.getLogger(VirtualFlowUtil.class.getName());
 
     /**
      * Bind the virtual flows found somewhere inside the two given controls to each other
@@ -121,7 +125,7 @@ public class VirtualFlowUtil {
             flow.layout();
             flow.scrollPixels(pos.offset);
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOG.log(Level.WARNING, "Failed to restore virtual flow position", e);
         }
     }
 

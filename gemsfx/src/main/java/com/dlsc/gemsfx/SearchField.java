@@ -57,6 +57,8 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The search field is a standard text field with auto suggest capabilities
@@ -98,6 +100,7 @@ import java.util.function.Consumer;
  */
 public class SearchField<T> extends Control {
 
+    private static final Logger LOG = Logger.getLogger(SearchField.class.getName());
     private static final String DEFAULT_STYLE_CLASS = "search-field";
 
     private static final boolean DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER = true;
@@ -700,7 +703,7 @@ public class SearchField<T> extends Control {
                     }
                 });
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOG.log(Level.WARNING, "failed to execute search suggestion", ex);
             }
         } else {
             selectedItem.set(null);

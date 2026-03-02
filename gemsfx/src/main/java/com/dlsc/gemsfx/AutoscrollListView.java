@@ -10,6 +10,9 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * A specialization of {@link ListView} that will automatically start to scroll
  * up or down during drag and drop operations whenever the mouse cursor reaches
@@ -19,6 +22,8 @@ import javafx.scene.layout.Region;
  * @param <T> the item type
  */
 public class AutoscrollListView<T> extends ListView<T> {
+
+    private static final Logger LOG = Logger.getLogger(AutoscrollListView.class.getName());
 
     final double proximity = 20;
 
@@ -129,7 +134,8 @@ public class AutoscrollListView<T> extends ListView<T> {
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e1) {
-                e1.printStackTrace();
+                Thread.currentThread().interrupt();
+                LOG.log(Level.WARNING, "Autoscroll thread interrupted during initial delay", e1);
             }
 
             while (running) {
@@ -139,8 +145,9 @@ public class AutoscrollListView<T> extends ListView<T> {
                 try {
                     sleep(15);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                        Thread.currentThread().interrupt();
+                        LOG.log(Level.WARNING, "Autoscroll thread interrupted", e);
+                    }
             }
         }
 
