@@ -290,7 +290,7 @@ public class DateRangeView extends Control {
         this.showPresets.set(showPresets);
     }
 
-    private final ObjectProperty<Runnable> onClose = new SimpleObjectProperty<>(this, "onClose", () -> System.out.println("closing"));
+    private final ObjectProperty<Runnable> onClose = new SimpleObjectProperty<>(this, "onClose", () -> {});
 
     public final Runnable getOnClose() {
         return onClose.get();
