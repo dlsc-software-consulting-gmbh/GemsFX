@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.ScreensView;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
@@ -37,6 +38,10 @@ public class ScreensViewSkin extends GemsSkinBase<ScreensView> {
 
     private final Group scalingGroup = new Group();
 
+    // Strong reference required so the weak wrapper below is not prematurely GC'd
+    private final InvalidationListener updateViewListener = (Observable it) -> updateView();
+    private final WeakInvalidationListener weakUpdateViewListener = new WeakInvalidationListener(updateViewListener);
+
     public ScreensViewSkin(ScreensView view) {
         super(view);
 
@@ -60,14 +65,12 @@ public class ScreensViewSkin extends GemsSkinBase<ScreensView> {
         }, view.showReflectionProperty(), view.showShadowProperty()));
         getChildren().add(group);
 
-        InvalidationListener updateViewListener = (Observable it) -> updateView();
-
         register(view.showWallpaperProperty(), updateViewListener);
         register(view.showWindowsProperty(), updateViewListener);
         register(view.getShapes(), updateViewListener);
 
-        register(Screen.getScreens(), updateViewListener);
-        register(Window.getWindows(), updateViewListener);
+        register(Screen.getScreens(), weakUpdateViewListener);
+        register(Window.getWindows(), weakUpdateViewListener);
 
         updateView();
     }
