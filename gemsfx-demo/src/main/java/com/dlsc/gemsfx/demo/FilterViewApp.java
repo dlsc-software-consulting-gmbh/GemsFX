@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.FilterView;
 import com.dlsc.gemsfx.FilterView.Filter;
 import com.dlsc.gemsfx.FilterView.FilterGroup;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.collections.transformation.SortedList;
@@ -183,7 +184,8 @@ public class FilterViewApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
-        stage.centerOnScreen();
+        StageManager.install(stage, "filter.view.app");
+
         stage.show();
 
         CSSFX.start();
@@ -234,6 +236,27 @@ public class FilterViewApp extends GemApplication {
         public void setRole(String role) {
             this.role = role;
         }
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### FilterView
+                
+                A view for presenting a set of predefined filter groups, each one with a list of filters.
+                The user can select one or more filters from each group. Elements found in the resulting
+                filtered list have to match ALL filters. The selected filters will be shown as "chips"
+                (see @link `ChipView`).
+                
+                Items can be added via the `getItems()` list. Table or list views have to use
+                the `getFilteredItems()` list. This filtered list can also be wrapped via a
+                `SortedList` and then added to a table or list view.
+                
+                An input field for filtering based on text input will appear as soon as a text filter provider
+                has been defined. See `setTextFilterProvider(Callback)`.
+                
+                Applications with additional filtering needs can utilize the `additionalFilterPredicateProperty()`.
+                """;
     }
 
     public static void main(String[] args) {

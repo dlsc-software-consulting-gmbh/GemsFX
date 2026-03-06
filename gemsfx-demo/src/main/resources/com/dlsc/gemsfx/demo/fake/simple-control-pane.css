@@ -1,5 +1,5 @@
 .simple-control-pane > .container {
-    -fx-padding: 5px;
+    -fx-padding: 5px 10px;
     -fx-background-color: white;
 }
 

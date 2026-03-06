@@ -45,6 +45,9 @@ public class SimpleControlPane extends Control {
 
     @Override
     public String getUserAgentStylesheet() {
+        if (Boolean.getBoolean("atlantafx")) {
+            return Objects.requireNonNull(SimpleControlPane.class.getResource("simple-control-pane-atlantafx.css")).toExternalForm();
+        }
         return Objects.requireNonNull(SimpleControlPane.class.getResource("simple-control-pane.css")).toExternalForm();
     }
 

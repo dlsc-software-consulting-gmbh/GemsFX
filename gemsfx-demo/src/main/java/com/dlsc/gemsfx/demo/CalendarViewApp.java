@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.SelectionModel.SelectionMode;
 import com.dlsc.gemsfx.CalendarView.YearDisplayMode;
 import com.dlsc.gemsfx.CalendarView.MonthDisplayMode;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -112,7 +113,8 @@ public class CalendarViewApp extends GemApplication {
         stage.setTitle("CalendarView");
         stage.setScene(scene);
         stage.sizeToScene();
-        stage.centerOnScreen();
+        StageManager.install(stage, "calendar.view.app");
+
         stage.show();
     }
 
@@ -134,6 +136,33 @@ public class CalendarViewApp extends GemApplication {
 
         Label selectionModeLabel = new Label(title);
         return new VBox(2, selectionModeLabel, comboBox);
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### CalendarView
+                
+                Displays a given month of a given year. The view can be configured in many
+                ways:
+                
+                - Show / hide the name of the month
+                - Show / hide the year
+                - Show / hide arrow buttons for changing the month
+                - Show / hide arrow buttons for changing the year
+                - Show / hide today
+                - Show / hide a button for going to today
+                - Show / hide usage colors
+                
+                Additionally the application can choose from two different behaviours when
+                the user clicks on a date:
+                
+                - Perform a selection / select the date
+                - Show details of the date (by default shows a popover with all entries on
+                that date)
+                
+                The image below shows the visual appearance of this control:
+                """;
     }
 
     public static void main(String[] args) {

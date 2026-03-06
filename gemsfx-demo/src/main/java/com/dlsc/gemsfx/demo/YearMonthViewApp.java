@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.YearMonthView;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -28,8 +29,19 @@ public class YearMonthViewApp extends GemApplication {
         stage.setTitle("YearMonthView");
         stage.setScene(scene);
         stage.sizeToScene();
-        stage.centerOnScreen();
+        StageManager.install(stage, "year.month.view.app");
+
         stage.show();
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### YearMonthView
+
+                A control that displays a grid of months for a given year, allowing the user
+                to select a specific year/month combination.
+                """;
     }
 
     public static void main(String[] args) {

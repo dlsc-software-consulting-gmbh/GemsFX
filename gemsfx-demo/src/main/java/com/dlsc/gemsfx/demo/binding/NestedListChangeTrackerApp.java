@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.Spacer;
 import com.dlsc.gemsfx.binding.NestedListChangeTracker;
 import com.dlsc.gemsfx.binding.TransformedNestedListBinding;
 import com.dlsc.gemsfx.demo.GemApplication;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -70,6 +71,8 @@ public class NestedListChangeTrackerApp extends GemApplication {
         primaryStage.setTitle("Student Score History");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
+        StageManager.install(primaryStage, "to");
+
         primaryStage.show();
     }
 
@@ -148,6 +151,16 @@ public class NestedListChangeTrackerApp extends GemApplication {
 
     private int randomScore() {
         return random.nextInt(51) + 50;
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### NestedListChangeTracker
+                
+                This class extends AbstractChangeTracker to specifically handle ObservableList of ObservableList.
+                It tracks changes to both the outer list and inner lists and notifies the consumer upon any modifications.
+                """;
     }
 
     public static void main(String[] args) {

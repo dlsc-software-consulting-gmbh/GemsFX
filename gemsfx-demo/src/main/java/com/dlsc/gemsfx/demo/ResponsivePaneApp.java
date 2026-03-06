@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ResponsivePane;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -25,6 +26,7 @@ public class ResponsivePaneApp extends GemApplication {
 
     @Override
     public void start(Stage stage) {
+        super.start(stage);
         Label widthLabel = new Label();
         widthLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         widthLabel.setStyle("-fx-background-color: pink; -fx-alignment: center; -fx-padding: 5px 10px;");
@@ -56,7 +58,8 @@ public class ResponsivePaneApp extends GemApplication {
         Scene scene = new Scene(borderPane);
         stage.setScene(scene);
         stage.sizeToScene();
-        stage.centerOnScreen();
+        StageManager.install(stage, "responsive.pane.app");
+
         stage.show();
     }
 
@@ -104,4 +107,13 @@ public class ResponsivePaneApp extends GemApplication {
                 node.prefWidthProperty(), node.prefHeightProperty()));
         return textField;
     }
+    @Override
+    public String getDescription() {
+        return """
+                ### ResponsivePane
+                
+                This property, when value is true, forces the display of the large sidebar even when the small sidebar is visible.
+                """;
+    }
+
 }

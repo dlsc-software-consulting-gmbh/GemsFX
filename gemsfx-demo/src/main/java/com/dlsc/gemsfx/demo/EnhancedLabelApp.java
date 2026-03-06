@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.EnhancedLabel;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -28,8 +29,19 @@ public class EnhancedLabelApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
-        stage.centerOnScreen();
+        StageManager.install(stage, "enhanced.label.app");
+
         stage.show();
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### EnhancedLabel
+                
+                An enhanced label that allows for selecting the (whole) label and copying to the clipboard
+                either via keyboard shortcut or via context menu.
+                """;
     }
 
     public static void main(String[] args) {

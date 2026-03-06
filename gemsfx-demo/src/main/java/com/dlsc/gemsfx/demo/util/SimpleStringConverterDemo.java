@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo.util;
 import com.dlsc.gemsfx.demo.GemApplication;
 import com.dlsc.gemsfx.util.EnumUtil;
 import com.dlsc.gemsfx.util.SimpleStringConverter;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -104,6 +105,8 @@ public class SimpleStringConverterDemo extends GemApplication {
         // Configure and show the primary stage
         primaryStage.setTitle("SimpleStringConverter Demo");
         primaryStage.setScene(scene);
+        StageManager.install(primaryStage, "demonstrates");
+
         primaryStage.show();
     }
 

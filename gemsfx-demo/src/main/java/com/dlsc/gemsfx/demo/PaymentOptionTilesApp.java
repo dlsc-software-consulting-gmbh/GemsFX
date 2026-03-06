@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.PaymentOptionView;
 import com.dlsc.gemsfx.PaymentOptionView.Option;
 import com.dlsc.gemsfx.PaymentOptionView.Theme;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -62,11 +63,24 @@ public class PaymentOptionTilesApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
-        stage.centerOnScreen();
+        StageManager.install(stage, "payment.option.tiles.app");
+
         stage.show();
     }
 
     private final ObjectProperty<Theme> theme = new SimpleObjectProperty<>(Theme.DARK);
+
+        @Override
+    public String getDescription() {
+        return """
+                ### PaymentOptionView
+                
+                A control for displaying different types of payment options, e.g. various
+                credit cards (MasterCard, American Express, Visa) but also new online options
+                such as PayPal or ApplePay. The default width is initialized with 100 pixels,
+                however the images are much bigger than that (500x300).
+                """;
+    }
 
     public static void main(String[] args) {
         launch();

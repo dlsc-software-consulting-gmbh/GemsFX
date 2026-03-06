@@ -1,5 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
+import com.dlsc.gemsfx.util.StageManager;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -11,6 +13,16 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class TableViewExample extends GemApplication {
+
+        @Override
+    public String getDescription() {
+        return """
+                ### AdvancedTableView
+                
+                A custom table view with additional features for the standard table view, e.g. the
+                ability to optimize the column width based on their content.
+                """;
+    }
 
     public static void main(String[] args) {
         launch(args);
@@ -50,6 +62,9 @@ public class TableViewExample extends GemApplication {
         Scene scene = new Scene(vbox);
 
         primaryStage.setScene(scene);
+
+        StageManager.install(primaryStage, "table.view.example");
+
 
         primaryStage.show();
     }

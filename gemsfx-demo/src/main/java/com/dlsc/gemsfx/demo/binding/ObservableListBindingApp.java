@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo.binding;
 
 import com.dlsc.gemsfx.binding.ObservableValuesListBinding;
 import com.dlsc.gemsfx.demo.GemApplication;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
@@ -62,6 +63,8 @@ public class ObservableListBindingApp extends GemApplication {
         primaryStage.setTitle("Observable Values List View Demo");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
+        StageManager.install(primaryStage, "to");
+
         primaryStage.show();
     }
 
@@ -98,6 +101,18 @@ public class ObservableListBindingApp extends GemApplication {
             }
         });
         return new HBox(10, addButton, updateButton, removeButton);
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### ObservableValuesListBinding
+                
+                This class binds to an ObservableList of ObservableValue objects and updates its value based on
+                the current values of these ObservableValues. It reevaluates its value whenever any of the
+                ObservableValues change. The computed value is determined by applying a transformation function
+                to the list of current values.
+                """;
     }
 
     public static void main(String[] args) {

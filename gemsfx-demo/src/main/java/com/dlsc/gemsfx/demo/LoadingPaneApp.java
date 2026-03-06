@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import atlantafx.base.controls.RingProgressIndicator;
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.LoadingPane.Status;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -92,8 +93,19 @@ public class LoadingPaneApp extends GemApplication {
         stage.setTitle("Loading Pane");
         stage.setScene(scene);
         stage.sizeToScene();
-        stage.centerOnScreen();
+        StageManager.install(stage, "loading.pane.app");
+
         stage.show();
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### LoadingPane
+                
+                Convenience method to change the status of the pane to `Status#ERROR`. There will be no error message
+                shown. This method is thread-safe.
+                """;
     }
 
     public static void main(String[] args) {

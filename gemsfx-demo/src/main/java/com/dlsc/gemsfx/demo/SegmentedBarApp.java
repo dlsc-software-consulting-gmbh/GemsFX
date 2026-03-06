@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.SegmentedBar;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -45,6 +46,7 @@ public class SegmentedBarApp extends GemApplication {
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
         hbox.setAlignment(Pos.CENTER);
         vbox.setAlignment(Pos.CENTER);
 
@@ -116,7 +118,8 @@ public class SegmentedBarApp extends GemApplication {
         primaryStage.setTitle("Segmented Bar Demo");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        primaryStage.centerOnScreen();
+        StageManager.install(primaryStage, "segmented.bar.app");
+
         primaryStage.show();
 
         orientationComboBox.valueProperty().addListener(it -> primaryStage.sizeToScene());
@@ -297,6 +300,17 @@ public class SegmentedBarApp extends GemApplication {
         public IssueStatus getStatus() {
             return status;
         }
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### SegmentedBar
+                
+                The layout method has been overridden to ensure that the label used for displaying the
+                text of a segment will be made invisible when there is not enough space to show the entire
+                text.
+                """;
     }
 
     public static void main(String[] args) {

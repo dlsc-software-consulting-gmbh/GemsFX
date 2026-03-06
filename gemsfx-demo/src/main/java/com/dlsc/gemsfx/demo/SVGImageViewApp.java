@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.SVGImageView;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.Node;
@@ -48,6 +49,8 @@ public class SVGImageViewApp extends GemApplication {
         scene.getStylesheets().add(Objects.requireNonNull(SVGImageViewApp.class.getResource("svg-image-view-app.css")).toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.setTitle("SVGImageView Demo");
+        StageManager.install(primaryStage, "s.v.g.image.view.app");
+
         primaryStage.show();
     }
 
@@ -91,6 +94,21 @@ public class SVGImageViewApp extends GemApplication {
         Spinner<Double> spinner = new Spinner<>(50, 300, 100, 50);
         imageView.bind(spinner.valueProperty());
         return spinner;
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### SVGImageView
+                
+                A control which can display SVG images.
+                
+                SVGImageView can display svg icons in high definition, and they won't become blurry even when zoomed in.
+                
+                Note for SvgImageView:
+                Currently, due to the limitation that weisj can only render BufferedImage from SVG,
+                SvgImageView does not support usage in native packaging scenarios.
+                """;
     }
 
     public static void main(String[] args) {

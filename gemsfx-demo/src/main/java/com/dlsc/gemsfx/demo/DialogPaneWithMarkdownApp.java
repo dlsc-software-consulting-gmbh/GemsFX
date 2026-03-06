@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.DialogPane.Dialog;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -165,7 +166,8 @@ public class DialogPaneWithMarkdownApp extends GemApplication {
         primaryStage.setScene(scene);
         primaryStage.setWidth(1500);
         primaryStage.setHeight(900);
-        primaryStage.centerOnScreen();
+        StageManager.install(primaryStage, "dialog.pane.with.markdown.app");
+
         primaryStage.show();
 
         CSSFX.start();
@@ -239,6 +241,17 @@ public class DialogPaneWithMarkdownApp extends GemApplication {
         public String getAddress() {
             return address;
         }
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### DialogPane
+                
+                The default resize handler is used to persist the dialog's width and height after the
+                user performed a resize operation on the dialog. Both values are stored via the
+                java.util.prefs.Preferences API.
+                """;
     }
 
     public static void main(String[] args) {

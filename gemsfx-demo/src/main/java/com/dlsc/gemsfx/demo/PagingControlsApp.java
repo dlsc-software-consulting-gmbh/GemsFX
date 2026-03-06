@@ -123,6 +123,15 @@ public class PagingControlsApp extends GemApplication {
         return vBox;
     }
 
+        @Override
+    public String getDescription() {
+        return """
+                ### PagingControls
+                
+                A control for navigating paged information, for example, a paged database table view.
+                """;
+    }
+
     public static void main(String[] args) {
         launch(args);
     }

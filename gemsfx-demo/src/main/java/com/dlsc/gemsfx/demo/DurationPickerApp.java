@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.DurationPicker;
 import com.dlsc.gemsfx.DurationPicker.LabelType;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -219,7 +220,7 @@ public class DurationPickerApp extends GemApplication {
         HBox box3 = new HBox(20, showPopupButton, hidePopupButton, zeroButton, nullButton);
 
         if (Boolean.getBoolean("atlantafx")) {
-            box1.setStyle("-fx-padding: 20px; -fx-background-color: -color-bg-default; -fx-background-radius: 2px; -fx-border-color: -color-border-default; -fx-border-radius: 2px;");
+            box1.setStyle("-fx-background-color: -color-neutral-muted; -fx-border-color: -color-border-default; -fx-padding: 20px; -fx-background-radius: 2px; -fx-border-radius: 2px;");
         } else {
             box1.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-background-radius: 2px; -fx-border-color: gray; -fx-border-radius: 2px;");
         }
@@ -250,10 +251,9 @@ public class DurationPickerApp extends GemApplication {
         primaryStage.setTitle("DurationPicker");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        primaryStage.centerOnScreen();
-        primaryStage.show();
+        StageManager.install(primaryStage, "duration.picker.app");
 
-        ScenicView.show(scene);
+        primaryStage.show();
     }
 
     private String humanReadableFormat(Duration duration) {
@@ -261,6 +261,17 @@ public class DurationPickerApp extends GemApplication {
             return duration.toDays() + " days, " + duration.toHoursPart() + " hours, " + duration.toMinutesPart() + " minutes, " + duration.toSecondsPart() + " seconds, " + duration.toMillisPart() + " millis";
         }
         return "null";
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### DurationPicker
+
+                A control for selecting a duration value. The picker displays individual fields
+                for days, hours, minutes, seconds, and milliseconds, allowing the user to
+                set each component of the duration independently.
+                """;
     }
 
     public static void main(String[] args) {

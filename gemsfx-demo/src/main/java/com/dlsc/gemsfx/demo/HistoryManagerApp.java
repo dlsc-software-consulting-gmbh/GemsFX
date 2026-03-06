@@ -6,6 +6,7 @@ import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.InMemoryHistoryManager;
 import com.dlsc.gemsfx.util.PreferencesHistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -45,6 +46,8 @@ public class HistoryManagerApp extends GemApplication {
 
         primaryStage.setScene(new Scene(tabPane, 800, 600));
         primaryStage.setTitle("History Manager Demo");
+        StageManager.install(primaryStage, "history.manager.app");
+
         primaryStage.show();
     }
 
@@ -226,6 +229,16 @@ public class HistoryManagerApp extends GemApplication {
         public int hashCode() {
             return Objects.hash(name, score);
         }
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### HistoryManager
+                
+                The HistoryManager class defines the standard operations to manage history storage
+                for any type of items, allowing for implementation of various data storage mechanisms.
+                """;
     }
 
     public static void main(String[] args) {

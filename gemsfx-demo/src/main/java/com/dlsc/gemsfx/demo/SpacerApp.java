@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.Spacer;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
@@ -12,6 +13,7 @@ import javafx.stage.Stage;
 public class SpacerApp extends GemApplication {
     @Override
     public void start(Stage stage) {
+        super.start(stage);
         VBox root = new VBox(10);
         root.setStyle("-fx-padding: 10px;-fx-alignment: top_center;");
 
@@ -41,7 +43,31 @@ public class SpacerApp extends GemApplication {
 
         stage.setScene(new Scene(root, 380, 380));
         stage.setTitle("Spacer Demo");
+        StageManager.install(stage, "spacer.app");
+
         stage.show();
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### Spacer
+                
+                The Spacer class extends the Region class and provides functionality
+                to create flexible spaces in layouts such as HBox and VBox. It is primarily
+                used to push adjacent nodes apart or together by filling up available space. 
+                
+                The Spacer can be toggled between active and inactive states. When active,
+                it tries to grow as much as possible within its parent container. When
+                inactive, it collapses and doesn't take up any space. 
+                
+                The growth direction of the Spacer (horizontal or vertical) is determined
+                based on its parent container. For instance, when placed inside an HBox, the
+                Spacer will grow horizontally. Conversely, inside a VBox, it will grow vertically. 
+                
+                The active state of the Spacer can also be controlled through CSS with the
+                "-fx-active" property.
+                """;
     }
 
     public static void main(String[] args) {

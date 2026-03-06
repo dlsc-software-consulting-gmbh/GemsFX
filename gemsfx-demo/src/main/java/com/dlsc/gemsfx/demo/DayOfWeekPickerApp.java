@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DayOfWeekPicker;
 import com.dlsc.gemsfx.demo.fake.SimpleControlPane;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -25,13 +26,19 @@ public class DayOfWeekPickerApp extends GemApplication {
 
         dayOfWeekPicker.prefWidthProperty().bind(dayOfWeekPicker.getSelectionModel().selectionModeProperty().map(sm -> sm == SelectionMode.SINGLE ? 135 : 160));
         StackPane wrapper = new StackPane(dayOfWeekPicker);
-        wrapper.setStyle("-fx-padding: 30px; -fx-background-color: white;");
+        if (Boolean.getBoolean("atlantafx")) {
+            wrapper.setStyle("-fx-padding: 30px; -fx-background-color: -color-neutral-subtle;");
+        } else {
+            wrapper.setStyle("-fx-padding: 30px; -fx-background-color: white;");
+        }
 
         SplitPane splitPane = new SplitPane(wrapper,getControlPanel());
         splitPane.setDividerPositions(0.68);
 
         primaryStage.setScene(new Scene(splitPane, 800, 600));
-        primaryStage.setTitle("Hello DayOfWeekPicker");
+        primaryStage.setTitle("DayOfWeekPicker");
+        StageManager.install(primaryStage, "day.of.week.picker.app");
+
         primaryStage.show();
     }
 
@@ -64,4 +71,17 @@ public class DayOfWeekPickerApp extends GemApplication {
                 new SimpleControlPane.ControlItem("Test Select", selectionButtons)
         );
     }
+        @Override
+    public String getDescription() {
+        return """
+                ### DayOfWeekPicker
+                
+                A custom control that allows users to select days of the week.
+                It provides support for two `SelectionMode`: single and multiple .
+                
+                  - `SINGLE` mode allows selection of only one day at a time.
+                  - `MULTIPLE` mode allows selection of multiple days.
+                """;
+    }
+
 }

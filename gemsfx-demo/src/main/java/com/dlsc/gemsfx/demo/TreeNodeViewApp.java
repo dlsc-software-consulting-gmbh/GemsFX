@@ -11,6 +11,7 @@ import com.dlsc.gemsfx.treeview.link.QuadCurveLink;
 import com.dlsc.gemsfx.treeview.link.SimpleCatmullRomLink;
 import com.dlsc.gemsfx.treeview.link.SineWaveDecayLink;
 import com.dlsc.gemsfx.treeview.link.StraightLineLink;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.HPos;
@@ -155,6 +156,8 @@ public class TreeNodeViewApp extends GemApplication {
         Scene scene = new Scene(parent, 1280, 800);
         scene.getStylesheets().add(Objects.requireNonNull(TreeNodeViewApp.class.getResource("tree-node-view-app.css")).toExternalForm());
         primaryStage.setScene(scene);
+        StageManager.install(primaryStage, "tree.node.view.app");
+
         primaryStage.show();
         CSSFX.start();
 
@@ -295,6 +298,19 @@ public class TreeNodeViewApp extends GemApplication {
         node12121.getChildren().add(node121211);
 
         return root;
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### TreeNodeView
+                
+                A visual control for displaying trees.
+                
+                Built on the `TreeNode` class, this control visualizes hierarchical structures, allowing nodes to have children.
+                
+                Customizable in layout, alignment, and style, it's ideal for representing data like file systems or organizational charts.
+                """;
     }
 
     public static void main(String[] args) {

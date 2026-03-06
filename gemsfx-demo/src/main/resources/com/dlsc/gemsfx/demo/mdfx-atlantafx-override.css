@@ -1,0 +1,21 @@
+/*
+ * Override MDFX's hardcoded light-theme color variables with AtlantaFX
+ * look-up values.  This file is added to the MarkdownView's node-level
+ * stylesheet list (markdownView.getStylesheets()) when an AtlantaFX theme
+ * is active, so it appears after mdfx-default.css in source order and wins
+ * at the same specificity level (* = 0,0,0).
+ */
+* {
+    -mdfx-font-color: -color-fg-default;
+    -mdfx-link-color: -color-accent-fg;
+    -mdfx-border-color-1: -color-border-default;
+    -mdfx-bg-color-1: -color-neutral-muted;
+    -mdfx-bg-color-2: -color-neutral-subtle;
+    -mdfx-bg-color-3: -color-bg-subtle;
+    -mdfx-bq-color-border: -color-accent-emphasis;
+    -mdfx-bq-color-background: -color-accent-subtle;
+}
+
+.description-markdown-view .markdown-heading-3 {
+    -fx-padding: 5px 0px;
+}

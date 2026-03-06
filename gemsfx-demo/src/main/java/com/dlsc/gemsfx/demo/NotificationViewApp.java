@@ -5,6 +5,7 @@ import com.dlsc.gemsfx.infocenter.Notification;
 import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import com.dlsc.gemsfx.infocenter.NotificationView;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -66,11 +67,22 @@ public class NotificationViewApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(800);
-        stage.centerOnScreen();
         stage.setTitle("Notification View Demo");
+        StageManager.install(stage, "notification.view.app");
+
         stage.show();
 
         ScenicView.show(scene);
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### NotificationView
+                
+                Updates the date and time label with a human-readable text
+                that is relative to the current time, e.g. "now", "yesterday".
+                """;
     }
 
     public static void main(String[] args) {

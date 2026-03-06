@@ -2,6 +2,8 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.CalendarPicker;
 import com.dlsc.gemsfx.util.SessionManager;
+import com.dlsc.gemsfx.util.StageManager;
+import com.dlsc.gemsfx.demo.GemApplication;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -22,7 +24,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.prefs.Preferences;
 
-public class SessionManagerApp extends Application {
+public class SessionManagerApp extends GemApplication {
 
     // Properties for session state
     private final StringProperty userName = new SimpleStringProperty();
@@ -39,6 +41,7 @@ public class SessionManagerApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        super.start(primaryStage);
         // Set up session manager
         SessionManager sessionManager = new SessionManager(Preferences.userNodeForPackage(SessionManagerApp.class));
         sessionManager.register("session.manager.app.user.name", userName);
@@ -104,11 +107,22 @@ public class SessionManagerApp extends Application {
         Scene scene = new Scene(root, 300, 420);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Session State Demo");
+        StageManager.install(primaryStage, "session.manager.app");
+
         primaryStage.show();
     }
 
     private void applyDarkMode(boolean enabled) {
         root.setStyle((enabled ? DARK_BG : LIGHT_BG) + BASIC_STYLE);
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### SessionManager
+                
+                Unregisters all listeners created by SessionManager.
+                """;
     }
 
     public static void main(String[] args) {

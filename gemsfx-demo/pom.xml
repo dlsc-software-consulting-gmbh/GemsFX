@@ -31,6 +31,7 @@
 
     <properties>
         <main.class>com.dlsc.gemsfx.demo.TimePickerApp</main.class>
+        <snapshot.filter></snapshot.filter>
     </properties>
 
     <build>
@@ -50,6 +51,7 @@
                         <configuration>
                             <options>
                                 <option>--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
+                                <option>-Dsnapshot.filter=${snapshot.filter}</option>
                             </options>
                         </configuration>
                     </execution>

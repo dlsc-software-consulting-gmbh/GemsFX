@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.incubator.GemScrollPane;
+import com.dlsc.gemsfx.util.StageManager;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -60,8 +61,18 @@ public class ScrollPaneApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
-        stage.centerOnScreen();
+        StageManager.install(stage, "scroll.pane.app");
+
         stage.show();
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### GemScrollPane
+
+An enhanced scroll pane that supports smooth animated scrolling.
+                """;
     }
 
     public static void main(String[] args) {

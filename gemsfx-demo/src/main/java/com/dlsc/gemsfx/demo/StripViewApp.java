@@ -5,6 +5,7 @@ import com.dlsc.gemsfx.StripView.StripCell;
 import com.dlsc.gemsfx.demo.fake.WeatherCondition;
 import com.dlsc.gemsfx.demo.fake.WeatherData;
 import com.dlsc.gemsfx.demo.fake.WeatherSummaryPane;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -142,7 +143,8 @@ public class StripViewApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1200);
         stage.setHeight(500);
-        stage.centerOnScreen();
+        StageManager.install(stage, "strip.view.app");
+
         stage.show();
 
 //        ScenicView.show(scene);
@@ -157,6 +159,19 @@ public class StripViewApp extends GemApplication {
         data.setWindSpeed(10 + Math.random() * 20);
         data.setWeatherCondition(condition);
         return data;
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### StripView
+
+                A view which can be used to lay out a fixed number of items horizontally. If the
+                available width is not sufficient then scrolling buttons will appear on either side
+                of the view so that the user can make hidden items visible. The nice thing about
+                this control is that it uses a `MaskedView` to fade out the elements on the
+                side. This ensures that the scroll buttons will be fully visible.
+                """;
     }
 
     public static void main(String[] args) {

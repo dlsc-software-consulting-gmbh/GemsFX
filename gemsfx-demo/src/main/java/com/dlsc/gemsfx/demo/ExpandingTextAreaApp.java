@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ExpandingTextArea;
+import com.dlsc.gemsfx.util.StageManager;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -47,8 +48,19 @@ public class ExpandingTextAreaApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
-        stage.centerOnScreen();
+        StageManager.install(stage, "expanding.text.area.app");
+
         stage.show();
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### ExpandingTextArea
+                
+                A customized text area that will never show scrollbars but instead will
+                grow as high as needed in order to completely fit its text inside of it.
+                """;
     }
 
     public static void main(String[] args) {

@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.CalendarPicker;
 import com.dlsc.gemsfx.daterange.DateRange;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.daterange.DateRangePreset;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -107,7 +108,8 @@ public class DateRangePickerApp extends GemApplication {
         stage.setTitle("Date Range Picker");
         stage.setScene(scene);
         stage.sizeToScene();
-        stage.centerOnScreen();
+        StageManager.install(stage, "date.range.picker.app");
+
         stage.show();
     }
 
@@ -124,6 +126,16 @@ public class DateRangePickerApp extends GemApplication {
             TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
             return new DateRange("This Week", LocalDate.now().with(fieldISO, 1), LocalDate.now().with(fieldISO, 1).plusDays(6));
         });
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### DateRangePicker
+                
+                A control to let the user select a date range (start date, end date) via two `com.dlsc.gemsfx.CalendarView`
+                instances or via a preset link.
+                """;
     }
 
     public static void main(String[] args) {

@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.StretchingTilePane;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,6 +12,7 @@ public class StretchingTilePaneApp extends GemApplication {
 
     @Override
     public void start(Stage stage) {
+        super.start(stage);
         StretchingTilePane pane = new StretchingTilePane(10, 10);
         pane.setPadding(new Insets(20));
         pane.setPrefSize(800, 600);
@@ -27,6 +29,22 @@ public class StretchingTilePaneApp extends GemApplication {
         stage.setTitle("Stretching Tile Pane");
         stage.setScene(scene);
         stage.sizeToScene();
+        StageManager.install(stage, "stretching.tile.pane.app");
+
         stage.show();
     }
+        @Override
+    public String getDescription() {
+        return """
+                ### StretchingTilePane
+                
+                A specialized pane that can be used to display a list of tiles (nodes) in one or more rows. The pane first calculates
+                how many tiles fit next to each other in a row and then arranges them in a grid. The tiles are stretched to fill
+                the entire width of each row. All tiles have the same height and width.
+                
+                Note: the main difference to the standard JavaFX TilePane is that the tiles are stretched to fill the entire width of
+                each row.
+                """;
+    }
+
 }

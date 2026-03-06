@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.util.ResizingBehaviour;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
@@ -87,7 +88,8 @@ public class ResizingBehaviourApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1090);
         stage.setHeight(900);
-        stage.centerOnScreen();
+        StageManager.install(stage, "resizing.behaviour.app");
+
         stage.show();
     }
 
@@ -126,6 +128,15 @@ public class ResizingBehaviourApp extends GemApplication {
                 return null;
             }
         };
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### ResizingBehaviour
+                
+                Uninstalls this ResizingBehaviour from the region, cleaning up all event handlers.
+                """;
     }
 
     public static void main(String[] args) {

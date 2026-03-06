@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.demo.fake.SimpleControlPane;
 import com.dlsc.gemsfx.util.SimpleStringConverter;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -60,6 +61,8 @@ public class SelectionBoxApp extends GemApplication {
 
         primaryStage.setTitle("SelectionBox Demo");
         primaryStage.setScene(new Scene(splitPane, 860, 600));
+        StageManager.install(primaryStage, "selection.box.app");
+
         primaryStage.show();
 
         CSSFX.start();
@@ -269,6 +272,21 @@ public class SelectionBoxApp extends GemApplication {
                 new SimpleControlPane.ControlItem("Clear Selection", clearSelectionButtonsBox),
                 new SimpleControlPane.ControlItem("Items", itemsButtonsBox)
         );
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### SelectionBox
+                
+                A versatile and customizable selection control that combines the features of `javafx.scene.control.ComboBox ComboBox`
+                and `javafx.scene.control.ChoiceBox ChoiceBox` with enhanced selection capabilities.
+                
+                Unlike `ComboBox` and `ChoiceBox`, which are limited to single selection modes, `SelectionBox`
+                supports both single and multiple selection modes, providing greater flexibility for various UI requirements.
+                Additionally, `SelectionBox` offers the ability to add extra buttons, enabling users to perform
+                common selection actions swiftly, such as selecting all items, clearing selections, or applying predefined selection criteria.
+                """;
     }
 
 }

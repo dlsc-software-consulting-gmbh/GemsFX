@@ -5,6 +5,7 @@ import com.dlsc.gemsfx.incubator.templatepane.TemplatePane.Position;
 import com.dlsc.gemsfx.incubator.templatepane.TemplatePaneControls;
 import com.dlsc.gemsfx.incubator.templatepane.Tile;
 import com.dlsc.gemsfx.incubator.templatepane.Visibility;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -39,7 +40,8 @@ public class TemplatePaneExampleApp extends GemApplication {
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Tiles Pane");
 		primaryStage.sizeToScene();
-		primaryStage.centerOnScreen();
+		StageManager.install(primaryStage, "template.pane.example.app");
+
 		primaryStage.show();
 	}
 
@@ -111,4 +113,13 @@ public class TemplatePaneExampleApp extends GemApplication {
 	public static void main(String[] args) {
 		launch(args);
 	}
+    @Override
+    public String getDescription() {
+        return """
+                ### TemplatePane
+
+An incubating layout pane that arranges child nodes according to a flexible named-position template (header, footer, left, right, content, etc.).
+                """;
+    }
+
 }

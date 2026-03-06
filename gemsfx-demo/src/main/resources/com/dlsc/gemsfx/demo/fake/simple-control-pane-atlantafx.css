@@ -1,0 +1,43 @@
+.simple-control-pane > .container {
+    -fx-padding: 5px 10px;
+    -fx-background-color: -color-neutral-subtle;
+}
+
+.simple-control-pane > .container > .separator {
+}
+
+.simple-control-pane > .container > .scroll-pane {
+    -fx-background-color: -color-neutral-subtle;
+}
+
+.simple-control-pane > .container .scroll-bar:vertical > .track-background {
+}
+
+.simple-control-pane > .container > .scroll-pane .cells-box {
+    -fx-spacing: 15px;
+    -fx-background-color: -color-neutral-subtle;
+    -fx-padding: 0 2px 0 0;
+}
+
+.simple-control-pane > .container > .title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-fg-default;
+    -fx-padding: 5px;
+}
+
+.simple-control-cell {
+    -fx-padding: 5px;
+}
+
+.simple-control-cell.with-border {
+    -fx-background-color: -color-neutral-subtle;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+}
+
+.simple-control-cell > .control-cell-title {
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-fg-default;
+}

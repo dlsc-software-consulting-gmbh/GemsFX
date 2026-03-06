@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.MultiColumnListView;
 import com.dlsc.gemsfx.MultiColumnListView.ColumnListCell;
 import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
@@ -69,7 +70,8 @@ public class MultiColumnListViewApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
-        stage.centerOnScreen();
+        StageManager.install(stage, "multi.column.list.view.app");
+
         stage.show();
     }
 
@@ -175,6 +177,17 @@ public class MultiColumnListViewApp extends GemApplication {
                 setText("");
             }
         }
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### MultiColumnListView
+                
+                A view for displaying multiple columns where each column consists of a header
+                control and a `ListView`. The control allows the user to rearrange the items in each
+                `ListView` and also to drag and drop items from one column to another.
+                """;
     }
 
     public static void main(String[] args) {

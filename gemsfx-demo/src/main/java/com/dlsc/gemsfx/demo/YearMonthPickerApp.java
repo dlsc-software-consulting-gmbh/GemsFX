@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.YearMonthPicker;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -57,8 +58,21 @@ public class YearMonthPickerApp extends GemApplication {
         stage.setTitle("YearMonthPicker");
         stage.setScene(scene);
         stage.sizeToScene();
-        stage.centerOnScreen();
+        StageManager.install(stage, "year.month.picker.app");
+
         stage.show();
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### YearMonthPicker
+                
+                A control for quickly selecting the month of a year. The format used for the
+                month depends on the `converterProperty()`. The default converter produces
+                and expects the full month name, e.g. "January", "February", etc. An invalid text
+                resets the value of the picker to null.
+                """;
     }
 
     public static void main(String[] args) {

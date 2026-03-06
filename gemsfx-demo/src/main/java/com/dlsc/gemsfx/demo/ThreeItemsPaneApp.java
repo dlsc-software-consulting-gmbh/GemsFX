@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ThreeItemsPane;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -53,7 +54,8 @@ public class ThreeItemsPaneApp extends GemApplication {
         primaryStage.setTitle("ThreeItemsPane");
         primaryStage.setWidth(1000);
         primaryStage.setHeight(800);
-        primaryStage.centerOnScreen();
+        StageManager.install(primaryStage, "three.items.pane.app");
+
         primaryStage.show();
     }
 
@@ -67,4 +69,28 @@ public class ThreeItemsPaneApp extends GemApplication {
 
         return new VBox(10, box, scenicView);
     }
+        @Override
+    public String getDescription() {
+        return """
+                ### ThreeItemsPane
+                
+                A custom layout container that arranges up to three child nodes in either a horizontal
+                or vertical orientation. This pane allows spacing between the nodes and provides methods
+                to control the alignment and orientation of the child nodes.
+                
+                The container manages three possible child nodes, identified as item1, item2, and item3.
+                The layout updates dynamically whenever the nodes or properties such as orientation or
+                spacing are modified.
+                
+                Features include:
+                - Dynamic management of child nodes: up to three nodes can be added and arranged.
+                - Adjustable orientation: supports horizontal and vertical alignment through the
+                  orientation property.
+                - Customizable spacing: allows setting the spacing between child nodes.
+                
+                Override methods provide computed sizes for use during layouts, including preferred,
+                minimum, and maximum widths and heights.
+                """;
+    }
+
 }

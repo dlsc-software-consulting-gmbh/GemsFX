@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.BeforeAfterView;
 import com.dlsc.gemsfx.demo.fake.SettingsPane;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -47,8 +48,20 @@ public class BeforeAfterViewApp2 extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
-        stage.centerOnScreen();
+        StageManager.install(stage, "before.after.view.app2");
+
         stage.show();
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### BeforeAfterView
+
+                A view capable of managing / displaying two nodes in such a way that the user
+                can show more or less of each node at the same time. This is very useful to
+                display before and after scenarios.
+                """;
     }
 
     public static void main(String[] args) {

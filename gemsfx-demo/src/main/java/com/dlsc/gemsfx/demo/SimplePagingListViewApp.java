@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.paging.SimplePagingListView;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -77,8 +78,20 @@ public class SimplePagingListViewApp extends GemApplication {
         stage.setTitle("Simple Paging List View");
         stage.setScene(scene);
         stage.sizeToScene();
-        stage.centerOnScreen();
+        StageManager.install(stage, "simple.paging.list.view.app");
+
         stage.show();
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### SimplePagingListView
+                
+                A simple version of the paging list view that is completely based on a list of items, just like a normal
+                list view would be. The view uses an internal data loader that accesses the list to retrieve the items of the
+                current page.
+                """;
     }
 
     public static void main(String[] args) {

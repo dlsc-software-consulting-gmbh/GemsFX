@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.EmailField;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -91,9 +92,25 @@ public class EmailFieldApp extends GemApplication {
         Scene scene = new Scene(box);
         stage.setScene(scene);
         stage.sizeToScene();
-        stage.centerOnScreen();
         stage.setTitle("Email Field");
+        StageManager.install(stage, "email.field.app");
+
         stage.show();
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### EmailField
+                
+                EmailField is a custom control for inputting and validating email addresses.
+                It provides the following functionalities:
+                
+                    
+                         - Automatic email domain suggestions to enhance user experience.
+                         - Email address format validation to ensure input validity.
+                         - Customizable properties to control the visibility of user interface elements, such as mail and validation icons, according to specific user interface requirements.
+                """;
     }
 
     public static void main(String[] args) {

@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
+import atlantafx.base.theme.CupertinoDark;
 import atlantafx.base.theme.NordDark;
 import atlantafx.base.theme.NordLight;
 import javafx.application.Application;
@@ -9,9 +10,13 @@ import java.util.Objects;
 
 public abstract class GemApplication extends Application {
 
+    public String getDescription() {
+        return "";
+    }
+
     static {
         if (Boolean.getBoolean("atlantafx")) {
-            setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
+            setUserAgentStylesheet(new CupertinoDark().getUserAgentStylesheet());
         }
     }
 
@@ -23,7 +28,7 @@ public abstract class GemApplication extends Application {
         if (Boolean.getBoolean("atlantafx")) {
             stage.sceneProperty().addListener((obs, oldScene, newScene) -> {
                 if (newScene != null) {
-                    newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("atlantafx.css")).toExternalForm());
+                    newScene.getStylesheets().add(Objects.requireNonNull(GemApplication.class.getResource("atlantafx.css")).toExternalForm());
                 }
             });
         }

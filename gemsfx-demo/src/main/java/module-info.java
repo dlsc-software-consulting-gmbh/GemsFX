@@ -1,4 +1,5 @@
 open module com.dlsc.gemsfx.demo {
+    requires javafx.swing;
     requires java.prefs;
 
     requires com.dlsc.gemsfx;

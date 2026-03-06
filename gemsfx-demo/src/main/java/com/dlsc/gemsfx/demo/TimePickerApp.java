@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
+import com.dlsc.gemsfx.util.StageManager;
 import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.TimePicker.Format;
@@ -150,7 +151,12 @@ public class TimePickerApp extends GemApplication {
         VBox box2 = new VBox(20, fullWidth, showPopupButtonBox, linkFieldsBox, rollOverBox, gridPane);
         HBox box3 = new HBox(20, showOrHidePopupButton, updateButton, nullButton);
 
-        box1.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-background-radius: 2px; -fx-border-color: gray; -fx-border-radius: 2px;");
+        if (Boolean.getBoolean("atlantafx")) {
+            box1.setStyle("-fx-background-color: -color-neutral-muted; -fx-border-color: -color-border-default; -fx-padding: 20px; -fx-background-radius: 2px; -fx-border-radius: 2px;");
+        } else {
+            box1.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-background-radius: 2px; -fx-border-color: gray; -fx-border-radius: 2px;");
+        }
+
         box2.setStyle(box1.getStyle()); // same style
         box3.setStyle(box2.getStyle()); // same style
 
@@ -177,8 +183,20 @@ public class TimePickerApp extends GemApplication {
         primaryStage.setTitle("TimePicker");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        primaryStage.centerOnScreen();
+        StageManager.install(primaryStage, "time.picker.app");
         primaryStage.show();
+    }
+
+        @Override
+    public String getDescription() {
+        return """
+                ### TimePicker
+                
+                A control for letting the user enter a time of day (see `LocalTime`). The control
+                can be configured to only enter a time within a given time range. It can also be configured
+                to show hours and minutes, or hours and minutes and seconds, or hours and minutes and seconds
+                and milliseconds (see `formatProperty()`)
+                """;
     }
 
     public static void main(String[] args) {

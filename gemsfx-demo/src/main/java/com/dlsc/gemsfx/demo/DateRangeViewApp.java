@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.daterange.DateRangeView;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -69,10 +70,22 @@ public class DateRangeViewApp extends GemApplication {
         stage.setTitle("Date Range View");
         stage.setScene(scene);
         stage.sizeToScene();
-        stage.centerOnScreen();
+        StageManager.install(stage, "date.range.view.app");
+
         stage.show();
 
         CSSFX.start(scene);
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### DateRangeView
+                
+                The date range view can be used to define a start and an end date 
+                via two CalendarView instances.
+
+                """;
     }
 
     public static void main(String[] args) {

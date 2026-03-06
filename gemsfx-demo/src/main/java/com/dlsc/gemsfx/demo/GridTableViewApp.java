@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.gridtable.GridTableCell;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
 import com.dlsc.gemsfx.gridtable.GridTablePropertyValueFactory;
 import com.dlsc.gemsfx.gridtable.GridTableView;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -138,7 +139,8 @@ public class GridTableViewApp extends GemApplication {
         Scene scene = new Scene(pane);
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        primaryStage.centerOnScreen();
+        StageManager.install(primaryStage, "grid.table.view.app");
+
         primaryStage.show();
 
         CSSFX.start(scene);
@@ -207,4 +209,13 @@ public class GridTableViewApp extends GemApplication {
             this.art = art;
         }
     }
+    @Override
+    public String getDescription() {
+        return """
+                ### GridTableView
+                
+                Triggers a rebuild of the view without reloading data.
+                """;
+    }
+
 }

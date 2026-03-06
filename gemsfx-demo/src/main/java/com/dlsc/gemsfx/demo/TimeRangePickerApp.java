@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TimeRangePicker;
 import com.dlsc.gemsfx.demo.fake.SimpleControlPane;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -26,13 +27,20 @@ public class TimeRangePickerApp extends GemApplication {
         timeRangePicker.getSelectionModel().selectIndices(1, 2, 3);
 
         StackPane wrapper = new StackPane(timeRangePicker);
-        wrapper.setStyle("-fx-background-color: white; -fx-padding: 10;");
+
+        if (Boolean.getBoolean("atlantafx")) {
+            wrapper.setStyle("-fx-background-color: -color-neutral-subtle; -fx-padding: 10;");
+        } else {
+            wrapper.setStyle("-fx-background-color: white; -fx-padding: 10;");
+        }
 
         SplitPane splitPane = new SplitPane(wrapper, createControlPane());
         splitPane.setDividerPositions(0.7);
 
         primaryStage.setScene(new Scene(splitPane, 800, 600));
         primaryStage.setTitle("Hello TimeRangePicker");
+        StageManager.install(primaryStage, "time.range.picker.app");
+
         primaryStage.show();
     }
 
@@ -47,6 +55,16 @@ public class TimeRangePickerApp extends GemApplication {
         );
     }
 
+
+    @Override
+    public String getDescription() {
+        return """
+                ### TimeRangePicker
+                
+                Represents a time range with a start time and an end time.
+                Ensures that the start time is not after the end time.
+                """;
+    }
 
     public static void main(String[] args) {
         launch(args);

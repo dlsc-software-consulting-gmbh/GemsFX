@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.LimitedTextArea;
 import com.dlsc.gemsfx.util.IntegerRange;
+import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -46,6 +47,8 @@ public class LimitedTextAreaApp extends GemApplication {
         Scene scene = new Scene(splitPane, 560, 420);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Limited Text Area Demo");
+        StageManager.install(primaryStage, "limited.text.area.app");
+
         primaryStage.show();
 
         CSSFX.start();
@@ -116,6 +119,16 @@ public class LimitedTextAreaApp extends GemApplication {
                 minLength, minLengthField, maxLength, maxLengthField, showBottomCheckBox, excludedItems, excludedItemsView);
         box.setPadding(new Insets(10));
         return box;
+    }
+
+    @Override
+    public String getDescription() {
+        return """
+                ### LimitedTextArea
+                
+                The warning threshold is a value between 0 and 1.
+                When the text length is greater than or equal to the maximum length times the warning threshold, the warning style will be applied.
+                """;
     }
 
     public static void main(String[] args) {
