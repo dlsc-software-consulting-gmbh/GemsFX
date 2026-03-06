@@ -7,6 +7,7 @@ import atlantafx.base.theme.NordDark;
 import atlantafx.base.theme.NordLight;
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
+import atlantafx.base.theme.Styles;
 import atlantafx.base.theme.Theme;
 import com.dlsc.gemsfx.demo.binding.AggregatedListBindingApp;
 import com.dlsc.gemsfx.demo.binding.NestedListBindingApp;
@@ -195,7 +196,7 @@ public class GemsFXDemoLauncher extends GemApplication {
                 new CupertinoDark(), new PrimerLight(), new PrimerDark(), new Dracula());
 
         Preferences prefs = Preferences.userNodeForPackage(GemsFXDemoLauncher.class);
-        String savedTheme = prefs.get("atlantafx.theme", themes.get(0).getName());
+        String savedTheme = prefs.get("atlantafx.theme", new NordDark().getName());
         Theme initialTheme = themes.stream()
                 .filter(t -> t.getName().equals(savedTheme))
                 .findFirst().orElse(themes.get(0));
@@ -218,7 +219,8 @@ public class GemsFXDemoLauncher extends GemApplication {
         themeComboBox.setMaxWidth(Double.MAX_VALUE);
 
         CheckBox atlantaFxCheckBox = new CheckBox("AtlantaFX");
-        atlantaFxCheckBox.setSelected(prefs.getBoolean("atlantafx.enabled", false));
+        atlantaFxCheckBox.setMinWidth(Region.USE_PREF_SIZE);
+        atlantaFxCheckBox.setSelected(prefs.getBoolean("atlantafx.enabled", true));
         if (atlantaFxCheckBox.isSelected()) System.setProperty("atlantafx", "true");
         themeComboBox.disableProperty().bind(atlantaFxCheckBox.selectedProperty().not());
 
@@ -235,6 +237,8 @@ public class GemsFXDemoLauncher extends GemApplication {
         Image logoImage = new Image(Objects.requireNonNull(
                 GemsFXDemoLauncher.class.getResourceAsStream("gems.png")));
 
+        Button[] launchButtonRef = new Button[1];
+
         Runnable applyTheme = () -> {
             Theme theme = themeComboBox.getValue();
             if (theme != null) {
@@ -246,6 +250,9 @@ public class GemsFXDemoLauncher extends GemApplication {
                 stage.getScene().getRoot().getStyleClass().add("atlantafx-active");
                 markdownView.getStylesheets().remove(mdfxOverrideCss);
                 markdownView.getStylesheets().add(mdfxOverrideCss);
+                if (launchButtonRef[0] != null) {
+                    launchButtonRef[0].getStyleClass().add(Styles.ROUNDED);
+                }
                 refreshScreenshot[0].run();
             }
         };
@@ -262,6 +269,9 @@ public class GemsFXDemoLauncher extends GemApplication {
                 stage.getScene().getStylesheets().remove(atlantaFxCss);
                 stage.getScene().getRoot().getStyleClass().remove("atlantafx-active");
                 markdownView.getStylesheets().remove(mdfxOverrideCss);
+                if (launchButtonRef[0] != null) {
+                    launchButtonRef[0].getStyleClass().remove(Styles.ROUNDED);
+                }
                 refreshScreenshot[0].run();
             }
         });
@@ -328,6 +338,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         CheckBox scenicViewCheckBox = new CheckBox("ScenicView");
         Button launchButton = new Button("Launch Demo");
         launchButton.setDefaultButton(true);
+        launchButtonRef[0] = launchButton;
 
         // wire disable state
         updateLaunchButton(launchButton, treeView, listView, searchField);
@@ -515,7 +526,6 @@ public class GemsFXDemoLauncher extends GemApplication {
 
         stage.sizeToScene();
 
-        StageManager.install(stage, "gemsfx.demo.launcher");
         stage.show();
 
         // Lock width but allow height resizing; enforce minimum height
