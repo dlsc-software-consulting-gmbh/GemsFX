@@ -1,0 +1,25 @@
+{
+  "name": "gemsfx-demo",
+  "version": "3.10.1",
+  "title": "GemsFX Demo Launcher",
+  "description": "Professional custom controls for JavaFX",
+  "author": "Dirk Lemmermann",
+  "license": "Apache-2.0",
+  "preferGlobal": true,
+  "main": "index.js",
+  "jdeploy": {
+    "jar": "gemsfx-demo/target/gemsfx-demo-3.10.1.jar",
+    "javaVersion": "24",
+    "javafxVersion": "25.0.2",
+    "javafx": true,
+    "jdk": false,
+    "title": "GemsFX Demo Launcher",
+    "githubRepository": "https://github.com/dlemmermann/GemsFX"
+  },
+  "files": [
+    "jdeploy-bundle"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
