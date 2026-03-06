@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.paging.SimplePagingListView;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -78,7 +77,6 @@ public class SimplePagingListViewApp extends GemApplication {
         stage.setTitle("Simple Paging List View");
         stage.setScene(scene);
         stage.sizeToScene();
-        StageManager.install(stage, "simple.paging.list.view.app");
 
         stage.show();
     }

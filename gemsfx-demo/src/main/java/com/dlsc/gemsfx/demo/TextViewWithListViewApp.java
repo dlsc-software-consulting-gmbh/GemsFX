@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TextView;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -80,7 +79,6 @@ public class TextViewWithListViewApp extends GemApplication {
         stage.setScene(scene);
         stage.sizeToScene();
         stage.setTitle("Text View (List View)");
-        StageManager.install(stage, "text.view.with.list.view.app");
 
         stage.show();
     }

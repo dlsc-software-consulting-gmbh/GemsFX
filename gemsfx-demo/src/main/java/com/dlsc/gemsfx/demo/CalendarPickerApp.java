@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.CalendarPicker;
 import com.dlsc.gemsfx.CustomComboBox;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -77,7 +76,6 @@ public class CalendarPickerApp extends GemApplication {
         stage.setTitle("CalendarPicker");
         stage.setScene(scene);
         stage.sizeToScene();
-        StageManager.install(stage, "calendar.picker.app");
 
         stage.show();
     }

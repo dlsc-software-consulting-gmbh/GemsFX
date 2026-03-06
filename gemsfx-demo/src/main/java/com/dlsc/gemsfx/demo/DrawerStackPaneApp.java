@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DrawerStackPane;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -108,7 +107,6 @@ public class DrawerStackPaneApp extends GemApplication {
         stage.setTitle("Drawer Demo");
         stage.setScene(scene);
         stage.sizeToScene();
-        StageManager.install(stage, "drawer.stack.pane.app");
 
         stage.show();
     }

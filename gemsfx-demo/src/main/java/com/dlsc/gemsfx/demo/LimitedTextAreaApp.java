@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.LimitedTextArea;
 import com.dlsc.gemsfx.util.IntegerRange;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -47,7 +46,6 @@ public class LimitedTextAreaApp extends GemApplication {
         Scene scene = new Scene(splitPane, 560, 420);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Limited Text Area Demo");
-        StageManager.install(primaryStage, "limited.text.area.app");
 
         primaryStage.show();
 

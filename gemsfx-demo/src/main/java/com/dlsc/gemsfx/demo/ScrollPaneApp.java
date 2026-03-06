@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.incubator.GemScrollPane;
-import com.dlsc.gemsfx.util.StageManager;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -61,7 +60,6 @@ public class ScrollPaneApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
-        StageManager.install(stage, "scroll.pane.app");
 
         stage.show();
     }

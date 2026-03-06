@@ -5,7 +5,6 @@ import com.dlsc.gemsfx.incubator.templatepane.TemplatePane.Position;
 import com.dlsc.gemsfx.incubator.templatepane.TemplatePaneControls;
 import com.dlsc.gemsfx.incubator.templatepane.Tile;
 import com.dlsc.gemsfx.incubator.templatepane.Visibility;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -33,7 +32,6 @@ public class TemplatePaneApp extends GemApplication {
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Tiles Pane");
 		primaryStage.sizeToScene();
-		StageManager.install(primaryStage, "template.pane.app");
 
 		primaryStage.show();
 	}

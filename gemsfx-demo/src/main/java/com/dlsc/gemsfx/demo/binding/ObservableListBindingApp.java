@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo.binding;
 
 import com.dlsc.gemsfx.binding.ObservableValuesListBinding;
 import com.dlsc.gemsfx.demo.GemApplication;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
@@ -63,7 +62,6 @@ public class ObservableListBindingApp extends GemApplication {
         primaryStage.setTitle("Observable Values List View Demo");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        StageManager.install(primaryStage, "to");
 
         primaryStage.show();
     }

@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TagsField;
 import com.dlsc.gemsfx.util.SessionManager;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -157,7 +156,6 @@ public class TagsFieldApp extends GemApplication {
         primaryStage.centerOnScreen();
         primaryStage.show();
 
-        StageManager.install(primaryStage, "tagsfieldapp");
     }
 
         @Override

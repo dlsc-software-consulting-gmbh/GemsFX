@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.SegmentedBar;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -118,7 +117,6 @@ public class SegmentedBarApp extends GemApplication {
         primaryStage.setTitle("Segmented Bar Demo");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        StageManager.install(primaryStage, "segmented.bar.app");
 
         primaryStage.show();
 

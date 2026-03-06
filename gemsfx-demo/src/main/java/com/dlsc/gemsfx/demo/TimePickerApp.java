@@ -1,6 +1,5 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.util.StageManager;
 import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.TimePicker.Format;
@@ -183,7 +182,6 @@ public class TimePickerApp extends GemApplication {
         primaryStage.setTitle("TimePicker");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        StageManager.install(primaryStage, "time.picker.app");
         primaryStage.show();
     }
 

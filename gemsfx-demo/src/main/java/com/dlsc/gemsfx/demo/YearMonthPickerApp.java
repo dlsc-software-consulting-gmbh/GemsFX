@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.YearMonthPicker;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -58,7 +57,6 @@ public class YearMonthPickerApp extends GemApplication {
         stage.setTitle("YearMonthPicker");
         stage.setScene(scene);
         stage.sizeToScene();
-        StageManager.install(stage, "year.month.picker.app");
 
         stage.show();
     }

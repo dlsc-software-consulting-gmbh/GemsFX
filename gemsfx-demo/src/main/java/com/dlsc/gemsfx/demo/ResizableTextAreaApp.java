@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import atlantafx.base.theme.Styles;
 import com.dlsc.gemsfx.ResizableTextArea;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
@@ -54,7 +53,6 @@ public class ResizableTextAreaApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
-        StageManager.install(stage, "resizable.text.area.app");
 
         stage.show();
     }

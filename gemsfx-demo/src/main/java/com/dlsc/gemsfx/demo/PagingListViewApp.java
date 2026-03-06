@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.paging.PagingControlBase;
 import com.dlsc.gemsfx.paging.PagingListView;
 import com.dlsc.gemsfx.paging.PagingLoadResponse;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -106,7 +105,6 @@ public class PagingListViewApp extends GemApplication {
         stage.setScene(scene);
         stage.centerOnScreen();
 
-        StageManager.install(stage, "product.list.view");
         stage.show();
         stage.sizeToScene();
     }

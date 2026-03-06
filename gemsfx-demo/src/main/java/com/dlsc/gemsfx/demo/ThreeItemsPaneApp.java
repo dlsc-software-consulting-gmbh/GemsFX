@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ThreeItemsPane;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -54,7 +53,6 @@ public class ThreeItemsPaneApp extends GemApplication {
         primaryStage.setTitle("ThreeItemsPane");
         primaryStage.setWidth(1000);
         primaryStage.setHeight(800);
-        StageManager.install(primaryStage, "three.items.pane.app");
 
         primaryStage.show();
     }

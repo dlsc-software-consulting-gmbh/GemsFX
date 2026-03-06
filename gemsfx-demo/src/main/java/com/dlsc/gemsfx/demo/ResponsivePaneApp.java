@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ResponsivePane;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -58,7 +57,6 @@ public class ResponsivePaneApp extends GemApplication {
         Scene scene = new Scene(borderPane);
         stage.setScene(scene);
         stage.sizeToScene();
-        StageManager.install(stage, "responsive.pane.app");
 
         stage.show();
     }

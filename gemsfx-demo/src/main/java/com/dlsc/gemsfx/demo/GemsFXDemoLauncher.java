@@ -347,8 +347,6 @@ public class GemsFXDemoLauncher extends GemApplication {
         ImageView screenshotView = new ImageView();
         screenshotView.setPreserveRatio(true);
         screenshotView.setSmooth(true);
-        screenshotView.setManaged(false);
-        screenshotView.setVisible(false);
         screenshotView.setFitWidth(600);
         screenshotView.setFitHeight(600);
         screenshotView.setCursor(javafx.scene.Cursor.HAND);
@@ -357,11 +355,26 @@ public class GemsFXDemoLauncher extends GemApplication {
             if (entry != null) launch(entry);
         });
 
+        StackPane screenshotFrame = new StackPane(screenshotView);
+        screenshotFrame.getStyleClass().add("screenshot-frame");
+        screenshotFrame.setMaxWidth(600);
+        screenshotFrame.setMaxHeight(600);
+        StackPane.setAlignment(screenshotView, Pos.CENTER);
+
+        Label screenshotCaption = new Label("Screenshot");
+        screenshotCaption.getStyleClass().add("text-caption");
+
+        VBox screenshotBox = new VBox(6, screenshotFrame, screenshotCaption);
+        screenshotBox.setAlignment(Pos.CENTER);
+        screenshotBox.setManaged(false);
+        screenshotBox.setVisible(false);
+
         Region spacer = new Region();
         spacer.setMinHeight(200);
         spacer.setPrefHeight(200);
-        VBox docContent = new VBox(16, markdownView, screenshotView, spacer);
+        VBox docContent = new VBox(16, markdownView, screenshotBox, spacer);
         docContent.setPadding(new Insets(8));
+        docContent.setAlignment(Pos.TOP_CENTER);
 
         ScrollPane docScrollPane = new ScrollPane(docContent);
         docScrollPane.setFitToWidth(true);
@@ -378,18 +391,18 @@ public class GemsFXDemoLauncher extends GemApplication {
         treeView.getSelectionModel().selectedItemProperty().addListener((obs, o, n) -> {
             DemoEntry entry = resolveSelected(treeView, listView, searchField);
             if (entry != null) prefs.put("selected.demo", entry.name());
-            showDescription(entry, currentThemeKey[0], markdownView, screenshotView);
+            showDescription(entry, currentThemeKey[0], markdownView, screenshotView, screenshotBox);
         });
         listView.getSelectionModel().selectedItemProperty().addListener((obs, o, n) -> {
             DemoEntry entry = resolveSelected(treeView, listView, searchField);
             if (entry != null) prefs.put("selected.demo", entry.name());
-            showDescription(entry, currentThemeKey[0], markdownView, screenshotView);
+            showDescription(entry, currentThemeKey[0], markdownView, screenshotView, screenshotBox);
         });
 
         // Wire up the screenshot refresh for theme changes (now that views are available).
         refreshScreenshot[0] = () -> showDescription(
                 resolveSelected(treeView, listView, searchField),
-                currentThemeKey[0], markdownView, screenshotView);
+                currentThemeKey[0], markdownView, screenshotView, screenshotBox);
 
         // Restore last selected demo, falling back to the first one.
         String savedDemo = prefs.get("selected.demo", null);
@@ -603,12 +616,12 @@ public class GemsFXDemoLauncher extends GemApplication {
     // MarkdownView description helpers
     // -----------------------------------------------------------------------
 
-    private void showDescription(DemoEntry entry, String themeKey, MarkdownView markdownView, ImageView screenshotView) {
+    private void showDescription(DemoEntry entry, String themeKey, MarkdownView markdownView, ImageView screenshotView, VBox screenshotBox) {
         if (entry == null) {
             markdownView.setMdString("*Select a demo to view its documentation.*");
             screenshotView.setImage(null);
-            screenshotView.setManaged(false);
-            screenshotView.setVisible(false);
+            screenshotBox.setManaged(false);
+            screenshotBox.setVisible(false);
             return;
         }
 
@@ -618,8 +631,8 @@ public class GemsFXDemoLauncher extends GemApplication {
         } catch (Exception e) {
             markdownView.setMdString("*No documentation available.*");
             screenshotView.setImage(null);
-            screenshotView.setManaged(false);
-            screenshotView.setVisible(false);
+            screenshotBox.setManaged(false);
+            screenshotBox.setVisible(false);
             return;
         }
 
@@ -639,12 +652,12 @@ public class GemsFXDemoLauncher extends GemApplication {
         if (screenshotUrl != null) {
             screenshotView.setImage(new Image(
                     screenshotUrl.toExternalForm(), true));
-            screenshotView.setManaged(true);
-            screenshotView.setVisible(true);
+            screenshotBox.setManaged(true);
+            screenshotBox.setVisible(true);
         } else {
             screenshotView.setImage(null);
-            screenshotView.setManaged(false);
-            screenshotView.setVisible(false);
+            screenshotBox.setManaged(false);
+            screenshotBox.setVisible(false);
         }
     }
 

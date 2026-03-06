@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.SelectionModel.SelectionMode;
 import com.dlsc.gemsfx.CalendarView.YearDisplayMode;
 import com.dlsc.gemsfx.CalendarView.MonthDisplayMode;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -113,7 +112,6 @@ public class CalendarViewApp extends GemApplication {
         stage.setTitle("CalendarView");
         stage.setScene(scene);
         stage.sizeToScene();
-        StageManager.install(stage, "calendar.view.app");
 
         stage.show();
     }

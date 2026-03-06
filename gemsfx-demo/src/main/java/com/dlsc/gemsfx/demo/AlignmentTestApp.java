@@ -7,7 +7,6 @@ import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.SimpleFilterView;
 import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
@@ -87,7 +86,6 @@ public class AlignmentTestApp extends GemApplication {
 
         Scene scene = new Scene(stackPane);
 
-        StageManager.install(stage, "alignment.test.demo", 800, 500);
 
         stage.setTitle("Alignment Test");
         stage.setScene(scene);

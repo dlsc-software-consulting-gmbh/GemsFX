@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.ArcProgressIndicator;
 import com.dlsc.gemsfx.ArcProgressIndicator.StyleType;
 import com.dlsc.gemsfx.CircleProgressIndicator;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -87,7 +86,6 @@ public class CircleProgressIndicatorApp extends GemApplication {
         Scene scene = new Scene(containerBox, 330, 390);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Circle Progress Indicator Demo");
-        StageManager.install(primaryStage, "circle.progress.indicator.app");
 
         primaryStage.show();
     }

@@ -7,7 +7,6 @@ import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.SimpleFilterView;
 import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
@@ -144,7 +143,6 @@ public class SimpleFilterViewApp extends GemApplication {
         stage.setHeight(500);
         stage.centerOnScreen();
 
-        StageManager.install(stage, "simple.filter.view.container.demo", 1200, 500);
 
         stage.show();
 

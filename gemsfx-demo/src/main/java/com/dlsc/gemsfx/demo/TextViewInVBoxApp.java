@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TextView;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
@@ -34,7 +33,6 @@ public class TextViewInVBoxApp extends GemApplication {
         stage.setScene(scene);
         stage.sizeToScene();
         stage.setTitle("Text View (VBox)");
-        StageManager.install(stage, "text.view.in.v.box.app");
 
         stage.show();
     }

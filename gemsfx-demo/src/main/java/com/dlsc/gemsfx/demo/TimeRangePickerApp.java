@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TimeRangePicker;
 import com.dlsc.gemsfx.demo.fake.SimpleControlPane;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -39,7 +38,6 @@ public class TimeRangePickerApp extends GemApplication {
 
         primaryStage.setScene(new Scene(splitPane, 800, 600));
         primaryStage.setTitle("Hello TimeRangePicker");
-        StageManager.install(primaryStage, "time.range.picker.app");
 
         primaryStage.show();
     }

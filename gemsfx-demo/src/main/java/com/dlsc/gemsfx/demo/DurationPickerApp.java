@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.DurationPicker;
 import com.dlsc.gemsfx.DurationPicker.LabelType;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -251,7 +250,6 @@ public class DurationPickerApp extends GemApplication {
         primaryStage.setTitle("DurationPicker");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        StageManager.install(primaryStage, "duration.picker.app");
 
         primaryStage.show();
     }

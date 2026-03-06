@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.ChipView;
 import com.dlsc.gemsfx.TagsField;
 import com.dlsc.gemsfx.util.SimpleStringConverter;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -81,7 +80,6 @@ public class TagsFieldEmailApp extends GemApplication {
         stage.setScene(scene);
         stage.show();
 
-        StageManager.install(stage, "tags.field.email.demo", 600, 800);
     }
 
     private Separator createSeparator() {

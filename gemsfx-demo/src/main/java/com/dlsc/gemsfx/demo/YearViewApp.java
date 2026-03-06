@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.YearView;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -29,7 +28,6 @@ public class YearViewApp extends GemApplication {
         stage.setTitle("YearView");
         stage.setScene(scene);
         stage.sizeToScene();
-        StageManager.install(stage, "year.view.app");
 
         stage.show();
     }

@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo.binding;
 import com.dlsc.gemsfx.binding.TransformedFlattenedNestedListStreamBinding;
 import com.dlsc.gemsfx.binding.TransformedNestedListBinding;
 import com.dlsc.gemsfx.demo.GemApplication;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -82,7 +81,6 @@ public class NestedListBindingApp extends GemApplication {
         primaryStage.setTitle("Student Score History");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        StageManager.install(primaryStage, "to");
 
         primaryStage.show();
     }

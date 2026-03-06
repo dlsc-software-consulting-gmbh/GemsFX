@@ -1,6 +1,5 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.util.StageManager;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -63,7 +62,6 @@ public class TableViewExample extends GemApplication {
 
         primaryStage.setScene(scene);
 
-        StageManager.install(primaryStage, "table.view.example");
 
 
         primaryStage.show();

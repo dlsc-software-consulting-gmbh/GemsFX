@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.PaymentOptionView;
 import com.dlsc.gemsfx.PaymentOptionView.Option;
 import com.dlsc.gemsfx.PaymentOptionView.Theme;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -51,7 +50,6 @@ public class PaymentOptionApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
-        StageManager.install(stage, "payment.option.app");
 
         stage.show();
     }

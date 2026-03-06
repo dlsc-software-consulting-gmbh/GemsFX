@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ExpandingTextArea;
-import com.dlsc.gemsfx.util.StageManager;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -48,7 +47,6 @@ public class ExpandingTextAreaApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(850);
-        StageManager.install(stage, "expanding.text.area.app");
 
         stage.show();
     }

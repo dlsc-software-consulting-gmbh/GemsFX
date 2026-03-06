@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ArcProgressIndicator;
 import com.dlsc.gemsfx.SemiCircleProgressIndicator;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
@@ -63,7 +62,6 @@ public class SemiCircleProgressIndicatorApp extends GemApplication {
         Scene scene = new Scene(containerBox, 300, 390);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Semi Circle Progress Indicator");
-        StageManager.install(primaryStage, "semi.circle.progress.indicator.app");
 
         primaryStage.show();
     }

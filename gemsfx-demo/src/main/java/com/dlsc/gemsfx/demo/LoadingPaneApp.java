@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import atlantafx.base.controls.RingProgressIndicator;
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.LoadingPane.Status;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -93,7 +92,6 @@ public class LoadingPaneApp extends GemApplication {
         stage.setTitle("Loading Pane");
         stage.setScene(scene);
         stage.sizeToScene();
-        StageManager.install(stage, "loading.pane.app");
 
         stage.show();
     }

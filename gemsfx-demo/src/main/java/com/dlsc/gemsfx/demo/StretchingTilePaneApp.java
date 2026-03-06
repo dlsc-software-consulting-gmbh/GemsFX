@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.StretchingTilePane;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -29,7 +28,6 @@ public class StretchingTilePaneApp extends GemApplication {
         stage.setTitle("Stretching Tile Pane");
         stage.setScene(scene);
         stage.sizeToScene();
-        StageManager.install(stage, "stretching.tile.pane.app");
 
         stage.show();
     }

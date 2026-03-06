@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.CalendarPicker;
 import com.dlsc.gemsfx.util.SessionManager;
-import com.dlsc.gemsfx.util.StageManager;
 import com.dlsc.gemsfx.demo.GemApplication;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
@@ -107,7 +106,6 @@ public class SessionManagerApp extends GemApplication {
         Scene scene = new Scene(root, 300, 420);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Session State Demo");
-        StageManager.install(primaryStage, "session.manager.app");
 
         primaryStage.show();
     }

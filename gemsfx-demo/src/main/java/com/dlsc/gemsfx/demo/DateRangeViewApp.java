@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.daterange.DateRangeView;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -70,7 +69,6 @@ public class DateRangeViewApp extends GemApplication {
         stage.setTitle("Date Range View");
         stage.setScene(scene);
         stage.sizeToScene();
-        StageManager.install(stage, "date.range.view.app");
 
         stage.show();
 

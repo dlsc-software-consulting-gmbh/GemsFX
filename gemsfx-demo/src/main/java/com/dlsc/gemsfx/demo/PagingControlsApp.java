@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.paging.PagingControlBase.MessageLabelStrategy;
 import com.dlsc.gemsfx.paging.PagingControls;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -75,7 +74,6 @@ public class PagingControlsApp extends GemApplication {
         stage.sizeToScene();
         stage.setTitle("Paging View");
 
-        StageManager.install(stage, "paging-controls-app");
 
         stage.show();
 

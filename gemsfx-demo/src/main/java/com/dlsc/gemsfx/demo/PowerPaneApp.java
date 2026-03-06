@@ -8,7 +8,6 @@ import com.dlsc.gemsfx.infocenter.Notification;
 import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import com.dlsc.gemsfx.infocenter.NotificationView;
-import com.dlsc.gemsfx.util.StageManager;
 import com.dlsc.pdfviewfx.PDFView;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Platform;
@@ -148,7 +147,6 @@ public class PowerPaneApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1200);
         stage.setHeight(950);
-        StageManager.install(stage, "power.pane.app");
 
         stage.show();
     }

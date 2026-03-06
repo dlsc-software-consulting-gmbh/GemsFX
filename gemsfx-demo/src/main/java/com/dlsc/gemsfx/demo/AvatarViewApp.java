@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.AvatarView;
 import com.dlsc.gemsfx.AvatarView.AvatarShape;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -50,7 +49,6 @@ public class AvatarViewApp extends GemApplication {
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         primaryStage.setTitle("AvatarView");
-        StageManager.install(primaryStage, "avatar.view.app");
 
         primaryStage.show();
     }

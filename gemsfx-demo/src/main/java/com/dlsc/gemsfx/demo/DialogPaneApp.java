@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.DialogPane.Dialog;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -229,7 +228,6 @@ public class DialogPaneApp extends GemApplication {
         primaryStage.setScene(scene);
         primaryStage.setWidth(1500);
         primaryStage.setHeight(900);
-        StageManager.install(primaryStage, "dialog.pane.app");
 
         primaryStage.show();
 

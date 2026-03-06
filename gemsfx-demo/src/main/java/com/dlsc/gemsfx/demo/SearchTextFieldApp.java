@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.SearchTextField;
 import com.dlsc.gemsfx.Spacer;
 import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -106,7 +105,6 @@ public class SearchTextFieldApp extends GemApplication {
         primaryStage.setTitle("Search Text Field");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        StageManager.install(primaryStage, "search.text.field.app");
 
         primaryStage.show();
     }

@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.gridtable.GridTableCell;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
 import com.dlsc.gemsfx.gridtable.GridTablePropertyValueFactory;
 import com.dlsc.gemsfx.gridtable.GridTableView;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -148,7 +147,6 @@ public class GridTableViewApp extends GemApplication {
         Scene scene = new Scene(pane);
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        StageManager.install(primaryStage, "grid.table.view.app");
 
         primaryStage.show();
 

@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TextView;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -72,7 +71,6 @@ public class TextViewApp extends GemApplication {
         stage.setWidth(800);
         stage.setHeight(600);
         stage.setTitle("Text View (Standalone)");
-        StageManager.install(stage, "text.view.app");
 
         stage.show();
 

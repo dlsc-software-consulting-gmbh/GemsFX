@@ -5,7 +5,6 @@ import com.dlsc.gemsfx.StripView.StripCell;
 import com.dlsc.gemsfx.demo.fake.WeatherCondition;
 import com.dlsc.gemsfx.demo.fake.WeatherData;
 import com.dlsc.gemsfx.demo.fake.WeatherSummaryPane;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -143,7 +142,6 @@ public class StripViewApp extends GemApplication {
         stage.setScene(scene);
         stage.setWidth(1200);
         stage.setHeight(500);
-        StageManager.install(stage, "strip.view.app");
 
         stage.show();
 

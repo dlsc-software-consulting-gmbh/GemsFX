@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -89,7 +88,6 @@ public class PhotoViewApp extends GemApplication {
         stage.setTitle("Photo View Demo");
         stage.setScene(scene);
         stage.sizeToScene();
-        StageManager.install(stage, "photo.view.app");
 
         stage.show();
     }

@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ScreensView;
 import com.dlsc.gemsfx.util.SessionManager;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -70,7 +69,6 @@ public class ScreensViewApp extends GemApplication {
         stage2.setScene(new Scene(new Label("Hello World")));
         stage2.setAlwaysOnTop(true);
         stage2.initOwner(stage);
-        StageManager.install(stage2, "screens.view.app.stage2");
         stage2.show();
 
         stage.setTitle("Screens View Demo");
@@ -78,7 +76,6 @@ public class ScreensViewApp extends GemApplication {
         stage.setWidth(1000);
         stage.setHeight(850);
         stage.centerOnScreen();
-        StageManager.install(stage, "screens.view.app.stage1");
         stage.show();
     }
 

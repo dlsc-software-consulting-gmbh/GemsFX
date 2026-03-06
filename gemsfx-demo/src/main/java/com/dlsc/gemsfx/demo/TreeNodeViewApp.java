@@ -11,7 +11,6 @@ import com.dlsc.gemsfx.treeview.link.QuadCurveLink;
 import com.dlsc.gemsfx.treeview.link.SimpleCatmullRomLink;
 import com.dlsc.gemsfx.treeview.link.SineWaveDecayLink;
 import com.dlsc.gemsfx.treeview.link.StraightLineLink;
-import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.geometry.HPos;
@@ -156,7 +155,6 @@ public class TreeNodeViewApp extends GemApplication {
         Scene scene = new Scene(parent, 1280, 800);
         scene.getStylesheets().add(Objects.requireNonNull(TreeNodeViewApp.class.getResource("tree-node-view-app.css")).toExternalForm());
         primaryStage.setScene(scene);
-        StageManager.install(primaryStage, "tree.node.view.app");
 
         primaryStage.show();
         CSSFX.start();

@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo.util;
 
 import com.dlsc.gemsfx.demo.GemApplication;
 import com.dlsc.gemsfx.util.EnumStringConverter;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -72,7 +71,6 @@ public class EnumStringConverterDemo extends GemApplication {
         // Configure and show the primary stage
         primaryStage.setTitle("EnumStringConverter Demo");
         primaryStage.setScene(scene);
-        StageManager.install(primaryStage, "demonstrates");
 
         primaryStage.show();
     }

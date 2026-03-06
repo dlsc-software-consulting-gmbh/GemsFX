@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.EmailField;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -93,7 +92,6 @@ public class EmailFieldApp extends GemApplication {
         stage.setScene(scene);
         stage.sizeToScene();
         stage.setTitle("Email Field");
-        StageManager.install(stage, "email.field.app");
 
         stage.show();
     }

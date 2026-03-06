@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.SVGImageView;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.Node;
@@ -49,7 +48,6 @@ public class SVGImageViewApp extends GemApplication {
         scene.getStylesheets().add(Objects.requireNonNull(SVGImageViewApp.class.getResource("svg-image-view-app.css")).toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.setTitle("SVGImageView Demo");
-        StageManager.install(primaryStage, "s.v.g.image.view.app");
 
         primaryStage.show();
     }

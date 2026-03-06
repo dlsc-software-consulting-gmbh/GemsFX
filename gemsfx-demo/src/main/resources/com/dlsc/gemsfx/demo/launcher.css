@@ -46,7 +46,17 @@
     -fx-background-insets: 0;
     -fx-padding: 0;
 }
-/* ── Footer ───────────────────────────────────────────────── */
+/* ── Screenshot frame ─────────────────────────────────────── */
+.screenshot-frame {
+    -fx-border-color: darkgrey;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+}
+
+.atlantafx-active .screenshot-frame {
+    -fx-border-color: -color-border-default;
+}
+
 .launcher-footer {
     -fx-background-color: white;
     -fx-border-color: darkgrey transparent transparent transparent;

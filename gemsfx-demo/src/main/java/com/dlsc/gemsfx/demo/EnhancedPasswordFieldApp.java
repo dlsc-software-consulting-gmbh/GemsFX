@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.EnhancedPasswordField;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
@@ -58,7 +57,6 @@ public class EnhancedPasswordFieldApp extends GemApplication {
         primaryStage.setScene(scene);
         primaryStage.setTitle("Enhanced Password Field");
         primaryStage.sizeToScene();
-        StageManager.install(primaryStage, "enhanced.password.field.app");
 
         primaryStage.show();
     }
@@ -98,12 +96,9 @@ public class EnhancedPasswordFieldApp extends GemApplication {
                 
                 Usage example:
                 ```
-                
-                `EnhancedPasswordField passwordField = new EnhancedPasswordField();
+                EnhancedPasswordField passwordField = new EnhancedPasswordField();
                 passwordField.setLeft(new ImageView(new Image("path/to/icon.png")));
                 passwordField.setRight(new Button("Show", e -> passwordField.setShowPassword(!passwordField.isShowPassword())));
-                `
-                
                 ```
                 """;
     }

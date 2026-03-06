@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DayOfWeekPicker;
 import com.dlsc.gemsfx.demo.fake.SimpleControlPane;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -37,7 +36,6 @@ public class DayOfWeekPickerApp extends GemApplication {
 
         primaryStage.setScene(new Scene(splitPane, 800, 600));
         primaryStage.setTitle("DayOfWeekPicker");
-        StageManager.install(primaryStage, "day.of.week.picker.app");
 
         primaryStage.show();
     }

@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.Spacer;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
@@ -43,7 +42,6 @@ public class SpacerApp extends GemApplication {
 
         stage.setScene(new Scene(root, 380, 380));
         stage.setTitle("Spacer Demo");
-        StageManager.install(stage, "spacer.app");
 
         stage.show();
     }

@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.util.RecentFiles;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -73,7 +72,6 @@ public class RecentFilesApp extends GemApplication {
         Scene scene = new Scene(root, 520, 260);
         stage.setTitle("Recent Files Demo");
         stage.setScene(scene);
-        StageManager.install(stage, "recent.files.app");
 
         stage.show();
     }

@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo.binding;
 import com.dlsc.gemsfx.binding.AggregatedListBinding;
 import com.dlsc.gemsfx.binding.GeneralAggregatedListBinding;
 import com.dlsc.gemsfx.demo.GemApplication;
-import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -113,7 +112,6 @@ public class AggregatedListBindingApp extends GemApplication {
         primaryStage.setTitle("Student Scores Management");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
-        StageManager.install(primaryStage, "aggregated.list.binding.app");
 
         primaryStage.show();
     }
