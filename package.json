@@ -23,7 +23,6 @@
             "url": "https://github.com/dlemmermann/gemsfx"
         }],
         "javaVersion": "25",
-        "icon": "gemsfx-demo/src/main/resources/images/logo.png",
         "jar": "gemsfx-demo/target/gemsfx-demo-3.10.1.jar",
         "javafx": true,
         "title": "GemsFX Demo Launcher",
