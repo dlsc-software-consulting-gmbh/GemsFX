@@ -8,13 +8,18 @@
   "preferGlobal": true,
   "main": "index.js",
   "jdeploy": {
+    "args": [
+      "-Djavafx.enablePreview=true",
+      "-Djavafx.suppressPreviewWarning=true",
+    ],
     "jar": "gemsfx-demo/target/gemsfx-demo-3.10.1.jar",
-    "javaVersion": "24",
-    "javafxVersion": "25.0.2",
+    "javaVersion": "25",
     "javafx": true,
     "jdk": false,
     "title": "GemsFX Demo Launcher",
-    "githubRepository": "https://github.com/dlemmermann/GemsFX"
+    "githubRepository": "https://github.com/dlemmermann/GemsFX",
+    "mainClass": "com.dlsc.gemsfx.demo.GemsFXDemoLauncher",
+    "icon": "gemsfx-demo/src/main/resources/images/logo.png"
   },
   "files": [
     "jdeploy-bundle"
