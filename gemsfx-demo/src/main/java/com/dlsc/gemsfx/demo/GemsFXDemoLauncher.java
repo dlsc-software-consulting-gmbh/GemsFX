@@ -15,6 +15,7 @@ import com.dlsc.gemsfx.demo.binding.ObservableListBindingApp;
 import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -27,10 +28,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -49,14 +49,16 @@ import javafx.stage.StageStyle;
 import one.jpro.platform.mdfx.MarkdownView;
 import org.scenicview.ScenicView;
 
+import java.awt.Desktop;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Supplier;
 import java.util.prefs.Preferences;
+import java.util.function.Supplier;
 
 /**
  * A single-window launcher that lists every demo application in the GemsFX
@@ -325,16 +327,12 @@ public class GemsFXDemoLauncher extends GemApplication {
         filtered.addListener((Observable obs) ->
                 countLabel.setText(filtered.size() + " / " + ALL_DEMOS.size() + " demos"));
 
-        HBox statusBar = new HBox(countLabel);
-        statusBar.setAlignment(Pos.CENTER_RIGHT);
-
         // ── Launch button ─────────────────────────────────────────────────────
-        MenuItem launchItem = new MenuItem("Launch Demo");
-        MenuItem launchWithScenicViewItem = new MenuItem("Launch with ScenicView");
-        MenuButton launchButton = new MenuButton("Launch Demo", null, launchItem, launchWithScenicViewItem);
-        launchButton.setMaxWidth(Double.MAX_VALUE);
+        CheckBox scenicViewCheckBox = new CheckBox("ScenicView");
+        Button launchButton = new Button("Launch Demo");
+        launchButton.setDefaultButton(true);
 
-        // wire disable + action for both views
+        // wire disable state
         updateLaunchButton(launchButton, treeView, listView, searchField);
 
         // Screenshot displayed below the description text, with a reflection effect.
@@ -398,8 +396,11 @@ public class GemsFXDemoLauncher extends GemApplication {
         }
         treeView.getSelectionModel().select(selectRow[0]);
 
-        launchItem.setOnAction(evt -> launch(resolveSelected(treeView, listView, searchField)));
-        launchWithScenicViewItem.setOnAction(evt -> launch(resolveSelected(treeView, listView, searchField), true));
+        launchButton.setOnAction(evt -> {
+            DemoEntry entry = resolveSelected(treeView, listView, searchField);
+            if (scenicViewCheckBox.isSelected()) launchWithScenicView(entry);
+            else launch(entry);
+        });
 
         // double-click on tree
         treeView.setOnMouseClicked(e -> {
@@ -437,23 +438,29 @@ public class GemsFXDemoLauncher extends GemApplication {
             centerPane.setCenter(searching ? listView : treeView);
         });
 
-        VBox layout = new VBox(8, themeBar, new Separator(), searchField, new Separator(), centerPane, statusBar, launchButton);
+        VBox layout = new VBox(8, themeBar, new Separator(), searchField, new Separator(), centerPane);
         layout.setPadding(new Insets(12));
         layout.setMinWidth(Region.USE_PREF_SIZE);
         layout.setPrefWidth(330);
 
         HBox.setHgrow(docScrollPane, Priority.ALWAYS);
-        HBox rootHBox = new HBox(layout, docScrollPane);
 
-        // ── Header ────────────────────────────────────────────────────────────
+        // Float the gemsfx logo above the scroll pane, top-right corner
         ImageView logoView = new ImageView(logoImage);
         logoView.setPreserveRatio(true);
-        logoView.setFitHeight(64);
+        logoView.setFitHeight(120);
+        logoView.setMouseTransparent(true);
+        StackPane.setAlignment(logoView, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(logoView, new Insets(20, 20, 20, 20));
+        StackPane docPane = new StackPane(docScrollPane, logoView);
+        HBox.setHgrow(docPane, Priority.ALWAYS);
+
+        HBox rootHBox = new HBox(layout, docPane);
 
         Label titleLabel = new Label("GemsFX Demo Launcher");
         titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
-        Label subtitleLabel = new Label("Professional custom controls for JavaFX.");
+        Label subtitleLabel = new Label("Professional open source custom controls for JavaFX.");
         subtitleLabel.setStyle("-fx-font-size: 13px;");
 
         VBox textBox = new VBox(2, titleLabel, subtitleLabel);
@@ -465,18 +472,34 @@ public class GemsFXDemoLauncher extends GemApplication {
         dlscLogoView.setPreserveRatio(true);
         dlscLogoView.setFitHeight(40);
         dlscLogoView.setCursor(javafx.scene.Cursor.HAND);
-        dlscLogoView.setOnMouseClicked(e -> getHostServices().showDocument("https://dlsc.com"));
+        dlscLogoView.setOnMouseClicked(e -> {
+            if (Desktop.isDesktopSupported()) {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://dlsc.com"));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
         ImageView githubBadgeView = new ImageView(new Image(Objects.requireNonNull(
                 GemsFXDemoLauncher.class.getResourceAsStream("get-it-on-github.png"))));
         githubBadgeView.setPreserveRatio(true);
         githubBadgeView.setFitHeight(60);
         githubBadgeView.setCursor(javafx.scene.Cursor.HAND);
-        githubBadgeView.setOnMouseClicked(e -> getHostServices().showDocument("https://github.com/dlemmermann/GemsFX"));
+        githubBadgeView.setOnMouseClicked(e -> {
+            if (Desktop.isDesktopSupported()) {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://github.com/dlemmermann/GemsFX"));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
-        HBox header = new HBox(12, logoView, textBox, githubBadgeView, dlscLogoView);
+        HBox header = new HBox(12, textBox, githubBadgeView, dlscLogoView);
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setPadding(new Insets(27, 16, 12, 16));
+        header.setPadding(new Insets(27, 16, 27, 16));
         header.getStyleClass().add("launcher-header");
 
         // Make the header draggable to move the stage
@@ -490,7 +513,15 @@ public class GemsFXDemoLauncher extends GemApplication {
             stage.setY(e.getScreenY() + dragDelta[1]);
         });
 
-        VBox rootWithHeader = new VBox(header, rootHBox);
+        // ── Footer ────────────────────────────────────────────────────────────
+        Region footerSpacer = new Region();
+        HBox.setHgrow(footerSpacer, Priority.ALWAYS);
+        HBox footer = new HBox(12, countLabel, footerSpacer, scenicViewCheckBox, launchButton);
+        footer.setAlignment(Pos.CENTER_LEFT);
+        footer.setPadding(new Insets(8, 16, 8, 16));
+        footer.getStyleClass().add("launcher-footer");
+
+        VBox rootWithHeader = new VBox(header, rootHBox, footer);
         VBox.setVgrow(rootHBox, Priority.ALWAYS);
 
         Scene scene = new Scene(new StackPane(rootWithHeader));
@@ -512,7 +543,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         stage.setMaxWidth(stage.getWidth());
         stage.setMinHeight(800);
 
-        ScenicView.show(scene);
+//        ScenicView.show(scene);
     }
 
     // -----------------------------------------------------------------------
@@ -536,16 +567,12 @@ public class GemsFXDemoLauncher extends GemApplication {
         return null;
     }
 
-    private void updateLaunchButton(MenuButton button, TreeView<Object> treeView,
+    private void updateLaunchButton(Button button, TreeView<Object> treeView,
                                     ListView<DemoEntry> listView, TextField searchField) {
         button.setDisable(resolveSelected(treeView, listView, searchField) == null);
     }
 
     private void launch(DemoEntry entry) {
-        launch(entry, false);
-    }
-
-    private void launch(DemoEntry entry, boolean withScenicView) {
         if (entry == null) return;
         try {
             Application app = entry.factory().get();
@@ -554,14 +581,31 @@ public class GemsFXDemoLauncher extends GemApplication {
             centerOnSameScreen(demoStage);
             openDemoStages.add(demoStage);
             demoStage.setOnHidden(e -> openDemoStages.remove(demoStage));
-            if (withScenicView && demoStage.getScene() != null) {
+        } catch (Exception ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Launch Error");
+            alert.setHeaderText("Failed to launch \"" + entry.name() + "\"");
+            alert.setContentText(ex.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    private void launchWithScenicView(DemoEntry entry) {
+        if (entry == null) return;
+        try {
+            Application app = entry.factory().get();
+            Stage demoStage = new Stage();
+            app.start(demoStage);
+            centerOnSameScreen(demoStage);
+            openDemoStages.add(demoStage);
+            demoStage.setOnHidden(e -> openDemoStages.remove(demoStage));
+            if (demoStage.getScene() != null) {
                 ScenicView.show(demoStage.getScene());
             }
         } catch (Exception ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Launch Error");
-            alert.setHeaderText("Failed to launch \"" + entry.name() + "\""
-                    + (withScenicView ? " with ScenicView" : ""));
+            alert.setHeaderText("Failed to launch \"" + entry.name() + "\" with ScenicView");
             alert.setContentText(ex.getMessage());
             alert.showAndWait();
         }
@@ -591,37 +635,37 @@ public class GemsFXDemoLauncher extends GemApplication {
             screenshotView.setVisible(false);
             return;
         }
-
-        GemApplication app;
         try {
-            app = (GemApplication) entry.factory().get();
+            GemApplication app = (GemApplication) entry.factory().get();
+            String desc = app.getDescription();
+            markdownView.setMdString(desc.isBlank()
+                    ? "*No documentation available.*"
+                    : desc);
         } catch (Exception e) {
             markdownView.setMdString("*No documentation available.*");
-            screenshotView.setImage(null);
-            screenshotView.setManaged(false);
-            screenshotView.setVisible(false);
-            return;
         }
-
-        String desc = app.getDescription();
-        markdownView.setMdString(desc.isBlank()
-                ? "*No documentation available.*"
-                : desc);
 
         // Load screenshot: prefer theme-specific, fall back to modena.
-        String className = app.getClass().getSimpleName();
-        URL screenshotUrl = GemsFXDemoLauncher.class.getResource(
-                "screenshots/" + themeKey + "/" + className + ".png");
-        if (screenshotUrl == null) {
-            screenshotUrl = GemsFXDemoLauncher.class.getResource(
-                    "screenshots/modena/" + className + ".png");
-        }
-        if (screenshotUrl != null) {
-            screenshotView.setImage(new Image(
-                    screenshotUrl.toExternalForm(), true));
-            screenshotView.setManaged(true);
-            screenshotView.setVisible(true);
-        } else {
+        try {
+            GemApplication app = (GemApplication) entry.factory().get();
+            String className = app.getClass().getSimpleName();
+            URL screenshotUrl = GemsFXDemoLauncher.class.getResource(
+                    "screenshots/" + themeKey + "/" + className + ".png");
+            if (screenshotUrl == null) {
+                screenshotUrl = GemsFXDemoLauncher.class.getResource(
+                        "screenshots/modena/" + className + ".png");
+            }
+            if (screenshotUrl != null) {
+                screenshotView.setImage(new Image(
+                        screenshotUrl.toExternalForm(), true));
+                screenshotView.setManaged(true);
+                screenshotView.setVisible(true);
+            } else {
+                screenshotView.setImage(null);
+                screenshotView.setManaged(false);
+                screenshotView.setVisible(false);
+            }
+        } catch (Exception e) {
             screenshotView.setImage(null);
             screenshotView.setManaged(false);
             screenshotView.setVisible(false);

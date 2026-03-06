@@ -83,7 +83,7 @@ public class DateRangeViewApp extends GemApplication {
                 ### DateRangeView
                 
                 The date range view can be used to define a start and an end date 
-                via two CalendarView instances.
+                via two `CalendarView` instances.
 
                 """;
     }

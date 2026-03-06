@@ -30,12 +30,14 @@
 /* ── Header background ────────────────────────────────────── */
 .launcher-header {
     -fx-background-color: white;
-    -fx-border-color: transparent transparent black transparent;
+    -fx-border-color: transparent transparent darkgrey transparent;
     -fx-border-width: 1;
 }
 
 .atlantafx-active .launcher-header {
     -fx-background-color: -color-accent-muted;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
 }
 
 /* ── Remove ScrollPane border in Modena ──────────────────── */
@@ -43,4 +45,15 @@
     -fx-border-color: transparent;
     -fx-background-insets: 0;
     -fx-padding: 0;
+}
+/* ── Footer ───────────────────────────────────────────────── */
+.launcher-footer {
+    -fx-background-color: white;
+    -fx-border-color: darkgrey transparent transparent transparent;
+    -fx-border-width: 1;
+}
+
+.atlantafx-active .launcher-footer {
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: -color-border-default transparent transparent transparent;
 }
