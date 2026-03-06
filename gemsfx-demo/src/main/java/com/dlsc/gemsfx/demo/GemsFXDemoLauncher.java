@@ -1,6 +1,5 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.util.StageManager;
 import atlantafx.base.theme.CupertinoDark;
 import atlantafx.base.theme.CupertinoLight;
 import atlantafx.base.theme.Dracula;
@@ -13,6 +12,7 @@ import com.dlsc.gemsfx.demo.binding.AggregatedListBindingApp;
 import com.dlsc.gemsfx.demo.binding.NestedListBindingApp;
 import com.dlsc.gemsfx.demo.binding.NestedListChangeTrackerApp;
 import com.dlsc.gemsfx.demo.binding.ObservableListBindingApp;
+import com.dlsc.gemsfx.util.StageManager;
 import javafx.application.Application;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -25,7 +25,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -47,6 +46,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import one.jpro.platform.mdfx.MarkdownView;
 import org.scenicview.ScenicView;
 
@@ -92,7 +92,6 @@ public class GemsFXDemoLauncher extends GemApplication {
             // --- Calendar & Date / Time -----------------------------------------
             demo("Calendar & Date / Time", "Calendar Picker", CalendarPickerApp::new),
             demo("Calendar & Date / Time", "Calendar View", CalendarViewApp::new),
-            demo("Calendar & Date / Time", "Calendar View 2", CalendarView2App::new),
             demo("Calendar & Date / Time", "Date Range Picker", DateRangePickerApp::new),
             demo("Calendar & Date / Time", "Date Range View", DateRangeViewApp::new),
             demo("Calendar & Date / Time", "Day Of Week Picker", DayOfWeekPickerApp::new),
@@ -114,8 +113,6 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Layout", "Scroll Pane", ScrollPaneApp::new),
             demo("Layout", "Spacer", SpacerApp::new),
             demo("Layout", "Stretching Tile Pane", StretchingTilePaneApp::new),
-            demo("Layout", "Template Pane", TemplatePaneApp::new),
-            demo("Layout", "Template Pane Example", TemplatePaneExampleApp::new),
             demo("Layout", "Three Items Pane", ThreeItemsPaneApp::new),
 
             // --- Lists & Tables -------------------------------------------------
@@ -134,7 +131,6 @@ public class GemsFXDemoLauncher extends GemApplication {
             // --- Media & Graphics -----------------------------------------------
             demo("Media & Graphics", "Avatar View", AvatarViewApp::new),
             demo("Media & Graphics", "Before / After View", BeforeAfterViewApp::new),
-            demo("Media & Graphics", "Before / After View 2", BeforeAfterViewApp2::new),
             demo("Media & Graphics", "Circle Progress Indicator", CircleProgressIndicatorApp::new),
             demo("Media & Graphics", "Payment Option", PaymentOptionApp::new),
             demo("Media & Graphics", "Payment Option Tiles", PaymentOptionTilesApp::new),
@@ -186,15 +182,18 @@ public class GemsFXDemoLauncher extends GemApplication {
 
     @Override
     public void start(Stage stage) {
+        stage.initStyle(StageStyle.EXTENDED);
         super.start(stage);
         launcherStage = stage;
 
         // ── AtlantaFX theme toggle ───────────────────────────────────────────
         String atlantaFxCss = getClass().getResource("atlantafx.css").toExternalForm();
+        String mdfxModenaCss = Objects.requireNonNull(GemsFXDemoLauncher.class.getResource("mdfx-modena-override.css")).toExternalForm();
         String mdfxOverrideCss = Objects.requireNonNull(GemsFXDemoLauncher.class.getResource("mdfx-atlantafx-override.css")).toExternalForm();
 
         MarkdownView markdownView = new MarkdownView();
         markdownView.getStyleClass().add("description-markdown-view");
+        markdownView.getStylesheets().add(mdfxModenaCss);
 
         List<Theme> themes = List.of(new NordLight(), new NordDark(), new CupertinoLight(),
                 new CupertinoDark(), new PrimerLight(), new PrimerDark(), new Dracula());
@@ -222,7 +221,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         HBox.setHgrow(themeComboBox, Priority.ALWAYS);
         themeComboBox.setMaxWidth(Double.MAX_VALUE);
 
-        CheckBox atlantaFxCheckBox = new CheckBox("AtlantaFX Theme");
+        CheckBox atlantaFxCheckBox = new CheckBox("AtlantaFX");
         atlantaFxCheckBox.setSelected(prefs.getBoolean("atlantafx.enabled", false));
         if (atlantaFxCheckBox.isSelected()) System.setProperty("atlantafx", "true");
         themeComboBox.disableProperty().bind(atlantaFxCheckBox.selectedProperty().not());
@@ -235,6 +234,10 @@ public class GemsFXDemoLauncher extends GemApplication {
 
         // Refreshes the screenshot when the theme changes. Populated once tree/list/search are ready.
         Runnable[] refreshScreenshot = {() -> {}};
+
+        // Logo image
+        Image logoImage = new Image(Objects.requireNonNull(
+                GemsFXDemoLauncher.class.getResourceAsStream("gems.png")));
 
         Runnable applyTheme = () -> {
             Theme theme = themeComboBox.getValue();
@@ -341,14 +344,15 @@ public class GemsFXDemoLauncher extends GemApplication {
         ImageView screenshotView = new ImageView();
         screenshotView.setPreserveRatio(true);
         screenshotView.setSmooth(true);
-        javafx.scene.effect.Reflection reflection = new javafx.scene.effect.Reflection();
-        reflection.setFraction(0.35);
-        reflection.setTopOffset(4.0);
-        reflection.setTopOpacity(0.55);
-        reflection.setBottomOpacity(0.0);
-        screenshotView.setEffect(reflection);
         screenshotView.setManaged(false);
         screenshotView.setVisible(false);
+        screenshotView.setFitWidth(600);
+        screenshotView.setFitHeight(600);
+        screenshotView.setCursor(javafx.scene.Cursor.HAND);
+        screenshotView.setOnMouseClicked(e -> {
+            DemoEntry entry = resolveSelected(treeView, listView, searchField);
+            if (entry != null) launch(entry);
+        });
 
         Region spacer = new Region();
         spacer.setMinHeight(200);
@@ -359,13 +363,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         ScrollPane docScrollPane = new ScrollPane(docContent);
         docScrollPane.setFitToWidth(true);
         docScrollPane.getStyleClass().add("doc-scroll-pane");
-
-        // Cap the screenshot at its natural size; shrink if the panel is narrower.
-        screenshotView.fitWidthProperty().bind(Bindings.createDoubleBinding(() -> {
-            Image img = screenshotView.getImage();
-            double available = docScrollPane.getWidth() - 32;
-            return img == null ? available : Math.min(available, img.getWidth());
-        }, docScrollPane.widthProperty(), screenshotView.imageProperty()));
+        docScrollPane.setPrefWidth(750);
 
         searchField.textProperty().addListener((obs, o, n) ->
                 updateLaunchButton(launchButton, treeView, listView, searchField));
@@ -444,26 +442,48 @@ public class GemsFXDemoLauncher extends GemApplication {
 
         VBox layout = new VBox(8, themeBar, new Separator(), searchField, new Separator(), centerPane, statusBar, launchButton);
         layout.setPadding(new Insets(12));
-        layout.setMinWidth(280);
+        layout.setMinWidth(330);
+        layout.setPrefWidth(330);
 
         HBox.setHgrow(docScrollPane, Priority.ALWAYS);
         HBox rootHBox = new HBox(layout, docScrollPane);
 
         // ── Header ────────────────────────────────────────────────────────────
-        ImageView logoView = new ImageView(new Image(Objects.requireNonNull(
-                GemsFXDemoLauncher.class.getResourceAsStream("gems.png"))));
+        ImageView logoView = new ImageView(logoImage);
         logoView.setPreserveRatio(true);
         logoView.setFitHeight(64);
 
-        Label titleLabel = new Label("GemsFX");
+        Label titleLabel = new Label("GemsFX Demo Launcher");
         titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
-        Label subtitleLabel = new Label("Professional custom controls for JavaFX");
+        Label subtitleLabel = new Label("Professional custom controls for JavaFX.");
         subtitleLabel.setStyle("-fx-font-size: 13px;");
 
-        Hyperlink githubLink = new Hyperlink("github.com/dlemmermann/GemsFX");
-        githubLink.setStyle("-fx-font-size: 12px;");
-        githubLink.setOnAction(e -> {
+        VBox textBox = new VBox(2, titleLabel, subtitleLabel);
+        textBox.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(textBox, Priority.ALWAYS);
+
+        ImageView dlscLogoView = new ImageView(new Image(Objects.requireNonNull(
+                GemsFXDemoLauncher.class.getResourceAsStream("dlsc-logo.png"))));
+        dlscLogoView.setPreserveRatio(true);
+        dlscLogoView.setFitHeight(40);
+        dlscLogoView.setCursor(javafx.scene.Cursor.HAND);
+        dlscLogoView.setOnMouseClicked(e -> {
+            if (Desktop.isDesktopSupported()) {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://dlsc.com"));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        ImageView githubBadgeView = new ImageView(new Image(Objects.requireNonNull(
+                GemsFXDemoLauncher.class.getResourceAsStream("get-it-on-github.png"))));
+        githubBadgeView.setPreserveRatio(true);
+        githubBadgeView.setFitHeight(60);
+        githubBadgeView.setCursor(javafx.scene.Cursor.HAND);
+        githubBadgeView.setOnMouseClicked(e -> {
             if (Desktop.isDesktopSupported()) {
                 try {
                     Desktop.getDesktop().browse(new URI("https://github.com/dlemmermann/GemsFX"));
@@ -473,30 +493,45 @@ public class GemsFXDemoLauncher extends GemApplication {
             }
         });
 
-        VBox textBox = new VBox(2, titleLabel, subtitleLabel, githubLink);
-        textBox.setAlignment(Pos.CENTER_LEFT);
-
-        HBox header = new HBox(12, logoView, textBox);
+        HBox header = new HBox(12, logoView, textBox, githubBadgeView, dlscLogoView);
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setPadding(new Insets(12, 16, 12, 16));
-        header.setStyle("-fx-border-color: transparent transparent -fx-box-border transparent; -fx-border-width: 1;");
+        header.setPadding(new Insets(27, 16, 12, 16));
+        header.getStyleClass().add("launcher-header");
 
-        VBox rootWithHeader = new VBox(header, new Separator(), rootHBox);
+        // Make the header draggable to move the stage
+        double[] dragDelta = {0, 0};
+        header.setOnMousePressed(e -> {
+            dragDelta[0] = stage.getX() - e.getScreenX();
+            dragDelta[1] = stage.getY() - e.getScreenY();
+        });
+        header.setOnMouseDragged(e -> {
+            stage.setX(e.getScreenX() + dragDelta[0]);
+            stage.setY(e.getScreenY() + dragDelta[1]);
+        });
+
+        VBox rootWithHeader = new VBox(header, rootHBox);
         VBox.setVgrow(rootHBox, Priority.ALWAYS);
 
         Scene scene = new Scene(new StackPane(rootWithHeader));
         scene.getStylesheets().add(Objects.requireNonNull(GemsFXDemoLauncher.class.getResource("launcher.css")).toExternalForm());
         stage.setTitle("GemsFX — Demo Launcher");
         stage.setScene(scene);
-        stage.setResizable(false);
-        stage.sizeToScene();
-
         stage.centerOnScreen();
         if (atlantaFxCheckBox.isSelected()) {
             applyTheme.run();
         }
 
+        stage.sizeToScene();
+
+        StageManager.install(stage, "gemsfx.demo.launcher");
         stage.show();
+
+        // Lock width but allow height resizing; enforce minimum height
+        stage.setMinWidth(stage.getWidth());
+        stage.setMaxWidth(stage.getWidth());
+        stage.setMinHeight(800);
+
+        ScenicView.show(scene);
     }
 
     // -----------------------------------------------------------------------
@@ -653,6 +688,7 @@ public class GemsFXDemoLauncher extends GemApplication {
     }
 
     public static void main(String[] args) {
+        System.setProperty("javafx.enablePreview", "true");
         launch(args);
     }
 }

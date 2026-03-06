@@ -48,8 +48,8 @@
         <project.identifier>gemsfx</project.identifier>
         <project.github.repository>dlsc-software-consulting-gmbh/GemsFX</project.github.repository>
         <local.repository.path>/tmp/repository</local.repository.path>
-        <java.version>21</java.version>
-        <javafx.version>23.0.2</javafx.version>
+        <java.version>24</java.version>
+        <javafx.version>25.0.2</javafx.version>
         <ikonli.version>12.4.0</ikonli.version>
         <sonar.projectKey>dlsc-software-consulting-gmbh_GemsFX</sonar.projectKey>
         <sonar.organization>dlsc-software-consulting-gmbh</sonar.organization>
@@ -79,19 +79,19 @@
             <dependency>
                 <groupId>one.jpro.platform</groupId>
                 <artifactId>jpro-mdfx</artifactId>
-                <version>0.5.0</version>
+                <version>0.5.8</version>
             </dependency>
 
             <dependency>
                 <groupId>one.jpro.platform</groupId>
                 <artifactId>jpro-utils</artifactId>
-                <version>0.5.0</version>
+                <version>0.5.8</version>
             </dependency>
 
             <dependency>
                 <groupId>net.synedra</groupId>
                 <artifactId>validatorfx</artifactId>
-                <version>0.5.0</version>
+                <version>0.6.1</version>
             </dependency>
 
             <dependency>
@@ -223,7 +223,7 @@
             <dependency>
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
-                <version>24.1.0</version>
+                <version>26.1.0</version>
             </dependency>
         </dependencies>
 

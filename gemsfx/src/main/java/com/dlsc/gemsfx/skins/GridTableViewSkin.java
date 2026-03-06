@@ -50,6 +50,9 @@ public class GridTableViewSkin<S> extends GemsSkinBase<GridTableView<S>> {
         Bindings.bindContent(gridPane.getColumnConstraints(), tableView.columnsProperty());
         register(tableView.columnsProperty(), (Observable it) -> updateView());
 
+        register(tableView.rowHeaderFactoryProperty(), c -> updateView());
+        register(tableView.rowFooterFactoryProperty(), c -> updateView());
+
         gridPane.getStyleClass().add("grid-pane");
 
         getChildren().add(gridPane);

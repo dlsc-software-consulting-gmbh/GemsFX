@@ -1,0 +1,12 @@
+.description-markdown-view {
+    -fx-font-family: "Inter Regular";
+}
+
+.description-markdown-view .markdown-heading-3 {
+    -fx-font-size: 1em;
+    -fx-padding: 5px 0px;
+}
+
+.description-markdown-view .markdown-heading-3 .text {
+    -fx-font-size: 1em;
+}

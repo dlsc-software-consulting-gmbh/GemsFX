@@ -15,7 +15,3 @@
     -mdfx-bq-color-border: -color-accent-emphasis;
     -mdfx-bq-color-background: -color-accent-subtle;
 }
-
-.description-markdown-view .markdown-heading-3 {
-    -fx-padding: 5px 0px;
-}

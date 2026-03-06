@@ -39,9 +39,6 @@ public class GridTableViewApp extends GemApplication {
         GridTableView<Student> tableView = new GridTableView<>();
         tableView.setMinNumberOfRows(8);
 
-        tableView.setRowHeaderFactory(student -> new Label("Header for student: " + student.getName()));
-        tableView.setRowFooterFactory(student -> new Label("Footer for student: " + student.getName()));
-
         // simple text for context menu callback
         tableView.setOnContextMenuForItemRequested(student -> new ContextMenu(new MenuItem("Edit")));
 
@@ -105,6 +102,18 @@ public class GridTableViewApp extends GemApplication {
             }
         });
 
+        CheckBox showHeaderAndFooter = new CheckBox("Show Header / Footer");
+        showHeaderAndFooter.setSelected(false);
+        showHeaderAndFooter.selectedProperty().addListener((ob, ov, selected) -> {
+            if (selected) {
+                tableView.setRowHeaderFactory(student -> new Label("Header for student: " + student.getName()));
+                tableView.setRowFooterFactory(student -> new Label("Footer for student: " + student.getName()));
+            } else {
+                tableView.setRowFooterFactory(null);
+                tableView.setRowHeaderFactory(null);
+            }
+        });
+
         Button btnAdd = new Button("Add");
         btnAdd.setOnAction(event -> {
             Random random = new Random();
@@ -121,7 +130,7 @@ public class GridTableViewApp extends GemApplication {
         Button scenicView = new Button("Scenic View");
         scenicView.setOnAction(evt -> ScenicView.show(tableView.getScene()));
 
-        HBox bottom = new HBox(30, artBox, btnAdd, btnRemove, scenicView);
+        HBox bottom = new HBox(30, artBox, showHeaderAndFooter, btnAdd, btnRemove, scenicView);
         bottom.setAlignment(Pos.CENTER);
         bottom.setPadding(new Insets(10));
 

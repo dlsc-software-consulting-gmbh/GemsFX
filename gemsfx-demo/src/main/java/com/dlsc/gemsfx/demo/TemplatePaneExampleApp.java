@@ -98,7 +98,9 @@ public class TemplatePaneExampleApp extends GemApplication {
 		pane.setNode(Position.HEADER, stackPane);
 		stackPane.setStyle("-fx-background-color: white");
 
-		ImageView logo = new ImageView(Objects.requireNonNull(TemplatePaneExampleApp.class.getResource("logo-dlsc.png")).toExternalForm());
+		ImageView logo = new ImageView(Objects.requireNonNull(TemplatePaneExampleApp.class.getResource("dlsc-logo.png")).toExternalForm());
+		logo.setFitHeight(50);
+		logo.setPreserveRatio(true);
 		StackPane.setAlignment(logo, Pos.CENTER_LEFT);
 		stackPane.getChildren().add(logo);
 

@@ -4,10 +4,7 @@ import com.dlsc.gemsfx.paging.PagingControlBase.MessageLabelStrategy;
 import com.dlsc.gemsfx.paging.PagingControls;
 import com.dlsc.gemsfx.util.StageManager;
 import fr.brouillard.oss.cssfx.CSSFX;
-import javafx.application.Application;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -35,15 +32,6 @@ public class PagingControlsApp extends GemApplication {
 
     @Override
     public void start(Stage stage) { super.start(stage);
-        ObjectProperty<Integer> obj = new SimpleObjectProperty<>();
-
-        IntegerProperty inti = new SimpleIntegerProperty(10);
-        obj.bindBidirectional(inti.asObject());
-
-        System.out.println("Obj: " + obj.get());
-        obj.set(20);
-        System.out.println("inti: " + inti.get());
-
         VBox vBox1 = createSection(10, 221, MessageLabelStrategy.SHOW_WHEN_NEEDED, PagingControls.FirstLastPageDisplayMode.SHOW_ARROW_BUTTONS, 1);
         VBox vBox2 = createSection(10, 221, MessageLabelStrategy.SHOW_WHEN_NEEDED, PagingControls.FirstLastPageDisplayMode.HIDE, 2);
         VBox vBox3 = createSection(10, 221, MessageLabelStrategy.SHOW_WHEN_NEEDED, PagingControls.FirstLastPageDisplayMode.HIDE, 3);

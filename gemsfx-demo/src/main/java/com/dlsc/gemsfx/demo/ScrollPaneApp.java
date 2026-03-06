@@ -71,7 +71,7 @@ public class ScrollPaneApp extends GemApplication {
         return """
                 ### GemScrollPane
 
-An enhanced scroll pane that supports smooth animated scrolling.
+                An enhanced scroll pane that supports smooth animated scrolling.
                 """;
     }
 
