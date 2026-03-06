@@ -1,16 +1,10 @@
 # Builds the project and publishes native installers to GitHub Releases via jDeploy.
-# On push to master: publishes to a rolling "master" release (snapshot).
-# On tag push: adds installers as artifacts to the tagged release.
 # See https://www.jdeploy.com for more information.
 
 name: "Demo-Launcher"
 
 on:
-  push:
-    branches:
-      - master
-    tags:
-      - '*'
+  workflow_dispatch:
 
 jobs:
   build:
