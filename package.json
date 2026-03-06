@@ -10,7 +10,7 @@
   "jdeploy": {
     "args": [
       "-Djavafx.enablePreview=true",
-      "-Djavafx.suppressPreviewWarning=true",
+      "-Djavafx.suppressPreviewWarning=true"
     ],
     "jar": "gemsfx-demo/target/gemsfx-demo-3.10.1.jar",
     "javaVersion": "25",
