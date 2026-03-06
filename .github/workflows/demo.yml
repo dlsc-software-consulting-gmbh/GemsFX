@@ -3,7 +3,7 @@
 # On tag push: adds installers as artifacts to the tagged release.
 # See https://www.jdeploy.com for more information.
 
-name: jDeploy
+name: "Demo-Launcher"
 
 on:
   push:
