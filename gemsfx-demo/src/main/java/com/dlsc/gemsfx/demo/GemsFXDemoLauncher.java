@@ -442,7 +442,7 @@ public class GemsFXDemoLauncher extends GemApplication {
 
         VBox layout = new VBox(8, themeBar, new Separator(), searchField, new Separator(), centerPane, statusBar, launchButton);
         layout.setPadding(new Insets(12));
-        layout.setMinWidth(330);
+        layout.setMinWidth(Region.USE_PREF_SIZE);
         layout.setPrefWidth(330);
 
         HBox.setHgrow(docScrollPane, Priority.ALWAYS);
