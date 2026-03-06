@@ -1,30 +1,33 @@
 {
-  "name": "gemsfx-demo",
-  "version": "1.0.0",
-  "title": "GemsFX Demo Launcher",
-  "description": "Professional custom controls for JavaFX",
-  "author": "Dirk Lemmermann",
-  "license": "Apache-2.0",
-  "preferGlobal": true,
-  "main": "index.js",
-  "jdeploy": {
-    "args": [
-      "-Djavafx.enablePreview=true",
-      "-Djavafx.suppressPreviewWarning=true"
-    ],
-    "jar": "gemsfx-demo/target/gemsfx-demo-3.10.1.jar",
-    "javaVersion": "25",
-    "javafx": true,
-    "jdk": false,
+    "license": "Apache-2.0",
+    "author": "Dirk Lemmermann",
+    "name": "gemsfx-demo",
+    "description": "Professional custom controls for JavaFX",
+    "files": ["jdeploy-bundle"],
+    "main": "index.js",
+    "preferGlobal": true,
     "title": "GemsFX Demo Launcher",
-    "githubRepository": "https://github.com/dlemmermann/GemsFX",
-    "mainClass": "com.dlsc.gemsfx.demo.GemsFXDemoLauncher",
-    "icon": "gemsfx-demo/src/main/resources/images/logo.png"
-  },
-  "files": [
-    "jdeploy-bundle"
-  ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  }
+    "scripts": {"test": "echo \"Error: no test specified\" && exit 1"},
+    "version": "1.0.0",
+    "jdeploy": {
+        "args": [
+            "-Djavafx.enablePreview=true",
+            "-Djavafx.suppressPreviewWarning=true"
+        ],
+        "fallbackToUniversal": false,
+        "githubRepository": "https://github.com/dlemmermann/GemsFX",
+        "mainClass": "com.dlsc.gemsfx.demo.GemsFXDemoLauncher",
+        "publishTargets": [{
+            "name": "github: github",
+            "type": "GITHUB",
+            "url": "https://github.com/dlemmermann/gemsfx"
+        }],
+        "javaVersion": "25",
+        "icon": "gemsfx-demo/src/main/resources/images/logo.png",
+        "jar": "gemsfx-demo/target/gemsfx-demo-3.10.1.jar",
+        "javafx": true,
+        "title": "GemsFX Demo Launcher",
+        "platformBundlesEnabled": false,
+        "downloadPage": {"platforms": ["default"]}
+    }
 }
