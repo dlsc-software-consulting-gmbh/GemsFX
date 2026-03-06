@@ -28,8 +28,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -328,16 +327,12 @@ public class GemsFXDemoLauncher extends GemApplication {
         filtered.addListener((Observable obs) ->
                 countLabel.setText(filtered.size() + " / " + ALL_DEMOS.size() + " demos"));
 
-        HBox statusBar = new HBox(countLabel);
-        statusBar.setAlignment(Pos.CENTER_RIGHT);
-
         // ── Launch button ─────────────────────────────────────────────────────
-        MenuItem launchItem = new MenuItem("Launch Demo");
-        MenuItem launchWithScenicViewItem = new MenuItem("Launch with ScenicView");
-        MenuButton launchButton = new MenuButton("Launch Demo", null, launchItem, launchWithScenicViewItem);
-        launchButton.setMaxWidth(Double.MAX_VALUE);
+        CheckBox scenicViewCheckBox = new CheckBox("ScenicView");
+        Button launchButton = new Button("Launch Demo");
+        launchButton.setDefaultButton(true);
 
-        // wire disable + action for both views
+        // wire disable state
         updateLaunchButton(launchButton, treeView, listView, searchField);
 
         // Screenshot displayed below the description text, with a reflection effect.
@@ -401,8 +396,11 @@ public class GemsFXDemoLauncher extends GemApplication {
         }
         treeView.getSelectionModel().select(selectRow[0]);
 
-        launchItem.setOnAction(evt -> launch(resolveSelected(treeView, listView, searchField)));
-        launchWithScenicViewItem.setOnAction(evt -> launchWithScenicView(resolveSelected(treeView, listView, searchField)));
+        launchButton.setOnAction(evt -> {
+            DemoEntry entry = resolveSelected(treeView, listView, searchField);
+            if (scenicViewCheckBox.isSelected()) launchWithScenicView(entry);
+            else launch(entry);
+        });
 
         // double-click on tree
         treeView.setOnMouseClicked(e -> {
@@ -440,23 +438,29 @@ public class GemsFXDemoLauncher extends GemApplication {
             centerPane.setCenter(searching ? listView : treeView);
         });
 
-        VBox layout = new VBox(8, themeBar, new Separator(), searchField, new Separator(), centerPane, statusBar, launchButton);
+        VBox layout = new VBox(8, themeBar, new Separator(), searchField, new Separator(), centerPane);
         layout.setPadding(new Insets(12));
         layout.setMinWidth(Region.USE_PREF_SIZE);
         layout.setPrefWidth(330);
 
         HBox.setHgrow(docScrollPane, Priority.ALWAYS);
-        HBox rootHBox = new HBox(layout, docScrollPane);
 
-        // ── Header ────────────────────────────────────────────────────────────
+        // Float the gemsfx logo above the scroll pane, top-right corner
         ImageView logoView = new ImageView(logoImage);
         logoView.setPreserveRatio(true);
-        logoView.setFitHeight(64);
+        logoView.setFitHeight(120);
+        logoView.setMouseTransparent(true);
+        StackPane.setAlignment(logoView, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(logoView, new Insets(20, 20, 20, 20));
+        StackPane docPane = new StackPane(docScrollPane, logoView);
+        HBox.setHgrow(docPane, Priority.ALWAYS);
+
+        HBox rootHBox = new HBox(layout, docPane);
 
         Label titleLabel = new Label("GemsFX Demo Launcher");
         titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
-        Label subtitleLabel = new Label("Professional custom controls for JavaFX.");
+        Label subtitleLabel = new Label("Professional open source custom controls for JavaFX.");
         subtitleLabel.setStyle("-fx-font-size: 13px;");
 
         VBox textBox = new VBox(2, titleLabel, subtitleLabel);
@@ -493,9 +497,9 @@ public class GemsFXDemoLauncher extends GemApplication {
             }
         });
 
-        HBox header = new HBox(12, logoView, textBox, githubBadgeView, dlscLogoView);
+        HBox header = new HBox(12, textBox, githubBadgeView, dlscLogoView);
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setPadding(new Insets(27, 16, 12, 16));
+        header.setPadding(new Insets(27, 16, 27, 16));
         header.getStyleClass().add("launcher-header");
 
         // Make the header draggable to move the stage
@@ -509,7 +513,15 @@ public class GemsFXDemoLauncher extends GemApplication {
             stage.setY(e.getScreenY() + dragDelta[1]);
         });
 
-        VBox rootWithHeader = new VBox(header, rootHBox);
+        // ── Footer ────────────────────────────────────────────────────────────
+        Region footerSpacer = new Region();
+        HBox.setHgrow(footerSpacer, Priority.ALWAYS);
+        HBox footer = new HBox(12, countLabel, footerSpacer, scenicViewCheckBox, launchButton);
+        footer.setAlignment(Pos.CENTER_LEFT);
+        footer.setPadding(new Insets(8, 16, 8, 16));
+        footer.getStyleClass().add("launcher-footer");
+
+        VBox rootWithHeader = new VBox(header, rootHBox, footer);
         VBox.setVgrow(rootHBox, Priority.ALWAYS);
 
         Scene scene = new Scene(new StackPane(rootWithHeader));
@@ -531,7 +543,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         stage.setMaxWidth(stage.getWidth());
         stage.setMinHeight(800);
 
-        ScenicView.show(scene);
+//        ScenicView.show(scene);
     }
 
     // -----------------------------------------------------------------------
@@ -555,7 +567,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         return null;
     }
 
-    private void updateLaunchButton(MenuButton button, TreeView<Object> treeView,
+    private void updateLaunchButton(Button button, TreeView<Object> treeView,
                                     ListView<DemoEntry> listView, TextField searchField) {
         button.setDisable(resolveSelected(treeView, listView, searchField) == null);
     }
