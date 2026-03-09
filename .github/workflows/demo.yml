@@ -40,8 +40,25 @@ jobs:
         id: project_version
         run: echo "version=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
 
+      - name: Determine release version with build number
+        id: release_version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LIB_VERSION="${{ steps.project_version.outputs.version }}"
+          EXISTING=$(gh release list --repo ${{ github.repository }} --limit 100 --json tagName \
+            --jq ".[].tagName" \
+            | grep -cE "^${LIB_VERSION}(b[0-9]+)?$" || true)
+          BUILD_NUM=$((EXISTING + 1))
+          if [ "$BUILD_NUM" -eq 1 ]; then
+            RELEASE_VERSION="${LIB_VERSION}"
+          else
+            RELEASE_VERSION="${LIB_VERSION}b${BUILD_NUM}"
+          fi
+          echo "release_version=${RELEASE_VERSION}" >> $GITHUB_OUTPUT
+
       - name: Update version in package.json
-        run: npm version ${{ steps.project_version.outputs.version }} --no-git-tag-version
+        run: npm version ${{ steps.release_version.outputs.release_version }} --no-git-tag-version
 
       - name: Build with Maven
         run: ./mvnw -B package -pl gemsfx-demo -am -DskipTests
