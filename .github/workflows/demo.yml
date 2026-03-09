@@ -21,6 +21,13 @@ jobs:
           distribution: 'zulu'
           cache: maven
 
+      - name: Read project version from pom.xml
+        id: project_version
+        run: echo "version=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+
+      - name: Update version in package.json
+        run: npm version ${{ steps.project_version.outputs.version }} --no-git-tag-version
+
       - name: Build with Maven
         run: ./mvnw -B package -pl gemsfx-demo -am -DskipTests
 

@@ -49,12 +49,15 @@ import javafx.stage.StageStyle;
 import one.jpro.platform.mdfx.MarkdownView;
 import org.scenicview.ScenicView;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 
@@ -480,10 +483,19 @@ public class GemsFXDemoLauncher extends GemApplication {
         Label titleLabel = new Label("GemsFX Demo Launcher");
         titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
+        String version = loadProjectVersion();
+        Label versionLabel = new Label(version);
+        versionLabel.setStyle("-fx-font-size: 13px; -fx-opacity: 0.6;");
+        versionLabel.setVisible(!version.isBlank());
+        versionLabel.setManaged(!version.isBlank());
+
+        HBox titleBox = new HBox(8, titleLabel, versionLabel);
+        titleBox.setAlignment(Pos.BASELINE_LEFT);
+
         Label subtitleLabel = new Label("Professional open source custom controls for JavaFX.");
         subtitleLabel.setStyle("-fx-font-size: 13px;");
 
-        VBox textBox = new VBox(2, titleLabel, subtitleLabel);
+        VBox textBox = new VBox(2, titleBox, subtitleLabel);
         textBox.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(textBox, Priority.ALWAYS);
 
@@ -545,8 +557,6 @@ public class GemsFXDemoLauncher extends GemApplication {
         stage.setMinWidth(stage.getWidth());
         stage.setMaxWidth(stage.getWidth());
         stage.setMinHeight(800);
-
-//        ScenicView.show(scene);
     }
 
     // -----------------------------------------------------------------------
@@ -668,6 +678,17 @@ public class GemsFXDemoLauncher extends GemApplication {
     /** Converts an AtlantaFX theme name to a screenshot subdirectory name, e.g. "Nord Light" → "nord-light". */
     private static String toThemeKey(Theme theme) {
         return theme == null ? "modena" : theme.getName().toLowerCase().replace(" ", "-");
+    }
+
+    private static String loadProjectVersion() {
+        try (InputStream in = GemsFXDemoLauncher.class.getResourceAsStream("version.properties")) {
+            if (in == null) return "";
+            Properties props = new Properties();
+            props.load(in);
+            return props.getProperty("version", "");
+        } catch (IOException e) {
+            return "";
+        }
     }
 
     private static class TreeDemoCell extends javafx.scene.control.TreeCell<Object> {

@@ -2,11 +2,22 @@
     -fx-font-family: "Inter";
 }
 
-.description-markdown-view .markdown-heading-3 {
+.description-markdown-view * {
+    -fx-font-family: "Inter";
+}
+
+.description-markdown-view .markdown-text,
+.description-markdown-view .markdown-listitem-dot,
+.description-markdown-view .markdown-codeblock,
+.description-markdown-view .markdown-code {
     -fx-font-size: 1em;
+}
+
+.description-markdown-view .markdown-heading-3 {
     -fx-padding: 5px 0px;
 }
 
-.description-markdown-view .markdown-heading-3 .text {
-    -fx-font-size: 1em;
+.description-markdown-view .markdown-heading-3 .markdown-text {
+    -fx-font-family: "Inter Bold";
+    -fx-font-size: 1.5em !important;
 }

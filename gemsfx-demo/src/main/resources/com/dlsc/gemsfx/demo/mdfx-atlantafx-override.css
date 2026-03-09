@@ -6,6 +6,7 @@
  * at the same specificity level (* = 0,0,0).
  */
 * {
+    -fx-font-family: "Inter";
     -mdfx-font-color: -color-fg-default;
     -mdfx-link-color: -color-accent-fg;
     -mdfx-border-color-1: -color-border-default;
@@ -14,4 +15,11 @@
     -mdfx-bg-color-3: -color-bg-subtle;
     -mdfx-bq-color-border: -color-accent-emphasis;
     -mdfx-bq-color-background: -color-accent-subtle;
+}
+
+.markdown-text,
+.markdown-listitem-dot,
+.markdown-codeblock,
+.markdown-code {
+    -fx-font-size: 1em !important;
 }
