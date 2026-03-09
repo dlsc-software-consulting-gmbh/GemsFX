@@ -73,8 +73,6 @@ public class TextViewApp extends GemApplication {
         stage.setTitle("Text View (Standalone)");
 
         stage.show();
-
-        ScenicView.show(scene);
     }
 
         @Override

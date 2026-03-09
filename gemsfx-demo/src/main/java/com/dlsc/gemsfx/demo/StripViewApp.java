@@ -144,8 +144,6 @@ public class StripViewApp extends GemApplication {
         stage.setHeight(500);
 
         stage.show();
-
-//        ScenicView.show(scene);
     }
 
 

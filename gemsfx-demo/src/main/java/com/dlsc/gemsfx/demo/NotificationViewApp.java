@@ -69,8 +69,6 @@ public class NotificationViewApp extends GemApplication {
         stage.setTitle("Notification View Demo");
 
         stage.show();
-
-        ScenicView.show(scene);
     }
 
     @Override
