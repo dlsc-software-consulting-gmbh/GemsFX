@@ -84,6 +84,7 @@ public class TagsField<T> extends SearchField<T> {
         addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
             MultipleSelectionModel<T> tagSelectionModel = getTagSelectionModel();
             if (evt.getCode().equals(KeyCode.BACK_SPACE)) {
+                setSelectedItem(null); // otherwise a focus-lost will recreate the tag if "on-the-fly" creation is enabled
                 if (!tagSelectionModel.isEmpty()) {
                     removeTags((T[]) tagSelectionModel.getSelectedItems().toArray());
                 } else if (getText().isEmpty() && !getTags().isEmpty()) {
