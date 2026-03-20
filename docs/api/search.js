@@ -363,8 +363,8 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
             }
             li.attr("class", "result-item");
         });
-        ul.append("<li class='ui-static-link'><a href='" + pathtoroot + "search.html?q="
-            + encodeURI(widget.term) + "'>Go to search page</a></li>");
+        ul.append("" + pathtoroot + "<li class='ui-static-link'><a href='search.html?q='>Go to search page</a></li>"
+            + encodeURI(widget.term) + "");
     },
     _renderItem: function(ul, item) {
         var li = $("<li/>").appendTo(ul);
@@ -417,7 +417,7 @@ $(function() {
     $("section[id] > :header, :header[id], :header:has(a[id])").hover(
         function () {
             $(this).append($("<button class='copy copy-header' onclick='copyUrl(this)'> " +
-                "<img src='" + pathtoroot + "copy.svg' alt='" + messages.copyUrl + "'> " +
+                "<img src=" + pathtoroot + "'copy.svg' alt='" + messages.copyUrl + "'> " +
                 "<span data-copied='" + messages.urlCopied + "'></span></button>"));
         },
         function () {
