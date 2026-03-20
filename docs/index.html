@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GemsFX — JavaFX Custom Controls &amp; Utilities</title>
+  <meta name="description" content="GemsFX is a rich collection of custom JavaFX controls and utilities. Explore date pickers, search fields, paging, tree views, notifications and more." />
+  <link rel="icon" type="image/png" href="screenshots/icon.png" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="site-header">
+  <div class="container header-inner">
+
+    <a href="#" class="site-logo" aria-label="GemsFX home">
+      <img src="screenshots/icon.png" alt="GemsFX logo" />
+      <span>Gems</span>FX
+    </a>
+
+    <nav class="site-nav" aria-label="Site navigation">
+      <a href="#install">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v13m0 0-4-4m4 4 4-4M2 17v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3"/></svg>
+        <span>Install</span>
+      </a>
+      <a href="#controls">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Controls</span>
+      </a>
+      <a href="#utilities">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <span>Utilities</span>
+      </a>
+      <a href="api/index.html" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>API Docs</span>
+      </a>
+      <a href="https://github.com/dlsc-software-consulting-gmbh/GemsFX" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        <span>GitHub</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badges">
+      <span class="badge accent">v3.10.1</span>
+      <span class="badge teal">JavaFX 25</span>
+      <span class="badge">Java 24+</span>
+      <span class="badge">Apache 2.0</span>
+    </div>
+
+    <h1>
+      <span class="gems">Gems</span><span class="fx">FX</span><br />
+      Custom Controls for JavaFX
+    </h1>
+
+    <p class="hero-subtitle">
+      A rich open-source collection of polished JavaFX controls and utilities —
+      from date pickers and search fields to paging, tree views, notification centers, and more.
+    </p>
+
+    <div class="hero-cta">
+      <a href="#controls" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Browse Controls
+      </a>
+      <a href="#install" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v13m0 0-4-4m4 4 4-4M2 17v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3"/></svg>
+        Get Started
+      </a>
+      <a href="https://github.com/dlsc-software-consulting-gmbh/GemsFX" class="btn btn-secondary" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     INSTALLATION
+     ============================================================ -->
+<section class="install-section" id="install">
+  <div class="container">
+    <h2 class="section-heading">Installation</h2>
+    <p class="section-sub">Add GemsFX to your project with Maven or Gradle.</p>
+
+    <div class="tabs">
+      <div class="tab-buttons" role="tablist" aria-label="Build tool">
+        <button class="tab-btn active" data-tab="maven"  role="tab" aria-selected="true">Maven</button>
+        <button class="tab-btn"        data-tab="gradle" role="tab" aria-selected="false">Gradle</button>
+        <button class="tab-btn"        data-tab="module" role="tab" aria-selected="false">module-info</button>
+      </div>
+      <div class="tab-panel active" data-tab="maven">
+        <button class="copy-btn" aria-label="Copy Maven snippet">Copy</button>
+        <pre>&lt;dependency&gt;
+    &lt;groupId&gt;com.dlsc.gemsfx&lt;/groupId&gt;
+    &lt;artifactId&gt;gemsfx&lt;/artifactId&gt;
+    &lt;version&gt;3.10.1&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+      </div>
+      <div class="tab-panel" data-tab="gradle">
+        <button class="copy-btn" aria-label="Copy Gradle snippet">Copy</button>
+        <pre>implementation 'com.dlsc.gemsfx:gemsfx:3.10.1'</pre>
+      </div>
+      <div class="tab-panel" data-tab="module">
+        <button class="copy-btn" aria-label="Copy module-info snippet">Copy</button>
+        <pre>// in your module-info.java
+requires com.dlsc.gemsfx;</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CONTROLS GALLERY
+     ============================================================ -->
+<section class="gallery-section" id="controls">
+  <div class="container">
+    <h2 class="section-heading">Controls</h2>
+    <p class="section-sub">
+      Over 40 production-ready controls. Use the filters or search to find what you need.
+    </p>
+
+    <!-- Toolbar -->
+    <div class="gallery-toolbar">
+      <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="search-input" type="search" placeholder="Search controls…" aria-label="Search controls" />
+      </div>
+
+      <div class="filter-pills" role="group" aria-label="Filter by category">
+        <button class="pill active" data-filter="all">All</button>
+        <button class="pill" data-filter="datetime">Date &amp; Time</button>
+        <button class="pill" data-filter="input">Text Input</button>
+        <button class="pill" data-filter="layout">Layout &amp; Containers</button>
+        <button class="pill" data-filter="images">Images &amp; Media</button>
+        <button class="pill" data-filter="progress">Progress</button>
+        <button class="pill" data-filter="data">Data &amp; Navigation</button>
+        <button class="pill" data-filter="paging">Paging</button>
+        <button class="pill" data-filter="other">Other</button>
+      </div>
+    </div>
+
+    <!-- No results -->
+    <div class="no-results" role="status" aria-live="polite">
+      <p>No controls match your search.</p>
+    </div>
+
+    <!-- Cards -->
+    <div class="cards-grid" id="cards-grid">
+
+      <!-- ── DATE & TIME ────────────────────────────────────── -->
+
+      <article class="control-card" data-visible="1"
+        data-category="datetime" data-cat-color="datetime"
+        data-name="CalendarView"
+        data-desc="Advanced monthly calendar with single, multi, and date-range selection modes. Supports earliest/earliest date limits and custom header layouts."
+        data-tags="calendar date picker month year selection">
+        <div class="card-img-wrap">
+          <img src="screenshots/calendar-view.png" alt="CalendarView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Date &amp; Time</span>
+          <h3 class="card-name">CalendarView</h3>
+          <p class="card-desc">Advanced monthly calendar with single, multi, and date-range selection modes. Supports earliest/latest date limits and customisable header layouts.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/CalendarView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="datetime" data-cat-color="datetime"
+        data-name="CalendarPicker"
+        data-desc="A compact picker that wraps CalendarView in a popup, suitable for forms and toolbars."
+        data-tags="calendar date picker popup">
+        <div class="card-img-wrap">
+          <img src="screenshots/calendar-picker.png" alt="CalendarPicker screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Date &amp; Time</span>
+          <h3 class="card-name">CalendarPicker</h3>
+          <p class="card-desc">A compact field + popup picker built on top of CalendarView. Suitable for forms and toolbars.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/CalendarPicker.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="datetime" data-cat-color="datetime"
+        data-name="DateRangeView"
+        data-desc="Side-by-side dual-month date range selector with built-in presets (Today, Last 7 days, …) and customisable preset location."
+        data-tags="date range start end preset">
+        <div class="card-img-wrap">
+          <img src="screenshots/date-range-view.png" alt="DateRangeView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Date &amp; Time</span>
+          <h3 class="card-name">DateRangeView</h3>
+          <p class="card-desc">Side-by-side dual-month selector for picking a start/end date range, with built-in presets (Today, Last 7 days, etc.).</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/daterange/DateRangeView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="datetime" data-cat-color="datetime"
+        data-name="DateRangePicker"
+        data-desc="Compact text field + popup that wraps DateRangeView for use in forms and filter bars."
+        data-tags="date range picker popup start end">
+        <div class="card-img-wrap">
+          <img src="screenshots/date-range-picker-small.png" alt="DateRangePicker screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Date &amp; Time</span>
+          <h3 class="card-name">DateRangePicker</h3>
+          <p class="card-desc">Compact field + popup date range picker, wrapping DateRangeView for use in forms and filter bars.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/daterange/DateRangePicker.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="datetime" data-cat-color="datetime"
+        data-name="YearView"
+        data-desc="Grid-based year selector with configurable rows and columns and earliest/latest year constraints."
+        data-tags="year picker grid select">
+        <div class="card-img-wrap">
+          <img src="screenshots/year-view.png" alt="YearView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Date &amp; Time</span>
+          <h3 class="card-name">YearView</h3>
+          <p class="card-desc">Grid-based year selector with configurable rows and columns and earliest/latest year constraints.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/YearView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="datetime" data-cat-color="datetime"
+        data-name="YearPicker"
+        data-desc="Inline or popup year selection control, built on top of YearView."
+        data-tags="year picker popup select">
+        <div class="card-img-wrap">
+          <img src="screenshots/year-picker.png" alt="YearPicker screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Date &amp; Time</span>
+          <h3 class="card-name">YearPicker</h3>
+          <p class="card-desc">Inline or popup year selection control built on top of YearView.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/YearPicker.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="datetime" data-cat-color="datetime"
+        data-name="YearMonthView"
+        data-desc="Monthly grid that lets the user pick a year-month combination."
+        data-tags="year month picker select grid">
+        <div class="card-img-wrap">
+          <img src="screenshots/year-month-view.png" alt="YearMonthView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Date &amp; Time</span>
+          <h3 class="card-name">YearMonthView</h3>
+          <p class="card-desc">Monthly grid control that lets the user pick a year-month combination.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/YearMonthView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="datetime" data-cat-color="datetime"
+        data-name="YearMonthPicker"
+        data-desc="Compact field + popup picker for selecting a year-month value."
+        data-tags="year month picker popup">
+        <div class="card-img-wrap">
+          <img src="screenshots/year-month-picker.png" alt="YearMonthPicker screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Date &amp; Time</span>
+          <h3 class="card-name">YearMonthPicker</h3>
+          <p class="card-desc">Compact field + popup picker for selecting a year-month value.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/YearMonthPicker.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="datetime" data-cat-color="datetime"
+        data-name="TimePicker"
+        data-desc="Hour/minute (optional second) time picker with 12/24-hour clock modes, popup, and linked field scrolling."
+        data-tags="time hour minute picker clock am pm">
+        <div class="card-img-wrap">
+          <img src="screenshots/time-picker.png" alt="TimePicker screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Date &amp; Time</span>
+          <h3 class="card-name">TimePicker</h3>
+          <p class="card-desc">Hour/minute/second time picker with 12 or 24-hour clock, popup support, and linked-field rollover scrolling.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/TimePicker.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="datetime" data-cat-color="datetime"
+        data-name="DurationPicker"
+        data-desc="Spinner-style picker for entering durations (days, hours, minutes, seconds, millis) with optional popup."
+        data-tags="duration picker time interval period">
+        <div class="card-img-wrap">
+          <img src="screenshots/duration-picker.png" alt="DurationPicker screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Date &amp; Time</span>
+          <h3 class="card-name">DurationPicker</h3>
+          <p class="card-desc">Spinner-style picker for entering durations (days, hours, minutes, seconds, milliseconds) with optional popup.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/DurationPicker.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── TEXT INPUT ─────────────────────────────────────── -->
+
+      <article class="control-card" data-visible="1"
+        data-category="input" data-cat-color="input"
+        data-name="SearchTextField"
+        data-desc="A styled text field with a built-in search icon and optional round/pill appearance for toolbars and filter bars."
+        data-tags="search text field input round toolbar">
+        <div class="card-img-wrap">
+          <img src="screenshots/search-text-field.png" alt="SearchTextField screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Text Input</span>
+          <h3 class="card-name">SearchTextField</h3>
+          <p class="card-desc">Styled text field with a built-in search icon and optional pill/round appearance, perfect for toolbars and filter bars.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/SearchTextField.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="input" data-cat-color="input"
+        data-name="SearchField"
+        data-desc="Powerful auto-complete search control with suggestion popup, history management, and commit/focus callbacks."
+        data-tags="search autocomplete suggest field history commit">
+        <div class="card-img-wrap">
+          <img src="screenshots/search-field.png" alt="SearchField screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Text Input</span>
+          <h3 class="card-name">SearchField</h3>
+          <p class="card-desc">Powerful auto-complete field with a suggestion popup, history management, configurable commit behaviour, and search icon.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/SearchField.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="input" data-cat-color="input"
+        data-name="EnhancedPasswordField"
+        data-desc="Password field with a show/hide toggle button so users can reveal what they typed."
+        data-tags="password field secure show hide toggle">
+        <div class="card-img-wrap">
+          <img src="screenshots/enhanced-password-field.png" alt="EnhancedPasswordField screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Text Input</span>
+          <h3 class="card-name">EnhancedPasswordField</h3>
+          <p class="card-desc">Password field with a show/hide toggle so users can reveal the text they typed.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/EnhancedPasswordField.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="input" data-cat-color="input"
+        data-name="EmailField"
+        data-desc="Text field with built-in email syntax validation, domain auto-completion, and support for multiple email addresses."
+        data-tags="email field validation domain autocomplete">
+        <div class="card-img-wrap">
+          <img src="screenshots/email-field.png" alt="EmailField screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Text Input</span>
+          <h3 class="card-name">EmailField</h3>
+          <p class="card-desc">Text field with built-in email syntax validation, domain auto-completion, and multi-address support.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/EmailField.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="input" data-cat-color="input"
+        data-name="TagsField"
+        data-desc="Multi-value text field where typed values are committed as removable chips/tags. Supports autocomplete suggestions."
+        data-tags="tags chips multi value autocomplete field">
+        <div class="card-img-wrap">
+          <img src="screenshots/tags-field.png" alt="TagsField screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Text Input</span>
+          <h3 class="card-name">TagsField</h3>
+          <p class="card-desc">Multi-value text field where typed values are committed as removable chips. Supports autocomplete suggestions.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/TagsField.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="input" data-cat-color="input"
+        data-name="ExpandingTextArea"
+        data-desc="A TextArea that grows vertically to fit its content, eliminating scroll bars for short texts."
+        data-tags="textarea text area expand grow auto height">
+        <div class="card-img-wrap">
+          <img src="screenshots/expanding-text-area.png" alt="ExpandingTextArea screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Text Input</span>
+          <h3 class="card-name">ExpandingTextArea</h3>
+          <p class="card-desc">A TextArea that grows vertically to fit its content, eliminating scroll bars for short multi-line inputs.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/ExpandingTextArea.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="input" data-cat-color="input"
+        data-name="ResizableTextArea"
+        data-desc="TextArea with a drag handle in the corner, letting users resize it freely at runtime."
+        data-tags="textarea resize drag handle">
+        <div class="card-img-wrap">
+          <img src="screenshots/resizable-text-area.png" alt="ResizableTextArea screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Text Input</span>
+          <h3 class="card-name">ResizableTextArea</h3>
+          <p class="card-desc">A TextArea with a drag handle that lets users resize it freely at runtime.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/ResizableTextArea.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="input" data-cat-color="input"
+        data-name="LimitedTextArea"
+        data-desc="TextArea that enforces a maximum character count and shows a live character counter with a configurable warning threshold."
+        data-tags="textarea limit character count warning threshold">
+        <div class="card-img-wrap">
+          <img src="screenshots/limited-text-area.png" alt="LimitedTextArea screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Text Input</span>
+          <h3 class="card-name">LimitedTextArea</h3>
+          <p class="card-desc">TextArea that enforces a maximum character count with a live counter and configurable warning threshold.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/LimitedTextArea.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── LAYOUT & CONTAINERS ────────────────────────────── -->
+
+      <article class="control-card" data-visible="1"
+        data-category="layout" data-cat-color="layout"
+        data-name="DialogPane"
+        data-desc="Overlay dialog system with scrim, animations, and support for multiple stacked dialogs on a single scene."
+        data-tags="dialog modal overlay alert confirm scrim">
+        <div class="card-img-wrap">
+          <img src="screenshots/dialog-pane.png" alt="DialogPane screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Layout &amp; Containers</span>
+          <h3 class="card-name">DialogPane</h3>
+          <p class="card-desc">Overlay dialog system with a translucent scrim, animation, and support for multiple stacked dialogs within a single scene.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/DialogPane.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="layout" data-cat-color="layout"
+        data-name="DrawerStackPane"
+        data-desc="StackPane with an animated sliding drawer that rises from the bottom, supporting titles, close gestures, and max height."
+        data-tags="drawer slide panel bottom sheet animation">
+        <div class="card-img-wrap">
+          <img src="screenshots/drawer-stackpane.png" alt="DrawerStackPane screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Layout &amp; Containers</span>
+          <h3 class="card-name">DrawerStackPane</h3>
+          <p class="card-desc">StackPane with an animated sliding drawer that rises from the bottom, with title, close gesture, and configurable max height.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/DrawerStackPane.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="layout" data-cat-color="layout"
+        data-name="PowerPane"
+        data-desc="All-in-one pane that combines ResponsivePane, DialogPane, GlassPane, and InfoCenterPane into a single reusable container."
+        data-tags="pane container layout combined composite">
+        <div class="card-img-wrap">
+          <img src="screenshots/power-pane.png" alt="PowerPane screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Layout &amp; Containers</span>
+          <h3 class="card-name">PowerPane</h3>
+          <p class="card-desc">All-in-one container combining ResponsivePane, DialogPane, GlassPane, and InfoCenterPane for complex application layouts.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/PowerPane.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="layout" data-cat-color="layout"
+        data-name="ResponsivePane"
+        data-desc="Sidebar + content pane that automatically switches between side-by-side and overlay modes based on available width."
+        data-tags="responsive sidebar navigation layout adaptive">
+        <div class="card-img-wrap">
+          <img src="screenshots/responsive-pane.png" alt="ResponsivePane screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Layout &amp; Containers</span>
+          <h3 class="card-name">ResponsivePane</h3>
+          <p class="card-desc">Sidebar + content pane that automatically switches between side-by-side and overlay modes based on available width.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/ResponsivePane.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="layout" data-cat-color="layout"
+        data-name="GlassPane"
+        data-desc="Semi-transparent overlay that blocks interaction with underlying content. Supports fade-in/out animation and configurable opacity."
+        data-tags="overlay glass block interaction loading opacity">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Layout &amp; Containers</span>
+          <h3 class="card-name">GlassPane</h3>
+          <p class="card-desc">Semi-transparent overlay that blocks user interaction with underlying content. Supports fade-in/out animation and configurable opacity.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/GlassPane.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="layout" data-cat-color="layout"
+        data-name="LoadingPane"
+        data-desc="Wrapper pane showing a progress indicator while data loads, then revealing its child content. Supports IDLE, LOADING, OK, and ERROR states."
+        data-tags="loading spinner state progress idle error">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Layout &amp; Containers</span>
+          <h3 class="card-name">LoadingPane</h3>
+          <p class="card-desc">Wrapper pane displaying a progress indicator while data loads, then revealing child content. Manages IDLE, LOADING, OK, and ERROR states.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/LoadingPane.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="layout" data-cat-color="layout"
+        data-name="StretchingTilePane"
+        data-desc="TilePane variant where tiles stretch horizontally to fill the available width."
+        data-tags="tile pane grid stretch fill layout">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Layout &amp; Containers</span>
+          <h3 class="card-name">StretchingTilePane</h3>
+          <p class="card-desc">TilePane variant that stretches tiles horizontally to fill the available width, eliminating gaps on the right edge.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/StretchingTilePane.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="layout" data-cat-color="layout"
+        data-name="ThreeItemsPane"
+        data-desc="Pane that arranges up to three child nodes — left/start, center, and right/end — with automatic horizontal or vertical switching."
+        data-tags="layout three items split header toolbar center">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Layout &amp; Containers</span>
+          <h3 class="card-name">ThreeItemsPane</h3>
+          <p class="card-desc">Pane that positions up to three children — start, center, and end — commonly used for header/toolbar layouts.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/ThreeItemsPane.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── IMAGES & MEDIA ─────────────────────────────────── -->
+
+      <article class="control-card" data-visible="1"
+        data-category="images" data-cat-color="images"
+        data-name="PhotoView"
+        data-desc="Zoomable, scrollable image view with optional clip shape and editable mode for photo selection."
+        data-tags="photo image zoom scroll clip edit avatar">
+        <div class="card-img-wrap">
+          <img src="screenshots/photo-view.png" alt="PhotoView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Images &amp; Media</span>
+          <h3 class="card-name">PhotoView</h3>
+          <p class="card-desc">Zoomable, scrollable image view with clip-shape support and an editable mode for selecting/replacing photos.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/PhotoView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="images" data-cat-color="images"
+        data-name="AvatarView"
+        data-desc="Circular (or custom-shape) user avatar with fallback initials, configurable arc radius, and size presets."
+        data-tags="avatar user profile picture initials circle">
+        <div class="card-img-wrap">
+          <img src="screenshots/avatar-view.png" alt="AvatarView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Images &amp; Media</span>
+          <h3 class="card-name">AvatarView</h3>
+          <p class="card-desc">Circular user avatar with fallback initials, configurable arc radius, and size presets for user profile displays.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/AvatarView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="images" data-cat-color="images"
+        data-name="SVGImageView"
+        data-desc="Node for rendering scalable SVG graphics without rasterisation, powered by JSVG."
+        data-tags="svg image vector graphics render">
+        <div class="card-img-wrap">
+          <img src="screenshots/svg-image-view.png" alt="SVGImageView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Images &amp; Media</span>
+          <h3 class="card-name">SVGImageView</h3>
+          <p class="card-desc">Renders scalable SVG graphics without rasterisation, powered by the JSVG library. Supports file, URL, and classpath sources.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/SVGImageView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="images" data-cat-color="images"
+        data-name="PaymentOptionView"
+        data-desc="Displays a payment method icon (Visa, Mastercard, PayPal, etc.) in light or dark mode."
+        data-tags="payment visa mastercard paypal icon badge">
+        <div class="card-img-wrap">
+          <img src="screenshots/payment-options-light.png" alt="PaymentOptionView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Images &amp; Media</span>
+          <h3 class="card-name">PaymentOptionView</h3>
+          <p class="card-desc">Displays a payment method icon (Visa, Mastercard, PayPal, and more) in both light and dark variants.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/PaymentOptionView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── PROGRESS ───────────────────────────────────────── -->
+
+      <article class="control-card" data-visible="1"
+        data-category="progress" data-cat-color="progress"
+        data-name="CircleProgressIndicator"
+        data-desc="Smooth circular progress ring with configurable stroke width, fill colour, and indeterminate animation."
+        data-tags="progress circle ring indicator percent loading">
+        <div class="card-img-wrap">
+          <img src="screenshots/circle-progress-indicator.png" alt="CircleProgressIndicator screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Progress</span>
+          <h3 class="card-name">CircleProgressIndicator</h3>
+          <p class="card-desc">Smooth circular progress ring with configurable stroke width, fill colour, and indeterminate animation.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/CircleProgressIndicator.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="progress" data-cat-color="progress"
+        data-name="ArcProgressIndicator"
+        data-desc="Arc-shaped progress indicator with configurable start/end angles, stroke colour, and arc size."
+        data-tags="progress arc indicator gauge angular">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Progress</span>
+          <h3 class="card-name">ArcProgressIndicator</h3>
+          <p class="card-desc">Arc-shaped progress indicator with configurable start/end angles, stroke colour, and arc size — great for dashboards.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/ArcProgressIndicator.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="progress" data-cat-color="progress"
+        data-name="SemiCircleProgressIndicator"
+        data-desc="Half-circle gauge indicator, useful for displaying values in a dashboard-style widget."
+        data-tags="progress semicircle gauge dashboard half circle">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Progress</span>
+          <h3 class="card-name">SemiCircleProgressIndicator</h3>
+          <p class="card-desc">Half-circle gauge indicator, ideal for dashboard-style widgets that show a value within a bounded range.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/SemiCircleProgressIndicator.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── DATA & NAVIGATION ──────────────────────────────── -->
+
+      <article class="control-card" data-visible="1"
+        data-category="data" data-cat-color="data"
+        data-name="FilterView"
+        data-desc="Data filtering control with a searchable text field and chip-based active filter display, backed by an observable predicate."
+        data-tags="filter search predicate chip observable list data">
+        <div class="card-img-wrap">
+          <img src="screenshots/filter-view.png" alt="FilterView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Data &amp; Navigation</span>
+          <h3 class="card-name">FilterView</h3>
+          <p class="card-desc">Data filtering control with a search field, dropdown filter groups, and chip display of active filters, backed by an observable predicate.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/FilterView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="data" data-cat-color="data"
+        data-name="MultiColumnListView"
+        data-desc="Horizontally-split list view displaying items spread across multiple columns with drag-and-drop reordering."
+        data-tags="list columns multi drag drop reorder layout">
+        <div class="card-img-wrap">
+          <img src="screenshots/multi-column-list-view.png" alt="MultiColumnListView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Data &amp; Navigation</span>
+          <h3 class="card-name">MultiColumnListView</h3>
+          <p class="card-desc">Horizontally-split list view displaying items across multiple columns with drag-and-drop reordering between columns.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/MultiColumnListView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="data" data-cat-color="data"
+        data-name="TreeNodeView"
+        data-desc="Visualises hierarchical tree structures as a node graph with configurable layout directions and animated expansion."
+        data-tags="tree node hierarchy graph visual diagram layout">
+        <div class="card-img-wrap">
+          <img src="screenshots/tree-node-view.png" alt="TreeNodeView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Data &amp; Navigation</span>
+          <h3 class="card-name">TreeNodeView</h3>
+          <p class="card-desc">Visualises hierarchical tree structures as a node graph with configurable layout directions and animated expansion.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/treeview/TreeNodeView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="data" data-cat-color="data"
+        data-name="InfoCenterPane"
+        data-desc="Slide-in notification center panel with grouped notifications, mark-as-read, and configurable show-all fade animation."
+        data-tags="notification info center panel slide alert message">
+        <div class="card-img-wrap">
+          <img src="screenshots/info-center-pane.png" alt="InfoCenterPane screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Data &amp; Navigation</span>
+          <h3 class="card-name">InfoCenterPane</h3>
+          <p class="card-desc">Slide-in notification center with grouped notifications, mark-as-read, and configurable animations — similar to macOS Notification Center.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/infocenter/InfoCenterPane.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="data" data-cat-color="data"
+        data-name="StripView"
+        data-desc="Scrollable horizontal strip of items that can be animated, looped, and centred. Ideal for card carousels and selection strips."
+        data-tags="strip horizontal scroll carousel items selection loop">
+        <div class="card-img-wrap">
+          <img src="screenshots/strip-view.png" alt="StripView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Data &amp; Navigation</span>
+          <h3 class="card-name">StripView</h3>
+          <p class="card-desc">Scrollable horizontal strip of items with animated scrolling, loop selection, and always-center modes — great for carousels.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/StripView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="data" data-cat-color="data"
+        data-name="ScreensView"
+        data-desc="Displays the layout and geometry of all connected screens/monitors, useful for multi-monitor management UIs."
+        data-tags="screen monitor display multi geometry layout">
+        <div class="card-img-wrap">
+          <img src="screenshots/screens-view.png" alt="ScreensView screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Data &amp; Navigation</span>
+          <h3 class="card-name">ScreensView</h3>
+          <p class="card-desc">Displays the layout and geometry of all connected screens/monitors — useful for multi-monitor management UIs.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/ScreensView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="data" data-cat-color="data"
+        data-name="GridTableView"
+        data-desc="GridPane-based table with columns and rows, offering pixel-perfect alignment without the overhead of TableView."
+        data-tags="table grid data rows columns grid pane">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Data &amp; Navigation</span>
+          <h3 class="card-name">GridTableView</h3>
+          <p class="card-desc">GridPane-based table with columns and rows, offering pixel-perfect cell alignment without the overhead of a full TableView.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/gridtable/GridTableView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── PAGING ─────────────────────────────────────────── -->
+
+      <article class="control-card" data-visible="1"
+        data-category="paging" data-cat-color="paging"
+        data-name="PagingListView"
+        data-desc="ListView with built-in pagination controls: page size selector, previous/next buttons, and page number indicators."
+        data-tags="paging list view pages pagination navigation">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Paging</span>
+          <h3 class="card-name">PagingListView</h3>
+          <p class="card-desc">ListView with integrated pagination controls — page size selector, previous/next buttons, and page number indicators.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/paging/PagingListView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="paging" data-cat-color="paging"
+        data-name="PagingGridTableView"
+        data-desc="GridTableView with built-in pagination — combines the precise grid layout with page-based data loading."
+        data-tags="paging table grid pagination data view">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Paging</span>
+          <h3 class="card-name">PagingGridTableView</h3>
+          <p class="card-desc">GridTableView with built-in pagination, combining the precise grid layout with page-based data loading.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/paging/PagingGridTableView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="paging" data-cat-color="paging"
+        data-name="PagingControls"
+        data-desc="Stand-alone pagination navigation bar — use it with any data view that needs page navigation."
+        data-tags="paging navigation controls bar standalone">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Paging</span>
+          <h3 class="card-name">PagingControls</h3>
+          <p class="card-desc">Stand-alone pagination navigation bar — can be paired with any data view that needs page navigation UI.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/paging/PagingControls.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── OTHER ──────────────────────────────────────────── -->
+
+      <article class="control-card" data-visible="1"
+        data-category="other" data-cat-color="other"
+        data-name="BeforeAfterView"
+        data-desc="Split view with a draggable divider to compare two visual states — ideal for showing before/after transformations."
+        data-tags="before after compare split divider image diff">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Other</span>
+          <h3 class="card-name">BeforeAfterView</h3>
+          <p class="card-desc">Split view with a draggable divider to compare two visual states — ideal for before/after image comparisons or UI diffs.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/BeforeAfterView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="other" data-cat-color="other"
+        data-name="ChipView"
+        data-desc="Badge-style chip node representing a model object, with an optional close button and configurable content display."
+        data-tags="chip badge tag close remove display label">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Other</span>
+          <h3 class="card-name">ChipView</h3>
+          <p class="card-desc">Badge-style chip node representing a model object, with an optional close button and configurable content display mode.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/ChipView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="other" data-cat-color="other"
+        data-name="SegmentedBar"
+        data-desc="Horizontal stacked bar that visualises proportional segments, each with its own colour and size."
+        data-tags="segmented bar chart visual proportional colour">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Other</span>
+          <h3 class="card-name">SegmentedBar</h3>
+          <p class="card-desc">Horizontal stacked bar that visualises proportional segments, each with its own colour and configurable minimum size.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/SegmentedBar.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="other" data-cat-color="other"
+        data-name="Spacer"
+        data-desc="A flexible Region that expands to fill available space in HBox or VBox containers, replacing Region with USE_PREF_SIZE."
+        data-tags="spacer filler flex hbox vbox grow expand">
+        <div class="card-img-wrap">
+          <img src="screenshots/spacer.png" alt="Spacer screenshot" loading="lazy" />
+        </div>
+        <div class="card-body">
+          <span class="card-category">Other</span>
+          <h3 class="card-name">Spacer</h3>
+          <p class="card-desc">Flexible Region that expands to fill available space in HBox or VBox, eliminating boilerplate HBox.setHgrow / VBox.setVgrow calls.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/Spacer.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="other" data-cat-color="other"
+        data-name="MaskedView"
+        data-desc="Wraps any node and applies a gradient edge mask so the content appears to fade out at the edges."
+        data-tags="mask fade edge gradient clip view">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Other</span>
+          <h3 class="card-name">MaskedView</h3>
+          <p class="card-desc">Wraps any node and applies a gradient edge mask, making content fade out at the edges for a polished overflow effect.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/MaskedView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="other" data-cat-color="other"
+        data-name="PopOver"
+        data-desc="Popup overlay with a connecting arrow that points to the owning node. Supports detached mode and various arrow directions."
+        data-tags="popover popup arrow tooltip overlay info">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Other</span>
+          <h3 class="card-name">PopOver</h3>
+          <p class="card-desc">Popup overlay with a connecting arrow pointing at the owning node. Supports detachable mode and configurable arrow directions.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/PopOver.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="control-card" data-visible="1"
+        data-category="other" data-cat-color="other"
+        data-name="TextView"
+        data-desc="Read-only text display with optional title, subtitle, and graphic. Useful for form field labels and detail views."
+        data-tags="text view label read only display field form">
+        <div class="card-img-wrap">
+          <div class="card-no-img">No preview available</div>
+        </div>
+        <div class="card-body">
+          <span class="card-category">Other</span>
+          <h3 class="card-name">TextView</h3>
+          <p class="card-desc">Read-only text display control with optional title, subtitle, and graphic — ideal for detail views and form labels.</p>
+          <div class="card-footer">
+            <a class="card-api-link" href="api/com.dlsc.gemsfx/com/dlsc/gemsfx/TextView.html" target="_blank">API →</a>
+          </div>
+        </div>
+      </article>
+
+    </div><!-- /cards-grid -->
+  </div><!-- /container -->
+</section>
+
+<!-- ============================================================
+     UTILITIES SECTION
+     ============================================================ -->
+<section class="utils-section" id="utilities">
+  <div class="container">
+    <h2 class="section-heading">Utilities</h2>
+    <p class="section-sub">Helper classes, converters, and managers in the <code>com.dlsc.gemsfx.util</code> package.</p>
+
+    <div class="utils-grid">
+
+      <div class="util-card">
+        <div class="util-name">SessionManager</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">Persists and restores application state (window positions, dividers, etc.) using the Java Preferences API.</div>
+      </div>
+
+      <div class="util-card">
+        <div class="util-name">StageManager</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">Remembers and restores a Stage's position, size, and maximised state across application restarts.</div>
+      </div>
+
+      <div class="util-card">
+        <div class="util-name">HistoryManager</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">Interface + implementations for managing a history list of typed values (e.g. recent searches). Includes in-memory and Preferences-backed variants.</div>
+      </div>
+
+      <div class="util-card">
+        <div class="util-name">RecentFiles</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">Maintains a most-recently-used file list, persisted via Java Preferences, with configurable max size.</div>
+      </div>
+
+      <div class="util-card">
+        <div class="util-name">DurationConverter</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">CSS StyleConverter that maps a numeric millisecond value in CSS to a <code>javafx.util.Duration</code>.</div>
+      </div>
+
+      <div class="util-card">
+        <div class="util-name">EnumStringConverter</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">Generic <code>StringConverter&lt;E extends Enum&gt;</code> that uses enum name or a custom label function for display.</div>
+      </div>
+
+      <div class="util-card">
+        <div class="util-name">SimpleStringConverter</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">Lightweight <code>StringConverter</code> backed by a single <code>Function&lt;T, String&gt;</code> lambda — no boilerplate subclassing.</div>
+      </div>
+
+      <div class="util-card">
+        <div class="util-name">FocusUtil</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">Utility methods for managing JavaFX focus — finding the focused node, traversing focus chains, and requesting focus on a deferred pulse.</div>
+      </div>
+
+      <div class="util-card">
+        <div class="util-name">ListUtils</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">Collection helpers: safe get, move-item, swap, and partition operations on ObservableLists.</div>
+      </div>
+
+      <div class="util-card">
+        <div class="util-name">CustomMultipleSelectionModel</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">Ready-to-use <code>MultipleSelectionModel</code> implementation backed by an observable list, suitable for custom list/grid controls.</div>
+      </div>
+
+      <div class="util-card">
+        <div class="util-name">ResizingBehaviour</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">Attaches drag-to-resize mouse handlers to any Region, supporting top, bottom, left, right, and corner edge resizing.</div>
+      </div>
+
+      <div class="util-card">
+        <div class="util-name">SVGUtil</div>
+        <div class="util-package">com.dlsc.gemsfx.util</div>
+        <div class="util-desc">Helper methods for loading SVG documents and converting them to JavaFX Images at arbitrary resolutions.</div>
+      </div>
+
+    </div>
+
+    <!-- Bindings subsection -->
+    <h3 style="margin-top: 3rem; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.375rem;">Bindings</h3>
+    <p class="section-sub">Reactive list bindings in the <code>com.dlsc.gemsfx.binding</code> package.</p>
+
+    <div class="utils-grid">
+      <div class="util-card">
+        <div class="util-name">AggregatedListBinding</div>
+        <div class="util-package">com.dlsc.gemsfx.binding</div>
+        <div class="util-desc">Aggregates values from multiple observable lists into a single computed binding (sum, count, etc.).</div>
+      </div>
+      <div class="util-card">
+        <div class="util-name">FlattenedNestedListStreamBinding</div>
+        <div class="util-package">com.dlsc.gemsfx.binding</div>
+        <div class="util-desc">Flattens a nested observable list structure into a single Stream-based binding that reacts to nested changes.</div>
+      </div>
+      <div class="util-card">
+        <div class="util-name">TransformedNestedListBinding</div>
+        <div class="util-package">com.dlsc.gemsfx.binding</div>
+        <div class="util-desc">Applies a transformation function to each element of a nested observable list and exposes the result as a flat observable list binding.</div>
+      </div>
+      <div class="util-card">
+        <div class="util-name">NestedListChangeTracker</div>
+        <div class="util-package">com.dlsc.gemsfx.binding</div>
+        <div class="util-desc">Tracks changes deep inside a nested observable list hierarchy and fires invalidation events when inner lists mutate.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-links">
+      <a href="https://github.com/dlsc-software-consulting-gmbh/GemsFX" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://search.maven.org/search?q=g:com.dlsc.gemsfx" target="_blank" rel="noopener">Maven Central</a>
+      <a href="https://www.jfx-central.com/libraries/gemsfx" target="_blank" rel="noopener">JFXCentral</a>
+      <a href="api/index.html" target="_blank">API Javadoc</a>
+      <a href="https://opensource.org/licenses/Apache-2.0" target="_blank" rel="noopener">Apache 2.0</a>
+    </div>
+    <p>GemsFX v3.10.1 &mdash; &copy; DLSC Software &amp; Consulting GmbH &mdash; Licensed under the Apache License 2.0</p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
