@@ -264,6 +264,7 @@
                     <windowtitle>GemsFX API</windowtitle>
                     <additionalJOption>-J-Djavafx.javadoc=true
                     </additionalJOption>
+                    <additionalOptions>-Xdoclint:none</additionalOptions>
                     <docfilessubdirs>true</docfilessubdirs>
                 </configuration>
                 <executions>

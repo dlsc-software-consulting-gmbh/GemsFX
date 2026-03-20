@@ -1,10 +1,13 @@
 module:com.dlsc.gemsfx
 com.dlsc.gemsfx
+com.dlsc.gemsfx.binding
+com.dlsc.gemsfx.daterange
+com.dlsc.gemsfx.gridtable
 com.dlsc.gemsfx.incubator
-com.dlsc.gemsfx.incubator.columnbrowser
 com.dlsc.gemsfx.incubator.templatepane
 com.dlsc.gemsfx.infocenter
+com.dlsc.gemsfx.paging
 com.dlsc.gemsfx.skins
+com.dlsc.gemsfx.treeview
+com.dlsc.gemsfx.treeview.link
 com.dlsc.gemsfx.util
-module:com.dlsc.gemsfx.demo
-com.dlsc.gemsfx.demo

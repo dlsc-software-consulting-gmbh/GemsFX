@@ -46,7 +46,7 @@ import javafx.css.converter.SizeConverter;
  * A custom stackpane that supports a drawer view sliding in from bottom to top. The content of the drawer gets added
  * in the normal way via the children list. The content for the drawer has to be added by calling {@link #setDrawerContent(Node)}.
  *
- * <h3>Features</h3>
+ * <b>Features:</b>
  * <ul>
  *     <li>User can resize the drawer via a handle at the top</li>
  *     <li>The drawer automatically closes completely if the user drags the resize handle below the lower bounds of the stackpane</li>

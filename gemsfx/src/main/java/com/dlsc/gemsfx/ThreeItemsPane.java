@@ -16,7 +16,7 @@ import java.util.List;
  * A custom layout container that arranges up to three child nodes in either a horizontal
  * or vertical orientation. This pane allows spacing between the nodes and provides methods
  * to control the alignment and orientation of the child nodes.
- * <p/>
+ * <p>
  * The container manages three possible child nodes, identified as item1, item2, and item3.
  * The layout updates dynamically whenever the nodes or properties such as orientation or
  * spacing are modified.

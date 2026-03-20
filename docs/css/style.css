@@ -402,8 +402,7 @@ img { max-width: 100%; display: block; }
 .card-img-wrap {
   background: var(--bg-base);
   border-bottom: 1px solid var(--border-subtle);
-  min-height: 160px;
-  max-height: 220px;
+  height: 200px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -412,7 +411,7 @@ img { max-width: 100%; display: block; }
 }
 
 .card-img-wrap img {
-  max-height: 200px;
+  height: 100%;
   width: 100%;
   object-fit: contain;
 }
@@ -502,6 +501,8 @@ img { max-width: 100%; display: block; }
   border-radius: var(--radius-md);
   padding: 1rem 1.1rem;
   transition: border-color var(--transition);
+  display: flex;
+  flex-direction: column;
 }
 
 .util-card:hover { border-color: var(--accent); }
@@ -524,7 +525,20 @@ img { max-width: 100%; display: block; }
   font-size: 0.82rem;
   color: var(--text-secondary);
   line-height: 1.5;
+  flex: 1;
 }
+
+.util-api-link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+}
+
+.util-api-link:hover { text-decoration: underline; }
 
 /* ============================================================
    FOOTER
