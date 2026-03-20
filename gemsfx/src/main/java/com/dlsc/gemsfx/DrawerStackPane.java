@@ -29,9 +29,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import com.dlsc.gemsfx.util.DurationConverter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableDoubleProperty;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
+import javafx.css.converter.SizeConverter;
+
 /**
  * A custom stackpane that supports a drawer view sliding in from bottom to top. The content of the drawer gets added
- * in the normal way via the childrens list. The content for the drawer has to be added by calling {@link #setDrawerContent(Node)}.
+ * in the normal way via the children list. The content for the drawer has to be added by calling {@link #setDrawerContent(Node)}.
  *
  * <h3>Features</h3>
  * <ul>
@@ -203,11 +216,20 @@ public class DrawerStackPane extends StackPane {
 
     // fade in / out support
 
-    private final BooleanProperty fadeInOut = new SimpleBooleanProperty(this, "fadeInOut", true);
+    private final BooleanProperty fadeInOut = new StyleableBooleanProperty(true) {
+        @Override public Object getBean() { return DrawerStackPane.this; }
+        @Override public String getName() { return "fadeInOut"; }
+        @Override public CssMetaData<? extends Styleable, Boolean> getCssMetaData() { return StyleableProperties.FADE_IN_OUT; }
+    };
 
     /**
      * Specifies whether the glass pane (used for blocking user input to nodes in the background) will
      * use a fade transition when it becomes visible.
+     * <p>
+     * Can be set via CSS using the {@code -fx-fade-in-out} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return true if the glass pane will fade in / out smoothly when appearing / disappearing
      */
@@ -277,7 +299,11 @@ public class DrawerStackPane extends StackPane {
 
     // max drawer height support
 
-    private final DoubleProperty maxDrawerHeight = new SimpleDoubleProperty(this, "maxDrawerHeight", 1);
+    private final DoubleProperty maxDrawerHeight = new StyleableDoubleProperty(1) {
+        @Override public Object getBean() { return DrawerStackPane.this; }
+        @Override public String getName() { return "maxDrawerHeight"; }
+        @Override public CssMetaData<? extends Styleable, Number> getCssMetaData() { return StyleableProperties.MAX_DRAWER_HEIGHT; }
+    };
 
     public double getMaxDrawerHeight() {
         return maxDrawerHeight.get();
@@ -286,6 +312,11 @@ public class DrawerStackPane extends StackPane {
     /**
      * The maximum drawer height, a value between 0 and 1 with 1 meaning that the drawer can
      * be as high as the stackpane.
+     * <p>
+     * Can be set via CSS using the {@code -fx-max-drawer-height} property.
+     * Valid values are: a number between 0 and 1.
+     * The default value is {@code 1.0}.
+     * </p>
      *
      * @return the maximum drawer height (value between 0 and 1)
      */
@@ -299,7 +330,11 @@ public class DrawerStackPane extends StackPane {
 
     // min drawer height support
 
-    private final DoubleProperty minDrawerHeight = new SimpleDoubleProperty(this, "minDrawerHeight", .1);
+    private final DoubleProperty minDrawerHeight = new StyleableDoubleProperty(.1) {
+        @Override public Object getBean() { return DrawerStackPane.this; }
+        @Override public String getName() { return "minDrawerHeight"; }
+        @Override public CssMetaData<? extends Styleable, Number> getCssMetaData() { return StyleableProperties.MIN_DRAWER_HEIGHT; }
+    };
 
     public double getMinDrawerHeight() {
         return minDrawerHeight.get();
@@ -309,6 +344,11 @@ public class DrawerStackPane extends StackPane {
      * The minimum drawer height, a value between 0 and 1 with 0 meaning that the drawer can be made
      * completely invisible. Even with a value larger than 0 the drawer can be made to hide by the user
      * by continuing to drag below the drawer.
+     * <p>
+     * Can be set via CSS using the {@code -fx-min-drawer-height} property.
+     * Valid values are: a number between 0 and 1.
+     * The default value is {@code 0.1}.
+     * </p>
      *
      * @return the minimum drawer height (value between 0 and 1)
      */
@@ -487,7 +527,11 @@ public class DrawerStackPane extends StackPane {
 
     // show drawer title support
 
-    private final BooleanProperty showDrawerTitle = new SimpleBooleanProperty(this, "showDrawerTitle", false);
+    private final BooleanProperty showDrawerTitle = new StyleableBooleanProperty(false) {
+        @Override public Object getBean() { return DrawerStackPane.this; }
+        @Override public String getName() { return "showDrawerTitle"; }
+        @Override public CssMetaData<? extends Styleable, Boolean> getCssMetaData() { return StyleableProperties.SHOW_DRAWER_TITLE; }
+    };
 
     public final boolean isShowDrawerTitle() {
         return showDrawerTitle.get();
@@ -495,6 +539,11 @@ public class DrawerStackPane extends StackPane {
 
     /**
      * A flag used to signal whether the drawer should have a title bar or not.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-drawer-title} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code false}.
+     * </p>
      *
      * @return true if the drawer shows a title
      */
@@ -596,7 +645,11 @@ public class DrawerStackPane extends StackPane {
 
     // preferred drawer width support
 
-    private final DoubleProperty preferredDrawerWidth = new SimpleDoubleProperty(this, "preferredDrawerWidth", Double.MAX_VALUE);
+    private final DoubleProperty preferredDrawerWidth = new StyleableDoubleProperty(Double.MAX_VALUE) {
+        @Override public Object getBean() { return DrawerStackPane.this; }
+        @Override public String getName() { return "preferredDrawerWidth"; }
+        @Override public CssMetaData<? extends Styleable, Number> getCssMetaData() { return StyleableProperties.PREFERRED_DRAWER_WIDTH; }
+    };
 
     public final double getPreferredDrawerWidth() {
         return preferredDrawerWidth.get();
@@ -607,6 +660,11 @@ public class DrawerStackPane extends StackPane {
      * drawer should use the entire available width. A value larger than -1 will make the pane use that value
      * for the width of the drawer. A value of {@link Region#USE_PREF_SIZE} will make the pane use the preferred
      * width of the content shown inside the drawer.
+     * <p>
+     * Can be set via CSS using the {@code -fx-preferred-drawer-width} property.
+     * Valid values are: a positive number or {@code Double.MAX_VALUE} for full available width.
+     * The default value is {@code Double.MAX_VALUE}.
+     * </p>
      *
      * @return the preferred drawer width
      */
@@ -618,7 +676,11 @@ public class DrawerStackPane extends StackPane {
         this.preferredDrawerWidth.set(preferredDrawerWidth);
     }
 
-    private final DoubleProperty topPadding = new SimpleDoubleProperty(this, "topPadding", 20);
+    private final DoubleProperty topPadding = new StyleableDoubleProperty(20) {
+        @Override public Object getBean() { return DrawerStackPane.this; }
+        @Override public String getName() { return "topPadding"; }
+        @Override public CssMetaData<? extends Styleable, Number> getCssMetaData() { return StyleableProperties.TOP_PADDING; }
+    };
 
     public final double getTopPadding() {
         return topPadding.get();
@@ -627,6 +689,11 @@ public class DrawerStackPane extends StackPane {
     /**
      * Specifies a value used for padding at the top of the drawer. This value will
      * always be enforced,.
+     * <p>
+     * Can be set via CSS using the {@code -fx-drawer-top-padding} property.
+     * Valid values are: non-negative numbers (pixels).
+     * The default value is {@code 20.0}.
+     * </p>
      *
      * @return the padding used for the top of the drawer
      */
@@ -638,7 +705,11 @@ public class DrawerStackPane extends StackPane {
         this.topPadding.set(topPadding);
     }
 
-    private final DoubleProperty sidePadding = new SimpleDoubleProperty(this, "sidePadding", 100);
+    private final DoubleProperty sidePadding = new StyleableDoubleProperty(100) {
+        @Override public Object getBean() { return DrawerStackPane.this; }
+        @Override public String getName() { return "sidePadding"; }
+        @Override public CssMetaData<? extends Styleable, Number> getCssMetaData() { return StyleableProperties.SIDE_PADDING; }
+    };
 
     public final double getSidePadding() {
         return sidePadding.get();
@@ -647,6 +718,11 @@ public class DrawerStackPane extends StackPane {
     /**
      * Specifies a value used for padding to the left and the right of the drawer. This value will
      * always be enforced, not matter what the preferred width of the drawer content is.
+     * <p>
+     * Can be set via CSS using the {@code -fx-drawer-side-padding} property.
+     * Valid values are: non-negative numbers (pixels).
+     * The default value is {@code 100.0}.
+     * </p>
      *
      * @return the padding used for the left and right side next to the drawer
      */
@@ -660,7 +736,11 @@ public class DrawerStackPane extends StackPane {
 
     // drawer animation support
 
-    private final BooleanProperty animateDrawer = new SimpleBooleanProperty(this, "animateDrawer", true);
+    private final BooleanProperty animateDrawer = new StyleableBooleanProperty(true) {
+        @Override public Object getBean() { return DrawerStackPane.this; }
+        @Override public String getName() { return "animateDrawer"; }
+        @Override public CssMetaData<? extends Styleable, Boolean> getCssMetaData() { return StyleableProperties.ANIMATE_DRAWER; }
+    };
 
     public final boolean isAnimateDrawer() {
         return animateDrawer.get();
@@ -669,6 +749,11 @@ public class DrawerStackPane extends StackPane {
     /**
      * Determines whether the drawer will smoothly slide in / out when the
      * user opens / closes it. If not then the drawer will just appear instantly.
+     * <p>
+     * Can be set via CSS using the {@code -fx-animate-drawer} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return true if the drawer will be animated (slide in / out)
      */
@@ -701,7 +786,11 @@ public class DrawerStackPane extends StackPane {
         this.drawerHeight.set(drawerHeight);
     }
 
-    private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(this, "animationDuration", Duration.millis(250));
+    private final ObjectProperty<Duration> animationDuration = new StyleableObjectProperty<>(Duration.millis(250)) {
+        @Override public Object getBean() { return DrawerStackPane.this; }
+        @Override public String getName() { return "animationDuration"; }
+        @Override public CssMetaData<? extends Styleable, Duration> getCssMetaData() { return StyleableProperties.ANIMATION_DURATION; }
+    };
 
     public final Duration getAnimationDuration() {
         return animationDuration.get();
@@ -709,6 +798,11 @@ public class DrawerStackPane extends StackPane {
 
     /**
      * The duration it takes to show / hide the drawer.
+     * <p>
+     * Can be set via CSS using the {@code -fx-animation-duration} property.
+     * Valid values are: a number in milliseconds.
+     * The default value is {@code 250}.
+     * </p>
      *
      * @return the animation duration
      */
@@ -787,5 +881,136 @@ public class DrawerStackPane extends StackPane {
         if (onClose != null) {
             onClose.run();
         }
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<DrawerStackPane, Number> PREFERRED_DRAWER_WIDTH =
+                new CssMetaData<>("-fx-preferred-drawer-width", SizeConverter.getInstance(), Double.MAX_VALUE) {
+                    @Override
+                    public boolean isSettable(DrawerStackPane n) {
+                        return !n.preferredDrawerWidth.isBound();
+                    }
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(DrawerStackPane n) {
+                        return (StyleableProperty<Number>) n.preferredDrawerWidthProperty();
+                    }
+                };
+
+        private static final CssMetaData<DrawerStackPane, Number> TOP_PADDING =
+                new CssMetaData<>("-fx-drawer-top-padding", SizeConverter.getInstance(), 20.0) {
+                    @Override
+                    public boolean isSettable(DrawerStackPane n) {
+                        return !n.topPadding.isBound();
+                    }
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(DrawerStackPane n) {
+                        return (StyleableProperty<Number>) n.topPaddingProperty();
+                    }
+                };
+
+        private static final CssMetaData<DrawerStackPane, Number> SIDE_PADDING =
+                new CssMetaData<>("-fx-drawer-side-padding", SizeConverter.getInstance(), 100.0) {
+                    @Override
+                    public boolean isSettable(DrawerStackPane n) {
+                        return !n.sidePadding.isBound();
+                    }
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(DrawerStackPane n) {
+                        return (StyleableProperty<Number>) n.sidePaddingProperty();
+                    }
+                };
+
+        private static final CssMetaData<DrawerStackPane, Boolean> ANIMATE_DRAWER =
+                new CssMetaData<>("-fx-animate-drawer", BooleanConverter.getInstance(), Boolean.TRUE) {
+                    @Override
+                    public boolean isSettable(DrawerStackPane n) {
+                        return !n.animateDrawer.isBound();
+                    }
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(DrawerStackPane n) {
+                        return (StyleableProperty<Boolean>) n.animateDrawerProperty();
+                    }
+                };
+
+        private static final CssMetaData<DrawerStackPane, Boolean> FADE_IN_OUT =
+                new CssMetaData<>("-fx-fade-in-out", BooleanConverter.getInstance(), Boolean.TRUE) {
+                    @Override
+                    public boolean isSettable(DrawerStackPane n) {
+                        return !n.fadeInOut.isBound();
+                    }
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(DrawerStackPane n) {
+                        return (StyleableProperty<Boolean>) n.fadeInOutProperty();
+                    }
+                };
+
+        private static final CssMetaData<DrawerStackPane, Boolean> SHOW_DRAWER_TITLE =
+                new CssMetaData<>("-fx-show-drawer-title", BooleanConverter.getInstance(), Boolean.FALSE) {
+                    @Override
+                    public boolean isSettable(DrawerStackPane n) {
+                        return !n.showDrawerTitle.isBound();
+                    }
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(DrawerStackPane n) {
+                        return (StyleableProperty<Boolean>) n.showDrawerTitleProperty();
+                    }
+                };
+
+        private static final CssMetaData<DrawerStackPane, Number> MAX_DRAWER_HEIGHT =
+                new CssMetaData<>("-fx-max-drawer-height", SizeConverter.getInstance(), 1.0) {
+                    @Override
+                    public boolean isSettable(DrawerStackPane n) {
+                        return !n.maxDrawerHeight.isBound();
+                    }
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(DrawerStackPane n) {
+                        return (StyleableProperty<Number>) n.maxDrawerHeightProperty();
+                    }
+                };
+
+        private static final CssMetaData<DrawerStackPane, Number> MIN_DRAWER_HEIGHT =
+                new CssMetaData<>("-fx-min-drawer-height", SizeConverter.getInstance(), 0.1) {
+                    @Override
+                    public boolean isSettable(DrawerStackPane n) {
+                        return !n.minDrawerHeight.isBound();
+                    }
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(DrawerStackPane n) {
+                        return (StyleableProperty<Number>) n.minDrawerHeightProperty();
+                    }
+                };
+
+        private static final CssMetaData<DrawerStackPane, Duration> ANIMATION_DURATION =
+                new CssMetaData<>("-fx-animation-duration", DurationConverter.getInstance(), Duration.millis(250)) {
+                    @Override
+                    public boolean isSettable(DrawerStackPane n) {
+                        return !n.animationDuration.isBound();
+                    }
+                    @Override
+                    public StyleableProperty<Duration> getStyleableProperty(DrawerStackPane n) {
+                        return (StyleableProperty<Duration>) n.animationDurationProperty();
+                    }
+                };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(StackPane.getClassCssMetaData());
+            Collections.addAll(styleables,
+                    PREFERRED_DRAWER_WIDTH, TOP_PADDING, SIDE_PADDING,
+                    ANIMATE_DRAWER, FADE_IN_OUT, SHOW_DRAWER_TITLE,
+                    MAX_DRAWER_HEIGHT, MIN_DRAWER_HEIGHT, ANIMATION_DURATION);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
+        return getClassCssMetaData();
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
     }
 }

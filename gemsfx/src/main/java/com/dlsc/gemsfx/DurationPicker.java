@@ -11,6 +11,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
+import javafx.css.converter.EnumConverter;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
@@ -20,6 +27,9 @@ import javafx.util.Pair;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -158,7 +168,22 @@ public class DurationPicker extends CustomComboBox<Duration> {
 
     // linking fields
 
-    private final BooleanProperty linkingFields = new SimpleBooleanProperty(this, "linkingFields", true);
+    private final BooleanProperty linkingFields = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return DurationPicker.this;
+        }
+
+        @Override
+        public String getName() {
+            return "linkingFields";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.LINKING_FIELDS;
+        }
+    };
 
     public final boolean isLinkingFields() {
         return linkingFields.get();
@@ -167,8 +192,13 @@ public class DurationPicker extends CustomComboBox<Duration> {
     /**
      * A property used to control whether the fields should automatically increase or decrease
      * the previous field when they reach their upper or lower limit.
+     * <p>
+     * Can be set via CSS using the {@code -fx-linking-fields} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
-     * @return true if rollover is desired
+     * @return true if linking fields is enabled
      */
     public final BooleanProperty linkingFieldsProperty() {
         return linkingFields;
@@ -180,16 +210,35 @@ public class DurationPicker extends CustomComboBox<Duration> {
 
     // rollover
 
-    private final BooleanProperty rollover = new SimpleBooleanProperty(this, "rollOver", true);
+    private final BooleanProperty rollover = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return DurationPicker.this;
+        }
+
+        @Override
+        public String getName() {
+            return "rollover";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.ROLLOVER;
+        }
+    };
 
     public final boolean isRollover() {
         return rollover.get();
     }
 
     /**
-     * A flag used to signal whether the time fields should start at the beginning of its value range
-     * when it reaches the end of it. E.g. incrementing hour 23 would result in hour 0 when the user tries
-     * to increase it by one.
+     * A flag used to signal whether the duration fields should start at the beginning of their
+     * value range when they reach the end of it.
+     * <p>
+     * Can be set via CSS using the {@code -fx-rollover} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return true if the fields should rollover
      */
@@ -225,15 +274,34 @@ public class DurationPicker extends CustomComboBox<Duration> {
 
     // popup trigger button
 
-    private final BooleanProperty showPopupTriggerButton = new SimpleBooleanProperty(this, "showPopupTriggerButton", true);
+    private final BooleanProperty showPopupTriggerButton = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return DurationPicker.this;
+        }
+
+        @Override
+        public String getName() {
+            return "showPopupTriggerButton";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SHOW_POPUP_TRIGGER_BUTTON;
+        }
+    };
 
     public final boolean isShowPopupTriggerButton() {
         return showPopupTriggerButton.get();
     }
 
     /**
-     * Determines if the control will show a button for showing or hiding the
-     * popup.
+     * Determines if the control will show a button for showing or hiding the popup.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-popup-trigger-button} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return true if the control will show a button for showing the popup
      */
@@ -311,7 +379,22 @@ public class DurationPicker extends CustomComboBox<Duration> {
         LONG
     }
 
-    private final ObjectProperty<LabelType> labelType = new SimpleObjectProperty<>(this, "labelType", LabelType.SHORT);
+    private final ObjectProperty<LabelType> labelType = new StyleableObjectProperty<>(LabelType.SHORT) {
+        @Override
+        public Object getBean() {
+            return DurationPicker.this;
+        }
+
+        @Override
+        public String getName() {
+            return "labelType";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, LabelType> getCssMetaData() {
+            return StyleableProperties.LABEL_TYPE;
+        }
+    };
 
     public final LabelType getLabelType() {
         return labelType.get();
@@ -320,6 +403,11 @@ public class DurationPicker extends CustomComboBox<Duration> {
     /**
      * The label type determines if the control will show no labels, short labels (e.g. "d") or
      * long labels (e.g. "days").
+     * <p>
+     * Can be set via CSS using the {@code -fx-label-type} property.
+     * Valid values are: {@code NONE}, {@code SHORT}, {@code LONG}.
+     * The default value is {@code SHORT}.
+     * </p>
      *
      * @return the type of labels shown for each unit
      */
@@ -333,7 +421,22 @@ public class DurationPicker extends CustomComboBox<Duration> {
 
     // fill digits
 
-    private final BooleanProperty fillDigits = new SimpleBooleanProperty(this, "fillDigits", true);
+    private final BooleanProperty fillDigits = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return DurationPicker.this;
+        }
+
+        @Override
+        public String getName() {
+            return "fillDigits";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.FILL_DIGITS;
+        }
+    };
 
     public final boolean isFillDigits() {
         return fillDigits.get();
@@ -343,7 +446,12 @@ public class DurationPicker extends CustomComboBox<Duration> {
      * Determines if the fields will be "filled" with leading zeros or not, example: "04" for
      * 4 hours, or "0005" for 5 milliseconds. This only applies to fields with a granularity
      * of HOURS or lower. It does not make sense to fill DAYS with it as there is no limit on
-     * the number of days (no upper bound). The default value is "true".
+     * the number of days (no upper bound).
+     * <p>
+     * Can be set via CSS using the {@code -fx-fill-digits} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return true if the fields will be filled with leading zeros
      */
@@ -353,5 +461,90 @@ public class DurationPicker extends CustomComboBox<Duration> {
 
     public final void setFillDigits(boolean fillDigits) {
         this.fillDigits.set(fillDigits);
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<DurationPicker, Boolean> SHOW_POPUP_TRIGGER_BUTTON =
+                new CssMetaData<>("-fx-show-popup-trigger-button", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(DurationPicker control) {
+                        return !control.showPopupTriggerButton.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(DurationPicker control) {
+                        return (StyleableProperty<Boolean>) control.showPopupTriggerButtonProperty();
+                    }
+                };
+
+        private static final CssMetaData<DurationPicker, Boolean> LINKING_FIELDS =
+                new CssMetaData<>("-fx-linking-fields", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(DurationPicker control) {
+                        return !control.linkingFields.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(DurationPicker control) {
+                        return (StyleableProperty<Boolean>) control.linkingFieldsProperty();
+                    }
+                };
+
+        private static final CssMetaData<DurationPicker, Boolean> ROLLOVER =
+                new CssMetaData<>("-fx-rollover", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(DurationPicker control) {
+                        return !control.rollover.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(DurationPicker control) {
+                        return (StyleableProperty<Boolean>) control.rolloverProperty();
+                    }
+                };
+
+        private static final CssMetaData<DurationPicker, LabelType> LABEL_TYPE =
+                new CssMetaData<>("-fx-label-type", new EnumConverter<>(LabelType.class), LabelType.SHORT) {
+                    @Override
+                    public boolean isSettable(DurationPicker control) {
+                        return !control.labelType.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<LabelType> getStyleableProperty(DurationPicker control) {
+                        return (StyleableProperty<LabelType>) control.labelTypeProperty();
+                    }
+                };
+
+        private static final CssMetaData<DurationPicker, Boolean> FILL_DIGITS =
+                new CssMetaData<>("-fx-fill-digits", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(DurationPicker control) {
+                        return !control.fillDigits.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(DurationPicker control) {
+                        return (StyleableProperty<Boolean>) control.fillDigitsProperty();
+                    }
+                };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(CustomComboBox.getClassCssMetaData());
+            Collections.addAll(styleables, SHOW_POPUP_TRIGGER_BUTTON, LINKING_FIELDS, ROLLOVER, LABEL_TYPE, FILL_DIGITS);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    @Override
+    protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
     }
 }

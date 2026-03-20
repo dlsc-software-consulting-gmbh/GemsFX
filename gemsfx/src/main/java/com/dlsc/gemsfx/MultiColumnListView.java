@@ -15,7 +15,12 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Control;
@@ -33,6 +38,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -110,7 +118,16 @@ public class MultiColumnListView<T> extends Control {
         this.loadingStatusSize.set(loadingStatusSize);
     }
 
-    private final BooleanProperty showHeaders = new SimpleBooleanProperty(this, "showHeaders", true);
+    private final StyleableBooleanProperty showHeaders = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() { return MultiColumnListView.this; }
+        @Override
+        public String getName() { return "showHeaders"; }
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SHOW_HEADERS;
+        }
+    };
 
     public final boolean isShowHeaders() {
         return showHeaders.get();
@@ -119,6 +136,11 @@ public class MultiColumnListView<T> extends Control {
     /**
      * Determines whether the headers will be shown or not. Toggling this property will trigger
      * a rebuild of the view.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-headers} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return true if the headers should be shown
      */
@@ -214,7 +236,16 @@ public class MultiColumnListView<T> extends Control {
         this.separatorFactory.set(separatorFactory);
     }
 
-    private final BooleanProperty disableDragAndDrop = new SimpleBooleanProperty(this, "disableDragAndDrop");
+    private final StyleableBooleanProperty disableDragAndDrop = new StyleableBooleanProperty(false) {
+        @Override
+        public Object getBean() { return MultiColumnListView.this; }
+        @Override
+        public String getName() { return "disableDragAndDrop"; }
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.DISABLE_DRAG_AND_DROP;
+        }
+    };
 
     public final boolean isDisableDragAndDrop() {
         return disableDragAndDrop.get();
@@ -222,6 +253,11 @@ public class MultiColumnListView<T> extends Control {
 
     /**
      * Controls whether the user can rearrange items via drag and drop or not.
+     * <p>
+     * Can be set via CSS using the {@code -fx-disable-drag-and-drop} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code false}.
+     * </p>
      *
      * @return "true" if the control allows rearranging items via drag and drop
      */
@@ -231,6 +267,50 @@ public class MultiColumnListView<T> extends Control {
 
     public final void setDisableDragAndDrop(boolean disableDragAndDrop) {
         this.disableDragAndDrop.set(disableDragAndDrop);
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<MultiColumnListView, Boolean> SHOW_HEADERS =
+            new CssMetaData<>("-fx-show-headers", BooleanConverter.getInstance(), true) {
+                @Override
+                public boolean isSettable(MultiColumnListView c) {
+                    return !c.showHeaders.isBound();
+                }
+                @Override
+                public StyleableProperty<Boolean> getStyleableProperty(MultiColumnListView c) {
+                    return (StyleableProperty<Boolean>) c.showHeaders;
+                }
+            };
+
+        private static final CssMetaData<MultiColumnListView, Boolean> DISABLE_DRAG_AND_DROP =
+            new CssMetaData<>("-fx-disable-drag-and-drop", BooleanConverter.getInstance(), false) {
+                @Override
+                public boolean isSettable(MultiColumnListView c) {
+                    return !c.disableDragAndDrop.isBound();
+                }
+                @Override
+                public StyleableProperty<Boolean> getStyleableProperty(MultiColumnListView c) {
+                    return (StyleableProperty<Boolean>) c.disableDragAndDrop;
+                }
+            };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+        static {
+            List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(SHOW_HEADERS);
+            styleables.add(DISABLE_DRAG_AND_DROP);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
     }
 
     /**

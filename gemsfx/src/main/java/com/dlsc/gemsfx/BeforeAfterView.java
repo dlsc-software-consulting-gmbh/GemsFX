@@ -8,9 +8,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
 import javafx.css.Styleable;
+import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.EnumConverter;
+import javafx.css.converter.SizeConverter;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -99,7 +101,22 @@ public class BeforeAfterView extends Control {
         return Objects.requireNonNull(BeforeAfterView.class.getResource("before-after-view.css")).toExternalForm();
     }
 
-    private final DoubleProperty dividerPosition = new SimpleDoubleProperty(this, "dividerPosition", .5);
+    private final StyleableDoubleProperty dividerPosition = new StyleableDoubleProperty(.5) {
+        @Override
+        public Object getBean() {
+            return BeforeAfterView.this;
+        }
+
+        @Override
+        public String getName() {
+            return "dividerPosition";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+            return StyleableProperties.DIVIDER_POSITION;
+        }
+    };
 
     public final double getDividerPosition() {
         return dividerPosition.get();
@@ -107,8 +124,13 @@ public class BeforeAfterView extends Control {
 
     /**
      * Stores the position of the divider within the value range of zero to 1.
+     * <p>
+     * Can be set via CSS using the {@code -fx-divider-position} property.
+     * Valid values are: numbers in the range 0.0–1.0.
+     * The default value is {@code 0.5}.
+     * </p>
      *
-     * @return the divider position
+     * @return the property
      */
     public final DoubleProperty dividerPositionProperty() {
         return dividerPosition;
@@ -176,7 +198,10 @@ public class BeforeAfterView extends Control {
     /**
      * Sets the orientation of the before / after view.
      * <p>
-     * Default value is {@link Orientation#HORIZONTAL}
+     * Can be set via CSS using the {@code -fx-orientation} property.
+     * Valid values are: {@code horizontal} or {@code vertical}.
+     * The default value is {@code horizontal}.
+     * </p>
      *
      * @return the orientation property
      */
@@ -214,6 +239,20 @@ public class BeforeAfterView extends Control {
 
     private static class StyleableProperties {
 
+        private static final CssMetaData<BeforeAfterView, Number> DIVIDER_POSITION = new CssMetaData<>(
+                "-fx-divider-position", SizeConverter.getInstance(), .5d) {
+
+            @Override
+            public StyleableProperty<Number> getStyleableProperty(BeforeAfterView view) {
+                return (StyleableProperty<Number>) view.dividerPositionProperty();
+            }
+
+            @Override
+            public boolean isSettable(BeforeAfterView view) {
+                return !view.dividerPosition.isBound();
+            }
+        };
+
         private static final CssMetaData<BeforeAfterView, Orientation> ORIENTATION =
                 new CssMetaData<>("-fx-orientation", new EnumConverter<>(Orientation.class), DEFAULT_ORIENTATION) {
                     @Override
@@ -232,6 +271,7 @@ public class BeforeAfterView extends Control {
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
             styleables.add(ORIENTATION);
+            styleables.add(DIVIDER_POSITION);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }

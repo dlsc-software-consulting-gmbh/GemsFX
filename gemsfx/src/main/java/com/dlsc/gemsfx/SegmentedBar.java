@@ -10,9 +10,11 @@ import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
 import javafx.css.Styleable;
+import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.EnumConverter;
+import javafx.css.converter.SizeConverter;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -147,8 +149,12 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
 
     /**
      * Returns the styleable object property used for storing the orientation of
-     * the segmented bar. The CSS property "-fx-orientation" can be used to
-     * initialize this value.
+     * the segmented bar.
+     * <p>
+     * Can be set via CSS using the {@code -fx-orientation} property.
+     * Valid values are: {@code horizontal} or {@code vertical}.
+     * The default value is {@code vertical}.
+     * </p>
      *
      * @return the orientation property
      */
@@ -158,7 +164,22 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
 
     private final ObjectProperty<Callback<T, Node>> segmentViewFactory = new SimpleObjectProperty<>(this, "segmentViewFactory");
 
-    private final DoubleProperty minSegmentSize = new SimpleDoubleProperty(this, "minSegmentSize", 5);
+    private final StyleableDoubleProperty minSegmentSize = new StyleableDoubleProperty(5) {
+        @Override
+        public Object getBean() {
+            return SegmentedBar.this;
+        }
+
+        @Override
+        public String getName() {
+            return "minSegmentSize";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+            return StyleableProperties.MIN_SEGMENT_SIZE;
+        }
+    };
 
     public final double getMinSegmentSize() {
         return minSegmentSize.get();
@@ -167,8 +188,13 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
     /**
      * The minimum width or height of a segment that will be used if the segment has a very small value
      * compared to the total value of the bar. Without this, small segments would not be visible.
+     * <p>
+     * Can be set via CSS using the {@code -fx-min-segment-size} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 5.0}.
+     * </p>
      *
-     * @return the property that stores the minimum segment size
+     * @return the property
      */
     public final DoubleProperty minSegmentSizeProperty() {
         return minSegmentSize;
@@ -375,6 +401,20 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
 
     private static class StyleableProperties {
 
+        private static final CssMetaData<SegmentedBar, Number> MIN_SEGMENT_SIZE = new CssMetaData<>(
+                "-fx-min-segment-size", SizeConverter.getInstance(), 5d) {
+
+            @Override
+            public StyleableProperty<Number> getStyleableProperty(SegmentedBar control) {
+                return (StyleableProperty<Number>) control.minSegmentSizeProperty();
+            }
+
+            @Override
+            public boolean isSettable(SegmentedBar control) {
+                return !control.minSegmentSize.isBound();
+            }
+        };
+
         private static final CssMetaData<SegmentedBar, Orientation> ORIENTATION = new CssMetaData<>(
                 "-fx-orientation", new EnumConverter<>( //$NON-NLS-1$
                 Orientation.class), Orientation.VERTICAL) {
@@ -403,6 +443,7 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
             styleables.add(ORIENTATION);
+            styleables.add(MIN_SEGMENT_SIZE);
 
             STYLEABLES = Collections.unmodifiableList(styleables);
         }

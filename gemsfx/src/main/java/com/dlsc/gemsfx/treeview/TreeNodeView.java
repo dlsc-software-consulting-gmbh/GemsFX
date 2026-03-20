@@ -131,6 +131,17 @@ public class TreeNodeView<T> extends Control {
         return rowAlignment.get();
     }
 
+    /**
+     * Alignment on the same level; when the layout direction is btt or ttb,
+     * this attribute indicates the alignment of nodes at the same level.
+     * <p>
+     * Can be set via CSS using the {@code -fx-row-alignment} property.
+     * Valid values are: {@code top}, {@code center}, {@code bottom}, {@code baseline}.
+     * The default value is {@code center}.
+     * </p>
+     *
+     * @return the row alignment property
+     */
     public ObjectProperty<VPos> rowAlignmentProperty() {
         return rowAlignment;
     }
@@ -165,6 +176,17 @@ public class TreeNodeView<T> extends Control {
         return columnAlignment.get();
     }
 
+    /**
+     * Alignment on the same level; when the layout direction is ltr or rtl,
+     * this attribute indicates the alignment of nodes at the same level.
+     * <p>
+     * Can be set via CSS using the {@code -fx-column-alignment} property.
+     * Valid values are: {@code left}, {@code center}, {@code right}.
+     * The default value is {@code center}.
+     * </p>
+     *
+     * @return the column alignment property
+     */
     public ObjectProperty<HPos> columnAlignmentProperty() {
         return columnAlignment;
     }
@@ -194,6 +216,16 @@ public class TreeNodeView<T> extends Control {
         return cellWidth.get();
     }
 
+    /**
+     * The fixed width of each cell (tree node) in the view.
+     * <p>
+     * Can be set via CSS using the {@code -fx-cell-width} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 60}.
+     * </p>
+     *
+     * @return the cell width property
+     */
     public DoubleProperty cellWidthProperty() {
         return cellWidth;
     }
@@ -224,6 +256,16 @@ public class TreeNodeView<T> extends Control {
         return cellHeight.get();
     }
 
+    /**
+     * The fixed height of each cell (tree node) in the view.
+     * <p>
+     * Can be set via CSS using the {@code -fx-cell-height} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 30}.
+     * </p>
+     *
+     * @return the cell height property
+     */
     public DoubleProperty cellHeightProperty() {
         return cellHeight;
     }
@@ -253,6 +295,16 @@ public class TreeNodeView<T> extends Control {
         return hgap.get();
     }
 
+    /**
+     * The horizontal gap between cells in the tree view.
+     * <p>
+     * Can be set via CSS using the {@code -fx-hgap} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 20}.
+     * </p>
+     *
+     * @return the horizontal gap property
+     */
     public DoubleProperty hgapProperty() {
         return hgap;
     }
@@ -282,6 +334,16 @@ public class TreeNodeView<T> extends Control {
         return vgap.get();
     }
 
+    /**
+     * The vertical gap between cells in the tree view.
+     * <p>
+     * Can be set via CSS using the {@code -fx-vgap} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 50}.
+     * </p>
+     *
+     * @return the vertical gap property
+     */
     public DoubleProperty vgapProperty() {
         return vgap;
     }
@@ -311,6 +373,16 @@ public class TreeNodeView<T> extends Control {
         return nodeLineGap.get();
     }
 
+    /**
+     * The gap between the tree node cell and the connecting lines.
+     * <p>
+     * Can be set via CSS using the {@code -fx-node-line-gap} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 10}.
+     * </p>
+     *
+     * @return the node line gap property
+     */
     public DoubleProperty nodeLineGapProperty() {
         return nodeLineGap;
     }
@@ -385,6 +457,16 @@ public class TreeNodeView<T> extends Control {
         return layoutType.get();
     }
 
+    /**
+     * Controls whether the tree node view uses regular or compact layout.
+     * <p>
+     * Can be set via CSS using the {@code -fx-layout-type} property.
+     * Valid values are: {@code regular}, {@code compact}.
+     * The default value is {@code regular}.
+     * </p>
+     *
+     * @return the layout type property
+     */
     public ObjectProperty<LayoutType> layoutTypeProperty() {
         return layoutType;
     }
@@ -433,6 +515,16 @@ public class TreeNodeView<T> extends Control {
         return layoutDirection.get();
     }
 
+    /**
+     * Controls the direction in which the tree is laid out.
+     * <p>
+     * Can be set via CSS using the {@code -fx-layout-direction} property.
+     * Valid values are: {@code left-to-right}, {@code right-to-left}, {@code top-to-bottom}, {@code bottom-to-top}.
+     * The default value is {@code top-to-bottom}.
+     * </p>
+     *
+     * @return the layout direction property
+     */
     public ObjectProperty<LayoutDirection> layoutDirectionProperty() {
         return layoutDirection;
     }

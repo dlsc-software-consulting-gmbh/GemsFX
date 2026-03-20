@@ -458,7 +458,11 @@ public class SelectionBox<T> extends Control {
     /**
      * Returns the BooleanProperty that controls the read-only state of the SelectionBox.
      * When set to true, the SelectionBox will be in read-only mode, preventing user interaction.
-     * The default value is false.
+     * <p>
+     * Can be set via CSS using the {@code -fx-read-only} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code false}.
+     * </p>
      *
      * @return the BooleanProperty controlling the read-only state of the SelectionBox.
      */
@@ -604,6 +608,16 @@ public class SelectionBox<T> extends Control {
 
     private BooleanProperty animationEnabled;
 
+    /**
+     * Controls whether animation is enabled for the popup opening/closing transitions.
+     * <p>
+     * Can be set via CSS using the {@code -fx-animation-enabled} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code false}.
+     * </p>
+     *
+     * @return the animation enabled property
+     */
     public final BooleanProperty animationEnabledProperty() {
         if (animationEnabled == null) {
             animationEnabled = new StyleableBooleanProperty(DEFAULT_ANIMATION_ENABLED) {

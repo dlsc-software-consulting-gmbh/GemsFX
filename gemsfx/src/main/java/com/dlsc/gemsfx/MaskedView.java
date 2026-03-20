@@ -77,6 +77,11 @@ public class MaskedView extends Control {
     /**
      * The width of the clips on the left and right hand side of the view. This property
      * defines how big the fade in / out areas will be.
+     * <p>
+     * Can be set via CSS using the {@code -fx-fading-size} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 120}.
+     * </p>
      *
      * @return the size of the side fading areas / clip areas
      */

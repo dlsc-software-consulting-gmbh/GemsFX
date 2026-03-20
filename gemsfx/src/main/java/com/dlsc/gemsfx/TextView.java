@@ -219,6 +219,11 @@ public class TextView extends Control {
     /**
      * The property for the {@code Paint} used for the background of the selection highlight.
      * This is the color or gradient that fills the area behind the selected text.
+     * <p>
+     * Can be set via CSS using the {@code -fx-highlight-fill} property.
+     * Valid values are: any CSS paint value (color, gradient).
+     * The default value is {@code blue}.
+     * </p>
      *
      * @return the highlight fill property.
      */
@@ -266,7 +271,11 @@ public class TextView extends Control {
     /**
      * The property for the {@code Paint} used for the stroke (outline) of the selection highlight.
      * This is the color or gradient for the border around the selected text area.
-     * The default value is {@code Color.TRANSPARENT}.
+     * <p>
+     * Can be set via CSS using the {@code -fx-highlight-stroke} property.
+     * Valid values are: any CSS paint value (color, gradient).
+     * The default value is {@code transparent}.
+     * </p>
      *
      * @return the highlight stroke property.
      */
@@ -314,6 +323,11 @@ public class TextView extends Control {
     /**
      * The property for the {@code Paint} used for the foreground (the text itself) of selected text.
      * This is the color of the text characters when they are part of a selection.
+     * <p>
+     * Can be set via CSS using the {@code -fx-highlight-text-fill} property.
+     * Valid values are: any CSS paint value (color, gradient).
+     * The default value is {@code white}.
+     * </p>
      *
      * @return the highlight text fill property.
      */

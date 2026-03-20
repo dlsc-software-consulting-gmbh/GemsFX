@@ -14,13 +14,21 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.Styleable;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.EnumConverter;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -393,10 +401,24 @@ public class LoadingPane extends StackPane {
         this.status.set(status);
     }
 
-    private final ObjectProperty<Size> size = new SimpleObjectProperty<>(this, "size", Size.MEDIUM);
+    private final StyleableObjectProperty<Size> size = new StyleableObjectProperty<>(Size.MEDIUM) {
+        @Override
+        public Object getBean() { return LoadingPane.this; }
+        @Override
+        public String getName() { return "size"; }
+        @Override
+        public CssMetaData<? extends Styleable, Size> getCssMetaData() {
+            return StyleableProperties.SIZE;
+        }
+    };
 
     /**
      * The size of the progress indicator. The size should match the size of the wrapped node.
+     * <p>
+     * Can be set via CSS using the {@code -fx-size} property.
+     * Valid values are: {@code SMALL}, {@code MEDIUM}, {@code LARGE}.
+     * The default value is {@code MEDIUM}.
+     * </p>
      *
      * @return the size of the progress indicator
      */
@@ -410,6 +432,37 @@ public class LoadingPane extends StackPane {
 
     public final void setSize(Size size) {
         this.size.set(size);
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<LoadingPane, Size> SIZE =
+            new CssMetaData<>("-fx-size", new EnumConverter<>(Size.class), Size.MEDIUM) {
+                @Override
+                public boolean isSettable(LoadingPane c) {
+                    return !c.size.isBound();
+                }
+                @Override
+                public StyleableProperty<Size> getStyleableProperty(LoadingPane c) {
+                    return (StyleableProperty<Size>) c.size;
+                }
+            };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+        static {
+            List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(StackPane.getClassCssMetaData());
+            styleables.add(SIZE);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
+        return getClassCssMetaData();
     }
 
     private final DoubleProperty progress = new SimpleDoubleProperty(this, "progress", 0);

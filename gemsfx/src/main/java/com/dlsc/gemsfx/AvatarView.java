@@ -227,6 +227,11 @@ public class AvatarView extends Control {
      * This property represents the degree of rounding applied to the corners of a rectangular avatar.
      * If the avatar is circular, this property is not used.
      * </p>
+     * <p>
+     * Can be set via CSS using the {@code -fx-avatar-arc-size} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 10}.
+     * </p>
      *
      * @return the round size property
      */
@@ -265,6 +270,11 @@ public class AvatarView extends Control {
      * The size property of the avatar.
      * <p>
      * This property represents the diameter (size) of the avatar.
+     * </p>
+     * <p>
+     * Can be set via CSS using the {@code -fx-avatar-size} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 50}.
      * </p>
      *
      * @return the size property
@@ -316,6 +326,11 @@ public class AvatarView extends Control {
      * The clip type property of the avatar.
      * <p>
      * This property determines the shape of the avatar, whether it is circular or rectangular.
+     * </p>
+     * <p>
+     * Can be set via CSS using the {@code -fx-avatar-shape} property.
+     * Valid values are: {@code round}, {@code square}.
+     * The default value is {@code square}.
      * </p>
      *
      * @return the clip type property

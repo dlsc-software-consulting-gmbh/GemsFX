@@ -71,6 +71,11 @@ public class StretchingTilePane extends Pane {
 
     /**
      * The horizontal gap between the tiles.
+     * <p>
+     * Can be set via CSS using the {@code -fx-hgap} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 0}.
+     * </p>
      *
      * @return the horizontal gap property.
      */
@@ -113,6 +118,11 @@ public class StretchingTilePane extends Pane {
 
     /**
      * The vertical gap between the tiles.
+     * <p>
+     * Can be set via CSS using the {@code -fx-vgap} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 0}.
+     * </p>
      *
      * @return the vertical gap property.
      */

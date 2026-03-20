@@ -9,11 +9,20 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.EnumConverter;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A small "badge-style" view representing a model object. One usage inside GemsFX
@@ -104,7 +113,16 @@ public class ChipView<T> extends Control {
 
     // content display
 
-    private final ObjectProperty<ContentDisplay> contentDisplay = new SimpleObjectProperty<>(this, "contentDisplay", ContentDisplay.LEFT);
+    private final StyleableObjectProperty<ContentDisplay> contentDisplay = new StyleableObjectProperty<>(ContentDisplay.LEFT) {
+        @Override
+        public Object getBean() { return ChipView.this; }
+        @Override
+        public String getName() { return "contentDisplay"; }
+        @Override
+        public CssMetaData<? extends Styleable, ContentDisplay> getCssMetaData() {
+            return StyleableProperties.CONTENT_DISPLAY;
+        }
+    };
 
     public final ContentDisplay getContentDisplay() {
         return contentDisplay.get();
@@ -114,6 +132,12 @@ public class ChipView<T> extends Control {
      * The content display property of the chip will be bound to the same property
      * of the label used by the chip's skin. This property allows applications to
      * switch to a "graphics only" mode (see {@link ContentDisplay#GRAPHIC_ONLY}).
+     * <p>
+     * Can be set via CSS using the {@code -fx-content-display} property.
+     * Valid values are: {@code LEFT}, {@code RIGHT}, {@code TOP}, {@code BOTTOM},
+     * {@code CENTER}, {@code RIGHT}, {@code GRAPHIC_ONLY}, {@code TEXT_ONLY}.
+     * The default value is {@code LEFT}.
+     * </p>
      *
      * @return the content display value
      */
@@ -123,6 +147,37 @@ public class ChipView<T> extends Control {
 
     public final void setContentDisplay(ContentDisplay contentDisplay) {
         this.contentDisplay.set(contentDisplay);
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<ChipView, ContentDisplay> CONTENT_DISPLAY =
+            new CssMetaData<>("-fx-content-display", new EnumConverter<>(ContentDisplay.class), ContentDisplay.LEFT) {
+                @Override
+                public boolean isSettable(ChipView c) {
+                    return !c.contentDisplay.isBound();
+                }
+                @Override
+                public StyleableProperty<ContentDisplay> getStyleableProperty(ChipView c) {
+                    return (StyleableProperty<ContentDisplay>) c.contentDisplay;
+                }
+            };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+        static {
+            List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(CONTENT_DISPLAY);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
     }
 
     // on close

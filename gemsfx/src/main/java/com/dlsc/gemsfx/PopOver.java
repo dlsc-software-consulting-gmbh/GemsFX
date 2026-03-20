@@ -782,6 +782,11 @@ public class PopOver extends PopupControl {
 
         /**
          * Controls the size of the arrow. The default value is 10.
+         * <p>
+         * Can be set via CSS using the {@code -fx-arrow-size} property.
+         * Valid values are: positive numbers.
+         * The default value is {@code 10}.
+         * </p>
          *
          * @return the arrow size property
          */
@@ -808,7 +813,11 @@ public class PopOver extends PopupControl {
 
         /**
          * Controls the distance between the arrow and the corners of the popover.
-         * The default value is 12.
+         * <p>
+         * Can be set via CSS using the {@code -fx-arrow-indent} property.
+         * Valid values are: positive numbers.
+         * The default value is {@code 12}.
+         * </p>
          *
          * @return the arrow indent property
          */
@@ -835,7 +844,11 @@ public class PopOver extends PopupControl {
 
         /**
          * Returns the corner radius property for the popover.
-         * The default value is 6.
+         * <p>
+         * Can be set via CSS using the {@code -fx-corner-radius} property.
+         * Valid values are: positive numbers.
+         * The default value is {@code 6}.
+         * </p>
          *
          * @return the corner radius property
          */

@@ -7,11 +7,17 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
 import javafx.event.ActionEvent;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
@@ -21,6 +27,9 @@ import org.controlsfx.control.textfield.CustomTextField;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -222,11 +231,19 @@ public class SearchTextField extends CustomTextField {
     /**
      * Determines whether the text field should have round corners.
      *
+     * <p>CSS: {@code -fx-round: true|false} — default: {@code false}</p>
+     *
      * @return true if the text field should have round corners, false otherwise
      */
     public final BooleanProperty roundProperty() {
         if (round == null) {
-            round = new SimpleBooleanProperty(this, "round", DEFAULT_ROUND);
+            round = new StyleableBooleanProperty(DEFAULT_ROUND) {
+                @Override public Object getBean() { return SearchTextField.this; }
+                @Override public String getName() { return "round"; }
+                @Override public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.ROUND;
+                }
+            };
         }
         return round;
     }
@@ -277,4 +294,38 @@ public class SearchTextField extends CustomTextField {
     public final void setHistoryManager(HistoryManager<String> historyManager) {
         historyManagerProperty().set(historyManager);
     }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<SearchTextField, Boolean> ROUND =
+                new CssMetaData<>("-fx-round", BooleanConverter.getInstance(), DEFAULT_ROUND) {
+                    @Override
+                    public boolean isSettable(SearchTextField c) {
+                        return c.round == null || !c.round.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(SearchTextField c) {
+                        return (StyleableProperty<Boolean>) c.roundProperty();
+                    }
+                };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(TextField.getClassCssMetaData());
+            styleables.add(ROUND);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+
 }

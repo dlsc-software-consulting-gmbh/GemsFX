@@ -57,6 +57,9 @@ public class CustomComboBox<T> extends ComboBoxBase<T> {
      * {@link ButtonDisplay#BUTTON_ONLY}: Only the button is visible, and the text field is hidden.<br/>
      * {@link ButtonDisplay#FIELD_ONLY}: Only the text field is visible, and the button is hidden.
      * <P>
+     * Can be set via CSS using the {@code -fx-button-display} property.
+     * Valid values are: {@code left}, {@code right}, {@code button-only}, {@code field-only}.
+     * The default value is {@code right}.
      *
      * @return  the button display property of the picker
      */

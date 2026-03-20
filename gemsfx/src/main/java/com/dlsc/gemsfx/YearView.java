@@ -3,10 +3,18 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.skins.YearViewSkin;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableIntegerProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.SizeConverter;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
 import java.time.Year;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -75,13 +83,20 @@ public class YearView extends Control {
         this.value.set(value);
     }
 
-    private final IntegerProperty cols = new SimpleIntegerProperty(this, "cols", 4) {
+    private final StyleableIntegerProperty cols = new StyleableIntegerProperty(4) {
         @Override
-        public void setValue(Number number) {
-            if (number.intValue() < 1) {
+        protected void invalidated() {
+            if (get() < 1) {
                 throw new IllegalArgumentException("number of columns must be larger than 0");
             }
-            super.setValue(number);
+        }
+        @Override
+        public Object getBean() { return YearView.this; }
+        @Override
+        public String getName() { return "cols"; }
+        @Override
+        public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+            return StyleableProperties.COLS;
         }
     };
 
@@ -93,6 +108,11 @@ public class YearView extends Control {
      * Determines how many columns of years will be displayed. The number of
      * columns multiplied with the number of rows determines the total number
      * of years shown per "page".
+     * <p>
+     * Can be set via CSS using the {@code -fx-cols} property.
+     * Valid values are positive integers (&gt;= 1).
+     * The default value is {@code 4}.
+     * </p>
      *
      * @see #rowsProperty()
      * @return the number of columns
@@ -105,13 +125,20 @@ public class YearView extends Control {
         this.cols.set(cols);
     }
 
-    private final IntegerProperty rows = new SimpleIntegerProperty(this, "rows", 5) {
+    private final StyleableIntegerProperty rows = new StyleableIntegerProperty(5) {
         @Override
-        public void setValue(Number number) {
-            if (number.intValue() < 1) {
+        protected void invalidated() {
+            if (get() < 1) {
                 throw new IllegalArgumentException("number of rows must be larger than 0");
             }
-            super.setValue(number);
+        }
+        @Override
+        public Object getBean() { return YearView.this; }
+        @Override
+        public String getName() { return "rows"; }
+        @Override
+        public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+            return StyleableProperties.ROWS;
         }
     };
 
@@ -123,6 +150,11 @@ public class YearView extends Control {
      * Determines how many rows of years will be displayed. The number of
      * columns multiplied with the number of rows determines the total number
      * of years shown per "page".
+     * <p>
+     * Can be set via CSS using the {@code -fx-rows} property.
+     * Valid values are positive integers (&gt;= 1).
+     * The default value is {@code 5}.
+     * </p>
      *
      * @see #colsProperty()
      * @return the number of rows
@@ -133,6 +165,50 @@ public class YearView extends Control {
 
     public final void setRows(int rows) {
         this.rows.set(rows);
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<YearView, Number> COLS =
+            new CssMetaData<>("-fx-cols", SizeConverter.getInstance(), 4) {
+                @Override
+                public boolean isSettable(YearView c) {
+                    return !c.cols.isBound();
+                }
+                @Override
+                public StyleableProperty<Number> getStyleableProperty(YearView c) {
+                    return (StyleableProperty<Number>) c.cols;
+                }
+            };
+
+        private static final CssMetaData<YearView, Number> ROWS =
+            new CssMetaData<>("-fx-rows", SizeConverter.getInstance(), 5) {
+                @Override
+                public boolean isSettable(YearView c) {
+                    return !c.rows.isBound();
+                }
+                @Override
+                public StyleableProperty<Number> getStyleableProperty(YearView c) {
+                    return (StyleableProperty<Number>) c.rows;
+                }
+            };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+        static {
+            List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(COLS);
+            styleables.add(ROWS);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
     }
 
     private final ObjectProperty<Year> earliestYear = new SimpleObjectProperty<>(this, "earliestYear");

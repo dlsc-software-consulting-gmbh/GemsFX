@@ -13,11 +13,16 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import com.dlsc.gemsfx.util.DurationConverter;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.SimpleStyleableBooleanProperty;
 import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
 import javafx.css.StyleableDoubleProperty;
+import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.SizeConverter;
 import javafx.scene.AccessibleAttribute;
 import javafx.scene.control.Control;
@@ -77,7 +82,7 @@ public class StripView<T> extends Control {
         return Objects.requireNonNull(StripView.class.getResource("strip-view.css")).toExternalForm();
     }
 
-    private final BooleanProperty alwaysCenter = new SimpleBooleanProperty(this, "alwaysCenter", true);
+    private final StyleableBooleanProperty alwaysCenter = new SimpleStyleableBooleanProperty(StyleableProperties.ALWAYS_CENTER, this, "alwaysCenter", true);
 
     public final boolean isAlwaysCenter() {
         return alwaysCenter.get();
@@ -86,8 +91,13 @@ public class StripView<T> extends Control {
     /**
      * A flag used to signal whether the currently selected item should always end up in
      * the center location of the view (if possible).
+     * <p>
+     * Can be set via CSS using the {@code -fx-always-center} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
-     * @return true if the selected item will be centered
+     * @return the property
      */
     public final BooleanProperty alwaysCenterProperty() {
         return alwaysCenter;
@@ -105,8 +115,13 @@ public class StripView<T> extends Control {
 
     /**
      * Specifies the size of the fade in / out areas on the left- and right-hand side.
+     * <p>
+     * Can be set via CSS using the {@code -fx-fading-size} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 120}.
+     * </p>
      *
-     * @return the size of the fading areas / the clips used for fading
+     * @return the property
      */
     public final DoubleProperty fadingSizeProperty() {
         if (fadingSize == null) {
@@ -157,12 +172,17 @@ public class StripView<T> extends Control {
 
     // Animation support.
 
-    private final BooleanProperty animateScrolling = new SimpleBooleanProperty(this, "animateScrolling", true);
+    private final StyleableBooleanProperty animateScrolling = new SimpleStyleableBooleanProperty(StyleableProperties.ANIMATE_SCROLLING, this, "animateScrolling", true);
 
     /**
      * Enables or disables whether animation is being used when scrolling to the left or right.
+     * <p>
+     * Can be set via CSS using the {@code -fx-animate-scrolling} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
-     * @return true if the scroll operation will be animated
+     * @return the property
      */
     public final BooleanProperty animateScrollingProperty() {
         return animateScrolling;
@@ -178,12 +198,32 @@ public class StripView<T> extends Control {
 
     // Animation duration support.
 
-    private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(this, "animationDuration", Duration.millis(200));
+    private final StyleableObjectProperty<Duration> animationDuration = new StyleableObjectProperty<>(Duration.millis(200)) {
+        @Override
+        public Object getBean() {
+            return StripView.this;
+        }
+
+        @Override
+        public String getName() {
+            return "animationDuration";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Duration> getCssMetaData() {
+            return StyleableProperties.ANIMATION_DURATION;
+        }
+    };
 
     /**
      * Determines the duration of the scroll animation.
+     * <p>
+     * Can be set via CSS using the {@code -fx-animation-duration} property.
+     * Valid values are: a numeric millisecond value (e.g. {@code 200}).
+     * The default value is {@code 200} ms.
+     * </p>
      *
-     * @return the scroll animation duration
+     * @return the property
      */
     public final ObjectProperty<Duration> animationDurationProperty() {
         return animationDuration;
@@ -264,7 +304,7 @@ public class StripView<T> extends Control {
         getProperties().put("scroll.to", item);
     }
 
-    private final BooleanProperty loopSelection = new SimpleBooleanProperty(this, "loopSelection", true);
+    private final StyleableBooleanProperty loopSelection = new SimpleStyleableBooleanProperty(StyleableProperties.LOOP_SELECTION, this, "loopSelection", true);
 
     public final boolean isLoopSelection() {
         return loopSelection.get();
@@ -276,7 +316,13 @@ public class StripView<T> extends Control {
 
     /**
      * Property to determine whether the selection should loop from the end to the start and vice versa.
-     * true means that the selection will loop.
+     * <p>
+     * Can be set via CSS using the {@code -fx-loop-selection} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
+     *
+     * @return the property
      */
     public final BooleanProperty loopSelectionProperty() {
         return loopSelection;
@@ -406,6 +452,62 @@ public class StripView<T> extends Control {
 
     private static class StyleableProperties {
 
+        private static final CssMetaData<StripView, Boolean> ALWAYS_CENTER = new CssMetaData<>(
+                "-fx-always-center", BooleanConverter.getInstance(), true) {
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(StripView control) {
+                return (StyleableProperty<Boolean>) control.alwaysCenterProperty();
+            }
+
+            @Override
+            public boolean isSettable(StripView control) {
+                return !control.alwaysCenter.isBound();
+            }
+        };
+
+        private static final CssMetaData<StripView, Boolean> ANIMATE_SCROLLING = new CssMetaData<>(
+                "-fx-animate-scrolling", BooleanConverter.getInstance(), true) {
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(StripView control) {
+                return (StyleableProperty<Boolean>) control.animateScrollingProperty();
+            }
+
+            @Override
+            public boolean isSettable(StripView control) {
+                return !control.animateScrolling.isBound();
+            }
+        };
+
+        private static final CssMetaData<StripView, Duration> ANIMATION_DURATION = new CssMetaData<>(
+                "-fx-animation-duration", DurationConverter.getInstance(), Duration.millis(200)) {
+
+            @Override
+            public StyleableProperty<Duration> getStyleableProperty(StripView control) {
+                return (StyleableProperty<Duration>) control.animationDurationProperty();
+            }
+
+            @Override
+            public boolean isSettable(StripView control) {
+                return !control.animationDuration.isBound();
+            }
+        };
+
+        private static final CssMetaData<StripView, Boolean> LOOP_SELECTION = new CssMetaData<>(
+                "-fx-loop-selection", BooleanConverter.getInstance(), true) {
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(StripView control) {
+                return (StyleableProperty<Boolean>) control.loopSelectionProperty();
+            }
+
+            @Override
+            public boolean isSettable(StripView control) {
+                return !control.loopSelection.isBound();
+            }
+        };
+
         private static final CssMetaData<StripView, Number> FADING_SIZE = new CssMetaData<>(
                 "-fx-fading-size", SizeConverter.getInstance(), DEFAULT_FADING_SIZE) {
 
@@ -425,6 +527,10 @@ public class StripView<T> extends Control {
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
             styleables.add(FADING_SIZE);
+            styleables.add(ALWAYS_CENTER);
+            styleables.add(ANIMATE_SCROLLING);
+            styleables.add(ANIMATION_DURATION);
+            styleables.add(LOOP_SELECTION);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }

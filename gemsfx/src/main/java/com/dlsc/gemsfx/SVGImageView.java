@@ -146,8 +146,12 @@ public class SVGImageView extends Control {
      * When {@link #preserveRatioProperty()} is set to true, then the actual displayed
      * width of the image is constrained not only by this property, but
      * also by {@link #fitHeightProperty()}, and it may not be the same as fitWidth.
-     * <p/>
-     * The default value is 0.
+     * </p>
+     * <p>
+     * Can be set via CSS using the {@code -fx-fit-width} property.
+     * Valid values are: numbers (use {@code 0} to use the image's intrinsic width).
+     * The default value is {@code 0}.
+     * </p>
      */
     public final DoubleProperty fitWidthProperty() {
         return fitWidth;
@@ -195,8 +199,12 @@ public class SVGImageView extends Control {
      * When {@link #preserveRatioProperty()} is set to true, then the actual displayed
      * height of the image is constrained not only by this property, but
      * also by {@link #fitWidthProperty()}, and it may not be the same as fitHeight.
-     * <p/>
-     * The default value is 0.
+     * </p>
+     * <p>
+     * Can be set via CSS using the {@code -fx-fit-height} property.
+     * Valid values are: numbers (use {@code 0} to use the image's intrinsic height).
+     * The default value is {@code 0}.
+     * </p>
      */
     public final DoubleProperty fitHeightProperty() {
         return fitHeight;
@@ -243,7 +251,10 @@ public class SVGImageView extends Control {
      * When set to false, the image may be stretched or compressed to fit the specified dimensions,
      * without preserving its aspect ratio.
      * <p>
-     * The default value is false
+     * Can be set via CSS using the {@code -fx-preserve-ratio} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      */
     public final BooleanProperty preserveRatioProperty() {
         return preserveRatio;
@@ -290,7 +301,10 @@ public class SVGImageView extends Control {
      * smoothing algorithm. If true, the image will be rendered with smoothing
      * applied, which can improve the visual quality but may reduce performance.
      * <p>
-     * defaultValue true
+     * Can be set via CSS using the {@code -fx-smooth} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      */
     public final BooleanProperty smoothProperty() {
         return smooth;
@@ -335,7 +349,10 @@ public class SVGImageView extends Control {
      * A property that holds the URL of the SVG image to be rendered.
      * Changing the URL will result in loading and rendering the new SVG image.
      * <p>
-     * defaultValue null
+     * Can be set via CSS using the {@code -fx-svg-url} property.
+     * Valid values are: a URL string pointing to an SVG file.
+     * The default value is {@code null}.
+     * </p>
      */
     public final StringProperty svgUrlProperty() {
         return svgUrl;
@@ -382,7 +399,10 @@ public class SVGImageView extends Control {
      * When set to true, the image is loaded in a background thread, allowing for
      * asynchronous loading of images.
      * <p>
-     * defaultValue false
+     * Can be set via CSS using the {@code -fx-background-loading} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code false}.
+     * </p>
      */
     public final BooleanProperty backgroundLoadingProperty() {
         return backgroundLoading;

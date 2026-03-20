@@ -212,12 +212,32 @@ public class EmailField extends Control {
 
     /**
      * Property for enabling or disabling the auto-completion of email domains.
+     * <p>
+     * Can be set via CSS using the {@code -fx-auto-domain-completion-enabled} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
-     * @return The BooleanProperty representing the state of auto domain completion.
+     * @return the property
      */
     public final BooleanProperty autoDomainCompletionEnabledProperty() {
         if (autoDomainCompletionEnabled == null) {
-            autoDomainCompletionEnabled = new SimpleBooleanProperty(this, "autoDomainCompletionEnabled", DEFAULT_AUTO_DOMAIN_COMPLETION_ENABLED);
+            autoDomainCompletionEnabled = new StyleableBooleanProperty(DEFAULT_AUTO_DOMAIN_COMPLETION_ENABLED) {
+                @Override
+                public Object getBean() {
+                    return EmailField.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "autoDomainCompletionEnabled";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.AUTO_DOMAIN_COMPLETION_ENABLED;
+                }
+            };
         }
         return autoDomainCompletionEnabled;
     }
@@ -253,7 +273,7 @@ public class EmailField extends Control {
 
     // required
 
-    private final BooleanProperty required = new SimpleBooleanProperty(this, "required", false);
+    private final StyleableBooleanProperty required = new SimpleStyleableBooleanProperty(StyleableProperties.REQUIRED, this, "required", false);
 
     public final boolean isRequired() {
         return required.get();
@@ -262,8 +282,13 @@ public class EmailField extends Control {
     /**
      * A flag signalling that this is a required field. This flag will be taken into account when
      * updating the state of the {@link #validProperty()}.
+     * <p>
+     * Can be set via CSS using the {@code -fx-required} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code false}.
+     * </p>
      *
-     * @return the flag used to determine if the field is required
+     * @return the property
      */
     public final BooleanProperty requiredProperty() {
         return required;
@@ -320,7 +345,7 @@ public class EmailField extends Control {
 
     // multiple address support
 
-    private final BooleanProperty supportingMultipleAddresses = new SimpleBooleanProperty(this, "supportingMultipleAddresses");
+    private final StyleableBooleanProperty supportingMultipleAddresses = new SimpleStyleableBooleanProperty(StyleableProperties.SUPPORTING_MULTIPLE_ADDRESSES, this, "supportingMultipleAddresses", false);
 
     public final boolean isSupportingMultipleAddresses() {
         return supportingMultipleAddresses.get();
@@ -329,8 +354,13 @@ public class EmailField extends Control {
     /**
      * A control flag used to determine if the user should be able to enter more than one email address
      * into the field.
+     * <p>
+     * Can be set via CSS using the {@code -fx-supporting-multiple-addresses} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code false}.
+     * </p>
      *
-     * @return a flag used for controlling input behaviour (single vs. multiple email addresses)
+     * @return the property
      */
     public final BooleanProperty supportingMultipleAddressesProperty() {
         return supportingMultipleAddresses;
@@ -425,6 +455,13 @@ public class EmailField extends Control {
 
     /**
      * Property for handling the mail icon visibility.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-mail-icon} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
+     *
+     * @return the show mail icon property
      */
     public final BooleanProperty showMailIconProperty() {
         return showMailIcon;
@@ -454,6 +491,13 @@ public class EmailField extends Control {
 
     /**
      * Property for handling the validation icon visibility.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-validation-icon} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
+     *
+     * @return the show validation icon property
      */
     public final BooleanProperty showValidationIconProperty() {
         return showValidationIcon;
@@ -469,6 +513,48 @@ public class EmailField extends Control {
     }
 
     private static class StyleableProperties {
+
+        private static final CssMetaData<EmailField, Boolean> AUTO_DOMAIN_COMPLETION_ENABLED = new CssMetaData<>(
+                "-fx-auto-domain-completion-enabled", BooleanConverter.getInstance(), DEFAULT_AUTO_DOMAIN_COMPLETION_ENABLED) {
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(EmailField control) {
+                return (StyleableProperty<Boolean>) control.autoDomainCompletionEnabledProperty();
+            }
+
+            @Override
+            public boolean isSettable(EmailField control) {
+                return control.autoDomainCompletionEnabled == null || !control.autoDomainCompletionEnabled.isBound();
+            }
+        };
+
+        private static final CssMetaData<EmailField, Boolean> SUPPORTING_MULTIPLE_ADDRESSES = new CssMetaData<>(
+                "-fx-supporting-multiple-addresses", BooleanConverter.getInstance(), false) {
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(EmailField control) {
+                return (StyleableProperty<Boolean>) control.supportingMultipleAddressesProperty();
+            }
+
+            @Override
+            public boolean isSettable(EmailField control) {
+                return !control.supportingMultipleAddresses.isBound();
+            }
+        };
+
+        private static final CssMetaData<EmailField, Boolean> REQUIRED = new CssMetaData<>(
+                "-fx-required", BooleanConverter.getInstance(), false) {
+
+            @Override
+            public StyleableProperty<Boolean> getStyleableProperty(EmailField control) {
+                return (StyleableProperty<Boolean>) control.requiredProperty();
+            }
+
+            @Override
+            public boolean isSettable(EmailField control) {
+                return !control.required.isBound();
+            }
+        };
 
         private static final CssMetaData<EmailField, Boolean> SHOW_MAIL_ICON = new CssMetaData<>(
                 "-fx-show-mail-icon", BooleanConverter.getInstance(), DEFAULT_SHOW_MAIL_ICON) {
@@ -502,7 +588,8 @@ public class EmailField extends Control {
 
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
-            Collections.addAll(styleables, SHOW_MAIL_ICON, SHOW_VALIDATION_ICON);
+            Collections.addAll(styleables, SHOW_MAIL_ICON, SHOW_VALIDATION_ICON,
+                    AUTO_DOMAIN_COMPLETION_ENABLED, SUPPORTING_MULTIPLE_ADDRESSES, REQUIRED);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }

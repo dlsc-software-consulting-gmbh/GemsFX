@@ -140,6 +140,11 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
 
     /**
      * The arc type property defines the type of the arc that is used to display the progress.
+     * <p>
+     * Can be set via CSS using the {@code -fx-progress-arc-type} property.
+     * Valid values are: {@code open}, {@code chord}, {@code round}.
+     * The default value is {@code open}.
+     * </p>
      *
      * @return the arc type property for the progress
      */
@@ -176,7 +181,12 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
     private ObjectProperty<ArcType> trackArcType;
 
     /**
-     * The arc type property defines the type of the arc that is used to display the track.
+     * The track arc type property defines the type of the arc that is used to display the track.
+     * <p>
+     * Can be set via CSS using the {@code -fx-track-arc-type} property.
+     * Valid values are: {@code open}, {@code chord}, {@code round}.
+     * The default value is {@code chord}.
+     * </p>
      *
      * @return the arc type property for the track
      */
@@ -221,7 +231,11 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
 
     /**
      * The style type property defines the visualization type of the arc that is used to display the progress.
-     * Possible values are: default, bold, thin, sector.
+     * <p>
+     * Can be set via CSS using the {@code -fx-style-type} property.
+     * Valid values are: {@code default}, {@code bold}, {@code thin}, {@code sector}.
+     * The default value is {@code default}.
+     * </p>
      *
      * @return the style type property for the progress
      */

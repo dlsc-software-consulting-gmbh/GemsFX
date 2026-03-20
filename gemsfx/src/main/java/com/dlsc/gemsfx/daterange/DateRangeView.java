@@ -8,6 +8,7 @@ import javafx.beans.value.WritableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.*;
+import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.EnumConverter;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
@@ -86,6 +87,11 @@ public class DateRangeView extends Control {
     /**
      * Determines how the start and end calendars will be laid out, either next to each
      * other (horizontal), or one on top of the other (vertical).
+     * <p>
+     * Can be set via CSS using the {@code -fx-orientation} property.
+     * Valid values are: {@code HORIZONTAL}, {@code VERTICAL}.
+     * The default value is {@code HORIZONTAL}.
+     * </p>
      *
      * @return the layout orientation of the two calendar views
      */
@@ -243,13 +249,28 @@ public class DateRangeView extends Control {
         this.presetTitle.set(presetTitle);
     }
 
-    private final ObjectProperty<Side> presetsLocation = new SimpleObjectProperty<>(this, "presetsLocation", Side.LEFT) {
+    private final ObjectProperty<Side> presetsLocation = new StyleableObjectProperty<>(Side.LEFT) {
         @Override
         public void set(Side side) {
             if (!Objects.equals(side, Side.LEFT) && !Objects.equals(side, Side.RIGHT)) {
                 throw new IllegalArgumentException("only sides LEFT and RIGHT are supported");
             }
             super.set(side);
+        }
+
+        @Override
+        public Object getBean() {
+            return DateRangeView.this;
+        }
+
+        @Override
+        public String getName() {
+            return "presetsLocation";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Side> getCssMetaData() {
+            return StyleableProperties.PRESETS_LOCATION;
         }
     };
 
@@ -260,6 +281,11 @@ public class DateRangeView extends Control {
     /**
      * Defines where the presets will be shown relative to the two calendar views.
      * Supports left and right side values.
+     * <p>
+     * Can be set via CSS using the {@code -fx-presets-location} property.
+     * Valid values are: {@code LEFT}, {@code RIGHT}.
+     * The default value is {@code LEFT}.
+     * </p>
      *
      * @return the location of the presets
      */
@@ -271,14 +297,34 @@ public class DateRangeView extends Control {
         this.presetsLocation.set(presetsLocation);
     }
 
-    private final BooleanProperty showPresets = new SimpleBooleanProperty(this, "showQuickSelect", true);
+    private final BooleanProperty showPresets = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return DateRangeView.this;
+        }
+
+        @Override
+        public String getName() {
+            return "showPresets";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SHOW_PRESETS;
+        }
+    };
 
     public final boolean isShowPresets() {
         return showPresets.get();
     }
 
     /**
-     * Controls whether the presets will be shown by the control
+     * Controls whether the presets section will be shown by the control.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-presets} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return controls visibility of the presets section
      */
@@ -330,7 +376,22 @@ public class DateRangeView extends Control {
         this.value.set(value);
     }
 
-    private final BooleanProperty showCancelAndApplyButton = new SimpleBooleanProperty(this, "showCancelAndApplyButton", true);
+    private final BooleanProperty showCancelAndApplyButton = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return DateRangeView.this;
+        }
+
+        @Override
+        public String getName() {
+            return "showCancelAndApplyButton";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SHOW_CANCEL_AND_APPLY_BUTTON;
+        }
+    };
 
     public final boolean isShowCancelAndApplyButton() {
         return showCancelAndApplyButton.get();
@@ -338,6 +399,11 @@ public class DateRangeView extends Control {
 
     /**
      * Shows or hides the cancel and the apply buttons.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-cancel-and-apply-button} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return true if the buttons will be shown
      */
@@ -415,12 +481,53 @@ public class DateRangeView extends Control {
                     }
                 };
 
+        private static final CssMetaData<DateRangeView, Boolean> SHOW_PRESETS =
+                new CssMetaData<>("-fx-show-presets", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(DateRangeView n) {
+                        return !n.showPresets.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(DateRangeView n) {
+                        return (StyleableProperty<Boolean>) n.showPresetsProperty();
+                    }
+                };
+
+        private static final CssMetaData<DateRangeView, Boolean> SHOW_CANCEL_AND_APPLY_BUTTON =
+                new CssMetaData<>("-fx-show-cancel-and-apply-button", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(DateRangeView n) {
+                        return !n.showCancelAndApplyButton.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(DateRangeView n) {
+                        return (StyleableProperty<Boolean>) n.showCancelAndApplyButtonProperty();
+                    }
+                };
+
+        private static final CssMetaData<DateRangeView, Side> PRESETS_LOCATION =
+                new CssMetaData<>("-fx-presets-location", new EnumConverter<>(Side.class), Side.LEFT) {
+                    @Override
+                    public boolean isSettable(DateRangeView n) {
+                        return !n.presetsLocation.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Side> getStyleableProperty(DateRangeView n) {
+                        return (StyleableProperty<Side>) n.presetsLocationProperty();
+                    }
+                };
+
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
 
         static {
-            final List<CssMetaData<? extends Styleable, ?>> styleables =
-                    new ArrayList<CssMetaData<? extends Styleable, ?>>(Control.getClassCssMetaData());
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
             styleables.add(ORIENTATION);
+            styleables.add(SHOW_PRESETS);
+            styleables.add(SHOW_CANCEL_AND_APPLY_BUTTON);
+            styleables.add(PRESETS_LOCATION);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }

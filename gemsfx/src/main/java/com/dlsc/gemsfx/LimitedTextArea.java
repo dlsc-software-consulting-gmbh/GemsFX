@@ -16,8 +16,12 @@ import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
 import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableDoubleProperty;
+import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
+import javafx.css.converter.EnumConverter;
+import javafx.css.converter.SizeConverter;
 import javafx.scene.control.Skin;
 
 import java.util.ArrayList;
@@ -88,6 +92,16 @@ public class LimitedTextArea extends ResizableTextArea {
 
     private BooleanProperty showBottom;
 
+    /**
+     * Controls whether the bottom area (containing the character count and tips) is shown.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-bottom} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
+     *
+     * @return the show bottom property
+     */
     public final BooleanProperty showBottomProperty() {
         if (showBottom == null) {
             showBottom = new StyleableBooleanProperty(DEFAULT_SHOW_BOTTOM) {
@@ -190,6 +204,11 @@ public class LimitedTextArea extends ResizableTextArea {
     /**
      * The length display mode property defines when the text length indicator label should be displayed.
      * {@link LengthDisplayMode#AUTO}, {@link LengthDisplayMode#ALWAYS_SHOW}, {@link LengthDisplayMode#ALWAYS_HIDE}
+     * <p>
+     * Can be set via CSS using the {@code -fx-length-display-mode} property.
+     * Valid values are: {@code auto}, {@code always-show}, {@code always-hide}.
+     * The default value is {@code auto}.
+     * </p>
      *
      * @return the length display mode property
      */
@@ -210,6 +229,13 @@ public class LimitedTextArea extends ResizableTextArea {
     /**
      * The warning threshold is a value between 0 and 1.
      * When the text length is greater than or equal to the maximum length times the warning threshold, the warning style will be applied.
+     * <p>
+     * Can be set via CSS using the {@code -fx-warning-threshold} property.
+     * Valid values are: numbers in the range {@code 0.0}–{@code 1.0}.
+     * The default value is {@code 0.9}.
+     * </p>
+     *
+     * @return the warning threshold property
      */
     public final DoubleProperty warningThresholdProperty() {
         return warningThreshold;
@@ -224,6 +250,34 @@ public class LimitedTextArea extends ResizableTextArea {
     }
 
     private static class StyleableProperties {
+
+        private static final CssMetaData<LimitedTextArea, Number> WARNING_THRESHOLD = new CssMetaData<>(
+                "-fx-warning-threshold", SizeConverter.getInstance(), 0.9d) {
+
+            @Override
+            public StyleableProperty<Number> getStyleableProperty(LimitedTextArea control) {
+                return (StyleableProperty<Number>) control.warningThresholdProperty();
+            }
+
+            @Override
+            public boolean isSettable(LimitedTextArea control) {
+                return !control.warningThreshold.isBound();
+            }
+        };
+
+        private static final CssMetaData<LimitedTextArea, LengthDisplayMode> LENGTH_DISPLAY_MODE = new CssMetaData<>(
+                "-fx-length-display-mode", new EnumConverter<>(LengthDisplayMode.class), LengthDisplayMode.AUTO) {
+
+            @Override
+            public StyleableProperty<LengthDisplayMode> getStyleableProperty(LimitedTextArea control) {
+                return (StyleableProperty<LengthDisplayMode>) control.lengthDisplayModeProperty();
+            }
+
+            @Override
+            public boolean isSettable(LimitedTextArea control) {
+                return !control.lengthDisplayMode.isBound();
+            }
+        };
 
         private static final CssMetaData<LimitedTextArea, Boolean> SHOW_BOTTOM = new CssMetaData<>(
                 "-fx-show-bottom", BooleanConverter.getInstance(), DEFAULT_SHOW_BOTTOM) {
@@ -244,6 +298,8 @@ public class LimitedTextArea extends ResizableTextArea {
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(ResizableTextArea.getClassCssMetaData());
             styleables.add(SHOW_BOTTOM);
+            styleables.add(WARNING_THRESHOLD);
+            styleables.add(LENGTH_DISPLAY_MODE);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }

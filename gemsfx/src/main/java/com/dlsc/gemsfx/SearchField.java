@@ -25,7 +25,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableDoubleProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
+import javafx.css.converter.SizeConverter;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -51,9 +58,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -542,7 +551,13 @@ public class SearchField<T> extends Control {
         return searching.get();
     }
 
-    private final BooleanProperty hidePopupWithSingleChoice = new SimpleBooleanProperty(this, "hidePopupWithSingleChoice", false);
+    private final StyleableBooleanProperty hidePopupWithSingleChoice = new StyleableBooleanProperty(false) {
+        @Override public Object getBean() { return SearchField.this; }
+        @Override public String getName() { return "hidePopupWithSingleChoice"; }
+        @Override public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.HIDE_POPUP_WITH_SINGLE_CHOICE;
+        }
+    };
 
     public final boolean isHidePopupWithSingleChoice() {
         return hidePopupWithSingleChoice.get();
@@ -551,6 +566,8 @@ public class SearchField<T> extends Control {
     /**
      * Hides the popup window with the suggestion list if the list only contains a single
      * elements. The default is "false".
+     *
+     * <p>CSS: {@code -fx-hide-popup-with-single-choice: true|false} — default: {@code false}</p>
      *
      * @return true if the popup showing the list of suggestions will not appear if only a single choice is available
      */
@@ -562,7 +579,13 @@ public class SearchField<T> extends Control {
         this.hidePopupWithSingleChoice.set(hidePopupWithSingleChoice);
     }
 
-    private final BooleanProperty hidePopupWithNoChoice = new SimpleBooleanProperty(this, "hidePopupWithNoChoice", false);
+    private final StyleableBooleanProperty hidePopupWithNoChoice = new StyleableBooleanProperty(false) {
+        @Override public Object getBean() { return SearchField.this; }
+        @Override public String getName() { return "hidePopupWithNoChoice"; }
+        @Override public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.HIDE_POPUP_WITH_NO_CHOICE;
+        }
+    };
 
     public final boolean isHidePopupWithNoChoice() {
         return hidePopupWithNoChoice.get();
@@ -571,6 +594,8 @@ public class SearchField<T> extends Control {
     /**
      * Determines whether to hide the popup window when there are no choices available in the suggestion list.
      * The default value is "false", indicating that the popup does not hide automatically under this condition.
+     *
+     * <p>CSS: {@code -fx-hide-popup-with-no-choice: true|false} — default: {@code false}</p>
      *
      * @return true if the popup should not be shown when there are no suggestions to display.
      */
@@ -819,7 +844,13 @@ public class SearchField<T> extends Control {
         this.newItemProducer.set(newItemProducer);
     }
 
-    private final DoubleProperty autoCompletionGap = new SimpleDoubleProperty(this, "autoCompletionGap", 1);
+    private final StyleableDoubleProperty autoCompletionGap = new StyleableDoubleProperty(1) {
+        @Override public Object getBean() { return SearchField.this; }
+        @Override public String getName() { return "autoCompletionGap"; }
+        @Override public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+            return StyleableProperties.AUTO_COMPLETION_GAP;
+        }
+    };
 
     public final double getAutoCompletionGap() {
         return autoCompletionGap.get();
@@ -827,6 +858,8 @@ public class SearchField<T> extends Control {
 
     /**
      * Defines the gap (in pixels) between the user typed text and the autocompleted text.
+     *
+     * <p>CSS: {@code -fx-auto-completion-gap: <number>} — default: {@code 1}</p>
      *
      * @return the gap (in pixels) between the user typed text and the autocompleted text
      */
@@ -1022,11 +1055,19 @@ public class SearchField<T> extends Control {
      * Returns the BooleanProperty that indicates if text should auto-commit when the field loses focus.
      * The property is lazy-initialized and defaults to true, enabling auto-commit by default.
      *
+     * <p>CSS: {@code -fx-auto-commit-on-focus-lost: true|false} — default: {@code true}</p>
+     *
      * @return the BooleanProperty for autoCommitOnFocusLost.
      */
     public final BooleanProperty autoCommitOnFocusLostProperty() {
         if (autoCommitOnFocusLost == null) {
-            autoCommitOnFocusLost = new SimpleBooleanProperty(this, "autoCommitOnFocusLost", true);
+            autoCommitOnFocusLost = new StyleableBooleanProperty(true) {
+                @Override public Object getBean() { return SearchField.this; }
+                @Override public String getName() { return "autoCommitOnFocusLost"; }
+                @Override public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.AUTO_COMMIT_ON_FOCUS_LOST;
+                }
+            };
         }
         return autoCommitOnFocusLost;
     }
@@ -1148,7 +1189,13 @@ public class SearchField<T> extends Control {
         this.right.set(right);
     }
 
-    private final BooleanProperty showSearchIcon = new SimpleBooleanProperty(this, "showSearchIcon", true);
+    private final StyleableBooleanProperty showSearchIcon = new StyleableBooleanProperty(true) {
+        @Override public Object getBean() { return SearchField.this; }
+        @Override public String getName() { return "showSearchIcon"; }
+        @Override public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SHOW_SEARCH_ICON;
+        }
+    };
 
     public final boolean isShowSearchIcon() {
         return showSearchIcon.get();
@@ -1157,6 +1204,8 @@ public class SearchField<T> extends Control {
     /**
      * Determines if the field will show an icon on the right-hand side which indicates
      * that the field is a search field.
+     *
+     * <p>CSS: {@code -fx-show-search-icon: true|false} — default: {@code true}</p>
      *
      * @return true if a search icon will be shown
      */
@@ -1197,11 +1246,19 @@ public class SearchField<T> extends Control {
     /**
      * Determines whether the text of the text field should be added to the history when the user presses the Enter key.
      *
+     * <p>CSS: {@code -fx-adding-item-to-history-on-enter: true|false} — default: {@code true}</p>
+     *
      * @return true if the text should be added to the history on Enter, false otherwise
      */
     public final BooleanProperty addingItemToHistoryOnEnterProperty() {
         if (addingItemToHistoryOnEnter == null) {
-            addingItemToHistoryOnEnter = new SimpleBooleanProperty(this, "addingItemToHistoryOnEnter", DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER);
+            addingItemToHistoryOnEnter = new StyleableBooleanProperty(DEFAULT_ADDING_ITEM_TO_HISTORY_ON_ENTER) {
+                @Override public Object getBean() { return SearchField.this; }
+                @Override public String getName() { return "addingItemToHistoryOnEnter"; }
+                @Override public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.ADDING_ITEM_TO_HISTORY_ON_ENTER;
+                }
+            };
         }
         return addingItemToHistoryOnEnter;
     }
@@ -1221,11 +1278,19 @@ public class SearchField<T> extends Control {
     /**
      * Determines whether the text of the text field should be added to the history when the field losses its focus.
      *
+     * <p>CSS: {@code -fx-adding-item-to-history-on-focus-lost: true|false} — default: {@code true}</p>
+     *
      * @return true if the text should be added to the history on focus lost, false otherwise
      */
     public final BooleanProperty addingItemToHistoryOnFocusLostProperty() {
         if (addingItemToHistoryOnFocusLost == null) {
-            addingItemToHistoryOnFocusLost = new SimpleBooleanProperty(this, "addingItemToHistoryOnFocusLost", DEFAULT_ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST);
+            addingItemToHistoryOnFocusLost = new StyleableBooleanProperty(DEFAULT_ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST) {
+                @Override public Object getBean() { return SearchField.this; }
+                @Override public String getName() { return "addingItemToHistoryOnFocusLost"; }
+                @Override public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST;
+                }
+            };
         }
         return addingItemToHistoryOnFocusLost;
     }
@@ -1245,11 +1310,19 @@ public class SearchField<T> extends Control {
     /**
      * Determines whether the text of the text field should be added to the history when the user commits to a value.
      *
+     * <p>CSS: {@code -fx-adding-item-to-history-on-commit: true|false} — default: {@code true}</p>
+     *
      * @return true if the text should be added to the history on commit, false otherwise
      */
     public final BooleanProperty addingItemToHistoryOnCommitProperty() {
         if (addingItemToHistoryOnCommit == null) {
-            addingItemToHistoryOnCommit = new SimpleBooleanProperty(this, "addingItemToHistoryOnCommit", DEFAULT_ADDING_ITEM_TO_HISTORY_ON_COMMIT);
+            addingItemToHistoryOnCommit = new StyleableBooleanProperty(DEFAULT_ADDING_ITEM_TO_HISTORY_ON_COMMIT) {
+                @Override public Object getBean() { return SearchField.this; }
+                @Override public String getName() { return "addingItemToHistoryOnCommit"; }
+                @Override public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+                    return StyleableProperties.ADDING_ITEM_TO_HISTORY_ON_COMMIT;
+                }
+            };
         }
         return addingItemToHistoryOnCommit;
     }
@@ -1361,6 +1434,137 @@ public class SearchField<T> extends Control {
 
     public final SearchFieldPopup<T> getPopup() {
         return popup;
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<SearchField<?>, Boolean> HIDE_POPUP_WITH_SINGLE_CHOICE =
+                new CssMetaData<>("-fx-hide-popup-with-single-choice", BooleanConverter.getInstance(), false) {
+                    @Override
+                    public boolean isSettable(SearchField<?> c) {
+                        return !c.hidePopupWithSingleChoice.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(SearchField<?> c) {
+                        return (StyleableProperty<Boolean>) c.hidePopupWithSingleChoiceProperty();
+                    }
+                };
+
+        private static final CssMetaData<SearchField<?>, Boolean> HIDE_POPUP_WITH_NO_CHOICE =
+                new CssMetaData<>("-fx-hide-popup-with-no-choice", BooleanConverter.getInstance(), false) {
+                    @Override
+                    public boolean isSettable(SearchField<?> c) {
+                        return !c.hidePopupWithNoChoice.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(SearchField<?> c) {
+                        return (StyleableProperty<Boolean>) c.hidePopupWithNoChoiceProperty();
+                    }
+                };
+
+        private static final CssMetaData<SearchField<?>, Number> AUTO_COMPLETION_GAP =
+                new CssMetaData<>("-fx-auto-completion-gap", SizeConverter.getInstance(), 1) {
+                    @Override
+                    public boolean isSettable(SearchField<?> c) {
+                        return !c.autoCompletionGap.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(SearchField<?> c) {
+                        return (StyleableProperty<Number>) c.autoCompletionGapProperty();
+                    }
+                };
+
+        private static final CssMetaData<SearchField<?>, Boolean> SHOW_SEARCH_ICON =
+                new CssMetaData<>("-fx-show-search-icon", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(SearchField<?> c) {
+                        return !c.showSearchIcon.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(SearchField<?> c) {
+                        return (StyleableProperty<Boolean>) c.showSearchIconProperty();
+                    }
+                };
+
+        private static final CssMetaData<SearchField<?>, Boolean> AUTO_COMMIT_ON_FOCUS_LOST =
+                new CssMetaData<>("-fx-auto-commit-on-focus-lost", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(SearchField<?> c) {
+                        return c.autoCommitOnFocusLost == null || !c.autoCommitOnFocusLost.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(SearchField<?> c) {
+                        return (StyleableProperty<Boolean>) c.autoCommitOnFocusLostProperty();
+                    }
+                };
+
+        private static final CssMetaData<SearchField<?>, Boolean> ADDING_ITEM_TO_HISTORY_ON_ENTER =
+                new CssMetaData<>("-fx-adding-item-to-history-on-enter", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(SearchField<?> c) {
+                        return c.addingItemToHistoryOnEnter == null || !c.addingItemToHistoryOnEnter.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(SearchField<?> c) {
+                        return (StyleableProperty<Boolean>) c.addingItemToHistoryOnEnterProperty();
+                    }
+                };
+
+        private static final CssMetaData<SearchField<?>, Boolean> ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST =
+                new CssMetaData<>("-fx-adding-item-to-history-on-focus-lost", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(SearchField<?> c) {
+                        return c.addingItemToHistoryOnFocusLost == null || !c.addingItemToHistoryOnFocusLost.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(SearchField<?> c) {
+                        return (StyleableProperty<Boolean>) c.addingItemToHistoryOnFocusLostProperty();
+                    }
+                };
+
+        private static final CssMetaData<SearchField<?>, Boolean> ADDING_ITEM_TO_HISTORY_ON_COMMIT =
+                new CssMetaData<>("-fx-adding-item-to-history-on-commit", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(SearchField<?> c) {
+                        return c.addingItemToHistoryOnCommit == null || !c.addingItemToHistoryOnCommit.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(SearchField<?> c) {
+                        return (StyleableProperty<Boolean>) c.addingItemToHistoryOnCommitProperty();
+                    }
+                };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(HIDE_POPUP_WITH_SINGLE_CHOICE);
+            styleables.add(HIDE_POPUP_WITH_NO_CHOICE);
+            styleables.add(AUTO_COMPLETION_GAP);
+            styleables.add(SHOW_SEARCH_ICON);
+            styleables.add(AUTO_COMMIT_ON_FOCUS_LOST);
+            styleables.add(ADDING_ITEM_TO_HISTORY_ON_ENTER);
+            styleables.add(ADDING_ITEM_TO_HISTORY_ON_FOCUS_LOST);
+            styleables.add(ADDING_ITEM_TO_HISTORY_ON_COMMIT);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    @Override
+    protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
     }
 
 }

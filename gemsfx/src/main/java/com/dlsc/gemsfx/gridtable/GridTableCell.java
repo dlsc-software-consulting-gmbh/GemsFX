@@ -119,6 +119,13 @@ public class GridTableCell<S, T> extends Cell<T> {
      * Since mouseTransparent cannot be directly set through CSS,
      * transparentProperty allows for CSS-driven adjustments,
      * facilitating easier styling without altering existing code.
+     * <p>
+     * Can be set via CSS using the {@code -fx-mouse-transparent} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code false}.
+     * </p>
+     *
+     * @return the transparent property
      */
     public final StyleableBooleanProperty transparentProperty() {
         if (transparent == null) {

@@ -10,6 +10,15 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.MapChangeListener;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableIntegerProperty;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
+import javafx.css.converter.EnumConverter;
+import javafx.css.converter.SizeConverter;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
@@ -17,6 +26,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Region;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -259,15 +271,34 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         this.hoursSeparator.set(separator);
     }
 
-    private final BooleanProperty showPopupTriggerButton = new SimpleBooleanProperty(this, "showPopupTriggerButton", true);
+    private final BooleanProperty showPopupTriggerButton = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return TimePicker.this;
+        }
+
+        @Override
+        public String getName() {
+            return "showPopupTriggerButton";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SHOW_POPUP_TRIGGER_BUTTON;
+        }
+    };
 
     public final boolean isShowPopupTriggerButton() {
         return showPopupTriggerButton.get();
     }
 
     /**
-     * Determines if the control will show a button for showing or hiding the
-     * popup.
+     * Determines if the control will show a button for showing or hiding the popup.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-popup-trigger-button} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return true if the control will show a button for showing the popup
      */
@@ -444,7 +475,22 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         }
     }
 
-    private final IntegerProperty stepRateInMinutes = new SimpleIntegerProperty(this, "stepRateInMinutes", 1);
+    private final IntegerProperty stepRateInMinutes = new StyleableIntegerProperty(1) {
+        @Override
+        public Object getBean() {
+            return TimePicker.this;
+        }
+
+        @Override
+        public String getName() {
+            return "stepRateInMinutes";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+            return StyleableProperties.STEP_RATE_IN_MINUTES;
+        }
+    };
 
     public final int getStepRateInMinutes() {
         return stepRateInMinutes.get();
@@ -455,6 +501,11 @@ public class TimePicker extends CustomComboBox<LocalTime> {
      * decreases the minutes field. The step rate can be used to (for example) make
      * the minutes increase or decrease by 15 minutes every time the user presses
      * the arrow up or down keys.
+     * <p>
+     * Can be set via CSS using the {@code -fx-step-rate-in-minutes} property.
+     * Valid values are: integers between {@code 1} and {@code 60} (inclusive).
+     * The default value is {@code 1}.
+     * </p>
      *
      * @return the step rate in minutes
      */
@@ -466,7 +517,22 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         this.stepRateInMinutes.set(stepRateInMinutes);
     }
 
-    private final ObjectProperty<ClockType> clockType = new SimpleObjectProperty<>(this, "clockType", ClockType.TWENTY_FOUR_HOUR_CLOCK);
+    private final ObjectProperty<ClockType> clockType = new StyleableObjectProperty<>(ClockType.TWENTY_FOUR_HOUR_CLOCK) {
+        @Override
+        public Object getBean() {
+            return TimePicker.this;
+        }
+
+        @Override
+        public String getName() {
+            return "clockType";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, ClockType> getCssMetaData() {
+            return StyleableProperties.CLOCK_TYPE;
+        }
+    };
 
     public final ClockType getClockType() {
         return clockType.get();
@@ -476,6 +542,11 @@ public class TimePicker extends CustomComboBox<LocalTime> {
      * The clock type determines whether the control will display 24 or 12 hours. If
      * the control shows 12 hours then an additional field for choosing between the "am"
      * or "pm" meridian will be added.
+     * <p>
+     * Can be set via CSS using the {@code -fx-clock-type} property.
+     * Valid values are: {@code TWENTY_FOUR_HOUR_CLOCK}, {@code TWELVE_HOUR_CLOCK}.
+     * The default value is {@code TWENTY_FOUR_HOUR_CLOCK}.
+     * </p>
      *
      * @return the type of the clock
      */
@@ -487,7 +558,22 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         this.clockType.set(clockType);
     }
 
-    private final BooleanProperty linkingFields = new SimpleBooleanProperty(this, "linkingFields", true);
+    private final BooleanProperty linkingFields = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return TimePicker.this;
+        }
+
+        @Override
+        public String getName() {
+            return "linkingFields";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.LINKING_FIELDS;
+        }
+    };
 
     public final boolean isLinkingFields() {
         return linkingFields.get();
@@ -496,8 +582,13 @@ public class TimePicker extends CustomComboBox<LocalTime> {
     /**
      * A property used to control whether the fields should automatically increase or decrease
      * the previous field when they reach their upper or lower limit.
+     * <p>
+     * Can be set via CSS using the {@code -fx-linking-fields} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
-     * @return true if rollover is desired
+     * @return true if linking fields is enabled
      */
     public final BooleanProperty linkingFieldsProperty() {
         return linkingFields;
@@ -507,7 +598,22 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         this.linkingFields.set(linkingFields);
     }
 
-    private final BooleanProperty rollover = new SimpleBooleanProperty(this, "rollOver", true);
+    private final BooleanProperty rollover = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return TimePicker.this;
+        }
+
+        @Override
+        public String getName() {
+            return "rollover";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.ROLLOVER;
+        }
+    };
 
     public final boolean isRollover() {
         return rollover.get();
@@ -517,6 +623,11 @@ public class TimePicker extends CustomComboBox<LocalTime> {
      * A flag used to signal whether the time fields should start at the beginning of its value range
      * when it reaches the end of it. E.g. incrementing hour 23 would result in hour 0 when the user tries
      * to increase it by one.
+     * <p>
+     * Can be set via CSS using the {@code -fx-rollover} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return true if the fields should rollover
      */
@@ -548,12 +659,33 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         this.onShowPopup.set(onShowPopup);
     }
 
-    private final ObjectProperty<Format> format = new SimpleObjectProperty<>(this, "format", Format.HOURS_MINUTES);
+    private final ObjectProperty<Format> format = new StyleableObjectProperty<>(Format.HOURS_MINUTES) {
+        @Override
+        public Object getBean() {
+            return TimePicker.this;
+        }
+
+        @Override
+        public String getName() {
+            return "format";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Format> getCssMetaData() {
+            return StyleableProperties.FORMAT;
+        }
+    };
 
     /**
      * The format used by the picker, e.g. "hours and minutes", or "hours, minutes, and seconds".
+     * <p>
+     * Can be set via CSS using the {@code -fx-format} property.
+     * Valid values are: {@code HOURS_MINUTES}, {@code HOURS_MINUTES_SECONDS},
+     * {@code HOURS_MINUTES_SECONDS_MILLIS}.
+     * The default value is {@code HOURS_MINUTES}.
+     * </p>
      *
-     * @return the time unit
+     * @return the time format
      */
     public final ObjectProperty<Format> formatProperty() {
         return format;
@@ -606,4 +738,102 @@ public class TimePicker extends CustomComboBox<LocalTime> {
     public final void setSecondsSeparator(Node separator) {
         this.secondsSeparator.set(separator);
     }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<TimePicker, Boolean> SHOW_POPUP_TRIGGER_BUTTON =
+                new CssMetaData<>("-fx-show-popup-trigger-button", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(TimePicker control) {
+                        return !control.showPopupTriggerButton.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(TimePicker control) {
+                        return (StyleableProperty<Boolean>) control.showPopupTriggerButtonProperty();
+                    }
+                };
+
+        private static final CssMetaData<TimePicker, Boolean> LINKING_FIELDS =
+                new CssMetaData<>("-fx-linking-fields", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(TimePicker control) {
+                        return !control.linkingFields.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(TimePicker control) {
+                        return (StyleableProperty<Boolean>) control.linkingFieldsProperty();
+                    }
+                };
+
+        private static final CssMetaData<TimePicker, Boolean> ROLLOVER =
+                new CssMetaData<>("-fx-rollover", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(TimePicker control) {
+                        return !control.rollover.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(TimePicker control) {
+                        return (StyleableProperty<Boolean>) control.rolloverProperty();
+                    }
+                };
+
+        private static final CssMetaData<TimePicker, ClockType> CLOCK_TYPE =
+                new CssMetaData<>("-fx-clock-type", new EnumConverter<>(ClockType.class), ClockType.TWENTY_FOUR_HOUR_CLOCK) {
+                    @Override
+                    public boolean isSettable(TimePicker control) {
+                        return !control.clockType.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<ClockType> getStyleableProperty(TimePicker control) {
+                        return (StyleableProperty<ClockType>) control.clockTypeProperty();
+                    }
+                };
+
+        private static final CssMetaData<TimePicker, Format> FORMAT =
+                new CssMetaData<>("-fx-format", new EnumConverter<>(Format.class), Format.HOURS_MINUTES) {
+                    @Override
+                    public boolean isSettable(TimePicker control) {
+                        return !control.format.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Format> getStyleableProperty(TimePicker control) {
+                        return (StyleableProperty<Format>) control.formatProperty();
+                    }
+                };
+
+        private static final CssMetaData<TimePicker, Number> STEP_RATE_IN_MINUTES =
+                new CssMetaData<>("-fx-step-rate-in-minutes", SizeConverter.getInstance(), 1) {
+                    @Override
+                    public boolean isSettable(TimePicker control) {
+                        return !control.stepRateInMinutes.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(TimePicker control) {
+                        return (StyleableProperty<Number>) control.stepRateInMinutesProperty();
+                    }
+                };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(CustomComboBox.getClassCssMetaData());
+            Collections.addAll(styleables, SHOW_POPUP_TRIGGER_BUTTON, LINKING_FIELDS, ROLLOVER, CLOCK_TYPE, FORMAT, STEP_RATE_IN_MINUTES);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
     }
+
+    @Override
+    protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+}

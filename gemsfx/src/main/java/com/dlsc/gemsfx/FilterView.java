@@ -11,7 +11,6 @@ import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -22,6 +21,11 @@ import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -30,6 +34,7 @@ import javafx.util.Callback;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,7 +206,16 @@ public class FilterView<T> extends Control {
         this.subtitleGraphic.set(subtitleGraphic);
     }
 
-    private final BooleanProperty showHeader = new SimpleBooleanProperty(this, "showHeader", true);
+    private final StyleableBooleanProperty showHeader = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() { return FilterView.this; }
+        @Override
+        public String getName() { return "showHeader"; }
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SHOW_HEADER;
+        }
+    };
 
     public final boolean isShowHeader() {
         return showHeader.get();
@@ -210,6 +224,11 @@ public class FilterView<T> extends Control {
     /**
      * A flag to control whether the title, subtitle, and the search field
      * will be shown or not.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-header} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return true if the header will be shown (default is "true")
      */
@@ -430,6 +449,36 @@ public class FilterView<T> extends Control {
 
     public final ReadOnlyObjectProperty<Predicate<T>> filterPredicateProperty() {
         return filterPredicate.getReadOnlyProperty();
+    }
+
+    private static class StyleableProperties {
+        private static final CssMetaData<FilterView, Boolean> SHOW_HEADER =
+                new CssMetaData<>("-fx-show-header", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(FilterView c) {
+                        return !c.showHeader.isBound();
+                    }
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(FilterView c) {
+                        return (StyleableProperty<Boolean>) c.showHeader;
+                    }
+                };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+        static {
+            List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(SHOW_HEADER);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
     }
 
     /**

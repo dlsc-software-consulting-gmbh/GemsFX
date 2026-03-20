@@ -5,9 +5,18 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.util.StringConverter;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import java.time.Month;
 import java.time.YearMonth;
@@ -32,7 +41,16 @@ public class YearMonthView extends Control {
         return Objects.requireNonNull(YearMonthView.class.getResource("year-month-view.css")).toExternalForm();
     }
 
-    private final BooleanProperty showYear = new SimpleBooleanProperty(this, "showYear", true);
+    private final StyleableBooleanProperty showYear = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() { return YearMonthView.this; }
+        @Override
+        public String getName() { return "showYear"; }
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SHOW_YEAR;
+        }
+    };
 
     public final boolean isShowYear() {
         return showYear.get();
@@ -43,6 +61,11 @@ public class YearMonthView extends Control {
      * control is used standalone, then showing the year is usually necessary.
      * If the control is part of a more complex control like the {@link CalendarView} then
      * showing the year might not be needed as it becomes obvious from the overall context.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-year} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return true if the year will be shown
      */
@@ -52,6 +75,37 @@ public class YearMonthView extends Control {
 
     public final void setShowYear(boolean showYear) {
         this.showYear.set(showYear);
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<YearMonthView, Boolean> SHOW_YEAR =
+            new CssMetaData<>("-fx-show-year", BooleanConverter.getInstance(), true) {
+                @Override
+                public boolean isSettable(YearMonthView c) {
+                    return !c.showYear.isBound();
+                }
+                @Override
+                public StyleableProperty<Boolean> getStyleableProperty(YearMonthView c) {
+                    return (StyleableProperty<Boolean>) c.showYear;
+                }
+            };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+        static {
+            List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(SHOW_YEAR);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
     }
 
     private final ObjectProperty<YearMonth> value = new SimpleObjectProperty<>(this, "value", YearMonth.now());

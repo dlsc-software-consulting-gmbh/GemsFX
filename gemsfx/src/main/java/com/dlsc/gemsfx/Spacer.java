@@ -68,6 +68,17 @@ public class Spacer extends Region {
         active.set(value);
     }
 
+    /**
+     * Determines whether the spacer is active. When active, the spacer tries to grow as much as possible
+     * within its parent container. When inactive, it collapses and does not take up any space.
+     * <p>
+     * Can be set via CSS using the {@code -fx-active} property.
+     * Valid values are: {@code true} or {@code false}.
+     * The default value is {@code true}.
+     * </p>
+     *
+     * @return the active property
+     */
     public final BooleanProperty activeProperty() {
         return active;
     }

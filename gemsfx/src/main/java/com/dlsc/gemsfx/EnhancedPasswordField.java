@@ -169,6 +169,16 @@ public class EnhancedPasswordField extends PasswordField {
 
     private ObjectProperty<Character> echoCharProperty;
 
+    /**
+     * The character used to mask the password when it is not shown in plain text.
+     * <p>
+     * Can be set via CSS using the {@code -fx-echo-char} property.
+     * Valid values are: a single character (e.g. {@code '●'}).
+     * The default value is {@code '●'}.
+     * </p>
+     *
+     * @return the echo character property
+     */
     public final ObjectProperty<Character> echoCharProperty() {
         if (echoCharProperty == null) {
             echoCharProperty = new StyleableObjectProperty<>(DEFAULT_ECHO_CHAR) {

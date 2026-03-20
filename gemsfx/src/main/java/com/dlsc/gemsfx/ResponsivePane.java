@@ -190,6 +190,16 @@ public class ResponsivePane extends StackPane {
 
     private ObjectProperty<Side> side;
 
+    /**
+     * Controls the side on which the sidebar (content area) is displayed relative to the main content.
+     * <p>
+     * Can be set via CSS using the {@code -fx-side} property.
+     * Valid values are: {@code top}, {@code bottom}, {@code left}, {@code right}.
+     * The default value is {@code left}.
+     * </p>
+     *
+     * @return the side property
+     */
     public final ObjectProperty<Side> sideProperty() {
         if (side == null) {
             side = new StyleableObjectProperty<>(DEFAULT_SIDE) {
@@ -238,6 +248,16 @@ public class ResponsivePane extends StackPane {
 
     private DoubleProperty gap;
 
+    /**
+     * The gap between the sidebar and the main content area.
+     * <p>
+     * Can be set via CSS using the {@code -fx-gap} property.
+     * Valid values are: positive numbers.
+     * The default value is {@code 0}.
+     * </p>
+     *
+     * @return the gap property
+     */
     public final DoubleProperty gapProperty() {
         if (gap == null) {
             gap = new StyleableDoubleProperty(0d) {

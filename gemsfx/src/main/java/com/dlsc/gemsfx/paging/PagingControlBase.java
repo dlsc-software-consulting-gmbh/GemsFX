@@ -15,6 +15,15 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableIntegerProperty;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
+import javafx.css.converter.EnumConverter;
+import javafx.css.converter.SizeConverter;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
@@ -24,6 +33,9 @@ import javafx.scene.layout.Region;
 import javafx.util.Callback;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class PagingControlBase extends Control {
@@ -138,7 +150,22 @@ public abstract class PagingControlBase extends Control {
         this.availablePageSizes.set(availablePageSizes);
     }
 
-    private final BooleanProperty showPageSizeSelector = new SimpleBooleanProperty(this, "showPageSizeSelector", true);
+    private final BooleanProperty showPageSizeSelector = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return PagingControlBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "showPageSizeSelector";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SHOW_PAGE_SIZE_SELECTOR;
+        }
+    };
 
     public final boolean isShowPageSizeSelector() {
         return showPageSizeSelector.get();
@@ -146,6 +173,11 @@ public abstract class PagingControlBase extends Control {
 
     /**
      * Determines if the control will show a selector UI for choosing different page sizes.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-page-size-selector} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @see #availablePageSizesProperty()
      * @see #pageSizeSelectorLabelProperty()
@@ -160,7 +192,22 @@ public abstract class PagingControlBase extends Control {
         this.showPageSizeSelector.set(showPageSizeSelector);
     }
 
-    private final BooleanProperty sameWidthPageButtons = new SimpleBooleanProperty(this, "sameWidthPageButtons", false);
+    private final BooleanProperty sameWidthPageButtons = new StyleableBooleanProperty(false) {
+        @Override
+        public Object getBean() {
+            return PagingControlBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "sameWidthPageButtons";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SAME_WIDTH_PAGE_BUTTONS;
+        }
+    };
 
     public final boolean isSameWidthPageButtons() {
         return sameWidthPageButtons.get();
@@ -170,6 +217,11 @@ public abstract class PagingControlBase extends Control {
      * A flag used to signal whether the individual page buttons will all have the same width or if their
      * width can be different based on the page number that they are showing (e.g. the button for page "1" would
      * be substantially less wide than the button for page "999").
+     * <p>
+     * Can be set via CSS using the {@code -fx-same-width-page-buttons} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code false}.
+     * </p>
      *
      * @return a flag to control the width of the page buttons
      */
@@ -181,7 +233,22 @@ public abstract class PagingControlBase extends Control {
         this.sameWidthPageButtons.set(sameWidthPageButtons);
     }
 
-    private final BooleanProperty showPreviousNextPageButton = new SimpleBooleanProperty(this, "showPreviousNextButton", true);
+    private final BooleanProperty showPreviousNextPageButton = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return PagingControlBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "showPreviousNextPageButton";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SHOW_PREVIOUS_NEXT_PAGE_BUTTON;
+        }
+    };
 
     public final boolean isShowPreviousNextPageButton() {
         return showPreviousNextPageButton.get();
@@ -190,6 +257,11 @@ public abstract class PagingControlBase extends Control {
     /**
      * A flag used to determine whether the control will display arrow buttons to
      * go to the next or the previous page.
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-previous-next-page-button} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return a boolean property to control the visibility of the previous / next buttons
      */
@@ -224,7 +296,22 @@ public abstract class PagingControlBase extends Control {
         ALWAYS_SHOW
     }
 
-    private final ObjectProperty<PagingControls.MessageLabelStrategy> messageLabelStrategy = new SimpleObjectProperty<>(this, "messageLabelStrategy", MessageLabelStrategy.ALWAYS_SHOW);
+    private final ObjectProperty<PagingControls.MessageLabelStrategy> messageLabelStrategy = new StyleableObjectProperty<>(MessageLabelStrategy.ALWAYS_SHOW) {
+        @Override
+        public Object getBean() {
+            return PagingControlBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "messageLabelStrategy";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, PagingControls.MessageLabelStrategy> getCssMetaData() {
+            return StyleableProperties.MESSAGE_LABEL_STRATEGY;
+        }
+    };
 
     public final PagingControls.MessageLabelStrategy getMessageLabelStrategy() {
         return messageLabelStrategy.get();
@@ -234,6 +321,11 @@ public abstract class PagingControlBase extends Control {
      * The message label strategy controls whether the message label will appear in
      * certain situations, for example, when there are no items currently in the view
      * that is being controlled by these pagination controls.
+     * <p>
+     * Can be set via CSS using the {@code -fx-message-label-strategy} property.
+     * Valid values are: {@code HIDE}, {@code SHOW_WHEN_NEEDED}, {@code ALWAYS_SHOW}.
+     * The default value is {@code ALWAYS_SHOW}.
+     * </p>
      *
      * @return the strategy used to show or hide the message label
      */
@@ -268,12 +360,37 @@ public abstract class PagingControlBase extends Control {
         SHOW_PAGE_BUTTONS
     }
 
-    private final ObjectProperty<PagingControls.FirstLastPageDisplayMode> firstLastPageDisplayMode = new SimpleObjectProperty<>(this, "firstLastPageStrategy", PagingControls.FirstLastPageDisplayMode.SHOW_PAGE_BUTTONS);
+    private final ObjectProperty<PagingControls.FirstLastPageDisplayMode> firstLastPageDisplayMode = new StyleableObjectProperty<>(PagingControls.FirstLastPageDisplayMode.SHOW_PAGE_BUTTONS) {
+        @Override
+        public Object getBean() {
+            return PagingControlBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "firstLastPageDisplayMode";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, PagingControls.FirstLastPageDisplayMode> getCssMetaData() {
+            return StyleableProperties.FIRST_LAST_PAGE_DISPLAY_MODE;
+        }
+    };
 
     public final PagingControls.FirstLastPageDisplayMode getFirstLastPageDisplayMode() {
         return firstLastPageDisplayMode.get();
     }
 
+    /**
+     * Controls how first and last page navigation is displayed by the paging control.
+     * <p>
+     * Can be set via CSS using the {@code -fx-first-last-page-display-mode} property.
+     * Valid values are: {@code HIDE}, {@code SHOW_ARROW_BUTTONS}, {@code SHOW_PAGE_BUTTONS}.
+     * The default value is {@code SHOW_PAGE_BUTTONS}.
+     * </p>
+     *
+     * @return the display mode for first and last page navigation controls
+     */
     public final ObjectProperty<PagingControls.FirstLastPageDisplayMode> firstLastPageDisplayModeProperty() {
         return firstLastPageDisplayMode;
     }
@@ -415,7 +532,22 @@ public abstract class PagingControlBase extends Control {
         return pageCount.getReadOnlyProperty();
     }
 
-    private final IntegerProperty maxPageIndicatorsCount = new SimpleIntegerProperty(this, "maxPageIndicatorsCount", 5);
+    private final IntegerProperty maxPageIndicatorsCount = new StyleableIntegerProperty(5) {
+        @Override
+        public Object getBean() {
+            return PagingControlBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "maxPageIndicatorsCount";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+            return StyleableProperties.MAX_PAGE_INDICATORS_COUNT;
+        }
+    };
 
     public final int getMaxPageIndicatorsCount() {
         return maxPageIndicatorsCount.get();
@@ -424,6 +556,11 @@ public abstract class PagingControlBase extends Control {
     /**
      * The maximum number of page indicators / buttons that will be shown at any time
      * by this control.
+     * <p>
+     * Can be set via CSS using the {@code -fx-max-page-indicators-count} property.
+     * Valid values are positive integers.
+     * The default value is {@code 5}.
+     * </p>
      *
      * @return the number of page buttons shown by the control
      */
@@ -474,7 +611,22 @@ public abstract class PagingControlBase extends Control {
         this.pageSize.set(pageSize);
     }
 
-    private final ObjectProperty<HPos> alignment = new SimpleObjectProperty<>(this, "alignment", HPos.RIGHT);
+    private final ObjectProperty<HPos> alignment = new StyleableObjectProperty<>(HPos.RIGHT) {
+        @Override
+        public Object getBean() {
+            return PagingControlBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "alignment";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, HPos> getCssMetaData() {
+            return StyleableProperties.ALIGNMENT;
+        }
+    };
 
     public final HPos getAlignment() {
         return alignment.get();
@@ -482,7 +634,12 @@ public abstract class PagingControlBase extends Control {
 
     /**
      * The alignment property controls where in the view the paging buttons will appear: left,
-     * center, middle.
+     * center, or right.
+     * <p>
+     * Can be set via CSS using the {@code -fx-page-alignment} property.
+     * Valid values are: {@code LEFT}, {@code CENTER}, {@code RIGHT}.
+     * The default value is {@code RIGHT}.
+     * </p>
      *
      * @return the alignment / the position of the paging buttons
      */
@@ -569,4 +726,128 @@ public abstract class PagingControlBase extends Control {
     public final void setNextPageText(String nextPageText) {
         this.nextPageText.set(nextPageText);
     }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<PagingControlBase, Boolean> SHOW_PAGE_SIZE_SELECTOR =
+                new CssMetaData<>("-fx-show-page-size-selector", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(PagingControlBase n) {
+                        return !n.showPageSizeSelector.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(PagingControlBase n) {
+                        return (StyleableProperty<Boolean>) n.showPageSizeSelectorProperty();
+                    }
+                };
+
+        private static final CssMetaData<PagingControlBase, Boolean> SAME_WIDTH_PAGE_BUTTONS =
+                new CssMetaData<>("-fx-same-width-page-buttons", BooleanConverter.getInstance(), false) {
+                    @Override
+                    public boolean isSettable(PagingControlBase n) {
+                        return !n.sameWidthPageButtons.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(PagingControlBase n) {
+                        return (StyleableProperty<Boolean>) n.sameWidthPageButtonsProperty();
+                    }
+                };
+
+        private static final CssMetaData<PagingControlBase, Boolean> SHOW_PREVIOUS_NEXT_PAGE_BUTTON =
+                new CssMetaData<>("-fx-show-previous-next-page-button", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(PagingControlBase n) {
+                        return !n.showPreviousNextPageButton.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(PagingControlBase n) {
+                        return (StyleableProperty<Boolean>) n.showPreviousNextPageButtonProperty();
+                    }
+                };
+
+        private static final CssMetaData<PagingControlBase, MessageLabelStrategy> MESSAGE_LABEL_STRATEGY =
+                new CssMetaData<>("-fx-message-label-strategy", new EnumConverter<>(MessageLabelStrategy.class), MessageLabelStrategy.ALWAYS_SHOW) {
+                    @Override
+                    public boolean isSettable(PagingControlBase n) {
+                        return !n.messageLabelStrategy.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<MessageLabelStrategy> getStyleableProperty(PagingControlBase n) {
+                        return (StyleableProperty<MessageLabelStrategy>) n.messageLabelStrategyProperty();
+                    }
+                };
+
+        private static final CssMetaData<PagingControlBase, FirstLastPageDisplayMode> FIRST_LAST_PAGE_DISPLAY_MODE =
+                new CssMetaData<>("-fx-first-last-page-display-mode", new EnumConverter<>(FirstLastPageDisplayMode.class), FirstLastPageDisplayMode.SHOW_PAGE_BUTTONS) {
+                    @Override
+                    public boolean isSettable(PagingControlBase n) {
+                        return !n.firstLastPageDisplayMode.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<FirstLastPageDisplayMode> getStyleableProperty(PagingControlBase n) {
+                        return (StyleableProperty<FirstLastPageDisplayMode>) n.firstLastPageDisplayModeProperty();
+                    }
+                };
+
+        private static final CssMetaData<PagingControlBase, Number> MAX_PAGE_INDICATORS_COUNT =
+                new CssMetaData<>("-fx-max-page-indicators-count", SizeConverter.getInstance(), 5) {
+                    @Override
+                    public boolean isSettable(PagingControlBase n) {
+                        return !n.maxPageIndicatorsCount.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Number> getStyleableProperty(PagingControlBase n) {
+                        return (StyleableProperty<Number>) n.maxPageIndicatorsCountProperty();
+                    }
+                };
+
+        private static final CssMetaData<PagingControlBase, HPos> ALIGNMENT =
+                new CssMetaData<>("-fx-page-alignment", new EnumConverter<>(HPos.class), HPos.RIGHT) {
+                    @Override
+                    public boolean isSettable(PagingControlBase n) {
+                        return !n.alignment.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<HPos> getStyleableProperty(PagingControlBase n) {
+                        return (StyleableProperty<HPos>) n.alignmentProperty();
+                    }
+                };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(SHOW_PAGE_SIZE_SELECTOR);
+            styleables.add(SAME_WIDTH_PAGE_BUTTONS);
+            styleables.add(SHOW_PREVIOUS_NEXT_PAGE_BUTTON);
+            styleables.add(MESSAGE_LABEL_STRATEGY);
+            styleables.add(FIRST_LAST_PAGE_DISPLAY_MODE);
+            styleables.add(MAX_PAGE_INDICATORS_COUNT);
+            styleables.add(ALIGNMENT);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    /**
+     * Gets the {@code CssMetaData} associated with this class, which may include the
+     * {@code CssMetaData} of its superclasses.
+     *
+     * @return the {@code CssMetaData}
+     */
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
 }

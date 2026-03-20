@@ -12,12 +12,21 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.BooleanConverter;
+import javafx.css.converter.EnumConverter;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.util.Callback;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -262,7 +271,22 @@ public abstract class ItemPagingControlBase<T> extends PagingControlBase {
         this.loader.set(loader);
     }
 
-    private final BooleanProperty fillLastPage = new SimpleBooleanProperty(this, "fillLastPage", false);
+    private final BooleanProperty fillLastPage = new StyleableBooleanProperty(false) {
+        @Override
+        public Object getBean() {
+            return ItemPagingControlBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "fillLastPage";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.FILL_LAST_PAGE;
+        }
+    };
 
     public final boolean isFillLastPage() {
         return fillLastPage.get();
@@ -272,6 +296,11 @@ public abstract class ItemPagingControlBase<T> extends PagingControlBase {
      * The control might not have enough data to fill its last page with items / cells. This flag can be used
      * to control whether we want the control to become smaller because of missing items or if we want the view to
      * fill the page with empty cells.
+     * <p>
+     * Can be set via CSS using the {@code -fx-fill-last-page} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code false}.
+     * </p>
      *
      * @return a flag used to control whether the last page will be filled with empty cells if needed
      */
@@ -292,7 +321,22 @@ public abstract class ItemPagingControlBase<T> extends PagingControlBase {
         return itemsOnCurrentPage;
     }
 
-    private final ObjectProperty<Side> pagingControlsLocation = new SimpleObjectProperty<>(this, "pagingControlsLocation", Side.BOTTOM);
+    private final ObjectProperty<Side> pagingControlsLocation = new StyleableObjectProperty<>(Side.BOTTOM) {
+        @Override
+        public Object getBean() {
+            return ItemPagingControlBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "pagingControlsLocation";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Side> getCssMetaData() {
+            return StyleableProperties.PAGING_CONTROLS_LOCATION;
+        }
+    };
 
     public final Side getPagingControlsLocation() {
         return pagingControlsLocation.get();
@@ -301,6 +345,11 @@ public abstract class ItemPagingControlBase<T> extends PagingControlBase {
     /**
      * Controls on which side the paging controls should be located. Currently only {@link Side#TOP} and
      * {@link Side#BOTTOM} are supported.
+     * <p>
+     * Can be set via CSS using the {@code -fx-paging-controls-location} property.
+     * Valid values are: {@code TOP}, {@code BOTTOM}.
+     * The default value is {@code BOTTOM}.
+     * </p>
      *
      * @return the location where the paging controls will be shown
      */
@@ -312,7 +361,22 @@ public abstract class ItemPagingControlBase<T> extends PagingControlBase {
         this.pagingControlsLocation.set(pagingControlsLocation);
     }
 
-    private final BooleanProperty showPagingControls = new SimpleBooleanProperty(this, "showPagingControls", true);
+    private final BooleanProperty showPagingControls = new StyleableBooleanProperty(true) {
+        @Override
+        public Object getBean() {
+            return ItemPagingControlBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "showPagingControls";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.SHOW_PAGING_CONTROLS;
+        }
+    };
 
     public final boolean isShowPagingControls() {
         return showPagingControls.get();
@@ -320,6 +384,11 @@ public abstract class ItemPagingControlBase<T> extends PagingControlBase {
 
     /**
      * A flag used to control the visibility of the paging controls (page buttons, previous, next, etc...).
+     * <p>
+     * Can be set via CSS using the {@code -fx-show-paging-controls} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code true}.
+     * </p>
      *
      * @return a property that is true if the paging controls should be visible
      */
@@ -372,12 +441,37 @@ public abstract class ItemPagingControlBase<T> extends PagingControlBase {
         this.onOpenItem.set(onOpenItem);
     }
 
-    private final BooleanProperty usingScrollPane = new SimpleBooleanProperty(this, "usingScrollPane", false);
+    private final BooleanProperty usingScrollPane = new StyleableBooleanProperty(false) {
+        @Override
+        public Object getBean() {
+            return ItemPagingControlBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "usingScrollPane";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
+            return StyleableProperties.USING_SCROLL_PANE;
+        }
+    };
 
     public final boolean isUsingScrollPane() {
         return usingScrollPane.get();
     }
 
+    /**
+     * Controls whether the control uses a scroll pane to wrap its content.
+     * <p>
+     * Can be set via CSS using the {@code -fx-use-scroll-pane} property.
+     * Valid values are: {@code true}, {@code false}.
+     * The default value is {@code false}.
+     * </p>
+     *
+     * @return a flag indicating whether a scroll pane is used
+     */
     public final BooleanProperty usingScrollPaneProperty() {
         return usingScrollPane;
     }
@@ -434,4 +528,86 @@ public abstract class ItemPagingControlBase<T> extends PagingControlBase {
     public final void reload() {
         getLoadingService().restart();
     }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<ItemPagingControlBase, Side> PAGING_CONTROLS_LOCATION =
+                new CssMetaData<>("-fx-paging-controls-location", new EnumConverter<>(Side.class), Side.BOTTOM) {
+                    @Override
+                    public boolean isSettable(ItemPagingControlBase n) {
+                        return !n.pagingControlsLocation.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Side> getStyleableProperty(ItemPagingControlBase n) {
+                        return (StyleableProperty<Side>) n.pagingControlsLocationProperty();
+                    }
+                };
+
+        private static final CssMetaData<ItemPagingControlBase, Boolean> SHOW_PAGING_CONTROLS =
+                new CssMetaData<>("-fx-show-paging-controls", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(ItemPagingControlBase n) {
+                        return !n.showPagingControls.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(ItemPagingControlBase n) {
+                        return (StyleableProperty<Boolean>) n.showPagingControlsProperty();
+                    }
+                };
+
+        private static final CssMetaData<ItemPagingControlBase, Boolean> USING_SCROLL_PANE =
+                new CssMetaData<>("-fx-use-scroll-pane", BooleanConverter.getInstance(), false) {
+                    @Override
+                    public boolean isSettable(ItemPagingControlBase n) {
+                        return !n.usingScrollPane.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(ItemPagingControlBase n) {
+                        return (StyleableProperty<Boolean>) n.usingScrollPaneProperty();
+                    }
+                };
+
+        private static final CssMetaData<ItemPagingControlBase, Boolean> FILL_LAST_PAGE =
+                new CssMetaData<>("-fx-fill-last-page", BooleanConverter.getInstance(), false) {
+                    @Override
+                    public boolean isSettable(ItemPagingControlBase n) {
+                        return !n.fillLastPage.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(ItemPagingControlBase n) {
+                        return (StyleableProperty<Boolean>) n.fillLastPageProperty();
+                    }
+                };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(PagingControlBase.getClassCssMetaData());
+            styleables.add(PAGING_CONTROLS_LOCATION);
+            styleables.add(SHOW_PAGING_CONTROLS);
+            styleables.add(USING_SCROLL_PANE);
+            styleables.add(FILL_LAST_PAGE);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    /**
+     * Gets the {@code CssMetaData} associated with this class, which may include the
+     * {@code CssMetaData} of its superclasses.
+     *
+     * @return the {@code CssMetaData}
+     */
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
 }
