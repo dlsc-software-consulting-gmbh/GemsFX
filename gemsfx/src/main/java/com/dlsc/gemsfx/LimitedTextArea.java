@@ -45,6 +45,17 @@ import java.util.Objects;
  * Use cases include form fields where input character count is restricted within a certain range
  * for validation purposes, or text areas that need to filter out specific unwanted characters or
  * phrases.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-length-display-mode}</td><td>{@code LengthDisplayMode}</td><td>Mode for displaying the character count</td></tr>
+ *     <tr><td>{@code -fx-show-bottom}</td><td>{@code boolean}</td><td>Whether to show the bottom bar</td></tr>
+ *     <tr><td>{@code -fx-warning-threshold}</td><td>{@code double}</td><td>Threshold for triggering the warning state (0–1)</td></tr>
+ *   </tbody>
+ * </table>
  */
 
 public class LimitedTextArea extends ResizableTextArea {

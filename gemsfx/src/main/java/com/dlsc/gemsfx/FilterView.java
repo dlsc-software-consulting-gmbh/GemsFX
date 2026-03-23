@@ -60,6 +60,15 @@ import java.util.function.Predicate;
  * </p>
  *
  * @param <T> the type of the model objects filtered by the view
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-show-header}</td><td>{@code boolean}</td><td>Whether to show the header</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class FilterView<T> extends Control {
 

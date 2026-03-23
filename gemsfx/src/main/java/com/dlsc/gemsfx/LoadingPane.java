@@ -38,6 +38,15 @@ import java.util.Objects;
  * shown again. If anything goes wrong while loading new data or refreshing the content a third state called
  * {@link Status#ERROR} can be applied resulting in an error icon and error text being shown. The pane also supports
  * a {@link #progressProperty()} for detailed progress feedback.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-size}</td><td>{@code Size}</td><td>Size of the progress indicator</td></tr>
+ *   </tbody>
+ * </table>
  */
 @DefaultProperty("content")
 public class LoadingPane extends StackPane {

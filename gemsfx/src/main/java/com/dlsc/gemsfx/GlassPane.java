@@ -25,6 +25,17 @@ import javafx.css.converter.SizeConverter;
  * A simple pane that can be used to overlay the UI with a semi-transparent color,
  * indicating that input is blocked. The glass pane can be animated, which means it
  * will fade in / fade out when it becomes visible or invisible.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-blocking-opacity}</td><td>{@code double}</td><td>Opacity of the glass pane when blocking</td></tr>
+ *     <tr><td>{@code -fx-fade-in-out}</td><td>{@code boolean}</td><td>Whether the glass pane fades in/out</td></tr>
+ *     <tr><td>{@code -fx-fade-in-out-duration}</td><td>{@code Duration}</td><td>Duration of the fade in/out animation</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class GlassPane extends StackPane {
 

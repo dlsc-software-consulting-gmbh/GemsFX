@@ -22,6 +22,15 @@ import java.util.List;
  * with controls that want to show scrolling controls on both sides for moving
  * things to the left and right as those controls will then be nicely visible.
  * The {@link StripView} control is using the masked view inside its skin.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-fading-size}</td><td>{@code double}</td><td>Size of the side fading areas in pixels</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class MaskedView extends Control {
 
