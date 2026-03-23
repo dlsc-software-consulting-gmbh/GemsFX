@@ -30,6 +30,15 @@ import java.util.List;
  *
  * The active state of the Spacer can also be controlled through CSS with the
  * "-fx-active" property.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-active}</td><td>{@code Boolean}</td><td>Whether the spacer is active.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class Spacer extends Region {
 

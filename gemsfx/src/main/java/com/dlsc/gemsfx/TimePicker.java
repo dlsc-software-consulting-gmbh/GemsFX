@@ -37,6 +37,20 @@ import java.util.function.Consumer;
  * can be configured to only enter a time within a given time range. It can also be configured
  * to show hours and minutes, or hours and minutes and seconds, or hours and minutes and seconds
  * and milliseconds (see {@link #formatProperty()})
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-clock-type}</td><td>{@code ClockType}</td><td>Whether to use 24-hour or 12-hour clock.</td></tr>
+ *     <tr><td>{@code -fx-format}</td><td>{@code Format}</td><td>The time format, e.g. hours and minutes.</td></tr>
+ *     <tr><td>{@code -fx-linking-fields}</td><td>{@code Boolean}</td><td>Whether fields auto-increment adjacent fields.</td></tr>
+ *     <tr><td>{@code -fx-rollover}</td><td>{@code Boolean}</td><td>Whether time fields rollover at value boundaries.</td></tr>
+ *     <tr><td>{@code -fx-show-popup-trigger-button}</td><td>{@code Boolean}</td><td>Whether to show the popup trigger button.</td></tr>
+ *     <tr><td>{@code -fx-step-rate-in-minutes}</td><td>{@code Double}</td><td>The step rate in minutes for time fields.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class TimePicker extends CustomComboBox<LocalTime> {
 

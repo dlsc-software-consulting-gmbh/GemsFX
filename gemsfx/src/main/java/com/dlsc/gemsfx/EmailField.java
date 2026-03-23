@@ -46,6 +46,19 @@ import java.util.StringTokenizer;
  *          <li>Customizable properties to control the visibility of user interface elements, such as mail and validation icons, according to specific user interface requirements.</li>
  *     </ul>
  * </p>
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-auto-domain-completion-enabled}</td><td>{@code boolean}</td><td>Whether auto domain completion is enabled</td></tr>
+ *     <tr><td>{@code -fx-required}</td><td>{@code boolean}</td><td>Whether the field is required</td></tr>
+ *     <tr><td>{@code -fx-show-mail-icon}</td><td>{@code boolean}</td><td>Whether to show the mail icon</td></tr>
+ *     <tr><td>{@code -fx-show-validation-icon}</td><td>{@code boolean}</td><td>Whether to show the validation icon</td></tr>
+ *     <tr><td>{@code -fx-supporting-multiple-addresses}</td><td>{@code boolean}</td><td>Whether multiple email addresses are supported</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class EmailField extends Control {
 

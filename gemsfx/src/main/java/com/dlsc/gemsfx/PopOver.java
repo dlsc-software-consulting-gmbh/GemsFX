@@ -48,6 +48,17 @@ import static java.util.Objects.requireNonNull;
  * var ownerLink = new Hyperlink("Show popover");
  * ownerLink.setOnAction(e -> popover.show(ownerLink));
  * }</pre>
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-arrow-indent}</td><td>{@code Double}</td><td>Distance between the arrow and popup corners.</td></tr>
+ *     <tr><td>{@code -fx-arrow-size}</td><td>{@code Double}</td><td>The size of the arrow.</td></tr>
+ *     <tr><td>{@code -fx-corner-radius}</td><td>{@code Double}</td><td>The corner radius of the popover.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class PopOver extends PopupControl {
     private static final PseudoClass DETACHED_PSEUDO_CLASS = PseudoClass.getPseudoClass("detached");

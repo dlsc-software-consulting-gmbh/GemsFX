@@ -79,6 +79,33 @@ import static javafx.geometry.Pos.CENTER;
  * </ol>
  * The image below shows the visual appearance of this control:
  * <img src="doc-files/date-picker.png" alt="Date Picker">
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-disable-month-dropdown-button}</td><td>{@code boolean}</td><td>Whether to disable the month dropdown button</td></tr>
+ *     <tr><td>{@code -fx-disable-next-month-button}</td><td>{@code boolean}</td><td>Whether to disable the next month button</td></tr>
+ *     <tr><td>{@code -fx-disable-next-year-button}</td><td>{@code boolean}</td><td>Whether to disable the next year button</td></tr>
+ *     <tr><td>{@code -fx-disable-previous-month-button}</td><td>{@code boolean}</td><td>Whether to disable the previous month button</td></tr>
+ *     <tr><td>{@code -fx-disable-previous-year-button}</td><td>{@code boolean}</td><td>Whether to disable the previous year button</td></tr>
+ *     <tr><td>{@code -fx-disable-year-dropdown-button}</td><td>{@code boolean}</td><td>Whether to disable the year dropdown button</td></tr>
+ *     <tr><td>{@code -fx-mark-selected-days-of-previous-or-next-month}</td><td>{@code boolean}</td><td>Whether to mark selected days of adjacent months</td></tr>
+ *     <tr><td>{@code -fx-month-display-mode}</td><td>{@code MonthDisplayMode}</td><td>Display mode for the month label</td></tr>
+ *     <tr><td>{@code -fx-month-selection-view-enabled}</td><td>{@code boolean}</td><td>Whether month selection view is enabled</td></tr>
+ *     <tr><td>{@code -fx-show-days-of-previous-or-next-month}</td><td>{@code boolean}</td><td>Whether to show days of adjacent months</td></tr>
+ *     <tr><td>{@code -fx-show-month}</td><td>{@code boolean}</td><td>Whether to show the month in the header</td></tr>
+ *     <tr><td>{@code -fx-show-month-arrows}</td><td>{@code boolean}</td><td>Whether to show the month arrows</td></tr>
+ *     <tr><td>{@code -fx-show-today}</td><td>{@code boolean}</td><td>Whether to show today's date highlighted</td></tr>
+ *     <tr><td>{@code -fx-show-today-button}</td><td>{@code boolean}</td><td>Whether to show the today button</td></tr>
+ *     <tr><td>{@code -fx-show-week-numbers}</td><td>{@code boolean}</td><td>Whether to show week numbers</td></tr>
+ *     <tr><td>{@code -fx-show-year}</td><td>{@code boolean}</td><td>Whether to show the year in the header</td></tr>
+ *     <tr><td>{@code -fx-week-number-column-width}</td><td>{@code double}</td><td>Width of the week number column in pixels</td></tr>
+ *     <tr><td>{@code -fx-year-display-mode}</td><td>{@code YearDisplayMode}</td><td>Display mode for the year label</td></tr>
+ *     <tr><td>{@code -fx-year-selection-view-enabled}</td><td>{@code boolean}</td><td>Whether year selection view is enabled</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class CalendarView extends Control {
 

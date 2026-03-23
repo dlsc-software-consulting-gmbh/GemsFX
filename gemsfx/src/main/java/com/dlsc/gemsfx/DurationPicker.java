@@ -33,6 +33,24 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * A picker control for selecting a {@link java.time.Duration} value. The picker consists of
+ * individual time-unit fields (e.g. hours, minutes, seconds) that can be edited independently
+ * or linked together.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-fill-digits}</td><td>{@code boolean}</td><td>Whether to fill fields with leading zeros</td></tr>
+ *     <tr><td>{@code -fx-label-type}</td><td>{@code LabelType}</td><td>Type of labels shown for each time unit</td></tr>
+ *     <tr><td>{@code -fx-linking-fields}</td><td>{@code boolean}</td><td>Whether linking fields is enabled</td></tr>
+ *     <tr><td>{@code -fx-rollover}</td><td>{@code boolean}</td><td>Whether fields roll over at their limits</td></tr>
+ *     <tr><td>{@code -fx-show-popup-trigger-button}</td><td>{@code boolean}</td><td>Whether to show the popup trigger button</td></tr>
+ *   </tbody>
+ * </table>
+ */
 public class DurationPicker extends CustomComboBox<Duration> {
 
     public DurationPicker() {

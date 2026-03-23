@@ -22,6 +22,16 @@ import java.util.List;
  * <br>
  * Note: the main difference to the standard JavaFX TilePane is that the tiles are stretched to fill the entire width of
  * each row.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-hgap}</td><td>{@code Double}</td><td>The horizontal gap between tiles.</td></tr>
+ *     <tr><td>{@code -fx-vgap}</td><td>{@code Double}</td><td>The vertical gap between tiles.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class StretchingTilePane extends Pane {
 

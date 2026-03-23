@@ -24,6 +24,18 @@ import java.util.*;
 
 /**
  * The date range view can be used to define a start and an end date via two {@link CalendarView} instances.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-orientation}</td><td>{@code Orientation}</td><td>Layout of start and end calendars.</td></tr>
+ *     <tr><td>{@code -fx-presets-location}</td><td>{@code Side}</td><td>Location of presets relative to calendar views.</td></tr>
+ *     <tr><td>{@code -fx-show-cancel-and-apply-button}</td><td>{@code boolean}</td><td>Whether to show cancel and apply buttons.</td></tr>
+ *     <tr><td>{@code -fx-show-presets}</td><td>{@code boolean}</td><td>Whether to show the presets section.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class DateRangeView extends Control {
 

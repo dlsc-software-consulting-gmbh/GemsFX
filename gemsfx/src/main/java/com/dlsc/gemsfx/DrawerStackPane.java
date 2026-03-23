@@ -57,6 +57,23 @@ import javafx.css.converter.SizeConverter;
  *     <li>The control can automatically persist the drawer height via the Java preferences API (see {@link #setPreferencesKey(String)})</li>
  *     <li>Auto hiding: drawer will close when the user clicks into the background (onto the glass pane)</li>
  * </ul>
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-animate-drawer}</td><td>{@code boolean}</td><td>Whether to animate the drawer sliding in/out</td></tr>
+ *     <tr><td>{@code -fx-animation-duration}</td><td>{@code Duration}</td><td>Duration of the drawer slide animation</td></tr>
+ *     <tr><td>{@code -fx-drawer-side-padding}</td><td>{@code double}</td><td>Left and right side padding of the drawer in pixels</td></tr>
+ *     <tr><td>{@code -fx-drawer-top-padding}</td><td>{@code double}</td><td>Top padding of the drawer in pixels</td></tr>
+ *     <tr><td>{@code -fx-fade-in-out}</td><td>{@code boolean}</td><td>Whether the glass pane fades in/out</td></tr>
+ *     <tr><td>{@code -fx-max-drawer-height}</td><td>{@code double}</td><td>Maximum drawer height as a fraction (0–1)</td></tr>
+ *     <tr><td>{@code -fx-min-drawer-height}</td><td>{@code double}</td><td>Minimum drawer height as a fraction (0–1)</td></tr>
+ *     <tr><td>{@code -fx-preferred-drawer-width}</td><td>{@code double}</td><td>Preferred width of the drawer in pixels</td></tr>
+ *     <tr><td>{@code -fx-show-drawer-title}</td><td>{@code boolean}</td><td>Whether to show the drawer title</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class DrawerStackPane extends StackPane {
 

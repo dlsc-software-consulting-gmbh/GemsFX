@@ -30,6 +30,16 @@ import java.util.Objects;
 /**
  * A view capable of managing / displaying two nodes in such a way that the user can show more
  * or less of each node at the same time. This is very useful to display before and after scenarios.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-divider-position}</td><td>{@code double}</td><td>Position of the divider from 0.0 to 1.0</td></tr>
+ *     <tr><td>{@code -fx-orientation}</td><td>{@code Orientation}</td><td>Orientation of the before/after view</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class BeforeAfterView extends Control {
 

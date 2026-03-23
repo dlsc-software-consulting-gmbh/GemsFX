@@ -31,6 +31,20 @@ import java.util.regex.Pattern;
  * Note for SvgImageView:
  * Currently, due to the limitation that weisj can only render BufferedImage from SVG,
  * SvgImageView does not support usage in native packaging scenarios.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-background-loading}</td><td>{@code Boolean}</td><td>Whether to load the SVG image in background.</td></tr>
+ *     <tr><td>{@code -fx-fit-height}</td><td>{@code Double}</td><td>Box height the SVG image should fit into.</td></tr>
+ *     <tr><td>{@code -fx-fit-width}</td><td>{@code Double}</td><td>Box width the SVG image should fit into.</td></tr>
+ *     <tr><td>{@code -fx-preserve-ratio}</td><td>{@code Boolean}</td><td>Whether to preserve the image aspect ratio.</td></tr>
+ *     <tr><td>{@code -fx-smooth}</td><td>{@code Boolean}</td><td>Whether to apply smoothing when rendering.</td></tr>
+ *     <tr><td>{@code -fx-svg-url}</td><td>{@code String}</td><td>The URL of the SVG image to render.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class SVGImageView extends Control {
     // Matches strings that start with a valid URI scheme

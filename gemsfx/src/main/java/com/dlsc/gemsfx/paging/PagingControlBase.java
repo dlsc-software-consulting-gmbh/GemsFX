@@ -38,6 +38,24 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Abstract base class for paging controls, providing common pagination properties and behaviour.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-first-last-page-display-mode}</td><td>{@code FirstLastPageDisplayMode}</td><td>How first/last page navigation is displayed.</td></tr>
+ *     <tr><td>{@code -fx-max-page-indicators-count}</td><td>{@code int}</td><td>Maximum number of page buttons shown.</td></tr>
+ *     <tr><td>{@code -fx-message-label-strategy}</td><td>{@code MessageLabelStrategy}</td><td>Strategy for showing or hiding message label.</td></tr>
+ *     <tr><td>{@code -fx-page-alignment}</td><td>{@code HPos}</td><td>Horizontal alignment of paging buttons.</td></tr>
+ *     <tr><td>{@code -fx-same-width-page-buttons}</td><td>{@code boolean}</td><td>Whether page buttons have equal width.</td></tr>
+ *     <tr><td>{@code -fx-show-page-size-selector}</td><td>{@code boolean}</td><td>Whether to show the page size selector.</td></tr>
+ *     <tr><td>{@code -fx-show-previous-next-page-button}</td><td>{@code boolean}</td><td>Whether to show previous/next page buttons.</td></tr>
+ *   </tbody>
+ * </table>
+ */
 public abstract class PagingControlBase extends Control {
 
     public PagingControlBase() {

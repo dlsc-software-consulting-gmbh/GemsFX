@@ -33,6 +33,23 @@ import java.util.Objects;
  * Built on the {@link TreeNode} class, this control visualizes hierarchical structures, allowing nodes to have children.
  * <p>
  * Customizable in layout, alignment, and style, it's ideal for representing data like file systems or organizational charts.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-cell-height}</td><td>{@code double}</td><td>Fixed height of each cell.</td></tr>
+ *     <tr><td>{@code -fx-cell-width}</td><td>{@code double}</td><td>Fixed width of each cell.</td></tr>
+ *     <tr><td>{@code -fx-column-alignment}</td><td>{@code HPos}</td><td>Alignment of nodes at the same column level.</td></tr>
+ *     <tr><td>{@code -fx-hgap}</td><td>{@code double}</td><td>Horizontal gap between cells.</td></tr>
+ *     <tr><td>{@code -fx-layout-direction}</td><td>{@code LayoutDirection}</td><td>Direction in which the tree is laid out.</td></tr>
+ *     <tr><td>{@code -fx-layout-type}</td><td>{@code LayoutType}</td><td>Whether layout is regular or compact.</td></tr>
+ *     <tr><td>{@code -fx-node-line-gap}</td><td>{@code double}</td><td>Gap between cell and connecting lines.</td></tr>
+ *     <tr><td>{@code -fx-row-alignment}</td><td>{@code VPos}</td><td>Alignment of nodes at the same row level.</td></tr>
+ *     <tr><td>{@code -fx-vgap}</td><td>{@code double}</td><td>Vertical gap between cells.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class TreeNodeView<T> extends Control {
     private static final int DEFAULT_CELL_WIDTH = 60;

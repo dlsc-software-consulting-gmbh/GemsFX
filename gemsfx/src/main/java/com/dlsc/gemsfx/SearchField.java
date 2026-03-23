@@ -106,6 +106,22 @@ import java.util.logging.Logger;
  * @see #setMatcher(BiFunction)
  * @see #setNewItemProducer(Callback)
  * @see #setComparator(Comparator)
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-adding-item-to-history-on-commit}</td><td>{@code Boolean}</td><td>Whether to add item to history on commit.</td></tr>
+ *     <tr><td>{@code -fx-adding-item-to-history-on-enter}</td><td>{@code Boolean}</td><td>Whether to add item to history on enter.</td></tr>
+ *     <tr><td>{@code -fx-adding-item-to-history-on-focus-lost}</td><td>{@code Boolean}</td><td>Whether to add item to history on focus lost.</td></tr>
+ *     <tr><td>{@code -fx-auto-commit-on-focus-lost}</td><td>{@code Boolean}</td><td>Whether to auto-commit when focus is lost.</td></tr>
+ *     <tr><td>{@code -fx-auto-completion-gap}</td><td>{@code Double}</td><td>Gap in pixels between typed and autocompleted text.</td></tr>
+ *     <tr><td>{@code -fx-hide-popup-with-no-choice}</td><td>{@code Boolean}</td><td>Whether to hide popup when no choices are available.</td></tr>
+ *     <tr><td>{@code -fx-hide-popup-with-single-choice}</td><td>{@code Boolean}</td><td>Whether to hide popup when only one choice exists.</td></tr>
+ *     <tr><td>{@code -fx-show-search-icon}</td><td>{@code Boolean}</td><td>Whether to show the search icon.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class SearchField<T> extends Control {
 

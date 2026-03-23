@@ -24,6 +24,18 @@ import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * A view for displaying and selecting year-month values.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-show-year}</td><td>{@code Boolean}</td><td>Whether to show the year at the top.</td></tr>
+ *   </tbody>
+ * </table>
+ */
 public class YearMonthView extends Control {
 
     public YearMonthView() {

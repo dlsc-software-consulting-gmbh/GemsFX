@@ -20,6 +20,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A single cell in a {@link GridTableView} row.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-mouse-transparent}</td><td>{@code boolean}</td><td>Whether the cell ignores mouse events.</td></tr>
+ *   </tbody>
+ * </table>
+ */
 public class GridTableCell<S, T> extends Cell<T> {
 
     private static final boolean DEFAULT_TRANSPARENT = false;

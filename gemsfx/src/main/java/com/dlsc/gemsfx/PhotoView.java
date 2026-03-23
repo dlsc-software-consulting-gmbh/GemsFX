@@ -66,6 +66,17 @@ import java.util.logging.Logger;
  *     <li>an effect can be applied directly to the image (see {@link #photoEffectProperty()})</li>
  * </ul>
  * <b>Note: the values for the zoom and translate properties will all be reset when a new photo is set.</b>
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-clip-shape}</td><td>{@code ClipShape}</td><td>The clip shape for the photo.</td></tr>
+ *     <tr><td>{@code -fx-editable}</td><td>{@code Boolean}</td><td>Whether the view is editable.</td></tr>
+ *     <tr><td>{@code -fx-max-zoom}</td><td>{@code Double}</td><td>The maximum zoom level allowed.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class PhotoView extends Control {
 

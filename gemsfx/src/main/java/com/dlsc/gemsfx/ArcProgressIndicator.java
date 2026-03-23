@@ -48,6 +48,17 @@ import java.util.List;
  *     // Initializes with no progress and no animation.
  *     ArcProgressIndicator progressIndicator = new ArcProgressIndicator(0.0);
  * </pre>
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-progress-arc-type}</td><td>{@code ArcType}</td><td>Arc type used to display the progress</td></tr>
+ *     <tr><td>{@code -fx-style-type}</td><td>{@code StyleType}</td><td>Visualization style type of the progress arc</td></tr>
+ *     <tr><td>{@code -fx-track-arc-type}</td><td>{@code ArcType}</td><td>Arc type used to display the track</td></tr>
+ *   </tbody>
+ * </table>
  */
 public abstract class ArcProgressIndicator extends ProgressIndicator {
 

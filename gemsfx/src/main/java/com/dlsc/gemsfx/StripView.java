@@ -44,6 +44,19 @@ import java.util.Objects;
  * side. This ensures that the scroll buttons will be fully visible.
  *
  * @param <T> the type of the items shown by the view
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-always-center}</td><td>{@code Boolean}</td><td>Whether the selected item is always centered.</td></tr>
+ *     <tr><td>{@code -fx-animate-scrolling}</td><td>{@code Boolean}</td><td>Whether scrolling animation is enabled.</td></tr>
+ *     <tr><td>{@code -fx-animation-duration}</td><td>{@code Duration}</td><td>The duration of the scroll animation.</td></tr>
+ *     <tr><td>{@code -fx-fading-size}</td><td>{@code Double}</td><td>The size of the fade in/out areas on each side.</td></tr>
+ *     <tr><td>{@code -fx-loop-selection}</td><td>{@code Boolean}</td><td>Whether selection loops from end to start.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class StripView<T> extends Control {
 

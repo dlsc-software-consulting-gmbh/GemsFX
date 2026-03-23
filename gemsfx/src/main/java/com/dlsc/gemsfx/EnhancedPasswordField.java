@@ -51,6 +51,15 @@ import java.util.logging.Logger;
  * </pre>
  *
  * @see PasswordField
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-echo-char}</td><td>{@code char}</td><td>Character used to mask the password</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class EnhancedPasswordField extends PasswordField {
 

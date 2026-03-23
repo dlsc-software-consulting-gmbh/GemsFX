@@ -39,6 +39,17 @@ import java.util.Objects;
  *     The user can select text by pressing and dragging the mouse, or by double clicking
  *     on a word. A triple click selects an entire paragraph.
  * </p>
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-highlight-fill}</td><td>{@code Paint}</td><td>The fill for the selection highlight background.</td></tr>
+ *     <tr><td>{@code -fx-highlight-stroke}</td><td>{@code Paint}</td><td>The stroke outline of the selection highlight.</td></tr>
+ *     <tr><td>{@code -fx-highlight-text-fill}</td><td>{@code Paint}</td><td>The text fill color within the selection highlight.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class TextView extends Control {
 

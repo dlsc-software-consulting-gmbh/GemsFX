@@ -47,6 +47,15 @@ import java.util.Objects;
  * Additionally, history can be manually added based on user actions, such as after typing text and selecting an item
  * from a ListView or TableView that displays results, or through other interactions, by calling the {@link #getHistoryManager()}
  * method to access the {@link StringHistoryManager} instance. then calling the {@link StringHistoryManager#add(Object)}} method.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-round}</td><td>{@code Boolean}</td><td>Whether the text field has rounded corners.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class SearchTextField extends CustomTextField {
 

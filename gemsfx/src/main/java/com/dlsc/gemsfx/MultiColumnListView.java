@@ -49,6 +49,16 @@ import java.util.Objects;
  * {@link ListView} and also to drag and drop items from one column to another.
  *
  * @param <T> the item types, e.g. "Issues" or "Tickets"
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-disable-drag-and-drop}</td><td>{@code Boolean}</td><td>Whether to disable drag and drop.</td></tr>
+ *     <tr><td>{@code -fx-show-headers}</td><td>{@code Boolean}</td><td>Whether to show column headers.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class MultiColumnListView<T> extends Control {
 

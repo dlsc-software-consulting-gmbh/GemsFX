@@ -52,6 +52,16 @@ import java.util.Objects;
  * Additionally, {@code SelectionBox} offers the ability to add extra buttons, enabling users to perform
  * common selection actions swiftly, such as selecting all items, clearing selections, or applying predefined selection criteria.
  * </p>
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-animation-enabled}</td><td>{@code Boolean}</td><td>Whether animation is enabled.</td></tr>
+ *     <tr><td>{@code -fx-read-only}</td><td>{@code Boolean}</td><td>Whether the box is in read-only mode.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class SelectionBox<T> extends Control {
 

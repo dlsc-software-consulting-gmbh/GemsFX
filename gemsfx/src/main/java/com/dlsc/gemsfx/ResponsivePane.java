@@ -34,6 +34,16 @@ import java.util.Objects;
  * When the window width is wide, both the large sidebar and the main content pane are shown.
  * Similarly, if the sidebar is positioned at the TOP or BOTTOM, its visibility will be adjusted based on the height of the pane.
  * However, it is also possible to force the sidebar to be displayed regardless of the window size.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-gap}</td><td>{@code Double}</td><td>Gap between sidebar and main content area.</td></tr>
+ *     <tr><td>{@code -fx-side}</td><td>{@code Side}</td><td>The side on which the sidebar is displayed.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class ResponsivePane extends StackPane {
 

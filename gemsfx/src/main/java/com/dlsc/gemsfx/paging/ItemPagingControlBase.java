@@ -36,6 +36,18 @@ import java.util.function.Consumer;
  * attribute, etc ...
  *
  * @param <T> the type of the items shown in the control
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-fill-last-page}</td><td>{@code boolean}</td><td>Whether to fill last page with empty cells.</td></tr>
+ *     <tr><td>{@code -fx-paging-controls-location}</td><td>{@code Side}</td><td>Side where paging controls are located.</td></tr>
+ *     <tr><td>{@code -fx-show-paging-controls}</td><td>{@code boolean}</td><td>Whether to show paging controls.</td></tr>
+ *     <tr><td>{@code -fx-use-scroll-pane}</td><td>{@code boolean}</td><td>Whether to wrap content in a scroll pane.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public abstract class ItemPagingControlBase<T> extends PagingControlBase {
 

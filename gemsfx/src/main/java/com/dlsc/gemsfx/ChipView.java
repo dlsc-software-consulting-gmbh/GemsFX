@@ -29,6 +29,15 @@ import java.util.List;
  * is the display of the currently active filters inside {@link FilterView}.
  *
  * @param <T> the model object represented by the chip
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-content-display}</td><td>{@code ContentDisplay}</td><td>Content display mode of the chip</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class ChipView<T> extends Control {
 

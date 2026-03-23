@@ -48,6 +48,17 @@ import java.util.Objects;
  * <p>
  * The default style class for this control is "avatar-view".
  * </p>
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-avatar-arc-size}</td><td>{@code double}</td><td>Corner roundness for rectangular avatars</td></tr>
+ *     <tr><td>{@code -fx-avatar-shape}</td><td>{@code AvatarShape}</td><td>Shape of the avatar (round or square)</td></tr>
+ *     <tr><td>{@code -fx-avatar-size}</td><td>{@code double}</td><td>Diameter of the avatar in pixels</td></tr>
+ *   </tbody>
+ * </table>
  **/
 public class AvatarView extends Control {
 

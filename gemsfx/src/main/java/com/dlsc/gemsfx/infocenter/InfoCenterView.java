@@ -44,6 +44,20 @@ import java.util.stream.Collectors;
  * so that the visibility of the view is actively managed.
  *
  * @see InfoCenterPane
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-auto-open-group}</td><td>{@code boolean}</td><td>Whether to auto-expand group on new notification.</td></tr>
+ *     <tr><td>{@code -fx-expand-duration}</td><td>{@code Duration}</td><td>Duration for expand/collapse animation.</td></tr>
+ *     <tr><td>{@code -fx-notification-spacing}</td><td>{@code double}</td><td>Spacing between notifications in the same group.</td></tr>
+ *     <tr><td>{@code -fx-show-all-fade-duration}</td><td>{@code Duration}</td><td>Duration for fade animation when toggling views.</td></tr>
+ *     <tr><td>{@code -fx-slide-in-duration}</td><td>{@code Duration}</td><td>Duration for slide-in/slide-out animation.</td></tr>
+ *     <tr><td>{@code -fx-transparent}</td><td>{@code boolean}</td><td>Whether the control background is transparent.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class InfoCenterView extends Control {
 

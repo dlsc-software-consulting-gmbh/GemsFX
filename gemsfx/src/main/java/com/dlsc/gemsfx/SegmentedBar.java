@@ -69,6 +69,16 @@ import java.util.Objects;
  * @see #setSegmentViewFactory(Callback)
  *
  * @param <T></T> the segment type
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-min-segment-size}</td><td>{@code Double}</td><td>The minimum width or height of a segment.</td></tr>
+ *     <tr><td>{@code -fx-orientation}</td><td>{@code Orientation}</td><td>The orientation of the segmented bar.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
 

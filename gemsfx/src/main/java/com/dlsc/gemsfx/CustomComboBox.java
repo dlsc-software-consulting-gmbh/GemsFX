@@ -13,6 +13,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A base combo-box control that supports configurable placement of the popup trigger button
+ * relative to the text field.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-button-display}</td><td>{@code ButtonDisplay}</td><td>Display mode of the picker button</td></tr>
+ *   </tbody>
+ * </table>
+ */
 public class CustomComboBox<T> extends ComboBoxBase<T> {
 
     private static final ButtonDisplay DEFAULT_BUTTON_DISPLAY = ButtonDisplay.RIGHT;

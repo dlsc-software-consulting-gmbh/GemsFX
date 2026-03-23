@@ -19,6 +19,16 @@ import java.util.Objects;
 
 /**
  * A view for selecting a year.
+ *
+ * <p><b>CSS Styleable Properties:</b>
+ * <table class="striped">
+ *   <caption>CSS Properties</caption>
+ *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@code -fx-cols}</td><td>{@code Integer}</td><td>The number of year columns displayed.</td></tr>
+ *     <tr><td>{@code -fx-rows}</td><td>{@code Integer}</td><td>The number of year rows displayed.</td></tr>
+ *   </tbody>
+ * </table>
  */
 public class YearView extends Control {
 
