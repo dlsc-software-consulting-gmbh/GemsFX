@@ -27,6 +27,14 @@
         <url>https://github.com/dlsc-software-consulting-gmbh/GemsFX</url>
     </scm>
 
+    <distributionManagement>
+        <site>
+            <id>github-pages</id>
+            <name>GemsFX GitHub Pages</name>
+            <url>https://dlsc-software-consulting-gmbh.github.io/GemsFX/api/com.dlsc.gemsfx/module-summary.html</url>
+        </site>
+    </distributionManagement>
+
     <developers>
         <developer>
             <name>Dirk Lemmermann</name>
