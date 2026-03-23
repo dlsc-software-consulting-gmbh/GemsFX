@@ -77,8 +77,6 @@ import static javafx.geometry.Pos.CENTER;
  * <li>Show details of the date (by default shows a popover with all entries on
  * that date)</li>
  * </ol>
- * The image below shows the visual appearance of this control:
- * <img src="doc-files/date-picker.png" alt="Date Picker">
  *
  * <p><b>CSS Styleable Properties:</b>
  * <table class="striped">
@@ -378,7 +376,6 @@ public class CalendarView extends Control {
      * A flag used to indicate that the view will mark the area that represents
      * the value of {@link #todayProperty()}. By default, this area will be
      * filled with a different color (red) than the rest (white).
-     * <img src="doc-files/all-day-view-today.png" alt="All Day View Today">
      *
      * @return true if today will be shown differently
      */
@@ -722,7 +719,6 @@ public class CalendarView extends Control {
      * below shows the {@link CalendarView} once with the default factory and
      * once with an alternative factory that creates checkboxes.
      * </p>
-     * <img src="doc-files/month-cell-factory.png" alt="Month Cell Factory">
      *
      * @return the cell factory
      */
