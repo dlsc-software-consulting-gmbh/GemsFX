@@ -93,7 +93,7 @@ img { max-width: 100%; display: block; }
   height: 32px;
 }
 
-.site-logo span { color: var(--accent-light); }
+.brand-name { white-space: nowrap; }
 
 .site-nav {
   display: flex;
@@ -170,6 +170,8 @@ img { max-width: 100%; display: block; }
 
 .hero h1 .gems { color: var(--accent-light); }
 .hero h1 .fx   { color: var(--teal); }
+.gems { color: var(--accent-light); }
+.fx   { color: var(--teal); }
 
 .hero-subtitle {
   font-size: 1.15rem;
