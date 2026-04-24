@@ -392,13 +392,27 @@ public class PopOver extends PopupControl {
         final double arrowIndent = getArrowIndent();
         final double arrowSize = getArrowSize();
 
-        return switch (getArrowLocation()) {
-            case TOP_LEFT, BOTTOM_LEFT -> cornerRadius + arrowIndent + arrowSize - rootNodeMinX;
-            case TOP_CENTER, BOTTOM_CENTER -> rootNodeWidth / 2 - rootNodeMinX;
-            case TOP_RIGHT, BOTTOM_RIGHT -> rootNodeWidth - arrowIndent - cornerRadius - arrowSize - rootNodeMinX;
-            case LEFT_TOP, LEFT_CENTER, LEFT_BOTTOM -> rootNodeMinX + arrowSize;
-            case RIGHT_TOP, RIGHT_CENTER, RIGHT_BOTTOM -> -rootNodeMinX + rootNodeWidth + arrowSize;
-        };
+        switch (getArrowLocation()) {
+            case TOP_LEFT:
+            case BOTTOM_LEFT:
+                return cornerRadius + arrowIndent + arrowSize - rootNodeMinX;
+            case TOP_CENTER:
+            case BOTTOM_CENTER:
+                return rootNodeWidth / 2 - rootNodeMinX;
+            case TOP_RIGHT:
+            case BOTTOM_RIGHT:
+                return rootNodeWidth - arrowIndent - cornerRadius - arrowSize - rootNodeMinX;
+            case LEFT_TOP:
+            case LEFT_CENTER:
+            case LEFT_BOTTOM:
+                return rootNodeMinX + arrowSize;
+            case RIGHT_TOP:
+            case RIGHT_CENTER:
+            case RIGHT_BOTTOM:
+                return -rootNodeMinX + rootNodeWidth + arrowSize;
+            default:
+                throw new IllegalStateException("Unexpected arrow location: " + getArrowLocation());
+        }
     }
 
     /*
@@ -421,13 +435,27 @@ public class PopOver extends PopupControl {
         final double arrowSize = getArrowSize();
         final double cornerRadius = getCornerRadius();
 
-        return switch (getArrowLocation()) {
-            case LEFT_TOP, RIGHT_TOP -> cornerRadius + arrowIndent + arrowSize - rootNodeMinY;
-            case LEFT_CENTER, RIGHT_CENTER -> rootNodeHeight / 2 - rootNodeMinY;
-            case LEFT_BOTTOM, RIGHT_BOTTOM -> rootNodeHeight - cornerRadius - arrowIndent - arrowSize - rootNodeMinY;
-            case BOTTOM_CENTER, BOTTOM_LEFT, BOTTOM_RIGHT -> rootNodeHeight - rootNodeMinY + arrowSize;
-            case TOP_CENTER, TOP_LEFT, TOP_RIGHT -> rootNodeMinY + arrowSize;
-        };
+        switch (getArrowLocation()) {
+            case LEFT_TOP:
+            case RIGHT_TOP:
+                return cornerRadius + arrowIndent + arrowSize - rootNodeMinY;
+            case LEFT_CENTER:
+            case RIGHT_CENTER:
+                return rootNodeHeight / 2 - rootNodeMinY;
+            case LEFT_BOTTOM:
+            case RIGHT_BOTTOM:
+                return rootNodeHeight - cornerRadius - arrowIndent - arrowSize - rootNodeMinY;
+            case BOTTOM_CENTER:
+            case BOTTOM_LEFT:
+            case BOTTOM_RIGHT:
+                return rootNodeHeight - rootNodeMinY + arrowSize;
+            case TOP_CENTER:
+            case TOP_LEFT:
+            case TOP_RIGHT:
+                return rootNodeMinY + arrowSize;
+            default:
+                throw new IllegalStateException("Unexpected arrow location: " + getArrowLocation());
+        }
     }
 
     /**

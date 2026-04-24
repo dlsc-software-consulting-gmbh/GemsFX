@@ -73,7 +73,7 @@ public class PreferencesHistoryManager<T> extends HistoryManager<T> {
             String[] ary = items.split(DELIMITER);
             set(Arrays.stream(ary)
                     .map(converter::fromString)
-                    .toList());
+                    .collect(Collectors.toList()));
         }
         LOG.finest(String.format("Loaded history items with key: '%s'.", key));
     }

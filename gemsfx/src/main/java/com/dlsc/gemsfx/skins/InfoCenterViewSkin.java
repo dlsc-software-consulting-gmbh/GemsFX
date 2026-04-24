@@ -618,11 +618,11 @@ public class InfoCenterViewSkin extends GemsSkinBase<InfoCenterView> {
                 h += spacing;
             }
 
-            List<Node> notificationViews = getChildren().stream().filter(node -> node instanceof NotificationView).toList();
+            List<Node> notificationViews = getChildren().stream().filter(node -> node instanceof NotificationView).collect(Collectors.toList());
 
             if (!notificationViews.isEmpty()) {
                 // the last one is on top
-                Node latestNotification = notificationViews.getLast();
+                Node latestNotification = notificationViews.get(notificationViews.size() - 1);
                 h += latestNotification.prefHeight(width);
             }
 

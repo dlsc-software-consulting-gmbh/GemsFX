@@ -61,7 +61,7 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
     public PagingListView() {
         getStyleClass().add("paging-list-view");
 
-        focusedProperty().subscribe(focused -> {
+        focusedProperty().addListener((obs, wasFocused, focused) -> {
             if (focused) {
                 listView.requestFocus();
             }

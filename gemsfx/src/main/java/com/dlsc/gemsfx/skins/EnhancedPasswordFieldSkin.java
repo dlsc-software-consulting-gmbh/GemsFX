@@ -47,7 +47,8 @@ public abstract class EnhancedPasswordFieldSkin extends CustomTextFieldSkin {
             return getDefaultMaskText(len);
         }
 
-        if (skinnable instanceof EnhancedPasswordField passwordField) {
+        if (skinnable instanceof EnhancedPasswordField) {
+            EnhancedPasswordField passwordField = (EnhancedPasswordField) skinnable;
             if (passwordField.isShowPassword()) {
                 return txt;
             }

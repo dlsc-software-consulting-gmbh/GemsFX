@@ -107,11 +107,12 @@ public class PagingControlsSkin extends GemsSkinBase<PagingControls> {
         register(view.pageProperty(), pageScrollListener);
 
         updateView();
+        view.getProperties().put("controls.needed", neededBinding.get());
 
-        register(neededBinding.subscribe(needed -> {
+        register(neededBinding, (obs, wasNeeded, needed) -> {
             view.getProperties().remove("controls.needed");
             view.getProperties().put("controls.needed", needed);
-        }));
+        });
     }
 
     private void createStaticElements() {
@@ -147,11 +148,16 @@ public class PagingControlsSkin extends GemsSkinBase<PagingControls> {
         messageLabel.textProperty().bind(Bindings.createStringBinding(() -> view.getMessageLabelProvider().call(view), view.messageLabelProviderProperty(), view.totalItemCountProperty(), view.pageProperty(), view.pageSizeProperty(), view.pageCountProperty()));
         messageLabel.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
             PagingControls.MessageLabelStrategy messageLabelStrategy = view.getMessageLabelStrategy();
-            return switch (messageLabelStrategy) {
-                case ALWAYS_SHOW -> true;
-                case HIDE -> false;
-                case SHOW_WHEN_NEEDED -> view.getTotalItemCount() > view.getPageSize();
-            };
+            switch (messageLabelStrategy) {
+                case ALWAYS_SHOW:
+                    return true;
+                case HIDE:
+                    return false;
+                case SHOW_WHEN_NEEDED:
+                    return view.getTotalItemCount() > view.getPageSize();
+                default:
+                    throw new IllegalStateException("Unexpected message label strategy: " + messageLabelStrategy);
+            }
         }, view.messageLabelStrategyProperty(), view.totalItemCountProperty(), view.pageSizeProperty()));
         messageLabel.managedProperty().bind(messageLabel.visibleProperty());
 

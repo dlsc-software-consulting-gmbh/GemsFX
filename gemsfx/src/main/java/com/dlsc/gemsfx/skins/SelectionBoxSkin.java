@@ -117,7 +117,8 @@ public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
             }
         };
 
-        popup.showingProperty().subscribe(isShowing -> control.pseudoClassStateChanged(SHOWING_POPUP_PSEUDO_CLASS, isShowing));
+        register(popup.showingProperty(), (obs, wasShowing, isShowing) -> control.pseudoClassStateChanged(SHOWING_POPUP_PSEUDO_CLASS, isShowing));
+        control.pseudoClassStateChanged(SHOWING_POPUP_PSEUDO_CLASS, popup.isShowing());
         popup.onShowingProperty().bind(control.onShowingProperty());
         popup.onShownProperty().bind(control.onShownProperty());
         popup.onHidingProperty().bind(control.onHidingProperty());
@@ -174,14 +175,19 @@ public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
         register(control.selectionModelProperty(), selectionModelChangeListener);
 
         // Handle readOnly property
-        register(control.readOnlyProperty().subscribe(isNowReadOnly -> {
+        register(control.readOnlyProperty(), (obs, wasReadOnly, isNowReadOnly) -> {
             pseudoClassStateChanged(READ_ONLY_PSEUDO_CLASS, isNowReadOnly);
 
             arrowButton.setVisible(!isNowReadOnly);
             if (isNowReadOnly) {
                 popup.hide();
             }
-        }));
+        });
+        pseudoClassStateChanged(READ_ONLY_PSEUDO_CLASS, control.isReadOnly());
+        arrowButton.setVisible(!control.isReadOnly());
+        if (control.isReadOnly()) {
+            popup.hide();
+        }
 
         // Add event handler to control to show the popup
         registerHandler(control, MouseEvent.MOUSE_CLICKED, mouseClickedHandler);
@@ -216,10 +222,14 @@ public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
 
     private void updateEmptyPseudoClass() {
         switch (control.getSelectionModel().getSelectionMode()) {
-            case SINGLE ->
-                    control.pseudoClassStateChanged(EMPTY_SELECTION_PSEUDO_CLASS, control.getSelectionModel().getSelectedItem() == null);
-            case MULTIPLE ->
-                    control.pseudoClassStateChanged(EMPTY_SELECTION_PSEUDO_CLASS, control.getSelectionModel().getSelectedItems().isEmpty());
+            case SINGLE:
+                control.pseudoClassStateChanged(EMPTY_SELECTION_PSEUDO_CLASS, control.getSelectionModel().getSelectedItem() == null);
+                break;
+            case MULTIPLE:
+                control.pseudoClassStateChanged(EMPTY_SELECTION_PSEUDO_CLASS, control.getSelectionModel().getSelectedItems().isEmpty());
+                break;
+            default:
+                throw new IllegalStateException("Unexpected selection mode: " + control.getSelectionModel().getSelectionMode());
         }
     }
 
@@ -265,7 +275,7 @@ public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
             return convertItemToText(selectedItems.get(0));
         } else {
             // Build the display text
-            List<String> elements = selectedItems.stream().map(this::convertItemToText).toList();
+            List<String> elements = selectedItems.stream().map(this::convertItemToText).collect(java.util.stream.Collectors.toList());
             return String.join(", ", elements);
         }
     }
@@ -338,7 +348,7 @@ public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
     private class SelectionPopup extends PopupControl {
 
         private static final String DEFAULT_STYLE_CLASS = "selection-popup";
-        private static final Duration ANIM_DURATION = Duration.millis(200);
+        private final Duration ANIM_DURATION = Duration.millis(200);
 
         private final SelectionBox<T> owner;
 
@@ -372,7 +382,8 @@ public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
         }
 
         public final boolean isUpdating() {
-            if (getSkin() instanceof SelectionBoxSkin.SelectionPopupSkin currentSkin) {
+            if (getSkin() instanceof SelectionBoxSkin.SelectionPopupSkin) {
+                SelectionBoxSkin.SelectionPopupSkin currentSkin = (SelectionBoxSkin.SelectionPopupSkin) getSkin();
                 return currentSkin.isUpdating();
             }
             return false;
@@ -383,7 +394,8 @@ public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
             super.show(node, bounds.getMinX(), bounds.getMaxY());
 
             Node popupNode = getSkin().getNode();
-            if (popupNode instanceof Region region) {
+            if (popupNode instanceof Region) {
+                Region region = (Region) popupNode;
                 region.setPrefWidth(Region.USE_COMPUTED_SIZE);
                 double popupNodeWidth = region.prefWidth(-1);
                 double prefWidth = Math.max(bounds.getWidth(), popupNodeWidth);

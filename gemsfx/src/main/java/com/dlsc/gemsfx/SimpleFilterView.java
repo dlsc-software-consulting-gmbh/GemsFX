@@ -70,8 +70,9 @@ public class SimpleFilterView extends HBox {
         getChildren().addListener((ListChangeListener<Node>) change -> {
             int size = getChildren().size();
             if (size == 1) {
-                updateNodeStyles(getChildren().getFirst());
-                getChildren().getFirst().getStyleClass().add("only");
+                Node child = getChildren().get(0);
+                updateNodeStyles(child);
+                child.getStyleClass().add("only");
             } else {
                 for (int i = 0; i < getChildren().size(); i++) {
 

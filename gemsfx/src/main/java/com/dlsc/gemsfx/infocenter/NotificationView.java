@@ -109,12 +109,22 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
 
     private void updateStyle(S notification) {
         getStyleClass().setAll("notification-view");
-        getStyleClass().add(switch (notification.getType()) {
-            case INFO -> "info";
-            case WARNING -> "warning";
-            case ERROR -> "danger";
-            case SUCCESS -> "success";
-        });
+        switch (notification.getType()) {
+            case INFO:
+                getStyleClass().add("info");
+                break;
+            case WARNING:
+                getStyleClass().add("warning");
+                break;
+            case ERROR:
+                getStyleClass().add("danger");
+                break;
+            case SUCCESS:
+                getStyleClass().add("success");
+                break;
+            default:
+                throw new IllegalStateException("Unexpected notification type: " + notification.getType());
+        }
     }
 
     @Override
@@ -317,7 +327,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
                     getChildren().remove(oldValue);
                 }
                 if (newValue != null) {
-                    getChildren().addFirst(newValue);
+                    getChildren().add(0, newValue);
                 }
             });
 

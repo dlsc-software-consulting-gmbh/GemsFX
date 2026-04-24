@@ -475,7 +475,7 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         } else {
             switch (getFormat()) {
                 case HOURS_MINUTES:
-                    var adj = time.withSecond(0);
+                    LocalTime adj = time.withSecond(0);
                     adj = adj.withNano(0);
                     this.time.set(adj);
                     break;

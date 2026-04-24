@@ -133,7 +133,9 @@ public class LoadingPane extends StackPane {
 
             if (newStatus != null) {
                 commitStatusThread = new CommitStatusThread(newStatus);
-                Thread.ofVirtual().start(commitStatusThread);
+                Thread thread = new Thread(commitStatusThread, "loading-pane-commit-status");
+                thread.setDaemon(true);
+                thread.start();
             }
         });
 

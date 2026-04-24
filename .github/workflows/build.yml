@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - java11-javafx17
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:

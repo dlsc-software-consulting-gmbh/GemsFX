@@ -571,65 +571,109 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
 
     private double computeRegularAdjustedXPosition(double x, double maxLevelWidth, double nodeWidth, HPos alignment, TreeNodeView.LayoutDirection direction) {
         if (direction == TreeNodeView.LayoutDirection.LEFT_TO_RIGHT) {
-            return switch (alignment) {
-                case LEFT -> x;
-                case CENTER -> x + (maxLevelWidth - nodeWidth) / 2;
-                case RIGHT -> x + maxLevelWidth - nodeWidth;
-            };
+            switch (alignment) {
+                case LEFT:
+                    return x;
+                case CENTER:
+                    return x + (maxLevelWidth - nodeWidth) / 2;
+                case RIGHT:
+                    return x + maxLevelWidth - nodeWidth;
+                default:
+                    throw new IllegalStateException("Unexpected horizontal alignment: " + alignment);
+            }
         } else { // RIGHT_TO_LEFT
-            return switch (alignment) {
-                case LEFT -> x - maxLevelWidth;
-                case CENTER -> x - (maxLevelWidth + nodeWidth) / 2;
-                case RIGHT -> x - nodeWidth;
-            };
+            switch (alignment) {
+                case LEFT:
+                    return x - maxLevelWidth;
+                case CENTER:
+                    return x - (maxLevelWidth + nodeWidth) / 2;
+                case RIGHT:
+                    return x - nodeWidth;
+                default:
+                    throw new IllegalStateException("Unexpected horizontal alignment: " + alignment);
+            }
         }
     }
 
     private double computeRegularAdjustedYPosition(double y, double maxLevelHeight, double nodeHeight, VPos alignment, TreeNodeView.LayoutDirection layoutDirection) {
         if (layoutDirection == TreeNodeView.LayoutDirection.TOP_TO_BOTTOM) {
-            return switch (alignment) {
-                case TOP -> y;
-                case CENTER -> y + (maxLevelHeight - nodeHeight) / 2;
-                case BASELINE, BOTTOM -> y + maxLevelHeight - nodeHeight;
-            };
+            switch (alignment) {
+                case TOP:
+                    return y;
+                case CENTER:
+                    return y + (maxLevelHeight - nodeHeight) / 2;
+                case BASELINE:
+                case BOTTOM:
+                    return y + maxLevelHeight - nodeHeight;
+                default:
+                    throw new IllegalStateException("Unexpected vertical alignment: " + alignment);
+            }
         } else {
-            return switch (alignment) {
-                case TOP -> y - maxLevelHeight;
-                case CENTER -> y - (maxLevelHeight + nodeHeight) / 2;
-                case BASELINE, BOTTOM -> y - nodeHeight;
-            };
+            switch (alignment) {
+                case TOP:
+                    return y - maxLevelHeight;
+                case CENTER:
+                    return y - (maxLevelHeight + nodeHeight) / 2;
+                case BASELINE:
+                case BOTTOM:
+                    return y - nodeHeight;
+                default:
+                    throw new IllegalStateException("Unexpected vertical alignment: " + alignment);
+            }
         }
     }
 
     private double computeCompactAdjustedYPosition(double y, double maxLevelHeight, double nodeHeight, VPos alignment, TreeNodeView.LayoutDirection layoutDirection) {
         if (layoutDirection == TreeNodeView.LayoutDirection.TOP_TO_BOTTOM) {
-            return switch (alignment) {
-                case TOP -> y;
-                case CENTER -> y + (maxLevelHeight - nodeHeight) / 2;
-                case BASELINE, BOTTOM -> y + maxLevelHeight - nodeHeight;
-            };
+            switch (alignment) {
+                case TOP:
+                    return y;
+                case CENTER:
+                    return y + (maxLevelHeight - nodeHeight) / 2;
+                case BASELINE:
+                case BOTTOM:
+                    return y + maxLevelHeight - nodeHeight;
+                default:
+                    throw new IllegalStateException("Unexpected vertical alignment: " + alignment);
+            }
         } else {
-            return switch (alignment) {
-                case TOP -> y;
-                case CENTER -> y + (maxLevelHeight / 2) - (nodeHeight / 2);
-                case BASELINE, BOTTOM -> y + maxLevelHeight - nodeHeight;
-            };
+            switch (alignment) {
+                case TOP:
+                    return y;
+                case CENTER:
+                    return y + (maxLevelHeight / 2) - (nodeHeight / 2);
+                case BASELINE:
+                case BOTTOM:
+                    return y + maxLevelHeight - nodeHeight;
+                default:
+                    throw new IllegalStateException("Unexpected vertical alignment: " + alignment);
+            }
         }
     }
 
     private double computeCompactAdjustedXPosition(double x, double maxLevelWidth, double nodeWidth, HPos alignment, TreeNodeView.LayoutDirection direction) {
         if (direction == TreeNodeView.LayoutDirection.LEFT_TO_RIGHT) {
-            return switch (alignment) {
-                case LEFT -> x;
-                case CENTER -> x + (maxLevelWidth - nodeWidth) / 2;
-                case RIGHT -> x + maxLevelWidth - nodeWidth;
-            };
+            switch (alignment) {
+                case LEFT:
+                    return x;
+                case CENTER:
+                    return x + (maxLevelWidth - nodeWidth) / 2;
+                case RIGHT:
+                    return x + maxLevelWidth - nodeWidth;
+                default:
+                    throw new IllegalStateException("Unexpected horizontal alignment: " + alignment);
+            }
         } else {
-            return switch (alignment) {
-                case LEFT -> x + maxLevelWidth - nodeWidth;
-                case CENTER -> x + (maxLevelWidth / 2) - (nodeWidth / 2);
-                case RIGHT -> x;
-            };
+            switch (alignment) {
+                case LEFT:
+                    return x + maxLevelWidth - nodeWidth;
+                case CENTER:
+                    return x + (maxLevelWidth / 2) - (nodeWidth / 2);
+                case RIGHT:
+                    return x;
+                default:
+                    throw new IllegalStateException("Unexpected horizontal alignment: " + alignment);
+            }
         }
     }
 

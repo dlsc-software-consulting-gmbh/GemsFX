@@ -26,11 +26,10 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventTarget;
 import javafx.event.EventType;
+import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.SkinBase;
-import javafx.util.Subscription;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,42 +100,31 @@ public abstract class GemsSkinBase<C extends Control> extends SkinBase<C> {
     }
 
     /**
-     * Adds an event handler to the given {@link EventTarget} and tracks it for
+     * Adds an event handler to the given {@link Node} and tracks it for
      * automatic removal when this skin is disposed.
      *
      * @return the handler, for use as a field initializer
      */
-    protected <E extends Event> EventHandler<E> registerHandler(EventTarget target, EventType<E> type, EventHandler<E> handler) {
+    protected <E extends Event> EventHandler<E> registerHandler(Node target, EventType<E> type, EventHandler<E> handler) {
         target.addEventHandler(type, handler);
         disposers.add(() -> target.removeEventHandler(type, handler));
         return handler;
     }
 
     /**
-     * Adds an event filter to the given {@link EventTarget} and tracks it for
+     * Adds an event filter to the given {@link Node} and tracks it for
      * automatic removal when this skin is disposed.
      *
      * @return the filter, for use as a field initializer
      */
-    protected <E extends Event> EventHandler<E> registerFilter(EventTarget target, EventType<E> type, EventHandler<E> filter) {
+    protected <E extends Event> EventHandler<E> registerFilter(Node target, EventType<E> type, EventHandler<E> filter) {
         target.addEventFilter(type, filter);
         disposers.add(() -> target.removeEventFilter(type, filter));
         return filter;
     }
 
     /**
-     * Registers a {@link Subscription} (e.g., from {@code observable.subscribe(...)})
-     * for automatic cancellation when this skin is disposed.
-     *
-     * @return the subscription, for use as a field initializer
-     */
-    protected Subscription register(Subscription subscription) {
-        disposers.add(subscription::unsubscribe);
-        return subscription;
-    }
-
-    /**
-     * Removes all registered listeners, event handlers, event filters, and subscriptions,
+     * Removes all registered listeners, event handlers, and event filters,
      * then delegates to {@link SkinBase#dispose()}.
      */
     @Override

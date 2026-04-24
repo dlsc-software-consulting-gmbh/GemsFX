@@ -133,7 +133,7 @@ public class DialogPane extends StackPane {
         } else if (evt.getCode() == KeyCode.ESCAPE) { // hide the last dialog that was opened
             ObservableList<Dialog<?>> dialogs = getDialogs();
             if (!dialogs.isEmpty()) {
-                Dialog<?> dialog = dialogs.getLast();
+                Dialog<?> dialog = dialogs.get(dialogs.size() - 1);
                 dialog.cancel();
                 evt.consume();
             }
@@ -337,7 +337,7 @@ public class DialogPane extends StackPane {
         }
         Duration delay = dialog.getDelay();
         if (delay != null) {
-            Thread thread = Thread.ofVirtual().name("show-dialog-delay").start(() -> {
+            Thread thread = new Thread(() -> {
                 try {
                     Thread.sleep((long) delay.toMillis());
                     Platform.runLater(() -> {
@@ -348,7 +348,9 @@ public class DialogPane extends StackPane {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-            });
+            }, "show-dialog-delay");
+            thread.setDaemon(true);
+            thread.start();
         } else {
             dialogs.add(dialog);
         }
@@ -1145,7 +1147,8 @@ public class DialogPane extends StackPane {
                 case WARNING:
                     getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
                     break;
-                case INFORMATION, ERROR:
+                case INFORMATION:
+                case ERROR:
                     getButtonTypes().setAll(ButtonType.OK);
                     break;
                 case CONFIRMATION:
@@ -1158,7 +1161,7 @@ public class DialogPane extends StackPane {
 
             setOnResize(new DefaultResizeHandler(this));
 
-            preferencesProperty().subscribe(preferences -> {
+            preferencesProperty().addListener((obs, oldPreferences, preferences) -> {
                 if (preferences != null) {
                     double width = preferences.getDouble("width", -1d);
                     if (width != -1d) {
@@ -1170,6 +1173,17 @@ public class DialogPane extends StackPane {
                     }
                 }
             });
+            Preferences preferences = getPreferences();
+            if (preferences != null) {
+                double width = preferences.getDouble("width", -1d);
+                if (width != -1d) {
+                    setPrefWidth(width);
+                }
+                double height = preferences.getDouble("height", -1d);
+                if (height != -1d) {
+                    setPrefHeight(height);
+                }
+            }
         }
 
         /**
@@ -2156,23 +2170,27 @@ public class DialogPane extends StackPane {
          * @param data the button data / button type to check
          */
         protected boolean isTriggeringValidation(ButtonData data) {
-            return switch (data) {
-                case LEFT -> true;
-                case RIGHT -> true;
-                case HELP -> false;
-                case HELP_2 -> false;
-                case YES -> true;
-                case NO -> false;
-                case NEXT_FORWARD -> true;
-                case BACK_PREVIOUS -> true;
-                case FINISH -> true;
-                case APPLY -> true;
-                case CANCEL_CLOSE -> false;
-                case OK_DONE -> true;
-                case OTHER -> true;
-                case BIG_GAP -> true;
-                case SMALL_GAP -> true;
-            };
+            switch (data) {
+                case LEFT:
+                case RIGHT:
+                case YES:
+                case NEXT_FORWARD:
+                case BACK_PREVIOUS:
+                case FINISH:
+                case APPLY:
+                case OK_DONE:
+                case OTHER:
+                case BIG_GAP:
+                case SMALL_GAP:
+                    return true;
+                case HELP:
+                case HELP_2:
+                case NO:
+                case CANCEL_CLOSE:
+                    return false;
+                default:
+                    throw new IllegalStateException("Unexpected button data: " + data);
+            }
         }
 
         /**

@@ -204,10 +204,16 @@ public class PaymentOptionView extends ImageView {
         }
 
         if (StringUtils.isNotBlank(fileName)) {
-            fileName = switch (getTheme()) {
-                case DARK -> fileName + "-dark.png";
-                case LIGHT -> fileName + "-light.png";
-            };
+            switch (getTheme()) {
+                case DARK:
+                    fileName = fileName + "-dark.png";
+                    break;
+                case LIGHT:
+                    fileName = fileName + "-light.png";
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected theme: " + getTheme());
+            }
 
             setImage(new Image(Objects.requireNonNull(PaymentOptionView.class.getResource("paymentoptions/" + fileName)).toExternalForm()));
         } else {

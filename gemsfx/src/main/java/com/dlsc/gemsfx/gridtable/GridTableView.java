@@ -57,7 +57,7 @@ public class GridTableView<S> extends Control {
         if (children.isEmpty()) {
             return super.getContentBias();
         }
-        return children.getFirst().getContentBias();
+        return children.get(0).getContentBias();
     }
 
     @Override

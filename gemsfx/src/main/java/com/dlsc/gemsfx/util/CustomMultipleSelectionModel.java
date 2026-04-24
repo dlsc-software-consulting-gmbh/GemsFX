@@ -264,7 +264,7 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         List<Integer> validNewIndices = requestedIndices.stream().filter(i -> i >= 0 && i < items.size())
                 .filter(i -> !selectedIndices.contains(i))
                 .distinct()
-                .toList();
+                .collect(java.util.stream.Collectors.toList());
 
         if (validNewIndices.isEmpty()) {
             return;
@@ -280,7 +280,7 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
 
         // MULTIPLE SELECTION MODE: add all valid indices
         selectedIndices.addAll(validNewIndices);
-        selectedItems.addAll(validNewIndices.stream().map(items::get).toList());
+        selectedItems.addAll(validNewIndices.stream().map(items::get).collect(java.util.stream.Collectors.toList()));
 
         // Set the last selected item
         setSelectedIndex(lastIndex);

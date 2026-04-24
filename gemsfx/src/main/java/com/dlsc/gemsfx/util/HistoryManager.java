@@ -174,6 +174,6 @@ public abstract class HistoryManager<T> {
      * @return the converted unique list of strings
      */
     private List<T> convertToUniqueList(List<T> history) {
-        return history.stream().distinct().filter(Objects::nonNull).filter(getFilter()).limit(Math.max(0, getMaxHistorySize())).toList();
+        return history.stream().distinct().filter(Objects::nonNull).filter(getFilter()).limit(Math.max(0, getMaxHistorySize())).collect(java.util.stream.Collectors.toList());
     }
 }

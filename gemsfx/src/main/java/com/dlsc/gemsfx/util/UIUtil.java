@@ -41,7 +41,7 @@ public class UIUtil {
     public static void addClassesIfAbsent(Styleable node, String... styleClasses) {
         List<String> list = Arrays.stream(styleClasses)
                 .filter(styleClass -> !node.getStyleClass().contains(styleClass))
-                .toList();
+                .collect(java.util.stream.Collectors.toList());
         node.getStyleClass().addAll(list);
     }
 
@@ -108,7 +108,7 @@ public class UIUtil {
         // Remove the specified styles except the style to be added
         node.getStyleClass().removeAll(stylesToRemove.stream()
                 .filter(style -> !style.equals(styleToAdd))
-                .toList());
+                .collect(java.util.stream.Collectors.toList()));
     }
 
     /**

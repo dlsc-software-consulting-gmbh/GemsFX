@@ -27,6 +27,11 @@
         <url>https://github.com/dlsc-software-consulting-gmbh/GemsFX</url>
     </scm>
 
+    <properties>
+        <java.version>${gemsfx.java.version}</java.version>
+        <javafx.version>${gemsfx.javafx.version}</javafx.version>
+    </properties>
+
     <distributionManagement>
         <site>
             <id>github-pages</id>

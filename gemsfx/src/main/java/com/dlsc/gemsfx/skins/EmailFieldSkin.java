@@ -29,8 +29,6 @@ public class EmailFieldSkin extends GemsSkinBase<EmailField> {
     private final CustomTextField customTextField;
     private final DomainPopup domainPopup;
     private javafx.beans.value.ChangeListener<String> invalidTextListener;
-    private javafx.util.Subscription textSubscription;
-    private javafx.util.Subscription focusedSubscription;
 
     public EmailFieldSkin(EmailField field) {
         super(field);
@@ -66,8 +64,9 @@ public class EmailFieldSkin extends GemsSkinBase<EmailField> {
 
         getChildren().setAll(customTextField);
 
-        textSubscription = register(customTextField.textProperty().subscribe(this::handleSuggestionPopupVisibility));
-        focusedSubscription = register(customTextField.focusedProperty().subscribe(this::handleSuggestionPopupVisibility));
+        register(customTextField.textProperty(), (obs, oldText, newText) -> handleSuggestionPopupVisibility());
+        register(customTextField.focusedProperty(), (obs, wasFocused, isFocused) -> handleSuggestionPopupVisibility());
+        handleSuggestionPopupVisibility();
     }
 
     private void updateTooltipVisibility(String invalidText, StackPane node, Tooltip invalidToolTip) {

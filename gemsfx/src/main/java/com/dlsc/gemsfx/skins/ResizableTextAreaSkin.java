@@ -35,7 +35,7 @@ public class ResizableTextAreaSkin extends TextAreaSkin {
     public ResizableTextAreaSkin(ResizableTextArea control) {
         super(control);
 
-        scrollPane = (ScrollPane) getChildren().getFirst();
+        scrollPane = (ScrollPane) getChildren().get(0);
         Region resizeIcon = new Region();
         resizeIcon.getStyleClass().add("resize-icon");
         resizeCorner = new StackPane(resizeIcon);
@@ -127,7 +127,8 @@ public class ResizableTextAreaSkin extends TextAreaSkin {
 
     private void findScrollBar() {
         scrollPane.getChildrenUnmodifiable().forEach(node -> {
-            if (node instanceof ScrollBar scrollBar) {
+            if (node instanceof ScrollBar) {
+                ScrollBar scrollBar = (ScrollBar) node;
                 if (scrollBar.getOrientation() == Orientation.VERTICAL) {
                     verticalScrollBar = scrollBar;
                 } else {

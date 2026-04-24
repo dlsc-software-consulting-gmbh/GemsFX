@@ -105,12 +105,18 @@ public class YearMonthViewSkin extends GemsSkinBase<YearMonthView> {
 
         getChildren().add(container);
 
-        register(control.valueProperty().subscribe(value -> {
-            updatingMonthBox = true;
-            year.set(value.getYear());
-            updateMonthBoxes(value, gridPane);
-            updatingMonthBox = false;
-        }));
+        register(control.valueProperty(), (obs, oldValue, value) -> {
+            if (value != null) {
+                updatingMonthBox = true;
+                year.set(value.getYear());
+                updateMonthBoxes(value, gridPane);
+                updatingMonthBox = false;
+            }
+        });
+        if (control.getValue() != null) {
+            year.set(control.getValue().getYear());
+            updateMonthBoxes(control.getValue(), gridPane);
+        }
 
         year.addListener(it -> {
             if (!updatingMonthBox) {

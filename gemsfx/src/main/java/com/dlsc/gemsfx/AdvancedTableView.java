@@ -77,9 +77,11 @@ public class AdvancedTableView<T> extends TableView<T> {
     }
 
     private void resize(TableColumnHeader header, int rows) {
-        if (header instanceof NestedTableColumnHeader nestedTableColumnHeader) {
+        if (header instanceof NestedTableColumnHeader) {
+            NestedTableColumnHeader nestedTableColumnHeader = (NestedTableColumnHeader) header;
             nestedTableColumnHeader.getColumnHeaders().forEach(col -> resize(col, rows));
-        } else if (header instanceof AdvancedTableColumnHeader advancedTableColumnHeader) {
+        } else if (header instanceof AdvancedTableColumnHeader) {
+            AdvancedTableColumnHeader advancedTableColumnHeader = (AdvancedTableColumnHeader) header;
             advancedTableColumnHeader.resizeColumnToFitContent(rows);
         }
     }

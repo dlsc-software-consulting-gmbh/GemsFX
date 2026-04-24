@@ -261,7 +261,8 @@ public class TextViewSkin extends GemsSkinBase<TextView> {
         private StringBuilder getTextFlowContentAsString() {
             StringBuilder sb = new StringBuilder();
             for (Node node : getChildren()) {
-                if (node instanceof Text t) {
+                if (node instanceof Text) {
+                    Text t = (Text) node;
                     sb.append(t.getText());
                 }
             }
@@ -278,7 +279,7 @@ public class TextViewSkin extends GemsSkinBase<TextView> {
         }
 
         private boolean isInvalidIndex(StringBuilder string, int charIndex) {
-            return string.isEmpty() || charIndex < 0 || charIndex >= string.length();
+            return string.length() == 0 || charIndex < 0 || charIndex >= string.length();
         }
     }
 }

@@ -50,6 +50,8 @@
         <local.repository.path>/tmp/repository</local.repository.path>
         <java.version>24</java.version>
         <javafx.version>25.0.2</javafx.version>
+        <gemsfx.java.version>11</gemsfx.java.version>
+        <gemsfx.javafx.version>17.0.16</gemsfx.javafx.version>
         <ikonli.version>12.4.0</ikonli.version>
         <sonar.projectKey>dlsc-software-consulting-gmbh_GemsFX</sonar.projectKey>
         <sonar.organization>dlsc-software-consulting-gmbh</sonar.organization>
@@ -85,7 +87,7 @@
             <dependency>
                 <groupId>one.jpro.platform</groupId>
                 <artifactId>jpro-utils</artifactId>
-                <version>0.5.8</version>
+                <version>0.5.6</version>
             </dependency>
 
             <dependency>
@@ -97,7 +99,7 @@
             <dependency>
                 <groupId>com.dlsc.unitfx</groupId>
                 <artifactId>unitfx</artifactId>
-                <version>1.0.10</version>
+                <version>1.0.9</version>
             </dependency>
 
             <dependency>

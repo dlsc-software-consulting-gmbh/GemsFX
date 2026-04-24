@@ -75,14 +75,15 @@ public class AvatarView extends Control {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         setFocusTraversable(false);
 
-        initials.subscribe(this::updateMagicNumber);
-        magicNumber.subscribe(number -> {
+        initials.addListener((obs, oldInitials, newInitials) -> updateMagicNumber());
+        magicNumber.addListener((obs, oldNumber, number) -> {
             getStyleClass().setAll(DEFAULT_STYLE_CLASS);
             if (number.intValue() >= 0) {
                 int index = number.intValue() % getNumberOfStyles();
                 getStyleClass().add("style" + index);
             }
         });
+        updateMagicNumber();
 
         prefWidthProperty().bind(sizeProperty());
         prefHeightProperty().bind(sizeProperty());

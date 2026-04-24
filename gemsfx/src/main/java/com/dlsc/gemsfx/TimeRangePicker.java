@@ -129,9 +129,12 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
      * Represents a time range with a start time and an end time.
      * Ensures that the start time is not after the end time.
      */
-    public record TimeRange(LocalTime startTime, LocalTime endTime) {
+    public static final class TimeRange {
 
-        public TimeRange {
+        private final LocalTime startTime;
+        private final LocalTime endTime;
+
+        public TimeRange(LocalTime startTime, LocalTime endTime) {
             // Ensure startTime and endTime are not null
             Objects.requireNonNull(startTime, "startTime cannot be null");
             Objects.requireNonNull(endTime, "endTime cannot be null");
@@ -142,6 +145,35 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
                 startTime = endTime;
                 endTime = temp;
             }
+
+            this.startTime = startTime;
+            this.endTime = endTime;
+        }
+
+        public LocalTime startTime() {
+            return startTime;
+        }
+
+        public LocalTime endTime() {
+            return endTime;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof TimeRange)) {
+                return false;
+            }
+
+            TimeRange timeRange = (TimeRange) o;
+            return Objects.equals(startTime, timeRange.startTime) && Objects.equals(endTime, timeRange.endTime);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(startTime, endTime);
         }
 
         @Override

@@ -104,7 +104,7 @@ public class VirtualFlowUtil {
     }
 
     private static void updatePosition(VirtualFlow<?> fromFlow, VirtualFlow<?> toFlow) {
-        var pos2 = getVFlowPosition(fromFlow);
+        VirtualFlowPosition pos2 = getVFlowPosition(fromFlow);
         setVFlowPosition(toFlow, pos2);
     }
 

@@ -146,8 +146,6 @@ public class CalendarViewSkin extends GemsSkinBase<CalendarView> {
     private final InvalidationListener selectionModelListener = it -> bindSelectionModel(getSkinnable().getSelectionModel());
     private final InvalidationListener updateStyleClassesListener = it -> updateStyleClasses();
 
-    private javafx.util.Subscription headerLayoutSubscription;
-
     public CalendarViewSkin(CalendarView view) {
         super(view);
 
@@ -292,7 +290,8 @@ public class CalendarViewSkin extends GemsSkinBase<CalendarView> {
         Spacer rightSpacer = new Spacer();
         rightSpacer.getStyleClass().add("right");
 
-        headerLayoutSubscription = register(view.headerLayoutProperty().subscribe(headerLayout -> updateHeader(header, previousArrowButton, leftSpacer, yearSpinnerBox, rightSpacer, nextMonthArrowButton)));
+        register(view.headerLayoutProperty(), (obs, oldHeaderLayout, newHeaderLayout) -> updateHeader(header, previousArrowButton, leftSpacer, yearSpinnerBox, rightSpacer, nextMonthArrowButton));
+        updateHeader(header, previousArrowButton, leftSpacer, yearSpinnerBox, rightSpacer, nextMonthArrowButton);
 
         register(view.yearMonthProperty(), viewYearMonthChangeListener);
 

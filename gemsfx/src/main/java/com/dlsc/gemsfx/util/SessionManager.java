@@ -223,7 +223,7 @@ public class SessionManager {
     }
     
     private   String colorToHexRGBA(Color color) {
-        return "%02X%02X%02X%02X".formatted(
+        return String.format("%02X%02X%02X%02X",
                 (int) (color.getRed() * 0xff),
                 (int) (color.getGreen() * 0xff),
                 (int) (color.getBlue() * 0xff),
@@ -233,20 +233,20 @@ public class SessionManager {
 
     private void putPropertyValueIntoPreferences(String path, Property property) {
         Object value = property.getValue();
-        if (value instanceof Boolean b) {
-            preferences.putBoolean(path, b);
-        } else if (value instanceof Double d) {
-            preferences.putDouble(path, d);
-        } else if (value instanceof Float f) {
-            preferences.putFloat(path, f);
-        } else if (value instanceof Integer i) {
-            preferences.putInt(path, i);
-        } else if (value instanceof Long l) {
-            preferences.putLong(path, l);
-        } else if (value instanceof String s) {
-            preferences.put(path, s);
-        } else if (value instanceof Color c) {
-            preferences.put(path, colorToHexRGBA(c));
+        if (value instanceof Boolean) {
+            preferences.putBoolean(path, (Boolean) value);
+        } else if (value instanceof Double) {
+            preferences.putDouble(path, (Double) value);
+        } else if (value instanceof Float) {
+            preferences.putFloat(path, (Float) value);
+        } else if (value instanceof Integer) {
+            preferences.putInt(path, (Integer) value);
+        } else if (value instanceof Long) {
+            preferences.putLong(path, (Long) value);
+        } else if (value instanceof String) {
+            preferences.put(path, (String) value);
+        } else if (value instanceof Color) {
+            preferences.put(path, colorToHexRGBA((Color) value));
         }
     }
 }

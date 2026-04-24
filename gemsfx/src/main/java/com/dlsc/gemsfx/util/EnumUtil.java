@@ -121,7 +121,7 @@ public class EnumUtil {
         // Use StringBuilder to build the final string
         StringBuilder result = new StringBuilder();
         for (String word : words) {
-            if (!result.isEmpty()) {
+            if (result.length() > 0) {
                 result.append(" ");
             }
             // Capitalize the first letter of each word and append to result

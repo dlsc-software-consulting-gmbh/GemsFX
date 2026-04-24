@@ -1,12 +1,14 @@
 [![JFXCentral](https://img.shields.io/badge/Find_me_on-JFXCentral-blue?logo=googlechrome&logoColor=white)](https://www.jfx-central.com/libraries/gemsfx)
 [![Maven Central](https://img.shields.io/maven-central/v/com.dlsc.gemsfx/gemsfx?color=brightgreen)](https://search.maven.org/search?q=g:com.dlsc.gemsfx%20AND%20a:gemsfx)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Java Version](https://img.shields.io/badge/Java_Version-21-ff69b4)](https://github.com/openjdk/jdk)
-[![JavaFX Version](https://img.shields.io/badge/JavaFX_Version-23-brightgreen)](https://github.com/openjdk/jfx)
+[![Java Version](https://img.shields.io/badge/Java_Version-11+-ff69b4)](https://github.com/openjdk/jdk)
+[![JavaFX Version](https://img.shields.io/badge/JavaFX_Version-17+-brightgreen)](https://github.com/openjdk/jfx)
 
 # GemsFX
 
 GemsFX is a collection of custom controls and utilities for JavaFX. The website is located at [https://gemsfx.dlsc.com](https://gemsfx.dlsc.com).
+
+The `gemsfx` library module targets **Java 11** and **JavaFX 17+**. The `gemsfx-demo` module continues to use the current repository toolchain (**Java 24** / **JavaFX 25.0.2**).
 
 ## AtlantaFX
 If you want to use **_AtlantaFX_** for your application then copy the stylesheet called `atlantafx.css` from the demo module into
