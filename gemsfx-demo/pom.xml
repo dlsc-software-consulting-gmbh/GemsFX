@@ -32,6 +32,8 @@
     <properties>
         <main.class>com.dlsc.gemsfx.demo.GemsFXDemoLauncher</main.class>
         <snapshot.filter></snapshot.filter>
+        <!-- Demo module is not published; skip Central releasability enforcement -->
+        <enforcer.skip>true</enforcer.skip>
     </properties>
 
     <build>
@@ -43,6 +45,13 @@
             <resource>
                 <directory>src/main/resources-filtered</directory>
                 <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.java</include>
+                </includes>
+                <filtering>false</filtering>
             </resource>
         </resources>
         <plugins>

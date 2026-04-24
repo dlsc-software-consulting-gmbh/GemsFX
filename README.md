@@ -6,7 +6,7 @@
 
 # GemsFX
 
-GemsFX is a collection of custom controls and utilities for JavaFX.
+GemsFX is a collection of custom controls and utilities for JavaFX. The website is located at [https://gemsfx.dlsc.com](https://gemsfx.dlsc.com).
 
 ## AtlantaFX
 If you want to use **_AtlantaFX_** for your application then copy the stylesheet called `atlantafx.css` from the demo module into

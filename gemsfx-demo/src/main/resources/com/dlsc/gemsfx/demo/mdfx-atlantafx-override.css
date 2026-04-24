@@ -23,3 +23,8 @@
 .markdown-code {
     -fx-font-size: 1em !important;
 }
+
+/* ── Dark-theme code block syntax highlighting ────────────────────────── */
+.dark-theme .markdown-code-block {
+    -mdfx-code-theme: "github-dark-default";
+}

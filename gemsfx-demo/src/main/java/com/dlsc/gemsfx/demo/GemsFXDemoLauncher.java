@@ -31,6 +31,8 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -52,6 +54,7 @@ import org.scenicview.ScenicView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -195,6 +198,14 @@ public class GemsFXDemoLauncher extends GemApplication {
         markdownView.getStyleClass().add("description-markdown-view");
         markdownView.getStylesheets().add(mdfxModenaCss);
 
+        MarkdownView codeMarkdownView = new MarkdownView();
+        codeMarkdownView.getStyleClass().add("code-markdown-view");
+        codeMarkdownView.getStylesheets().add(mdfxModenaCss);
+
+        MarkdownView cssMarkdownView = new MarkdownView();
+        cssMarkdownView.getStyleClass().add("css-markdown-view");
+        cssMarkdownView.getStylesheets().add(mdfxModenaCss);
+
         List<Theme> themes = List.of(new NordLight(), new NordDark(), new CupertinoLight(),
                 new CupertinoDark(), new PrimerLight(), new PrimerDark(), new Dracula());
 
@@ -251,8 +262,16 @@ public class GemsFXDemoLauncher extends GemApplication {
                 stage.getScene().getStylesheets().add(atlantaFxCss);
                 stage.getScene().getRoot().getStyleClass().remove("atlantafx-active");
                 stage.getScene().getRoot().getStyleClass().add("atlantafx-active");
+                stage.getScene().getRoot().getStyleClass().remove("dark-theme");
+                if (isDarkTheme(theme)) {
+                    stage.getScene().getRoot().getStyleClass().add("dark-theme");
+                }
                 markdownView.getStylesheets().remove(mdfxOverrideCss);
                 markdownView.getStylesheets().add(mdfxOverrideCss);
+                codeMarkdownView.getStylesheets().remove(mdfxOverrideCss);
+                codeMarkdownView.getStylesheets().add(mdfxOverrideCss);
+                cssMarkdownView.getStylesheets().remove(mdfxOverrideCss);
+                cssMarkdownView.getStylesheets().add(mdfxOverrideCss);
                 if (launchButtonRef[0] != null) {
                     launchButtonRef[0].getStyleClass().add(Styles.ROUNDED);
                 }
@@ -271,7 +290,10 @@ public class GemsFXDemoLauncher extends GemApplication {
                 Application.setUserAgentStylesheet(null);
                 stage.getScene().getStylesheets().remove(atlantaFxCss);
                 stage.getScene().getRoot().getStyleClass().remove("atlantafx-active");
+                stage.getScene().getRoot().getStyleClass().remove("dark-theme");
                 markdownView.getStylesheets().remove(mdfxOverrideCss);
+                codeMarkdownView.getStylesheets().remove(mdfxOverrideCss);
+                cssMarkdownView.getStylesheets().remove(mdfxOverrideCss);
                 if (launchButtonRef[0] != null) {
                     launchButtonRef[0].getStyleClass().remove(Styles.ROUNDED);
                 }
@@ -382,7 +404,43 @@ public class GemsFXDemoLauncher extends GemApplication {
         ScrollPane docScrollPane = new ScrollPane(docContent);
         docScrollPane.setFitToWidth(true);
         docScrollPane.getStyleClass().add("doc-scroll-pane");
-        docScrollPane.setPrefWidth(750);
+
+        // Float the gemsfx logo above the description scroll pane, bottom-right corner
+        ImageView logoView = new ImageView(logoImage);
+        logoView.setPreserveRatio(true);
+        logoView.setFitHeight(120);
+        logoView.setMouseTransparent(true);
+        StackPane.setAlignment(logoView, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(logoView, new Insets(20, 20, 20, 20));
+        StackPane descPane = new StackPane(docScrollPane, logoView);
+
+        Tab descriptionTab = new Tab("Description", descPane);
+        descriptionTab.setClosable(false);
+
+        // ── Source Code tab ───────────────────────────────────────────────────
+        VBox codeContent = new VBox(codeMarkdownView);
+        codeContent.setPadding(new Insets(8));
+        ScrollPane codeScrollPane = new ScrollPane(codeContent);
+        codeScrollPane.setFitToWidth(true);
+        codeScrollPane.getStyleClass().add("doc-scroll-pane");
+
+        Tab sourceTab = new Tab("Source Code", codeScrollPane);
+        sourceTab.setClosable(false);
+
+        // ── CSS tab ───────────────────────────────────────────────────────────
+        VBox cssContent = new VBox(cssMarkdownView);
+        cssContent.setPadding(new Insets(8));
+        ScrollPane cssScrollPane = new ScrollPane(cssContent);
+        cssScrollPane.setFitToWidth(true);
+        cssScrollPane.getStyleClass().add("doc-scroll-pane");
+
+        Tab cssTab = new Tab("CSS", cssScrollPane);
+        cssTab.setClosable(false);
+
+        TabPane docTabPane = new TabPane(descriptionTab, sourceTab, cssTab);
+        docTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        docTabPane.setPrefWidth(750);
+        HBox.setHgrow(docTabPane, Priority.ALWAYS);
 
         searchField.textProperty().addListener((obs, o, n) ->
                 updateLaunchButton(launchButton, treeView, listView, searchField));
@@ -394,18 +452,18 @@ public class GemsFXDemoLauncher extends GemApplication {
         treeView.getSelectionModel().selectedItemProperty().addListener((obs, o, n) -> {
             DemoEntry entry = resolveSelected(treeView, listView, searchField);
             if (entry != null) prefs.put("selected.demo", entry.name());
-            showDescription(entry, currentThemeKey[0], markdownView, screenshotView, screenshotBox);
+            showContent(entry, currentThemeKey[0], markdownView, screenshotView, screenshotBox, codeMarkdownView, cssMarkdownView);
         });
         listView.getSelectionModel().selectedItemProperty().addListener((obs, o, n) -> {
             DemoEntry entry = resolveSelected(treeView, listView, searchField);
             if (entry != null) prefs.put("selected.demo", entry.name());
-            showDescription(entry, currentThemeKey[0], markdownView, screenshotView, screenshotBox);
+            showContent(entry, currentThemeKey[0], markdownView, screenshotView, screenshotBox, codeMarkdownView, cssMarkdownView);
         });
 
         // Wire up the screenshot refresh for theme changes (now that views are available).
-        refreshScreenshot[0] = () -> showDescription(
+        refreshScreenshot[0] = () -> showContent(
                 resolveSelected(treeView, listView, searchField),
-                currentThemeKey[0], markdownView, screenshotView, screenshotBox);
+                currentThemeKey[0], markdownView, screenshotView, screenshotBox, codeMarkdownView, cssMarkdownView);
 
         // Restore last selected demo, falling back to the first one.
         String savedDemo = prefs.get("selected.demo", null);
@@ -466,19 +524,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         layout.setMinWidth(Region.USE_PREF_SIZE);
         layout.setPrefWidth(330);
 
-        HBox.setHgrow(docScrollPane, Priority.ALWAYS);
-
-        // Float the gemsfx logo above the scroll pane, top-right corner
-        ImageView logoView = new ImageView(logoImage);
-        logoView.setPreserveRatio(true);
-        logoView.setFitHeight(120);
-        logoView.setMouseTransparent(true);
-        StackPane.setAlignment(logoView, Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(logoView, new Insets(20, 20, 20, 20));
-        StackPane docPane = new StackPane(docScrollPane, logoView);
-        HBox.setHgrow(docPane, Priority.ALWAYS);
-
-        HBox rootHBox = new HBox(layout, docPane);
+        HBox rootHBox = new HBox(layout, docTabPane);
 
         Label titleLabel = new Label("GemsFX Demo Launcher");
         titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
@@ -553,9 +599,8 @@ public class GemsFXDemoLauncher extends GemApplication {
 
         stage.show();
 
-        // Lock width but allow height resizing; enforce minimum height
+        // Lock minimum size; allow free resizing in both dimensions
         stage.setMinWidth(stage.getWidth());
-        stage.setMaxWidth(stage.getWidth());
         stage.setMinHeight(800);
     }
 
@@ -626,12 +671,16 @@ public class GemsFXDemoLauncher extends GemApplication {
     // MarkdownView description helpers
     // -----------------------------------------------------------------------
 
-    private void showDescription(DemoEntry entry, String themeKey, MarkdownView markdownView, ImageView screenshotView, VBox screenshotBox) {
+    private void showContent(DemoEntry entry, String themeKey,
+                             MarkdownView markdownView, ImageView screenshotView, VBox screenshotBox,
+                             MarkdownView codeMarkdownView, MarkdownView cssMarkdownView) {
         if (entry == null) {
             markdownView.setMdString("*Select a demo to view its documentation.*");
             screenshotView.setImage(null);
             screenshotBox.setManaged(false);
             screenshotBox.setVisible(false);
+            codeMarkdownView.setMdString("*Select a demo to view its source code.*");
+            cssMarkdownView.setMdString("*Select a demo to view its CSS.*");
             return;
         }
 
@@ -643,6 +692,8 @@ public class GemsFXDemoLauncher extends GemApplication {
             screenshotView.setImage(null);
             screenshotBox.setManaged(false);
             screenshotBox.setVisible(false);
+            codeMarkdownView.setMdString("*No source code available.*");
+            cssMarkdownView.setMdString("*No CSS available.*");
             return;
         }
 
@@ -669,6 +720,62 @@ public class GemsFXDemoLauncher extends GemApplication {
             screenshotBox.setManaged(false);
             screenshotBox.setVisible(false);
         }
+
+        // Load source code
+        String sourceCode = loadSourceCode(app);
+        codeMarkdownView.setMdString(sourceCode != null
+                ? "```java\n" + sourceCode + "\n```"
+                : "*No source code available.*");
+
+        // Load CSS
+        String cssCode = loadCssForDemo(app);
+        cssMarkdownView.setMdString(cssCode != null
+                ? "```css\n" + cssCode + "\n```"
+                : "*No CSS file found for this control.*");
+    }
+
+    private String loadSourceCode(GemApplication app) {
+        String resourcePath = "/" + app.getClass().getName().replace('.', '/') + ".java";
+        try (InputStream is = GemsFXDemoLauncher.class.getResourceAsStream(resourcePath)) {
+            if (is == null) return null;
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private String loadCssForDemo(GemApplication app) {
+        String controlName = app.getClass().getSimpleName();
+        if (controlName.endsWith("App")) {
+            controlName = controlName.substring(0, controlName.length() - 3);
+        }
+
+        // Try to instantiate the matching control class and call getUserAgentStylesheet()
+        String[] packages = {
+                "com.dlsc.gemsfx",
+                "com.dlsc.gemsfx.daterange",
+                "com.dlsc.gemsfx.infocenter",
+                "com.dlsc.gemsfx.paging",
+                "com.dlsc.gemsfx.gridtable",
+                "com.dlsc.gemsfx.treeview",
+                "com.dlsc.gemsfx.incubator"
+        };
+        for (String pkg : packages) {
+            try {
+                Class<?> cls = Class.forName(pkg + "." + controlName);
+                Object instance = cls.getDeclaredConstructor().newInstance();
+                java.lang.reflect.Method m = cls.getMethod("getUserAgentStylesheet");
+                String stylesheet = (String) m.invoke(instance);
+                if (stylesheet != null && !stylesheet.isBlank()) {
+                    try (InputStream is = new URL(stylesheet).openStream()) {
+                        return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                    }
+                }
+            } catch (Exception ignored) {
+                // control not found in this package or no stylesheet — try next
+            }
+        }
+        return null;
     }
 
     // -----------------------------------------------------------------------
@@ -678,6 +785,13 @@ public class GemsFXDemoLauncher extends GemApplication {
     /** Converts an AtlantaFX theme name to a screenshot subdirectory name, e.g. "Nord Light" → "nord-light". */
     private static String toThemeKey(Theme theme) {
         return theme == null ? "modena" : theme.getName().toLowerCase().replace(" ", "-");
+    }
+
+    /** Returns true for AtlantaFX dark themes (NordDark, CupertinoDark, PrimerDark, Dracula). */
+    private static boolean isDarkTheme(Theme theme) {
+        if (theme == null) return false;
+        String name = theme.getName().toLowerCase();
+        return name.contains("dark") || name.equals("dracula");
     }
 
     private static String loadProjectVersion() {

@@ -79,7 +79,7 @@
             <dependency>
                 <groupId>one.jpro.platform</groupId>
                 <artifactId>jpro-mdfx</artifactId>
-                <version>0.5.8</version>
+                <version>0.6.1</version>
             </dependency>
 
             <dependency>

@@ -67,3 +67,9 @@
     -fx-background-color: -color-bg-default;
     -fx-border-color: -color-border-default transparent transparent transparent;
 }
+
+/* ── Code / CSS tab markdown views (smaller font) ────────────────────── */
+.code-markdown-view,
+.css-markdown-view {
+    -fx-font-size: 11px;
+}
