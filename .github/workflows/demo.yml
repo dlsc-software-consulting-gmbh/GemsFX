@@ -16,10 +16,10 @@ jobs:
         with:
           ref: demo-launcher
 
-      - name: Set up Java 24 with JavaFX
+      - name: Set up Java 25 with JavaFX
         uses: actions/setup-java@v4
         with:
-          java-version: '24'
+          java-version: '25'
           distribution: 'zulu'
 
       - name: Cache Maven packages
