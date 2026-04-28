@@ -9,6 +9,7 @@ import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 import atlantafx.base.theme.Styles;
 import atlantafx.base.theme.Theme;
+import com.dlsc.gemsfx.Spacer;
 import com.dlsc.gemsfx.demo.binding.AggregatedListBindingApp;
 import com.dlsc.gemsfx.demo.binding.NestedListBindingApp;
 import com.dlsc.gemsfx.demo.binding.NestedListChangeTrackerApp;
@@ -25,15 +26,18 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -206,46 +210,34 @@ public class GemsFXDemoLauncher extends GemApplication {
         cssMarkdownView.getStyleClass().add("css-markdown-view");
         cssMarkdownView.getStylesheets().add(mdfxModenaCss);
 
+        List<MarkdownView> markdownViews = List.of(markdownView, codeMarkdownView, cssMarkdownView);
+
         List<Theme> themes = List.of(new NordLight(), new NordDark(), new CupertinoLight(),
                 new CupertinoDark(), new PrimerLight(), new PrimerDark(), new Dracula());
+        Map<String, Theme> themeOptions = new LinkedHashMap<>();
+        themeOptions.put("Modena", null);
+        for (Theme theme : themes) {
+            themeOptions.put(theme.getName(), theme);
+        }
 
         Preferences prefs = Preferences.userNodeForPackage(GemsFXDemoLauncher.class);
-        String savedTheme = prefs.get("atlantafx.theme", new NordDark().getName());
-        Theme initialTheme = themes.stream()
-                .filter(t -> t.getName().equals(savedTheme))
-                .findFirst().orElse(themes.get(0));
+        String legacyTheme = prefs.getBoolean("atlantafx.enabled", true)
+                ? prefs.get("atlantafx.theme", new NordDark().getName())
+                : "Modena";
+        String savedTheme = prefs.get("launcher.theme", legacyTheme);
+        String initialThemeName = themeOptions.containsKey(savedTheme) ? savedTheme : new NordDark().getName();
 
-        ComboBox<Theme> themeComboBox = new ComboBox<>();
-        themeComboBox.getItems().addAll(themes);
-        themeComboBox.setValue(initialTheme);
-        themeComboBox.setConverter(new javafx.util.StringConverter<>() {
-            @Override
-            public String toString(Theme t) {
-                return t == null ? "" : t.getName();
+        MenuButton themeMenuButton = new MenuButton(initialThemeName);
+        ToggleGroup themeToggleGroup = new ToggleGroup();
+        for (String themeName : themeOptions.keySet()) {
+            RadioMenuItem item = new RadioMenuItem(themeName);
+            item.setToggleGroup(themeToggleGroup);
+            item.setUserData(themeName);
+            themeMenuButton.getItems().add(item);
+            if (themeName.equals(initialThemeName)) {
+                item.setSelected(true);
             }
-
-            @Override
-            public Theme fromString(String s) {
-                return null;
-            }
-        });
-        HBox.setHgrow(themeComboBox, Priority.ALWAYS);
-        themeComboBox.setMaxWidth(Double.MAX_VALUE);
-
-        CheckBox atlantaFxCheckBox = new CheckBox("AtlantaFX");
-        atlantaFxCheckBox.setMinWidth(Region.USE_PREF_SIZE);
-        atlantaFxCheckBox.setSelected(prefs.getBoolean("atlantafx.enabled", true));
-        if (atlantaFxCheckBox.isSelected()) System.setProperty("atlantafx", "true");
-        themeComboBox.disableProperty().bind(atlantaFxCheckBox.selectedProperty().not());
-
-        // Tracks the screenshot subdirectory for the active theme.
-        // Updated whenever the theme changes so showDescription loads the right image.
-        String[] currentThemeKey = {atlantaFxCheckBox.isSelected()
-                ? toThemeKey(themeComboBox.getValue())
-                : "modena"};
-
-        // Refreshes the screenshot when the theme changes. Populated once tree/list/search are ready.
-        Runnable[] refreshScreenshot = {() -> {}};
+        }
 
         // Logo image
         Image logoImage = new Image(Objects.requireNonNull(
@@ -254,16 +246,32 @@ public class GemsFXDemoLauncher extends GemApplication {
         Button[] launchButtonRef = new Button[1];
 
         Runnable applyTheme = () -> {
-            Theme theme = themeComboBox.getValue();
+            Toggle selectedToggle = themeToggleGroup.getSelectedToggle();
+            if (selectedToggle == null) {
+                return;
+            }
+
+            String selectedThemeName = (String) selectedToggle.getUserData();
+            Theme theme = themeOptions.get(selectedThemeName);
+            themeMenuButton.setText(selectedThemeName);
+            prefs.put("launcher.theme", selectedThemeName);
+            new ArrayList<>(openDemoStages).forEach(Stage::close);
+            boolean darkTheme = theme != null && isDarkTheme(theme);
+
+            markdownViews.forEach(view -> view.getStyleClass().remove("dark"));
+            if (darkTheme) {
+                markdownViews.forEach(view -> view.getStyleClass().add("dark"));
+            }
+
             if (theme != null) {
-                currentThemeKey[0] = toThemeKey(theme);
+                System.setProperty("atlantafx", "true");
                 Application.setUserAgentStylesheet(theme.getUserAgentStylesheet());
                 stage.getScene().getStylesheets().remove(atlantaFxCss);
                 stage.getScene().getStylesheets().add(atlantaFxCss);
                 stage.getScene().getRoot().getStyleClass().remove("atlantafx-active");
                 stage.getScene().getRoot().getStyleClass().add("atlantafx-active");
                 stage.getScene().getRoot().getStyleClass().remove("dark-theme");
-                if (isDarkTheme(theme)) {
+                if (darkTheme) {
                     stage.getScene().getRoot().getStyleClass().add("dark-theme");
                 }
                 markdownView.getStylesheets().remove(mdfxOverrideCss);
@@ -275,18 +283,8 @@ public class GemsFXDemoLauncher extends GemApplication {
                 if (launchButtonRef[0] != null) {
                     launchButtonRef[0].getStyleClass().add(Styles.ROUNDED);
                 }
-                refreshScreenshot[0].run();
-            }
-        };
-
-        atlantaFxCheckBox.selectedProperty().addListener((obs, wasSelected, selected) -> {
-            prefs.putBoolean("atlantafx.enabled", selected);
-            System.setProperty("atlantafx", selected ? "true" : "false");
-            new ArrayList<>(openDemoStages).forEach(Stage::close);
-            if (selected) {
-                applyTheme.run();
             } else {
-                currentThemeKey[0] = "modena";
+                System.setProperty("atlantafx", "false");
                 Application.setUserAgentStylesheet(null);
                 stage.getScene().getStylesheets().remove(atlantaFxCss);
                 stage.getScene().getRoot().getStyleClass().remove("atlantafx-active");
@@ -297,16 +295,14 @@ public class GemsFXDemoLauncher extends GemApplication {
                 if (launchButtonRef[0] != null) {
                     launchButtonRef[0].getStyleClass().remove(Styles.ROUNDED);
                 }
-                refreshScreenshot[0].run();
+            }
+        };
+
+        themeToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+            if (newToggle != null) {
+                applyTheme.run();
             }
         });
-        themeComboBox.valueProperty().addListener((obs, o, n) -> {
-            if (n != null) prefs.put("atlantafx.theme", n.getName());
-            if (atlantaFxCheckBox.isSelected()) applyTheme.run();
-        });
-
-        HBox themeBar = new HBox(8, atlantaFxCheckBox, themeComboBox);
-        themeBar.setAlignment(Pos.CENTER_LEFT);
 
         // ── Search ──────────────────────────────────────────────────────────
         TextField searchField = new TextField();
@@ -368,36 +364,10 @@ public class GemsFXDemoLauncher extends GemApplication {
         // wire disable state
         updateLaunchButton(launchButton, treeView, listView, searchField);
 
-        // Screenshot displayed below the description text, with a reflection effect.
-        ImageView screenshotView = new ImageView();
-        screenshotView.setPreserveRatio(true);
-        screenshotView.setSmooth(true);
-        screenshotView.setFitWidth(600);
-        screenshotView.setFitHeight(600);
-        screenshotView.setCursor(javafx.scene.Cursor.HAND);
-        screenshotView.setOnMouseClicked(e -> {
-            DemoEntry entry = resolveSelected(treeView, listView, searchField);
-            if (entry != null) launch(entry);
-        });
-
-        StackPane screenshotFrame = new StackPane(screenshotView);
-        screenshotFrame.getStyleClass().add("screenshot-frame");
-        screenshotFrame.setMaxWidth(600);
-        screenshotFrame.setMaxHeight(600);
-        StackPane.setAlignment(screenshotView, Pos.CENTER);
-
-        Label screenshotCaption = new Label("Screenshot");
-        screenshotCaption.getStyleClass().add("text-caption");
-
-        VBox screenshotBox = new VBox(6, screenshotFrame, screenshotCaption);
-        screenshotBox.setAlignment(Pos.CENTER);
-        screenshotBox.setManaged(false);
-        screenshotBox.setVisible(false);
-
         Region spacer = new Region();
         spacer.setMinHeight(200);
         spacer.setPrefHeight(200);
-        VBox docContent = new VBox(16, markdownView, screenshotBox, spacer);
+        VBox docContent = new VBox(16, markdownView, spacer);
         docContent.setPadding(new Insets(8));
         docContent.setAlignment(Pos.TOP_CENTER);
 
@@ -439,6 +409,7 @@ public class GemsFXDemoLauncher extends GemApplication {
 
         TabPane docTabPane = new TabPane(descriptionTab, sourceTab, cssTab);
         docTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        docTabPane.getStyleClass().add(Styles.TABS_CLASSIC);
         docTabPane.setPrefWidth(750);
         HBox.setHgrow(docTabPane, Priority.ALWAYS);
 
@@ -452,18 +423,13 @@ public class GemsFXDemoLauncher extends GemApplication {
         treeView.getSelectionModel().selectedItemProperty().addListener((obs, o, n) -> {
             DemoEntry entry = resolveSelected(treeView, listView, searchField);
             if (entry != null) prefs.put("selected.demo", entry.name());
-            showContent(entry, currentThemeKey[0], markdownView, screenshotView, screenshotBox, codeMarkdownView, cssMarkdownView);
+            showContent(entry, markdownView, codeMarkdownView, cssMarkdownView);
         });
         listView.getSelectionModel().selectedItemProperty().addListener((obs, o, n) -> {
             DemoEntry entry = resolveSelected(treeView, listView, searchField);
             if (entry != null) prefs.put("selected.demo", entry.name());
-            showContent(entry, currentThemeKey[0], markdownView, screenshotView, screenshotBox, codeMarkdownView, cssMarkdownView);
+            showContent(entry, markdownView, codeMarkdownView, cssMarkdownView);
         });
-
-        // Wire up the screenshot refresh for theme changes (now that views are available).
-        refreshScreenshot[0] = () -> showContent(
-                resolveSelected(treeView, listView, searchField),
-                currentThemeKey[0], markdownView, screenshotView, screenshotBox, codeMarkdownView, cssMarkdownView);
 
         // Restore last selected demo, falling back to the first one.
         String savedDemo = prefs.get("selected.demo", null);
@@ -519,49 +485,49 @@ public class GemsFXDemoLauncher extends GemApplication {
             centerPane.setCenter(searching ? listView : treeView);
         });
 
-        VBox layout = new VBox(8, themeBar, new Separator(), searchField, new Separator(), centerPane);
+        VBox layout = new VBox(8, searchField, new Separator(), centerPane);
         layout.setPadding(new Insets(12));
         layout.setMinWidth(Region.USE_PREF_SIZE);
         layout.setPrefWidth(330);
 
-        HBox rootHBox = new HBox(layout, docTabPane);
+        StackPane tabPaneWrapper = new StackPane(docTabPane);
+        tabPaneWrapper.getStyleClass().add("tab-pane-wrapper");
+        HBox.setHgrow(tabPaneWrapper, Priority.ALWAYS);
+
+        HBox rootHBox = new HBox(layout, tabPaneWrapper);
 
         Label titleLabel = new Label("GemsFX Demo Launcher");
-        titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+        titleLabel.getStyleClass().add("title-label");
 
         String version = loadProjectVersion();
         Label versionLabel = new Label(version);
-        versionLabel.setStyle("-fx-font-size: 13px; -fx-opacity: 0.6;");
+        versionLabel.getStyleClass().add("version-label");
         versionLabel.setVisible(!version.isBlank());
         versionLabel.setManaged(!version.isBlank());
 
         HBox titleBox = new HBox(8, titleLabel, versionLabel);
         titleBox.setAlignment(Pos.BASELINE_LEFT);
 
-        Label subtitleLabel = new Label("Professional open source custom controls for JavaFX.");
-        subtitleLabel.setStyle("-fx-font-size: 13px;");
+        HBox.setHgrow(titleBox, Priority.ALWAYS);
 
-        VBox textBox = new VBox(2, titleBox, subtitleLabel);
-        textBox.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(textBox, Priority.ALWAYS);
-
-        ImageView dlscLogoView = new ImageView(new Image(Objects.requireNonNull(
-                GemsFXDemoLauncher.class.getResourceAsStream("dlsc-logo.png"))));
+        ImageView dlscLogoView = new ImageView(new Image(Objects.requireNonNull(GemsFXDemoLauncher.class.getResourceAsStream("dlsc-logo.png"))));
         dlscLogoView.setPreserveRatio(true);
-        dlscLogoView.setFitHeight(40);
+        dlscLogoView.setFitHeight(30);
         dlscLogoView.setCursor(javafx.scene.Cursor.HAND);
         dlscLogoView.setOnMouseClicked(e -> getHostServices().showDocument("https://dlsc.com"));
 
-        ImageView githubBadgeView = new ImageView(new Image(Objects.requireNonNull(
-                GemsFXDemoLauncher.class.getResourceAsStream("get-it-on-github.png"))));
+        ImageView githubBadgeView = new ImageView(new Image(Objects.requireNonNull(GemsFXDemoLauncher.class.getResourceAsStream("get-it-on-github.png"))));
         githubBadgeView.setPreserveRatio(true);
-        githubBadgeView.setFitHeight(60);
+        githubBadgeView.setFitHeight(40);
         githubBadgeView.setCursor(javafx.scene.Cursor.HAND);
         githubBadgeView.setOnMouseClicked(e -> getHostServices().showDocument("https://github.com/dlemmermann/GemsFX"));
 
-        HBox header = new HBox(12, textBox, githubBadgeView, dlscLogoView);
+        Spacer spacer1 = new Spacer();
+        spacer1.setMinWidth(50);
+        spacer1.setMaxWidth(50);
+
+        HBox header = new HBox(12, titleBox, themeMenuButton, spacer1, githubBadgeView, dlscLogoView);
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setPadding(new Insets(27, 16, 27, 16));
         header.getStyleClass().add("launcher-header");
 
         // Make the header draggable to move the stage
@@ -591,17 +557,11 @@ public class GemsFXDemoLauncher extends GemApplication {
         stage.setTitle("GemsFX — Demo Launcher");
         stage.setScene(scene);
         stage.centerOnScreen();
-        if (atlantaFxCheckBox.isSelected()) {
-            applyTheme.run();
-        }
+        applyTheme.run();
 
-        stage.sizeToScene();
-
+        stage.setWidth(1200);
+        stage.setHeight(800);
         stage.show();
-
-        // Lock minimum size; allow free resizing in both dimensions
-        stage.setMinWidth(stage.getWidth());
-        stage.setMinHeight(800);
     }
 
     // -----------------------------------------------------------------------
@@ -671,14 +631,11 @@ public class GemsFXDemoLauncher extends GemApplication {
     // MarkdownView description helpers
     // -----------------------------------------------------------------------
 
-    private void showContent(DemoEntry entry, String themeKey,
-                             MarkdownView markdownView, ImageView screenshotView, VBox screenshotBox,
+    private void showContent(DemoEntry entry,
+                             MarkdownView markdownView,
                              MarkdownView codeMarkdownView, MarkdownView cssMarkdownView) {
         if (entry == null) {
             markdownView.setMdString("*Select a demo to view its documentation.*");
-            screenshotView.setImage(null);
-            screenshotBox.setManaged(false);
-            screenshotBox.setVisible(false);
             codeMarkdownView.setMdString("*Select a demo to view its source code.*");
             cssMarkdownView.setMdString("*Select a demo to view its CSS.*");
             return;
@@ -689,9 +646,6 @@ public class GemsFXDemoLauncher extends GemApplication {
             app = (GemApplication) entry.factory().get();
         } catch (Exception e) {
             markdownView.setMdString("*No documentation available.*");
-            screenshotView.setImage(null);
-            screenshotBox.setManaged(false);
-            screenshotBox.setVisible(false);
             codeMarkdownView.setMdString("*No source code available.*");
             cssMarkdownView.setMdString("*No CSS available.*");
             return;
@@ -701,25 +655,6 @@ public class GemsFXDemoLauncher extends GemApplication {
         markdownView.setMdString(desc.isBlank()
                 ? "*No documentation available.*"
                 : desc);
-
-        // Load screenshot: prefer theme-specific, fall back to modena.
-        String className = app.getClass().getSimpleName();
-        URL screenshotUrl = GemsFXDemoLauncher.class.getResource(
-                "screenshots/" + themeKey + "/" + className + ".png");
-        if (screenshotUrl == null) {
-            screenshotUrl = GemsFXDemoLauncher.class.getResource(
-                    "screenshots/modena/" + className + ".png");
-        }
-        if (screenshotUrl != null) {
-            screenshotView.setImage(new Image(
-                    screenshotUrl.toExternalForm(), true));
-            screenshotBox.setManaged(true);
-            screenshotBox.setVisible(true);
-        } else {
-            screenshotView.setImage(null);
-            screenshotBox.setManaged(false);
-            screenshotBox.setVisible(false);
-        }
 
         // Load source code
         String sourceCode = loadSourceCode(app);
@@ -781,11 +716,6 @@ public class GemsFXDemoLauncher extends GemApplication {
     // -----------------------------------------------------------------------
     // Custom TreeCell
     // -----------------------------------------------------------------------
-
-    /** Converts an AtlantaFX theme name to a screenshot subdirectory name, e.g. "Nord Light" → "nord-light". */
-    private static String toThemeKey(Theme theme) {
-        return theme == null ? "modena" : theme.getName().toLowerCase().replace(" ", "-");
-    }
 
     /** Returns true for AtlantaFX dark themes (NordDark, CupertinoDark, PrimerDark, Dracula). */
     private static boolean isDarkTheme(Theme theme) {

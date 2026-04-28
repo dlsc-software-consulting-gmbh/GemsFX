@@ -216,13 +216,5 @@ public class GridTableViewApp extends GemApplication {
             this.art = art;
         }
     }
-    @Override
-    public String getDescription() {
-        return """
-                ### GridTableView
-                
-                Triggers a rebuild of the view without reloading data.
-                """;
-    }
 
 }

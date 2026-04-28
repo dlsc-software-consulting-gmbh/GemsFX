@@ -126,16 +126,6 @@ public class DateRangePickerApp extends GemApplication {
         });
     }
 
-        @Override
-    public String getDescription() {
-        return """
-                ### DateRangePicker
-                
-                A control to let the user select a date range (start date, end date) via two `com.dlsc.gemsfx.CalendarView`
-                instances or via a preset link.
-                """;
-    }
-
     public static void main(String[] args) {
         launch();
     }

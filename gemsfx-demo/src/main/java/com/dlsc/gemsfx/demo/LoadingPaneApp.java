@@ -96,16 +96,6 @@ public class LoadingPaneApp extends GemApplication {
         stage.show();
     }
 
-    @Override
-    public String getDescription() {
-        return """
-                ### LoadingPane
-                
-                Convenience method to change the status of the pane to `Status#ERROR`. There will be no error message
-                shown. This method is thread-safe.
-                """;
-    }
-
     public static void main(String[] args) {
         launch();
     }

@@ -61,16 +61,6 @@ public class YearPickerApp extends GemApplication {
         stage.show();
     }
 
-        @Override
-    public String getDescription() {
-        return """
-                ### YearPicker
-                
-                A control for selecting a year. This class utilizes the `YearView` control inside of its
-                popup.
-                """;
-    }
-
     public static void main(String[] args) {
         launch();
     }

@@ -32,16 +32,6 @@ public class EnhancedLabelApp extends GemApplication {
         stage.show();
     }
 
-        @Override
-    public String getDescription() {
-        return """
-                ### EnhancedLabel
-                
-                An enhanced label that allows for selecting the (whole) label and copying to the clipboard
-                either via keyboard shortcut or via context menu.
-                """;
-    }
-
     public static void main(String[] args) {
         launch();
     }

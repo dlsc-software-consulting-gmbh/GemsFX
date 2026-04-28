@@ -47,16 +47,6 @@ public class BeforeAfterViewApp extends GemApplication {
         stage.show();
     }
 
-        @Override
-    public String getDescription() {
-        return """
-                ### BeforeAfterView
-                
-                A view capable of managing / displaying two nodes in such a way that the user can show more
-                or less of each node at the same time. This is very useful to display before and after scenarios.
-                """;
-    }
-
     public static void main(String[] args) {
         launch();
     }

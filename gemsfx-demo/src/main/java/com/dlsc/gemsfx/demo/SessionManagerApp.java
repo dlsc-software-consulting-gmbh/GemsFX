@@ -114,15 +114,6 @@ public class SessionManagerApp extends GemApplication {
         root.setStyle((enabled ? DARK_BG : LIGHT_BG) + BASIC_STYLE);
     }
 
-    @Override
-    public String getDescription() {
-        return """
-                ### SessionManager
-                
-                Unregisters all listeners created by SessionManager.
-                """;
-    }
-
     public static void main(String[] args) {
         launch(args);
     }

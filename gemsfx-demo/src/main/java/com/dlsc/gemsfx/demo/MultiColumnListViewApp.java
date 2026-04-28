@@ -177,17 +177,6 @@ public class MultiColumnListViewApp extends GemApplication {
         }
     }
 
-        @Override
-    public String getDescription() {
-        return """
-                ### MultiColumnListView
-                
-                A view for displaying multiple columns where each column consists of a header
-                control and a `ListView`. The control allows the user to rearrange the items in each
-                `ListView` and also to drag and drop items from one column to another.
-                """;
-    }
-
     public static void main(String[] args) {
         launch();
     }

@@ -32,16 +32,6 @@ public class YearMonthViewApp extends GemApplication {
         stage.show();
     }
 
-    @Override
-    public String getDescription() {
-        return """
-                ### YearMonthView
-
-                A control that displays a grid of months for a given year, allowing the user
-                to select a specific year/month combination.
-                """;
-    }
-
     public static void main(String[] args) {
         launch();
     }

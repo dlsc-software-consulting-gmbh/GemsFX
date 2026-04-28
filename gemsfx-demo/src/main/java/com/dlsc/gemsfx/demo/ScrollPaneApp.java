@@ -51,7 +51,6 @@ public class ScrollPaneApp extends GemApplication {
             scrollPane.bottomNode(lookup);
         });
 
-
         VBox wrapper = new VBox(20, scrollPane, footer);
         wrapper.setPadding(new Insets(20));
 
@@ -62,15 +61,6 @@ public class ScrollPaneApp extends GemApplication {
         stage.setHeight(850);
 
         stage.show();
-    }
-
-    @Override
-    public String getDescription() {
-        return """
-                ### GemScrollPane
-
-                An enhanced scroll pane that supports smooth animated scrolling.
-                """;
     }
 
     public static void main(String[] args) {

@@ -219,7 +219,6 @@ public class TreeNodeViewApp extends GemApplication {
 
         node2.getChildren().addAll(node21, node22);
 
-
         TreeNode<String> node31 = new TreeNode<>("C1");
         TreeNode<String> node32 = new TreeNode<>("C2");
         TreeNode<String> node33 = new TreeNode<>("C3");
@@ -233,7 +232,6 @@ public class TreeNodeViewApp extends GemApplication {
 
         TreeNode<String> node211 = new TreeNode<>("B1-1");
         TreeNode<String> node212 = new TreeNode<>("B1-2");
-
 
         node21.getChildren().addAll(node211, node212);
 
@@ -271,7 +269,6 @@ public class TreeNodeViewApp extends GemApplication {
         node2.getChildren().add(node12);
         node3.getChildren().add(node13);
 
-
         TreeNode<String> node121 = new TreeNode<>("Agent Concensus");
         node121.setName("agent");
         //node121.setExpanded(false);
@@ -279,7 +276,6 @@ public class TreeNodeViewApp extends GemApplication {
 
         node11.getLinkedNodes().addAll(node121);
         node13.getLinkedNodes().add(node121);
-
 
         TreeNode<String> node1211 = new TreeNode<>("D0148  for MOP");
         TreeNode<String> node1212 = new TreeNode<>("D0148 for DC");
@@ -296,19 +292,6 @@ public class TreeNodeViewApp extends GemApplication {
         node12121.getChildren().add(node121211);
 
         return root;
-    }
-
-    @Override
-    public String getDescription() {
-        return """
-                ### TreeNodeView
-                
-                A visual control for displaying trees.
-                
-                Built on the `TreeNode` class, this control visualizes hierarchical structures, allowing nodes to have children.
-                
-                Customizable in layout, alignment, and style, it's ideal for representing data like file systems or organizational charts.
-                """;
     }
 
     public static void main(String[] args) {

@@ -109,15 +109,6 @@ public class PagingListViewApp extends GemApplication {
         stage.sizeToScene();
     }
 
-    @Override
-    public String getDescription() {
-        return """
-                ### PagingListView
-                
-                Triggers a rebuild of the view without reloading data.
-                """;
-    }
-
     public static void main(String[] args) {
         launch();
     }

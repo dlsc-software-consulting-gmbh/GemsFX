@@ -261,17 +261,6 @@ public class DurationPickerApp extends GemApplication {
         return "null";
     }
 
-    @Override
-    public String getDescription() {
-        return """
-                ### DurationPicker
-
-                A control for selecting a duration value. The picker displays individual fields
-                for days, hours, minutes, seconds, and milliseconds, allowing the user to
-                set each component of the duration independently.
-                """;
-    }
-
     public static void main(String[] args) {
         launch(args);
     }

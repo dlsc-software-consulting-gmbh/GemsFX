@@ -53,17 +53,6 @@ public class TimeRangePickerApp extends GemApplication {
         );
     }
 
-
-    @Override
-    public String getDescription() {
-        return """
-                ### TimeRangePicker
-                
-                Represents a time range with a start time and an end time.
-                Ensures that the start time is not after the end time.
-                """;
-    }
-
     public static void main(String[] args) {
         launch(args);
     }

@@ -97,7 +97,6 @@ public class SegmentedBarApp extends GemApplication {
                 new TypeSegment(35, MediaType.FREE)
         );
 
-
         StackPane.setAlignment(vbox, Pos.CENTER);
         StackPane.setAlignment(hbox, Pos.CENTER);
 
@@ -298,17 +297,6 @@ public class SegmentedBarApp extends GemApplication {
         public IssueStatus getStatus() {
             return status;
         }
-    }
-
-    @Override
-    public String getDescription() {
-        return """
-                ### SegmentedBar
-                
-                The layout method has been overridden to ensure that the label used for displaying the
-                text of a segment will be made invisible when there is not enough space to show the entire
-                text.
-                """;
     }
 
     public static void main(String[] args) {

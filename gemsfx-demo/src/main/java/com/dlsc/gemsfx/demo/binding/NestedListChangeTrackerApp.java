@@ -127,7 +127,6 @@ public class NestedListChangeTrackerApp extends GemApplication {
             }
         });
 
-
         return new HBox(10, addButton, removeButton, updateButton);
     }
 
@@ -149,16 +148,6 @@ public class NestedListChangeTrackerApp extends GemApplication {
 
     private int randomScore() {
         return random.nextInt(51) + 50;
-    }
-
-        @Override
-    public String getDescription() {
-        return """
-                ### NestedListChangeTracker
-                
-                This class extends AbstractChangeTracker to specifically handle ObservableList of ObservableList.
-                It tracks changes to both the outer list and inner lists and notifies the consumer upon any modifications.
-                """;
     }
 
     public static void main(String[] args) {

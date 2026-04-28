@@ -75,17 +75,6 @@ public class DateRangeViewApp extends GemApplication {
         CSSFX.start(scene);
     }
 
-    @Override
-    public String getDescription() {
-        return """
-                ### DateRangeView
-                
-                The date range view can be used to define a start and an end date 
-                via two `CalendarView` instances.
-
-                """;
-    }
-
     public static void main(String[] args) {
         launch();
     }

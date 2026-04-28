@@ -132,7 +132,6 @@ public class PagingGridTableViewApp extends GemApplication {
         Platform.runLater(stage::sizeToScene);
     }
 
-
     public static class Movie {
         public String title;
         public int year;
@@ -227,15 +226,6 @@ public class PagingGridTableViewApp extends GemApplication {
         }
 
         return Collections.emptyList();
-    }
-
-    @Override
-    public String getDescription() {
-        return """
-                ### PagingGridTableView
-                
-                Triggers a rebuild of the view without reloading data.
-                """;
     }
 
     public static void main(String[] args) {

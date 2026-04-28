@@ -51,16 +51,6 @@ public class ExpandingTextAreaApp extends GemApplication {
         stage.show();
     }
 
-    @Override
-    public String getDescription() {
-        return """
-                ### ExpandingTextArea
-                
-                A customized text area that will never show scrollbars but instead will
-                grow as high as needed in order to completely fit its text inside of it.
-                """;
-    }
-
     public static void main(String[] args) {
         launch();
     }

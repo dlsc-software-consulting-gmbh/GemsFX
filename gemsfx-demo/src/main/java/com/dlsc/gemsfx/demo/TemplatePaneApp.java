@@ -110,13 +110,5 @@ public class TemplatePaneApp extends GemApplication {
 	public static void main(String[] args) {
 		launch(args);
 	}
-    @Override
-    public String getDescription() {
-        return """
-                ### TemplatePane
-
-An incubating layout pane that arranges child nodes according to a flexible named-position template (header, footer, left, right, content, etc.).
-                """;
-    }
 
 }

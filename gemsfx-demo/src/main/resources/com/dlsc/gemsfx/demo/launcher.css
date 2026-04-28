@@ -27,17 +27,53 @@
     -fx-background-color: -color-bg-default;
     -fx-background-insets: 0;
 }
+
 /* ── Header background ────────────────────────────────────── */
 .launcher-header {
     -fx-background-color: white;
     -fx-border-color: transparent transparent darkgrey transparent;
     -fx-border-width: 1;
+    -fx-padding: 30px 16px 10px 16px;
+}
+
+.launcher-header .title-label {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.launcher-header .version-label {
+    -fx-font-size: 13px;
+    -fx-opacity: 0.6;
 }
 
 .atlantafx-active .launcher-header {
-    -fx-background-color: -color-accent-muted;
+    -fx-background-color: -color-accent-emphasis;
     -fx-border-color: transparent;
     -fx-border-width: 0;
+}
+
+.atlantafx-active .launcher-header .title-label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.atlantafx-active .launcher-header .version-label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.atlantafx-active .tab-pane-wrapper {
+    -fx-padding: 10px;
+}
+
+.atlantafx-active .tab-pane-wrapper .tab-pane {
+    -fx-border-color: -color-border-default;
+}
+
+.markdown-view.light .markdown-code-block {
+    -mdfx-code-theme: "/one/jpro/platform/mdfx/themes/github-light-default.json";
+}
+
+.markdown-view.dark .markdown-code-block {
+    -mdfx-code-theme: "/one/jpro/platform/mdfx/themes/github-dark-default.json";
 }
 
 /* ── Remove ScrollPane border in Modena ──────────────────── */
@@ -45,16 +81,6 @@
     -fx-border-color: transparent;
     -fx-background-insets: 0;
     -fx-padding: 0;
-}
-/* ── Screenshot frame ─────────────────────────────────────── */
-.screenshot-frame {
-    -fx-border-color: darkgrey;
-    -fx-border-width: 1;
-    -fx-border-radius: 4;
-}
-
-.atlantafx-active .screenshot-frame {
-    -fx-border-color: -color-border-default;
 }
 
 .launcher-footer {
@@ -66,10 +92,4 @@
 .atlantafx-active .launcher-footer {
     -fx-background-color: -color-bg-default;
     -fx-border-color: -color-border-default transparent transparent transparent;
-}
-
-/* ── Code / CSS tab markdown views (smaller font) ────────────────────── */
-.code-markdown-view,
-.css-markdown-view {
-    -fx-font-size: 11px;
 }

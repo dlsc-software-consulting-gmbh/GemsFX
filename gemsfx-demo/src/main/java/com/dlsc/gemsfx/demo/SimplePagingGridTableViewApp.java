@@ -109,7 +109,6 @@ public class SimplePagingGridTableViewApp extends GemApplication {
         Platform.runLater(stage::sizeToScene);
     }
 
-
     public static class Movie {
         public String title;
         public int year;
@@ -204,17 +203,6 @@ public class SimplePagingGridTableViewApp extends GemApplication {
         }
 
         return Collections.emptyList();
-    }
-
-        @Override
-    public String getDescription() {
-        return """
-                ### SimplePagingGridTableView
-                
-                A simple version of the paging grid table view that is completely based on a list of items, just like a normal
-                table view would be. The view uses an internal data loader that accesses the list to retrieve the items of the
-                current page.
-                """;
     }
 
     public static void main(String[] args) {

@@ -32,15 +32,6 @@ public class YearViewApp extends GemApplication {
         stage.show();
     }
 
-        @Override
-    public String getDescription() {
-        return """
-                ### YearView
-                
-                A view for selecting a year.
-                """;
-    }
-
     public static void main(String[] args) {
         launch();
     }

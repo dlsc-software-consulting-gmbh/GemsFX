@@ -74,7 +74,6 @@ public class PagingControlsApp extends GemApplication {
         stage.sizeToScene();
         stage.setTitle("Paging View");
 
-
         stage.show();
 
         CSSFX.start(stackPane);
@@ -107,15 +106,6 @@ public class PagingControlsApp extends GemApplication {
         vBox.setMaxHeight(Region.USE_PREF_SIZE);
 
         return vBox;
-    }
-
-        @Override
-    public String getDescription() {
-        return """
-                ### PagingControls
-                
-                A control for navigating paged information, for example, a paged database table view.
-                """;
     }
 
     public static void main(String[] args) {
