@@ -12,11 +12,10 @@ owner.
 Example
 
 ```
-`var textFlow = new TextFlow(new Text("Some content"));
+TextFlow textFlow = new TextFlow(new Text("Some content"));
 textFlow.setPrefWidth(300);
 
 var popover = new Popover(textFlow);
 var ownerLink = new Hyperlink("Show popover");
 ownerLink.setOnAction(e -> popover.show(ownerLink));
-`
 ```

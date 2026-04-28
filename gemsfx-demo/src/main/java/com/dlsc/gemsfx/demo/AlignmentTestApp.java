@@ -85,8 +85,6 @@ public class AlignmentTestApp extends GemApplication {
         StackPane stackPane = new StackPane(box);
 
         Scene scene = new Scene(stackPane);
-
-
         stage.setTitle("Alignment Test");
         stage.setScene(scene);
         stage.setWidth(800);

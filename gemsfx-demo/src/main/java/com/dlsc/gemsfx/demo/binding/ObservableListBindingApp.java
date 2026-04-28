@@ -71,7 +71,11 @@ public class ObservableListBindingApp extends GemApplication {
         HBox statsBox = new HBox(30, sumLabel, averageLabel);
 
         VBox vBox = new VBox(10, titleLabel, statsBox);
-        vBox.setStyle("-fx-border-radius: 5px;-fx-border-color: lightgrey;-fx-border-width: 1px;-fx-alignment: center-left;-fx-padding: 5px;");
+        if (Boolean.getBoolean("atlantafx")) {
+            vBox.setStyle("-fx-border-radius: 5px;-fx-border-color: -color-border-default; -fx-background-color: -color-bg-inset; -fx-border-width: 1px;-fx-alignment: center-left;-fx-padding: 5px;");
+        } else {
+            vBox.setStyle("-fx-border-radius: 5px;-fx-border-color: lightgrey;-fx-border-width: 1px;-fx-alignment: center-left;-fx-padding: 5px;");
+        }
 
         return vBox;
     }

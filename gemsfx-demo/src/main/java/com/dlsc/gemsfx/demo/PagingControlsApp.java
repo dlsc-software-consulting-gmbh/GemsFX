@@ -65,18 +65,12 @@ public class PagingControlsApp extends GemApplication {
 
         Scene scene = new Scene(scrollPane);
 
-        CSSFX.start(stackPane);
-
-        scene.focusOwnerProperty().addListener(it -> System.out.println(scene.getFocusOwner()));
-
         stage.setScene(scene);
         stage.centerOnScreen();
         stage.sizeToScene();
         stage.setTitle("Paging View");
 
         stage.show();
-
-        CSSFX.start(stackPane);
     }
 
     private VBox createSection(int pageSize, int itemCount, MessageLabelStrategy messageLabelStrategy, PagingControls.FirstLastPageDisplayMode displayMode, int index) {
@@ -87,7 +81,14 @@ public class PagingControlsApp extends GemApplication {
         pagingControls.setPageSize(pageSize);
         pagingControls.setFirstLastPageDisplayMode(displayMode);
         pagingControls.getStylesheets().add(Objects.requireNonNull(PagingControlsApp.class.getResource("paging-controls-" + index + ".css")).toExternalForm());
-        pagingControls.setStyle("-fx-border-color: black; -fx-padding: 20px");
+
+        if (Boolean.getBoolean("atlantafx")) {
+            pagingControls.getStyleClass().add("atlantafx");
+            pagingControls.setStyle("-fx-background-color: -color-bg-inset; -fx-border-color: -color-border-default; -fx-padding: 20px");
+        } else {
+            pagingControls.getStyleClass().remove("atlantafx");
+            pagingControls.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-padding: 20px");
+        }
         pagingControls.setPrefWidth(800);
         HBox.setHgrow(pagingControls, Priority.ALWAYS);
 

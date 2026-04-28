@@ -53,7 +53,11 @@ public class ScreensViewApp extends GemApplication {
         showWindows.selectedProperty().bindBidirectional(this.showWindows);
 
         HBox controls = new HBox(10, enableWindowDragging, showShadow, showReflection, showWindows, showWallpaper);
-        controls.setStyle("-fx-background-color: white");
+        if (Boolean.getBoolean("atlantafx")) {
+            controls.setStyle("-fx-background-color: -color-bg-default;");
+        } else {
+            controls.setStyle("-fx-background-color: white");
+        }
         controls.setPadding(new Insets(10, 10, 10, 10));
         controls.setAlignment(Pos.CENTER_RIGHT);
 

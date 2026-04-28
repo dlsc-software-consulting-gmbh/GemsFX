@@ -15,7 +15,6 @@ Additionally the application can choose from two different behaviours when
 the user clicks on a date:
 
 - Perform a selection / select the date
-- Show details of the date (by default shows a popover with all entries on
-that date)
+- Show details of the date (by default shows a popover with all entries on that date)
 
 The image below shows the visual appearance of this control:

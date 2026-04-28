@@ -36,8 +36,12 @@ public class LimitedTextAreaApp extends GemApplication {
         textArea.setPrefHeight(380);
 
         VBox vBox = new VBox(textArea);
+
         StackPane wrapper = new StackPane(vBox);
         wrapper.setPadding(new Insets(20));
+        if (Boolean.getBoolean("atlantafx")) {
+            wrapper.setStyle("-fx-background-color: -color-bg-default;");
+        }
 
         SplitPane splitPane = new SplitPane();
         splitPane.setDividerPositions(0.75);
@@ -116,6 +120,9 @@ public class LimitedTextAreaApp extends GemApplication {
         VBox box = new VBox(10, lengthDisplayMode, lengthDisplayModeComboBox, warningThreshold, warningThresholdSlider,
                 minLength, minLengthField, maxLength, maxLengthField, showBottomCheckBox, excludedItems, excludedItemsView);
         box.setPadding(new Insets(10));
+        if (Boolean.getBoolean("atlantafx")) {
+            box.setStyle("-fx-background-color: -color-bg-default;");
+        }
         return box;
     }
 

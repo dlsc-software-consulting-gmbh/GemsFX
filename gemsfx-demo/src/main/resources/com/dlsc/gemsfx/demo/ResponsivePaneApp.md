@@ -1,7 +1,7 @@
 ### ResponsivePane
 
  ResponsivePane is a container that allows for responsive behavior of a sidebar and a main content panel.
- Depending on the specified position of the sidebar (LEFT or RIGHT), it will automatically adjust its visibility
+ Depending on the specified position of the sidebar (left or right), it will automatically adjust its visibility
  based on the width of the pane. When the window width is narrow, the sidebar is hidden, and only the content panel is shown.
  When the window width is moderate, both a small sidebar and a large sidebar, along with the content panel, are displayed.
  When the window width is wide, both the large sidebar and the main content pane are shown.

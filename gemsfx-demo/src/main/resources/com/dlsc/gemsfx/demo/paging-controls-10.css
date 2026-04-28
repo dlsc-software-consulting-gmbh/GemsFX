@@ -1,5 +1,4 @@
 .paging-controls {
-    -fx-background-color: white;
 }
 
 .paging-controls > .pane > .buttons-container {
@@ -18,6 +17,10 @@
     -fx-padding: 10px 20px;
     -fx-font-size: 1.5em;
     -fx-text-fill: -fx-text-base-color;
+}
+
+.paging-controls.atlantafx > .pane .element {
+    -fx-border-color: -color-border-default;
 }
 
 .paging-controls > .pane .button:hover {

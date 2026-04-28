@@ -82,7 +82,11 @@ public class NestedListChangeTrackerApp extends GemApplication {
             sumLabel2.setText("ChangeTracker:\tdisposed");
         });
         HBox hBox = new HBox(sumLabel2, new Spacer(), disposeButton);
-        hBox.setStyle("-fx-border-radius: 5px;-fx-border-color: lightgrey;-fx-border-width: 1px;-fx-alignment: center-left;-fx-padding: 5px;");
+        if (Boolean.getBoolean("atlantafx")) {
+            hBox.setStyle("-fx-border-radius: 5px;-fx-border-color: -color-border-default; -fx-background-color: -color-bg-inset; -fx-border-width: 1px;-fx-alignment: center-left;-fx-padding: 5px;");
+        } else {
+            hBox.setStyle("-fx-border-radius: 5px;-fx-border-color: lightgrey;-fx-border-width: 1px;-fx-alignment: center-left;-fx-padding: 5px;");
+        }
         return hBox;
     }
 
@@ -96,7 +100,11 @@ public class NestedListChangeTrackerApp extends GemApplication {
         });
 
         HBox hBox = new HBox(sumLabel, new Spacer(), disposeButton);
-        hBox.setStyle("-fx-border-radius: 5px;-fx-border-color: lightgrey;-fx-border-width: 1px;-fx-alignment: center-left;-fx-padding: 5px;");
+        if (Boolean.getBoolean("atlantafx")) {
+            hBox.setStyle("-fx-border-radius: 5px;-fx-border-color: -color-border-default; -fx-background-color: -color-bg-inset; -fx-border-width: 1px;-fx-alignment: center-left;-fx-padding: 5px;");
+        } else {
+            hBox.setStyle("-fx-border-radius: 5px;-fx-border-color: lightgrey;-fx-border-width: 1px;-fx-alignment: center-left;-fx-padding: 5px;");
+        }
         return hBox;
     }
 

@@ -1,13 +1,13 @@
 .simple-control-pane > .container {
     -fx-padding: 5px 10px;
-    -fx-background-color: -color-neutral-subtle;
+    -fx-background-color: -color-bg-default;
 }
 
 .simple-control-pane > .container > .separator {
 }
 
 .simple-control-pane > .container > .scroll-pane {
-    -fx-background-color: -color-neutral-subtle;
+    -fx-background-color: -color-bg-default;
 }
 
 .simple-control-pane > .container .scroll-bar:vertical > .track-background {
@@ -15,7 +15,7 @@
 
 .simple-control-pane > .container > .scroll-pane .cells-box {
     -fx-spacing: 15px;
-    -fx-background-color: -color-neutral-subtle;
+    -fx-background-color: -color-bg-default;
     -fx-padding: 0 2px 0 0;
 }
 
@@ -31,8 +31,8 @@
 }
 
 .simple-control-cell.with-border {
-    -fx-background-color: -color-neutral-subtle;
-    -fx-border-color: #e0e0e0;
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: -color-border-default;
     -fx-border-width: 1px;
     -fx-border-radius: 5px;
 }

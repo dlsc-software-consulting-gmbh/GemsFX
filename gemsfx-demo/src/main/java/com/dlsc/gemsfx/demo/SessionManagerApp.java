@@ -32,15 +32,15 @@ public class SessionManagerApp extends GemApplication {
     private final StringProperty birthDateString = new SimpleStringProperty();
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
-    private static final String LIGHT_BG = "-fx-background-color: white;";
-    private static final String DARK_BG = "-fx-background-color: rgb(225,225,225);";
-    private static final String BASIC_STYLE = "-fx-padding: 20; -fx-font-size: 14px; -fx-spacing: 25px;";
 
     private final VBox root = new VBox();
 
     @Override
     public void start(Stage primaryStage) {
         super.start(primaryStage);
+
+        root.setStyle("-fx-padding: 20; -fx-font-size: 14px; -fx-spacing: 25px;");
+
         // Set up session manager
         SessionManager sessionManager = new SessionManager(Preferences.userNodeForPackage(SessionManagerApp.class));
         sessionManager.register("session.manager.app.user.name", userName);
@@ -50,7 +50,7 @@ public class SessionManagerApp extends GemApplication {
 
         // UI Elements
 
-        Label tipsLabel = new Label("The following values will be restored automatically on next launch.");
+        Label tipsLabel = new Label("The following values will be restored\nautomatically on next launch.");
         tipsLabel.setWrapText(true);
 
         // Name input field (stored as a StringProperty)
@@ -92,26 +92,15 @@ public class SessionManagerApp extends GemApplication {
 
         VBox dateBox = new VBox(5, dateLabel, calendarPicker);
 
-        // Dark mode setting (stored as a BooleanProperty)
-        Label darkModeLabel = new Label("Enable dark mode:");
-        CheckBox darkModeCheckBox = new CheckBox("Dark mode");
-        darkModeCheckBox.selectedProperty().bindBidirectional(darkModeEnabled);
-        darkModeCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> applyDarkMode(newVal));
-        applyDarkMode(darkModeEnabled.get());
-        VBox darkModeBox = new VBox(5, darkModeLabel, darkModeCheckBox);
-
         // Combine all sections
-        root.getChildren().addAll(tipsLabel, nameBox, scoreBox, dateBox, darkModeBox);
+        root.getChildren().addAll(tipsLabel, nameBox, scoreBox, dateBox);
 
-        Scene scene = new Scene(root, 300, 420);
+        Scene scene = new Scene(root);
+
         primaryStage.setScene(scene);
         primaryStage.setTitle("Session State Demo");
-
+        primaryStage.sizeToScene();
         primaryStage.show();
-    }
-
-    private void applyDarkMode(boolean enabled) {
-        root.setStyle((enabled ? DARK_BG : LIGHT_BG) + BASIC_STYLE);
     }
 
     public static void main(String[] args) {

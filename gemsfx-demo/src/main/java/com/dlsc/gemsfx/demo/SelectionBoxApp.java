@@ -39,17 +39,22 @@ public class SelectionBoxApp extends GemApplication {
 
         selectionBox.show();
 
-        topNode.setStyle("-fx-background-color: lightblue;-fx-padding: 10;");
         topNode.getChildren().add(new Label("Top"));
-
         bottomNode.getChildren().add(new Label("Bottom"));
-        bottomNode.setStyle("-fx-background-color: lightcoral;-fx-padding: 10;");
-
         leftNode.getChildren().add(new Label("Left"));
-        leftNode.setStyle("-fx-background-color: lightgreen;-fx-padding: 10;");
-
         rightNode.getChildren().add(new Label("Right"));
-        rightNode.setStyle("-fx-background-color: lightyellow;-fx-padding: 10;");
+
+        if (Boolean.getBoolean("atlantafx")) {
+            topNode.setStyle("-fx-background-color: -color-accent-emphasis;-fx-padding: 10;");
+            bottomNode.setStyle("-fx-background-color: -color-danger-emphasis;-fx-padding: 10;");
+            leftNode.setStyle("-fx-background-color: -color-warning-emphasis;-fx-padding: 10;");
+            rightNode.setStyle("-fx-background-color: -color-success-emphasis;-fx-padding: 10;");
+        } else {
+            topNode.setStyle("-fx-background-color: lightblue;-fx-padding: 10;");
+            bottomNode.setStyle("-fx-background-color: lightcoral;-fx-padding: 10;");
+            leftNode.setStyle("-fx-background-color: lightgreen;-fx-padding: 10;");
+            rightNode.setStyle("-fx-background-color: lightyellow;-fx-padding: 10;");
+        }
 
         SplitPane splitPane = new SplitPane();
         splitPane.setDividerPositions(0.7);
@@ -73,7 +78,11 @@ public class SelectionBoxApp extends GemApplication {
         // selectionBox.setItemConverter(new SimpleStringConverter<>(s -> ">>" +s));
 
         StackPane wrapper = new StackPane(selectionBox);
-        wrapper.setStyle("-fx-background-color: white; -fx-padding: 50px;");
+        if (Boolean.getBoolean("atlantafx")) {
+            wrapper.setStyle("-fx-background-color: -color-bg-default; -fx-padding: 50px;");
+        } else {
+            wrapper.setStyle("-fx-background-color: white; -fx-padding: 50px;");
+        }
         return wrapper;
     }
 

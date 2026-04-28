@@ -24,7 +24,12 @@ public class PhotoViewApp extends GemApplication {
         PhotoView photoView = new PhotoView();
 
         StackPane photoViewWrapper = new StackPane(photoView);
-        photoViewWrapper.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-border-color: grey;");
+
+        if (Boolean.getBoolean("atlantafx")) {
+            photoViewWrapper.setStyle("-fx-padding: 20px; -fx-background-color: -color-bg-inset; -fx-border-color: -color-border-default; -fx-border-width: 1px;");
+        } else {
+            photoViewWrapper.setStyle("-fx-padding: 20px; -fx-background-color: white; -fx-border-color: grey;");
+        }
 
         VBox.setVgrow(photoViewWrapper, Priority.ALWAYS);
 

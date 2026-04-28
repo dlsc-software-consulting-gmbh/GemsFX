@@ -1,42 +1,153 @@
 /* -----------------------------------------------------------------------
+ * tree node view
+ */
+.tree-node-cell {
+    -fx-border-color: -color-border-default;
+}
+
+.tree-node-cell > .tree-node-cell-label {
+}
+
+.tree-node-cell > .arrow-wrapper {
+}
+
+.tree-node-cell > .arrow-wrapper > .disclosure-arrow {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.tree-node-cell > .arrow-wrapper:hover > .disclosure-arrow,
+.tree-node-cell > .arrow-wrapper:pressed > .disclosure-arrow,
+.tree-node-cell > .arrow-wrapper:hover:pressed > .disclosure-arrow {
+    -fx-background-color: -color-fg-default;
+}
+
+.tree-node-cell:collapsed > .arrow-wrapper > .disclosure-arrow {
+}
+
+/** ------
+ * TreeNodeView
+ */
+.tree-node-view > .tree-content > .link-arrow {
+    -fx-background-color: -color-fg-muted;
+}
+
+.tree-node-view > .tree-content > .link-line,
+.tree-node-view > .tree-content > .link-path,
+.tree-node-view > .tree-content > .link-curve {
+    -fx-stroke: -color-fg-muted;
+}
+
+.tree-node-view > .tree-content > .link-circle {
+    -fx-stroke: -color-fg-muted;
+    -fx-fill: -color-fg-muted;
+}
+
+/* -----------------------------------------------------------------------
+ * screens view
+ */
+.screens-view {
+    -fx-background-color: -color-bg-default;
+}
+
+.screens-view .container {
+}
+
+.screens-view .screen {
+    -fx-background-color: transparent;
+}
+
+.screens-view .screen.no-wallpaper {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.screens-view .screen .label {
+    -fx-opacity: 1;
+}
+
+.screens-view .glass {
+    -fx-background-color: radial-gradient(radius 75%, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+}
+
+.screens-view .visible-area {
+    -fx-background-color: -color-fg-emphasis;
+    -fx-opacity: .75;
+}
+
+/* -----------------------------------------------------------------------
+ * photo view
+ */
+.photo-view {
+}
+
+.photo-view > .box {
+}
+
+.photo-view > .box > .image-box {
+}
+
+.photo-view:empty > .box > .image-box {
+    -fx-background-color: -color-bg-default;
+}
+
+.photo-view > .box > .image-box > .placeholder {
+    -fx-text-fill: -color-fg-default;
+}
+
+.photo-view > .box > .image-box > .placeholder > .upload-icon {
+    -fx-icon-color: -color-neutral-emphasis;
+}
+
+.photo-view > .box > .image-box > .border-circle {
+    -fx-stroke: -color-accent-emphasis;
+}
+
+.photo-view.file-drag > .box > .image-box > .border-circle {
+    -fx-stroke: -color-danger-emphasis;
+}
+
+.photo-view:focused > .box > .image-box > .border-circle {
+}
+
+
+.photo-view > .box > .image-box > .border-rectangle {
+    -fx-stroke: -color-accent-emphasis;
+}
+
+.photo-view:focused > .box > .image-box > .border-rectangle {
+}
+
+/* -----------------------------------------------------------------------
  * popover
  */
 .popover {
     -fx-background-color: transparent;
 }
 
+.popover:detached {
+}
+
+.popover > .background {
+    -fx-stroke: transparent;
+    -fx-fill: -color-bg-default;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0.0, 0, 3); /* same as Tooltip */
+}
+
 .popover > .border {
     -fx-stroke: -color-border-default;
+    -fx-fill: transparent;
     -fx-stroke-width: 1;
-    -fx-fill: -color-bg-overlay;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, .2), 6, 0.3, 0, 2);
 }
 
 .popover > .content {
 }
 
-.popover > .detached {
-}
-
-.popover > .content > .title > .text {
-    -fx-text-fill: -color-fg-default;
-    -fx-font-size: 1.25em;
-    -fx-alignment: CENTER;
-
-}
-
-.popover > .content > .title > .icon {
-    -fx-padding: 6.0 0.0 0.0 10.0;
-}
-
-.popover > .content > .title > .icon > .graphics > .circle {
-    -fx-fill: gray;
-    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, .2), 3, 0.5, 1.0, 1.0);
-}
-
-.popover > .content > .title > .icon > .graphics > .line {
-    -fx-stroke: white;
-    -fx-stroke-width: 2;
+.calendar-popover > .content .calendar-view {
+    -fx-border-color: transparent;
+    -fx-border-width: 0px;
+    -fx-padding: 0px;
+    -fx-background-insets: 0px;
+    -fx-background-color: transparent;
+    -fx-effect: null;
 }
 
 /* -----------------------------------------------------------------------
@@ -470,6 +581,16 @@
 }
 
 /* -----------------------------------------------------------------------
+ * EnhancedPasswordField
+ */
+.enhanced-password-field .right-icon-wrapper {
+}
+
+.enhanced-password-field .right-icon-wrapper .right-icon {
+    -fx-background-color: -color-fg-muted;
+}
+
+/* -----------------------------------------------------------------------
  * EmailField
  */
 .email-field {
@@ -821,12 +942,12 @@
     -fx-padding: 1em;
     -fx-background-radius: 1000px;
     -fx-background-insets: 0px, 1px;
-    -fx-background-color: -color-border-default, -color-border-subtle;
+    -fx-background-color: -color-accent-emphasis, -color-border-subtle;
 }
 
 .before-after-view .handle .ikonli-font-icon {
     -fx-icon-size: 18px;
-    -fx-icon-color: -color-border-default;
+    -fx-icon-color: -color-accent-emphasis;
 }
 
 /* -----------------------------------------------------------------------

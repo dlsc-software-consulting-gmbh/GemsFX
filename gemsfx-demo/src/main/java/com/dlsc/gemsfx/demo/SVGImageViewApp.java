@@ -42,10 +42,17 @@ public class SVGImageViewApp extends GemApplication {
         ScrollPane scrollPane = new ScrollPane(imageWrapper);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
+
         SplitPane root = new SplitPane(scrollPane, controlBox);
         root.setDividerPositions(0.7);
+
         Scene scene = new Scene(root, 600, 380);
-        scene.getStylesheets().add(Objects.requireNonNull(SVGImageViewApp.class.getResource("svg-image-view-app.css")).toExternalForm());
+        if (Boolean.getBoolean("atlantafx")) {
+            scene.getStylesheets().add(Objects.requireNonNull(SVGImageViewApp.class.getResource("svg-image-view-app-atlantafx.css")).toExternalForm());
+        } else {
+            scene.getStylesheets().add(Objects.requireNonNull(SVGImageViewApp.class.getResource("svg-image-view-app.css")).toExternalForm());
+        }
+
         primaryStage.setScene(scene);
         primaryStage.setTitle("SVGImageView Demo");
 

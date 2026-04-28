@@ -103,6 +103,9 @@ public class CalendarViewApp extends GemApplication {
         box.setAlignment(Pos.CENTER);
 
         StackPane stackPane = new StackPane(box);
+        if (Boolean.getBoolean("atlantafx")) {
+            stackPane.setStyle("-fx-background-color: -color-bg-default;");
+        }
 
         Scene scene = new Scene(stackPane);
         CSSFX.start(scene);

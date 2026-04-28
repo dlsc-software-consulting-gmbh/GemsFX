@@ -92,7 +92,7 @@ public class NestedListBindingApp extends GemApplication {
         VBox vBox = new VBox(10, titleLabel, innerBox);
         vBox.setAlignment(Pos.CENTER_LEFT);
         if (Boolean.getBoolean("atlantafx")) {
-            vBox.setStyle("-fx-border-color: -color-border-default; -fx-border-width: 1px; -fx-border-radius: 5px;-fx-padding: 5px;-fx-background-color: -color-neutral-subtle;");
+            vBox.setStyle("-fx-border-color: -color-border-default; -fx-border-width: 1px; -fx-border-radius: 5px;-fx-padding: 5px;-fx-background-color: -color-bg-inset;");
         } else {
             vBox.setStyle("-fx-border-color: lightgrey; -fx-border-width: 1px; -fx-border-radius: 5px;-fx-padding: 5px;-fx-background-color: #f9f9f9;");
         }

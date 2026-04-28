@@ -14,7 +14,8 @@ Key features:
   - Left and right nodes: Allows adding custom nodes (like buttons or icons) to either side of the field.
 
 Usage example:
-```
+
+```java
 EnhancedPasswordField passwordField = new EnhancedPasswordField();
 passwordField.setLeft(new ImageView(new Image("path/to/icon.png")));
 passwordField.setRight(new Button("Show", e -> passwordField.setShowPassword(!passwordField.isShowPassword())));

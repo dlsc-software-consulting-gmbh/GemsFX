@@ -43,7 +43,11 @@ public class TreeNodeViewApp extends GemApplication {
         treePane.setRowAlignment(VPos.TOP);
         TreeNode<String> root = createTree();
         treePane.setRoot(root);
-        treePane.setStyle("-fx-border-color: #4da2d2;-fx-background-color: #e0e7ec;-fx-padding: 10px;");
+        if (Boolean.getBoolean("atlantafx")) {
+            treePane.setStyle("-fx-border-color: -color-border-default;-fx-background-color: -color-bg-inset;-fx-padding: 10px;");
+        } else {
+            treePane.setStyle("-fx-border-color: #4da2d2;-fx-background-color: #e0e7ec;-fx-padding: 10px;");
+        }
         BorderPane parent = new BorderPane(new ScrollPane(treePane));
 
         ComboBox<LinkStrategy<String>> linkStrategyComboBox = new ComboBox<>();
@@ -157,8 +161,6 @@ public class TreeNodeViewApp extends GemApplication {
         primaryStage.setScene(scene);
 
         primaryStage.show();
-        CSSFX.start();
-
     }
 
     private Button createChangeRootBtn(TreeNodeView<String> treePane) {

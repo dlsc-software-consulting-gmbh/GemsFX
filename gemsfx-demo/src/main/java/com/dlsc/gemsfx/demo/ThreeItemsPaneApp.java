@@ -25,21 +25,29 @@ public class ThreeItemsPaneApp extends GemApplication {
     public void start(Stage primaryStage) {
         super.start(primaryStage);
 
-        pane.setStyle("-fx-background-color: white; -fx-padding: 5px; -fx-border-color: black;");
         pane.setMaxHeight(Region.USE_PREF_SIZE);
         pane.setSpacing(20);
 
         Label item1 = new Label("Senapt CRM Desktop UI");
-        item1.setStyle("-fx-border-color: red;");
         pane.setItem1(item1);
 
         Label item2 = new Label("Center");
-        item2.setStyle("-fx-border-color: red;");
         pane.setItem2(item2);
 
         Label item3 = new Label("User Avatar");
-        item3.setStyle("-fx-border-color: red;");
         pane.setItem3(item3);
+
+        if (Boolean.getBoolean("atlantafx")) {
+            pane.setStyle("-fx-background-color: -color-bg-inset; -fx-padding: 5px; -fx-border-color: -color-border-default;");
+            item1.setStyle("-fx-border-color: -color-danger-emphasis;");
+            item2.setStyle("-fx-border-color: -color-danger-emphasis;");
+            item3.setStyle("-fx-border-color: -color-danger-emphasis;");
+        } else {
+            pane.setStyle("-fx-background-color: white; -fx-padding: 5px; -fx-border-color: black;");
+            item1.setStyle("-fx-border-color: red;");
+            item2.setStyle("-fx-border-color: red;");
+            item3.setStyle("-fx-border-color: red;");
+        }
 
         StackPane stackPane = new StackPane(pane);
         stackPane.setPadding(new Insets(20));
@@ -47,6 +55,7 @@ public class ThreeItemsPaneApp extends GemApplication {
         HBox.setHgrow(stackPane, Priority.ALWAYS);
 
         HBox box = new HBox(10, stackPane, getControlPanel());
+        box.setPadding(new Insets(20));
 
         Scene scene = new Scene(box);
         primaryStage.setScene(scene);

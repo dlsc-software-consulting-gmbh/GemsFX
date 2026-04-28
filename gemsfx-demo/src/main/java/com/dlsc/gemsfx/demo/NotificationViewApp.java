@@ -59,7 +59,11 @@ public class NotificationViewApp extends GemApplication {
 
         BorderPane borderPane = new BorderPane(root);
         borderPane.setBottom(box);
-        borderPane.setStyle("-fx-background-color: white;");
+        if (Boolean.getBoolean("atlantafx")) {
+            borderPane.setStyle("-fx-background-color: -color-bg-default;");
+        } else {
+            borderPane.setStyle("-fx-background-color: white;");
+        }
 
         Scene scene = new Scene(borderPane);
 

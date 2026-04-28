@@ -28,3 +28,14 @@
 .dark-theme .markdown-code-block {
     -mdfx-code-theme: "github-dark-default";
 }
+
+.markdown-view .markdown-code {
+    -fx-text-fill: -color-fg-emphasis;
+    -fx-padding: 0px 4px;
+}
+
+.markdown-view .markdown-code-background {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-background-radius: 2px;
+}
+

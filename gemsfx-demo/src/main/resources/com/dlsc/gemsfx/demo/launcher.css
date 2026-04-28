@@ -68,11 +68,11 @@
     -fx-border-color: -color-border-default;
 }
 
-.markdown-view.light .markdown-code-block {
+.markdown-view.dark .markdown-code-block {
     -mdfx-code-theme: "/one/jpro/platform/mdfx/themes/github-light-default.json";
 }
 
-.markdown-view.dark .markdown-code-block {
+.markdown-view.light .markdown-code-block {
     -mdfx-code-theme: "/one/jpro/platform/mdfx/themes/github-dark-default.json";
 }
 

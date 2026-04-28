@@ -25,5 +25,7 @@ the indeterminate state, which would otherwise instantiate and start the animati
 
 Usage examples:
 
-    // Initializes with no progress and no animation.
-    SemiCircleProgressIndicator progressIndicator = new SemiCircleProgressIndicator(0.0);
+```
+// Initializes with no progress and no animation.
+SemiCircleProgressIndicator progressIndicator = new SemiCircleProgressIndicator(0.0);
+```

@@ -43,7 +43,7 @@ public class HistoryManagerApp extends GemApplication {
                 new Tab("Preferences History Manager)", prefsDemo())
         );
 
-        primaryStage.setScene(new Scene(tabPane, 800, 600));
+        primaryStage.setScene(new Scene(tabPane, 800, 700));
         primaryStage.setTitle("History Manager Demo");
 
         primaryStage.show();
@@ -77,7 +77,12 @@ public class HistoryManagerApp extends GemApplication {
                 2. Click the history button to show the history popup.
                 3. This is a simple case, since the preferencesKey is not set, it will not be persisted, just saved in memory.
                 """);
-        label.setStyle("-fx-text-fill: #666;");
+
+        if (Boolean.getBoolean("atlantafx")) {
+            label.setStyle("-fx-text-fill: -color-fg-muted;");
+        } else {
+            label.setStyle("-fx-text-fill: #666;");
+        }
 
         VBox vbox = new VBox(50, label, box);
         vbox.setAlignment(Pos.CENTER);
@@ -142,7 +147,12 @@ public class HistoryManagerApp extends GemApplication {
                 1. Tips: Press Enter to add the text to the history.
                 2. Click the history button to show the history popup.
                 """);
-        label.setStyle("-fx-text-fill: #666;");
+
+        if (Boolean.getBoolean("atlantafx")) {
+            label.setStyle("-fx-text-fill: -color-fg-muted;");
+        } else {
+            label.setStyle("-fx-text-fill: #666;");
+        }
 
         VBox vbox = new VBox(50, label, box);
         vbox.setAlignment(Pos.CENTER);
@@ -206,7 +216,11 @@ public class HistoryManagerApp extends GemApplication {
                 2. Click the history button to show the history popup.
                 3. Click the item in the history popup to select it in the list view.
                 """);
-        label.setStyle("-fx-text-fill: #666;");
+        if (Boolean.getBoolean("atlantafx")) {
+            label.setStyle("-fx-text-fill: -color-fg-muted;");
+        } else {
+            label.setStyle("-fx-text-fill: #666;");
+        }
 
         VBox vBox = new VBox(15, label, listView, historyButton);
         vBox.setAlignment(Pos.CENTER);

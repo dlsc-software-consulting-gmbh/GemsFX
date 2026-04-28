@@ -9,6 +9,7 @@ The layout updates dynamically whenever the nodes or properties such as orientat
 spacing are modified.
 
 Features include:
+
 - Dynamic management of child nodes: up to three nodes can be added and arranged.
 - Adjustable orientation: supports horizontal and vertical alignment through the
   orientation property.

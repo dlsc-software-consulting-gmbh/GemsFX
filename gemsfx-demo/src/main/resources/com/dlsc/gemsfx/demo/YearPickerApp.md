@@ -1,4 +1,4 @@
 ### YearPicker
 
-A control for selecting a year. This class utilizes the `YearView` control inside of its
+A control for selecting a year. This class uses the `YearView` control inside its
 popup.

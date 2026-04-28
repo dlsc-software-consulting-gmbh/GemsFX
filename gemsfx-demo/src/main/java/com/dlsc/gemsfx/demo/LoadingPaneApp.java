@@ -25,12 +25,22 @@ public class LoadingPaneApp extends GemApplication {
     public void start(Stage stage) { super.start(stage);
         Label node = new Label("Some content goes here...");
         node.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        node.setStyle("-fx-background-color: white;");
+
+        if (Boolean.getBoolean("atlantafx")) {
+            node.setStyle("-fx-background-color: -color-bg-inset;");
+        } else {
+            node.setStyle("-fx-background-color: white;");
+        }
         node.setAlignment(Pos.CENTER);
 
         LoadingPane loadingPane = new LoadingPane(node);
         loadingPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        loadingPane.setStyle("-fx-border-color: black;");
+
+        if (Boolean.getBoolean("atlantafx")) {
+            loadingPane.setStyle("-fx-border-color: -color-border-default;");
+        } else {
+            loadingPane.setStyle("-fx-border-color: black;");
+        }
         loadingPane.setError("Some error message...");
 
         if (Boolean.getBoolean("atlantafx")) {
@@ -83,8 +93,10 @@ public class LoadingPaneApp extends GemApplication {
         HBox hBox = new HBox(10, statusBox, sizeBox, simulateLoading, scenicViewButton);
         VBox vBox = new VBox(20, loadingPane, hBox);
 
+        vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(20));
         vBox.setAlignment(Pos.CENTER);
+        vBox.setMinSize(400, 400);
 
         Scene scene = new Scene(vBox);
         CSSFX.start(scene);

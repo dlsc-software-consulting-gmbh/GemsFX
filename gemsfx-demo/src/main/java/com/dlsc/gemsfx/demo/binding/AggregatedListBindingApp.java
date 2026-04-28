@@ -118,10 +118,18 @@ public class AggregatedListBindingApp extends GemApplication {
 
     private Node createStatisticBox(String title, Node... children) {
         Label titleLabel = new Label(title);
-        titleLabel.setStyle(" -fx-font-size: 15px;-fx-text-fill: #9a9999");
+        if (Boolean.getBoolean("atlantafx")) {
+            titleLabel.setStyle(" -fx-font-size: 15px;-fx-text-fill: -color-fg-default;");
+        } else {
+            titleLabel.setStyle(" -fx-font-size: 15px;-fx-text-fill: #9a9999");
+        }
         HBox box = new HBox(10, children);
         VBox wrapper = new VBox(15, titleLabel, box);
-        wrapper.setStyle("-fx-border-color: lightgray; -fx-border-width: 1px; -fx-padding: 10px; -fx-border-radius: 5px;-fx-background-color: white;");
+        if (Boolean.getBoolean("atlantafx")) {
+            wrapper.setStyle("-fx-border-color: -color-border-default; -fx-border-width: 1px; -fx-padding: 10px; -fx-border-radius: 5px;-fx-background-color: -color-bg-inset;");
+        } else {
+            wrapper.setStyle("-fx-border-color: lightgray; -fx-border-width: 1px; -fx-padding: 10px; -fx-border-radius: 5px;-fx-background-color: white;");
+        }
         return wrapper;
     }
 

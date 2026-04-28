@@ -52,6 +52,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import one.jpro.platform.mdfx.MarkdownCodeBlock;
 import one.jpro.platform.mdfx.MarkdownView;
 import org.scenicview.ScenicView;
 
@@ -64,6 +65,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
@@ -198,15 +200,33 @@ public class GemsFXDemoLauncher extends GemApplication {
         String mdfxModenaCss = Objects.requireNonNull(GemsFXDemoLauncher.class.getResource("mdfx-modena-override.css")).toExternalForm();
         String mdfxOverrideCss = Objects.requireNonNull(GemsFXDemoLauncher.class.getResource("mdfx-atlantafx-override.css")).toExternalForm();
 
-        MarkdownView markdownView = new MarkdownView();
+        MarkdownView markdownView = new MarkdownView() {
+            @Override
+            public Optional<String> getDefaultLanguage() {
+                return Optional.of("java");
+            }
+        };
+
         markdownView.getStyleClass().add("description-markdown-view");
         markdownView.getStylesheets().add(mdfxModenaCss);
 
-        MarkdownView codeMarkdownView = new MarkdownView();
+        MarkdownView codeMarkdownView = new MarkdownView() {
+            @Override
+            public Optional<String> getDefaultLanguage() {
+                return Optional.of("java");
+            }
+        };
+
         codeMarkdownView.getStyleClass().add("code-markdown-view");
         codeMarkdownView.getStylesheets().add(mdfxModenaCss);
 
-        MarkdownView cssMarkdownView = new MarkdownView();
+        MarkdownView cssMarkdownView = new MarkdownView() {
+            @Override
+            public Optional<String> getDefaultLanguage() {
+                return Optional.of("css");
+            }
+        };
+
         cssMarkdownView.getStyleClass().add("css-markdown-view");
         cssMarkdownView.getStylesheets().add(mdfxModenaCss);
 
@@ -258,9 +278,11 @@ public class GemsFXDemoLauncher extends GemApplication {
             new ArrayList<>(openDemoStages).forEach(Stage::close);
             boolean darkTheme = theme != null && isDarkTheme(theme);
 
-            markdownViews.forEach(view -> view.getStyleClass().remove("dark"));
+            markdownViews.forEach(view -> view.getStyleClass().removeAll("light", "dark"));
             if (darkTheme) {
                 markdownViews.forEach(view -> view.getStyleClass().add("dark"));
+            } else {
+                markdownViews.forEach(view -> view.getStyleClass().add("light"));
             }
 
             if (theme != null) {

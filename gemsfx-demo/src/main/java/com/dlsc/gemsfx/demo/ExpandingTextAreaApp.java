@@ -32,6 +32,9 @@ public class ExpandingTextAreaApp extends GemApplication {
 
         VBox parent = new VBox(20, textField, expandingTextArea, textArea);
         parent.setMinHeight(Region.USE_PREF_SIZE);
+        if (Boolean.getBoolean("atlantafx")) {
+            parent.setStyle("-fx-background-color: -color-bg-default;");
+        }
 
         parent.setFillWidth(false);
         parent.setAlignment(Pos.CENTER);
