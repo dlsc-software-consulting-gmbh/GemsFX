@@ -9,8 +9,6 @@ open module com.dlsc.gemsfx {
 
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign;
-    requires org.kordamp.ikonli.material;
-    requires org.kordamp.ikonli.bootstrapicons;
 
     requires java.logging;
     requires java.prefs;

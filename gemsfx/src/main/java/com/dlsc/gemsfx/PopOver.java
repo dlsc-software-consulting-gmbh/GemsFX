@@ -323,6 +323,53 @@ public class PopOver extends PopupControl {
         }
     }
 
+    /**
+     * Repositions the popover so that the arrow tip is at the given screen coordinate,
+     * without hiding and re-showing it. Use this instead of calling {@link #show} again
+     * when the popover is already visible, to avoid flickering during event-to-event
+     * transitions.
+     *
+     * @param arrowTipX the screen X coordinate for the arrow tip
+     * @param arrowTipY the screen Y coordinate for the arrow tip
+     */
+    public final void relocate(double arrowTipX, double arrowTipY) {
+        targetX = arrowTipX;
+        targetY = arrowTipY;
+
+        double x = arrowTipX;
+        double y = arrowTipY;
+
+        switch (getArrowLocation()) {
+            case TOP_CENTER:
+            case TOP_LEFT:
+            case TOP_RIGHT:
+                x -= computeXOffset();
+                y += computeYOffset();
+                break;
+            case BOTTOM_CENTER:
+            case BOTTOM_LEFT:
+            case BOTTOM_RIGHT:
+                x -= computeXOffset();
+                y -= computeYOffset();
+                break;
+            case LEFT_TOP:
+            case LEFT_CENTER:
+            case LEFT_BOTTOM:
+                x += computeXOffset();
+                y -= computeYOffset();
+                break;
+            case RIGHT_TOP:
+            case RIGHT_BOTTOM:
+            case RIGHT_CENTER:
+                x -= computeXOffset();
+                y -= computeYOffset();
+                break;
+        }
+
+        setX(x);
+        setY(y);
+    }
+
     private void showFadeInAnimation(Duration fadeInDuration) {
         // Fade In
         Node skinNode = getSkin().getNode();

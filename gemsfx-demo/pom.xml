@@ -222,6 +222,16 @@
             <artifactId>pdfviewfx</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-materialdesign-pack</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-material-pack</artifactId>
+        </dependency>
+
         <!-- required if any dependency intends to log -->
         <dependency>
             <groupId>commons-logging</groupId>
