@@ -1,0 +1,37 @@
+{
+    "license": "Apache-2.0",
+    "author": "Dirk Lemmermann",
+    "name": "gemsfxdemo",
+    "description": "Sampler application for GemsFX showcasing various features and capabilities.",
+    "files": ["jdeploy-bundle"],
+    "main": "index.js",
+    "preferGlobal": true,
+    "title": "GemsFX Demo Launcher",
+    "scripts": {"test": "echo \"Error: no test specified\" && exit 1"},
+    "version": "4.0.1",
+    "jdeploy": {
+        "args": [
+            "-Djavafx.enablePreview=true",
+            "-Djavafx.suppressPreviewWarning=true"
+        ],
+        "singleton": true,
+        "fallbackToUniversal": false,
+        "githubRepository": "https://github.com/dlemmermann/GemsFX",
+        "mainClass": "com.dlsc.gemsfx.demo.GemsFXDemoLauncher",
+        "publishTargets": [{
+            "name": "npm: npm",
+            "type": "NPM",
+            "url": ""
+        }],
+        "javaVersion": "25",
+        "jar": "target/gemsfx-demo-4.0.1.jar",
+        "javafx": true,
+        "title": "GemsFX Demo Launcher",
+        "platformBundlesEnabled": false,
+        "downloadPage": {"platforms": ["default"]}
+    },
+    "dependencies": {
+        "njre": "^0.2.0",
+        "shelljs": "^0.8.4"
+    }
+}
