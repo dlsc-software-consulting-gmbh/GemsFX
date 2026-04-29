@@ -14,8 +14,9 @@ import com.dlsc.gemsfx.demo.binding.AggregatedListBindingApp;
 import com.dlsc.gemsfx.demo.binding.NestedListBindingApp;
 import com.dlsc.gemsfx.demo.binding.NestedListChangeTrackerApp;
 import com.dlsc.gemsfx.demo.binding.ObservableListBindingApp;
-import com.dlsc.gemsfx.util.StageManager;
+import devtoolsfx.gui.GUI;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,9 +53,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import one.jpro.platform.mdfx.MarkdownCodeBlock;
 import one.jpro.platform.mdfx.MarkdownView;
-import org.scenicview.ScenicView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -76,6 +75,8 @@ import java.util.prefs.Preferences;
  * a demo in its own {@link Stage}.
  */
 public class GemsFXDemoLauncher extends GemApplication {
+
+    private CheckBox developerToolCheckBox;
 
     // -----------------------------------------------------------------------
     // Demo registry
@@ -113,7 +114,7 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Calendar & Date / Time", "Year View", YearViewApp::new),
 
             // --- Layout ---------------------------------------------------------
-            demo("Layout", "Alignment Test", AlignmentTestApp::new),
+//            demo("Layout", "Alignment Test", AlignmentTestApp::new),
             demo("Layout", "Drawer Stack Pane", DrawerStackPaneApp::new),
             demo("Layout", "Loading Pane", LoadingPaneApp::new),
             demo("Layout", "Power Pane", PowerPaneApp::new),
@@ -337,7 +338,7 @@ public class GemsFXDemoLauncher extends GemApplication {
             String lower = q == null ? "" : q.strip().toLowerCase();
             filtered.setPredicate(lower.isEmpty() ? null
                     : e -> e.name().toLowerCase().contains(lower)
-                    || e.category().toLowerCase().contains(lower));
+                           || e.category().toLowerCase().contains(lower));
         });
 
         // ── Tree view (default – no search active) ───────────────────────────
@@ -378,7 +379,7 @@ public class GemsFXDemoLauncher extends GemApplication {
                 countLabel.setText(filtered.size() + " / " + ALL_DEMOS.size() + " demos"));
 
         // ── Launch button ─────────────────────────────────────────────────────
-        CheckBox scenicViewCheckBox = new CheckBox("ScenicView");
+        developerToolCheckBox = new CheckBox("Show Developer Tool");
         Button launchButton = new Button("Launch Demo");
         launchButton.setDefaultButton(true);
         launchButtonRef[0] = launchButton;
@@ -444,12 +445,16 @@ public class GemsFXDemoLauncher extends GemApplication {
 
         treeView.getSelectionModel().selectedItemProperty().addListener((obs, o, n) -> {
             DemoEntry entry = resolveSelected(treeView, listView, searchField);
-            if (entry != null) prefs.put("selected.demo", entry.name());
+            if (entry != null) {
+                prefs.put("selected.demo", entry.name());
+            }
             showContent(entry, markdownView, codeMarkdownView, cssMarkdownView);
         });
         listView.getSelectionModel().selectedItemProperty().addListener((obs, o, n) -> {
             DemoEntry entry = resolveSelected(treeView, listView, searchField);
-            if (entry != null) prefs.put("selected.demo", entry.name());
+            if (entry != null) {
+                prefs.put("selected.demo", entry.name());
+            }
             showContent(entry, markdownView, codeMarkdownView, cssMarkdownView);
         });
 
@@ -468,20 +473,24 @@ public class GemsFXDemoLauncher extends GemApplication {
 
         launchButton.setOnAction(evt -> {
             DemoEntry entry = resolveSelected(treeView, listView, searchField);
-            launch(entry, scenicViewCheckBox.isSelected());
+            launch(entry);
         });
 
         // double-click on tree
         treeView.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
                 DemoEntry entry = resolveSelected(treeView, listView, searchField);
-                if (entry != null) launch(entry);
+                if (entry != null) {
+                    launch(entry);
+                }
             }
         });
         treeView.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 DemoEntry entry = resolveSelected(treeView, listView, searchField);
-                if (entry != null) launch(entry);
+                if (entry != null) {
+                    launch(entry);
+                }
             }
         });
 
@@ -489,13 +498,17 @@ public class GemsFXDemoLauncher extends GemApplication {
         listView.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
                 DemoEntry entry = listView.getSelectionModel().getSelectedItem();
-                if (entry != null) launch(entry);
+                if (entry != null) {
+                    launch(entry);
+                }
             }
         });
         listView.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 DemoEntry entry = listView.getSelectionModel().getSelectedItem();
-                if (entry != null) launch(entry);
+                if (entry != null) {
+                    launch(entry);
+                }
             }
         });
 
@@ -566,7 +579,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         // ── Footer ────────────────────────────────────────────────────────────
         Region footerSpacer = new Region();
         HBox.setHgrow(footerSpacer, Priority.ALWAYS);
-        HBox footer = new HBox(12, countLabel, footerSpacer, scenicViewCheckBox, launchButton);
+        HBox footer = new HBox(12, countLabel, footerSpacer, developerToolCheckBox, launchButton);
         footer.setAlignment(Pos.CENTER_LEFT);
         footer.setPadding(new Insets(8, 16, 8, 16));
         footer.getStyleClass().add("launcher-footer");
@@ -584,6 +597,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         stage.setWidth(1200);
         stage.setHeight(800);
         stage.show();
+        Platform.runLater(() -> treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex()));
     }
 
     // -----------------------------------------------------------------------
@@ -613,11 +627,9 @@ public class GemsFXDemoLauncher extends GemApplication {
     }
 
     private void launch(DemoEntry entry) {
-        launch(entry, false);
-    }
-
-    private void launch(DemoEntry entry, boolean withScenicView) {
-        if (entry == null) return;
+        if (entry == null) {
+            return;
+        }
         try {
             Application app = entry.factory().get();
             Stage demoStage = new Stage();
@@ -625,20 +637,22 @@ public class GemsFXDemoLauncher extends GemApplication {
             centerOnSameScreen(demoStage);
             openDemoStages.add(demoStage);
             demoStage.setOnHidden(e -> openDemoStages.remove(demoStage));
-            if (withScenicView && demoStage.getScene() != null) {
-                ScenicView.show(demoStage.getScene());
+            if (developerToolCheckBox.isSelected() && demoStage.getScene() != null) {
+                GUI.openToolStage(demoStage, app.getHostServices());
             }
         } catch (Exception ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Launch Error");
-            alert.setHeaderText("Failed to launch \"" + entry.name() + "\"" + (withScenicView ? " with ScenicView" : ""));
+            alert.setHeaderText("Failed to launch \"" + entry.name() + "\"" + (developerToolCheckBox.isSelected() ? " with debug tool" : ""));
             alert.setContentText(ex.getMessage());
             alert.showAndWait();
         }
     }
 
     private void centerOnSameScreen(Stage demoStage) {
-        if (!Double.isNaN(demoStage.getX())) return; // StageManager already positioned it
+        if (!Double.isNaN(demoStage.getX())) {
+            return; // StageManager already positioned it
+        }
         javafx.geometry.Rectangle2D bounds = javafx.stage.Screen.getScreensForRectangle(
                         launcherStage.getX(), launcherStage.getY(),
                         launcherStage.getWidth(), launcherStage.getHeight())
@@ -694,7 +708,9 @@ public class GemsFXDemoLauncher extends GemApplication {
     private String loadSourceCode(GemApplication app) {
         String resourcePath = "/" + app.getClass().getName().replace('.', '/') + ".java";
         try (InputStream is = GemsFXDemoLauncher.class.getResourceAsStream(resourcePath)) {
-            if (is == null) return null;
+            if (is == null) {
+                return null;
+            }
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             return null;
@@ -739,16 +755,22 @@ public class GemsFXDemoLauncher extends GemApplication {
     // Custom TreeCell
     // -----------------------------------------------------------------------
 
-    /** Returns true for AtlantaFX dark themes (NordDark, CupertinoDark, PrimerDark, Dracula). */
+    /**
+     * Returns true for AtlantaFX dark themes (NordDark, CupertinoDark, PrimerDark, Dracula).
+     */
     private static boolean isDarkTheme(Theme theme) {
-        if (theme == null) return false;
+        if (theme == null) {
+            return false;
+        }
         String name = theme.getName().toLowerCase();
         return name.contains("dark") || name.equals("dracula");
     }
 
     private static String loadProjectVersion() {
         try (InputStream in = GemsFXDemoLauncher.class.getResourceAsStream("version.properties")) {
-            if (in == null) return "";
+            if (in == null) {
+                return "";
+            }
             Properties props = new Properties();
             props.load(in);
             return props.getProperty("version", "");

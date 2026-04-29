@@ -34,6 +34,7 @@
         <snapshot.filter></snapshot.filter>
         <!-- Demo module is not published; skip Central releasability enforcement -->
         <enforcer.skip>true</enforcer.skip>
+        <devtoolsfx.version>1.0.1</devtoolsfx.version>
     </properties>
 
     <build>
@@ -172,6 +173,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
@@ -181,6 +183,18 @@
             <groupId>io.github.mkpaz</groupId>
             <artifactId>atlantafx-base</artifactId>
             <version>2.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>devtoolsfx-connector</artifactId>
+            <version>${devtoolsfx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>devtoolsfx-gui</artifactId>
+            <version>${devtoolsfx.version}</version>
         </dependency>
 
         <dependency>

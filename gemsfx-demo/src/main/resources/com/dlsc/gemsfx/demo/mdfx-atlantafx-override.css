@@ -39,3 +39,8 @@
     -fx-background-radius: 2px;
 }
 
+.markdown-view .markdown-code,
+.markdown-view .markdown-code-block .code-text-flow {
+    -fx-font-family: "JetBrains Mono";
+}
+

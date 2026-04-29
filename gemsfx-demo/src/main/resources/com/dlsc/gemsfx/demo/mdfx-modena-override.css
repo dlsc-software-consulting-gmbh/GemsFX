@@ -21,3 +21,18 @@
     -fx-font-family: "Inter Bold";
     -fx-font-size: 1.5em !important;
 }
+
+.markdown-view .markdown-code {
+    -fx-text-fill: white;
+    -fx-padding: 0px 4px;
+}
+
+.markdown-view .markdown-code-background {
+    -fx-background-color: -fx-accent;
+    -fx-background-radius: 2px;
+}
+
+.markdown-view .markdown-code,
+.markdown-view .markdown-code-block .code-text-flow {
+    -fx-font-family: "JetBrains Mono";
+}

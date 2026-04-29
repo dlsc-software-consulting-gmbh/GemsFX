@@ -138,13 +138,18 @@ public class GridTableViewApp extends GemApplication {
         tableView.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
         StackPane stackPane = new StackPane(tableView);
-        stackPane.setStyle("-fx-background-color: grey;");
+        if (Boolean.getBoolean("atlantafx")) {
+            stackPane.setStyle("-fx-background-color: -color-bg-inset;");
+        } else {
+            stackPane.setStyle("-fx-background-color: grey;");
+        }
         StackPane.setAlignment(tableView, Pos.CENTER);
 
         BorderPane pane = new BorderPane(stackPane);
         pane.setBottom(bottom);
 
-        Scene scene = new Scene(pane);
+        Scene scene = new Scene(pane, 750, 580);
+        primaryStage.setTitle("Grid Table View");
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
 

@@ -6,7 +6,8 @@ open module com.dlsc.gemsfx.demo {
     requires com.dlsc.pdfviewfx;
 
     requires atlantafx.base;
-
+    requires devtoolsfx.connector;
+    requires devtoolsfx.gui;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
 
