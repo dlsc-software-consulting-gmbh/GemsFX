@@ -11,7 +11,7 @@
 
 GemsFX is a collection of custom controls and utilities for JavaFX. The website is located at [https://gemsfx.dlsc.com](https://gemsfx.dlsc.com).
 
-The `gemsfx` library module targets **Java 11** and **JavaFX 17+**. The `gemsfx-demo` module continues to use the current repository toolchain (**Java 24** / **JavaFX 25.0.2**).
+The `gemsfx` library module targets **Java 11** and **JavaFX 17+**. The `gemsfx-demo` module uses the **Java 24** / **JavaFX 25.0.2**.
 
 ## AtlantaFX
 If you want to use **_AtlantaFX_** for your application then copy the stylesheet called `atlantafx.css` from the demo module into
