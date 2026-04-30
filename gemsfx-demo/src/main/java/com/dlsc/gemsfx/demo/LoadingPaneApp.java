@@ -87,10 +87,12 @@ public class LoadingPaneApp extends GemApplication {
             thread.start();
         });
 
-        Button scenicViewButton = new Button("Scenic View");
-        scenicViewButton.setOnAction(event -> ScenicView.show(loadingPane.getScene()));
+        Button scenicViewButton = new Button("Dev Tools");
+        hideInBrowser(scenicViewButton);
+        configureDevToolsButton(scenicViewButton);
 
         HBox hBox = new HBox(10, statusBox, sizeBox, simulateLoading, scenicViewButton);
+        hBox.setAlignment(Pos.CENTER);
         VBox vBox = new VBox(20, loadingPane, hBox);
 
         vBox.setAlignment(Pos.CENTER);

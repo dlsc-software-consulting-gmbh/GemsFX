@@ -60,8 +60,9 @@ public class TextViewWithListViewApp extends GemApplication {
             }
         });
 
-        Button scenicView = new Button("Scenic View");
-        scenicView.setOnAction(evt -> ScenicView.show(listView.getScene()));
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
+        configureDevToolsButton(scenicView);
 
         VBox vBox = new VBox(10);
 

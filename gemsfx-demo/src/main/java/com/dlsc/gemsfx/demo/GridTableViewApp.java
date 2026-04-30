@@ -126,8 +126,9 @@ public class GridTableViewApp extends GemApplication {
             }
         });
 
-        Button scenicView = new Button("Scenic View");
-        scenicView.setOnAction(evt -> ScenicView.show(tableView.getScene()));
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
+        configureDevToolsButton(scenicView);
 
         HBox bottom = new HBox(30, artBox, showHeaderAndFooter, btnAdd, btnRemove, scenicView);
         bottom.setAlignment(Pos.CENTER);

@@ -7,6 +7,7 @@ import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.SimpleFilterView;
 import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
+import com.jpro.webapi.WebAPI;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
@@ -76,8 +77,9 @@ public class AlignmentTestApp extends GemApplication {
         datePicker.setValue(LocalDate.now());
         hbox.getChildren().add(datePicker);
 
-        Button scenicView = new Button("Scenic View");
-        scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
+        configureDevToolsButton(scenicView);
 
         VBox box = new VBox(20, hbox, scenicView);
         box.setAlignment(Pos.CENTER);

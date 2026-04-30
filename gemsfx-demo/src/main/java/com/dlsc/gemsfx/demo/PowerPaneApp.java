@@ -101,9 +101,10 @@ public class PowerPaneApp extends GemApplication {
         showDrawerButton.setMaxWidth(Double.MAX_VALUE);
         showDrawerButton.selectedProperty().bindBidirectional(powerPane.getDrawerStackPane().showDrawerProperty());
 
-        Button scenicView = new Button("Scenic View");
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
         scenicView.setMaxWidth(Double.MAX_VALUE);
-        scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
+        configureDevToolsButton(scenicView);
 
         VBox controls = new VBox(10,
                 titleLabel,

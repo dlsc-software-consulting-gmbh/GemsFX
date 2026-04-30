@@ -66,10 +66,9 @@ public class TextViewApp extends GemApplication {
         hBox.setPadding(new Insets(20));
 
         Scene scene = new Scene(hBox);
-        scene.focusOwnerProperty().addListener(it -> System.out.println("focus owner: " + scene.getFocusOwner()));
         stage.setScene(scene);
         stage.setWidth(800);
-        stage.setHeight(600);
+        stage.setHeight(650);
         stage.setTitle("Text View (Standalone)");
 
         stage.show();

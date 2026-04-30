@@ -123,8 +123,9 @@ public class SimpleFilterViewApp extends GemApplication {
         layoutModeComboBox.valueProperty().bindBidirectional(layoutMode);
         layoutModeComboBox.setValue(SimpleFilterView.LayoutMode.COMPACT);
 
-        Button scenicView = new Button("Scenic View");
-        scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
+        configureDevToolsButton(scenicView);
 
         VBox box = new VBox(20, box0, box1, box2, layoutModeComboBox, scenicView);
         box.setAlignment(Pos.CENTER);

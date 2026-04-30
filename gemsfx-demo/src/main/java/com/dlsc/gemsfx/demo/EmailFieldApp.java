@@ -23,23 +23,23 @@ public class EmailFieldApp extends GemApplication {
 
     @Override
     public void start(Stage stage) { super.start(stage);
-        EmailField view = new EmailField();
-        view.setPromptText("Enter an email address");
+        EmailField emailField = new EmailField();
+        emailField.setPromptText("Enter an email address");
 
         CheckBox required = new CheckBox("Required");
-        required.selectedProperty().bindBidirectional(view.requiredProperty());
+        required.selectedProperty().bindBidirectional(emailField.requiredProperty());
 
         // When user types '@' in the email field, show a list of suggestions
         CheckBox autoCompletion = new CheckBox("Auto-Complete Domain");
-        autoCompletion.selectedProperty().bindBidirectional(view.autoDomainCompletionEnabledProperty());
+        autoCompletion.selectedProperty().bindBidirectional(emailField.autoDomainCompletionEnabledProperty());
 
         CheckBox multipleAddresses = new CheckBox("Multiple addresses");
-        multipleAddresses.selectedProperty().bindBidirectional(view.supportingMultipleAddressesProperty());
+        multipleAddresses.selectedProperty().bindBidirectional(emailField.supportingMultipleAddressesProperty());
 
         CheckBox enableCustomCell = new CheckBox("Enable Custom Cell");
         enableCustomCell.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
-                view.setDomainListCellFactory(param -> new ListCell<>() {
+                emailField.setDomainListCellFactory(param -> new ListCell<>() {
                     @Override
                     protected void updateItem(String item, boolean empty) {
                         super.updateItem(item, empty);
@@ -54,40 +54,41 @@ public class EmailFieldApp extends GemApplication {
                     }
                 });
             } else {
-                view.setDomainListCellFactory(null);
+                emailField.setDomainListCellFactory(null);
             }
         });
 
         CheckBox showMailIcon = new CheckBox("Show Mail Icon");
-        showMailIcon.selectedProperty().bindBidirectional(view.showMailIconProperty());
+        showMailIcon.selectedProperty().bindBidirectional(emailField.showMailIconProperty());
 
         CheckBox showValidationIcon = new CheckBox("Show Validation Icon");
-        showValidationIcon.selectedProperty().bindBidirectional(view.showValidationIconProperty());
+        showValidationIcon.selectedProperty().bindBidirectional(emailField.showValidationIconProperty());
 
-        TextField invalidTextField = new TextField(view.getInvalidText());
+        TextField invalidTextField = new TextField(emailField.getInvalidText());
         invalidTextField.setPromptText("Invalid text for the tooltip");
-        view.invalidTextProperty().bind(invalidTextField.textProperty());
+        emailField.invalidTextProperty().bind(invalidTextField.textProperty());
 
         Label resultLabel = new Label("Entered address(es)");
         resultLabel.textProperty().bind(Bindings.createStringBinding(() -> {
-            if (view.isValid()) {
-                if (view.isSupportingMultipleAddresses()) {
-                    return String.join(", ", view.getMultipleEmailAddresses());
+            if (emailField.isValid()) {
+                if (emailField.isSupportingMultipleAddresses()) {
+                    return String.join(", ", emailField.getMultipleEmailAddresses());
                 }
-                return view.getEmailAddress();
+                return emailField.getEmailAddress();
             } else {
-                if (view.isSupportingMultipleAddresses()) {
-                    return "Invalid: " + String.join(", ", view.getMultipleEmailAddresses());
+                if (emailField.isSupportingMultipleAddresses()) {
+                    return "Invalid: " + String.join(", ", emailField.getMultipleEmailAddresses());
                 }
-                return "Invalid " + view.getEmailAddress();
+                return "Invalid " + emailField.getEmailAddress();
             }
-        }, view.supportingMultipleAddressesProperty(), view.emailAddressProperty(), view.getMultipleEmailAddresses()));
+        }, emailField.supportingMultipleAddressesProperty(), emailField.emailAddressProperty(), emailField.getMultipleEmailAddresses()));
 
-        VBox topBox = new VBox(10, required, autoCompletion, multipleAddresses, enableCustomCell, showMailIcon, showValidationIcon, new Label("Text to show when invalid:"), invalidTextField);
+        VBox optionsBox = new VBox(10, required, autoCompletion, multipleAddresses, enableCustomCell, showMailIcon, showValidationIcon, new Label("Text to show when invalid:"), invalidTextField);
 
-        VBox box = new VBox(20, topBox, view, resultLabel);
+        VBox box = new VBox(10, new Label("Enter an email address:"), emailField, resultLabel, optionsBox);
         box.setPrefWidth(300);
         box.setPadding(new Insets(10));
+
         Scene scene = new Scene(box);
         stage.setScene(scene);
         stage.sizeToScene();

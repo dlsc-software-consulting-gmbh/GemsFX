@@ -64,8 +64,9 @@ public class SimplePagingListViewApp extends GemApplication {
             }
         });
 
-        Button scenicView = new Button("Scenic View");
-        scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
+        configureDevToolsButton(scenicView);
 
         VBox box = new VBox(20, pagingListView, new PagingControlsSettingsView(pagingListView), scenicView);
         box.setPadding(new Insets(20));

@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.DialogPane.Dialog;
+import com.jpro.webapi.WebAPI;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -202,8 +203,9 @@ public class DialogPaneApp extends GemApplication {
         VBox.setVgrow(flowPane, Priority.ALWAYS);
         VBox.setVgrow(durationBox, Priority.ALWAYS);
 
-        Button scenicView = new Button("Scenic View");
-        scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
+        configureDevToolsButton(scenicView);
 
         HBox hBox = new HBox(10, new Label("Animation:"), durationBox, new Label("StyleType:"), styleBox, scenicView);
         hBox.setAlignment(Pos.CENTER);

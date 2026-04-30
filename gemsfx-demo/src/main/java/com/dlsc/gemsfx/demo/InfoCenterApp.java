@@ -155,8 +155,9 @@ public class InfoCenterApp extends GemApplication {
         infoCenterViewPosition.setMaxWidth(Double.MAX_VALUE);
         infoCenterViewPosition.valueProperty().bindBidirectional(infoCenterPane.infoCenterViewPosProperty());
 
-        Button scenicView = new Button("Scenic View");
-        scenicView.setOnAction(evt -> ScenicView.show(infoCenterView.getScene()));
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
+        configureDevToolsButton(scenicView);
         scenicView.setMaxWidth(Double.MAX_VALUE);
 
         ToggleButton darkMode = new ToggleButton("Dark Mode");

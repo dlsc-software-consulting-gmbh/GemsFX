@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.daterange.DateRangeView;
+import com.jpro.webapi.WebAPI;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -27,7 +28,9 @@ public class DateRangeViewApp extends GemApplication {
         DateRangeView view = new DateRangeView();
         view.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
-        Button scenicViewButton = new Button("SCENIC VIEW");
+        Button scenicViewButton = new Button("Dev Tools");
+        scenicViewButton.setVisible(!WebAPI.isBrowser());
+        scenicViewButton.setManaged(!WebAPI.isBrowser());
         VBox.setMargin(scenicViewButton, new Insets(50, 0, 0, 0));
 
         ComboBox<Side> sideBox = new ComboBox<>();
@@ -64,7 +67,7 @@ public class DateRangeViewApp extends GemApplication {
         vBox.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(vBox);
-        scenicViewButton.setOnAction(evt -> ScenicView.show(scene));
+        configureDevToolsButton(scenicViewButton);
 
         stage.setTitle("Date Range View");
         stage.setScene(scene);

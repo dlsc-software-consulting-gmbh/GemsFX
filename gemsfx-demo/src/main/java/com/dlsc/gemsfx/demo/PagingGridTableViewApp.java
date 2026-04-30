@@ -88,8 +88,9 @@ public class PagingGridTableViewApp extends GemApplication {
 
         simulateNoData.addListener(it -> pagingGridTableView.reload());
 
-        Button scenicView = new Button("Scenic View");
-        scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
+        configureDevToolsButton(scenicView);
 
         CheckBox fillBox = new CheckBox("Fill last page");
         fillBox.selectedProperty().bindBidirectional(pagingGridTableView.fillLastPageProperty());

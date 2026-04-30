@@ -68,6 +68,7 @@ public class SearchFieldApp extends GemApplication {
 
         CheckBox createNewItemBox = new CheckBox("Create new country 'on-the-fly' if it can't be found in the data set.");
         field.newItemProducerProperty().bind(Bindings.createObjectBinding(() -> createNewItemBox.isSelected() ? name -> new Country(name) : null, createNewItemBox.selectedProperty()));
+        createNewItemBox.setSelected(true);
 
         CheckBox showPromptText = new CheckBox("Show prompt text");
         showPromptText.setSelected(true);
@@ -122,19 +123,33 @@ public class SearchFieldApp extends GemApplication {
         addHistoryOnFocusLossBox.setSelected(true);
         field.addingItemToHistoryOnFocusLostProperty().bind(addHistoryOnFocusLossBox.selectedProperty());
 
-        VBox historyControls = new VBox(10, new Separator(), addHistoryOnActionBox, addHistoryOnFocusLossBox);
+        VBox historyControls = new VBox(10, addHistoryOnActionBox, addHistoryOnFocusLossBox);
         historyControls.managedProperty().bind(enableHistoryBox.selectedProperty());
         historyControls.visibleProperty().bind(enableHistoryBox.selectedProperty());
 
         field.leftProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionLeft : null, showLeftRightNodes.selectedProperty()));
         field.rightProperty().bind(Bindings.createObjectBinding(() -> showLeftRightNodes.isSelected() ? regionRight : null, showLeftRightNodes.selectedProperty()));
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, hideWithNoChoiceBox, showSearchIconBox, showLeftRightNodes,
-                autoCommitOnFocusLostBox, hBox, hBox2, enableHistoryBox, historyControls, field);
+        VBox vbox = new VBox(
+                10,
+                new Label("Select a country (e.g. start typing \"United\")"),
+                field,
+                hBox,
+                hBox2,
+                createNewItemBox,
+                showPromptText,
+                usePlaceholder,
+                hideWithSingleChoiceBox,
+                hideWithNoChoiceBox,
+                showSearchIconBox,
+                showLeftRightNodes,
+                autoCommitOnFocusLostBox,
+                enableHistoryBox,
+                historyControls);
+
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox);
-        scene.focusOwnerProperty().addListener(it -> System.out.println("owner: " + scene.getFocusOwner()));
 
         primaryStage.setTitle("Search Field");
         primaryStage.setScene(scene);

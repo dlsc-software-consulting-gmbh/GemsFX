@@ -46,8 +46,9 @@ public class PagingControlsApp extends GemApplication {
         alignmentChoiceBox.getItems().setAll(HPos.values());
         alignmentChoiceBox.valueProperty().bindBidirectional(alignmentProperty);
 
-        Button scenicViewButton = new Button("Scenic View");
-        scenicViewButton.setOnAction(event -> ScenicView.show(stage.getScene()));
+        Button scenicViewButton = new Button("Dev Tools");
+        hideInBrowser(scenicViewButton);
+        configureDevToolsButton(scenicViewButton);
 
         HBox hBox = new HBox(10, alignmentChoiceBox, scenicViewButton);
         hBox.setAlignment(Pos.CENTER_LEFT);

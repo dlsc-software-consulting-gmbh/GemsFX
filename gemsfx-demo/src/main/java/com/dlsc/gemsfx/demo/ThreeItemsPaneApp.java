@@ -71,8 +71,9 @@ public class ThreeItemsPaneApp extends GemApplication {
         box.getItems().setAll(Orientation.values());
         box.valueProperty().bindBidirectional(pane.orientationProperty());
 
-        Button scenicView = new Button("ScenicView");
-        scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
+        configureDevToolsButton(scenicView);
 
         return new VBox(10, box, scenicView);
     }

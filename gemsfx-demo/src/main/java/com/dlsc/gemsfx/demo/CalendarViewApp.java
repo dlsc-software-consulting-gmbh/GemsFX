@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.SelectionModel.SelectionMode;
 import com.dlsc.gemsfx.CalendarView.YearDisplayMode;
 import com.dlsc.gemsfx.CalendarView.MonthDisplayMode;
+import com.jpro.webapi.WebAPI;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -94,7 +95,9 @@ public class CalendarViewApp extends GemApplication {
         options2.getChildren().add(createOption("Enable month selection view", calendarView.monthSelectionViewEnabledProperty()));
         options2.getChildren().add(new Separator(Orientation.HORIZONTAL));
         options2.getChildren().add(disabledWeekendBox);
-        Button scenicViewButton = new Button("Scenic View");
+
+        Button scenicViewButton = new Button("Dev Tools");
+        hideInBrowser(scenicViewButton);
 
         VBox calendarWrapper = new VBox(50, calendarView, scenicViewButton);
 
@@ -110,7 +113,7 @@ public class CalendarViewApp extends GemApplication {
         Scene scene = new Scene(stackPane);
         CSSFX.start(scene);
 
-        scenicViewButton.setOnAction(evt -> ScenicView.show(scene));
+        configureDevToolsButton(scenicViewButton);
 
         stage.setTitle("CalendarView");
         stage.setScene(scene);

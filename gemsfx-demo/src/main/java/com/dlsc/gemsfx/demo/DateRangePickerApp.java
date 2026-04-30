@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.CalendarPicker;
 import com.dlsc.gemsfx.daterange.DateRange;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.daterange.DateRangePreset;
+import com.jpro.webapi.WebAPI;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -53,7 +54,8 @@ public class DateRangePickerApp extends GemApplication {
         CalendarPicker calendarPicker = new CalendarPicker();
         calendarPicker.setMaxWidth(Double.MAX_VALUE);
 
-        Button scenicViewButton = new Button("Scenic View");
+        Button scenicViewButton = new Button("Dev Tools");
+        hideInBrowser(scenicViewButton);
 
         CheckBox showPresetTitleCheckBox = new CheckBox("Show preset title");
         showPresetTitleCheckBox.selectedProperty().bindBidirectional(picker.showPresetTitleProperty());
@@ -100,7 +102,7 @@ public class DateRangePickerApp extends GemApplication {
         vBox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vBox);
-        scenicViewButton.setOnAction(evt -> ScenicView.show(scene));
+        configureDevToolsButton(scenicViewButton);
 
         CSSFX.start(scene);
 

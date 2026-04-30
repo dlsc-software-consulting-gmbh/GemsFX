@@ -100,8 +100,9 @@ public class PopOverApp extends GemApplication {
         CheckBox detachableBox = new CheckBox("Detachable");
         detachableBox.selectedProperty().bindBidirectional(detachable);
 
-        Button sceneViewButton = new Button("ScenicView");
-        sceneViewButton.setOnAction(evt -> ScenicView.show(pane.getScene()));
+        Button sceneViewButton = new Button("Dev Tools");
+        hideInBrowser(sceneViewButton);
+        configureDevToolsButton(sceneViewButton);
 
         ComboBox<String> styleBox = new ComboBox<>();
         styleBox.getItems().addAll("Default", "Dark", "Red");

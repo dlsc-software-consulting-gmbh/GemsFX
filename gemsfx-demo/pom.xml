@@ -29,12 +29,28 @@
         <url>https://github.com/dlsc-software-consulting-gmbh/GemsFX</url>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>jpro-repo</id>
+            <url>https://sandec.jfrog.io/artifactory/repo</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jpro-repo</id>
+            <url>https://sandec.jfrog.io/artifactory/repo</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <properties>
         <main.class>com.dlsc.gemsfx.demo.GemsFXDemoLauncher</main.class>
         <snapshot.filter></snapshot.filter>
         <!-- Demo module is not published; skip Central releasability enforcement -->
         <enforcer.skip>true</enforcer.skip>
         <devtoolsfx.version>1.0.1</devtoolsfx.version>
+        <jpro.maven.plugin.version>2026.1.1</jpro.maven.plugin.version>
+        <jpro.webapi.version>2025.3.1</jpro.webapi.version>
     </properties>
 
     <build>
@@ -174,6 +190,20 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>one.jpro</groupId>
+                <artifactId>jpro-maven-plugin</artifactId>
+                <version>${jpro.maven.plugin.version}</version>
+                <configuration>
+                    <mainClassName>${main.class}</mainClassName>
+                    <localJVMArgs>
+                        <JVMArg>
+                            -Djavafx.enablePreview=true
+                        </JVMArg>
+                    </localJVMArgs>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
@@ -205,6 +235,12 @@
         <dependency>
             <groupId>one.jpro.platform</groupId>
             <artifactId>jpro-mdfx</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>one.jpro</groupId>
+            <artifactId>jpro-webapi</artifactId>
+            <version>${jpro.webapi.version}</version>
         </dependency>
 
         <dependency>

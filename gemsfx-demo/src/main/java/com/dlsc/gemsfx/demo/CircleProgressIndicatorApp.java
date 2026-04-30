@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.ArcProgressIndicator;
 import com.dlsc.gemsfx.ArcProgressIndicator.StyleType;
 import com.dlsc.gemsfx.CircleProgressIndicator;
+import com.jpro.webapi.WebAPI;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -66,9 +67,10 @@ public class CircleProgressIndicatorApp extends GemApplication {
         indicatorWrapper.getStyleClass().add("indicator-wrapper");
         VBox.setVgrow(indicatorWrapper, Priority.ALWAYS);
 
-        Button scenicView = new Button("Scenic View");
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
         scenicView.setMaxWidth(Double.MAX_VALUE);
-        scenicView.setOnAction(e -> ScenicView.show(scenicView.getScene()));
+        configureDevToolsButton(scenicView);
 
         VBox bottom = new VBox(10, customConverterBox, startAngleBox, styleComboBox, scenicView);
         bottom.setAlignment(Pos.CENTER_LEFT);

@@ -13,6 +13,7 @@ open module com.dlsc.gemsfx.demo {
 
     requires one.jpro.platform.utils;
     requires one.jpro.platform.mdfx;
+    requires jpro.webapi;
 
     requires org.scenicview.scenicview;
     requires org.controlsfx.controls;

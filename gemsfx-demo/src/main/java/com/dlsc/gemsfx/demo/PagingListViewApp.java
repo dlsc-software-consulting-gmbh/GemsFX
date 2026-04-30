@@ -63,8 +63,9 @@ public class PagingListViewApp extends GemApplication {
         pagingListView.totalItemCountProperty().subscribe(count -> System.out.println("total item count: " + count));
         simulateNoData.addListener(it -> pagingListView.reload());
 
-        Button scenicView = new Button("Scenic View");
-        scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
+        configureDevToolsButton(scenicView);
 
         CheckBox fillBox = new CheckBox("Fill last page");
         fillBox.selectedProperty().bindBidirectional(pagingListView.fillLastPageProperty());

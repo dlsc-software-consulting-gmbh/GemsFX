@@ -139,8 +139,9 @@ public class DialogPaneWithMarkdownApp extends GemApplication {
         VBox.setVgrow(flowPane, Priority.ALWAYS);
         VBox.setVgrow(durationBox, Priority.ALWAYS);
 
-        Button scenicView = new Button("Scenic View");
-        scenicView.setOnAction(evt -> ScenicView.show(scenicView.getScene()));
+        Button scenicView = new Button("Dev Tools");
+        hideInBrowser(scenicView);
+        configureDevToolsButton(scenicView);
 
         HBox hBox = new HBox(10, new Label("Animation:"), durationBox, new Label("StyleType:"), styleBox, scenicView);
         hBox.setAlignment(Pos.CENTER);

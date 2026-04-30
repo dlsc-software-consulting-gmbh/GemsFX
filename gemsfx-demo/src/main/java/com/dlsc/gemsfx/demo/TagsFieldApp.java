@@ -6,6 +6,7 @@ import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -51,7 +52,7 @@ public class TagsFieldApp extends GemApplication {
         Label label = new Label("Selected country:");
         Label value = new Label();
         value.textProperty().bind(Bindings.createStringBinding(() -> field.getSelectedItem() != null ? field.getSelectedItem().getName() : "<no selection>", field.selectedItemProperty()));
-        HBox hBox = new HBox(10, label, value);
+        HBox hBox1 = new HBox(10, label, value);
 
         Label label2 = new Label("Number of suggestions found:");
         Label value2 = new Label();
@@ -121,8 +122,9 @@ public class TagsFieldApp extends GemApplication {
         fieldsBox.setAlignment(Pos.TOP_LEFT);
         HBox.setHgrow(field, Priority.ALWAYS);
 
-        Button scenicViewButton = new Button("Scenic View");
-        scenicViewButton.setOnAction(evt -> ScenicView.show(field.getScene()));
+        Button scenicViewButton = new Button("Dev Tools");
+        hideInBrowser(scenicViewButton);
+        configureDevToolsButton(scenicViewButton);
 
         Button generateButton = new Button("Generate Tags");
         generateButton.setOnAction(evt -> {
@@ -141,14 +143,30 @@ public class TagsFieldApp extends GemApplication {
 
         HBox buttonBox = new HBox(10, scenicViewButton, generateButton, clearButton);
 
-        VBox vbox = new VBox(20, createNewItemBox, showPromptText, usePlaceholder, hideWithSingleChoiceBox, showSearchIconBox, showLeftRightNodes, singleSelectionBox, hBox, hBox2, hBox2a, hBox3, hBox4, buttonBox, field);
+        VBox vbox = new VBox(10,
+                field,
+                buttonBox,
+                new Separator(Orientation.HORIZONTAL),
+                hBox1,
+                hBox2,
+                hBox2a,
+                hBox3,
+                hBox4,
+                new Separator(Orientation.HORIZONTAL),
+                createNewItemBox,
+                showPromptText,
+                usePlaceholder,
+                hideWithSingleChoiceBox,
+                showSearchIconBox,
+                showLeftRightNodes,
+                singleSelectionBox);
+
         vbox.setPadding(new Insets(20));
+        vbox.setMinHeight(Region.USE_PREF_SIZE);
 
         field.getTags().add(new Country("Germany"));
-        CSSFX.start();
 
         Scene scene = new Scene(vbox);
-        scene.focusOwnerProperty().addListener(it -> System.out.println("owner: " + scene.getFocusOwner()));
 
         primaryStage.setTitle("Tags Field");
         primaryStage.setScene(scene);

@@ -9,11 +9,13 @@ import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 import atlantafx.base.theme.Styles;
 import atlantafx.base.theme.Theme;
+import com.dlsc.gemsfx.GlassPane;
 import com.dlsc.gemsfx.Spacer;
 import com.dlsc.gemsfx.demo.binding.AggregatedListBindingApp;
 import com.dlsc.gemsfx.demo.binding.NestedListBindingApp;
 import com.dlsc.gemsfx.demo.binding.NestedListChangeTrackerApp;
 import com.dlsc.gemsfx.demo.binding.ObservableListBindingApp;
+import com.jpro.webapi.WebAPI;
 import devtoolsfx.gui.GUI;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -27,6 +29,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -51,6 +54,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import one.jpro.platform.mdfx.MarkdownView;
@@ -77,12 +81,13 @@ import java.util.prefs.Preferences;
 public class GemsFXDemoLauncher extends GemApplication {
 
     private CheckBox developerToolCheckBox;
+    private GlassPane browserGlassPane;
 
     // -----------------------------------------------------------------------
     // Demo registry
     // -----------------------------------------------------------------------
 
-    public record DemoEntry(String category, String name, Supplier<Application> factory) {
+    public record DemoEntry(String category, String name, Supplier<Application> factory, boolean desktopOnly) {
     }
 
     private final List<Stage> openDemoStages = new ArrayList<>();
@@ -129,14 +134,14 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Lists & Tables", "Filter View", FilterViewApp::new),
             demo("Lists & Tables", "Filter View (Simple)", SimpleFilterViewApp::new),
             demo("Lists & Tables", "Grid Table View", GridTableViewApp::new),
-            demo("Lists & Tables", "Multi Column List View", MultiColumnListViewApp::new),
+            desktopDemo("Lists & Tables", "Multi Column List View", MultiColumnListViewApp::new),
             demo("Lists & Tables", "Paging Controls", PagingControlsApp::new),
             demo("Lists & Tables", "Paging Grid Table View", PagingGridTableViewApp::new),
             demo("Lists & Tables", "Paging Grid Table View (Simple)", SimplePagingGridTableViewApp::new),
             demo("Lists & Tables", "Paging List View", PagingListViewApp::new),
             demo("Lists & Tables", "Paging List View (Simple)", SimplePagingListViewApp::new),
             demo("Lists & Tables", "Strip View", StripViewApp::new),
-            demo("Lists & Tables", "Table View", TableViewExample::new),
+            desktopDemo("Lists & Tables", "Table View", TableViewExample::new),
 
             // --- Media & Graphics -----------------------------------------------
             demo("Media & Graphics", "Avatar View", AvatarViewApp::new),
@@ -144,21 +149,21 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Media & Graphics", "Circle Progress Indicator", CircleProgressIndicatorApp::new),
             demo("Media & Graphics", "Payment Option", PaymentOptionApp::new),
             demo("Media & Graphics", "Payment Option Tiles", PaymentOptionTilesApp::new),
-            demo("Media & Graphics", "Photo View", PhotoViewApp::new),
+            desktopDemo("Media & Graphics", "Photo View", PhotoViewApp::new),
             demo("Media & Graphics", "Segmented Bar", SegmentedBarApp::new),
             demo("Media & Graphics", "Semi-Circle Progress Indicator", SemiCircleProgressIndicatorApp::new),
             demo("Media & Graphics", "SVG Image View", SVGImageViewApp::new),
 
             // --- Overlays & Dialogs ---------------------------------------------
             demo("Overlays & Dialogs", "Dialog Pane", DialogPaneApp::new),
-            demo("Overlays & Dialogs", "Dialog Pane with Markdown", DialogPaneWithMarkdownApp::new),
+            desktopDemo("Overlays & Dialogs", "Dialog Pane with Markdown", DialogPaneWithMarkdownApp::new),
             demo("Overlays & Dialogs", "Info Center", InfoCenterApp::new),
             demo("Overlays & Dialogs", "Notification View", NotificationViewApp::new),
             demo("Overlays & Dialogs", "Pop Over", PopOverApp::new),
 
             // --- Text & Input ---------------------------------------------------
             demo("Text & Input", "Email Field", EmailFieldApp::new),
-            demo("Text & Input", "Enhanced Label", EnhancedLabelApp::new),
+            desktopDemo("Text & Input", "Enhanced Label", EnhancedLabelApp::new),
             demo("Text & Input", "Enhanced Password Field", EnhancedPasswordFieldApp::new),
             demo("Text & Input", "Expanding Text Area", ExpandingTextAreaApp::new),
             demo("Text & Input", "Limited Text Area", LimitedTextAreaApp::new),
@@ -167,23 +172,27 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Text & Input", "Search Text Field", SearchTextFieldApp::new),
             demo("Text & Input", "Selection Box", SelectionBoxApp::new),
             demo("Text & Input", "Tags Field", TagsFieldApp::new),
-            demo("Text & Input", "Tags Field (Email)", TagsFieldEmailApp::new),
+            desktopDemo("Text & Input", "Tags Field (Email)", TagsFieldEmailApp::new),
             demo("Text & Input", "Text View", TextViewApp::new),
-            demo("Text & Input", "Text View in VBox", TextViewInVBoxApp::new),
-            demo("Text & Input", "Text View with List View", TextViewWithListViewApp::new),
-            demo("Text & Input", "Text View with Paging List View", TextViewWithPagingListViewApp::new),
+            desktopDemo("Text & Input", "Text View in VBox", TextViewInVBoxApp::new),
+            desktopDemo("Text & Input", "Text View with List View", TextViewWithListViewApp::new),
+            desktopDemo("Text & Input", "Text View with Paging List View", TextViewWithPagingListViewApp::new),
 
             // --- Utilities ------------------------------------------------------
             demo("Utilities", "History Manager", HistoryManagerApp::new),
-            demo("Utilities", "Recent Files", RecentFilesApp::new),
-            demo("Utilities", "Screens View", ScreensViewApp::new),
+            desktopDemo("Utilities", "Recent Files", RecentFilesApp::new),
+            desktopDemo("Utilities", "Screens View", ScreensViewApp::new),
             demo("Utilities", "Session Manager", SessionManagerApp::new),
-            demo("Utilities", "Stage Manager", StageManagerApp::new),
+            desktopDemo("Utilities", "Stage Manager", StageManagerApp::new),
             demo("Utilities", "Tree Node View", TreeNodeViewApp::new)
     );
 
     private static DemoEntry demo(String category, String name, Supplier<Application> factory) {
-        return new DemoEntry(category, name, factory);
+        return new DemoEntry(category, name, factory, false);
+    }
+
+    private static DemoEntry desktopDemo(String category, String name, Supplier<Application> factory) {
+        return new DemoEntry(category, name, factory, true);
     }
 
     // -----------------------------------------------------------------------
@@ -192,7 +201,10 @@ public class GemsFXDemoLauncher extends GemApplication {
 
     @Override
     public void start(Stage stage) {
-        stage.initStyle(StageStyle.EXTENDED);
+        if (!WebAPI.isBrowser()) {
+            stage.initStyle(StageStyle.EXTENDED);
+        }
+
         super.start(stage);
         launcherStage = stage;
 
@@ -261,8 +273,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         }
 
         // Logo image
-        Image logoImage = new Image(Objects.requireNonNull(
-                GemsFXDemoLauncher.class.getResourceAsStream("gems.png")));
+        Image logoImage = new Image(Objects.requireNonNull(GemsFXDemoLauncher.class.getResourceAsStream("gems.png")));
 
         Button[] launchButtonRef = new Button[1];
 
@@ -277,7 +288,7 @@ public class GemsFXDemoLauncher extends GemApplication {
             themeMenuButton.setText(selectedThemeName);
             prefs.put("launcher.theme", selectedThemeName);
             new ArrayList<>(openDemoStages).forEach(Stage::close);
-            boolean darkTheme = theme != null && isDarkTheme(theme);
+            boolean darkTheme = isDarkTheme(theme);
 
             markdownViews.forEach(view -> view.getStyleClass().removeAll("light", "dark"));
             if (darkTheme) {
@@ -331,7 +342,11 @@ public class GemsFXDemoLauncher extends GemApplication {
         TextField searchField = new TextField();
         searchField.setPromptText("Search demos…");
 
-        ObservableList<DemoEntry> allItems = FXCollections.observableArrayList(ALL_DEMOS);
+        List<DemoEntry> visibleDemos = ALL_DEMOS.stream()
+                .filter(entry -> !WebAPI.isBrowser() || !entry.desktopOnly())
+                .toList();
+
+        ObservableList<DemoEntry> allItems = FXCollections.observableArrayList(visibleDemos);
         FilteredList<DemoEntry> filtered = new FilteredList<>(allItems);
 
         searchField.textProperty().addListener((obs, oldVal, q) -> {
@@ -346,7 +361,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         root.setExpanded(true);
 
         Map<String, TreeItem<Object>> categoryNodes = new LinkedHashMap<>();
-        for (DemoEntry entry : ALL_DEMOS) {
+        for (DemoEntry entry : visibleDemos) {
             categoryNodes.computeIfAbsent(entry.category(), cat -> {
                 TreeItem<Object> node = new TreeItem<>(cat);
                 node.setExpanded(true);
@@ -372,14 +387,17 @@ public class GemsFXDemoLauncher extends GemApplication {
         VBox.setVgrow(listView, Priority.ALWAYS);
 
         // ── Status bar ───────────────────────────────────────────────────────
-        Label countLabel = new Label(ALL_DEMOS.size() + " demos");
+        Label countLabel = new Label(visibleDemos.size() + " demos");
         countLabel.setStyle("-fx-font-size: 11px;");
         countLabel.setOpacity(0.6);
         filtered.addListener((Observable obs) ->
-                countLabel.setText(filtered.size() + " / " + ALL_DEMOS.size() + " demos"));
+                countLabel.setText(filtered.size() + " / " + visibleDemos.size() + " demos"));
 
         // ── Launch button ─────────────────────────────────────────────────────
         developerToolCheckBox = new CheckBox("Show Developer Tool");
+        developerToolCheckBox.setVisible(!WebAPI.isBrowser());
+        developerToolCheckBox.setManaged(!WebAPI.isBrowser());
+
         Button launchButton = new Button("Launch Demo");
         launchButton.setDefaultButton(true);
         launchButtonRef[0] = launchButton;
@@ -564,6 +582,9 @@ public class GemsFXDemoLauncher extends GemApplication {
         HBox header = new HBox(12, titleBox, themeMenuButton, spacer1, githubBadgeView, dlscLogoView);
         header.setAlignment(Pos.CENTER_LEFT);
         header.getStyleClass().add("launcher-header");
+        if (WebAPI.isBrowser()) {
+            header.getStyleClass().add("browser");
+        }
 
         // Make the header draggable to move the stage
         double[] dragDelta = {0, 0};
@@ -577,9 +598,14 @@ public class GemsFXDemoLauncher extends GemApplication {
         });
 
         // ── Footer ────────────────────────────────────────────────────────────
+        Hyperlink poweredByJProLink = new Hyperlink("Powered by JPro");
+        poweredByJProLink.setOnAction(e -> getHostServices().showDocument("https://www.jpro.one"));
+        poweredByJProLink.setVisible(WebAPI.isBrowser());
+        poweredByJProLink.setManaged(WebAPI.isBrowser());
+
         Region footerSpacer = new Region();
         HBox.setHgrow(footerSpacer, Priority.ALWAYS);
-        HBox footer = new HBox(12, countLabel, footerSpacer, developerToolCheckBox, launchButton);
+        HBox footer = new HBox(12, countLabel, poweredByJProLink, footerSpacer, developerToolCheckBox, launchButton);
         footer.setAlignment(Pos.CENTER_LEFT);
         footer.setPadding(new Insets(8, 16, 8, 16));
         footer.getStyleClass().add("launcher-footer");
@@ -587,7 +613,10 @@ public class GemsFXDemoLauncher extends GemApplication {
         VBox rootWithHeader = new VBox(header, rootHBox, footer);
         VBox.setVgrow(rootHBox, Priority.ALWAYS);
 
-        Scene scene = new Scene(new StackPane(rootWithHeader));
+        browserGlassPane = new GlassPane();
+        browserGlassPane.setHide(true);
+
+        Scene scene = new Scene(new StackPane(rootWithHeader, browserGlassPane));
         scene.getStylesheets().add(Objects.requireNonNull(GemsFXDemoLauncher.class.getResource("launcher.css")).toExternalForm());
         stage.setTitle("GemsFX — Demo Launcher");
         stage.setScene(scene);
@@ -633,10 +662,18 @@ public class GemsFXDemoLauncher extends GemApplication {
         try {
             Application app = entry.factory().get();
             Stage demoStage = new Stage();
+            demoStage.initOwner(launcherStage);
+            if (WebAPI.isBrowser()) {
+                demoStage.initModality(Modality.APPLICATION_MODAL);
+            }
             app.start(demoStage);
-            centerOnSameScreen(demoStage);
+
             openDemoStages.add(demoStage);
-            demoStage.setOnHidden(e -> openDemoStages.remove(demoStage));
+            updateBrowserGlassPane();
+            demoStage.setOnHidden(e -> {
+                openDemoStages.remove(demoStage);
+                updateBrowserGlassPane();
+            });
             if (developerToolCheckBox.isSelected() && demoStage.getScene() != null) {
                 GUI.openToolStage(demoStage, app.getHostServices());
             }
@@ -661,6 +698,12 @@ public class GemsFXDemoLauncher extends GemApplication {
                 .orElse(javafx.stage.Screen.getPrimary().getVisualBounds());
         demoStage.setX(bounds.getMinX() + (bounds.getWidth() - demoStage.getWidth()) / 2);
         demoStage.setY(bounds.getMinY() + (bounds.getHeight() - demoStage.getHeight()) / 2);
+    }
+
+    private void updateBrowserGlassPane() {
+        if (browserGlassPane != null) {
+            browserGlassPane.setHide(!WebAPI.isBrowser() || openDemoStages.isEmpty());
+        }
     }
 
     // -----------------------------------------------------------------------
