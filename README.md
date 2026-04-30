@@ -4,6 +4,9 @@
 [![Java Version](https://img.shields.io/badge/Java_Version-11+-ff69b4)](https://github.com/openjdk/jdk)
 [![JavaFX Version](https://img.shields.io/badge/JavaFX_Version-17+-brightgreen)](https://github.com/openjdk/jfx)
 
+> Install the GemsFX demo launcher locally via jdeploy: [https://www.jdeploy.com/~gemsfxdemo](https://www.jdeploy.com/~gemsfxdemo)
+> The demo will automatically update itself when new versions of GemsFX are released. You can also run the demo via Maven (see below).
+
 # GemsFX
 
 GemsFX is a collection of custom controls and utilities for JavaFX. The website is located at [https://gemsfx.dlsc.com](https://gemsfx.dlsc.com).
