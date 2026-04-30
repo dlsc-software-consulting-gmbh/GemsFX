@@ -26,7 +26,7 @@ public class DayOfWeekPickerApp extends GemApplication {
         dayOfWeekPicker.prefWidthProperty().bind(dayOfWeekPicker.getSelectionModel().selectionModeProperty().map(sm -> sm == SelectionMode.SINGLE ? 135 : 160));
         StackPane wrapper = new StackPane(dayOfWeekPicker);
         if (Boolean.getBoolean("atlantafx")) {
-            wrapper.setStyle("-fx-padding: 30px; -fx-background-color: -color-neutral-subtle;");
+            wrapper.setStyle("-fx-padding: 30px; -fx-background-color: -color-bg-default;");
         } else {
             wrapper.setStyle("-fx-padding: 30px; -fx-background-color: white;");
         }

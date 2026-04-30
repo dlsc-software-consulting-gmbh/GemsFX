@@ -28,7 +28,7 @@ public class TimeRangePickerApp extends GemApplication {
         StackPane wrapper = new StackPane(timeRangePicker);
 
         if (Boolean.getBoolean("atlantafx")) {
-            wrapper.setStyle("-fx-background-color: -color-neutral-subtle; -fx-padding: 10;");
+            wrapper.setStyle("-fx-background-color: -color-bg-default; -fx-padding: 10;");
         } else {
             wrapper.setStyle("-fx-background-color: white; -fx-padding: 10;");
         }

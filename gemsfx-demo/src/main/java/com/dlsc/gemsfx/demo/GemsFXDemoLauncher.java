@@ -125,7 +125,6 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Layout", "Power Pane", PowerPaneApp::new),
             demo("Layout", "Resizing Behaviour", ResizingBehaviourApp::new),
             demo("Layout", "Responsive Pane", ResponsivePaneApp::new),
-            demo("Layout", "Scroll Pane", ScrollPaneApp::new),
             demo("Layout", "Spacer", SpacerApp::new),
             demo("Layout", "Stretching Tile Pane", StretchingTilePaneApp::new),
             demo("Layout", "Three Items Pane", ThreeItemsPaneApp::new),
@@ -134,14 +133,14 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Lists & Tables", "Filter View", FilterViewApp::new),
             demo("Lists & Tables", "Filter View (Simple)", SimpleFilterViewApp::new),
             demo("Lists & Tables", "Grid Table View", GridTableViewApp::new),
-            desktopDemo("Lists & Tables", "Multi Column List View", MultiColumnListViewApp::new),
+            desktopDemoOnly("Lists & Tables", "Multi Column List View", MultiColumnListViewApp::new),
             demo("Lists & Tables", "Paging Controls", PagingControlsApp::new),
             demo("Lists & Tables", "Paging Grid Table View", PagingGridTableViewApp::new),
             demo("Lists & Tables", "Paging Grid Table View (Simple)", SimplePagingGridTableViewApp::new),
             demo("Lists & Tables", "Paging List View", PagingListViewApp::new),
             demo("Lists & Tables", "Paging List View (Simple)", SimplePagingListViewApp::new),
             demo("Lists & Tables", "Strip View", StripViewApp::new),
-            desktopDemo("Lists & Tables", "Table View", TableViewExample::new),
+            desktopDemoOnly("Lists & Tables", "Table View", TableViewExample::new),
 
             // --- Media & Graphics -----------------------------------------------
             demo("Media & Graphics", "Avatar View", AvatarViewApp::new),
@@ -149,21 +148,20 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Media & Graphics", "Circle Progress Indicator", CircleProgressIndicatorApp::new),
             demo("Media & Graphics", "Payment Option", PaymentOptionApp::new),
             demo("Media & Graphics", "Payment Option Tiles", PaymentOptionTilesApp::new),
-            desktopDemo("Media & Graphics", "Photo View", PhotoViewApp::new),
+            desktopDemoOnly("Media & Graphics", "Photo View", PhotoViewApp::new),
             demo("Media & Graphics", "Segmented Bar", SegmentedBarApp::new),
             demo("Media & Graphics", "Semi-Circle Progress Indicator", SemiCircleProgressIndicatorApp::new),
             demo("Media & Graphics", "SVG Image View", SVGImageViewApp::new),
 
             // --- Overlays & Dialogs ---------------------------------------------
             demo("Overlays & Dialogs", "Dialog Pane", DialogPaneApp::new),
-            desktopDemo("Overlays & Dialogs", "Dialog Pane with Markdown", DialogPaneWithMarkdownApp::new),
             demo("Overlays & Dialogs", "Info Center", InfoCenterApp::new),
             demo("Overlays & Dialogs", "Notification View", NotificationViewApp::new),
             demo("Overlays & Dialogs", "Pop Over", PopOverApp::new),
 
             // --- Text & Input ---------------------------------------------------
             demo("Text & Input", "Email Field", EmailFieldApp::new),
-            desktopDemo("Text & Input", "Enhanced Label", EnhancedLabelApp::new),
+            desktopDemoOnly("Text & Input", "Enhanced Label", EnhancedLabelApp::new),
             demo("Text & Input", "Enhanced Password Field", EnhancedPasswordFieldApp::new),
             demo("Text & Input", "Expanding Text Area", ExpandingTextAreaApp::new),
             demo("Text & Input", "Limited Text Area", LimitedTextAreaApp::new),
@@ -172,18 +170,18 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Text & Input", "Search Text Field", SearchTextFieldApp::new),
             demo("Text & Input", "Selection Box", SelectionBoxApp::new),
             demo("Text & Input", "Tags Field", TagsFieldApp::new),
-            desktopDemo("Text & Input", "Tags Field (Email)", TagsFieldEmailApp::new),
+            desktopDemoOnly("Text & Input", "Tags Field (Email)", TagsFieldEmailApp::new),
             demo("Text & Input", "Text View", TextViewApp::new),
-            desktopDemo("Text & Input", "Text View in VBox", TextViewInVBoxApp::new),
-            desktopDemo("Text & Input", "Text View with List View", TextViewWithListViewApp::new),
-            desktopDemo("Text & Input", "Text View with Paging List View", TextViewWithPagingListViewApp::new),
+//            desktopDemoOnly("Text & Input", "Text View in VBox", TextViewInVBoxApp::new),
+//            desktopDemoOnly("Text & Input", "Text View with List View", TextViewWithListViewApp::new),
+//            desktopDemoOnly("Text & Input", "Text View with Paging List View", TextViewWithPagingListViewApp::new),
 
             // --- Utilities ------------------------------------------------------
             demo("Utilities", "History Manager", HistoryManagerApp::new),
-            desktopDemo("Utilities", "Recent Files", RecentFilesApp::new),
-            desktopDemo("Utilities", "Screens View", ScreensViewApp::new),
+            desktopDemoOnly("Utilities", "Recent Files", RecentFilesApp::new),
+            desktopDemoOnly("Utilities", "Screens View", ScreensViewApp::new),
             demo("Utilities", "Session Manager", SessionManagerApp::new),
-            desktopDemo("Utilities", "Stage Manager", StageManagerApp::new),
+            desktopDemoOnly("Utilities", "Stage Manager", StageManagerApp::new),
             demo("Utilities", "Tree Node View", TreeNodeViewApp::new)
     );
 
@@ -191,7 +189,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         return new DemoEntry(category, name, factory, false);
     }
 
-    private static DemoEntry desktopDemo(String category, String name, Supplier<Application> factory) {
+    private static DemoEntry desktopDemoOnly(String category, String name, Supplier<Application> factory) {
         return new DemoEntry(category, name, factory, true);
     }
 
@@ -662,8 +660,8 @@ public class GemsFXDemoLauncher extends GemApplication {
         try {
             Application app = entry.factory().get();
             Stage demoStage = new Stage();
-            demoStage.initOwner(launcherStage);
             if (WebAPI.isBrowser()) {
+                demoStage.initOwner(launcherStage);
                 demoStage.initModality(Modality.APPLICATION_MODAL);
             }
             app.start(demoStage);
