@@ -112,6 +112,11 @@
 
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-material-pack</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-bootstrapicons-pack</artifactId>
         </dependency>
 
