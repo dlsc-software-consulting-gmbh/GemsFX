@@ -1531,7 +1531,10 @@
 }
 
 .info-center-view .notification-view > .content > .text-container > .actions-box .button {
-    -fx-background-color: -color-button-bg;
+    -fx-background-color: -color-bg-subtle;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 2px;
+    -fx-text-fill: -color-button-fg;
 }
 
 .info-center-view .notification-view > .stack-notification1 {

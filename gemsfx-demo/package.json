@@ -8,7 +8,7 @@
     "preferGlobal": true,
     "title": "GemsFX Demo Launcher",
     "scripts": {"test": "echo \"Error: no test specified\" && exit 1"},
-    "version": "4.0.1",
+    "version": "4.0.3",
     "jdeploy": {
         "args": [
             "-Djavafx.enablePreview=true",
@@ -24,7 +24,7 @@
             "url": ""
         }],
         "javaVersion": "25",
-        "jar": "target/gemsfx-demo-4.0.1.jar",
+        "jar": "target/gemsfx-demo-4.0.3.jar",
         "javafx": true,
         "title": "GemsFX Demo Launcher",
         "platformBundlesEnabled": false,

@@ -8,12 +8,13 @@
 }
 
 .info-center-view > .main-pane > .default-placeholder {
-    -fx-background-color: rgba(0, 0, 0, .3);
+    -fx-background: rgba(0, 0, 0, .3);
+    -fx-background-color: -fx-background;
     -fx-background-radius: 2px;
 }
 
 .info-center-view > .main-pane > .default-placeholder > .label {
-    -fx-text-fill: white;
+    -fx-text-fill: -fx-text-background-color;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
     -fx-padding: 5px 0;
@@ -22,17 +23,11 @@
 
 .info-center-view > .main-pane > .default-placeholder > .label > .ikonli-font-icon {
     -fx-icon-size: 20px;
-    -fx-icon-color: white;
-}
-
-.info-center-view .notification-view .default-icon {
-    -fx-icon-size: 32px;
-    -fx-icon-color: -fx-accent;
-    -fx-icon-code: gmi-info;
+    -fx-icon-color: -fx-text-background-color;
 }
 
 .info-center-view.transparent > .main-pane > .all-groups-container > .pinned-separator {
-    -fx-background-color: rgba(255, 255, 255, .3);
+    -fx-background-color: -fx-control-inner-background-alt;
     -fx-background-insets: 0px 100px;
     -fx-pref-height: 1px;
 }
@@ -54,7 +49,8 @@
 }
 
 .info-center-view .wrapper {
-    -fx-background-color: rgba(0, 0, 0, .3);
+    -fx-background: rgba(0, 0, 0, .3);
+    -fx-background-color: -fx-background;
     -fx-background-radius: 6px;
     -fx-padding: 10px;
 }
@@ -70,7 +66,7 @@
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container.pinned {
-    -fx-padding: 20px 25px; /* needs more padding, because its content is not inside a scrollpane */
+    -fx-padding: 20px 25px; /* needs more padding, because its content is not inside a scroll pane */
 }
 
 .info-center-view.transparent > .main-pane > .all-groups-container .groups-container.pinned {
@@ -93,7 +89,7 @@
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .group-name-label {
-    -fx-text-fill: white;
+    -fx-text-fill: -fx-text-background-color;
     -fx-font-size: 24px;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
@@ -105,14 +101,15 @@
     -fx-font-size: .9em;
     -fx-pref-height: 2em;
     -fx-padding: 0px 10px;
-    -fx-background-color: lightgrey;
-    -fx-text-fill: rgba(0, 0, 0, .6);
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-background;
+    -fx-text-fill: -fx-text-background-color;
     -fx-background-radius: 1000px;
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .show-less-button:pressed,
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .show-all-button:pressed {
-    -fx-background-color: derive(lightgrey, -10%);
+    -fx-background: -fx-control-inner-background-alt;
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .pin-button,
@@ -122,18 +119,19 @@
     -fx-pref-width: -size;
     -fx-pref-height: -size;
     -fx-padding: 0px;
-    -fx-background-color: lightgrey;
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-background;
     -fx-background-radius: 1000px;
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .clear-button .ikonli-font-icon {
-    -fx-icon-color: rgba(0, 0, 0, .6);
+    -fx-icon-color: -fx-text-background-color;
     -fx-font-size: 16px;
     -fx-icon-code: gmi-close;
 }
 
 .info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .pin-button .ikonli-font-icon {
-    -fx-icon-color: rgba(0, 0, 0, .6);
+    -fx-icon-color: -fx-text-background-color;
     -fx-font-size: 14px;
     -fx-icon-code: bi-pin-angle;
 }
@@ -154,7 +152,7 @@
 }
 
 .info-center-view > .main-pane > .single-group-wrapper > .single-group-header > .group-name-label {
-    -fx-text-fill: white;
+    -fx-text-fill: -fx-text-background-color;
     -fx-font-size: 24px;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
@@ -165,8 +163,9 @@
     -fx-font-size: .9em;
     -fx-pref-height: 2em;
     -fx-padding: 0px 10px;
-    -fx-background-color: lightgrey;
-    -fx-text-fill: rgba(0, 0, 0, .6);
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-background;
+    -fx-text-fill: -fx-text-background-color;
     -fx-background-radius: 1000px;
 }
 
@@ -176,12 +175,13 @@
     -fx-pref-width: -size;
     -fx-pref-height: -size;
     -fx-padding: 0px;
-    -fx-background-color: lightgrey;
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-background;
     -fx-background-radius: 1000px;
 }
 
 .info-center-view > .main-pane > .single-group-wrapper > .single-group-header > .clear-all-button .ikonli-font-icon {
-    -fx-icon-color: rgba(0, 0, 0, .6);
+    -fx-icon-color: -fx-text-background-color;
     -fx-font-size: 16px;
     -fx-icon-code: gmi-close;
 }
@@ -206,6 +206,32 @@
 .info-center-view .notification-view {
 }
 
+.info-center-view .notification-view .default-icon {
+    -fx-icon-size: 32px;
+    -fx-icon-color: -fx-accent;
+    -fx-icon-code: gmi-info;
+}
+
+.info-center-view .notification-view > .content {
+    -fx-background-radius: 8px;
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-background;
+    -fx-padding: 10px 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
+}
+
+.info-center-view .notification-view.warning > .content {
+    -fx-background-color: yellow;
+}
+
+.info-center-view .notification-view.danger > .content {
+    -fx-background-color: red;
+}
+
+.info-center-view .notification-view.success > .content {
+    -fx-background-color: green;
+}
+
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane {
     -size: 20;
     -fx-pref-width: -size;
@@ -215,12 +241,15 @@
     -fx-max-width: -size;
     -fx-max-height: -size;
     -fx-background-radius: 1000px;
-    -fx-background-color: lightgrey;
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-background;
 }
 
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
     -fx-icon-size: 16px;
     -fx-icon-code: gmi-chevron-right;
+    -fx-icon-color: -fx-text-background-color;
+    -fx-opacity: .75;
 }
 
 .info-center-view .notification-view:expanded > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
@@ -240,12 +269,13 @@
     -fx-translate-y: -5;
 
     -fx-background-radius: 1000px;
-    -fx-background-color: rgb(240, 240, 240);
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-background;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
 }
 
 .info-center-view .notification-view > .content > .close-icon-wrapper:pressed {
-    -fx-background-color: derive(rgb(240, 240, 240), -10%);
+    -fx-background: -fx-control-inner-background-alt;
 }
 
 .info-center-view .notification-view > .content > .close-icon-wrapper > .ikonli-font-icon {
@@ -275,13 +305,6 @@
     visibility: hidden;
 }
 
-.info-center-view .notification-view > .content {
-    -fx-background-radius: 8px;
-    -fx-background-color: rgb(240, 240, 240);
-    -fx-padding: 10px 10px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 15, 0.16, -1, 4);
-}
-
 .info-center-view .notification-view > .content > .text-container {
     -fx-spacing: 0px;
     -fx-padding: 0px 0px 0px 5px;
@@ -292,11 +315,12 @@
 }
 
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .time-label {
-    -fx-text-fill: gray;
+    -fx-text-fill: -fx-text-background-color;
+    -fx-opacity: 0.75;
 }
 
 .info-center-view .notification-view > .content > .text-container > .description-label {
-    -fx-text-fill: gray;
+    -fx-text-fill: -fx-text-background-color;
 }
 
 .info-center-view .notification-view > .content > .text-container > .actions-box {
@@ -305,9 +329,12 @@
 }
 
 .info-center-view .notification-view > .content > .text-container > .actions-box .button {
+    -fx-background: -fx-control-inner-background-alt;
+    -fx-background-color: -fx-box-border, -fx-background;
+    -fx-background-insets: 0px, 1px;
+    -fx-background-radius: 2px, 1px;
     -fx-padding: 2px 5px;
-    -fx-background-color: lightgrey;
-    -fx-background-radius: 2px;
+    -fx-text-fill: -fx-text-background-color;
 }
 
 .info-center-view .notification-view > .stack-notification1 {
@@ -335,7 +362,7 @@
 }
 
 .info-center-view > .main-pane > .top-level-container .scroll-bar .thumb {
-    -fx-background-color: rgba(0, 0, 0, .8);
+    -fx-background-color: -fx-text-background-color;
     -fx-background-radius: 1000;
     -fx-background-insets: 0px 1px 0px 0px;
     -size: 6;
