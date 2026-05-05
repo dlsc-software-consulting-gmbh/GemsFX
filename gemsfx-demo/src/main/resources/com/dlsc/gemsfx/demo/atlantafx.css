@@ -1424,6 +1424,7 @@
 }
 
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
+    -fx-icon-color: -color-fg-default;
 }
 
 .info-center-view .notification-view:expanded > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
