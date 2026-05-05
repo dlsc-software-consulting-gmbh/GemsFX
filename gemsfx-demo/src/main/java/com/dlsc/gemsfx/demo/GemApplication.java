@@ -31,7 +31,7 @@ public abstract class GemApplication extends Application {
 
     static {
         if (Boolean.getBoolean("atlantafx")) {
-            setUserAgentStylesheet(new CupertinoDark().getUserAgentStylesheet());
+            setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
         }
     }
 
