@@ -6,6 +6,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -15,6 +16,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
+import javafx.geometry.HorizontalDirection;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.MouseButton;
@@ -225,6 +227,10 @@ public class InfoCenterPane extends StackPane {
                 hide();
             }
         });
+
+        infoCenterView.slideInOriginProperty().bind(Bindings.createObjectBinding(
+                () -> getInfoCenterViewPos().isLeft() ? HorizontalDirection.LEFT : HorizontalDirection.RIGHT,
+                infoCenterViewPosProperty()));
     }
 
     private ObjectProperty<Duration> autoHideDuration;
@@ -359,6 +365,10 @@ public class InfoCenterPane extends StackPane {
      * component determines which side the info center slides in from (left or right),
      * and the vertical component determines whether it is placed at the top, center,
      * or bottom. The default value is {@link InfoCenterViewPos#TOP_RIGHT}.
+     * <p>
+     * The horizontal component also drives the managed view's
+     * {@link InfoCenterView#slideInOriginProperty()}, so that newly
+     * added notifications slide in from the same side the view is anchored to.
      *
      * @return the position of the info center view
      */

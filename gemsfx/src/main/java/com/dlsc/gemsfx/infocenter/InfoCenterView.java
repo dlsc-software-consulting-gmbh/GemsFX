@@ -13,13 +13,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
+import javafx.css.PseudoClass;
 import javafx.css.Styleable;
 import javafx.css.StyleableBooleanProperty;
 import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
+import javafx.css.converter.EnumConverter;
 import javafx.css.converter.SizeConverter;
+import javafx.geometry.HorizontalDirection;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -55,6 +58,7 @@ import java.util.stream.Collectors;
  *     <tr><td>{@code -fx-notification-spacing}</td><td>{@code double}</td><td>Spacing between notifications in the same group.</td></tr>
  *     <tr><td>{@code -fx-show-all-fade-duration}</td><td>{@code Duration}</td><td>Duration for fade animation when toggling views.</td></tr>
  *     <tr><td>{@code -fx-slide-in-duration}</td><td>{@code Duration}</td><td>Duration for slide-in/slide-out animation.</td></tr>
+ *     <tr><td>{@code -fx-slide-in-origin}</td><td>{@code left | right}</td><td>Edge from which a notification slides in.</td></tr>
  *     <tr><td>{@code -fx-transparent}</td><td>{@code boolean}</td><td>Whether the control background is transparent.</td></tr>
  *   </tbody>
  * </table>
@@ -68,7 +72,11 @@ public class InfoCenterView extends Control {
     private static final Duration DEFAULT_SLIDE_IN_DURATION = Duration.millis(500);
     private static final boolean DEFAULT_AUTO_OPEN_GROUP = false;
     private static final boolean DEFAULT_TRANSPARENT = false;
+    private static final HorizontalDirection DEFAULT_SLIDE_IN_ORIGIN = HorizontalDirection.RIGHT;
     private static final Node DEFAULT_PLACEHOLDER = createDefaultPlaceholder();
+
+    private static final PseudoClass LEFT_PSEUDO_CLASS = PseudoClass.getPseudoClass("left");
+    private static final PseudoClass RIGHT_PSEUDO_CLASS = PseudoClass.getPseudoClass("right");
 
     private final InvalidationListener updateNotificationsListener = it -> updateNotificationsList();
 
@@ -107,7 +115,15 @@ public class InfoCenterView extends Control {
 
         getGroups().addListener(groupListListener);
 
+        updateSlideInOriginPseudoClass(DEFAULT_SLIDE_IN_ORIGIN);
+
         setFocusTraversable(false);
+    }
+
+    private void updateSlideInOriginPseudoClass(HorizontalDirection origin) {
+        boolean isLeft = origin == HorizontalDirection.LEFT;
+        pseudoClassStateChanged(LEFT_PSEUDO_CLASS, isLeft);
+        pseudoClassStateChanged(RIGHT_PSEUDO_CLASS, !isLeft);
     }
 
     @Override
@@ -442,6 +458,69 @@ public class InfoCenterView extends Control {
         slideInDurationProperty().set(slideInDuration);
     }
 
+    private ObjectProperty<HorizontalDirection> slideInOrigin;
+
+    public final HorizontalDirection getSlideInOrigin() {
+        return slideInOrigin == null ? DEFAULT_SLIDE_IN_ORIGIN : slideInOrigin.get();
+    }
+
+    /**
+     * The edge from which a newly added notification slides into view. The default
+     * value is {@link HorizontalDirection#RIGHT}. When the view is placed on the
+     * left side of its container, applications should set this to
+     * {@link HorizontalDirection#LEFT} so that the slide-in animation matches
+     * the view's anchor side.
+     * <p>
+     * Can be set via CSS using the {@code -fx-slide-in-origin} property.
+     * Valid values are: {@code left}, {@code right}.
+     * The default value is {@code right}.
+     * </p>
+     * <p>
+     * When this view is managed by an {@link InfoCenterPane}, the pane <b>binds</b>
+     * this property to its {@link InfoCenterPane#infoCenterViewPosProperty()};
+     * in that case callers must control the direction via
+     * {@link InfoCenterPane#infoCenterViewPosProperty()}, since calling the
+     * setter on a bound property throws a {@link RuntimeException}.
+     * <p>
+     * A {@code null} value is treated as {@link HorizontalDirection#RIGHT} by
+     * the slide-in animation and the {@code :left} / {@code :right}
+     * pseudo-classes. The getter itself returns the raw property value and may
+     * therefore return {@code null} if the property has been explicitly set to
+     * {@code null} or bound to a {@code null}-producing binding.
+     *
+     * @return the slide origin of newly added notifications
+     */
+    public final ObjectProperty<HorizontalDirection> slideInOriginProperty() {
+        if (slideInOrigin == null) {
+            slideInOrigin = new StyleableObjectProperty<>(DEFAULT_SLIDE_IN_ORIGIN) {
+                @Override
+                protected void invalidated() {
+                    updateSlideInOriginPseudoClass(get());
+                }
+
+                @Override
+                public Object getBean() {
+                    return InfoCenterView.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "slideInOrigin";
+                }
+
+                @Override
+                public CssMetaData<? extends Styleable, HorizontalDirection> getCssMetaData() {
+                    return StyleableProperties.SLIDE_IN_ORIGIN;
+                }
+            };
+        }
+        return slideInOrigin;
+    }
+
+    public final void setSlideInOrigin(HorizontalDirection slideInOrigin) {
+        slideInOriginProperty().set(slideInOrigin);
+    }
+
     private BooleanProperty transparent;
 
     public final boolean isTransparent() {
@@ -638,6 +717,19 @@ public class InfoCenterView extends Control {
                     }
                 };
 
+        private static final CssMetaData<InfoCenterView, HorizontalDirection> SLIDE_IN_ORIGIN =
+                new CssMetaData<>("-fx-slide-in-origin", new EnumConverter<>(HorizontalDirection.class), DEFAULT_SLIDE_IN_ORIGIN) {
+                    @Override
+                    public boolean isSettable(InfoCenterView view) {
+                        return view.slideInOrigin == null || !view.slideInOrigin.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<HorizontalDirection> getStyleableProperty(InfoCenterView view) {
+                        return (StyleableProperty<HorizontalDirection>) view.slideInOriginProperty();
+                    }
+                };
+
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
 
         static {
@@ -648,6 +740,7 @@ public class InfoCenterView extends Control {
             styleables.add(SHOW_ALL_FADE_DURATION);
             styleables.add(EXPAND_DURATION);
             styleables.add(SLIDE_IN_DURATION);
+            styleables.add(SLIDE_IN_ORIGIN);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }

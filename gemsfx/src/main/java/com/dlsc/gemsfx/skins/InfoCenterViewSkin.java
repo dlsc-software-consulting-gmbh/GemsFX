@@ -28,6 +28,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
 import javafx.collections.transformation.SortedList;
+import javafx.geometry.HorizontalDirection;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -596,7 +597,9 @@ public class InfoCenterViewSkin extends GemsSkinBase<InfoCenterView> {
 
                     if (notificationViewOptional.isPresent()) {
                         NotificationView notificationView = notificationViewOptional.get();
-                        notificationView.setTranslateX(getWidth());
+                        boolean fromLeft = getSkinnable().getSlideInOrigin() == HorizontalDirection.LEFT;
+                        double startTranslateX = fromLeft ? -getWidth() : getWidth();
+                        notificationView.setTranslateX(startTranslateX);
 
                         Timeline slideInTimeline = new Timeline();
                         slideInTimeline.getKeyFrames().setAll(new KeyFrame(getSkinnable().getSlideInDuration(), new KeyValue(notificationView.translateXProperty(), 0, Interpolator.EASE_BOTH)));
