@@ -5,11 +5,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
-import org.controlsfx.control.HiddenSidesPane;
 
 /**
- * The "PowerPane" combines several other highly specialized panes of GemsFX and
- * ControlsFX. They are:
+ * The "PowerPane" combines several other highly specialized panes of GemsFX. They are:
  * <ul>
  *     <li>InfoCenterPane - to display notifications</li>
  *     <li>DialogPane - to display dialogs</li>

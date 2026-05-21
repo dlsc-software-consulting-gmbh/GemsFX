@@ -1,23 +1,23 @@
 open module com.dlsc.gemsfx {
-    requires javafx.base;
-    requires transitive javafx.controls;
-    requires javafx.graphics;
-    requires javafx.swing;
-    requires com.github.weisj.jsvg;
-
-    requires org.kordamp.ikonli.javafx;
-    requires org.kordamp.ikonli.materialdesign;
-    requires org.kordamp.ikonli.bootstrapicons;
-
+    requires java.desktop;
     requires java.logging;
     requires java.prefs;
 
-    requires net.synedra.validatorfx;
-    requires org.controlsfx.controls;
+    requires javafx.base;
+    requires javafx.controls;
+    requires javafx.graphics;
+    requires javafx.swing;
 
-    requires java.desktop;
+    requires com.github.weisj.jsvg;
+
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.material; // referenced in CSS files via -fx-icon-code, prefix "gmi-"
+    requires org.kordamp.ikonli.materialdesign; // referenced in CSS files via -fx-icon-code, prefix "mdi-"
+    requires org.kordamp.ikonli.bootstrapicons; // referenced in CSS files via -fx-icon-code, prefix "bi-"
+
+    requires net.synedra.validatorfx;
+
     requires com.dlsc.pickerfx;
-    requires com.dlsc.unitfx;
 
     exports com.dlsc.gemsfx;
     exports com.dlsc.gemsfx.daterange;

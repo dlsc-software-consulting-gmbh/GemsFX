@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DialogPane;
+import com.dlsc.gemsfx.HiddenSidesPane;
 import com.dlsc.gemsfx.PowerPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterView;
@@ -47,7 +48,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-import org.controlsfx.control.HiddenSidesPane;
 
 import java.time.ZonedDateTime;
 import java.util.List;

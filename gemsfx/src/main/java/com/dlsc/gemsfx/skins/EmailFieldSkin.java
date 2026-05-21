@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.CustomTextField;
 import com.dlsc.gemsfx.EmailField;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -20,7 +21,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import com.dlsc.gemsfx.util.StringUtils;
-import org.controlsfx.control.textfield.CustomTextField;
 
 import java.util.Objects;
 

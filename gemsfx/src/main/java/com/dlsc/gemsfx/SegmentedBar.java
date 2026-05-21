@@ -53,7 +53,7 @@ import java.util.Objects;
  * In this example the bar is used to visualize the usage of disk space for
  * various media types (photos, videos, music, ...). A special info node factory
  * is supplied to present a useful detailed description of the segment. The
- * type "TypeSegment" is a subclass of {@link org.controlsfx.control.SegmentedBar.Segment}
+ * type "TypeSegment" is a subclass of {@link SegmentedBar.Segment}
  * <pre>
  * typesBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
  * typesBar.setInfoNodeFactory(segment -> new InfoLabel(segment.getText() + " " + segment.getValue() + " GB"));

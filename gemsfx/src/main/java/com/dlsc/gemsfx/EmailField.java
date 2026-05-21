@@ -27,7 +27,6 @@ import javafx.scene.control.Skin;
 import javafx.util.Callback;
 import com.dlsc.gemsfx.util.EmailValidator;
 import com.dlsc.gemsfx.util.StringUtils;
-import org.controlsfx.control.textfield.CustomTextField;
 
 import java.util.ArrayList;
 import java.util.Collections;

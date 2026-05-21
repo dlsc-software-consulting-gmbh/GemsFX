@@ -132,7 +132,6 @@
                         <id>default-cli</id>
                         <configuration>
                             <options>
-                                <option>--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
                                 <option>-Dsnapshot.filter=${snapshot.filter}</option>
                                 <option>-Djavafx.enablePreview=true</option>
                             </options>
@@ -146,7 +145,6 @@
                             <options>
                                 <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:8000
                                 </option>
-                                <option>--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
                             </options>
                         </configuration>
                     </execution>
@@ -156,7 +154,6 @@
                         <configuration>
                             <options>
                                 <option>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>
-                                <option>--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
                             </options>
                         </configuration>
                     </execution>

@@ -1,6 +1,6 @@
 package com.dlsc.gemsfx.skins;
-import com.dlsc.unitfx.skins.CustomTextFieldSkin;
 import com.dlsc.gemsfx.EnhancedPasswordField;
+
 import javafx.beans.binding.StringBinding;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
