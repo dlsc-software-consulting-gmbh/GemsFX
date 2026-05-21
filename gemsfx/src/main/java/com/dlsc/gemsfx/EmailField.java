@@ -7,7 +7,6 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -26,8 +25,8 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.routines.EmailValidator;
+import com.dlsc.gemsfx.util.EmailValidator;
+import com.dlsc.gemsfx.util.StringUtils;
 import org.controlsfx.control.textfield.CustomTextField;
 
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringTokenizer;
+import java.util.function.Predicate;
 
 /**
  * EmailField is a custom control for inputting and validating email addresses.
@@ -68,7 +68,6 @@ public class EmailField extends Control {
 
     private static final PseudoClass VALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("valid");
     private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
-    private static final EmailValidator emailValidator = EmailValidator.getInstance();
 
     private final CustomTextField editor = new CustomTextField() {
         @Override
@@ -76,6 +75,42 @@ public class EmailField extends Control {
             return Objects.requireNonNull(EmailField.class.getResource("email-field.css")).toExternalForm();
         }
     };
+
+    // emailValidator
+
+    private final ObjectProperty<Predicate<String>> emailValidator = new SimpleObjectProperty<>(
+            this, "emailValidator", EmailValidator.getInstance()::isValid);
+
+    /**
+     * Returns the predicate used to decide whether an individual email address string is valid.
+     * Defaults to {@link EmailValidator#getInstance()}.
+     *
+     * @return the email validator predicate
+     */
+    public final Predicate<String> getEmailValidator() {
+        return emailValidator.get();
+    }
+
+    /**
+     * A pluggable validator for email address strings.
+     * Assign any {@link Predicate}{@code <String>} to replace the built-in validation logic.
+     * The binding that drives {@link #validProperty()} re-evaluates automatically when this
+     * property changes.
+     *
+     * @return the email validator property
+     */
+    public final ObjectProperty<Predicate<String>> emailValidatorProperty() {
+        return emailValidator;
+    }
+
+    /**
+     * Sets the predicate used to validate individual email address strings.
+     *
+     * @param emailValidator the new validator; must not be {@code null}
+     */
+    public final void setEmailValidator(Predicate<String> emailValidator) {
+        this.emailValidator.set(emailValidator);
+    }
 
     /**
      * Constructs a new email field.
@@ -122,7 +157,7 @@ public class EmailField extends Control {
 
                     while (st.hasMoreTokens()) {
                         String token = st.nextToken().trim();
-                        if (!emailValidator.isValid(token)) {
+                        if (!getEmailValidator().test(token)) {
                             getMultipleEmailAddresses().setAll(addresses);
                             return false;
                         }
@@ -137,9 +172,9 @@ public class EmailField extends Control {
             } else {
                 boolean valid;
                 if (isRequired()) {
-                    valid = emailValidator.isValid(text);
+                    valid = getEmailValidator().test(text);
                 } else {
-                    valid = StringUtils.isBlank(text) || emailValidator.isValid(text);
+                    valid = StringUtils.isBlank(text) || getEmailValidator().test(text);
                 }
 
                 if (valid) {
@@ -150,7 +185,7 @@ public class EmailField extends Control {
 
                 return valid;
             }
-        }, editor.textProperty(), requiredProperty()));
+        }, editor.textProperty(), requiredProperty(), emailValidatorProperty()));
 
         updateValidPseudoClass(false);
 

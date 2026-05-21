@@ -115,12 +115,6 @@
             </dependency>
 
             <dependency>
-                <groupId>commons-validator</groupId>
-                <artifactId>commons-validator</artifactId>
-                <version>1.8.0</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.controlsfx</groupId>
                 <artifactId>controlsfx</artifactId>
                 <version>11.1.2</version>

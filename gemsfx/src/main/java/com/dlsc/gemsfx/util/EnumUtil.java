@@ -1,6 +1,5 @@
 package com.dlsc.gemsfx.util;
 
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class for working with enums.

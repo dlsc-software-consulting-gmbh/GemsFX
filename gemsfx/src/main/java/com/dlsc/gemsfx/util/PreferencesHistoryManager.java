@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.util;
 
 import javafx.util.StringConverter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Objects;

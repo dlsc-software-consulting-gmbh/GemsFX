@@ -5,8 +5,6 @@ open module com.dlsc.gemsfx {
     requires javafx.swing;
     requires com.github.weisj.jsvg;
 
-    requires one.jpro.platform.utils;
-
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign;
     requires org.kordamp.ikonli.bootstrapicons;
@@ -14,9 +12,7 @@ open module com.dlsc.gemsfx {
     requires java.logging;
     requires java.prefs;
 
-    requires org.apache.commons.validator;
     requires net.synedra.validatorfx;
-    requires org.apache.commons.lang3;
     requires org.controlsfx.controls;
 
     requires java.desktop;

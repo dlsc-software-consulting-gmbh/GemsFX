@@ -53,8 +53,7 @@ import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import com.dlsc.gemsfx.util.StringUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -1158,12 +1157,13 @@ public class SearchField<T> extends Control {
 
         @Override
         public String toString() {
-            return new ToStringBuilder(this)
-                    .append("eventType", eventType)
-                    .append("target", target)
-                    .append("consumed", consumed)
-                    .append("text", text)
-                    .toString();
+            return "SearchEvent{" +
+                    "eventType=" + eventType +
+                    ", target=" + target +
+                    ", consumed=" + consumed +
+                    ", text='" + text + '\'' +
+                    ", source=" + source +
+                    '}';
         }
     }
 

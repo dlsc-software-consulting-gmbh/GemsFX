@@ -13,7 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.stage.Window;
-import one.jpro.platform.utils.TreeShowing;
+import com.dlsc.gemsfx.util.TreeShowing;
 
 import java.net.URI;
 import java.util.logging.Level;

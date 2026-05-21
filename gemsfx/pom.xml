@@ -40,6 +40,11 @@
         </site>
     </distributionManagement>
 
+    <organization>
+        <name>DLSC Software &amp; Consulting</name>
+        <url>https://www.dlsc.com</url>
+    </organization>
+
     <developers>
         <developer>
             <name>Dirk Lemmermann</name>
@@ -49,11 +54,6 @@
     </developers>
 
     <dependencies>
-
-        <dependency>
-            <groupId>one.jpro.platform</groupId>
-            <artifactId>jpro-utils</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>net.synedra</groupId>
@@ -73,11 +73,6 @@
         <dependency>
             <groupId>com.github.weisj</groupId>
             <artifactId>jsvg</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
         </dependency>
 
         <dependency>
@@ -103,11 +98,6 @@
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-materialdesign-pack</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
         </dependency>
 
         <dependency>

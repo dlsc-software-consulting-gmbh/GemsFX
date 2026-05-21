@@ -24,7 +24,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-import one.jpro.platform.utils.TreeShowing;
+import com.dlsc.gemsfx.util.TreeShowing;
 
 /**
  * A pane used for managing a single instance of {@link InfoCenterView}. The pane will show or

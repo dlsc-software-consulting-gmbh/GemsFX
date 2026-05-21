@@ -47,7 +47,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-import one.jpro.platform.utils.TreeShowing;
+import com.dlsc.gemsfx.util.TreeShowing;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.text.MessageFormat;

@@ -2,7 +2,7 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.TimePicker;
 
-import org.apache.commons.lang3.StringUtils;
+import com.dlsc.gemsfx.util.StringUtils;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;

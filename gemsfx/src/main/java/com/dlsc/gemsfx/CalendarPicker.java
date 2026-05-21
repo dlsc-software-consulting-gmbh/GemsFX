@@ -13,7 +13,7 @@ import javafx.scene.layout.Region;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.LocalDateStringConverter;
-import org.apache.commons.lang3.StringUtils;
+import com.dlsc.gemsfx.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.Objects;
