@@ -5,7 +5,6 @@ import com.dlsc.gemsfx.skins.AdvancedTableViewSkin;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Skin;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.skin.NestedTableColumnHeader;
 import javafx.scene.control.skin.TableColumnHeader;

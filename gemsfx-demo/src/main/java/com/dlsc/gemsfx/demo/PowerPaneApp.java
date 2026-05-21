@@ -48,7 +48,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import org.controlsfx.control.HiddenSidesPane;
-import org.scenicview.ScenicView;
 
 import java.time.ZonedDateTime;
 import java.util.List;

@@ -6,7 +6,6 @@ import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.InMemoryHistoryManager;
 import com.dlsc.gemsfx.util.PreferencesHistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
-import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

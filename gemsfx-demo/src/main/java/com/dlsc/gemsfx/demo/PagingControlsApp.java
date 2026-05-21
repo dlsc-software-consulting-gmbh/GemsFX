@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.paging.PagingControlBase.MessageLabelStrategy;
 import com.dlsc.gemsfx.paging.PagingControls;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
@@ -21,7 +20,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
-import org.scenicview.ScenicView;
 
 import java.util.Objects;
 

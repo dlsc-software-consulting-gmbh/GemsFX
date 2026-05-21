@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo.util;
 
 import com.dlsc.gemsfx.demo.GemApplication;
 import com.dlsc.gemsfx.util.EnumStringConverter;
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

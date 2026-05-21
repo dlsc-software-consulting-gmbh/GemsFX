@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ArcProgressIndicator;
 import com.dlsc.gemsfx.SemiCircleProgressIndicator;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.geometry.Insets;
@@ -17,9 +16,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.util.Objects;
 
 public class SemiCircleProgressIndicatorApp extends GemApplication {
 

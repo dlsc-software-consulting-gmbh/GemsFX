@@ -13,7 +13,6 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Region;
 
 import java.util.HashMap;
 import java.util.Map;

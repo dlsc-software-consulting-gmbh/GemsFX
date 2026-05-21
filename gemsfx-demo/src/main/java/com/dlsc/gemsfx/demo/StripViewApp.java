@@ -6,7 +6,6 @@ import com.dlsc.gemsfx.demo.fake.WeatherCondition;
 import com.dlsc.gemsfx.demo.fake.WeatherData;
 import com.dlsc.gemsfx.demo.fake.WeatherSummaryPane;
 import fr.brouillard.oss.cssfx.CSSFX;
-import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,9 +18,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.scenicview.ScenicView;
 
 import java.time.LocalDate;
 import java.util.Objects;

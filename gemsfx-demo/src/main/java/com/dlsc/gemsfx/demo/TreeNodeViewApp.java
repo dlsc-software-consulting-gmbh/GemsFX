@@ -11,8 +11,6 @@ import com.dlsc.gemsfx.treeview.link.QuadCurveLink;
 import com.dlsc.gemsfx.treeview.link.SimpleCatmullRomLink;
 import com.dlsc.gemsfx.treeview.link.SineWaveDecayLink;
 import com.dlsc.gemsfx.treeview.link.StraightLineLink;
-import fr.brouillard.oss.cssfx.CSSFX;
-import javafx.application.Application;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;

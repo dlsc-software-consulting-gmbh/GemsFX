@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.paging.PagingListView;
 import javafx.collections.MapChangeListener;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;

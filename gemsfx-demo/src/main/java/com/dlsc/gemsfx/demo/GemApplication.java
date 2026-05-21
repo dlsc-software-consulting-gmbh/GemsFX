@@ -1,7 +1,5 @@
 package com.dlsc.gemsfx.demo;
 
-import atlantafx.base.theme.CupertinoDark;
-import atlantafx.base.theme.NordDark;
 import atlantafx.base.theme.NordLight;
 import com.jpro.webapi.WebAPI;
 import devtoolsfx.gui.GUI;

@@ -3,7 +3,6 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.skins.YearMonthViewSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;

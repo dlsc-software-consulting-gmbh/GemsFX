@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.util.HistoryManager;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.css.PseudoClass;

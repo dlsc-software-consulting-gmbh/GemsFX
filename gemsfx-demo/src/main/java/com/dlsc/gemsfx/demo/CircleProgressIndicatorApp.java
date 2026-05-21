@@ -1,10 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
-import com.dlsc.gemsfx.ArcProgressIndicator;
 import com.dlsc.gemsfx.ArcProgressIndicator.StyleType;
 import com.dlsc.gemsfx.CircleProgressIndicator;
-import com.jpro.webapi.WebAPI;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Service;
@@ -24,10 +21,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.scenicview.ScenicView;
 
-import java.util.Objects;
 
 public class CircleProgressIndicatorApp extends GemApplication {
 

@@ -35,9 +35,6 @@ import javafx.stage.Window;
  *     myTimeline.play();
  * }
  * }</pre>
- *
- * <p>This is a local reimplementation of
- * {@code one.jpro.platform.utils.TreeShowing} by Florian Kirmaier.
  */
 public final class TreeShowing {
 

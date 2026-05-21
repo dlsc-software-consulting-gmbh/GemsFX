@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.paging.SimplePagingGridTableView;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -22,7 +21,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import com.dlsc.gemsfx.util.StringUtils;
-import org.scenicview.ScenicView;
 
 import java.io.IOException;
 import java.util.ArrayList;

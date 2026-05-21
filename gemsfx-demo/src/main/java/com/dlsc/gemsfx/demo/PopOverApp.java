@@ -27,7 +27,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.scenicview.ScenicView;
 
 import java.time.LocalDate;
 import java.util.Objects;

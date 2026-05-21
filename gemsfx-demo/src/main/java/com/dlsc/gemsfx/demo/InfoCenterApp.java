@@ -33,7 +33,6 @@ import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
-import org.scenicview.ScenicView;
 
 import java.io.IOException;
 import java.io.InputStream;

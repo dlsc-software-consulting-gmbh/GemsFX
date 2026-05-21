@@ -1,8 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
-import atlantafx.base.theme.Styles;
 import com.dlsc.gemsfx.ResizableTextArea;
-import javafx.application.Application;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

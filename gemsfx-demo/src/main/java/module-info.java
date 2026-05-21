@@ -11,7 +11,6 @@ open module com.dlsc.gemsfx.demo {
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
 
-    requires one.jpro.platform.utils;
     requires one.jpro.platform.mdfx;
     requires jpro.webapi;
 

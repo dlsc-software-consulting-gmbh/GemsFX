@@ -9,7 +9,6 @@ import javafx.scene.shape.Rectangle;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import java.util.Objects;
 
 public class BeforeAfterViewSkin extends GemsSkinBase<BeforeAfterView> {
 
