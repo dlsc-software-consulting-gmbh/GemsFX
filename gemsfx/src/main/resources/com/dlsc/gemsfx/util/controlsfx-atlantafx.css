@@ -1,0 +1,870 @@
+/*
+ * Copyright (c) 2024, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/*******************************************************************************
+ *                                                                             *
+ * ControlsFX – AtlantaFX Companion Stylesheet                                *
+ *                                                                             *
+ * This stylesheet overrides the Modena-derived CSS variables used by         *
+ * ControlsFX controls with AtlantaFX CSS looked-up color tokens.             *
+ *                                                                             *
+ * Load it as a scene stylesheet AFTER applying an AtlantaFX user-agent       *
+ * stylesheet:                                                                 *
+ *                                                                             *
+ *   Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet()); *
+ *   ControlsFXAtlantaFX.applyTo(scene);                                      *
+ *                                                                             *
+ * AtlantaFX token reference (all resolved from .root):                       *
+ *   Foreground : -color-fg-default  -color-fg-muted  -color-fg-subtle        *
+ *                -color-fg-emphasis                                           *
+ *   Background : -color-bg-default  -color-bg-subtle  -color-bg-overlay      *
+ *                -color-bg-inset                                              *
+ *   Border     : -color-border-default  -color-border-muted                  *
+ *                -color-border-subtle                                         *
+ *   Accent     : -color-accent-fg  -color-accent-emphasis                    *
+ *                -color-accent-muted  -color-accent-subtle                   *
+ *   Semantic   : -color-neutral-emphasis-plus  -color-neutral-emphasis        *
+ *                -color-neutral-muted  -color-neutral-subtle                 *
+ *                -color-success-*  -color-warning-*  -color-danger-*         *
+ *                                                                             *
+ ******************************************************************************/
+
+
+/*******************************************************************************
+ *                                                                             *
+ * ToggleSwitch                                                                *
+ *                                                                             *
+ ******************************************************************************/
+
+.toggle-switch .label {
+    -fx-text-fill: -color-fg-default;
+}
+
+.toggle-switch .thumb {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 1.0em;
+    -fx-padding: 0.75em;
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.15), 4, 0.0, 0, 1);
+}
+
+.toggle-switch:hover .thumb {
+    -fx-background-color: -color-border-muted, -color-bg-subtle;
+    -fx-background-insets: 0, 1;
+}
+
+.toggle-switch:focused .thumb {
+    -fx-background-color: -color-accent-emphasis, -color-bg-default;
+    -fx-background-insets: -0.2, 0;
+    -fx-background-radius: 1.0em;
+}
+
+.toggle-switch .thumb-area {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 1em;
+}
+
+.toggle-switch:focused .thumb-area {
+    -fx-background-color:
+            -color-accent-emphasis,
+            -color-border-default,
+            -color-accent-muted,
+            -color-bg-subtle;
+    -fx-background-insets: -0.2, 0, -1.4, 1;
+}
+
+.toggle-switch:selected .thumb-area {
+    -fx-background-color: -color-border-default, -color-accent-emphasis;
+    -fx-background-insets: 0, 1;
+}
+
+.toggle-switch:selected:focused .thumb-area {
+    -fx-background-color:
+            -color-accent-emphasis,
+            -color-border-default,
+            -color-accent-muted,
+            -color-accent-emphasis;
+    -fx-background-insets: -0.2, 0, -1.4, 1;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * RangeSlider                                                                 *
+ *                                                                             *
+ ******************************************************************************/
+
+.range-slider .low-thumb,
+.range-slider .high-thumb {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 1.0em;
+    -fx-padding: 0.583333em;
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.1), 5, 0.0, 0, 2);
+}
+
+.range-slider:focused .low-thumb,
+.range-slider:focused .high-thumb {
+    -fx-background-radius: 1.0em;
+}
+
+.range-slider .low-thumb:focused,
+.range-slider .high-thumb:focused {
+    -fx-background-color:
+            -color-accent-emphasis,
+            -color-bg-default,
+            -color-accent-muted,
+            -color-bg-default;
+    -fx-background-insets: -1.4, 0, -1.4, 2;
+    -fx-background-radius: 1.0em;
+}
+
+.range-slider .low-thumb:hover,
+.range-slider .high-thumb:hover {
+    -fx-background-color: -color-border-muted, -color-bg-subtle;
+    -fx-background-insets: 0, 1;
+}
+
+.range-slider .low-thumb:pressed,
+.range-slider .high-thumb:pressed {
+    -fx-background-color: -color-border-default, -color-accent-subtle;
+    -fx-background-insets: 0, 1;
+}
+
+.range-slider .range-bar {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.range-slider .track {
+    -fx-background-color: -color-border-muted, -color-bg-inset;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0.25em;
+    -fx-padding: 0.25em;
+}
+
+.range-slider .axis {
+    -fx-tick-label-fill: -color-fg-muted;
+}
+
+.range-slider > .axis > .axis-tick-mark,
+.range-slider > .axis > .axis-minor-tick-mark {
+    -fx-stroke: -color-fg-muted;
+}
+
+.range-slider:disabled {
+    -fx-opacity: 0.55;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * PlusMinusSlider                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
+.plus-minus-slider {
+    -fx-border-color: -color-border-default;
+}
+
+.plus-minus-slider:horizontal {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-background-insets: 0, 1 0 1 0;
+}
+
+.plus-minus-slider:vertical {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-background-insets: 0, 0 1 0 1;
+}
+
+.plus-minus-slider > * > .slider > .thumb {
+    -fx-padding: 10px;
+    -fx-background-color: -color-slider-thumb-border, -color-slider-thumb;
+    -fx-background-insets: 2, 3;
+    -fx-background-radius: 3, 2;
+}
+
+.plus-minus-slider > * > .slider:focused > .thumb {
+    -fx-background-color: -color-slider-thumb-border, -color-slider-thumb;
+    -fx-background-insets: 2, 3;
+    -fx-background-radius: 3, 2;
+}
+
+.plus-minus-slider > * > .adjust-plus,
+.plus-minus-slider > * > .adjust-minus {
+    -fx-background-color: -color-fg-muted;
+    -fx-effect: null;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * StatusBar                                                                   *
+ *                                                                             *
+ ******************************************************************************/
+
+.status-bar {
+    -fx-background-color: -color-border-muted, -color-bg-subtle;
+    -fx-background-insets: 0, 1;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * NotificationPane                                                            *
+ *                                                                             *
+ ******************************************************************************/
+
+.notification-pane .notification-bar > .pane {
+    -fx-background-color: -color-border-default, -color-border-muted, -color-bg-default;
+    -fx-padding: 0 7 0 7;
+}
+
+.notification-pane.top .notification-bar > .pane {
+    -fx-background-insets: 0 0 0 0, 0 0 1 0, 0 0 2 0;
+}
+
+.notification-pane.bottom .notification-bar > .pane {
+    -fx-background-insets: 0 0 0 0, 1 0 0 0, 2 0 0 0;
+}
+
+.notification-pane .notification-bar > .pane .label {
+    -fx-text-fill: -color-fg-default;
+}
+
+.notification-pane.dark .notification-bar > .pane {
+    -fx-background-color: -color-neutral-emphasis;
+}
+
+.notification-pane.dark .notification-bar > .pane .label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.notification-pane .notification-bar > .pane .close-button:hover {
+    -fx-background-color: -color-neutral-muted;
+}
+
+.notification-pane .notification-bar > .pane .close-button:pressed {
+    -fx-background-color: -color-neutral-emphasis;
+}
+
+.notification-pane .notification-bar > .pane .close-button > .graphic {
+    -fx-background-color: -color-fg-muted;
+}
+
+.notification-pane .notification-bar > .pane .close-button:hover > .graphic {
+    -fx-background-color: -color-fg-default;
+}
+
+.notification-pane .notification-bar > .pane .close-button:pressed > .graphic {
+    -fx-background-color: -color-fg-subtle;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Notifications (popup notification bar)                                     *
+ *                                                                             *
+ ******************************************************************************/
+
+.notification-bar > .pane {
+    -fx-background-color: -color-border-default, -color-border-muted, -color-bg-default;
+    -fx-background-insets: 0, 1, 2;
+    -fx-padding: 7 7 7 7;
+}
+
+.notification-bar > .pane .title {
+    -fx-text-fill: -color-fg-default;
+}
+
+.notification-bar > .pane .label {
+    -fx-text-fill: -color-fg-default;
+}
+
+.notification-bar.dark > .pane {
+    -fx-background-color: -color-neutral-emphasis;
+}
+
+.notification-bar.dark > .pane .title,
+.notification-bar.dark > .pane .label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.notification-bar > .pane .close-button:hover {
+    -fx-background-color: -color-neutral-muted;
+}
+
+.notification-bar > .pane .close-button:pressed {
+    -fx-background-color: -color-neutral-emphasis;
+}
+
+.notification-bar > .pane .close-button > .graphic {
+    -fx-background-color: -color-fg-muted;
+}
+
+.notification-bar > .pane .close-button:hover > .graphic {
+    -fx-background-color: -color-fg-default;
+}
+
+.notification-bar > .pane .close-button:pressed > .graphic {
+    -fx-background-color: -color-fg-subtle;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * PopOver                                                                    *
+ *                                                                             *
+ ******************************************************************************/
+
+.popover > .border {
+    -fx-stroke: -color-border-default;
+    -fx-stroke-width: 1;
+    -fx-fill: -color-bg-overlay;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10.0, 0.5, 2.0, 2.0);
+}
+
+.popover > .content > .title > .text {
+    -fx-text-fill: -color-fg-muted;
+}
+
+.popover > .content > .title > .icon > .graphics > .circle {
+    -fx-fill: -color-fg-muted;
+}
+
+.popover > .content > .title > .icon > .graphics > .line {
+    -fx-stroke: -color-bg-default;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * TaskProgressView                                                            *
+ *                                                                             *
+ ******************************************************************************/
+
+.task-progress-view {
+    -fx-background-color: -color-bg-default;
+}
+
+.task-progress-view > * > .label {
+    -fx-text-fill: -color-fg-muted;
+}
+
+.task-list-cell {
+    -fx-border-color: transparent transparent -color-border-subtle transparent;
+}
+
+.task-cancel-button {
+    -fx-base-color: -color-danger-emphasis;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * SegmentedBar                                                                *
+ *                                                                             *
+ ******************************************************************************/
+
+.segmented-bar > .segment-view > .label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.segmented-bar > .segment {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * SegmentedButton (dark variant)                                              *
+ *                                                                             *
+ ******************************************************************************/
+
+.segmented-button.dark .toggle-button {
+    -fx-border-color: transparent -color-border-default transparent transparent;
+}
+
+.segmented-button.dark .toggle-button:focused {
+    -fx-background-color:
+            -color-accent-muted,
+            -color-accent-emphasis,
+            -color-bg-default,
+            -color-bg-default;
+}
+
+.segmented-button.dark .toggle-button:selected {
+    -fx-background-color:
+            -color-neutral-emphasis-plus,
+            -color-neutral-emphasis,
+            -color-neutral-emphasis,
+            -color-neutral-subtle;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 1;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * InfoOverlay                                                                 *
+ *                                                                             *
+ ******************************************************************************/
+
+.info-overlay > .info-panel {
+    -fx-background-color: -color-bg-subtle;
+    -fx-opacity: 0.85;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * ListActionView toolbar                                                      *
+ *                                                                             *
+ ******************************************************************************/
+
+.list-action-view > .container > .tool-bar {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-background-insets: 0, 1 1 0 1;
+}
+
+.list-action-view > .container > .tool-bar.bottom {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-background-insets: 0, 0 1 1 1;
+}
+
+.list-action-view > .container > .tool-bar:vertical {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-background-insets: 0, 1 0 1 1;
+}
+
+.list-action-view > .container > .tool-bar:vertical.right {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-background-insets: 0, 1 1 1 0;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * CustomTextField / ClearableField                                            *
+ *                                                                             *
+ ******************************************************************************/
+
+.custom-text-field {
+    -fx-text-fill: -color-fg-default;
+    -fx-highlight-fill: -color-accent-subtle;
+    -fx-highlight-text-fill: -color-fg-default;
+    -fx-prompt-text-fill: -color-fg-subtle;
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 3, 2;
+}
+
+.custom-text-field:focused,
+.custom-text-field:text-field-has-focus {
+    -fx-highlight-fill: -color-accent-emphasis;
+    -fx-highlight-text-fill: -color-fg-emphasis;
+    -fx-background-color:
+            -color-accent-emphasis,
+            -color-bg-default,
+            -color-accent-muted,
+            -color-bg-default;
+    -fx-background-insets: -0.2, 1, -1.4, 3;
+    -fx-background-radius: 3, 2, 4, 0;
+    -fx-prompt-text-fill: transparent;
+}
+
+.clearable-field .clear-button > .graphic {
+    -fx-background-color: -color-fg-muted;
+}
+
+.clearable-field .clear-button:hover > .graphic {
+    -fx-background-color: -color-danger-emphasis;
+}
+
+.clearable-field .clear-button:pressed > .graphic {
+    -fx-background-color: -color-danger-fg;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * AutoCompletion popup                                                        *
+ *                                                                             *
+ ******************************************************************************/
+
+.auto-complete-popup > .list-view {
+    -fx-background-color: -color-border-default, -color-bg-overlay;
+    -fx-background-insets: -1 -2 -1 -1, 0 -1 0 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.0, 0, 8);
+}
+
+.auto-complete-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-background: -color-bg-overlay;
+}
+
+.auto-complete-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    -fx-background: -color-accent-subtle;
+    -fx-background-color: -fx-background;
+}
+
+.auto-complete-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover,
+.auto-complete-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background: -color-accent-emphasis;
+    -fx-background-color: -fx-background;
+}
+
+.auto-complete-popup > .list-view > .placeholder > .label {
+    -fx-text-fill: -color-fg-subtle;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * SpreadsheetView                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
+.spreadsheet-cell {
+    -fx-border-color: -color-border-subtle;
+    -fx-background-color: -color-border-subtle, -color-bg-default;
+}
+
+.spreadsheet-cell:filled:selected,
+.spreadsheet-cell:filled:focused:selected,
+.spreadsheet-cell:filled:focused:selected:hover {
+    -fx-background-color: -color-accent-muted;
+    -fx-border-color: -color-border-muted;
+    -fx-text-fill: -color-fg-default;
+}
+
+.spreadsheet-cell:hover,
+.spreadsheet-cell:filled:focused {
+    -fx-background-color: -color-accent-subtle;
+    -fx-text-fill: -color-fg-default;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+VerticalHeader > Label.fixed,
+HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.fixed {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-font-style: italic;
+}
+
+VerticalHeader > Label,
+HorizontalHeaderColumn > TableColumnHeader.column-header.table-column {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
+    -fx-text-fill: -color-fg-default;
+}
+
+VerticalHeader > Label.selected {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected,
+HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected > Label {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * TableView2                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+.table-view2 .column-header-background {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+    -fx-background-insets: 0, 1 1 0 1;
+}
+
+.table-view2 .column-header.south-header.selected,
+.nested-column-header > .column-header.table-column.selected,
+.nested-column-header > .column-header.table-column.selected > .label {
+    -fx-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.table-view2 .column-header.south-header.fixed,
+.nested-column-header > .column-header.table-column.fixed {
+    -fx-color: -color-bg-subtle;
+}
+
+.table-view2 .column-header.south-header.fixed.selected,
+.nested-column-header > .column-header.table-column.fixed.selected {
+    -fx-color: derive(-color-accent-emphasis, -10%);
+}
+
+.row-header > .table-view2 > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .tableview2-cell {
+    -fx-background-color: -color-border-default, -color-border-muted, -color-bg-subtle;
+    -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
+    -fx-text-fill: -color-fg-default;
+}
+
+.row-header > .table-view2 > .virtual-flow > .clipped-container > .sheet > .table-row-cell:selected > .tableview2-cell {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.row-header > .table-view2 > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .tableview2-cell:fixed {
+    -fx-background-color: -color-border-default, -color-bg-subtle;
+}
+
+.row-header > .table-view2 > .virtual-flow > .clipped-container > .sheet > .table-row-cell:selected > .tableview2-cell:fixed {
+    -fx-background-color: derive(-color-accent-emphasis, -10%);
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.row-header > .hbar {
+    -fx-background-color: -color-border-default, -color-border-muted, -color-bg-subtle;
+    -fx-background-insets: 0, 1 1 0 0, 2 2 1 1;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * TableView2 popup filter                                                     *
+ *                                                                             *
+ ******************************************************************************/
+
+.pop-up-filter {
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: -color-border-default;
+}
+
+.pop-up-filter > VBox > FlowPane > .label.operation {
+    -fx-background-color: -color-accent-subtle;
+}
+
+.pop-up-filter > VBox > HBox > .text-field:error {
+    -fx-background-color:
+            -color-danger-emphasis,
+            -color-bg-default,
+            -color-danger-muted,
+            -color-bg-default;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * BreadCrumbBar                                                               *
+ *                                                                             *
+ ******************************************************************************/
+
+.bread-crumb-bar {
+    -fx-background-color: transparent;
+}
+
+/* The BreadCrumbButton extends Button and receives full AtlantaFX button
+   styling. The arrow shape is set programmatically, so we only need to
+   ensure the selected (last / current) crumb is visually distinguished. */
+.bread-crumb-bar .button.crumb:selected,
+.bread-crumb-bar .button.crumb.selected {
+    -fx-background-color: -color-border-default, -color-accent-subtle;
+    -fx-background-insets: 0, 1;
+    -fx-text-fill: -color-fg-default;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * MaskerPane                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+.masker-pane .masker-glass {
+    -fx-background-color: rgba(0, 0, 0, 0.35);
+}
+
+.masker-pane .masker-text {
+    -fx-text-fill: white;
+}
+
+.masker-pane .masker-center {
+    -fx-background-color: rgba(0, 0, 0, 0.65);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 12, 0.0, 0, 4);
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Rating                                                                      *
+ *                                                                             *
+ ******************************************************************************/
+
+.rating > .container > .button {
+    -fx-background-color: transparent;
+}
+
+.rating > .container > .button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 8, 0.0, 0, 0);
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * PropertySheet                                                               *
+ *                                                                             *
+ ******************************************************************************/
+
+.property-sheet .scroll-pane {
+    -fx-background-color: -color-bg-default;
+}
+
+.property-sheet .scroll-pane .property-pane {
+    -fx-background-color: -color-bg-default;
+}
+
+.property-sheet .scroll-pane .accordion {
+    -fx-padding: -1;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * ListSelectionView                                                           *
+ *                                                                             *
+ ******************************************************************************/
+
+.list-selection-view > .grid-pane > .list-header-label {
+    -fx-text-fill: -color-fg-default;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * WorldMapView                                                                *
+ *                                                                             *
+ ******************************************************************************/
+
+.world-map {
+    -fx-background-color: -color-neutral-muted;
+}
+
+.world-map .country {
+    -fx-fill: -color-bg-default;
+    -fx-stroke: -color-border-default;
+    -fx-stroke-width: 0.1;
+}
+
+.world-map .country:hover {
+    -fx-fill: -color-success-muted;
+}
+
+.world-map .country:pressed {
+    -fx-fill: -color-success-emphasis;
+}
+
+.world-map .country:selected {
+    -fx-fill: -color-accent-emphasis;
+}
+
+.world-map .country:selected:hover {
+    -fx-fill: -color-accent-fg;
+}
+
+.world-map .country:selected:pressed {
+    -fx-fill: derive(-color-accent-emphasis, -15%);
+}
+
+.world-map .location {
+    -fx-fill: -color-fg-default;
+    -fx-stroke: -color-fg-default;
+}
+
+.world-map .location:hover {
+    -fx-fill: -color-warning-emphasis;
+}
+
+.world-map .location:pressed {
+    -fx-fill: -color-danger-fg;
+}
+
+.world-map .location:selected {
+    -fx-fill: -color-danger-emphasis;
+}
+
+.world-map .location:selected:hover {
+    -fx-fill: -color-danger-fg;
+}
+
+.world-map .location:selected:pressed {
+    -fx-fill: derive(-color-danger-emphasis, -15%);
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * SpreadsheetView – cell corner indicator                                     *
+ *                                                                             *
+ ******************************************************************************/
+
+.cell-corner {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * CommandLinksDialog                                                          *
+ *                                                                             *
+ ******************************************************************************/
+
+.command-links-dialog.dialog-pane > .container > .command-link-button:hover {
+    -fx-border-color: -color-border-default;
+    -fx-background-color: -color-bg-subtle;
+}
+
+.command-links-dialog.dialog-pane > .container > .command-link-button:armed {
+    -fx-border-color: -color-border-muted;
+    -fx-background-color: -color-bg-inset;
+}
+
+.command-links-dialog.dialog-pane > .container > .command-link-button:default {
+    -fx-border-color: -color-accent-emphasis;
+    -fx-background-color: -color-accent-subtle;
+}
+
+.command-links-dialog.dialog-pane > .container > .command-link-button:default:hover {
+    -fx-border-color: -color-accent-emphasis;
+    -fx-background-color: -color-accent-muted;
+}
+
+.command-links-dialog.dialog-pane > .container > .command-link-button:default:armed {
+    -fx-border-color: -color-accent-emphasis;
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.command-links-dialog.dialog-pane > .container > .command-link-button > .container > .line-1 {
+    -fx-text-fill: -color-fg-default;
+}
+
+.command-links-dialog.dialog-pane > .container > .command-link-button > .container > .line-2 {
+    -fx-text-fill: -color-fg-muted;
+}
