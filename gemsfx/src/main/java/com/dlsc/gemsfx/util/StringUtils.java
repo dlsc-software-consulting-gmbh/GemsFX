@@ -104,6 +104,20 @@ public final class StringUtils {
     }
 
     /**
+     * Returns {@code true} if the two strings are equal.
+     * Two {@code null} values are considered equal.
+     */
+    public static boolean equals(String str1, String str2) {
+        if (str1 == str2) {
+            return true;
+        }
+        if (str1 == null || str2 == null) {
+            return false;
+        }
+        return str1.equals(str2);
+    }
+
+    /**
      * Returns {@code true} if the two strings are equal ignoring case.
      * Two {@code null} values are considered equal.
      */

@@ -256,6 +256,56 @@ public class StringUtilsTest {
     }
 
     // -------------------------------------------------------------------------
+    // equals
+    // -------------------------------------------------------------------------
+
+    @Test
+    public void equals_bothNull_returnsTrue() {
+        assertTrue(StringUtils.equals(null, null));
+    }
+
+    @Test
+    public void equals_firstNull_returnsFalse() {
+        assertFalse(StringUtils.equals(null, "a"));
+    }
+
+    @Test
+    public void equals_secondNull_returnsFalse() {
+        assertFalse(StringUtils.equals("a", null));
+    }
+
+    @Test
+    public void equals_sameContent_returnsTrue() {
+        assertTrue(StringUtils.equals("hello", "hello"));
+    }
+
+    @Test
+    public void equals_sameReference_returnsTrue() {
+        String s = "hello";
+        assertTrue(StringUtils.equals(s, s));
+    }
+
+    @Test
+    public void equals_differentContent_returnsFalse() {
+        assertFalse(StringUtils.equals("hello", "world"));
+    }
+
+    @Test
+    public void equals_differentCase_returnsFalse() {
+        assertFalse(StringUtils.equals("hello", "Hello"));
+    }
+
+    @Test
+    public void equals_emptyStrings_returnsTrue() {
+        assertTrue(StringUtils.equals("", ""));
+    }
+
+    @Test
+    public void equals_emptyAndNonEmpty_returnsFalse() {
+        assertFalse(StringUtils.equals("", "a"));
+    }
+
+    // -------------------------------------------------------------------------
     // equalsIgnoreCase
     // -------------------------------------------------------------------------
 
