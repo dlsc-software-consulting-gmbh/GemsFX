@@ -68,30 +68,30 @@ public class GridTableView<S> extends Control {
     // row header factory
     private final ObjectProperty<Callback<S, Node>> rowHeaderFactory = new SimpleObjectProperty<>(this, "rowHeaderFactory");
 
-    public Callback<S, Node> getRowHeaderFactory() {
+    public final Callback<S, Node> getRowHeaderFactory() {
         return rowHeaderFactory.get();
     }
 
-    public ObjectProperty<Callback<S, Node>> rowHeaderFactoryProperty() {
+    public final ObjectProperty<Callback<S, Node>> rowHeaderFactoryProperty() {
         return rowHeaderFactory;
     }
 
-    public void setRowHeaderFactory(Callback<S, Node> rowHeaderFactory) {
+    public final void setRowHeaderFactory(Callback<S, Node> rowHeaderFactory) {
         this.rowHeaderFactory.set(rowHeaderFactory);
     }
 
     // row footer factory
     private final ObjectProperty<Callback<S, Node>> rowFooterFactory = new SimpleObjectProperty<>(this, "rowFooterFactory");
 
-    public Callback<S, Node> getRowFooterFactory() {
+    public final Callback<S, Node> getRowFooterFactory() {
         return rowFooterFactory.get();
     }
 
-    public ObjectProperty<Callback<S, Node>> rowFooterFactoryProperty() {
+    public final ObjectProperty<Callback<S, Node>> rowFooterFactoryProperty() {
         return rowFooterFactory;
     }
 
-    public void setRowFooterFactory(Callback<S, Node> rowFooterFactory) {
+    public final void setRowFooterFactory(Callback<S, Node> rowFooterFactory) {
         this.rowFooterFactory.set(rowFooterFactory);
     }
 

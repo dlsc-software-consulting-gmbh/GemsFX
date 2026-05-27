@@ -86,71 +86,71 @@ public class TreeNodeCell<T> extends BorderPane {
 
     private final ObjectProperty<T> item = new SimpleObjectProperty<>(this, "item");
 
-    public T getItem() {
+    public final T getItem() {
         return item.get();
     }
 
-    public ObjectProperty<T> itemProperty() {
+    public final ObjectProperty<T> itemProperty() {
         return item;
     }
 
-    public void setItem(T item) {
+    public final void setItem(T item) {
         this.item.set(item);
     }
 
     private final ReadOnlyObjectWrapper<TreeNode<T>> treeNode = new ReadOnlyObjectWrapper<>(this, "treeNode");
 
-    public TreeNode<T> getTreeNode() {
+    public final TreeNode<T> getTreeNode() {
         return treeNode.get();
     }
 
-    public ReadOnlyObjectProperty<TreeNode<T>> treeNodeProperty() {
+    public final ReadOnlyObjectProperty<TreeNode<T>> treeNodeProperty() {
         return treeNode.getReadOnlyProperty();
     }
 
-    protected void setTreeNode(TreeNode<T> treeNode) {
+    protected final void setTreeNode(TreeNode<T> treeNode) {
         this.treeNode.set(treeNode);
     }
 
     private final BooleanProperty expanded = new SimpleBooleanProperty(this, "expanded", DEFAULT_EXPANDED);
 
-    public boolean isExpanded() {
+    public final boolean isExpanded() {
         return expanded.get();
     }
 
-    public BooleanProperty expandedProperty() {
+    public final BooleanProperty expandedProperty() {
         return expanded;
     }
 
-    public void setExpanded(boolean expanded) {
+    public final void setExpanded(boolean expanded) {
         this.expanded.set(expanded);
     }
 
     private final ObjectProperty<Node> graphic = new SimpleObjectProperty<>(this, "graphic");
 
-    public Node getGraphic() {
+    public final Node getGraphic() {
         return graphic.get();
     }
 
-    public ObjectProperty<Node> graphicProperty() {
+    public final ObjectProperty<Node> graphicProperty() {
         return graphic;
     }
 
-    public void setGraphic(Node graphic) {
+    public final void setGraphic(Node graphic) {
         this.graphic.set(graphic);
     }
 
     private final StringProperty text = new SimpleStringProperty(this, "text");
 
-    public String getText() {
+    public final String getText() {
         return text.get();
     }
 
-    public StringProperty textProperty() {
+    public final StringProperty textProperty() {
         return text;
     }
 
-    public void setText(String text) {
+    public final void setText(String text) {
         this.text.set(text);
     }
 

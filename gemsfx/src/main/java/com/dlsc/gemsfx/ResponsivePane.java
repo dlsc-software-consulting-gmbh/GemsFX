@@ -247,11 +247,11 @@ public class ResponsivePane extends StackPane {
         pseudoClassStateChanged(BOTTOM_PSEUDOCLASS, currentSide == Side.BOTTOM);
     }
 
-    public Side getSide() {
+    public final Side getSide() {
         return side == null ? DEFAULT_SIDE : side.get();
     }
 
-    public void setSide(Side side) {
+    public final void setSide(Side side) {
         sideProperty().set(side);
     }
 
@@ -295,11 +295,11 @@ public class ResponsivePane extends StackPane {
         return gap;
     }
 
-    public double getGap() {
+    public final double getGap() {
         return gap == null ? 0d : gap.get();
     }
 
-    public void setGap(double gap) {
+    public final void setGap(double gap) {
         gapProperty().set(gap);
     }
 

@@ -239,7 +239,7 @@ public class Notification<T> implements Comparable<Notification<T>> {
 
     private final ObjectProperty<Type> type = new SimpleObjectProperty<>(this, "type", Type.INFO);
 
-    public Type getType() {
+    public final Type getType() {
         return type.get();
     }
 
@@ -249,11 +249,11 @@ public class Notification<T> implements Comparable<Notification<T>> {
      *
      * @return an {@code ObjectProperty} representing the type of the notification
      */
-    public ObjectProperty<Type> typeProperty() {
+    public final ObjectProperty<Type> typeProperty() {
         return type;
     }
 
-    public void setType(Type type) {
+    public final void setType(Type type) {
         this.type.set(type);
     }
 

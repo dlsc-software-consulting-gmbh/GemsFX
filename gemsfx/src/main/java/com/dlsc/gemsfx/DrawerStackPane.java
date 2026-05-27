@@ -266,7 +266,7 @@ public class DrawerStackPane extends StackPane {
 
     private final BooleanProperty autoHide = new SimpleBooleanProperty(this, "autoHide", true);
 
-    public boolean isAutoHide() {
+    public final boolean isAutoHide() {
         return autoHide.get();
     }
 
@@ -275,11 +275,11 @@ public class DrawerStackPane extends StackPane {
      *
      * @return true if the drawer hides when user clicks on background
      */
-    public BooleanProperty autoHideProperty() {
+    public final BooleanProperty autoHideProperty() {
         return autoHide;
     }
 
-    public void setAutoHide(boolean autoHide) {
+    public final void setAutoHide(boolean autoHide) {
         this.autoHide.set(autoHide);
     }
 
@@ -322,7 +322,7 @@ public class DrawerStackPane extends StackPane {
         @Override public CssMetaData<? extends Styleable, Number> getCssMetaData() { return StyleableProperties.MAX_DRAWER_HEIGHT; }
     };
 
-    public double getMaxDrawerHeight() {
+    public final double getMaxDrawerHeight() {
         return maxDrawerHeight.get();
     }
 
@@ -337,11 +337,11 @@ public class DrawerStackPane extends StackPane {
      *
      * @return the maximum drawer height (value between 0 and 1)
      */
-    public DoubleProperty maxDrawerHeightProperty() {
+    public final DoubleProperty maxDrawerHeightProperty() {
         return maxDrawerHeight;
     }
 
-    public void setMaxDrawerHeight(double maxDrawerHeight) {
+    public final void setMaxDrawerHeight(double maxDrawerHeight) {
         this.maxDrawerHeight.set(maxDrawerHeight);
     }
 
@@ -353,7 +353,7 @@ public class DrawerStackPane extends StackPane {
         @Override public CssMetaData<? extends Styleable, Number> getCssMetaData() { return StyleableProperties.MIN_DRAWER_HEIGHT; }
     };
 
-    public double getMinDrawerHeight() {
+    public final double getMinDrawerHeight() {
         return minDrawerHeight.get();
     }
 
@@ -369,11 +369,11 @@ public class DrawerStackPane extends StackPane {
      *
      * @return the minimum drawer height (value between 0 and 1)
      */
-    public DoubleProperty minDrawerHeightProperty() {
+    public final DoubleProperty minDrawerHeightProperty() {
         return minDrawerHeight;
     }
 
-    public void setMinDrawerHeight(double minDrawerHeight) {
+    public final void setMinDrawerHeight(double minDrawerHeight) {
         this.minDrawerHeight.set(minDrawerHeight);
     }
 
@@ -505,7 +505,7 @@ public class DrawerStackPane extends StackPane {
 
     private final ObjectProperty<Runnable> onCloseRequest = new SimpleObjectProperty<>(this, "onCloseRequest", () -> setShowDrawer(false));
 
-    public Runnable getOnCloseRequest() {
+    public final Runnable getOnCloseRequest() {
         return onCloseRequest.get();
     }
 
@@ -515,11 +515,11 @@ public class DrawerStackPane extends StackPane {
      *
      * @return the callback for closing the drawer
      */
-    public ObjectProperty<Runnable> onCloseRequestProperty() {
+    public final ObjectProperty<Runnable> onCloseRequestProperty() {
         return onCloseRequest;
     }
 
-    public void setOnCloseRequest(Runnable onCloseRequest) {
+    public final void setOnCloseRequest(Runnable onCloseRequest) {
         this.onCloseRequest.set(onCloseRequest);
     }
 
@@ -589,7 +589,7 @@ public class DrawerStackPane extends StackPane {
         return drawerTitle;
     }
 
-    public void setDrawerTitle(String drawerTitle) {
+    public final void setDrawerTitle(String drawerTitle) {
         this.drawerTitle.set(drawerTitle);
     }
 
@@ -643,7 +643,7 @@ public class DrawerStackPane extends StackPane {
 
     private final BooleanProperty showDrawer = new SimpleBooleanProperty(this, "showDrawer", false);
 
-    public boolean isShowDrawer() {
+    public final boolean isShowDrawer() {
         return showDrawer.get();
     }
 

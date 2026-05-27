@@ -768,7 +768,7 @@ public class PopOver extends PopupControl {
          *
          * @return the arrow size property
          */
-        public DoubleProperty arrowSizeProperty() {
+        public final DoubleProperty arrowSizeProperty() {
             return arrowSize;
         }
 
@@ -814,7 +814,7 @@ public class PopOver extends PopupControl {
          *
          * @return the arrow indent property
          */
-        public DoubleProperty arrowIndentProperty() {
+        public final DoubleProperty arrowIndentProperty() {
             return arrowIndent;
         }
 
@@ -860,7 +860,7 @@ public class PopOver extends PopupControl {
          *
          * @return the corner radius property
          */
-        public DoubleProperty cornerRadiusProperty() {
+        public final DoubleProperty cornerRadiusProperty() {
             return cornerRadius;
         }
 

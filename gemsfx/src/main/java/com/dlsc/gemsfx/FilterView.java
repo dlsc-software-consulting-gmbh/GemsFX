@@ -148,7 +148,7 @@ public class FilterView<T> extends Control {
 
     private final IntegerProperty scrollThreshold = new SimpleIntegerProperty(this, "scrollThreshold", 100);
 
-    public int getScrollThreshold() {
+    public final int getScrollThreshold() {
         return scrollThreshold.get();
     }
 
@@ -156,11 +156,11 @@ public class FilterView<T> extends Control {
      * The threshold number of filters at which a ScrollPane is introduced to handle large number of elements.
      * If the number of filters is equal to or exceeds this value, the filters will be displayed within a ScrollPane.
      */
-    public IntegerProperty scrollThresholdProperty() {
+    public final IntegerProperty scrollThresholdProperty() {
         return scrollThreshold;
     }
 
-    public void setScrollThreshold(int scrollThreshold) {
+    public final void setScrollThreshold(int scrollThreshold) {
         this.scrollThreshold.set(scrollThreshold);
     }
 
@@ -200,18 +200,18 @@ public class FilterView<T> extends Control {
 
     private final ObjectProperty<Node> subtitleGraphic = new SimpleObjectProperty<>(this, "subtitleGraphic");
 
-    public Node getSubtitleGraphic() {
+    public final Node getSubtitleGraphic() {
         return subtitleGraphic.get();
     }
 
     /**
      * The graphic node displayed alongside the subtitle label.
      */
-    public ObjectProperty<Node> subtitleGraphicProperty() {
+    public final ObjectProperty<Node> subtitleGraphicProperty() {
         return subtitleGraphic;
     }
 
-    public void setSubtitleGraphic(Node subtitleGraphic) {
+    public final void setSubtitleGraphic(Node subtitleGraphic) {
         this.subtitleGraphic.set(subtitleGraphic);
     }
 
@@ -420,15 +420,15 @@ public class FilterView<T> extends Control {
 
     private final ListProperty<Filter<T>> filters = new SimpleListProperty<>(this, "filters", FXCollections.observableArrayList());
 
-    public ObservableList<Filter<T>> getFilters() {
+    public final ObservableList<Filter<T>> getFilters() {
         return filters.get();
     }
 
-    public ListProperty<Filter<T>> filtersProperty() {
+    public final ListProperty<Filter<T>> filtersProperty() {
         return filters;
     }
 
-    public void setFilters(ObservableList<Filter<T>> filters) {
+    public final void setFilters(ObservableList<Filter<T>> filters) {
         this.filters.set(filters);
     }
 

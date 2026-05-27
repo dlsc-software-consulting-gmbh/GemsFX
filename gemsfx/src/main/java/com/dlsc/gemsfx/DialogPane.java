@@ -1946,15 +1946,15 @@ public class DialogPane extends StackPane {
 
         private final BooleanProperty blocked = new SimpleBooleanProperty(this, "blocked");
 
-        public boolean isBlocked() {
+        public final boolean isBlocked() {
             return blocked.get();
         }
 
-        public BooleanProperty blockedProperty() {
+        public final BooleanProperty blockedProperty() {
             return blocked;
         }
 
-        public void setBlocked(boolean blocked) {
+        public final void setBlocked(boolean blocked) {
             this.blocked.set(blocked);
         }
 
@@ -2425,15 +2425,15 @@ public class DialogPane extends StackPane {
 
 
         // ******************** Methods *******************************************
-        public double getProgress() {
+        public final double getProgress() {
             return progress.get();
         }
 
-        public void setProgress(double PROGRESS) {
+        public final void setProgress(double PROGRESS) {
             progress.set(PROGRESS);
         }
 
-        public DoubleProperty progressProperty() {
+        public final DoubleProperty progressProperty() {
             return progress;
         }
 
@@ -2467,23 +2467,23 @@ public class DialogPane extends StackPane {
             indeterminate.set(false);
         }
 
-        public boolean isIndeterminate() {
+        public final boolean isIndeterminate() {
             return Double.compare(ProgressIndicator.INDETERMINATE_PROGRESS, getProgress()) == 0;
         }
 
-        public ReadOnlyBooleanProperty indeterminateProperty() {
+        public final ReadOnlyBooleanProperty indeterminateProperty() {
             return indeterminate;
         }
 
-        public boolean isRoundLineCap() {
+        public final boolean isRoundLineCap() {
             return roundLineCap.get();
         }
 
-        public void setRoundLineCap(boolean BOOLEAN) {
+        public final void setRoundLineCap(boolean BOOLEAN) {
             roundLineCap.set(BOOLEAN);
         }
 
-        public BooleanProperty roundLineCapProperty() {
+        public final BooleanProperty roundLineCapProperty() {
             return roundLineCap;
         }
 

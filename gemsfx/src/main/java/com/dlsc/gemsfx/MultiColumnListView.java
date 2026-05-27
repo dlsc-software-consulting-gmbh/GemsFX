@@ -115,15 +115,15 @@ public class MultiColumnListView<T> extends Control {
 
     private final ObjectProperty<Size> loadingStatusSize = new SimpleObjectProperty<>(this, "loadingStatusSize", Size.MEDIUM);
 
-    public Size getLoadingStatusSize() {
+    public final Size getLoadingStatusSize() {
         return loadingStatusSize.get();
     }
 
-    public ObjectProperty<Size> loadingStatusSizeProperty() {
+    public final ObjectProperty<Size> loadingStatusSizeProperty() {
         return loadingStatusSize;
     }
 
-    public void setLoadingStatusSize(Size loadingStatusSize) {
+    public final void setLoadingStatusSize(Size loadingStatusSize) {
         this.loadingStatusSize.set(loadingStatusSize);
     }
 

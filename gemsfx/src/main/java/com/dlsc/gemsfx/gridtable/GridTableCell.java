@@ -101,7 +101,7 @@ public class GridTableCell<S, T> extends Cell<T> {
 
     private final ObjectProperty<S> rowItem = new SimpleObjectProperty<>(this, "rowItem");
 
-    public S getRowItem() {
+    public final S getRowItem() {
         return rowItem.get();
     }
 
@@ -110,11 +110,11 @@ public class GridTableCell<S, T> extends Cell<T> {
      *
      * @return the row item property
      */
-    public ObjectProperty<S> rowItemProperty() {
+    public final ObjectProperty<S> rowItemProperty() {
         return rowItem;
     }
 
-    public void setRowItem(S rowItem) {
+    public final void setRowItem(S rowItem) {
         this.rowItem.set(rowItem);
     }
 

@@ -361,7 +361,7 @@ public class PhotoView extends Control {
 
     private final ObjectProperty<Supplier<Image>> photoSupplier = new SimpleObjectProperty<>(this, "photoSupplier");
 
-    public Supplier<Image> getPhotoSupplier() {
+    public final Supplier<Image> getPhotoSupplier() {
         return photoSupplier.get();
     }
 
@@ -372,11 +372,11 @@ public class PhotoView extends Control {
      *
      * @return the photo supplier
      */
-    public ObjectProperty<Supplier<Image>> photoSupplierProperty() {
+    public final ObjectProperty<Supplier<Image>> photoSupplierProperty() {
         return photoSupplier;
     }
 
-    public void setPhotoSupplier(Supplier<Image> photoSupplier) {
+    public final void setPhotoSupplier(Supplier<Image> photoSupplier) {
         this.photoSupplier.set(photoSupplier);
     }
 
@@ -399,7 +399,7 @@ public class PhotoView extends Control {
         }
     };
 
-    public ClipShape getClipShape() {
+    public final ClipShape getClipShape() {
         return clipShape.get();
     }
 
@@ -414,11 +414,11 @@ public class PhotoView extends Control {
      *
      * @return the clip shape (circle, rectangle)
      */
-    public ObjectProperty<ClipShape> clipShapeProperty() {
+    public final ObjectProperty<ClipShape> clipShapeProperty() {
         return clipShape;
     }
 
-    public void setClipShape(ClipShape clipShape) {
+    public final void setClipShape(ClipShape clipShape) {
         this.clipShape.set(clipShape);
     }
 

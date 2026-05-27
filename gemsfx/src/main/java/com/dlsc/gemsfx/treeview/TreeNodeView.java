@@ -110,15 +110,15 @@ public class TreeNodeView<T> extends Control {
 
     private final ObjectProperty<TreeNode<T>> root = new SimpleObjectProperty<>(this, "root");
 
-    public TreeNode<T> getRoot() {
+    public final TreeNode<T> getRoot() {
         return root.get();
     }
 
-    public ObjectProperty<TreeNode<T>> rootProperty() {
+    public final ObjectProperty<TreeNode<T>> rootProperty() {
         return root;
     }
 
-    public void setRoot(TreeNode<T> root) {
+    public final void setRoot(TreeNode<T> root) {
         this.root.set(root);
     }
 
@@ -139,7 +139,7 @@ public class TreeNodeView<T> extends Control {
         }
     };
 
-    public VPos getRowAlignment() {
+    public final VPos getRowAlignment() {
         return rowAlignment.get();
     }
 
@@ -154,11 +154,11 @@ public class TreeNodeView<T> extends Control {
      *
      * @return the row alignment property
      */
-    public ObjectProperty<VPos> rowAlignmentProperty() {
+    public final ObjectProperty<VPos> rowAlignmentProperty() {
         return rowAlignment;
     }
 
-    public void setRowAlignment(VPos rowAlignment) {
+    public final void setRowAlignment(VPos rowAlignment) {
         this.rowAlignment.set(rowAlignment);
     }
 
@@ -179,7 +179,7 @@ public class TreeNodeView<T> extends Control {
         }
     };
 
-    public HPos getColumnAlignment() {
+    public final HPos getColumnAlignment() {
         return columnAlignment.get();
     }
 
@@ -194,11 +194,11 @@ public class TreeNodeView<T> extends Control {
      *
      * @return the column alignment property
      */
-    public ObjectProperty<HPos> columnAlignmentProperty() {
+    public final ObjectProperty<HPos> columnAlignmentProperty() {
         return columnAlignment;
     }
 
-    public void setColumnAlignment(HPos columnAlignment) {
+    public final void setColumnAlignment(HPos columnAlignment) {
         this.columnAlignment.set(columnAlignment);
     }
 
@@ -219,7 +219,7 @@ public class TreeNodeView<T> extends Control {
         }
     };
 
-    public double getCellWidth() {
+    public final double getCellWidth() {
         return cellWidth.get();
     }
 
@@ -233,11 +233,11 @@ public class TreeNodeView<T> extends Control {
      *
      * @return the cell width property
      */
-    public DoubleProperty cellWidthProperty() {
+    public final DoubleProperty cellWidthProperty() {
         return cellWidth;
     }
 
-    public void setCellWidth(double cellWidth) {
+    public final void setCellWidth(double cellWidth) {
         this.cellWidth.set(cellWidth);
     }
 
@@ -259,7 +259,7 @@ public class TreeNodeView<T> extends Control {
 
     };
 
-    public double getCellHeight() {
+    public final double getCellHeight() {
         return cellHeight.get();
     }
 
@@ -273,11 +273,11 @@ public class TreeNodeView<T> extends Control {
      *
      * @return the cell height property
      */
-    public DoubleProperty cellHeightProperty() {
+    public final DoubleProperty cellHeightProperty() {
         return cellHeight;
     }
 
-    public void setCellHeight(double cellHeight) {
+    public final void setCellHeight(double cellHeight) {
         this.cellHeight.set(cellHeight);
     }
 
@@ -298,7 +298,7 @@ public class TreeNodeView<T> extends Control {
         }
     };
 
-    public double getHgap() {
+    public final double getHgap() {
         return hgap.get();
     }
 
@@ -312,11 +312,11 @@ public class TreeNodeView<T> extends Control {
      *
      * @return the horizontal gap property
      */
-    public DoubleProperty hgapProperty() {
+    public final DoubleProperty hgapProperty() {
         return hgap;
     }
 
-    public void setHgap(double hgap) {
+    public final void setHgap(double hgap) {
         this.hgap.set(hgap);
     }
 
@@ -337,7 +337,7 @@ public class TreeNodeView<T> extends Control {
         }
     };
 
-    public double getVgap() {
+    public final double getVgap() {
         return vgap.get();
     }
 
@@ -351,11 +351,11 @@ public class TreeNodeView<T> extends Control {
      *
      * @return the vertical gap property
      */
-    public DoubleProperty vgapProperty() {
+    public final DoubleProperty vgapProperty() {
         return vgap;
     }
 
-    public void setVgap(double vgap) {
+    public final void setVgap(double vgap) {
         this.vgap.set(vgap);
     }
 
@@ -376,7 +376,7 @@ public class TreeNodeView<T> extends Control {
         }
     };
 
-    public double getNodeLineGap() {
+    public final double getNodeLineGap() {
         return nodeLineGap.get();
     }
 
@@ -390,39 +390,39 @@ public class TreeNodeView<T> extends Control {
      *
      * @return the node line gap property
      */
-    public DoubleProperty nodeLineGapProperty() {
+    public final DoubleProperty nodeLineGapProperty() {
         return nodeLineGap;
     }
 
-    public void setNodeLineGap(double nodeLineGap) {
+    public final void setNodeLineGap(double nodeLineGap) {
         this.nodeLineGap.set(nodeLineGap);
     }
 
     private final ObjectProperty<Node> placeholder = new SimpleObjectProperty<>(this, "placeholder", createDefaultPlaceholder());
 
-    public Node getPlaceholder() {
+    public final Node getPlaceholder() {
         return placeholder.get();
     }
 
-    public ObjectProperty<Node> placeholderProperty() {
+    public final ObjectProperty<Node> placeholderProperty() {
         return placeholder;
     }
 
-    public void setPlaceholder(Node placeholder) {
+    public final void setPlaceholder(Node placeholder) {
         this.placeholder.set(placeholder);
     }
 
     private final ObjectProperty<LinkStrategy<T>> linkStrategy = new SimpleObjectProperty<>(this, "linkStrategy", new StraightLineLink<>());
 
-    public LinkStrategy<T> getLinkStrategy() {
+    public final LinkStrategy<T> getLinkStrategy() {
         return linkStrategy.get();
     }
 
-    public ObjectProperty<LinkStrategy<T>> linkStrategyProperty() {
+    public final ObjectProperty<LinkStrategy<T>> linkStrategyProperty() {
         return linkStrategy;
     }
 
-    public void setLinkStrategy(LinkStrategy<T> linkStrategy) {
+    public final void setLinkStrategy(LinkStrategy<T> linkStrategy) {
         this.linkStrategy.set(linkStrategy);
     }
 
@@ -460,7 +460,7 @@ public class TreeNodeView<T> extends Control {
         }
     };
 
-    public LayoutType getLayoutType() {
+    public final LayoutType getLayoutType() {
         return layoutType.get();
     }
 
@@ -474,11 +474,11 @@ public class TreeNodeView<T> extends Control {
      *
      * @return the layout type property
      */
-    public ObjectProperty<LayoutType> layoutTypeProperty() {
+    public final ObjectProperty<LayoutType> layoutTypeProperty() {
         return layoutType;
     }
 
-    public void setLayoutType(LayoutType layoutType) {
+    public final void setLayoutType(LayoutType layoutType) {
         this.layoutType.set(layoutType);
     }
 
@@ -518,7 +518,7 @@ public class TreeNodeView<T> extends Control {
         }
     };
 
-    public LayoutDirection getLayoutDirection() {
+    public final LayoutDirection getLayoutDirection() {
         return layoutDirection.get();
     }
 
@@ -532,11 +532,11 @@ public class TreeNodeView<T> extends Control {
      *
      * @return the layout direction property
      */
-    public ObjectProperty<LayoutDirection> layoutDirectionProperty() {
+    public final ObjectProperty<LayoutDirection> layoutDirectionProperty() {
         return layoutDirection;
     }
 
-    public void setLayoutDirection(LayoutDirection layoutDirection) {
+    public final void setLayoutDirection(LayoutDirection layoutDirection) {
         this.layoutDirection.set(layoutDirection);
     }
 

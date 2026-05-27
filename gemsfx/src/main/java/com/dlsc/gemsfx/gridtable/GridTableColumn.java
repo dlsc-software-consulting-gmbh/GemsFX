@@ -96,7 +96,7 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
 
     private final ObjectProperty<ContentDisplay> contentDisplay = new SimpleObjectProperty<>(this, "contentDisplay", ContentDisplay.LEFT);
 
-    public ContentDisplay getContentDisplay() {
+    public final ContentDisplay getContentDisplay() {
         return contentDisplay.get();
     }
 
@@ -105,17 +105,17 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
      *
      * @return the content display property
      */
-    public ObjectProperty<ContentDisplay> contentDisplayProperty() {
+    public final ObjectProperty<ContentDisplay> contentDisplayProperty() {
         return contentDisplay;
     }
 
-    public void setContentDisplay(ContentDisplay contentDisplay) {
+    public final void setContentDisplay(ContentDisplay contentDisplay) {
         this.contentDisplay.set(contentDisplay);
     }
 
     private final ObjectProperty<Node> graphic = new SimpleObjectProperty<>(this, "graphic");
 
-    public Node getGraphic() {
+    public final Node getGraphic() {
         return graphic.get();
     }
 
@@ -124,17 +124,17 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
      *
      * @return the graphic property
      */
-    public ObjectProperty<Node> graphicProperty() {
+    public final ObjectProperty<Node> graphicProperty() {
         return graphic;
     }
 
-    public void setGraphic(Node graphic) {
+    public final void setGraphic(Node graphic) {
         this.graphic.set(graphic);
     }
 
     private final StringProperty text = new SimpleStringProperty(this, "text", "Header");
 
-    public String getText() {
+    public final String getText() {
         return text.get();
     }
 
@@ -143,17 +143,17 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
      *
      * @return the text property
      */
-    public StringProperty textProperty() {
+    public final StringProperty textProperty() {
         return text;
     }
 
-    public void setText(String text) {
+    public final void setText(String text) {
         this.text.set(text);
     }
 
     private final ObjectProperty<StringConverter<T>> converter = new SimpleObjectProperty<>(this, "converter", new SimpleStringConverter<>());
 
-    public StringConverter<T> getConverter() {
+    public final StringConverter<T> getConverter() {
         return converter.get();
     }
 
@@ -162,11 +162,11 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
      *
      * @return the converter property
      */
-    public ObjectProperty<StringConverter<T>> converterProperty() {
+    public final ObjectProperty<StringConverter<T>> converterProperty() {
         return converter;
     }
 
-    public void setConverter(StringConverter<T> converter) {
+    public final void setConverter(StringConverter<T> converter) {
         this.converter.set(converter);
     }
 
@@ -193,7 +193,7 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
 
     public ObjectProperty<Callback<S, T>> cellValueFactory = new SimpleObjectProperty<>(this, "cellValueFactory");
 
-    public Callback<S, T> getCellValueFactory() {
+    public final Callback<S, T> getCellValueFactory() {
         return cellValueFactory.get();
     }
 
@@ -202,17 +202,17 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
      *
      * @return the cell value factory property
      */
-    public ObjectProperty<Callback<S, T>> cellValueFactoryProperty() {
+    public final ObjectProperty<Callback<S, T>> cellValueFactoryProperty() {
         return cellValueFactory;
     }
 
-    public void setCellValueFactory(Callback<S, T> cellValueFactory) {
+    public final void setCellValueFactory(Callback<S, T> cellValueFactory) {
         this.cellValueFactory.set(cellValueFactory);
     }
 
     private final ReadOnlyObjectWrapper<Node> header = new ReadOnlyObjectWrapper<>(this, "header");
 
-    public Node getHeader() {
+    public final Node getHeader() {
         return header.get();
     }
 
@@ -221,7 +221,7 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
      *
      * @return the header property
      */
-    public ReadOnlyObjectProperty<Node> headerProperty() {
+    public final ReadOnlyObjectProperty<Node> headerProperty() {
         return header.getReadOnlyProperty();
     }
 

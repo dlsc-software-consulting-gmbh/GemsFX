@@ -73,15 +73,15 @@ public class TreeNode<T> {
 
     private final ReadOnlyObjectWrapper<TreeNode<T>> parent = new ReadOnlyObjectWrapper<>(this, "parent", null);
 
-    public ReadOnlyObjectProperty<TreeNode<T>> parentProperty() {
+    public final ReadOnlyObjectProperty<TreeNode<T>> parentProperty() {
         return parent.getReadOnlyProperty();
     }
 
-    protected void setParent(TreeNode<T> parent) {
+    protected final void setParent(TreeNode<T> parent) {
         this.parent.set(parent);
     }
 
-    public TreeNode<T> getParent() {
+    public final TreeNode<T> getParent() {
         return parentProperty().get();
     }
 
@@ -112,57 +112,57 @@ public class TreeNode<T> {
 
     private final BooleanProperty expanded = new SimpleBooleanProperty(this, "expanded", DEFAULT_EXPANDED);
 
-    public boolean isExpanded() {
+    public final boolean isExpanded() {
         return expanded.get();
     }
 
-    public BooleanProperty expandedProperty() {
+    public final BooleanProperty expandedProperty() {
         return expanded;
     }
 
-    public void setExpanded(boolean expanded) {
+    public final void setExpanded(boolean expanded) {
         this.expanded.set(expanded);
     }
 
     private final ObjectProperty<T> value = new SimpleObjectProperty<>(this, "value", null);
 
-    public T getValue() {
+    public final T getValue() {
         return valueProperty().get();
     }
 
-    public ObjectProperty<T> valueProperty() {
+    public final ObjectProperty<T> valueProperty() {
         return value;
     }
 
-    public void setValue(T value) {
+    public final void setValue(T value) {
         valueProperty().set(value);
     }
 
     private final DoubleProperty width = new SimpleDoubleProperty(this, "width", DEFAULT_WIDTH);
 
-    public double getWidth() {
+    public final double getWidth() {
         return width.get();
     }
 
-    public DoubleProperty widthProperty() {
+    public final DoubleProperty widthProperty() {
         return width;
     }
 
-    public void setWidth(double width) {
+    public final void setWidth(double width) {
         this.width.set(width);
     }
 
     private final DoubleProperty height = new SimpleDoubleProperty(this, "height", DEFAULT_HEIGHT);
 
-    public double getHeight() {
+    public final double getHeight() {
         return height.get();
     }
 
-    public DoubleProperty heightProperty() {
+    public final DoubleProperty heightProperty() {
         return height;
     }
 
-    public void setHeight(double height) {
+    public final void setHeight(double height) {
         this.height.set(height);
     }
 
