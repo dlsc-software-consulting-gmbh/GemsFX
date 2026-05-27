@@ -29,6 +29,7 @@
 
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.CustomTextField;
 import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
