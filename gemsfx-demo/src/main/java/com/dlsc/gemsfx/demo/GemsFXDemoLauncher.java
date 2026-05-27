@@ -9,12 +9,38 @@ import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 import atlantafx.base.theme.Styles;
 import atlantafx.base.theme.Theme;
+import com.dlsc.atlantafx.themes.ArmyDark;
+import com.dlsc.atlantafx.themes.ArmyLight;
+import com.dlsc.atlantafx.themes.Autumn;
+import com.dlsc.atlantafx.themes.Blacky;
+import com.dlsc.atlantafx.themes.BlueDark;
+import com.dlsc.atlantafx.themes.BlueLight;
+import com.dlsc.atlantafx.themes.Browny;
+import com.dlsc.atlantafx.themes.FallDark;
+import com.dlsc.atlantafx.themes.FallLight;
+import com.dlsc.atlantafx.themes.GithubDarkColorblind;
+import com.dlsc.atlantafx.themes.GithubDarkTritanopia;
+import com.dlsc.atlantafx.themes.GithubLightColorblind;
+import com.dlsc.atlantafx.themes.GithubLightDefault;
+import com.dlsc.atlantafx.themes.GithubLightTritanopia;
+import com.dlsc.atlantafx.themes.GithubSoftDark;
+import com.dlsc.atlantafx.themes.NavyDark;
+import com.dlsc.atlantafx.themes.NavyLight;
+import com.dlsc.atlantafx.themes.News;
+import com.dlsc.atlantafx.themes.SpringDark;
+import com.dlsc.atlantafx.themes.SpringLight;
+import com.dlsc.atlantafx.themes.SummerDark;
+import com.dlsc.atlantafx.themes.SummerLight;
+import com.dlsc.atlantafx.themes.WinterDark;
+import com.dlsc.atlantafx.themes.WinterLight;
+import com.dlsc.atlantafx.themes.Yacht;
 import com.dlsc.gemsfx.GlassPane;
 import com.dlsc.gemsfx.Spacer;
 import com.dlsc.gemsfx.demo.binding.AggregatedListBindingApp;
 import com.dlsc.gemsfx.demo.binding.NestedListBindingApp;
 import com.dlsc.gemsfx.demo.binding.NestedListChangeTrackerApp;
 import com.dlsc.gemsfx.demo.binding.ObservableListBindingApp;
+import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import com.jpro.webapi.WebAPI;
 import devtoolsfx.gui.GUI;
 import javafx.application.Application;
@@ -207,7 +233,6 @@ public class GemsFXDemoLauncher extends GemApplication {
         launcherStage = stage;
 
         // ── AtlantaFX theme toggle ───────────────────────────────────────────
-        String atlantaFxCss = getClass().getResource("atlantafx.css").toExternalForm();
         String mdfxModenaCss = Objects.requireNonNull(GemsFXDemoLauncher.class.getResource("mdfx-modena-override.css")).toExternalForm();
         String mdfxOverrideCss = Objects.requireNonNull(GemsFXDemoLauncher.class.getResource("mdfx-atlantafx-override.css")).toExternalForm();
 
@@ -243,8 +268,26 @@ public class GemsFXDemoLauncher extends GemApplication {
 
         List<MarkdownView> markdownViews = List.of(markdownView, codeMarkdownView, cssMarkdownView);
 
-        List<Theme> themes = List.of(new NordLight(), new NordDark(), new CupertinoLight(),
-                new CupertinoDark(), new PrimerLight(), new PrimerDark(), new Dracula());
+        List<Theme> themes = List.of(
+                new NordLight(), new NordDark(),
+                new CupertinoLight(), new CupertinoDark(),
+                new PrimerLight(), new PrimerDark(),
+                new Dracula(),
+                new ArmyDark(), new ArmyLight(),
+                new Autumn(),
+                new Blacky(),
+                new BlueDark(), new BlueLight(),
+                new Browny(),
+                new FallDark(), new FallLight(),
+                new GithubDarkColorblind(), new GithubDarkTritanopia(),
+                new GithubLightColorblind(), new GithubLightDefault(), new GithubLightTritanopia(),
+                new GithubSoftDark(),
+                new NavyDark(), new NavyLight(),
+                new News(),
+                new SpringDark(), new SpringLight(),
+                new SummerDark(), new SummerLight(),
+                new WinterDark(), new WinterLight(),
+                new Yacht());
         Map<String, Theme> themeOptions = new LinkedHashMap<>();
         themeOptions.put("Modena", null);
         for (Theme theme : themes) {
@@ -298,8 +341,7 @@ public class GemsFXDemoLauncher extends GemApplication {
             if (theme != null) {
                 System.setProperty("atlantafx", "true");
                 Application.setUserAgentStylesheet(theme.getUserAgentStylesheet());
-                stage.getScene().getStylesheets().remove(atlantaFxCss);
-                stage.getScene().getStylesheets().add(atlantaFxCss);
+                GemsFXAtlantaFX.applyTo(stage.getScene());
                 stage.getScene().getRoot().getStyleClass().remove("atlantafx-active");
                 stage.getScene().getRoot().getStyleClass().add("atlantafx-active");
                 stage.getScene().getRoot().getStyleClass().remove("dark-theme");
@@ -318,7 +360,7 @@ public class GemsFXDemoLauncher extends GemApplication {
             } else {
                 System.setProperty("atlantafx", "false");
                 Application.setUserAgentStylesheet(null);
-                stage.getScene().getStylesheets().remove(atlantaFxCss);
+                stage.getScene().getStylesheets().remove(GemsFXAtlantaFX.STYLESHEET);
                 stage.getScene().getRoot().getStyleClass().remove("atlantafx-active");
                 stage.getScene().getRoot().getStyleClass().remove("dark-theme");
                 markdownView.getStylesheets().remove(mdfxOverrideCss);
@@ -803,8 +845,7 @@ public class GemsFXDemoLauncher extends GemApplication {
         if (theme == null) {
             return false;
         }
-        String name = theme.getName().toLowerCase();
-        return name.contains("dark") || name.equals("dracula");
+        return theme.isDarkMode();
     }
 
     private static String loadProjectVersion() {
