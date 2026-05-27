@@ -534,6 +534,10 @@
 .tags-field:contains-focus {
     -fx-highlight-fill: -color-accent-emphasis;
     -fx-highlight-text-fill: -color-fg-emphasis;
+    -fx-background-color: -color-bg-default;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 0px;
+    -fx-prompt-text-fill: transparent;
 }
 
 .tags-field .graphic-wrapper {
