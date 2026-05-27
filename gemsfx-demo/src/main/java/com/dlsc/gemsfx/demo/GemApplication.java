@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import atlantafx.base.theme.NordLight;
+import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import com.jpro.webapi.WebAPI;
 import devtoolsfx.gui.GUI;
 import javafx.application.Application;
@@ -59,7 +60,7 @@ public abstract class GemApplication extends Application {
         if (Boolean.getBoolean("atlantafx")) {
             stage.sceneProperty().addListener((obs, oldScene, newScene) -> {
                 if (newScene != null) {
-                    newScene.getStylesheets().add(Objects.requireNonNull(GemApplication.class.getResource("atlantafx.css")).toExternalForm());
+                    GemsFXAtlantaFX.applyTo(newScene);
                 }
             });
         }
