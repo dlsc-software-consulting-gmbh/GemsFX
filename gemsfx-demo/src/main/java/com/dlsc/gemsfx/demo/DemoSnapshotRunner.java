@@ -9,6 +9,7 @@ import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 import atlantafx.base.theme.Theme;
 import com.dlsc.gemsfx.demo.GemsFXDemoLauncher.DemoEntry;
+import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -148,11 +149,7 @@ public class DemoSnapshotRunner extends Application {
         // For AtlantaFX themes, inject atlantafx.css into the scene if the
         // demo's start() didn't do it via super.start() / GemApplication.
         if (theme.isAtlantaFx() && stage.getScene() != null) {
-            String css = Objects.requireNonNull(
-                    GemApplication.class.getResource("atlantafx.css")).toExternalForm();
-            if (!stage.getScene().getStylesheets().contains(css)) {
-                stage.getScene().getStylesheets().add(css);
-            }
+            GemsFXAtlantaFX.applyTo(stage.getScene());
         }
 
         PauseTransition pause = new PauseTransition(Duration.seconds(2));
