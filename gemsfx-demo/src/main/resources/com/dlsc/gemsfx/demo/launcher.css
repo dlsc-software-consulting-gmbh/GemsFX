@@ -1,16 +1,11 @@
-/* ── Demo Launcher stylesheet ─────────────────────────────── */
-
-/* ── Inter font ───────────────────────────────────────────── */
 @font-face {
     font-family: 'Inter';
     src: url('Inter-Regular.ttf');
-    font-weight: normal;
 }
 
 @font-face {
     font-family: 'Inter';
     src: url('Inter-Bold.ttf');
-    font-weight: bold;
 }
 
 .root {
@@ -78,6 +73,23 @@
 
 .markdown-view.light .markdown-code-block {
     -mdfx-code-theme: "/one/jpro/platform/mdfx/themes/github-dark-default.json";
+}
+
+.atlantafx-active .markdown-view {
+    -mdfx-font-color: -color-fg-default;
+    -mdfx-link-color: -color-accent-emphasis;
+    -mdfx-border-color-1: -color-border-default;
+
+    -mdfx-bg-color-1: -color-bg-default;
+    -mdfx-bg-color-2: -color-bg-inset;
+    -mdfx-bg-color-3: red;
+
+    -mdfx-bq-color-border: -color-fg-emphasis-plus;
+    -mdfx-bq-color-background: -color-fg-emphasis;
+    -mdfx-bq-text-fill: -color-fg-emphasis;
+
+    -mdfx-code-block-border: -color-fg-emphasis;
+    -mdfx-code-block-background: -color-accent-emphasis;
 }
 
 /* ── Remove ScrollPane border in Modena ──────────────────── */
