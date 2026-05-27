@@ -61,16 +61,28 @@ public class CustomTextField extends TextField {
     }
 
     /**
-     * {@inheritDoc}
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
      */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new CustomTextFieldSkin(this) {
+            /**
+             * {@inheritDoc}
+             *
+             * @return the result
+             */
             @Override
             public ObjectProperty<Node> leftProperty() {
                 return CustomTextField.this.leftProperty();
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the result
+             */
             @Override
             public ObjectProperty<Node> rightProperty() {
                 return CustomTextField.this.rightProperty();
@@ -83,7 +95,9 @@ public class CustomTextField extends TextField {
     ///////////////////////////////////////////////////////////////////////////
 
     /**
-     * Represents the {@link Node} that is placed on the left of the text field.
+     * The {@link Node} that is placed on the left of the text field.
+     *
+     * @return the left property
      */
     public final ObjectProperty<Node> leftProperty() {
         return left;
@@ -91,22 +105,18 @@ public class CustomTextField extends TextField {
 
     private final ObjectProperty<Node> left = new SimpleObjectProperty<>(this, "left");
 
-    /**
-     * Returns the {@link Node} that is placed on the left of the text field.
-     */
     public final Node getLeft() {
         return left.get();
     }
 
-    /**
-     * Sets the {@link Node} that is placed on the left of the text field.
-     */
     public final void setLeft(Node value) {
         left.set(value);
     }
 
     /**
-     * Represents the {@link Node} that is placed on the right of the text field.
+     * The {@link Node} that is placed on the right of the text field.
+     *
+     * @return the right property
      */
     public final ObjectProperty<Node> rightProperty() {
         return right;
@@ -114,16 +124,10 @@ public class CustomTextField extends TextField {
 
     private final ObjectProperty<Node> right = new SimpleObjectProperty<>(this, "right");
 
-    /**
-     * Returns the {@link Node} that is placed on the right of the text field.
-     */
     public final Node getRight() {
         return right.get();
     }
 
-    /**
-     * Sets the {@link Node} that is placed on the right of the text field.
-     */
     public final void setRight(Node value) {
         right.set(value);
     }

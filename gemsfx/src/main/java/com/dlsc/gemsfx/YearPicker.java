@@ -89,6 +89,11 @@ public class YearPicker extends CustomComboBox<Year> {
         return editor;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new YearPickerSkin(this);
@@ -111,6 +116,11 @@ public class YearPicker extends CustomComboBox<Year> {
         return yearView;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(YearMonthView.class.getResource("year-picker.css")).toExternalForm();
@@ -118,6 +128,11 @@ public class YearPicker extends CustomComboBox<Year> {
 
     private final ReadOnlyObjectWrapper<Integer> year = new ReadOnlyObjectWrapper<>(this, "year");
 
+    /**
+     * A read-only property storing the selected year value.
+     *
+     * @return the selected year property
+     */
     public final ReadOnlyObjectProperty<Integer> yearProperty() {
         return year.getReadOnlyProperty();
     }
@@ -159,6 +174,9 @@ public class YearPicker extends CustomComboBox<Year> {
 
     static class NumberStringFilteredConverter extends NumberStringConverter {
 
+        /**
+         * Constructs a new converter that only accepts up to four digits.
+         */
         public NumberStringFilteredConverter() {
             super(new DecimalFormat("####"));
         }

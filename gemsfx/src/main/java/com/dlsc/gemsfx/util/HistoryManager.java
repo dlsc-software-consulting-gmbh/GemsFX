@@ -27,6 +27,9 @@ public abstract class HistoryManager<T> {
 
     private final ObservableList<T> history = FXCollections.observableArrayList();
 
+    /**
+     * Creates a new history manager.
+     */
     public HistoryManager() {
         maxHistorySizeProperty().addListener(it -> {
             // Check if the max history size is negative. If so, log a warning.
@@ -39,8 +42,14 @@ public abstract class HistoryManager<T> {
         unmodifiableHistory.addListener((Observable it) -> storeHistory());
     }
 
+    /**
+     * Loads the history from the underlying storage.
+     */
     protected abstract void loadHistory();
 
+    /**
+     * Stores the history in the underlying storage.
+     */
     protected abstract void storeHistory();
 
     /**
@@ -110,6 +119,8 @@ public abstract class HistoryManager<T> {
 
     /**
      * Returns an unmodifiable list of the history.
+     *
+     * @return the unmodifiable history list
      */
     public final ObservableList<T> getAllUnmodifiable() {
         return unmodifiableHistory;

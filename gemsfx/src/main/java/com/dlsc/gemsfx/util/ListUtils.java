@@ -13,10 +13,11 @@ public class ListUtils {
     /**
      * Replaces matching elements in the list with the provided new value.
      *
-     * @param list                 the list to operate on
-     * @param matchPredicate       the predicate to match elements
-     * @param newValue             the new value to replace matching elements
-     * @param <T>                  the type of elements in the list
+     * @param list the list to operate on
+     * @param matchPredicate the predicate to match elements
+     * @param newValue the new value to replace matching elements
+     * @param <T> the type of elements in the list
+     * @return {@code true} if at least one element was replaced
      */
     public static <T> boolean replaceIf(List<T> list, Predicate<T> matchPredicate, T newValue) {
         Objects.requireNonNull(list, "list can not be null");

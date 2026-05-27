@@ -101,6 +101,11 @@ public class SimpleFilterView extends HBox {
         pseudoClassStateChanged(COMPACT_PSEUDO_CLASS, getLayoutMode() == LayoutMode.COMPACT);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(SimpleFilterView.class.getResource("simple-filter-view.css")).toExternalForm();
@@ -303,11 +308,25 @@ public class SimpleFilterView extends HBox {
         box.setMaxWidth(Double.MAX_VALUE);
         box.getSelectionModel().getSelectedItems().addListener(changeListener);
         box.setSelectedItemsConverter(new StringConverter<>() {
+            /**
+             * {@inheritDoc}
+             *
+             * @return the string representation of the value
+             *
+             * @param object the value to convert
+             */
             @Override
             public String toString(List<T> object) {
                 return text;
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the parsed value
+             *
+             * @param string the string to parse
+             */
             @Override
             public List<T> fromString(String string) {
                 return List.of();
@@ -367,6 +386,11 @@ public class SimpleFilterView extends HBox {
         return box;
     }
 
+    /**
+     * Creates the check box used by {@link #addCheckBox(String)}.
+     *
+     * @return a new check box
+     */
     protected CheckBox createCheckBox() {
         return new CheckBox();
     }

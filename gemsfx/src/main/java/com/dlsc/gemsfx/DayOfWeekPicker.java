@@ -31,6 +31,9 @@ public class DayOfWeekPicker extends SelectionBox<DayOfWeek> {
 
     private static final String DEFAULT_STYLE_CLASS = "day-of-week-picker";
 
+    /**
+     * Constructs a new day-of-week picker.
+     */
     public DayOfWeekPicker() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
@@ -154,7 +157,9 @@ public class DayOfWeekPicker extends SelectionBox<DayOfWeek> {
     }
 
     /**
-     * Get the localized order of DayOfWeek.
+     * Returns the localized order of the days of the week.
+     *
+     * @return the localized day order
      */
     public List<DayOfWeek> getLocalizedDayOrder() {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());

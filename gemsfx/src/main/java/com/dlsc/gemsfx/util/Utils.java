@@ -55,8 +55,12 @@ public class Utils {
      **************************************************************************/
 
     /**
-     * Simple utility function which clamps the given value to be strictly
-     * between the min and max values.
+     * Clamps the given value to the inclusive range between {@code min} and {@code max}.
+     *
+     * @param min the minimum allowed value
+     * @param value the value to clamp
+     * @param max the maximum allowed value
+     * @return the clamped value
      */
     public static float clamp(float min, float value, float max) {
         if (value < min) return min;
@@ -65,8 +69,12 @@ public class Utils {
     }
 
     /**
-     * Simple utility function which clamps the given value to be strictly
-     * between the min and max values.
+     * Clamps the given value to the inclusive range between {@code min} and {@code max}.
+     *
+     * @param min the minimum allowed value
+     * @param value the value to clamp
+     * @param max the maximum allowed value
+     * @return the clamped value
      */
     public static int clamp(int min, int value, int max) {
         if (value < min) return min;
@@ -75,8 +83,12 @@ public class Utils {
     }
 
     /**
-     * Simple utility function which clamps the given value to be strictly
-     * between the min and max values.
+     * Clamps the given value to the inclusive range between {@code min} and {@code max}.
+     *
+     * @param min the minimum allowed value
+     * @param value the value to clamp
+     * @param max the maximum allowed value
+     * @return the clamped value
      */
     public static double clamp(double min, double value, double max) {
         if (value < min) return min;
@@ -85,8 +97,12 @@ public class Utils {
     }
 
     /**
-     * Simple utility function which clamps the given value to be strictly
-     * between the min and max values.
+     * Clamps the given value to the inclusive range between {@code min} and {@code max}.
+     *
+     * @param min the minimum allowed value
+     * @param value the value to clamp
+     * @param max the maximum allowed value
+     * @return the clamped value
      */
     public static long clamp(long min, long value, long max) {
         if (value < min) return min;
@@ -95,8 +111,11 @@ public class Utils {
     }
 
     /**
-     * Simple utility function which clamps the given value to be strictly
-     * above the min value.
+     * Clamps the given value to be at least {@code min}.
+     *
+     * @param value the value to clamp
+     * @param min the minimum allowed value
+     * @return the clamped value
      */
     public static double clampMin(double value, double min) {
         if (value < min) return min;
@@ -104,8 +123,11 @@ public class Utils {
     }
 
     /**
-     * Simple utility function which clamps the given value to be strictly
-     * under the max value.
+     * Clamps the given value to be at most {@code max}.
+     *
+     * @param value the value to clamp
+     * @param max the maximum allowed value
+     * @return the clamped value
      */
     public static int clampMax(int value, int max) {
         if (value > max) return max;
@@ -113,9 +135,12 @@ public class Utils {
     }
 
     /**
-     * Utility function which returns either {@code less} or {@code more}
-     * depending on which {@code value} is closer to. If {@code value}
-     * is perfectly between them, then either may be returned.
+     * Returns either {@code less} or {@code more}, depending on which one is closer to {@code value}.
+     *
+     * @param less the lower candidate value
+     * @param value the value to compare against
+     * @param more the upper candidate value
+     * @return the nearest candidate value
      */
     public static double nearest(double less, double value, double more) {
         double lessDiff = value - less;
@@ -131,8 +156,10 @@ public class Utils {
      **************************************************************************/
 
     /**
-     * Helper to remove leading and trailing quotes from a string.
-     * Works with single or double quotes.
+     * Removes leading and trailing quotes from a string. Works with single or double quotes.
+     *
+     * @param str the string to process
+     * @return the unquoted string
      */
     public static String stripQuotes(String str) {
         if (str == null) return str;
@@ -154,8 +181,11 @@ public class Utils {
     }
 
     /**
-     * Because mobile doesn't have string.split(s) function, this function
-     * was written.
+     * Splits the given string using the specified separator.
+     *
+     * @param str the string to split
+     * @param separator the separator to use
+     * @return the split parts
      */
     public static String[] split(String str, String separator) {
         if (str == null || str.length() == 0) return new String[]{};
@@ -182,8 +212,11 @@ public class Utils {
     }
 
     /**
-     * Because mobile doesn't have string.contains(s) function, this function
-     * was written.
+     * Checks whether the source string contains the given substring.
+     *
+     * @param src the source string
+     * @param s the substring to look for
+     * @return {@code true} if the substring is contained in the source string
      */
     public static boolean contains(String src, String s) {
         if (src == null || src.length() == 0) return false;
@@ -200,18 +233,21 @@ public class Utils {
      **************************************************************************/
 
     /**
-     * Calculates a perceptual brightness for a color between 0.0 black and 1.0 while
+     * Calculates a perceptual brightness for a color between {@code 0.0} and {@code 1.0}.
+     *
+     * @param color the color to analyze
+     * @return the calculated brightness
      */
     public static double calculateBrightness(Color color) {
         return (0.3 * color.getRed()) + (0.59 * color.getGreen()) + (0.11 * color.getBlue());
     }
 
     /**
-     * Derives a lighter or darker of a given color.
+     * Derives a lighter or darker version of a given color.
      *
-     * @param c          The color to derive from
-     * @param brightness The brightness difference for the new color -1.0 being 100% dark which is always black, 0.0 being
-     *                   no change and 1.0 being 100% lighter which is always white
+     * @param c the color to derive from
+     * @param brightness the brightness difference, where {@code -1.0} is black, {@code 0.0} means no change, and {@code 1.0} is white
+     * @return the derived color
      */
     public static Color deriveColor(Color c, double brightness) {
         double baseBrightness = calculateBrightness(c);
@@ -328,12 +364,24 @@ public class Utils {
     }
 
     /**
-     * Get the color at the give {@code position} in the ladder of color stops
+     * Returns the ladder color for the given base color and stops.
+     *
+     * @param color the base color
+     * @param stops the ladder stops
+     * @return the ladder color
      */
     public static Color ladder(Color color, Stop[] stops) {
         return ladder(calculateBrightness(color), stops);
     }
 
+    /**
+     * Converts HSB values to RGB values.
+     *
+     * @param hue the hue value
+     * @param saturation the saturation value
+     * @param brightness the brightness value
+     * @return the RGB values
+     */
     public static double[] HSBtoRGB(double hue, double saturation, double brightness) {
         // normalize the hue
         double normalizedHue = ((hue % 360) + 360) % 360;
@@ -388,6 +436,14 @@ public class Utils {
         return f;
     }
 
+    /**
+     * Converts RGB values to HSB values.
+     *
+     * @param r the red component
+     * @param g the green component
+     * @param b the blue component
+     * @return the HSB values
+     */
     public static double[] RGBtoHSB(double r, double g, double b) {
         double hue, saturation, brightness;
         double[] hsbvals = new double[3];
@@ -425,7 +481,10 @@ public class Utils {
     }
 
     /**
-     * Helper function to convert a color in sRGB space to linear RGB space.
+     * Converts a color from sRGB space to linear RGB space.
+     *
+     * @param color the color to convert
+     * @return the converted color
      */
     public static Color convertSRGBtoLinearRGB(Color color) {
         double[] colors = new double[]{color.getRed(), color.getGreen(), color.getBlue()};
@@ -440,7 +499,10 @@ public class Utils {
     }
 
     /**
-     * Helper function to convert a color in linear RGB space to SRGB space.
+     * Converts a color from linear RGB space to sRGB space.
+     *
+     * @param color the color to convert
+     * @return the converted color
      */
     public static Color convertLinearRGBtoSRGB(Color color) {
         double[] colors = new double[]{color.getRed(), color.getGreen(), color.getBlue()};
@@ -455,7 +517,10 @@ public class Utils {
     }
 
     /**
-     * helper function for calculating the sum of a series of numbers
+     * Calculates the average of the given values.
+     *
+     * @param values the values to average
+     * @return the calculated average
      */
     public static double sum(double[] values) {
         double sum = 0;
@@ -463,6 +528,18 @@ public class Utils {
         return sum / values.length;
     }
 
+    /**
+     * Computes a point for positioning a node relative to its parent.
+     *
+     * @param parent the parent node
+     * @param node the node to position
+     * @param hpos the horizontal position
+     * @param vpos the vertical position
+     * @param dx the horizontal offset
+     * @param dy the vertical offset
+     * @param reposition whether the point should be adjusted to remain on screen
+     * @return the computed point
+     */
     public static Point2D pointRelativeTo(Node parent, Node node, HPos hpos,
                                           VPos vpos, double dx, double dy, boolean reposition) {
         double nodeWidth = node.getLayoutBounds().getWidth();
@@ -470,6 +547,19 @@ public class Utils {
         return pointRelativeTo(parent, nodeWidth, nodeHeight, hpos, vpos, dx, dy, reposition);
     }
 
+    /**
+     * Computes a point for positioning content relative to its parent.
+     *
+     * @param parent the parent node
+     * @param anchorWidth the width of the content to position
+     * @param anchorHeight the height of the content to position
+     * @param hpos the horizontal position
+     * @param vpos the vertical position
+     * @param dx the horizontal offset
+     * @param dy the vertical offset
+     * @param reposition whether the point should be adjusted to remain on screen
+     * @return the computed point
+     */
     public static Point2D pointRelativeTo(Node parent, double anchorWidth,
                                           double anchorHeight, HPos hpos, VPos vpos, double dx, double dy,
                                           boolean reposition) {
@@ -506,17 +596,16 @@ public class Utils {
     }
 
     /**
-     * This is the fallthrough function that most other functions fall into. It takes
-     * care specifically of the repositioning of the item such that it remains onscreen
-     * as best it can, given its unique qualities.
-     * <p>
-     * As will all other functions, this one returns a Point2D that represents an x,y
-     * location that should safely position the item onscreen as best as possible.
-     * <p>
-     * Note that <code>width</code> and <code><height/code> refer to the width and height of the
-     * node/popup that is needing to be repositioned, not of the parent.
-     * <p>
-     * Don't use the BASELINE vpos, it doesn't make sense and would produce a wrong result.
+     * Repositions an item relative to its parent while keeping it on screen whenever possible.
+     *
+     * @param parent the parent object
+     * @param width the width of the item to position
+     * @param height the height of the item to position
+     * @param screenX the initial x coordinate
+     * @param screenY the initial y coordinate
+     * @param hpos the horizontal position
+     * @param vpos the vertical position
+     * @return the computed point
      */
     public static Point2D pointRelativeTo(Object parent, double width,
                                           double height, double screenX, double screenY, HPos hpos, VPos vpos) {
@@ -678,6 +767,12 @@ public class Utils {
         }
     }
 
+    /**
+     * Checks whether the given screen currently shows a full-screen stage.
+     *
+     * @param screen the screen to inspect
+     * @return {@code true} if a full-screen stage is shown on the screen
+     */
     public static boolean hasFullScreenStage(Screen screen) {
         List<Window> allWindows = Window.getWindows();
 
@@ -692,8 +787,10 @@ public class Utils {
         return false;
     }
 
-    /*
-     * Returns true if the primary Screen has QVGA dimensions, in landscape or portrait mode.
+    /**
+     * Returns whether the primary screen has QVGA dimensions.
+     *
+     * @return {@code true} if the primary screen uses QVGA dimensions
      */
     public static boolean isQVGAScreen() {
         Rectangle2D bounds = Screen.getPrimary().getBounds();
@@ -702,10 +799,10 @@ public class Utils {
     }
 
     /**
-     * This function attempts to determine the best screen given the parent object
-     * from which we are wanting to position another item relative to. This is particularly
-     * important when we want to keep items from going off screen, and for handling
-     * multiple monitor support.
+     * Determines the best screen for the given object.
+     *
+     * @param obj the object to inspect
+     * @return the best matching screen
      */
     public static Screen getScreen(Object obj) {
         Bounds parentBounds = getBounds(obj);
@@ -719,6 +816,12 @@ public class Utils {
         return getScreenForRectangle(rect);
     }
 
+    /**
+     * Determines the best screen for the given rectangle.
+     *
+     * @param rect the rectangle to inspect
+     * @return the best matching screen
+     */
     public static Screen getScreenForRectangle(Rectangle2D rect) {
         List<Screen> screens = Screen.getScreens();
 
@@ -772,6 +875,13 @@ public class Utils {
         return selectedScreen;
     }
 
+    /**
+     * Determines the best screen for the given point.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @return the best matching screen
+     */
     public static Screen getScreenForPoint(double x, double y) {
         List<Screen> screens = Screen.getScreens();
 

@@ -35,6 +35,10 @@ public class StageManager {
      * Installs a new manager for the given stage. The location and dimension information will
      * be stored in the user preferences at the given path. The default values for the minimum
      * width is 850 and for the minimum height is 600.
+     *
+     * @param stage the stage to persist and restore
+     * @param preferencesPath the java.util preferences path used for storing the information
+     * @return the installed stage manager
      */
     public static StageManager install(Stage stage, String preferencesPath) {
         return install(stage, Preferences.userRoot().node(preferencesPath));
@@ -45,6 +49,10 @@ public class StageManager {
      * information will be stored in the given preferences. The
      * default values for the minimum width is 850 and for the minimum height is
      * 600.
+     *
+     * @param stage the stage to persist and restore
+     * @param preferences the preferences used for storing the information
+     * @return the installed stage manager
      */
     public static StageManager install(Stage stage, Preferences preferences) {
         return install(stage, preferences, 850, 600);
@@ -58,6 +66,7 @@ public class StageManager {
      * @param preferencesPath the java.util preferences path used for storing the information
      * @param minWidth the minimum width that will be used for the stage
      * @param minHeight the minimum height that will be used for the stage
+     * @return the installed stage manager
      */
     public static StageManager install(Stage stage, String preferencesPath, double minWidth, double minHeight) {
         return install(stage, Preferences.userRoot().node(preferencesPath), minWidth, minHeight);
@@ -71,6 +80,7 @@ public class StageManager {
      * @param preferences the java.util preferences used for storing the information
      * @param minWidth the minimum width that will be used for the stage
      * @param minHeight the minimum height that will be used for the stage
+     * @return the installed stage manager
      */
     public static StageManager install(Stage stage, Preferences preferences, double minWidth, double minHeight) {
         return new StageManager(stage, preferences, minWidth, minHeight);
@@ -110,10 +120,20 @@ public class StageManager {
         stage.maximizedProperty().addListener(stageListener);
     }
 
+    /**
+     * Sets whether full-screen and maximized states should be persisted.
+     *
+     * @param supportFullScreenAndMaximized {@code true} to persist full-screen and maximized states
+     */
     public final void setSupportFullScreenAndMaximized(boolean supportFullScreenAndMaximized) {
         this.supportFullScreenAndMaximized = supportFullScreenAndMaximized;
     }
 
+    /**
+     * Returns whether full-screen and maximized states should be persisted.
+     *
+     * @return {@code true} if full-screen and maximized states are persisted
+     */
     public final boolean isSupportFullScreenAndMaximized() {
         return supportFullScreenAndMaximized;
     }

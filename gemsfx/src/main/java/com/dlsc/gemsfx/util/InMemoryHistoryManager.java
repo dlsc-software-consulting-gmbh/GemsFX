@@ -8,10 +8,16 @@ package com.dlsc.gemsfx.util;
  */
 public class InMemoryHistoryManager<T> extends HistoryManager<T> {
 
+    /**
+     * Loads the history.
+     */
     @Override
     protected void loadHistory() {
     }
 
+    /**
+     * Stores the history.
+     */
     @Override
     protected void storeHistory() {
     }

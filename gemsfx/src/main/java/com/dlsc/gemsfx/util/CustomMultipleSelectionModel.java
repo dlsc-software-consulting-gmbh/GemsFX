@@ -30,6 +30,9 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
     private final ListChangeListener<T> itemsContentListener = this::updateSelectionOnItemsChange;
     private final InvalidationListener itemsPropertyListener = observable -> updateItemsObserver();
 
+    /**
+     * Creates a new selection model.
+     */
     public CustomMultipleSelectionModel() {
         // Add listener to itemsProperty
         itemsProperty().addListener(new WeakInvalidationListener(itemsPropertyListener));
@@ -224,6 +227,11 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         items.set(value);
     }
 
+    /**
+     * The items available for selection.
+     *
+     * @return the items property
+     */
     public final ListProperty<T> itemsProperty() {
         return items;
     }
@@ -232,6 +240,11 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
 
     private final ReadOnlyListWrapper<Integer> selectedIndices = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
 
+    /**
+     * Returns the selected indices.
+     *
+     * @return the selected indices
+     */
     @Override
     public ObservableList<Integer> getSelectedIndices() {
         return selectedIndices.getReadOnlyProperty();
@@ -241,11 +254,22 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
 
     private final ReadOnlyListWrapper<T> selectedItems = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
 
+    /**
+     * Returns the selected items.
+     *
+     * @return the selected items
+     */
     @Override
     public ObservableList<T> getSelectedItems() {
         return selectedItems.getReadOnlyProperty();
     }
 
+    /**
+     * Selects the given indices.
+     *
+     * @param index the first index to select
+     * @param indices the additional indices to select
+     */
     @Override
     public void selectIndices(int index, int... indices) {
         ObservableList<T> items = getItems();
@@ -287,6 +311,9 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         setSelectedItem(items.get(lastIndex));
     }
 
+    /**
+     * Selects all items.
+     */
     @Override
     public void selectAll() {
         ObservableList<T> items = getItems();
@@ -312,6 +339,11 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         setSelectedItem(items.get(size - 1));
     }
 
+    /**
+     * Clears the current selection and selects the item at the given index.
+     *
+     * @param index the index to select
+     */
     @Override
     public void clearAndSelect(int index) {
         ObservableList<T> items = getItems();
@@ -327,6 +359,11 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         selectedItems.setAll(items.get(index));
     }
 
+    /**
+     * Selects the item at the given index.
+     *
+     * @param index the index to select
+     */
     @Override
     public void select(int index) {
         ObservableList<T> items = getItems();
@@ -349,6 +386,11 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         setSelectedItem(items.get(index));
     }
 
+    /**
+     * Selects the given item.
+     *
+     * @param obj the item to select
+     */
     @Override
     public void select(T obj) {
         ObservableList<T> items = getItems();
@@ -362,6 +404,11 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         }
     }
 
+    /**
+     * Clears the selection for the given index.
+     *
+     * @param index the index to clear
+     */
     @Override
     public void clearSelection(int index) {
         int idx = selectedIndices.indexOf(index);
@@ -373,6 +420,9 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         updateSelectedItemAndIndex();
     }
 
+    /**
+     * Clears the current selection.
+     */
     @Override
     public void clearSelection() {
         selectedIndices.clear();
@@ -381,16 +431,30 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         setSelectedItem(null);
     }
 
+    /**
+     * Checks whether the given index is selected.
+     *
+     * @param index the index to check
+     * @return {@code true} if the index is selected
+     */
     @Override
     public boolean isSelected(int index) {
         return selectedIndices.contains(index);
     }
 
+    /**
+     * Checks whether no items are currently selected.
+     *
+     * @return {@code true} if no items are selected
+     */
     @Override
     public boolean isEmpty() {
         return selectedIndices.isEmpty();
     }
 
+    /**
+     * Selects the previous item.
+     */
     @Override
     public void selectPrevious() {
         ObservableList<T> items = getItems();
@@ -408,6 +472,9 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         }
     }
 
+    /**
+     * Selects the next item.
+     */
     @Override
     public void selectNext() {
         ObservableList<T> items = getItems();
@@ -425,6 +492,9 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         }
     }
 
+    /**
+     * Selects the first item.
+     */
     @Override
     public void selectFirst() {
         ObservableList<T> items = getItems();
@@ -434,6 +504,9 @@ public class CustomMultipleSelectionModel<T> extends MultipleSelectionModel<T> {
         select(0);
     }
 
+    /**
+     * Selects the last item.
+     */
     @Override
     public void selectLast() {
         ObservableList<T> items = getItems();

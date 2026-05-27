@@ -37,6 +37,11 @@ public class ChipsViewContainer extends FlowPane {
         managedProperty().bind(visibleProperty());
     }
 
+    /**
+     * Returns the stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(ChipsViewContainer.class.getResource("chips-view-container.css")).toExternalForm();

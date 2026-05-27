@@ -338,6 +338,8 @@ public class ResizingBehaviour {
     /**
      * The offset from the edges in pixels where the user will be able to perform a press
      * and drag to resize the pane. Default is 5.
+     *
+     * @return the offset property
      */
     public final DoubleProperty offsetProperty() {
         if (offset == null) {

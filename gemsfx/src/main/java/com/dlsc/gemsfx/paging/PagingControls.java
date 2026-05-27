@@ -32,11 +32,21 @@ public class PagingControls extends PagingControlBase {
         });
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new PagingControlsSkin(this);
     }
 
+    /**
+     * Returns the user agent stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(PagingControls.class.getResource("paging-controls.css")).toExternalForm();

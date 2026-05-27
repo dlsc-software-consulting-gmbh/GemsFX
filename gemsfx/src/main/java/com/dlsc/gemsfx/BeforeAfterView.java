@@ -95,6 +95,11 @@ public class BeforeAfterView extends Control {
         this(new ImageView(beforeImage), new ImageView(afterImage));
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new BeforeAfterViewSkin(this);
@@ -105,22 +110,42 @@ public class BeforeAfterView extends Control {
         pseudoClassStateChanged(PSEUDO_CLASS_VERTICAL, getOrientation().equals(Orientation.VERTICAL));
     }
 
+    /**
+     * Returns the stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(BeforeAfterView.class.getResource("before-after-view.css")).toExternalForm();
     }
 
     private final StyleableDoubleProperty dividerPosition = new StyleableDoubleProperty(.5) {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() {
             return BeforeAfterView.this;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() {
             return "dividerPosition";
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<? extends Styleable, Number> getCssMetaData() {
             return StyleableProperties.DIVIDER_POSITION;
@@ -218,21 +243,39 @@ public class BeforeAfterView extends Control {
         if (orientation == null) {
             orientation = new StyleableObjectProperty<>(DEFAULT_ORIENTATION) {
 
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 protected void invalidated() {
                     updatePseudoClass();
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the owning bean
+                 */
                 @Override
                 public Object getBean() {
                     return BeforeAfterView.this;
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the property name
+                 */
                 @Override
                 public String getName() {
                     return "orientation";
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the CSS metadata for this property
+                 */
                 @Override
                 public CssMetaData<? extends Styleable, Orientation> getCssMetaData() {
                     return StyleableProperties.ORIENTATION;
@@ -251,11 +294,23 @@ public class BeforeAfterView extends Control {
         private static final CssMetaData<BeforeAfterView, Number> DIVIDER_POSITION = new CssMetaData<>(
                 "-fx-divider-position", SizeConverter.getInstance(), .5d) {
 
+            /**
+             * {@inheritDoc}
+             *
+             * @param view the control to inspect
+             * @return the styleable property
+             */
             @Override
             public StyleableProperty<Number> getStyleableProperty(BeforeAfterView view) {
                 return (StyleableProperty<Number>) view.dividerPositionProperty();
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @param view the control to inspect
+             * @return true if the property can be styled
+             */
             @Override
             public boolean isSettable(BeforeAfterView view) {
                 return !view.dividerPosition.isBound();
@@ -264,11 +319,23 @@ public class BeforeAfterView extends Control {
 
         private static final CssMetaData<BeforeAfterView, Orientation> ORIENTATION =
                 new CssMetaData<>("-fx-orientation", new EnumConverter<>(Orientation.class), DEFAULT_ORIENTATION) {
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @param view the control to inspect
+                     * @return true if the property can be styled
+                     */
                     @Override
                     public boolean isSettable(BeforeAfterView view) {
                         return view.orientation == null || !view.orientation.isBound();
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @param view the control to inspect
+                     * @return the styleable property
+                     */
                     @Override
                     public StyleableProperty<Orientation> getStyleableProperty(BeforeAfterView view) {
                         return (StyleableProperty<Orientation>) view.orientationProperty();
@@ -285,11 +352,21 @@ public class BeforeAfterView extends Control {
         }
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the control CSS metadata
+     */
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the class CSS metadata
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return BeforeAfterView.StyleableProperties.STYLEABLES;
     }

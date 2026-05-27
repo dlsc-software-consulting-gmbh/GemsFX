@@ -43,6 +43,13 @@ public class PreferencesHistoryManager<T> extends HistoryManager<T> {
 
     private final StringConverter<T> converter;
 
+    /**
+     * Creates a new preferences-based history manager.
+     *
+     * @param preferences the preferences used for persistence
+     * @param key the key used to store the history
+     * @param converter the converter used to serialize and deserialize items
+     */
     public PreferencesHistoryManager(Preferences preferences, String key, StringConverter<T> converter) {
         this.preferences = Objects.requireNonNull(preferences);
         this.key = Objects.requireNonNull(key);

@@ -48,21 +48,39 @@ public class CircleProgressIndicator extends ArcProgressIndicator {
     private static final String DEFAULT_STYLE_CLASS = "circle-progress-indicator";
     private static final double DEFAULT_START_ANGLE = 90.0;
 
+    /**
+     * Constructs a new circle progress indicator in the indeterminate state.
+     */
     public CircleProgressIndicator() {
         this(INDETERMINATE_PROGRESS);
     }
 
+    /**
+     * Constructs a new circle progress indicator with the given progress.
+     *
+     * @param progress the initial progress
+     */
     public CircleProgressIndicator(double progress) {
         super(progress);
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         setMinSize(26, 26);
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new CircleProgressIndicatorSkin(this);
     }
 
+    /**
+     * Returns the stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(CircleProgressIndicator.class.getResource("circle-progress-indicator.css")).toExternalForm();

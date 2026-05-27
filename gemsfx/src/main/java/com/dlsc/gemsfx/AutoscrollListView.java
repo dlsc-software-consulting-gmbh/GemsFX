@@ -113,6 +113,9 @@ public class AutoscrollListView<T> extends ListView<T> {
         return null;
     }
 
+    /**
+     * A thread used for auto-scrolling while a drag operation is in progress.
+     */
     private class ScrollThread extends Thread {
 
         private boolean running = true;
@@ -123,6 +126,9 @@ public class AutoscrollListView<T> extends ListView<T> {
             setDaemon(true);
         }
 
+        /**
+         * Runs the auto-scroll loop until the thread is stopped.
+         */
         @Override
         public void run() {
 
@@ -156,10 +162,18 @@ public class AutoscrollListView<T> extends ListView<T> {
             flow.scrollPixels(yOffset);
         }
 
+        /**
+         * Requests that the auto-scroll thread stops running.
+         */
         public void stopRunning() {
             this.running = false;
         }
 
+        /**
+         * Updates the vertical scroll delta used by the auto-scroll thread.
+         *
+         * @param yOffset the vertical scroll delta
+         */
         public void setDelta(double yOffset) {
             this.yOffset = yOffset;
         }

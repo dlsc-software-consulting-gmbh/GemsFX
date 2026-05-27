@@ -28,17 +28,29 @@ public class ResizableTextArea extends TextArea {
 
     /**
      * Constructs a new resizable text area with the given text.
+     *
+     * @param text the initial text
      */
     public ResizableTextArea(String text) {
         this();
         setText(text);
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new ResizableTextAreaSkin(this);
     }
 
+    /**
+     * Returns the stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(ResizableTextArea.class.getResource("resizable-text-area.css")).toExternalForm();

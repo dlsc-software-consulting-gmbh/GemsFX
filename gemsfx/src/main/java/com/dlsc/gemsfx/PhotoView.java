@@ -50,7 +50,7 @@ import java.util.logging.Logger;
 
 /**
  * The photo view is mostly used to display a user profile picture.
- * <h3>Features</h3>
+ * <h2>Features</h2>
  * <ul>
  *     <li>control can be used as read-only view or as an editor (see {@link #editableProperty()})</li>
  *     <li>picture can moved around by dragging it</li>

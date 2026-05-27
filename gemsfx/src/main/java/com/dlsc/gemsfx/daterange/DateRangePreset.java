@@ -31,10 +31,20 @@ public class DateRangePreset {
         this.dateRangeSupplier = Objects.requireNonNull(dateRangeSupplier);
     }
 
+    /**
+     * Returns the title of the preset.
+     *
+     * @return the preset title
+     */
     public final String getTitle() {
         return title;
     }
 
+    /**
+     * Returns the supplier used to create the date range for this preset.
+     *
+     * @return the date range supplier
+     */
     public final Supplier<DateRange> getDateRangeSupplier() {
         return dateRangeSupplier;
     }

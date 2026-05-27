@@ -12,6 +12,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Utility class providing miscellaneous UI helper methods for JavaFX applications.
+ *
+ * <p>Methods cover common tasks such as conditionally adding CSS style classes to
+ * {@link javafx.css.Styleable} nodes, copying text to the clipboard, handling
+ * double-click events, and computing insets.
+ */
 public class UIUtil {
 
     private UIUtil() {
@@ -147,6 +154,9 @@ public class UIUtil {
 
     /**
      * Returns the height of the top and bottom insets combined.
+     *
+     * @param insets the insets
+     * @return the combined top and bottom insets
      */
     public static double getInsetsHeight(Insets insets) {
         return insets == null ? 0 : insets.getTop() + insets.getBottom();
@@ -154,6 +164,9 @@ public class UIUtil {
 
     /**
      * Returns the width of the left and right insets combined.
+     *
+     * @param insets the insets
+     * @return the combined left and right insets
      */
     public static double getInsetsWidth(Insets insets) {
         return insets == null ? 0 : insets.getLeft() + insets.getRight();

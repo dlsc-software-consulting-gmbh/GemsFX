@@ -6,6 +6,13 @@ import javafx.scene.Parent;
 
 import java.util.Objects;
 
+/**
+ * Utility class providing focus-related helper methods for JavaFX nodes.
+ *
+ * <p>This class contains static methods for requesting and delegating keyboard
+ * focus in a safe way, ensuring that focus requests are deferred until the target
+ * node is actually showing in the scene graph.
+ */
 public class FocusUtil {
 
     private FocusUtil() {
@@ -28,6 +35,12 @@ public class FocusUtil {
         }
     }
 
+    /**
+     * Delegates the focus from one node to another.
+     *
+     * @param receiver the node receiving the initial focus
+     * @param delegate the node that should receive the delegated focus
+     */
     public static void delegateFocus(Node receiver, Node delegate) {
         Objects.requireNonNull(receiver, "receiving node can not be null");
         Objects.requireNonNull(receiver, "delegate node can not be null");
@@ -66,6 +79,11 @@ public class FocusUtil {
         return null;
     }
 
+    /**
+     * Requests focus on the first focusable node below the given node.
+     *
+     * @param node the node used to start the search
+     */
     public static void focusOnFirstFocusableNode(Node node) {
         Node firstFocusableNode = findFirstFocusableNode(node);
         if (firstFocusableNode != null) {

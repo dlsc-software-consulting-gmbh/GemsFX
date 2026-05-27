@@ -94,28 +94,23 @@ import java.util.prefs.Preferences;
  * of the window. If the application is using a StackPane as its root container then the dialog
  * pane can simply be added as the last child of the StackPane.
  * </p>
- * <h3>Example</h3>
+ * <h2>Example</h2>
  * To show an information dialog one can simply call:
- * <p>
  * <pre>
  *    dialogPane.showInformation("My Title", "My message");
  * </pre>
- * </p>
  * <p>
  * If an application wants to act upon the button that was pressed after showing a confirmation dialog
  * then the following can be written:
- * <p>
  * <pre>
  *     dialogPane.showConfirmation("Confirm", "Really delete?").onClose(buttonType -> { ... });
  * </pre>
- * </p>
  * The pane supports factories for creating the header and the footer. This allows application developers
  * to completely replace those elements of the dialogs. Default factories are already registered and will
  * be used if not replaced.
  *
  * @see #setHeaderFactory(Callback)
  * @see #setFooterFactory(Callback)
- * </p>
  */
 public class DialogPane extends StackPane {
 

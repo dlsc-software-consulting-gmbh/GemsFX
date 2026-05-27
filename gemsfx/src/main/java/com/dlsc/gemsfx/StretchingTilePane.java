@@ -92,21 +92,39 @@ public class StretchingTilePane extends Pane {
     public final DoubleProperty hgapProperty() {
         if (hgap == null) {
             hgap = new StyleableDoubleProperty() {
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 public void invalidated() {
                     requestLayout();
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the CSS metadata for this property
+                 */
                 @Override
                 public CssMetaData<StretchingTilePane, Number> getCssMetaData() {
                     return StretchingTilePane.StyleableProperties.HGAP;
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the owning bean
+                 */
                 @Override
                 public Object getBean() {
                     return StretchingTilePane.this;
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the property name
+                 */
                 @Override
                 public String getName() {
                     return "hgap";
@@ -139,21 +157,39 @@ public class StretchingTilePane extends Pane {
     public final DoubleProperty vgapProperty() {
         if (vgap == null) {
             vgap = new StyleableDoubleProperty() {
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 public void invalidated() {
                     requestLayout();
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the CSS metadata for this property
+                 */
                 @Override
                 public CssMetaData<StretchingTilePane, Number> getCssMetaData() {
                     return StretchingTilePane.StyleableProperties.VGAP;
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the owning bean
+                 */
                 @Override
                 public Object getBean() {
                     return StretchingTilePane.this;
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the property name
+                 */
                 @Override
                 public String getName() {
                     return "vgap";
@@ -197,6 +233,13 @@ public class StretchingTilePane extends Pane {
         return prefWidth;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the preferred height for the given width
+     *
+     * @param width the available width
+     */
     @Override
     protected double computePrefHeight(double width) {
         List<Node> children = getManagedChildren();
@@ -221,11 +264,21 @@ public class StretchingTilePane extends Pane {
         return cellHeight + (numberOfRows - 1) * getVgap() + getInsets().getTop() + getInsets().getBottom();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the minimum height for the given width
+     *
+     * @param width the available width
+     */
     @Override
     protected double computeMinHeight(double width) {
         return computePrefHeight(width);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void layoutChildren() {
         super.layoutChildren();
@@ -273,12 +326,26 @@ public class StretchingTilePane extends Pane {
         private static final CssMetaData<StretchingTilePane, Number> HGAP =
                 new CssMetaData<>("-fx-hgap", SizeConverter.getInstance(), 0.0) {
 
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @return true if the property can be styled
+                     *
+                     * @param node the control to inspect
+                     */
                     @Override
                     public boolean isSettable(StretchingTilePane node) {
                         return node.hgap == null ||
                                 !node.hgap.isBound();
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @return the styleable property
+                     *
+                     * @param node the control to inspect
+                     */
                     @Override
                     public StyleableProperty<Number> getStyleableProperty(StretchingTilePane node) {
                         return (StyleableProperty<Number>) node.hgapProperty();
@@ -288,12 +355,26 @@ public class StretchingTilePane extends Pane {
         private static final CssMetaData<StretchingTilePane, Number> VGAP =
                 new CssMetaData<>("-fx-vgap", SizeConverter.getInstance(), 0.0) {
 
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @return true if the property can be styled
+                     *
+                     * @param node the control to inspect
+                     */
                     @Override
                     public boolean isSettable(StretchingTilePane node) {
                         return node.vgap == null ||
                                 !node.vgap.isBound();
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @return the styleable property
+                     *
+                     * @param node the control to inspect
+                     */
                     @Override
                     public StyleableProperty<Number> getStyleableProperty(StretchingTilePane node) {
                         return (StyleableProperty<Number>) node.vgapProperty();
@@ -309,11 +390,21 @@ public class StretchingTilePane extends Pane {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the supported CSS metadata
+     */
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the CSS metadata supported by this control
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StretchingTilePane.StyleableProperties.STYLEABLES;
     }

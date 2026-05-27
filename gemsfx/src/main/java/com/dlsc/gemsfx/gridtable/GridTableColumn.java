@@ -25,6 +25,12 @@ import javafx.util.StringConverter;
  */
 public class GridTableColumn<S, T> extends ColumnConstraints {
 
+    /**
+     * Constructs a new grid table column.
+     *
+     * @param text the column text
+     * @param graphic the column graphic
+     */
     public GridTableColumn(String text, Node graphic) {
         setText(text);
         setGraphic(graphic);
@@ -48,22 +54,40 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         header.set(label);
     }
 
+    /**
+     * Constructs a new grid table column that only shows a graphic.
+     *
+     * @param graphic the column graphic
+     */
     public GridTableColumn(Node graphic) {
         this(null, graphic);
         setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     }
 
+    /**
+     * Constructs a new grid table column that only shows text.
+     *
+     * @param text the column text
+     */
     public GridTableColumn(String text) {
         this(text, null);
         setContentDisplay(ContentDisplay.TEXT_ONLY);
     }
 
+    /**
+     * Constructs a new grid table column with an empty header.
+     */
     public GridTableColumn() {
         this("", null);
     }
 
     private final ObservableList<String> styleClass = FXCollections.observableArrayList();
 
+    /**
+     * Returns the style classes applied to cells created by this column.
+     *
+     * @return the style classes
+     */
     public ObservableList<String> getStyleClass() {
         return styleClass;
     }
@@ -74,6 +98,11 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         return contentDisplay.get();
     }
 
+    /**
+     * Stores how the text and graphic should be arranged in the header.
+     *
+     * @return the content display property
+     */
     public ObjectProperty<ContentDisplay> contentDisplayProperty() {
         return contentDisplay;
     }
@@ -88,6 +117,11 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         return graphic.get();
     }
 
+    /**
+     * Stores the graphic shown in the header.
+     *
+     * @return the graphic property
+     */
     public ObjectProperty<Node> graphicProperty() {
         return graphic;
     }
@@ -102,6 +136,11 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         return text.get();
     }
 
+    /**
+     * Stores the text shown in the header.
+     *
+     * @return the text property
+     */
     public StringProperty textProperty() {
         return text;
     }
@@ -116,6 +155,11 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         return converter.get();
     }
 
+    /**
+     * Stores the converter used to turn cell values into text.
+     *
+     * @return the converter property
+     */
     public ObjectProperty<StringConverter<T>> converterProperty() {
         return converter;
     }
@@ -132,6 +176,11 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         return cellFactory.get();
     }
 
+    /**
+     * Stores the factory used to create cells for this column.
+     *
+     * @return the cell factory property
+     */
     public final ObjectProperty<Callback<GridTableView<S>, GridTableCell<S, T>>> cellFactoryProperty() {
         return cellFactory;
     }
@@ -146,6 +195,11 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         return cellValueFactory.get();
     }
 
+    /**
+     * Stores the factory used to extract cell values from row items.
+     *
+     * @return the cell value factory property
+     */
     public ObjectProperty<Callback<S, T>> cellValueFactoryProperty() {
         return cellValueFactory;
     }
@@ -160,10 +214,22 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         return header.get();
     }
 
+    /**
+     * A read-only property containing the header node.
+     *
+     * @return the header property
+     */
     public ReadOnlyObjectProperty<Node> headerProperty() {
         return header.getReadOnlyProperty();
     }
 
+    /**
+     * Creates a new cell for the given table view and row index.
+     *
+     * @param tableView the owning table view
+     * @param index the row index
+     * @return the created cell
+     */
     public final GridTableCell<S, T> createCell(GridTableView<S> tableView, int index) {
         // step 1: retrieve the model object for the given row (index) from the table view
         S rowItem = null;

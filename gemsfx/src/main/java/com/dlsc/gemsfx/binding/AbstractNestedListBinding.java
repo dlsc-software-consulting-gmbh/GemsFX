@@ -77,12 +77,20 @@ public abstract class AbstractNestedListBinding<T, U> extends ObjectBinding<U> {
         }
     }
 
+    /**
+     * Returns the flattened stream of all non-null source elements.
+     *
+     * @return the flattened source stream
+     */
     protected Stream<T> flattenSource() {
         return source.stream()
                 .filter(Objects::nonNull)
                 .flatMap(List::stream);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispose() {
         source.forEach(this::safeRemoveListener);

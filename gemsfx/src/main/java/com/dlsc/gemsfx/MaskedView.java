@@ -47,12 +47,19 @@ public class MaskedView extends Control {
 
     /**
      * Constructs a new masked view for the given content.
+     *
+     * @param content the content to show inside the view
      */
     public MaskedView(Node content) {
         this();
         setContent(content);
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new MaskedViewSkin(this);
@@ -97,16 +104,31 @@ public class MaskedView extends Control {
     public final DoubleProperty fadingSizeProperty() {
         if (fadingSize == null) {
             fadingSize = new StyleableDoubleProperty(DEFAULT_FADING_SIZE) {
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the owning bean
+                 */
                 @Override
                 public Object getBean() {
                     return MaskedView.this;
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the property name
+                 */
                 @Override
                 public String getName() {
                     return "fadingSize";
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the CSS metadata for this property
+                 */
                 @Override
                 public CssMetaData<? extends Styleable, Number> getCssMetaData() {
                     return StyleableProperties.FADING_SIZE;
@@ -125,11 +147,23 @@ public class MaskedView extends Control {
         private static final CssMetaData<MaskedView, Number> FADING_SIZE = new CssMetaData<>(
                 "-fx-fading-size", SizeConverter.getInstance(), DEFAULT_FADING_SIZE) {
 
+            /**
+             * {@inheritDoc}
+             *
+             * @param control the control to inspect
+             * @return the styleable property
+             */
             @Override
             public StyleableProperty<Number> getStyleableProperty(MaskedView control) {
                 return (StyleableProperty<Number>) control.fadingSizeProperty();
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @param control the control to inspect
+             * @return true if the property can be styled
+             */
             @Override
             public boolean isSettable(MaskedView control) {
                 return control.fadingSize == null || !control.fadingSize.isBound();
@@ -145,11 +179,21 @@ public class MaskedView extends Control {
         }
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the control CSS metadata
+     */
     @Override
     protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the class CSS metadata
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return MaskedView.StyleableProperties.STYLEABLES;
     }

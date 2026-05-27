@@ -119,6 +119,11 @@ public class PopOver extends PopupControl {
         setContentNode(content);
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new PopOverSkin(this);
@@ -128,7 +133,7 @@ public class PopOver extends PopupControl {
      * The root pane stores the content node of the popover. It is accessible
      * via this method to support proper styling.
      *
-     * <h3>Example:</h3>
+     * <h4>Example:</h4>
      *
      * <pre>{@code
      * Popover popOver = new Popover();
@@ -144,6 +149,11 @@ public class PopOver extends PopupControl {
     // Content support.
 
     private final ObjectProperty<Node> contentNode = new SimpleObjectProperty<Node>(this, "contentNode") {
+        /**
+         * Updates the content node shown by the popover.
+         *
+         * @param node the new content node
+         */
         @Override
         public void setValue(Node node) {
             if (node == null) {
@@ -162,22 +172,10 @@ public class PopOver extends PopupControl {
         return contentNode;
     }
 
-    /**
-     * Returns the value of the content property
-     *
-     * @return the content node
-     * @see #contentNodeProperty()
-     */
     public final Node getContentNode() {
         return contentNodeProperty().get();
     }
 
-    /**
-     * Sets the value of the content property.
-     *
-     * @param content the new content node value
-     * @see #contentNodeProperty()
-     */
     public final void setContentNode(Node content) {
         contentNodeProperty().set(content);
     }
@@ -521,27 +519,17 @@ public class PopOver extends PopupControl {
 
     /**
      * Determines if the popover is detachable at all.
+     *
+     * @return the detachable property
      */
     public final BooleanProperty detachableProperty() {
         return detachable;
     }
 
-    /**
-     * Sets the value of the detachable property.
-     *
-     * @param detachable if true, then the user can detach / tear off the popover
-     * @see #detachableProperty()
-     */
     public final void setDetachable(boolean detachable) {
         detachableProperty().set(detachable);
     }
 
-    /**
-     * Returns the value of the detachable property.
-     *
-     * @return true if the user is allowed to detach / tear off the popover
-     * @see #detachableProperty()
-     */
     public final boolean isDetachable() {
         return detachableProperty().get();
     }
@@ -559,22 +547,10 @@ public class PopOver extends PopupControl {
         return detached;
     }
 
-    /**
-     * Sets the value of the detached property.
-     *
-     * @param detached if true, the popover will change its appearance to "detached" mode
-     * @see #detachedProperty()
-     */
     public final void setDetached(boolean detached) {
         detachedProperty().set(detached);
     }
 
-    /**
-     * Returns the value of the detached property.
-     *
-     * @return true if the popover is currently detached.
-     * @see #detachedProperty()
-     */
     public final boolean isDetached() {
         return detachedProperty().get();
     }
@@ -590,22 +566,10 @@ public class PopOver extends PopupControl {
         return root.arrowSizeProperty();
     }
 
-    /**
-     * Returns the value of the arrow size property.
-     *
-     * @return the arrow size property value
-     * @see #arrowSizeProperty()
-     */
     public final double getArrowSize() {
         return arrowSizeProperty().get();
     }
 
-    /**
-     * Sets the value of the arrow size property.
-     *
-     * @param size the new value of the arrow size property
-     * @see #arrowSizeProperty()
-     */
     public final void setArrowSize(double size) {
         arrowSizeProperty().set(size);
     }
@@ -622,22 +586,10 @@ public class PopOver extends PopupControl {
         return root.arrowIndentProperty();
     }
 
-    /**
-     * Returns the value of the arrow indent property.
-     *
-     * @return the arrow indent value
-     * @see #arrowIndentProperty()
-     */
     public final double getArrowIndent() {
         return arrowIndentProperty().get();
     }
 
-    /**
-     * Sets the value of the arrow indent property.
-     *
-     * @param size the arrow indent value
-     * @see #arrowIndentProperty()
-     */
     public final void setArrowIndent(double size) {
         arrowIndentProperty().set(size);
     }
@@ -653,22 +605,10 @@ public class PopOver extends PopupControl {
         return root.cornerRadiusProperty();
     }
 
-    /**
-     * Returns the value of the corner radius property.
-     *
-     * @return the corner radius
-     * @see #cornerRadiusProperty()
-     */
     public final double getCornerRadius() {
         return cornerRadiusProperty().get();
     }
 
-    /**
-     * Sets the value of the corner radius property.
-     *
-     * @param radius the corner radius
-     * @see #cornerRadiusProperty()
-     */
     public final void setCornerRadius(double radius) {
         cornerRadiusProperty().set(radius);
     }
@@ -687,22 +627,10 @@ public class PopOver extends PopupControl {
         return arrowLocation;
     }
 
-    /**
-     * Sets the value of the arrow location property.
-     *
-     * @param location the requested location
-     * @see #arrowLocationProperty()
-     */
     public final void setArrowLocation(ArrowLocation location) {
         arrowLocationProperty().set(location);
     }
 
-    /**
-     * Returns the value of the arrow location property.
-     *
-     * @return the preferred arrow location
-     * @see #arrowLocationProperty()
-     */
     public final ArrowLocation getArrowLocation() {
         return arrowLocationProperty().get();
     }
@@ -747,42 +675,18 @@ public class PopOver extends PopupControl {
         return fadeOutDuration;
     }
 
-    /**
-     * Returns the value of the fade-in duration property.
-     *
-     * @return the fade-in duration
-     * @see #fadeInDurationProperty()
-     */
     public final Duration getFadeInDuration() {
         return fadeInDurationProperty().get();
     }
 
-    /**
-     * Sets the value of the fade-in duration property. This should be set before calling PopOver.show(...).
-     *
-     * @param duration the requested fade-in duration
-     * @see #fadeInDurationProperty()
-     */
     public final void setFadeInDuration(Duration duration) {
         fadeInDurationProperty().setValue(duration);
     }
 
-    /**
-     * Returns the value of the fade-out duration property.
-     *
-     * @return the fade-out duration
-     * @see #fadeOutDurationProperty()
-     */
     public final Duration getFadeOutDuration() {
         return fadeOutDurationProperty().get();
     }
 
-    /**
-     * Sets the value of the fade-out duration property.
-     *
-     * @param duration the requested fade-out duration
-     * @see #fadeOutDurationProperty()
-     */
     public final void setFadeOutDuration(Duration duration) {
         fadeOutDurationProperty().setValue(duration);
     }
@@ -798,22 +702,10 @@ public class PopOver extends PopupControl {
         return animated;
     }
 
-    /**
-     * Returns the value of the "animated" property.
-     *
-     * @return true if the PopOver will be shown and hidden with a short fade animation
-     * @see #animatedProperty()
-     */
     public final boolean isAnimated() {
         return animatedProperty().get();
     }
 
-    /**
-     * Sets the value of the "animated" property.
-     *
-     * @param animated if true, the PopOver will be shown and hidden with a short fade animation
-     * @see #animatedProperty()
-     */
     public final void setAnimated(boolean animated) {
         animatedProperty().set(animated);
     }
@@ -881,16 +773,31 @@ public class PopOver extends PopupControl {
         }
 
         private final DoubleProperty arrowSize = new StyleableDoubleProperty(DEFAULT_ARROW_SIZE) {
+            /**
+             * {@inheritDoc}
+             *
+             * @return the owning bean
+             */
             @Override
             public Object getBean() {
                 return PopOverRoot.this;
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the property name
+             */
             @Override
             public String getName() {
                 return "arrowSize";
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the CSS metadata for this property
+             */
             @Override
             public CssMetaData<PopOverRoot, Number> getCssMetaData() {
                 return StyleableProperties.ARROW_SIZE;
@@ -912,16 +819,31 @@ public class PopOver extends PopupControl {
         }
 
         private final DoubleProperty arrowIndent = new StyleableDoubleProperty(DEFAULT_ARROW_INDENT) {
+            /**
+             * {@inheritDoc}
+             *
+             * @return the owning bean
+             */
             @Override
             public Object getBean() {
                 return PopOverRoot.this;
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the property name
+             */
             @Override
             public String getName() {
                 return "arrowIndent";
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the CSS metadata for this property
+             */
             @Override
             public CssMetaData<PopOverRoot, Number> getCssMetaData() {
                 return StyleableProperties.ARROW_INDENT;
@@ -943,31 +865,61 @@ public class PopOver extends PopupControl {
         }
 
         private final DoubleProperty cornerRadius = new StyleableDoubleProperty(DEFAULT_CORNER_RADIUS) {
+            /**
+             * {@inheritDoc}
+             *
+             * @return the owning bean
+             */
             @Override
             public Object getBean() {
                 return PopOverRoot.this;
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the property name
+             */
             @Override
             public String getName() {
                 return "cornerRadius";
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the CSS metadata for this property
+             */
             @Override
             public CssMetaData<PopOverRoot, Number> getCssMetaData() {
                 return StyleableProperties.CORNER_RADIUS;
             }
         };
 
+        /**
+         * Returns the stylesheet used by this control.
+         *
+         * @return the user agent stylesheet
+         */
         @Override
         public String getUserAgentStylesheet() {
             return requireNonNull(PopOver.class.getResource("popover.css")).toExternalForm();
         }
 
+        /**
+         * Returns the CSS metadata supported by this control.
+         *
+         * @return the class CSS metadata
+         */
         public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
             return StyleableProperties.STYLEABLES;
         }
 
+        /**
+         * Returns the CSS metadata supported by this control.
+         *
+         * @return the control CSS metadata
+         */
         @Override
         public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
             return getClassCssMetaData();
@@ -977,11 +929,23 @@ public class PopOver extends PopupControl {
 
             private static final CssMetaData<PopOverRoot, Number> ARROW_SIZE =
                     new CssMetaData<>("-fx-arrow-size", SizeConverter.getInstance(), DEFAULT_ARROW_SIZE) {
+                        /**
+                         * {@inheritDoc}
+                         *
+                         * @param node the control to inspect
+                         * @return true if the property can be styled
+                         */
                         @Override
                         public boolean isSettable(PopOverRoot node) {
                             return !node.arrowSize.isBound();
                         }
 
+                        /**
+                         * {@inheritDoc}
+                         *
+                         * @param node the control to inspect
+                         * @return the styleable property
+                         */
                         @Override
                         public StyleableProperty<Number> getStyleableProperty(PopOverRoot node) {
                             return (StyleableProperty<Number>) node.arrowSizeProperty();
@@ -990,11 +954,23 @@ public class PopOver extends PopupControl {
 
             private static final CssMetaData<PopOverRoot, Number> ARROW_INDENT =
                     new CssMetaData<>("-fx-arrow-indent", SizeConverter.getInstance(), DEFAULT_ARROW_INDENT) {
+                        /**
+                         * {@inheritDoc}
+                         *
+                         * @param node the control to inspect
+                         * @return true if the property can be styled
+                         */
                         @Override
                         public boolean isSettable(PopOverRoot node) {
                             return !node.arrowIndent.isBound();
                         }
 
+                        /**
+                         * {@inheritDoc}
+                         *
+                         * @param node the control to inspect
+                         * @return the styleable property
+                         */
                         @Override
                         public StyleableProperty<Number> getStyleableProperty(PopOverRoot node) {
                             return (StyleableProperty<Number>) node.arrowIndentProperty();
@@ -1003,11 +979,23 @@ public class PopOver extends PopupControl {
 
             private static final CssMetaData<PopOverRoot, Number> CORNER_RADIUS =
                     new CssMetaData<>("-fx-corner-radius", SizeConverter.getInstance(), DEFAULT_CORNER_RADIUS) {
+                        /**
+                         * {@inheritDoc}
+                         *
+                         * @param node the control to inspect
+                         * @return true if the property can be styled
+                         */
                         @Override
                         public boolean isSettable(PopOverRoot node) {
                             return !node.cornerRadius.isBound();
                         }
 
+                        /**
+                         * {@inheritDoc}
+                         *
+                         * @param node the control to inspect
+                         * @return the styleable property
+                         */
                         @Override
                         public StyleableProperty<Number> getStyleableProperty(PopOverRoot node) {
                             return (StyleableProperty<Number>) node.cornerRadiusProperty();

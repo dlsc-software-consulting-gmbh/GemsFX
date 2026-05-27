@@ -58,18 +58,38 @@ public class DateRange {
         this(date, date);
     }
 
+    /**
+     * Returns the optional title of the date range.
+     *
+     * @return the title of the date range
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Returns the start date of the range.
+     *
+     * @return the start date
+     */
     public LocalDate getStartDate() {
         return startDate;
     }
 
+    /**
+     * Returns the end date of the range.
+     *
+     * @return the end date
+     */
     public LocalDate getEndDate() {
         return endDate;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the string representation of the value
+     */
     @Override
     public String toString() {
         if (getStartDate().equals(getEndDate())) {
@@ -81,6 +101,13 @@ public class DateRange {
                 DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).format(getEndDate());
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the result
+     *
+     * @param o the o value
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -92,6 +119,11 @@ public class DateRange {
         return endDate.equals(that.endDate);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the result
+     */
     @Override
     public int hashCode() {
         int result = startDate.hashCode();

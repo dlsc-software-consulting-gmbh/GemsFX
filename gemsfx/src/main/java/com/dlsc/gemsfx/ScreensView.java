@@ -59,11 +59,21 @@ public class ScreensView extends Control {
         setReflection(reflection);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new ScreensViewSkin(this);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(ScreensView.class.getResource("screens-view.css")).toExternalForm();

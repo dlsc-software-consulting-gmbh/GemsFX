@@ -72,16 +72,31 @@ public class YearMonthPicker extends CustomComboBox<YearMonth> {
         setValue(YearMonth.now());
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new YearMonthPickerSkin(this);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(YearMonthView.class.getResource("year-month-picker.css")).toExternalForm();
     }
 
+    /**
+     * Returns the year-month view used by this picker.
+     *
+     * @return the year-month view
+     */
     public YearMonthView getYearMonthView() {
         if (yearMonthView == null) {
             yearMonthView = new YearMonthView();
@@ -96,6 +111,9 @@ public class YearMonthPicker extends CustomComboBox<YearMonth> {
 
     /*
      * Performs the work of actually creating and setting a new month value.
+     */
+    /**
+     * Commits the text currently shown in the editor to the picker value.
      */
     public void commit() {
         String text = editor.getText();
@@ -136,6 +154,13 @@ public class YearMonthPicker extends CustomComboBox<YearMonth> {
     }
 
     private final ObjectProperty<StringConverter<YearMonth>> converter = new SimpleObjectProperty<>(this, "value", new StringConverter<>() {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the string representation of the value
+         *
+         * @param object the value to convert
+         */
         @Override
         public String toString(YearMonth object) {
             if (object != null) {
@@ -144,6 +169,13 @@ public class YearMonthPicker extends CustomComboBox<YearMonth> {
             return null;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the parsed value
+         *
+         * @param string the string to parse
+         */
         @Override
         public YearMonth fromString(String string) {
             try {

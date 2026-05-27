@@ -42,6 +42,9 @@ import java.util.List;
  */
 public class Spacer extends Region {
 
+    /**
+     * Constructs a new spacer.
+     */
     public Spacer() {
         getStyleClass().add("spacer");
 
@@ -53,16 +56,31 @@ public class Spacer extends Region {
     }
 
     private final BooleanProperty active = new StyleableBooleanProperty(true) {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() {
             return Spacer.this;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() {
             return "active";
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<Spacer, Boolean> getCssMetaData() {
             return StyleableProperties.ACTIVE;
@@ -96,11 +114,25 @@ public class Spacer extends Region {
         private static final CssMetaData<Spacer, Boolean> ACTIVE =
                 new CssMetaData<>("-fx-active", BooleanConverter.getInstance(), false) {
 
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @return true if the property can be styled
+                     *
+                     * @param n the control to inspect
+                     */
                     @Override
                     public boolean isSettable(Spacer n) {
                         return !n.active.isBound();
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @return the styleable property
+                     *
+                     * @param n the control to inspect
+                     */
                     @Override
                     public StyleableProperty<Boolean> getStyleableProperty(Spacer n) {
                         return (StyleableProperty<Boolean>) n.activeProperty();
@@ -116,10 +148,20 @@ public class Spacer extends Region {
         }
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the CSS metadata supported by this control
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the supported CSS metadata
+     */
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
         return getClassCssMetaData();

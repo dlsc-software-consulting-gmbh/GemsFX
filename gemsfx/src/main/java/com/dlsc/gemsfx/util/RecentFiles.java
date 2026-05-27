@@ -41,11 +41,23 @@ public class RecentFiles {
     public static final String DEFAULT_PREFS_KEY = "recent.files";
 
     private static final StringConverter<File> FILE_CONVERTER = new StringConverter<>() {
+        /**
+         * {@inheritDoc}
+         *
+         * @param file the value to convert
+         * @return the string representation of the value
+         */
         @Override
         public String toString(File file) {
             return file == null ? "" : file.getAbsolutePath();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param path the string to parse
+         * @return the parsed value
+         */
         @Override
         public File fromString(String path) {
             return (path == null || path.isBlank()) ? null : new File(path);

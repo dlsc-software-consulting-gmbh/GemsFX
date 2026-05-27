@@ -148,6 +148,9 @@ public class HistoryButton<T> extends Button {
     // popup showing
 
     private final ReadOnlyBooleanWrapper popupShowing = new ReadOnlyBooleanWrapper(this, "popupShowing") {
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void invalidated() {
             pseudoClassStateChanged(POPUP_SHOWING_PSEUDO_CLASS, get());
@@ -175,6 +178,9 @@ public class HistoryButton<T> extends Button {
     public final ObjectProperty<HistoryManager<T>> historyManagerProperty() {
         if (historyManager == null) {
             historyManager = new SimpleObjectProperty<>(this, "historyManager") {
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 protected void invalidated() {
                     pseudoClassStateChanged(DISABLED_POPUP_PSEUDO_CLASS, get() == null);
@@ -345,6 +351,9 @@ public class HistoryButton<T> extends Button {
 
         public static final String DEFAULT_STYLE_CLASS = "history-popup";
 
+        /**
+         * Constructs a new history popup.
+         */
         public HistoryPopup() {
             getStyleClass().addAll(DEFAULT_STYLE_CLASS);
 
@@ -353,6 +362,11 @@ public class HistoryButton<T> extends Button {
             setHideOnEscape(true);
         }
 
+        /**
+         * Creates the default skin for this popup.
+         *
+         * @return the default skin
+         */
         @Override
         protected Skin<?> createDefaultSkin() {
             return new HistoryPopupSkin(this);
@@ -367,10 +381,20 @@ public class HistoryButton<T> extends Button {
         private final HistoryPopup popup;
         private final BorderPane root;
 
+        /**
+         * Constructs a new skin for the given popup.
+         *
+         * @param popup the popup being skinned
+         */
         public HistoryPopupSkin(HistoryPopup popup) {
             this.popup = popup;
 
             root = new BorderPane() {
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the user agent stylesheet
+                 */
                 @Override
                 public String getUserAgentStylesheet() {
                     return Objects.requireNonNull(HistoryButton.class.getResource("history-button.css")).toExternalForm();
@@ -431,16 +455,29 @@ public class HistoryButton<T> extends Button {
             Optional.ofNullable(getOnItemSelected()).ifPresent(onItemSelected -> onItemSelected.accept(historyItem));
         }
 
+        /**
+         * Returns the node used by this skin.
+         *
+         * @return the skin node
+         */
         @Override
         public Node getNode() {
             return root;
         }
 
+        /**
+         * Returns the popup managed by this skin.
+         *
+         * @return the skinnable popup
+         */
         @Override
         public HistoryPopup getSkinnable() {
             return popup;
         }
 
+        /**
+         * Disposes the skin.
+         */
         @Override
         public void dispose() {
         }

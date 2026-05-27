@@ -32,17 +32,35 @@ import java.util.prefs.Preferences;
 public class StringHistoryManager extends PreferencesHistoryManager<String> {
 
     private static final StringConverter<String> CONVERTER = new StringConverter<>() {
+        /**
+         * {@inheritDoc}
+         *
+         * @param object the value to convert
+         * @return the string representation of the value
+         */
         @Override
         public String toString(String object) {
             return object;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param string the string to parse
+         * @return the parsed value
+         */
         @Override
         public String fromString(String string) {
             return string;
         }
     };
 
+    /**
+     * Creates a new string history manager.
+     *
+     * @param preferences the preferences used for persistence
+     * @param key the key used to store the history
+     */
     public StringHistoryManager(Preferences preferences, String key) {
         super(preferences, key, CONVERTER);
         setFilter(StringUtils::isNotEmpty);

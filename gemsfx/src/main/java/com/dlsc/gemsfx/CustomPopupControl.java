@@ -17,6 +17,11 @@ public class CustomPopupControl extends PopupControl {
     private static final PseudoClass ABOVE_PSEUDO_CLASS = PseudoClass.getPseudoClass("above");
     private static final PseudoClass BELOW_PSEUDO_CLASS = PseudoClass.getPseudoClass("below");
 
+    /**
+     * Shows the popup relative to the given node.
+     *
+     * @param node the node used to position the popup
+     */
     public void show(Node node) {
         if (node.getScene() != null && node.getScene().getWindow() != null) {
             Window parent = node.getScene().getWindow();

@@ -45,12 +45,22 @@ public class NestedListChangeTracker<T> extends AbstractChangeTracker<Observable
         initOuterListener();
     }
 
+    /**
+     * Adds the nested list listener to the given list.
+     *
+     * @param value the list to observe
+     */
     protected void safeAddListener(ObservableList<T> value) {
         if (value != null) {
             value.addListener(weakInnerListListener);
         }
     }
 
+    /**
+     * Removes the nested list listener from the given list.
+     *
+     * @param value the list to stop observing
+     */
     protected void safeRemoveListener(ObservableList<T> value) {
         if (value != null) {
             value.removeListener(weakInnerListListener);

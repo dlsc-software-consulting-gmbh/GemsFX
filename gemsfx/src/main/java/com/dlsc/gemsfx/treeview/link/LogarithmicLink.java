@@ -9,8 +9,31 @@ import javafx.scene.shape.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link LinkStrategy} that draws a link whose path follows a logarithmic curve.
+ *
+ * <p>The path is approximated by 10 line segments whose positions are computed using
+ * {@code log₂(1 + fraction)} along the primary axis. This produces a curve that
+ * accelerates quickly near the parent node and then levels off as it approaches the
+ * child node. A small directional arrow is added at the child end.
+ *
+ * @param <T> the type of the data value stored in each tree node
+ */
 public class LogarithmicLink<T> extends AbstractLinkStrategy<T> {
 
+    /**
+     * Draws the link for the given start and end coordinates.
+     *
+     * @param direction the layout direction
+     * @param maxDimensionInLine the maximum node dimension in the active line
+     * @param startX the x-coordinate of the link start
+     * @param startY the y-coordinate of the link start
+     * @param endX the x-coordinate of the link end
+     * @param endY the y-coordinate of the link end
+     * @param vgap the vertical gap between levels
+     * @param hgap the horizontal gap between levels
+     * @return the nodes used to render the link
+     */
     @Override
     protected ArrayList<Node> drawLink(TreeNodeView.LayoutDirection direction, double maxDimensionInLine, double startX, double startY, double endX, double endY, double vgap, double hgap) {
         Path path = new Path();

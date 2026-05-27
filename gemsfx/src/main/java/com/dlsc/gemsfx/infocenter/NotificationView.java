@@ -127,6 +127,12 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
         }
     }
 
+    /**
+     * Computes the preferred height of the notification view.
+     *
+     * @param width the width used for the computation
+     * @return the preferred height
+     */
     @Override
     protected double computePrefHeight(double width) {
         double h = contentPane.prefHeight(width - getInsets().getLeft() - getInsets().getRight());
@@ -142,16 +148,31 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
         return h;
     }
 
+    /**
+     * Computes the minimum height of the notification view.
+     *
+     * @param width the width used for the computation
+     * @return the minimum height
+     */
     @Override
     protected double computeMinHeight(double width) {
         return computePrefHeight(width);
     }
 
+    /**
+     * Computes the maximum height of the notification view.
+     *
+     * @param width the width used for the computation
+     * @return the maximum height
+     */
     @Override
     protected double computeMaxHeight(double width) {
         return computePrefHeight(width);
     }
 
+    /**
+     * Lays out the content pane and the optional stacked notifications.
+     */
     @Override
     protected void layoutChildren() {
         double width = getWidth() - getInsets().getLeft() - getInsets().getRight();
@@ -238,6 +259,11 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
         return showContent.get();
     }
 
+    /**
+     * Determines whether the detailed content node is currently shown.
+     *
+     * @return the showContent property
+     */
     public final BooleanProperty showContentProperty() {
         return showContent;
     }
@@ -247,6 +273,12 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
     }
 
     private static final StringConverter<ZonedDateTime> DEFAULT_TIME_CONVERTER = new StringConverter<>() {
+        /**
+         * Converts the given date and time into a human-readable text.
+         *
+         * @param dateTime the date and time to convert
+         * @return the converted text
+         */
         @Override
         public String toString(ZonedDateTime dateTime) {
             if (dateTime != null) {
@@ -272,6 +304,12 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             return "";
         }
 
+        /**
+         * Converts the given text back into a date and time.
+         *
+         * @param string the text to convert
+         * @return always {@code null}
+         */
         @Override
         public ZonedDateTime fromString(String string) {
             return null;
@@ -294,6 +332,9 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
     public final ObjectProperty<StringConverter<ZonedDateTime>> timeConverterProperty() {
         if (timeConverter == null) {
             timeConverter = new SimpleObjectProperty<>(this, "timeConverter", DEFAULT_TIME_CONVERTER) {
+                /**
+                 * Updates the date and time label after the converter changes.
+                 */
                 @Override
                 protected void invalidated() {
                     updateDateAndTimeLabel();
@@ -307,6 +348,9 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
         timeConverterProperty().set(timeConverter);
     }
 
+    /**
+     * The pane used to render the notification content and actions.
+     */
     public class ContentPane extends HBox {
 
         private final StackPane closeIconWrapper;
@@ -317,6 +361,9 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
 
         private FadeTransition fadeTransition;
 
+        /**
+         * Constructs a new content pane.
+         */
         public ContentPane() {
             getStyleClass().add("content");
 
@@ -481,6 +528,9 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             }
         }
 
+        /**
+         * Lays out the close icon wrapper in the upper left corner.
+         */
         @Override
         protected void layoutChildren() {
             super.layoutChildren();

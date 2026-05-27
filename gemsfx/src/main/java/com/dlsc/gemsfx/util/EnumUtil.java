@@ -168,11 +168,25 @@ public class EnumUtil {
         return enumValue.name().toLowerCase().replace("_", "-");
     }
 
+    /**
+     * Converts all enum constants of the given enum class to style class names.
+     *
+     * @param enumClass the enum class
+     * @param <T> the enum type
+     * @return the style class names
+     */
     public static <T extends Enum<T>> String[] convertAllToStylesClassName(Class<T> enumClass) {
         T[] enumConstants = enumClass.getEnumConstants();
         return convertAllToStylesClassName(enumConstants);
     }
 
+    /**
+     * Converts the given enum values to style class names.
+     *
+     * @param enumValues the enum values
+     * @param <T> the enum type
+     * @return the style class names
+     */
     public static <T extends Enum<T>> String[] convertAllToStylesClassName(T[] enumValues) {
         String[] styles = new String[enumValues.length];
         for (int i = 0; i < enumValues.length; i++) {

@@ -99,11 +99,21 @@ public class CalendarPicker extends CustomComboBox<LocalDate> {
         show();
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new CalendarPickerSkin(this);
     }
 
+    /**
+     * Returns the stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(CalendarPicker.class.getResource("calendar-picker.css")).toExternalForm();

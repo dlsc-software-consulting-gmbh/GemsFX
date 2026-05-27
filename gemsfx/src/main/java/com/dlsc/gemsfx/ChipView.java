@@ -41,17 +41,30 @@ import java.util.List;
  */
 public class ChipView<T> extends Control {
 
+    /**
+     * Constructs a new chip view.
+     */
     public ChipView() {
         getStyleClass().add("chip-view");
 
         setMinWidth(Region.USE_PREF_SIZE);
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new ChipViewSkin<>(this);
     }
 
+    /**
+     * Returns the stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(ChipView.class.getResource("chip-view.css")).toExternalForm();
@@ -82,15 +95,15 @@ public class ChipView<T> extends Control {
 
     private final StringProperty text = new SimpleStringProperty(this, "text", "Untitled");
 
+    /**
+     * The text shown by the view.
+     *
+     * @return the text property
+     */
     public final StringProperty textProperty() {
         return text;
     }
 
-    /**
-     * The text shown by the view.
-     *
-     * @return the chip view's text
-     */
     public final String getText() {
         return text.get();
     }
@@ -106,7 +119,7 @@ public class ChipView<T> extends Control {
     /**
      * The graphic node shown by the chip view.
      *
-     * @return the chip view's graphic
+     * @return the graphic property
      */
     public final ObjectProperty<Node> graphicProperty() {
         return graphic;
@@ -123,10 +136,25 @@ public class ChipView<T> extends Control {
     // content display
 
     private final StyleableObjectProperty<ContentDisplay> contentDisplay = new StyleableObjectProperty<>(ContentDisplay.LEFT) {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() { return ChipView.this; }
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() { return "contentDisplay"; }
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<? extends Styleable, ContentDisplay> getCssMetaData() {
             return StyleableProperties.CONTENT_DISPLAY;
@@ -162,10 +190,22 @@ public class ChipView<T> extends Control {
 
         private static final CssMetaData<ChipView, ContentDisplay> CONTENT_DISPLAY =
             new CssMetaData<>("-fx-content-display", new EnumConverter<>(ContentDisplay.class), ContentDisplay.LEFT) {
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @param c the control to inspect
+                 * @return true if the property can be styled
+                 */
                 @Override
                 public boolean isSettable(ChipView c) {
                     return !c.contentDisplay.isBound();
                 }
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @param c the control to inspect
+                 * @return the styleable property
+                 */
                 @Override
                 public StyleableProperty<ContentDisplay> getStyleableProperty(ChipView c) {
                     return (StyleableProperty<ContentDisplay>) c.contentDisplay;
@@ -180,10 +220,20 @@ public class ChipView<T> extends Control {
         }
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the class CSS metadata
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the control CSS metadata
+     */
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
         return getClassCssMetaData();

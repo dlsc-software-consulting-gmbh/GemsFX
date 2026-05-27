@@ -92,16 +92,31 @@ public class TextView extends Control {
         setText(text);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the preferred content bias
+     */
     @Override
     public Orientation getContentBias() {
         return Orientation.HORIZONTAL;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new TextViewSkin(this);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(TextView.class.getResource("text-view.css")).toExternalForm();
@@ -176,48 +191,54 @@ public class TextView extends Control {
 
     private final ReadOnlyStringWrapper selectedText = new ReadOnlyStringWrapper(this, "selectedText");
 
-    /**
-     * String property used to save selected skin text
-     *
-     * @return The String property.
-     */
     public final String getSelectedText() {
         return selectedText.get();
     }
 
+    /**
+     * A read-only property containing the currently selected text.
+     *
+     * @return the selected text property
+     */
     public final ReadOnlyStringProperty selectedTextProperty() {
         return selectedText.getReadOnlyProperty();
     }
 
     // highlight fill
 
-    /**
-     * Defines the {@code Paint} used for the background of the selection highlight.
-     * This is the color or gradient that fills the area behind the selected text.
-     */
     private final ObjectProperty<Paint> highlightFill = new StyleableObjectProperty<>(Color.BLUE) {
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() {
             return TextView.this;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() {
             return "highlightFill";
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<TextView, Paint> getCssMetaData() {
             return StyleableProperties.HIGHLIGHT_FILL;
         }
     };
 
-    /**
-     * The fill {@code Paint} used for the background of selected text.
-     *
-     * @param value the highlight fill
-     */
     public final void setHighlightFill(Paint value) {
         highlightFill.set(value);
     }
@@ -243,33 +264,39 @@ public class TextView extends Control {
 
     // highlight stroke
 
-    /**
-     * Defines the {@code Paint} used for the stroke (outline) of the selection highlight.
-     * This is the color or gradient for the border around the selected text area.
-     */
     private final ObjectProperty<Paint> highlightStroke = new StyleableObjectProperty<>(Color.TRANSPARENT) {
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() {
             return TextView.this;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() {
             return "highlightStroke";
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<TextView, Paint> getCssMetaData() {
             return StyleableProperties.HIGHLIGHT_STROKE;
         }
     };
 
-    /**
-     * Sets the {@code Paint} to be used for the stroke (outline) of the selection highlight.
-     *
-     * @param value the paint to use for the selection highlight's stroke.
-     */
     public final void setHighlightStroke(Paint value) {
         highlightStroke.set(value);
     }
@@ -295,33 +322,41 @@ public class TextView extends Control {
 
     // highlight text fill
 
-    /**
-     * Defines the {@code Paint} used for the foreground (the text itself) of selected text.
-     * This is the color of the text characters when they are part of a selection.
-     */
+    // highlight text fill
+
     private final ObjectProperty<Paint> highlightTextFill = new StyleableObjectProperty<>(Color.WHITE) {
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() {
             return TextView.this;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() {
             return "highlightTextFill";
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<TextView, Paint> getCssMetaData() {
             return StyleableProperties.HIGHLIGHT_TEXT_FILL;
         }
     };
 
-    /**
-     * The fill {@code Paint} used for the foreground of selected text.
-     *
-     * @param value the highlight text fill
-     */
     public final void setHighlightTextFill(Paint value) {
         highlightTextFill.set(value);
     }
@@ -350,11 +385,25 @@ public class TextView extends Control {
         private static final CssMetaData<TextView, Paint> HIGHLIGHT_TEXT_FILL = new CssMetaData<>(
                 "-fx-highlight-text-fill", PaintConverter.getInstance(), Color.TRANSPARENT) {
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return true if the property can be styled
+             *
+             * @param c the control to inspect
+             */
             @Override
             public boolean isSettable(TextView c) {
                 return !c.highlightTextFill.isBound();
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the styleable property
+             *
+             * @param n the control to inspect
+             */
             @Override
             @SuppressWarnings("unchecked")
             public StyleableProperty<Paint> getStyleableProperty(TextView n) {
@@ -366,11 +415,25 @@ public class TextView extends Control {
                 "-fx-highlight-fill", PaintConverter.getInstance(), Color.BLUE
         ) {
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return true if the property can be styled
+             *
+             * @param c the control to inspect
+             */
             @Override
             public boolean isSettable(TextView c) {
                 return !c.highlightFill.isBound();
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the styleable property
+             *
+             * @param c the control to inspect
+             */
             @Override
             public StyleableProperty<Paint> getStyleableProperty(TextView c) {
                 return (StyleableProperty<Paint>) c.highlightFillProperty();
@@ -381,11 +444,25 @@ public class TextView extends Control {
                 "-fx-highlight-stroke", PaintConverter.getInstance(), Color.TRANSPARENT
         ) {
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return true if the property can be styled
+             *
+             * @param c the control to inspect
+             */
             @Override
             public boolean isSettable(TextView c) {
                 return !c.highlightStroke.isBound();
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the styleable property
+             *
+             * @param c the control to inspect
+             */
             @Override
             public StyleableProperty<Paint> getStyleableProperty(TextView c) {
                 return (StyleableProperty<Paint>) c.highlightStroke;
@@ -403,11 +480,21 @@ public class TextView extends Control {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the supported CSS metadata
+     */
     @Override
     protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the CSS metadata supported by this control
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return TextView.StyleableProperties.STYLEABLES;
     }

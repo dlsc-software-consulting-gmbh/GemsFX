@@ -155,7 +155,7 @@ public class SVGImageView extends Control {
 
     /**
      * Defines the width of the box that the source svg image should fit into. If the
-     * value is <= 0, the svg image's intrinsic width will be used.
+     * value is &lt;= 0, the svg image's intrinsic width will be used.
      * <p>
      * When {@link #preserveRatioProperty()} is set to true, then the actual displayed
      * width of the image is constrained not only by this property, but
@@ -208,7 +208,7 @@ public class SVGImageView extends Control {
 
     /**
      * Defines the height of the box that the source svg image should fit into. If the
-     * value is <= 0, the svg image's intrinsic height will be used.
+     * value is &lt;= 0, the svg image's intrinsic height will be used.
      * <p>
      * When {@link #preserveRatioProperty()} is set to true, then the actual displayed
      * height of the image is constrained not only by this property, but

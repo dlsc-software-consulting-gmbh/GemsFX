@@ -38,13 +38,11 @@ import java.util.function.Predicate;
 /**
  * EmailField is a custom control for inputting and validating email addresses.
  * It provides the following functionalities:
- * <p>
- *     <ul>
- *          <li>Automatic email domain suggestions to enhance user experience.</li>
- *          <li>Email address format validation to ensure input validity.</li>
- *          <li>Customizable properties to control the visibility of user interface elements, such as mail and validation icons, according to specific user interface requirements.</li>
- *     </ul>
- * </p>
+ * <ul>
+ *     <li>Automatic email domain suggestions to enhance user experience.</li>
+ *     <li>Email address format validation to ensure input validity.</li>
+ *     <li>Customizable properties to control the visibility of user interface elements, such as mail and validation icons, according to specific user interface requirements.</li>
+ * </ul>
  *
  * <p><b>CSS Styleable Properties:</b>
  * <table class="striped">

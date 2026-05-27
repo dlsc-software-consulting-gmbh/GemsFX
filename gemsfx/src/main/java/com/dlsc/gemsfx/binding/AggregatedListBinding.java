@@ -110,6 +110,11 @@ public class AggregatedListBinding<T, S, R> extends ObjectBinding<R> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the computed value
+     */
     @Override
     protected R computeValue() {
         return aggregationFunction.apply(
@@ -119,6 +124,9 @@ public class AggregatedListBinding<T, S, R> extends ObjectBinding<R> {
                         .flatMap(List::stream));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispose() {
         source.stream()

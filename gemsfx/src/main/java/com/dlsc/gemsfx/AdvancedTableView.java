@@ -21,15 +21,28 @@ public class AdvancedTableView<T> extends TableView<T> {
     private boolean autoResizeAllColumns;
     private int autoResizeRows;
 
+    /**
+     * Constructs a new advanced table view.
+     */
     public AdvancedTableView() {
         init();
     }
 
+    /**
+     * Constructs a new advanced table view with the given items.
+     *
+     * @param items the items shown by the table view
+     */
     public AdvancedTableView(ObservableList<T> items) {
         super(items);
         init();
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new AdvancedTableViewSkin<>(this);

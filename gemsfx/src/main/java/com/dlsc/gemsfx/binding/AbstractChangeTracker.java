@@ -72,14 +72,27 @@ public abstract class AbstractChangeTracker<T extends Observable> {
         this.onChanged = onChanged;
     }
 
+    /**
+     * Notifies the registered consumer about a change in the tracked source list.
+     */
     protected void notifyChange() {
         if (onChanged != null) {
             onChanged.accept(source);
         }
     }
 
+    /**
+     * Adds the required listeners to the given value if needed.
+     *
+     * @param value the value to observe
+     */
     protected abstract void safeAddListener(T value);
 
+    /**
+     * Removes the required listeners from the given value if needed.
+     *
+     * @param value the value to stop observing
+     */
     protected abstract void safeRemoveListener(T value);
 
     /**

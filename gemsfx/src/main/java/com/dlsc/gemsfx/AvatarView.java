@@ -43,7 +43,6 @@ import java.util.Objects;
  *   <li>-fx-round-size: Defines the corner roundness of rectangular avatars.</li>
  *   <li>-fx-avatar-size: Defines the size of the avatar.</li>
  * </ul>
- * </p>
  *
  * <p>
  * The default style class for this control is "avatar-view".
@@ -128,11 +127,21 @@ public class AvatarView extends Control {
         setImage(image);
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new AvatarViewSkin(this);
     }
 
+    /**
+     * Returns the stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(AvatarView.class.getResource("avatar-view.css")).toExternalForm();
@@ -213,16 +222,31 @@ public class AvatarView extends Control {
     // arc size
 
     private final DoubleProperty arcSize = new StyleableDoubleProperty(DEFAULT_ARC_SIZE) {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() {
             return AvatarView.this;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() {
             return "arcSize";
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<? extends Styleable, Number> getCssMetaData() {
             return StyleableProperties.AVATAR_ARC_SIZE;
@@ -258,16 +282,31 @@ public class AvatarView extends Control {
     // size
 
     private final DoubleProperty size = new StyleableDoubleProperty(DEFAULT_SIZE) {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() {
             return AvatarView.this;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() {
             return "size";
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<? extends Styleable, Number> getCssMetaData() {
             return StyleableProperties.AVATAR_SIZE;
@@ -318,16 +357,31 @@ public class AvatarView extends Control {
     }
 
     private final StyleableObjectProperty<AvatarShape> avatarShape = new StyleableObjectProperty<>(DEFAULT_AVATAR_SHAPE) {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<? extends Styleable, AvatarShape> getCssMetaData() {
             return StyleableProperties.AVATAR_SHAPE;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() {
             return AvatarView.this;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() {
             return "avatarShape";
@@ -388,11 +442,23 @@ public class AvatarView extends Control {
     private static class StyleableProperties {
         private static final CssMetaData<AvatarView, AvatarShape> AVATAR_SHAPE = new CssMetaData<>(
                 "-fx-avatar-shape", new EnumConverter<>(AvatarShape.class), DEFAULT_AVATAR_SHAPE) {
+            /**
+             * {@inheritDoc}
+             *
+             * @param control the control to inspect
+             * @return true if the property can be styled
+             */
             @Override
             public boolean isSettable(AvatarView control) {
                 return !control.avatarShape.isBound();
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @param control the control to inspect
+             * @return the styleable property
+             */
             @Override
             public StyleableProperty<AvatarShape> getStyleableProperty(AvatarView control) {
                 return (StyleableProperty<AvatarShape>) control.avatarShapeProperty();
@@ -401,11 +467,23 @@ public class AvatarView extends Control {
 
         private static final CssMetaData<AvatarView, Number> AVATAR_ARC_SIZE =
                 new CssMetaData<>("-fx-avatar-arc-size", SizeConverter.getInstance(), DEFAULT_ARC_SIZE) {
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @param n the control to inspect
+                     * @return true if the property can be styled
+                     */
                     @Override
                     public boolean isSettable(AvatarView n) {
                         return !n.arcSize.isBound();
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @param n the control to inspect
+                     * @return the styleable property
+                     */
                     @Override
                     public StyleableProperty<Number> getStyleableProperty(AvatarView n) {
                         return (StyleableProperty<Number>) n.arcSizeProperty();
@@ -414,11 +492,23 @@ public class AvatarView extends Control {
 
         private static final CssMetaData<AvatarView, Number> AVATAR_SIZE =
                 new CssMetaData<>("-fx-avatar-size", SizeConverter.getInstance(), DEFAULT_SIZE) {
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @param n the control to inspect
+                     * @return true if the property can be styled
+                     */
                     @Override
                     public boolean isSettable(AvatarView n) {
                         return !n.size.isBound();
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @param n the control to inspect
+                     * @return the styleable property
+                     */
                     @Override
                     public StyleableProperty<Number> getStyleableProperty(AvatarView n) {
                         return (StyleableProperty<Number>) n.sizeProperty();
@@ -434,11 +524,21 @@ public class AvatarView extends Control {
         }
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the control CSS metadata
+     */
     @Override
     protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the class CSS metadata
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

@@ -134,16 +134,33 @@ public class VirtualFlowUtil {
         private int index;
         private double offset;
 
+        /**
+         * Creates a new virtual flow position.
+         *
+         * @param index the first visible cell index
+         * @param offset the pixel offset within the cell
+         */
         public VirtualFlowPosition(int index, double offset) {
             this.index = index;
             this.offset = offset;
         }
 
+        /**
+         * Returns a string representation of this position.
+         *
+         * @return the string representation
+         */
         @Override
         public String toString() {
             return "VBosPosition{" + "index=" + index + ", offset=" + offset + '}';
         }
 
+        /**
+         * Compares this position with another object.
+         *
+         * @param o the object to compare with
+         * @return {@code true} if the objects are equal
+         */
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -158,6 +175,11 @@ public class VirtualFlowUtil {
             return index == that.index && Double.compare(that.offset, offset) == 0;
         }
 
+        /**
+         * Returns the hash code of this position.
+         *
+         * @return the hash code
+         */
         @Override
         public int hashCode() {
             return Objects.hash(index, offset);

@@ -31,20 +31,39 @@ public class EnhancedLabel extends Label {
 
     private static final PseudoClass SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
 
+    /**
+     * Constructs a new enhanced label.
+     */
     public EnhancedLabel() {
         init();
     }
 
+    /**
+     * Constructs a new enhanced label with the given text.
+     *
+     * @param text the label text
+     */
     public EnhancedLabel(String text) {
         super(text);
         init();
     }
 
+    /**
+     * Constructs a new enhanced label with the given text and graphic.
+     *
+     * @param text the label text
+     * @param node the label graphic
+     */
     public EnhancedLabel(String text, Node node) {
         super(text, node);
         init();
     }
 
+    /**
+     * Returns the stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(EnhancedLabel.class.getResource("enhanced-label.css")).toExternalForm();

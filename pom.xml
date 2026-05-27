@@ -249,12 +249,15 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <failOnError>false</failOnError>
+                    <failOnError>true</failOnError>
                     <force>true</force>
                     <windowtitle>GemsFX API</windowtitle>
                     <additionalJOption>-J-Djavafx.javadoc=true
                     </additionalJOption>
-                    <additionalOptions>-Xdoclint:none</additionalOptions>
+                    <!-- Validate syntax, HTML, and cross-references in all existing comments.
+                         The "missing" group is excluded because com.dlsc.gemsfx.skins is
+                         exported but intentionally left without full method-level docs. -->
+                    <doclint>accessibility,html,reference,syntax</doclint>
                     <docfilessubdirs>true</docfilessubdirs>
                 </configuration>
                 <executions>

@@ -8,6 +8,12 @@ public class IntegerRange {
     private final int fromInclusive;
     private final int toInclusive;
 
+    /**
+     * Constructs a range with the given inclusive bounds.
+     *
+     * @param fromInclusive the lower bound
+     * @param toInclusive the upper bound
+     */
     public IntegerRange(int fromInclusive, int toInclusive) {
         this.fromInclusive = fromInclusive;
         this.toInclusive = toInclusive;
@@ -15,6 +21,8 @@ public class IntegerRange {
 
     /**
      * Constructs an IntegerRange with one endpoint specified by the given number and the other endpoint set to 0.
+     *
+     * @param toInclusive the inclusive upper bound
      */
     public IntegerRange(int toInclusive) {
         this(0, toInclusive);

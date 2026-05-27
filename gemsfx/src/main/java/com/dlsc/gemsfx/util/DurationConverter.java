@@ -37,6 +37,13 @@ public class DurationConverter extends StyleConverter<Number, Duration> {
     private DurationConverter() {
     }
 
+    /**
+     * Converts the parsed CSS value into a duration.
+     *
+     * @param value the parsed value
+     * @param font the font in use
+     * @return the converted duration
+     */
     @Override
     public Duration convert(ParsedValue<Number, Duration> value, Font font) {
         Number number = value.getValue();
@@ -46,6 +53,11 @@ public class DurationConverter extends StyleConverter<Number, Duration> {
         return Duration.millis(number.doubleValue());
     }
 
+    /**
+     * Returns the name of this converter.
+     *
+     * @return the converter name
+     */
     @Override
     public String toString() {
         return "DurationConverter";

@@ -51,12 +51,20 @@ public class RemovableListCell<T> extends ListCell<T> {
 
     /**
      * Constructs a new cell with the given remove handler function.
+     *
+     * @param onRemove the callback invoked when the remove button is pressed
      */
     public RemovableListCell(BiConsumer<ListView<T>, T> onRemove) {
         this();
         setOnRemove(onRemove);
     }
 
+    /**
+     * Updates the cell to display the given item.
+     *
+     * @param item the new item shown by the cell
+     * @param empty whether the cell is empty
+     */
     @Override
     protected void updateItem(T item, boolean empty) {
         super.updateItem(item, empty);

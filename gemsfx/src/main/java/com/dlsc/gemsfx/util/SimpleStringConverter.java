@@ -89,6 +89,12 @@ public class SimpleStringConverter<T> extends StringConverter<T> {
                 .orElse(nullDefaultValue);
     }
 
+    /**
+     * Converts the given object to a string.
+     *
+     * @param object the object to convert
+     * @return the converted string
+     */
     @Override
     public String toString(T object) {
         if (this.valueToStringCallback != null) {

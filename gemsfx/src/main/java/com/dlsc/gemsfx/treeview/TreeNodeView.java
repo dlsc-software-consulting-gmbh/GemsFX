@@ -122,11 +122,6 @@ public class TreeNodeView<T> extends Control {
         this.root.set(root);
     }
 
-    /**
-     * Alignment on the same level;
-     * When the layout direction is btt or ttb,
-     * this attribute indicates the alignment of nodes at the same level;
-     */
     private final StyleableObjectProperty<VPos> rowAlignment = new StyleableObjectProperty<>(DEFAULT_ROW_ALIGNMENT) {
         @Override
         public CssMetaData<? extends Styleable, VPos> getCssMetaData() {
@@ -167,11 +162,6 @@ public class TreeNodeView<T> extends Control {
         this.rowAlignment.set(rowAlignment);
     }
 
-    /**
-     * Alignment on the same level;
-     * When the layout direction is ltr or rtl,
-     * this attribute indicates the alignment of nodes at the same level;
-     */
     private final StyleableObjectProperty<HPos> columnAlignment = new StyleableObjectProperty<>(DEFAULT_COLUMN_ALIGNMENT) {
         @Override
         public CssMetaData<? extends Styleable, HPos> getCssMetaData() {

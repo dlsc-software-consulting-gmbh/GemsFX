@@ -159,6 +159,11 @@ public class SearchTextField extends CustomTextField {
         return clearIconWrapper;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(SearchTextField.class.getResource("search-text-field.css")).toExternalForm();
@@ -286,6 +291,9 @@ public class SearchTextField extends CustomTextField {
     public final ObjectProperty<HistoryManager<String>> historyManagerProperty() {
         if (historyManager == null) {
             historyManager = new SimpleObjectProperty<>(this, "historyManager") {
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 protected void invalidated() {
                     pseudoClassStateChanged(DISABLED_POPUP_PSEUDO_CLASS, get() == null);
@@ -307,11 +315,25 @@ public class SearchTextField extends CustomTextField {
 
         private static final CssMetaData<SearchTextField, Boolean> ROUND =
                 new CssMetaData<>("-fx-round", BooleanConverter.getInstance(), DEFAULT_ROUND) {
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @return true if the property can be styled
+                     *
+                     * @param c the control to inspect
+                     */
                     @Override
                     public boolean isSettable(SearchTextField c) {
                         return c.round == null || !c.round.isBound();
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     *
+                     * @return the styleable property
+                     *
+                     * @param c the control to inspect
+                     */
                     @Override
                     public StyleableProperty<Boolean> getStyleableProperty(SearchTextField c) {
                         return (StyleableProperty<Boolean>) c.roundProperty();
@@ -327,11 +349,21 @@ public class SearchTextField extends CustomTextField {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the supported CSS metadata
+     */
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the CSS metadata supported by this control
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

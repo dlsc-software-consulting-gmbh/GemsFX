@@ -23,6 +23,9 @@ public class ResourceBundleManager {
     private static final Map<String, ResourceBundle> BUNDLES = new ConcurrentHashMap<>();
     private static Locale currentLocale = Locale.getDefault();
 
+    /**
+     * The supported resource bundle types.
+     */
     public enum Type {
         INFO_CENTER_VIEW("info-center-view"),
         NOTIFICATION_VIEW("notification-view");
@@ -33,6 +36,11 @@ public class ResourceBundleManager {
             this.baseName = baseName;
         }
 
+        /**
+         * Returns the base name of the resource bundle.
+         *
+         * @return the base name
+         */
         public String getBaseName() {
             return baseName;
         }

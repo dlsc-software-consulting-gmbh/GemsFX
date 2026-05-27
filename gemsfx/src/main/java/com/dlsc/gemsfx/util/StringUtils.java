@@ -12,12 +12,22 @@ public final class StringUtils {
     private StringUtils() {
     }
 
-    /** Returns {@code true} if {@code str} is {@code null} or its length is 0. */
+    /**
+     * Returns {@code true} if {@code str} is {@code null} or its length is 0.
+     *
+     * @param str the string to test
+     * @return {@code true} if the string is empty
+     */
     public static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }
 
-    /** Returns {@code true} if {@code str} is neither {@code null} nor empty. */
+    /**
+     * Returns {@code true} if {@code str} is neither {@code null} nor empty.
+     *
+     * @param str the string to test
+     * @return {@code true} if the string is not empty
+     */
     public static boolean isNotEmpty(String str) {
         return !isEmpty(str);
     }
@@ -25,6 +35,9 @@ public final class StringUtils {
     /**
      * Returns {@code true} if {@code str} is {@code null}, empty, or contains
      * only whitespace characters (as defined by {@link Character#isWhitespace}).
+     *
+     * @param str the string to test
+     * @return {@code true} if the string is blank
      */
     public static boolean isBlank(String str) {
         if (str == null) {
@@ -38,15 +51,23 @@ public final class StringUtils {
         return true;
     }
 
-    /** Returns {@code true} if {@code str} is not blank (see {@link #isBlank}). */
+    /**
+     * Returns {@code true} if {@code str} is not blank (see {@link #isBlank}).
+     *
+     * @param str the string to test
+     * @return {@code true} if the string is not blank
+     */
     public static boolean isNotBlank(String str) {
         return !isBlank(str);
     }
 
     /**
      * Capitalises the first character of {@code str} using
-     * {@link Character#toTitleCase}.  Returns {@code str} unchanged when it is
+     * {@link Character#toTitleCase}. Returns {@code str} unchanged when it is
      * {@code null} or empty.
+     *
+     * @param str the string to capitalize
+     * @return the capitalized string
      */
     public static String capitalize(String str) {
         if (isEmpty(str)) {
@@ -64,6 +85,9 @@ public final class StringUtils {
      * Splits {@code str} on whitespace, discarding empty tokens.
      * Returns {@code null} when {@code str} is {@code null} and an empty
      * array when {@code str} is empty or all-whitespace.
+     *
+     * @param str the string to split
+     * @return the split parts
      */
     public static String[] split(String str) {
         if (str == null) {
@@ -80,6 +104,10 @@ public final class StringUtils {
      * Joins the elements of {@code array} with {@code separator} between each pair.
      * A {@code null} separator is treated as an empty string.
      * Returns {@code null} when {@code array} is {@code null}.
+     *
+     * @param array the strings to join
+     * @param separator the separator to use
+     * @return the joined string
      */
     public static String join(String[] array, String separator) {
         if (array == null) {
@@ -90,8 +118,12 @@ public final class StringUtils {
 
     /**
      * Returns {@code true} if {@code str} starts with {@code prefix},
-     * ignoring case.  Null-safe: two {@code null} values are considered equal,
+     * ignoring case. Null-safe: two {@code null} values are considered equal,
      * otherwise a {@code null} argument yields {@code false}.
+     *
+     * @param str the string to test
+     * @param prefix the prefix to look for
+     * @return {@code true} if the string starts with the prefix
      */
     public static boolean startsWithIgnoreCase(String str, String prefix) {
         if (str == null || prefix == null) {
@@ -106,6 +138,10 @@ public final class StringUtils {
     /**
      * Returns {@code true} if the two strings are equal.
      * Two {@code null} values are considered equal.
+     *
+     * @param str1 the first string
+     * @param str2 the second string
+     * @return {@code true} if both strings are equal
      */
     public static boolean equals(String str1, String str2) {
         if (str1 == str2) {
@@ -120,6 +156,10 @@ public final class StringUtils {
     /**
      * Returns {@code true} if the two strings are equal ignoring case.
      * Two {@code null} values are considered equal.
+     *
+     * @param str1 the first string
+     * @param str2 the second string
+     * @return {@code true} if both strings are equal ignoring case
      */
     public static boolean equalsIgnoreCase(String str1, String str2) {
         if (str1 == str2) {
@@ -133,10 +173,15 @@ public final class StringUtils {
 
     /**
      * Replaces each string in {@code searchList} with the corresponding entry
-     * in {@code replacementList} within {@code text}.  Replacements are applied
+     * in {@code replacementList} within {@code text}. Replacements are applied
      * in order; each operates on the result of the previous one.
      * Returns {@code text} unchanged when any argument is {@code null} or
      * the two lists have different lengths.
+     *
+     * @param text the text to process
+     * @param searchList the strings to search for
+     * @param replacementList the replacement strings
+     * @return the processed string
      */
     public static String replaceEach(String text, String[] searchList, String[] replacementList) {
         if (text == null || searchList == null || replacementList == null
@@ -160,6 +205,9 @@ public final class StringUtils {
      *
      * <p>Returns {@code null} when {@code str} is {@code null} and an empty array
      * when {@code str} is empty.
+     *
+     * @param str the string to split
+     * @return the split parts
      */
     public static String[] splitByCharacterTypeCamelCase(String str) {
         if (str == null) {

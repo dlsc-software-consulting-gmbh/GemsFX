@@ -66,11 +66,19 @@ public class ObservableValuesListBinding<T, U> extends ObjectBinding<U> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the computed value
+     */
     @Override
     protected U computeValue() {
         return transformer.apply(source.stream().map(ObservableValue::getValue));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispose() {
         source.forEach(this::safeRemoveListener);

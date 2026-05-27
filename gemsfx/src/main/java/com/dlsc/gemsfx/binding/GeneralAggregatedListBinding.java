@@ -115,6 +115,11 @@ public class GeneralAggregatedListBinding<T, S, U, R> extends ObjectBinding<R> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the computed value
+     */
     @Override
     protected R computeValue() {
         return finalAggregationFunction.apply(source.stream()
@@ -122,6 +127,9 @@ public class GeneralAggregatedListBinding<T, S, U, R> extends ObjectBinding<R> {
                 .map(aggregationFunction));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispose() {
         source.stream()

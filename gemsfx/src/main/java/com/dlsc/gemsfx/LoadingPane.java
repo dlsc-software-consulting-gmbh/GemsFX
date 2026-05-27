@@ -191,6 +191,11 @@ public class LoadingPane extends StackPane {
         setContent(node);
     }
 
+    /**
+     * Returns the stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(LoadingPane.class.getResource("loading-pane.css")).toExternalForm();
@@ -295,6 +300,9 @@ public class LoadingPane extends StackPane {
             this.status = status;
         }
 
+        /**
+         * Commits the pending status change after the configured delay.
+         */
         @Override
         public void run() {
             try {
@@ -310,6 +318,9 @@ public class LoadingPane extends StackPane {
             }
         }
 
+        /**
+         * Stops the pending status change from being committed.
+         */
         public void abort() {
             stopped = true;
         }
@@ -413,10 +424,25 @@ public class LoadingPane extends StackPane {
     }
 
     private final StyleableObjectProperty<Size> size = new StyleableObjectProperty<>(Size.MEDIUM) {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() { return LoadingPane.this; }
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() { return "size"; }
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<? extends Styleable, Size> getCssMetaData() {
             return StyleableProperties.SIZE;
@@ -449,10 +475,22 @@ public class LoadingPane extends StackPane {
 
         private static final CssMetaData<LoadingPane, Size> SIZE =
             new CssMetaData<>("-fx-size", new EnumConverter<>(Size.class), Size.MEDIUM) {
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @param c the control to inspect
+                 * @return true if the property can be styled
+                 */
                 @Override
                 public boolean isSettable(LoadingPane c) {
                     return !c.size.isBound();
                 }
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @param c the control to inspect
+                 * @return the styleable property
+                 */
                 @Override
                 public StyleableProperty<Size> getStyleableProperty(LoadingPane c) {
                     return (StyleableProperty<Size>) c.size;
@@ -467,10 +505,20 @@ public class LoadingPane extends StackPane {
         }
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the class CSS metadata
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the control CSS metadata
+     */
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
         return getClassCssMetaData();
@@ -521,6 +569,12 @@ public class LoadingPane extends StackPane {
      * Convenience method to change the status of the pane to {@link Status#ERROR}. Also changes the error text to
      * the given value. This method is thread-safe.
      */
+    /**
+     * Convenience method to change the status of the pane to {@link Status#ERROR}. Also changes the error text to
+     * the given value. This method is thread-safe.
+     *
+     * @param message the error message
+     */
     public final void error(String message) {
         Platform.runLater(() -> {
             setStatus(Status.ERROR);
@@ -531,6 +585,12 @@ public class LoadingPane extends StackPane {
     /**
      * Convenience method to change the status of the pane to {@link Status#ERROR}. Also changes the error text to
      * the message provided by the throwable. This method is thread-safe.
+     */
+    /**
+     * Convenience method to change the status of the pane to {@link Status#ERROR}. Also changes the error text to
+     * the message provided by the throwable. This method is thread-safe.
+     *
+     * @param ex the throwable providing the error message
      */
     public final void error(Throwable ex) {
         Platform.runLater(() -> {

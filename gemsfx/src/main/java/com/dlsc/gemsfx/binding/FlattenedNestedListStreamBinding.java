@@ -17,6 +17,11 @@ import java.util.stream.Stream;
  */
 public class FlattenedNestedListStreamBinding<T> extends AbstractNestedListBinding<T, Stream<T>> {
 
+    /**
+     * Constructs a new binding for flattening nested observable lists into a stream.
+     *
+     * @param source the nested source list
+     */
     public FlattenedNestedListStreamBinding(ObservableList<ObservableList<T>> source) {
         super(source);
 

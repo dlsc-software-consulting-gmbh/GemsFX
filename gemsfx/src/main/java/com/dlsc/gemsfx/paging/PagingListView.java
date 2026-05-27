@@ -35,6 +35,11 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
 
     private final ListView<T> listView = new ListView<>(items) {
 
+        /**
+         * Creates the default skin for the wrapped list view.
+         *
+         * @return the default skin
+         */
         @Override
         protected Skin<?> createDefaultSkin() {
             return new InnerListViewSkin<>(this, PagingListView.this);
@@ -75,6 +80,12 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
         selectionModelProperty().bindBidirectional(listView.selectionModelProperty());
 
         setCellFactory(lv -> new ListCell<>() {
+            /**
+             * Updates the cell to represent the given item.
+             *
+             * @param item the item to show in the cell
+             * @param empty whether the cell should be shown as empty
+             */
             @Override
             protected void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);
@@ -90,11 +101,21 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
         cellFactoryProperty().addListener(refreshListener);
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new PagingListViewSkin<>(this);
     }
 
+    /**
+     * Returns the user agent stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(PagingListView.class.getResource("paging-list-view.css")).toExternalForm();
@@ -132,22 +153,10 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
     // --- Cell Factory
     private ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactory;
 
-    /**
-     * Sets a new cell factory to use in the ListView. This forces all old
-     * {@link ListCell}'s to be thrown away, and new ListCell's created with
-     * the new cell factory.
-     *
-     * @param value cell factory to use in this ListView
-     */
     public final void setCellFactory(Callback<ListView<T>, ListCell<T>> value) {
         cellFactoryProperty().set(value);
     }
 
-    /**
-     * Returns the current cell factory.
-     *
-     * @return the current cell factory
-     */
     public final Callback<ListView<T>, ListCell<T>> getCellFactory() {
         return cellFactory == null ? null : cellFactory.get();
     }

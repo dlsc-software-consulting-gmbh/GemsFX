@@ -40,11 +40,21 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new DateRangePickerSkin(this);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(DateRangePicker.class.getResource("date-range-picker.css")).toExternalForm();

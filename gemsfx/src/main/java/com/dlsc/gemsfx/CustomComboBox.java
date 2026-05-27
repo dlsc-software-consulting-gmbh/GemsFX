@@ -34,6 +34,9 @@ public class CustomComboBox<T> extends ComboBoxBase<T> {
     private static final PseudoClass PSEUDO_CLASS_BUTTON_ONLY = PseudoClass.getPseudoClass("button-only");
     private static final PseudoClass PSEUDO_CLASS_FIELD_ONLY = PseudoClass.getPseudoClass("field-only");
 
+    /**
+     * The supported display modes for the popup button.
+     */
     public enum ButtonDisplay {
 
         /**
@@ -57,6 +60,9 @@ public class CustomComboBox<T> extends ComboBoxBase<T> {
         FIELD_ONLY
     }
 
+    /**
+     * Constructs a new custom combo box.
+     */
     public CustomComboBox() {
         pseudoClassStateChanged(PSEUDO_CLASS_RIGHT, true);
     }
@@ -80,6 +86,9 @@ public class CustomComboBox<T> extends ComboBoxBase<T> {
         if (buttonDisplay == null) {
             buttonDisplay = new StyleableObjectProperty<>(DEFAULT_BUTTON_DISPLAY) {
 
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 protected void invalidated() {
                     final ButtonDisplay value = get();
@@ -89,16 +98,31 @@ public class CustomComboBox<T> extends ComboBoxBase<T> {
                     pseudoClassStateChanged(PSEUDO_CLASS_FIELD_ONLY, value == ButtonDisplay.FIELD_ONLY);
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the CSS metadata for this property
+                 */
                 @Override
                 public CssMetaData<CustomComboBox, ButtonDisplay> getCssMetaData() {
                     return CustomComboBox.StyleableProperties.BUTTON_DISPLAY;
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the owning bean
+                 */
                 @Override
                 public Object getBean() {
                     return CustomComboBox.this;
                 }
 
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the property name
+                 */
                 @Override
                 public String getName() {
                     return "buttonDisplay";
@@ -122,11 +146,23 @@ public class CustomComboBox<T> extends ComboBoxBase<T> {
 
         private static final CssMetaData<CustomComboBox, ButtonDisplay> BUTTON_DISPLAY = new CssMetaData<>("-fx-button-display", new EnumConverter<>(ButtonDisplay.class), DEFAULT_BUTTON_DISPLAY) {
 
+            /**
+             * {@inheritDoc}
+             *
+             * @param styleable the control to inspect
+             * @return true if the property can be styled
+             */
             @Override
             public boolean isSettable(CustomComboBox styleable) {
                 return styleable.buttonDisplay == null || !styleable.buttonDisplay.isBound();
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @param styleable the control to inspect
+             * @return the styleable property
+             */
             @Override
             @SuppressWarnings("unchecked")
             public StyleableProperty<ButtonDisplay> getStyleableProperty(CustomComboBox styleable) {
@@ -144,11 +180,21 @@ public class CustomComboBox<T> extends ComboBoxBase<T> {
 
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the control CSS metadata
+     */
     @Override
     protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the class CSS metadata
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return CustomComboBox.StyleableProperties.STYLEABLES;
     }

@@ -27,12 +27,22 @@ public class LoadingService<T> extends Service<PagingLoadResponse<T>> {
 
     public static int UNDEFINED = -1;
 
+    /**
+     * Creates a task for loading the current page.
+     *
+     * @return the loading task
+     */
     @Override
     protected Task<PagingLoadResponse<T>> createTask() {
         return new Task<>() {
 
             final PagingLoadRequest loadRequest = new PagingLoadRequest(getPage(), getPageSize());
 
+            /**
+             * Loads the items for the current request.
+             *
+             * @return the load response
+             */
             @Override
             protected PagingLoadResponse<T> call() {
                 try {
@@ -115,6 +125,11 @@ public class LoadingService<T> extends Service<PagingLoadResponse<T>> {
         return loader.get();
     }
 
+    /**
+     * The callback used by the service to load items for the current page request.
+     *
+     * @return the loader property
+     */
     public final ObjectProperty<Callback<PagingLoadRequest, PagingLoadResponse<T>>> loaderProperty() {
         return loader;
     }

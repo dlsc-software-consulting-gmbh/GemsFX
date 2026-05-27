@@ -56,16 +56,31 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
         gridTableView.minNumberOfRowsProperty().addListener(it -> refresh());
     }
 
+    /**
+     * Creates the default skin for this control.
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new PagingGridTableViewSkin<>(this);
     }
 
+    /**
+     * Returns the user agent stylesheet used by this control.
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(PagingGridTableView.class.getResource("paging-grid-table-view.css")).toExternalForm();
     }
 
+    /**
+     * Returns the content bias of the wrapped table view.
+     *
+     * @return the content bias
+     */
     @Override
     public Orientation getContentBias() {
         return gridTableView.getContentBias();

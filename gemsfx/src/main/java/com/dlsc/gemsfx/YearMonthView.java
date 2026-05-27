@@ -37,26 +37,54 @@ import java.util.Objects;
  */
 public class YearMonthView extends Control {
 
+    /**
+     * Constructs a new year-month view.
+     */
     public YearMonthView() {
         getStyleClass().add("year-month-view");
         setFocusTraversable(false);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new YearMonthViewSkin(this);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(YearMonthView.class.getResource("year-month-view.css")).toExternalForm();
     }
 
     private final StyleableBooleanProperty showYear = new StyleableBooleanProperty(true) {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() { return YearMonthView.this; }
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() { return "showYear"; }
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
             return StyleableProperties.SHOW_YEAR;
@@ -92,10 +120,24 @@ public class YearMonthView extends Control {
 
         private static final CssMetaData<YearMonthView, Boolean> SHOW_YEAR =
             new CssMetaData<>("-fx-show-year", BooleanConverter.getInstance(), true) {
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return true if the property can be styled
+                 *
+                 * @param c the control to inspect
+                 */
                 @Override
                 public boolean isSettable(YearMonthView c) {
                     return !c.showYear.isBound();
                 }
+                /**
+                 * {@inheritDoc}
+                 *
+                 * @return the styleable property
+                 *
+                 * @param c the control to inspect
+                 */
                 @Override
                 public StyleableProperty<Boolean> getStyleableProperty(YearMonthView c) {
                     return (StyleableProperty<Boolean>) c.showYear;
@@ -110,10 +152,20 @@ public class YearMonthView extends Control {
         }
     }
 
+    /**
+     * Returns the CSS metadata supported by this control.
+     *
+     * @return the CSS metadata supported by this control
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the supported CSS metadata
+     */
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
         return getClassCssMetaData();
@@ -125,6 +177,11 @@ public class YearMonthView extends Control {
         return value.get();
     }
 
+    /**
+     * Stores the selected year and month.
+     *
+     * @return the selected year-month property
+     */
     public final ObjectProperty<YearMonth> valueProperty() {
         return value;
     }
@@ -134,6 +191,13 @@ public class YearMonthView extends Control {
     }
 
     private final ObjectProperty<StringConverter<Month>> converter = new SimpleObjectProperty<>(this, "converter", new StringConverter<>() {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the string representation of the value
+         *
+         * @param month the value to convert
+         */
         @Override
         public String toString(Month month) {
             if (month != null) {
@@ -142,6 +206,13 @@ public class YearMonthView extends Control {
             return null;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the parsed value
+         *
+         * @param s the string to parse
+         */
         @Override
         public Month fromString(String s) {
             return null;
@@ -152,6 +223,11 @@ public class YearMonthView extends Control {
         return converter.get();
     }
 
+    /**
+     * Stores the converter used to format the month names shown by the view.
+     *
+     * @return the month converter property
+     */
     public final ObjectProperty<StringConverter<Month>> converterProperty() {
         return converter;
     }

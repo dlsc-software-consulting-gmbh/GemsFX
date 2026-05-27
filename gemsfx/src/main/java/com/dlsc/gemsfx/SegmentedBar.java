@@ -36,8 +36,7 @@ import java.util.Objects;
  * representing a value. The sum of all values is the total value of the bar
  * (see {@link #totalProperty()}). The bar can be customised by setting a
  * factory for the creation of the segment views.
- * <h3>Example 1:</h3>
- * The most basic version of the bar. It is using the default segment view
+ * <h2>Example 1:</h2>
  * factory.
  * <pre>
  * SegmentedBar bar = new SegmentedBar();
@@ -49,8 +48,7 @@ import java.util.Objects;
  *     new Segment(10, "10"),
  *     new Segment(50, "50"));
  * </pre>
- * <h3>Example 1:</h3>
- * In this example the bar is used to visualize the usage of disk space for
+ * <h2>Example 2:</h2>
  * various media types (photos, videos, music, ...). A special info node factory
  * is supplied to present a useful detailed description of the segment. The
  * type "TypeSegment" is a subclass of {@link SegmentedBar.Segment}
@@ -68,7 +66,7 @@ import java.util.Objects;
  *
  * @see #setSegmentViewFactory(Callback)
  *
- * @param <T></T> the segment type
+ * @param <T> the segment type
  *
  * <p><b>CSS Styleable Properties:</b>
  * <table class="striped">
@@ -100,11 +98,21 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
         setSegmentViewFactory(SegmentView::new);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the default skin
+     */
     @Override
     protected Skin<?> createDefaultSkin() {
         return new SegmentedBarSkin<>(this);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the user agent stylesheet
+     */
     @Override
     public String getUserAgentStylesheet() {
         return Objects.requireNonNull(SegmentedBar.class.getResource("segmented-bar.css")).toExternalForm();
@@ -114,6 +122,9 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
 
     private final ObjectProperty<Orientation> orientation = new StyleableObjectProperty<>(Orientation.VERTICAL) {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void invalidated() {
             final boolean vertical = (get() == Orientation.VERTICAL);
@@ -121,38 +132,41 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
             pseudoClassStateChanged(HORIZONTAL_PSEUDOCLASS_STATE, !vertical);
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<SegmentedBar, Orientation> getCssMetaData() {
             return StyleableProperties.ORIENTATION;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() {
             return SegmentedBar.this;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() {
             return "orientation"; //$NON-NLS-1$
         }
     };
 
-    /**
-     * Sets the value of the orientation property.
-     *
-     * @param value the new orientation (horizontal, vertical).
-     * @see #orientationProperty()
-     */
     public final void setOrientation(Orientation value) {
         orientationProperty().set(value);
     }
 
-    /**
-     * Returns the value of the orientation property.
-     *
-     * @return the current orientation of the control
-     * @see #orientationProperty()
-     */
     public final Orientation getOrientation() {
         return orientation == null ? Orientation.HORIZONTAL : orientation.get();
     }
@@ -175,16 +189,31 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
     private final ObjectProperty<Callback<T, Node>> segmentViewFactory = new SimpleObjectProperty<>(this, "segmentViewFactory");
 
     private final StyleableDoubleProperty minSegmentSize = new StyleableDoubleProperty(5) {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the owning bean
+         */
         @Override
         public Object getBean() {
             return SegmentedBar.this;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the property name
+         */
         @Override
         public String getName() {
             return "minSegmentSize";
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the CSS metadata for this property
+         */
         @Override
         public CssMetaData<? extends Styleable, Number> getCssMetaData() {
             return StyleableProperties.MIN_SEGMENT_SIZE;
@@ -224,20 +253,10 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
         return segmentViewFactory;
     }
 
-    /**
-     * Returns the value of {@link #segmentViewFactoryProperty()}.
-     *
-     * @return the segment view factory
-     */
     public final Callback<T, Node> getSegmentViewFactory() {
         return segmentViewFactory.get();
     }
 
-    /**
-     * Sets the value of {@link #segmentViewFactoryProperty()}.
-     *
-     * @param factory the segment view factory
-     */
     public final void setSegmentViewFactory(Callback<T, Node> factory) {
         this.segmentViewFactory.set(factory);
     }
@@ -253,20 +272,10 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
         return segments;
     }
 
-    /**
-     * Returns the list of segments (the model).
-     *
-     * @return the list of segments shown by the bar
-     */
     public final ObservableList<T> getSegments() {
         return segments.get();
     }
 
-    /**
-     * Sets the list of segments (the model).
-     *
-     * @param segments the list of segments shown by the bar
-     */
     public void setSegments(ObservableList<T> segments) {
         this.segments.set(segments);
     }
@@ -283,11 +292,6 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
         return total.getReadOnlyProperty();
     }
 
-    /**
-     * Returns the value of {@link #totalProperty()}.
-     *
-     * @return the total value of the bar (sum of segments)
-     */
     public final double getTotal() {
         return total.get();
     }
@@ -350,20 +354,10 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
             return text;
         }
 
-        /**
-         * Sets the value of {@link #textProperty()}.
-         *
-         * @param text the new text
-         */
         public final void setText(String text) {
             this.text.set(text);
         }
 
-        /**
-         * Returns the value of {@link #textProperty()}.
-         *
-         * @return the segment's text
-         */
         public final String getText() {
             return text.get();
         }
@@ -371,6 +365,11 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
         // value support
 
         private final DoubleProperty value = new SimpleDoubleProperty(this, "value") {
+            /**
+             * {@inheritDoc}
+             *
+             * @param newValue the newValue value
+             */
             @Override
             public void set(double newValue) {
                 if (newValue < 0) {
@@ -390,20 +389,10 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
             return value;
         }
 
-        /**
-         * Sets the value of {@link #valueProperty()}.
-         *
-         * @param value the new value
-         */
         public final void setValue(double value) {
             this.value.set(value);
         }
 
-        /**
-         * Returns the value of {@link #valueProperty()}.
-         *
-         * @return the segment's value
-         */
         public final double getValue() {
             return value.get();
         }
@@ -414,11 +403,25 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
         private static final CssMetaData<SegmentedBar, Number> MIN_SEGMENT_SIZE = new CssMetaData<>(
                 "-fx-min-segment-size", SizeConverter.getInstance(), 5d) {
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the styleable property
+             *
+             * @param control the control to inspect
+             */
             @Override
             public StyleableProperty<Number> getStyleableProperty(SegmentedBar control) {
                 return (StyleableProperty<Number>) control.minSegmentSizeProperty();
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return true if the property can be styled
+             *
+             * @param control the control to inspect
+             */
             @Override
             public boolean isSettable(SegmentedBar control) {
                 return !control.minSegmentSize.isBound();
@@ -429,17 +432,34 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
                 "-fx-orientation", new EnumConverter<>( //$NON-NLS-1$
                 Orientation.class), Orientation.VERTICAL) {
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return the initial CSS value
+             *
+             * @param node the control to inspect
+             */
             @Override
             public Orientation getInitialValue(SegmentedBar node) {
                 // A vertical bar should remain vertical
                 return node.getOrientation();
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return true if the property can be styled
+             *
+             * @param n the control to inspect
+             */
             @Override
             public boolean isSettable(SegmentedBar n) {
                 return n.orientation == null || !n.orientation.isBound();
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @SuppressWarnings("unchecked")
             @Override
             public StyleableProperty<Orientation> getStyleableProperty(
@@ -469,6 +489,8 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
 
     /**
      * {@inheritDoc}
+     *
+     * @return the supported CSS metadata
      */
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {

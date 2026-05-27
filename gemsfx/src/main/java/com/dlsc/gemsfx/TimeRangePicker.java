@@ -27,6 +27,9 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
 
     private static final String DEFAULT_STYLE_CLASS = "time-range-picker";
 
+    /**
+     * Constructs a new time range picker with a predefined set of ranges.
+     */
     public TimeRangePicker() {
         // add some default time ranges
         this(new TimeRange(LocalTime.of(10, 0), LocalTime.of(12, 0)),
@@ -35,6 +38,11 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
                 new TimeRange(LocalTime.of(16, 0), LocalTime.of(18, 0)));
     }
 
+    /**
+     * Constructs a new time range picker with the given ranges.
+     *
+     * @param ranges the time ranges to display
+     */
     public TimeRangePicker(TimeRange... ranges) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
@@ -134,6 +142,12 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
         private final LocalTime startTime;
         private final LocalTime endTime;
 
+        /**
+         * Constructs a new time range.
+         *
+         * @param startTime the start time
+         * @param endTime the end time
+         */
         public TimeRange(LocalTime startTime, LocalTime endTime) {
             // Ensure startTime and endTime are not null
             Objects.requireNonNull(startTime, "startTime cannot be null");
@@ -150,14 +164,31 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
             this.endTime = endTime;
         }
 
+        /**
+         * Returns the start time of the range.
+         *
+         * @return the start time
+         */
         public LocalTime startTime() {
             return startTime;
         }
 
+        /**
+         * Returns the end time of the range.
+         *
+         * @return the end time
+         */
         public LocalTime endTime() {
             return endTime;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the result
+         *
+         * @param o the o value
+         */
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -171,11 +202,21 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
             return Objects.equals(startTime, timeRange.startTime) && Objects.equals(endTime, timeRange.endTime);
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the result
+         */
         @Override
         public int hashCode() {
             return Objects.hash(startTime, endTime);
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return the string representation of the value
+         */
         @Override
         public String toString() {
             return startTime + " ~ " + endTime;

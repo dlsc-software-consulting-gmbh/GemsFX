@@ -48,7 +48,11 @@ public final class EmailValidator {
     private EmailValidator() {
     }
 
-    /** Returns the shared singleton instance. */
+    /**
+     * Returns the shared singleton instance.
+     *
+     * @return the shared singleton instance
+     */
     public static EmailValidator getInstance() {
         return INSTANCE;
     }

@@ -718,7 +718,6 @@ public class CalendarView extends Control {
      * A factory for creating alternative content for the month view. The image
      * below shows the {@link CalendarView} once with the default factory and
      * once with an alternative factory that creates checkboxes.
-     * </p>
      *
      * @return the cell factory
      */

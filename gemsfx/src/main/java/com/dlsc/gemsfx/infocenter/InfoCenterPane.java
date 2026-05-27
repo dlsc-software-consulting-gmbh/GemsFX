@@ -43,7 +43,6 @@ import com.dlsc.gemsfx.util.TreeShowing;
  *    InfoCenterPane infoCenterPane = new InfoCenterPane();
  *    StackPane root = new StackPane(infoCenterPane);
  * </pre>
- * </p>
  */
 public class InfoCenterPane extends StackPane {
 

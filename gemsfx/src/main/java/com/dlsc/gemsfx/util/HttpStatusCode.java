@@ -1,5 +1,13 @@
 package com.dlsc.gemsfx.util;
 
+/**
+ * Enum of standard HTTP status codes as defined by
+ * <a href="https://www.iana.org/assignments/http-status-codes">IANA HTTP Status Code Registry</a>.
+ *
+ * <p>Each constant carries its numeric {@link #getStatusCode() code}, a human-readable
+ * {@link #getReasonPhrase() reason phrase}, and a {@link Family} classification
+ * (1xx informational, 2xx success, 3xx redirection, 4xx client error, 5xx server error).
+ */
 public enum HttpStatusCode {
 
     OK(200, "OK"),
@@ -53,22 +61,48 @@ public enum HttpStatusCode {
         family = HttpStatusCode.Family.familyOf(statusCode);
     }
 
+    /**
+     * Returns the status code family.
+     *
+     * @return the status code family
+     */
     public HttpStatusCode.Family getFamily() {
         return family;
     }
 
+    /**
+     * Returns the numeric status code.
+     *
+     * @return the numeric status code
+     */
     public int getStatusCode() {
         return code;
     }
 
+    /**
+     * Returns the reason phrase.
+     *
+     * @return the reason phrase
+     */
     public String getReasonPhrase() {
         return toString();
     }
 
+    /**
+     * Returns the reason phrase.
+     *
+     * @return the reason phrase
+     */
     public String toString() {
         return reason;
     }
 
+    /**
+     * Returns the enum constant for the given status code.
+     *
+     * @param statusCode the status code
+     * @return the matching enum constant, or {@code null} if none matches
+     */
     public static HttpStatusCode fromStatusCode(int statusCode) {
         HttpStatusCode[] codes = values();
 
@@ -81,6 +115,9 @@ public enum HttpStatusCode {
         return null;
     }
 
+    /**
+     * The available HTTP status code families.
+     */
     public enum Family {
         INFORMATIONAL,
         SUCCESSFUL,
@@ -92,6 +129,12 @@ public enum HttpStatusCode {
         Family() {
         }
 
+        /**
+         * Determines the family for the given status code.
+         *
+         * @param statusCode the status code
+         * @return the status code family
+         */
         public static HttpStatusCode.Family familyOf(int statusCode) {
             switch (statusCode / 100) {
                 case 1:

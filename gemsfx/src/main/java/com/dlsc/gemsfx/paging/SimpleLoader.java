@@ -40,6 +40,12 @@ public class SimpleLoader<T> implements Callback<PagingLoadRequest, PagingLoadRe
         });
     }
 
+    /**
+     * Loads the items for the requested page from the backing list.
+     *
+     * @param param the load request
+     * @return the load response
+     */
     @Override
     public PagingLoadResponse<T> call(PagingLoadRequest param) {
         int page = param.getPage();
@@ -50,6 +56,11 @@ public class SimpleLoader<T> implements Callback<PagingLoadRequest, PagingLoadRe
         return new PagingLoadResponse<>(new ArrayList<>(items.subList(offset, Math.min(items.size(), offset + pageSize))), getItems().size());
     }
 
+    /**
+     * Returns the list property backing this loader.
+     *
+     * @return the items property
+     */
     public ListProperty<T> getItems() {
         return items;
     }

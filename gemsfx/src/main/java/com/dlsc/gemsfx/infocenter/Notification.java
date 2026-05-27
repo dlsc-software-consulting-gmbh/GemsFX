@@ -227,6 +227,9 @@ public class Notification<T> implements Comparable<Notification<T>> {
         this.onClick.set(onClick);
     }
 
+    /**
+     * The type of a notification.
+     */
     public enum Type {
         INFO,
         WARNING,
@@ -254,6 +257,11 @@ public class Notification<T> implements Comparable<Notification<T>> {
         this.type.set(type);
     }
 
+    /**
+     * Returns a string representation of this notification.
+     *
+     * @return a string representation of this notification
+     */
     @Override
     public String toString() {
         return new StringJoiner(", ", Notification.class.getSimpleName() + "[", "]")
@@ -263,6 +271,12 @@ public class Notification<T> implements Comparable<Notification<T>> {
                 .toString();
     }
 
+    /**
+     * Compares this notification with another notification based on their timestamps.
+     *
+     * @param o the other notification
+     * @return a negative integer, zero, or a positive integer as this notification is earlier than, simultaneous with, or later than the other notification
+     */
     @Override
     public int compareTo(Notification<T> o) {
         return getDateTime().compareTo(o.getDateTime());
