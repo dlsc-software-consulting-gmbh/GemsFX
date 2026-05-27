@@ -31,6 +31,9 @@ import java.util.List;
  *     <tr><td>{@code -fx-mouse-transparent}</td><td>{@code boolean}</td><td>Whether the cell ignores mouse events.</td></tr>
  *   </tbody>
  * </table>
+ *
+ * @param <S> the type of the row item
+ * @param <T> the type of the cell item
  */
 public class GridTableCell<S, T> extends Cell<T> {
 

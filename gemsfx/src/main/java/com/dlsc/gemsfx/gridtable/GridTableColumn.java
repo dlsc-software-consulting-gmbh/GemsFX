@@ -20,6 +20,8 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 /**
+ * A column in a {@link GridTableView}.
+ *
  * @param <S> table item type
  * @param <T> table cell value type
  */
