@@ -9,11 +9,13 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -38,7 +40,7 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
 
         gridPane.getStyleClass().add("grid-pane");
 
-        LoadingPane loadingPane = new LoadingPane(gridPane){
+        LoadingPane loadingPane = new LoadingPane(gridPane) {
             @Override
             public String getUserAgentStylesheet() {
                 return null;
@@ -119,14 +121,39 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
 
             listView.cellFactoryProperty().bind(Bindings.createObjectBinding(() -> lv -> {
                 Callback<MultiColumnListView<T>, ColumnListCell<T>> cellFactory = view.getCellFactory();
-                return cellFactory.call(view);
+                ColumnListCell<T> cell = cellFactory.call(view);
+                cell.updateColumn(column);
+                return cell;
             }, view.cellFactoryProperty()));
 
+            Region columnBackground = new Region();
+            columnBackground.getStyleClass().add("column-background-region");
+
+            Region columnForeground = new Region();
+            columnForeground.getStyleClass().add("column-foreground-region");
+            columnForeground.setMouseTransparent(true);
+
+            InvalidationListener hoverListener = (Observable o) -> columnForeground.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), listView.isHover());
+            EventHandler<DragEvent> hoverDragEnterHandler = (DragEvent event) -> columnForeground.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), true);
+            EventHandler<DragEvent> hoverDragExitHandler = (DragEvent event) -> columnForeground.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), false);
+
+            listView.hoverProperty().addListener(hoverListener);
+            listView.addEventHandler(DragEvent.DRAG_ENTERED, hoverDragEnterHandler);
+            listView.addEventHandler(DragEvent.DRAG_EXITED, hoverDragExitHandler);
+
             if (view.isShowHeaders()) {
+                gridPane.add(columnBackground, col, 0);
+                GridPane.setRowSpan(columnBackground, 2);
+
                 gridPane.add(header, col, 0);
                 gridPane.add(listView, col, 1);
+
+                gridPane.add(columnForeground, col, 0);
+                GridPane.setRowSpan(columnForeground, 2);
             } else {
+                gridPane.add(columnBackground, col, 0);
                 gridPane.add(listView, col, 0);
+                gridPane.add(columnForeground, col, 0);
             }
 
             if (separatorFactory != null && columnIndex < numberOfColumns - 1) {
@@ -152,10 +179,15 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
         listView.setPlaceholder(label);
     }
 
-    private void initPlaceholder(ListView listView, Node placeholder) {
+    private void initPlaceholder(ListView<T> listView, Node placeholder) {
         placeholder.setOnDragOver(event -> {
-            event.consume();
-            event.acceptTransferModes(TransferMode.MOVE);
+            T draggedItem = getSkinnable().getDraggedItem();
+            if (getSkinnable().getDragPossibleCallback().call(draggedItem)) {
+                event.consume();
+                event.acceptTransferModes(TransferMode.MOVE);
+            } else{
+                event.acceptTransferModes(TransferMode.NONE);
+            }
         });
 
         placeholder.setOnDragDropped(event -> {

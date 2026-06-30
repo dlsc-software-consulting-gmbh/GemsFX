@@ -24,6 +24,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class MultiColumnListViewApp extends GemApplication {
+    ListViewColumn<Issue> col1 = new ListViewColumn<>();
+    ListViewColumn<Issue> col2 = new ListViewColumn<>();
+    ListViewColumn<Issue> col3 = new ListViewColumn<>();
+    ListViewColumn<Issue> col4 = new ListViewColumn<>();
+    ListViewColumn<Issue> col5 = new ListViewColumn<>();
 
     @Override
     public void start(Stage stage) { super.start(stage);
@@ -32,6 +37,8 @@ public class MultiColumnListViewApp extends GemApplication {
         multiColumnListView.getColumns().setAll(createColumns());
         multiColumnListView.setPlaceholderFrom(new Issue("From"));
         multiColumnListView.setPlaceholderTo(new Issue("To"));
+        multiColumnListView.setDragPossibleCallback(issue -> !issue.getStatus().equals("done"));
+        multiColumnListView.setDropPossibleCallback(para -> !para.getColumn().getUserObject().equals("col1"));
         VBox.setVgrow(multiColumnListView, Priority.ALWAYS);
 
         CheckBox showHeaders = new CheckBox("Show Headers");
@@ -72,11 +79,17 @@ public class MultiColumnListViewApp extends GemApplication {
     }
 
     private List<ListViewColumn<Issue>> createColumns() {
-        ListViewColumn<Issue> col1 = new ListViewColumn<>();
-        ListViewColumn<Issue> col2 = new ListViewColumn<>();
-        ListViewColumn<Issue> col3 = new ListViewColumn<>();
-        ListViewColumn<Issue> col4 = new ListViewColumn<>();
-        ListViewColumn<Issue> col5 = new ListViewColumn<>();
+        col1.setHeader(new Label("Column 1"));
+        col2.setHeader(new Label("Column 2"));
+        col3.setHeader(new Label("Column 3"));
+        col4.setHeader(new Label("Column 4"));
+        col5.setHeader(new Label("Column 5"));
+
+        col1.setUserObject("col1");
+        col2.setUserObject("col2");
+        col3.setUserObject("col3");
+        col4.setUserObject("col4");
+        col5.setUserObject("col5");
 
         col1.getItems().setAll(new Issue("Dirk"), new Issue("Katja"), new Issue("Philip"));
         col2.getItems().setAll(new Issue("Jule"), new Issue("Franz"), new Issue("Paul"), new Issue("Orange"), new Issue("Yellow"), new Issue("Red"), new Issue("Mango"), new Issue("Apple"), new Issue("Pear"), new Issue("Sun"), new Issue("Moon"), new Issue("Saturn"));
@@ -166,7 +179,7 @@ public class MultiColumnListViewApp extends GemApplication {
                     placeholder.set(true);
                     setText("To");
                 } else {
-                    setText(item.getTitle());
+                    setText(item.getTitle() + "\n(" + item.getStatus() + ")");
                     getStyleClass().add(item.getStatus());
                 }
             } else {

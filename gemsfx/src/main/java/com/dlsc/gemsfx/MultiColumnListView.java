@@ -79,6 +79,52 @@ public class MultiColumnListView<T> extends Control {
         return Objects.requireNonNull(MultiColumnListView.class.getResource("multi-column-list-view.css")).toExternalForm();
     }
 
+    public static class DropParameter<T> {
+        private final T item;
+        private final ListViewColumn<T> column;
+
+        public DropParameter(T item, ListViewColumn<T> column) {
+            this.item = item;
+            this.column = column;
+        }
+
+        public T getItem() {
+            return item;
+        }
+
+        public ListViewColumn<T> getColumn() {
+            return column;
+        }
+    }
+
+    private final ObjectProperty<Callback<DropParameter<T>, Boolean>> dropPossibleCallback = new SimpleObjectProperty<>(this, "dropPossibleCallback", param -> true);
+
+    public final Callback<DropParameter<T>, Boolean> getDropPossibleCallback() {
+        return dropPossibleCallback.get();
+    }
+
+    public final ObjectProperty<Callback<DropParameter<T>, Boolean>> dropPossibleCallbackProperty() {
+        return dropPossibleCallback;
+    }
+
+    public final void setDropPossibleCallback(Callback<DropParameter<T>, Boolean> dropPossibleCallback) {
+        this.dropPossibleCallback.set(dropPossibleCallback);
+    }
+
+    private final ObjectProperty<Callback<T, Boolean>> dragPossibleCallback = new SimpleObjectProperty<>(this, "draggableCallback", item -> true);
+
+    public Callback<T, Boolean> getDragPossibleCallback() {
+        return dragPossibleCallback.get();
+    }
+
+    public ObjectProperty<Callback<T, Boolean>> dragPossibleCallbackProperty() {
+        return dragPossibleCallback;
+    }
+
+    public void setDragPossibleCallback(Callback<T, Boolean> dragPossibleCallback) {
+        this.dragPossibleCallback.set(dragPossibleCallback);
+    }
+
     private final ObjectProperty<ProgressIndicator> progressIndicator = new SimpleObjectProperty<>(this, "progressIndicator", new CircleProgressIndicator());
 
     public final ProgressIndicator getProgressIndicator() {
@@ -105,6 +151,13 @@ public class MultiColumnListView<T> extends Control {
         return loadingStatus.get();
     }
 
+    /**
+     * Provides a property that holds the current loading status of the control.
+     * This status indicates whether the control is in a loading state, displaying
+     * an error, or ready to display the content.
+     *
+     * @return an {@link ObjectProperty} representing the {@link Status} of the control
+     */
     public final ObjectProperty<Status> loadingStatusProperty() {
         return loadingStatus;
     }
@@ -113,6 +166,15 @@ public class MultiColumnListView<T> extends Control {
         this.loadingStatus.set(loadingStatus);
     }
 
+    /**
+     * Represents the size of the loading status indicator used in the control.
+     * This property determines the visual size (e.g., SMALL, MEDIUM, LARGE) of the loading status
+     * and can be updated dynamically to reflect size changes in the UI.
+     *
+     * The default value is {@code Size.MEDIUM}.
+     *
+     * @see #loadingStatusProperty()
+     */
     private final ObjectProperty<Size> loadingStatusSize = new SimpleObjectProperty<>(this, "loadingStatusSize", Size.MEDIUM);
 
     public final Size getLoadingStatusSize() {
@@ -367,6 +429,26 @@ public class MultiColumnListView<T> extends Control {
         public final void setHeader(Node header) {
             this.header.set(header);
         }
+
+        /**
+         * An optional user object that can be associated with the column. This can be used to store additional
+         * information about the column, such as an identifier or metadata.
+         */
+        private final ObjectProperty<Object> userObject = new SimpleObjectProperty<>(this, "userObject");
+
+        public final Object getUserObject() {
+            return userObject.get();
+        }
+
+        public final void setUserObject(Object value) {
+            userObject.set(value);
+        }
+
+        public final ObjectProperty<Object> userObjectProperty() {
+            return userObject;
+        }
+
+
     }
 
     private final ObjectProperty<T> draggedItem = new SimpleObjectProperty<>(this, "draggedItem");
@@ -437,6 +519,7 @@ public class MultiColumnListView<T> extends Control {
     public static class ColumnListCell<T> extends ListCell<T> {
 
         private final MultiColumnListView<T> multiColumnListView;
+        private ListViewColumn<T> column;
 
         /**
          * Creates a new list cell.
@@ -467,40 +550,50 @@ public class MultiColumnListView<T> extends Control {
                     return;
                 }
 
-                ClipboardContent content = new ClipboardContent();
-                content.putString(Integer.toString(getIndex()));
+                Callback<T, Boolean> dragPossibleCallback = multiColumnListView.getDragPossibleCallback();
+                if (dragPossibleCallback.call(getItem())) {
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(Integer.toString(getIndex()));
 
-                SnapshotParameters parameters = new SnapshotParameters();
-                parameters.setFill(Color.TRANSPARENT); // important or we get a white frame in many cases
-                WritableImage snapshot = getSnapshotNode().snapshot(parameters, null);
+                    SnapshotParameters parameters = new SnapshotParameters();
+                    parameters.setFill(Color.TRANSPARENT); // important or we get a white frame in many cases
+                    WritableImage snapshot = getSnapshotNode().snapshot(parameters, null);
 
-                Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
-                dragboard.setContent(content);
-                dragboard.setDragView(snapshot);
+                    Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+                    dragboard.setContent(content);
+                    dragboard.setDragView(snapshot);
 
-                dragboard.setDragViewOffsetX(snapshot.getWidth() / 2);
-                dragboard.setDragViewOffsetY(-snapshot.getHeight() / 2);
+                    dragboard.setDragViewOffsetX(snapshot.getWidth() / 2);
+                    dragboard.setDragViewOffsetY(-snapshot.getHeight() / 2);
 
-                event.consume();
+                    event.consume();
 
-                multiColumnListView.setDraggedItem(getItem());
+                    multiColumnListView.setDraggedItem(getItem());
 
-                multiColumnListView.getDraggedItems().setAll(getListView().getSelectionModel().getSelectedItems());
+                    multiColumnListView.getDraggedItems().setAll(getListView().getSelectionModel().getSelectedItems());
 
-                ListUtils.replaceIf(getListView().getItems(), item -> item == getItem(), multiColumnListView.getPlaceholderFrom());
+                    ListUtils.replaceIf(getListView().getItems(), item -> item == getItem(), multiColumnListView.getPlaceholderFrom());
+                }
             });
 
             setOnDragOver(event -> {
                 log("drag over");
                 if (event.getGestureSource() != this && multiColumnListView.getPlaceholderFrom() != getItem()) {
-                    log("   accepting, " + hashCode() + ", txt: " + getText());
-                    updateItems(event);
-                    event.consume();
-                    event.acceptTransferModes(TransferMode.MOVE);
+                    DropParameter<T> dropParameter = new DropParameter<>(getItem(), column);
+                    Callback<DropParameter<T>, Boolean> callback = multiColumnListView.getDropPossibleCallback();
+                    if (callback.call(dropParameter)) {
+                        log("   drop possible callback is accepting, " + hashCode() + ", txt: " + getText());
+                        updateItems(event);
+                        event.acceptTransferModes(TransferMode.MOVE);
+                    } else {
+                        log("   drop possible callback is not accepting drag");
+                        event.acceptTransferModes(TransferMode.NONE);
+                    }
                 } else {
                     log("   not accepting drag");
                     event.acceptTransferModes(TransferMode.NONE);
                 }
+                event.consume();
             });
 
             setOnDragEntered(event -> log("drag entered"));
@@ -522,24 +615,29 @@ public class MultiColumnListView<T> extends Control {
                     return;
                 }
 
-                log("   performing drop");
+                Callback<DropParameter<T>, Boolean> dropCallback = multiColumnListView.getDropPossibleCallback();
+                if (dropCallback.call(new DropParameter<>(getItem(), column))) {
+                    log("   drop is possible, performing drop");
+                    ListView<T> listView = getListView();
+                    ObservableList<T> items = listView.getItems();
 
-                ListView<T> listView = getListView();
-                ObservableList<T> items = listView.getItems();
+                    items.remove(multiColumnListView.getPlaceholderFrom());
 
-                items.remove(multiColumnListView.getPlaceholderFrom());
+                    T draggedItem = multiColumnListView.getDraggedItem();
+                    ListUtils.replaceIf(items, item -> item == multiColumnListView.getPlaceholderTo(), draggedItem);
 
-                T draggedItem = multiColumnListView.getDraggedItem();
-                ListUtils.replaceIf(items, item -> item == multiColumnListView.getPlaceholderTo(), draggedItem);
+                    if (!items.contains(draggedItem)) {
+                        // probably dropped on same list view / same column (hence no "to" placeholder)
+                        items.add(draggedItem);
+                    }
 
-                if (!items.contains(draggedItem)) {
-                    // probably dropped on same list view / same column (hence no "to" placeholder)
-                    items.add(draggedItem);
+                    listView.getSelectionModel().select(draggedItem);
+
+                    event.setDropCompleted(true);
+                } else {
+                    log("   drop is not possible, ignoring");
+                    event.setDropCompleted(false);
                 }
-
-                listView.getSelectionModel().select(draggedItem);
-
-                event.setDropCompleted(true);
 
                 event.consume();
             });
@@ -565,6 +663,10 @@ public class MultiColumnListView<T> extends Control {
                 multiColumnListView.setDraggedItem(null);
                 evt.consume();
             });
+        }
+
+        public final ListViewColumn<T> getColumn() {
+            return column;
         }
 
         /**
@@ -725,7 +827,11 @@ public class MultiColumnListView<T> extends Control {
 
         // for quick and dirty logging / debugging
         private void log(String text) {
-            // System.out.println(text);
+            System.out.println(text);
+        }
+
+        public void updateColumn(ListViewColumn<T> column) {
+            this.column = column;
         }
     }
 }
