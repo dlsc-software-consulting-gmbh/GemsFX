@@ -43,6 +43,20 @@ public class YearMonthView extends Control {
     public YearMonthView() {
         getStyleClass().add("year-month-view");
         setFocusTraversable(false);
+
+        // the UI / the skin should prevent this from happening, but just in case, we make sure that the value is
+        // always within the allowed range
+        valueProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                YearMonth earliestMonth = getEarliestMonth();
+                YearMonth latestMonth = getLatestMonth();
+                if (earliestMonth != null && newValue.isBefore(earliestMonth)) {
+                    setValue(earliestMonth);
+                } else if (latestMonth != null && newValue.isAfter(latestMonth)) {
+                    setValue(latestMonth);
+                }
+            }
+        });
     }
 
     /**
