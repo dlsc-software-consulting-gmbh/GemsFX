@@ -3,7 +3,9 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.MultiColumnListView;
 import com.dlsc.gemsfx.MultiColumnListView.ColumnListCell;
+import com.dlsc.gemsfx.MultiColumnListView.DropParameter;
 import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
+import com.dlsc.gemsfx.MultiColumnListView.MultiColumnListViewEvent;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -109,12 +111,12 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
                 createPlaceholder(listView);
             }
 
-            initPlaceholder(listView, listView.getPlaceholder());
+            initPlaceholder(listView, listView.getPlaceholder(), column);
             listView.placeholderProperty().addListener((obs, oldPlaceholder, newPlaceholder) -> {
                 if (newPlaceholder == null) {
                     createPlaceholder(listView);
                 }
-                initPlaceholder(listView, listView.getPlaceholder());
+                initPlaceholder(listView, listView.getPlaceholder(), column);
             });
 
             listView.itemsProperty().bind(column.itemsProperty());
@@ -179,24 +181,46 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
         listView.setPlaceholder(label);
     }
 
-    private void initPlaceholder(ListView<T> listView, Node placeholder) {
+    private void initPlaceholder(ListView<T> listView, Node placeholder, ListViewColumn<T> column) {
         placeholder.setOnDragOver(event -> {
-            T draggedItem = getSkinnable().getDraggedItem();
-            if (getSkinnable().getDragPossibleCallback().call(draggedItem)) {
-                event.consume();
+            MultiColumnListView<T> multiColumnListView = getSkinnable();
+            T draggedItem = multiColumnListView.getDraggedItem();
+            DropParameter<T> dropParameter = new DropParameter<>(draggedItem, column);
+            Callback<DropParameter<T>, Boolean> callback = multiColumnListView.getDropPossibleCallback();
+            if (callback.call(dropParameter)) {
                 event.acceptTransferModes(TransferMode.MOVE);
-            } else{
+                multiColumnListView.fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_OVER, draggedItem, column, 0));
+            } else {
                 event.acceptTransferModes(TransferMode.NONE);
             }
-        });
-
-        placeholder.setOnDragDropped(event -> {
-            listView.getItems().add(getSkinnable().getDraggedItem());
-            event.setDropCompleted(true);
             event.consume();
         });
 
-        placeholder.setOnDragEntered(evt -> placeholder.pseudoClassStateChanged(PseudoClass.getPseudoClass("drag-over"), true));
-        placeholder.setOnDragExited(evt -> placeholder.pseudoClassStateChanged(PseudoClass.getPseudoClass("drag-over"), false));
+        placeholder.setOnDragDropped(event -> {
+            MultiColumnListView<T> multiColumnListView = getSkinnable();
+            T draggedItem = multiColumnListView.getDraggedItem();
+            listView.getItems().add(getSkinnable().getDraggedItem());
+            event.setDropCompleted(true);
+            event.consume();
+            getSkinnable().fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_OVER, draggedItem, column, 0));
+        });
+
+        placeholder.setOnDragEntered(evt -> {
+            T draggedItem = getSkinnable().getDraggedItem();
+            DropParameter<T> dropParameter = new DropParameter<>(draggedItem, column);
+            Callback<DropParameter<T>, Boolean> callback = getSkinnable().getDropPossibleCallback();
+            if (callback.call(dropParameter)) {
+                placeholder.pseudoClassStateChanged(PseudoClass.getPseudoClass("drag-over"), true);
+            }
+        });
+
+        placeholder.setOnDragExited(evt -> {
+            T draggedItem = getSkinnable().getDraggedItem();
+            DropParameter<T> dropParameter = new DropParameter<>(draggedItem, column);
+            Callback<DropParameter<T>, Boolean> callback = getSkinnable().getDropPossibleCallback();
+            if (callback.call(dropParameter)) {
+                placeholder.pseudoClassStateChanged(PseudoClass.getPseudoClass("drag-over"), false);
+            }
+        });
     }
 }

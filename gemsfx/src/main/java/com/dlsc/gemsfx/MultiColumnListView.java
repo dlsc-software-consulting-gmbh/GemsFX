@@ -20,6 +20,8 @@ import javafx.css.Styleable;
 import javafx.css.StyleableBooleanProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Control;
@@ -573,6 +575,10 @@ public class MultiColumnListView<T> extends Control {
                     multiColumnListView.getDraggedItems().setAll(getListView().getSelectionModel().getSelectedItems());
 
                     ListUtils.replaceIf(getListView().getItems(), item -> item == getItem(), multiColumnListView.getPlaceholderFrom());
+                    
+                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_STARTED, getItem(), getColumn(), getIndex()));
+                } else {
+                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_NOT_POSSIBLE, getItem(), getColumn(), getIndex()));
                 }
             });
 
@@ -585,13 +591,16 @@ public class MultiColumnListView<T> extends Control {
                         log("   drop possible callback is accepting, " + hashCode() + ", txt: " + getText());
                         updateItems(event);
                         event.acceptTransferModes(TransferMode.MOVE);
+                        fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_OVER, getItem(), getColumn(), getIndex()));
                     } else {
                         log("   drop possible callback is not accepting drag");
                         event.acceptTransferModes(TransferMode.NONE);
+                        fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DROP_NOT_POSSIBLE, getItem(), getColumn(), getIndex()));
                     }
                 } else {
-                    log("   not accepting drag");
+                    log("   not accepting transfer");
                     event.acceptTransferModes(TransferMode.NONE);
+                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DROP_NOT_POSSIBLE, getItem(), getColumn(), getIndex()));
                 }
                 event.consume();
             });
@@ -634,9 +643,12 @@ public class MultiColumnListView<T> extends Control {
                     listView.getSelectionModel().select(draggedItem);
 
                     event.setDropCompleted(true);
-                } else {
-                    log("   drop is not possible, ignoring");
-                    event.setDropCompleted(false);
+
+                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.ITEM_MOVED, getItem(), getColumn(), getIndex()));
+//                } else {
+//                    log("   drop is not possible, ignoring");
+//                    event.setDropCompleted(false);
+                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DROP_NOT_POSSIBLE, getItem(), getColumn(), getIndex()));
                 }
 
                 event.consume();
@@ -827,11 +839,77 @@ public class MultiColumnListView<T> extends Control {
 
         // for quick and dirty logging / debugging
         private void log(String text) {
-            System.out.println(text);
+            // System.out.println(text);
         }
 
         public void updateColumn(ListViewColumn<T> column) {
             this.column = column;
+        }
+    }
+
+
+    /**
+     * Represents an event specific to the {@code MultiColumnListView} component.
+     * This event is triggered during user interactions such as drag and drop activities
+     * or changes in the state of the list view.
+     *
+     * The class provides a set of predefined event types to handle common scenarios,
+     * such as item movement, drag operations, and drop validation.
+     *
+     * Event Types:
+     * - {@link #ANY}: Represents a generic {@code MultiColumnListViewEvent}.
+     * - {@link #ITEM_MOVED}: Indicates that an item has been moved to a new location.
+     * - {@link #DROP_NOT_POSSIBLE}: Signifies a failed drop operation due to validation failures.
+     * - {@link #DRAG_OVER}: Fired when a drag operation hovers over the target area.
+     * - {@link #DRAG_STARTED}: Specifies the start of a drag operation.
+     * - {@link #DRAG_ENDED}: Fired when a drag operation has completed.
+     *
+     * This event also provides access to the dragged item and the associated column
+     * where the interaction occurs.
+     */
+    public static class MultiColumnListViewEvent extends Event {
+
+        public static final EventType<MultiColumnListViewEvent> ANY = new EventType<>(Event.ANY, "MULTI_COLUMN_LIST_VIEW_EVENT");
+        public static final EventType<MultiColumnListViewEvent> ITEM_MOVED = new EventType<>(MultiColumnListViewEvent.ANY, "ITEM_MOVED");
+        public static final EventType<MultiColumnListViewEvent> DRAG_NOT_POSSIBLE = new EventType<>(MultiColumnListViewEvent.ANY, "DRAG_NOT_POSSIBLE");
+        public static final EventType<MultiColumnListViewEvent> DROP_NOT_POSSIBLE = new EventType<>(MultiColumnListViewEvent.ANY, "DROP_NOT_POSSIBLE");
+        public static final EventType<MultiColumnListViewEvent> DRAG_OVER = new EventType<>(MultiColumnListViewEvent.ANY, "DRAG_OVER");
+        public static final EventType<MultiColumnListViewEvent> DRAG_STARTED = new EventType<>(MultiColumnListViewEvent.ANY, "DRAG_STARTED");
+        public static final EventType<MultiColumnListViewEvent> DRAG_ENDED = new EventType<>(MultiColumnListViewEvent.ANY, "DRAG_ENDED");
+
+        private final Object draggedItem;
+        private final ListViewColumn column;
+        private final int index;
+
+
+        public MultiColumnListViewEvent(EventType<? extends Event> eventType, Object draggedItem, ListViewColumn column, int index) {
+            super(eventType);
+            this.draggedItem = draggedItem;
+            this.column = column;
+            this.index = index;
+        }
+
+        public Object getDraggedItem() {
+            return draggedItem;
+        }
+
+        public ListViewColumn getColumn() {
+            return column;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        @Override
+        public String toString() {
+            return "MultiColumnListViewEvent{" +
+                    "column=" + column +
+                    ", eventType=" + eventType +
+                    ", target=" + target +
+                    ", consumed=" + consumed +
+                    ", source=" + source +
+                    '}';
         }
     }
 }

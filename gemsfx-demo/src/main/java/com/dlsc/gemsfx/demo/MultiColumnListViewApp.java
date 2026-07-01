@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.MultiColumnListView;
 import com.dlsc.gemsfx.MultiColumnListView.ColumnListCell;
 import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
+import com.dlsc.gemsfx.MultiColumnListView.MultiColumnListViewEvent;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,6 +20,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.controlsfx.control.StatusBar;
 
 import java.util.List;
 import java.util.Objects;
@@ -39,6 +41,7 @@ public class MultiColumnListViewApp extends GemApplication {
         multiColumnListView.setPlaceholderTo(new Issue("To"));
         multiColumnListView.setDragPossibleCallback(issue -> !issue.getStatus().equals("done"));
         multiColumnListView.setDropPossibleCallback(para -> !para.getColumn().getUserObject().equals("col1"));
+        multiColumnListView.addEventHandler(MultiColumnListViewEvent.ANY, System.out::println);
         VBox.setVgrow(multiColumnListView, Priority.ALWAYS);
 
         CheckBox showHeaders = new CheckBox("Show Headers");
@@ -61,11 +64,21 @@ public class MultiColumnListViewApp extends GemApplication {
 
         HBox optionsBox = new HBox(10, separators, showHeaders, disableDragAndDrop);
         optionsBox.setAlignment(Pos.CENTER_RIGHT);
+
+        StatusBar statusBar = new StatusBar();
+        multiColumnListView.addEventHandler(MultiColumnListViewEvent.DRAG_NOT_POSSIBLE, e-> statusBar.setText("Drag not possible"));
+        multiColumnListView.addEventHandler(MultiColumnListViewEvent.DROP_NOT_POSSIBLE, e-> statusBar.setText("Drop here not possible at index " + e.getIndex() + " in column: " + e.getColumn().getUserObject()));
+        multiColumnListView.addEventHandler(MultiColumnListViewEvent.ITEM_MOVED, e-> statusBar.setText("Item was moved to column: " + e.getColumn().getUserObject() + " at index: " + e.getIndex()));
+        multiColumnListView.addEventHandler(MultiColumnListViewEvent.DRAG_OVER, e-> statusBar.setText("Item dragged over column: " + e.getColumn().getUserObject() + " at index: " + e.getIndex()));
+
         VBox vbox = new VBox(10, multiColumnListView, optionsBox);
         vbox.setAlignment(Pos.TOP_RIGHT);
         vbox.setPadding(new Insets(20));
 
-        Scene scene = new Scene(vbox);
+        VBox outerBox = new VBox(vbox, statusBar);
+        VBox.setVgrow(vbox, Priority.ALWAYS);
+
+        Scene scene = new Scene(outerBox);
         scene.getStylesheets().add(Objects.requireNonNull(MultiColumnListViewApp.class.getResource("multi-column-app.css")).toExternalForm());
 
         CSSFX.start();
