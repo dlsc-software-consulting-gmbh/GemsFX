@@ -40,6 +40,9 @@ jobs:
           VERSION=${{ github.event.inputs.version }}
           echo "Updating POMs to version $VERSION"
           ./mvnw -B versions:set versions:commit -DnewVersion=$VERSION
+          echo "Updating README.md to version $VERSION"
+          sed -i "s|<version>[^<]*</version>|<version>$VERSION</version>|" README.md
+          sed -i "s|com.dlsc.gemsfx:gemsfx:[^']*|com.dlsc.gemsfx:gemsfx:$VERSION|" README.md
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Action"
           git commit -a -m "🏁 Releasing version $VERSION"
