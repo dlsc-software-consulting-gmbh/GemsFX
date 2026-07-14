@@ -26,17 +26,25 @@
  */
 package com.dlsc.gemsfx;
 
-import java.util.Objects;
+import java.util.List;
 
-import com.dlsc.gemsfx.skins.HiddenSidesPaneSkin;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
-import javafx.scene.control.Skin;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 /**
@@ -62,7 +70,13 @@ import javafx.util.Duration;
  * pane.setRight(new ListView());
  * </pre>
  */
-public class HiddenSidesPane extends Control {
+public class HiddenSidesPane extends Pane {
+
+    private boolean biasDirty = true;
+    private Orientation bias;
+
+    private final EventHandler<MouseEvent> exitedHandler;
+    private boolean mousePressed;
 
     /**
      * Constructs a new pane with the given content node and the four side
@@ -76,6 +90,69 @@ public class HiddenSidesPane extends Control {
      * @param left    the hidden node on the left side
      */
     public HiddenSidesPane(Node content, Node top, Node right, Node bottom, Node left) {
+        exitedHandler = event -> {
+            if (isMouseEnabled() && getPinnedSide() == null && !mousePressed) {
+                hide();
+            }
+        };
+
+        updateStackPane();
+
+        InvalidationListener rebuildListener = observable -> updateStackPane();
+        contentProperty().addListener(rebuildListener);
+        topProperty().addListener(rebuildListener);
+        rightProperty().addListener(rebuildListener);
+        bottomProperty().addListener(rebuildListener);
+        leftProperty().addListener(rebuildListener);
+
+        addEventFilter(MouseEvent.MOUSE_MOVED, event -> {
+            if (isMouseEnabled() && getPinnedSide() == null) {
+                Side side = getSide(event);
+                if (side != null) {
+                    show(side);
+                } else if (isMouseMovedOutsideSides(event)) {
+                    hide();
+                }
+            }
+        });
+
+        addEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
+
+        addEventFilter(MouseEvent.MOUSE_PRESSED, event -> mousePressed = true);
+
+        addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
+            mousePressed = false;
+
+            if (isMouseEnabled() && getPinnedSide() == null) {
+                Side side = getSide(event);
+                if (side != null) {
+                    show(side);
+                } else {
+                    hide();
+                }
+            }
+        });
+
+        for (Side side : Side.values()) {
+            visibility[side.ordinal()] = new SimpleDoubleProperty(0);
+            visibility[side.ordinal()].addListener(observable -> requestLayout());
+        }
+
+        Side pinnedSide = getPinnedSide();
+        if (pinnedSide != null) {
+            show(pinnedSide);
+        }
+
+        pinnedSideProperty().addListener(observable -> show(getPinnedSide()));
+        
+        Rectangle clip = new Rectangle();
+        clip.setX(0);
+        clip.setY(0);
+        clip.widthProperty().bind(widthProperty());
+        clip.heightProperty().bind(heightProperty());
+
+        setClip(clip);
+        
         setContent(content);
         setTop(top);
         setRight(right);
@@ -90,14 +167,23 @@ public class HiddenSidesPane extends Control {
         this(null, null, null, null, null);
     }
 
-    /**
-     * Creates the default skin for this control.
-     *
-     * @return the default skin
-     */
     @Override
-    protected Skin<?> createDefaultSkin() {
-        return new HiddenSidesPaneSkin(this);
+    public Orientation getContentBias() {
+        if (biasDirty) {
+            bias = null;
+            final List<Node> children = getManagedChildren();
+            for (Node child : children) {
+                Orientation contentBias = child.getContentBias();
+                if (contentBias != null) {
+                    bias = contentBias;
+                    if (contentBias == Orientation.HORIZONTAL) {
+                        break;
+                    }
+                }
+            }
+            biasDirty = false;
+        }
+        return bias;
     }
 
     private final DoubleProperty triggerDistance = new SimpleDoubleProperty(this, "triggerDistance", 16); 
@@ -300,20 +386,222 @@ public class HiddenSidesPane extends Control {
         animationDuration.set(duration);
     }
 
-    /**
-     * Shows a specific side
-     *
-     * @param side the side to show
-     */
-    public void show(Side side) {
-        Objects.requireNonNull(side, "side cannot be null");
-        getProperties().put("showPane", side);
+    @Override
+    protected void layoutChildren() {
+        double contentX = 0;
+        double contentY = 0;
+        double contentWidth = getWidth();
+        double contentHeight = getHeight();
+
+        getContent().resizeRelocate(contentX, contentY, contentWidth, contentHeight);
+
+        // layout the unmanaged side nodes
+
+        Node bottom = getBottom();
+        if (bottom != null) {
+            double prefHeight = bottom.prefHeight(contentWidth);
+            double offset = prefHeight * visibility[Side.BOTTOM.ordinal()].get();
+            bottom.resizeRelocate(contentX, contentY + contentHeight - offset, contentWidth, prefHeight);
+            bottom.setVisible(visibility[Side.BOTTOM.ordinal()].get() > 0);
+        }
+
+        Node left = getLeft();
+        if (left != null) {
+            double prefWidth = left.prefWidth(contentHeight);
+            double offset = prefWidth * visibility[Side.LEFT.ordinal()].get();
+            left.resizeRelocate(contentX - (prefWidth - offset), contentY, prefWidth, contentHeight);
+            left.setVisible(visibility[Side.LEFT.ordinal()].get() > 0);
+        }
+
+        Node right = getRight();
+        if (right != null) {
+            double prefWidth = right.prefWidth(contentHeight);
+            double offset = prefWidth * visibility[Side.RIGHT.ordinal()].get();
+
+            System.out.println("prefWidth: " + prefWidth + ", offset: " + offset + ", contentX: " + contentX + ", contentWidth: " + contentWidth + ", contentheight: " + contentHeight);
+            right.resizeRelocate(contentX + contentWidth - offset, contentY, prefWidth, contentHeight);
+            right.setVisible(visibility[Side.RIGHT.ordinal()].get() > 0);
+        }
+
+        Node top = getTop();
+        if (top != null) {
+            double prefHeight = top.prefHeight(contentWidth);
+            double offset = prefHeight * visibility[Side.TOP.ordinal()].get();
+            top.resizeRelocate(contentX, contentY - (prefHeight - offset), contentWidth, prefHeight);
+            top.setVisible(visibility[Side.TOP.ordinal()].get() > 0);
+        }
     }
 
-    /**
-     * Hides the currently showing side
-     */
-    public void hide() {
-        getProperties().put("showPane", null);
+    @Override
+    protected double computePrefWidth(double height) {
+        return getContent() != null ? getContent().prefWidth(height) : 0;
+    }
+
+    @Override
+    protected double computePrefHeight(double width) {
+        return getContent() != null ? getContent().prefHeight(width) : 0;
+    }
+
+    @Override
+    protected double computeMinWidth(double height) {
+        return getContent() != null ? getContent().minWidth(height) : 0;
+    }
+
+    @Override
+    protected double computeMinHeight(double width) {
+        return getContent() != null ? getContent().minHeight(width) : 0;
+    }
+
+    @Override
+    protected double computeMaxWidth(double height) {
+        return getContent() != null ? getContent().maxWidth(height) : 0;
+    }
+
+    @Override
+    protected double computeMaxHeight(double width) {
+        return getContent() != null ? getContent().maxHeight(width) : 0;
+    }
+
+    private boolean isMouseMovedOutsideSides(MouseEvent event) {
+        if (getLeft() != null && getLeft().getBoundsInParent().contains(event.getX(), event.getY())) {
+            return false;
+        }
+
+        if (getTop() != null && getTop().getBoundsInParent().contains(event.getX(), event.getY())) {
+            return false;
+        }
+
+        if (getRight() != null && getRight().getBoundsInParent().contains(event.getX(), event.getY())) {
+            return false;
+        }
+
+        if (getBottom() != null && getBottom().getBoundsInParent().contains(event.getX(), event.getY())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isMouseEnabled() {
+        return getTriggerDistance() > 0;
+    }
+
+    private Side getSide(MouseEvent evt) {
+        if (getBoundsInLocal().contains(evt.getX(), evt.getY())) {
+            double trigger = getTriggerDistance();
+            if (evt.getX() <= trigger) {
+                return Side.LEFT;
+            } else if (evt.getX() > getWidth() - trigger) {
+                return Side.RIGHT;
+            } else if (evt.getY() <= trigger) {
+                return Side.TOP;
+            } else if (evt.getY() > getHeight() - trigger) {
+                return Side.BOTTOM;
+            }
+        }
+
+        return null;
+    }
+
+    private final DoubleProperty[] visibility = new SimpleDoubleProperty[Side.values().length];
+
+    private Timeline showTimeline;
+
+    private void show(Side side) {
+        if (hideTimeline != null) {
+            hideTimeline.stop();
+        }
+
+        if (showTimeline != null && showTimeline.getStatus() == Animation.Status.RUNNING) {
+            return;
+        }
+
+        KeyValue[] keyValues = new KeyValue[Side.values().length];
+        for (Side s : Side.values()) {
+            keyValues[s.ordinal()] = new KeyValue(visibility[s.ordinal()], s.equals(side) ? 1 : 0);
+        }
+
+        Duration delay = getAnimationDelay() != null ? getAnimationDelay() : Duration.millis(300);
+        Duration duration = getAnimationDuration() != null ? getAnimationDuration() : Duration.millis(200);
+
+        KeyFrame keyFrame = new KeyFrame(duration, keyValues);
+        showTimeline = new Timeline(keyFrame);
+        showTimeline.setDelay(delay);
+        showTimeline.play();
+    }
+
+    private Timeline hideTimeline;
+
+    private void hide() {
+        if (showTimeline != null) {
+            showTimeline.stop();
+        }
+
+        if (hideTimeline != null && hideTimeline.getStatus() == Animation.Status.RUNNING) {
+            return;
+        }
+
+        boolean sideVisible = false;
+        for (Side side : Side.values()) {
+            if (visibility[side.ordinal()].get() > 0) {
+                sideVisible = true;
+                break;
+            }
+        }
+
+        // nothing to do here
+        if (!sideVisible) {
+            return;
+        }
+
+        KeyValue[] keyValues = new KeyValue[Side.values().length];
+        for (Side side : Side.values()) {
+            keyValues[side.ordinal()] = new KeyValue(visibility[side.ordinal()], 0);
+        }
+
+        Duration delay = getAnimationDelay() != null ? getAnimationDelay() : Duration.millis(300);
+        Duration duration = getAnimationDuration() != null ? getAnimationDuration() : Duration.millis(200);
+
+        KeyFrame keyFrame = new KeyFrame(duration, keyValues);
+        hideTimeline = new Timeline(keyFrame);
+        hideTimeline.setDelay(delay);
+        hideTimeline.play();
+    }
+
+    private void updateStackPane() {
+        getChildren().clear();
+
+        if (getContent() != null) {
+            getChildren().add(getContent());
+        }
+
+        if (getTop() != null) {
+            getChildren().add(getTop());
+            ((Region) getTop()).setMaxHeight(Region.USE_PREF_SIZE);
+            ((Region) getTop()).setMaxWidth(Double.MAX_VALUE);
+            getTop().removeEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
+            getTop().addEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
+        }
+        if (getRight() != null) {
+            getChildren().add(getRight());
+            ((Region) getRight()).setMaxWidth(Region.USE_PREF_SIZE);
+            ((Region) getRight()).setMaxHeight(Double.MAX_VALUE);
+            getRight().removeEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
+            getRight().addEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
+        }
+        if (getBottom() != null) {
+            getChildren().add(getBottom());
+            ((Region) getBottom()).setMaxHeight(Region.USE_PREF_SIZE);
+            ((Region) getBottom()).setMaxWidth(Double.MAX_VALUE);
+            getBottom().removeEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
+            getBottom().addEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
+        }
+        if (getLeft() != null) {
+            getChildren().add(getLeft());
+            ((Region) getLeft()).setMaxWidth(Region.USE_PREF_SIZE);
+            ((Region) getLeft()).setMaxHeight(Double.MAX_VALUE);
+            getLeft().removeEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
+            getLeft().addEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
+        }
     }
 }
