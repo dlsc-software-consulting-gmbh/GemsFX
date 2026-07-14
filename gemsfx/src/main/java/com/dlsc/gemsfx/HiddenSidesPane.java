@@ -417,8 +417,6 @@ public class HiddenSidesPane extends Pane {
         if (right != null) {
             double prefWidth = right.prefWidth(contentHeight);
             double offset = prefWidth * visibility[Side.RIGHT.ordinal()].get();
-
-            System.out.println("prefWidth: " + prefWidth + ", offset: " + offset + ", contentX: " + contentX + ", contentWidth: " + contentWidth + ", contentheight: " + contentHeight);
             right.resizeRelocate(contentX + contentWidth - offset, contentY, prefWidth, contentHeight);
             right.setVisible(visibility[Side.RIGHT.ordinal()].get() > 0);
         }
