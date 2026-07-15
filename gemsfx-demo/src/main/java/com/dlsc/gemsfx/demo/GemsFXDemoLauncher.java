@@ -151,6 +151,7 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Layout", "Power Pane", PowerPaneApp::new),
             demo("Layout", "Resizing Behaviour", ResizingBehaviourApp::new),
             demo("Layout", "Responsive Pane", ResponsivePaneApp::new),
+            demo("Layout", "Skeleton Pane", SkeletonPaneApp::new),
             demo("Layout", "Spacer", SpacerApp::new),
             demo("Layout", "Stretching Tile Pane", StretchingTilePaneApp::new),
             demo("Layout", "Three Items Pane", ThreeItemsPaneApp::new),
