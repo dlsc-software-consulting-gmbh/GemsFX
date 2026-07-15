@@ -328,7 +328,7 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
 
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(ProgressIndicator.getClassCssMetaData());
-            Collections.addAll(styleables, PROGRESS_ARC_TYPE, TRACK_ARC_TYPE);
+            Collections.addAll(styleables, STYLE_TYPE, PROGRESS_ARC_TYPE, TRACK_ARC_TYPE);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }
