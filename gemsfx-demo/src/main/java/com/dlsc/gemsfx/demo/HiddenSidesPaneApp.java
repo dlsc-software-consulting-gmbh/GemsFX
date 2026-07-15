@@ -43,7 +43,7 @@ public class HiddenSidesPaneApp extends GemApplication {
         stackPane.getChildren().add(pane);
 
         stage.setScene(new Scene(stackPane, 800, 700));
-        stage.setTitle("History Manager Demo");
+        stage.setTitle("HiddenSidesPane Demo");
 
         stage.show();
     }
