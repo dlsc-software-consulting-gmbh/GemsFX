@@ -201,7 +201,7 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
         syncShapeLayer(blocks, contentX, contentY);
         syncShimmerMask(blocks);
 
-        layoutShimmer(contentX, contentY, contentWidth, contentHeight);
+        layoutShimmer(contentX, contentY, contentHeight);
         rebuildShimmerTimeline();
     }
 
@@ -301,7 +301,7 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
         }
     }
 
-    private void layoutShimmer(double contentX, double contentY, double contentWidth, double contentHeight) {
+    private void layoutShimmer(double contentX, double contentY, double contentHeight) {
         double bandWidth = sanitizeFiniteNonNegative(getSkinnable().getShimmerWidth());
         positionShimmerLayer(contentX, contentY);
         if (bandWidth <= 0.0) {
@@ -374,18 +374,6 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
         }
 
         return topInset + inner + bottomInset;
-    }
-
-    @Override
-    protected double computeMaxWidth(double height, double topInset, double rightInset,
-                                     double bottomInset, double leftInset) {
-        return Double.MAX_VALUE;
-    }
-
-    @Override
-    protected double computeMaxHeight(double width, double topInset, double rightInset,
-                                      double bottomInset, double leftInset) {
-        return Double.MAX_VALUE;
     }
 
     @Override
