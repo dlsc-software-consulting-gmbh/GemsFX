@@ -199,6 +199,7 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Text & Input", "Tags Field", TagsFieldApp::new),
             desktopDemoOnly("Text & Input", "Tags Field (Email)", TagsFieldEmailApp::new),
             demo("Text & Input", "Text View", TextViewApp::new),
+            demo("Text & Input", "Cascader", CascaderApp::new),
 //            desktopDemoOnly("Text & Input", "Text View in VBox", TextViewInVBoxApp::new),
 //            desktopDemoOnly("Text & Input", "Text View with List View", TextViewWithListViewApp::new),
 //            desktopDemoOnly("Text & Input", "Text View with Paging List View", TextViewWithPagingListViewApp::new),
