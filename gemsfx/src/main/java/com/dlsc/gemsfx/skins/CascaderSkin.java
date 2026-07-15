@@ -70,7 +70,7 @@ public class CascaderSkin<T> extends GemsSkinBase<Cascader<T>> {
 
     private final EventHandler<WindowEvent> popupHiddenHandler = event -> onPopupHidden();
     /** Popup shell hosting {@link #view}. */
-    private final CascaderPopup popup = new CascaderPopup();
+    private final CascaderPopup popup;
 
     private boolean suppressReopen;
 
@@ -97,6 +97,7 @@ public class CascaderSkin<T> extends GemsSkinBase<Cascader<T>> {
     public CascaderSkin(Cascader<T> control, CascaderView<T> view) {
         super(control);
         this.view = view;
+        this.popup = new CascaderPopup();
         initializeNodes(control);
         registerListeners(control);
         getChildren().setAll(display);
