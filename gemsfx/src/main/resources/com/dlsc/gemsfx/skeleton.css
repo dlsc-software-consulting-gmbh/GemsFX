@@ -1,0 +1,15 @@
+.skeleton {
+    -fx-variant: ROUNDED_RECTANGLE;
+    -fx-corner-radius: 4px;
+    -fx-base-color: #e0e0e0;
+    -fx-shimmer-fill: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.6), transparent);
+    -fx-cycle-duration: 1500ms;
+    -fx-shimmer-width: 56px;
+    -fx-line-count: 1;
+    -fx-line-height: 14px;
+    -fx-line-spacing: 8px;
+    -fx-last-line-fill-percent: 70;
+}
+
+.skeleton-pane {
+}
