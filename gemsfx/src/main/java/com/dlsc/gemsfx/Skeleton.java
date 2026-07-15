@@ -27,7 +27,6 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Single-unit skeleton placeholder with a horizontal shimmer animation,
@@ -72,33 +71,7 @@ public class Skeleton extends Control {
 
     private static final String DEFAULT_STYLE_CLASS = "skeleton";
 
-    /**
-     * Geometric form of a {@link Skeleton}.
-     */
-    public enum Variant {
-        /**
-         * A rounded rectangle whose corner radius is driven by
-         * {@link Skeleton#cornerRadiusProperty() cornerRadius}.
-         */
-        ROUNDED_RECTANGLE,
-
-        /**
-         * A circle inscribed in {@code min(width, height)}.
-         */
-        CIRCULAR,
-
-        /**
-         * A vertical stack of {@link Skeleton#lineCountProperty() lineCount}
-         * horizontal lines simulating a paragraph.
-         */
-        TEXT
-    }
-
-    /**
-     * Default {@link Variant}.
-     */
     public static final Variant DEFAULT_VARIANT = Variant.ROUNDED_RECTANGLE;
-
     private static final double DEFAULT_CORNER_RADIUS = 4.0;
     private static final Duration DEFAULT_CYCLE_DURATION = Duration.millis(1500.0);
     private static final double DEFAULT_SHIMMER_WIDTH = 56.0;
@@ -151,16 +124,6 @@ public class Skeleton extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new SkeletonSkin(this);
-    }
-
-    /**
-     * Returns the stylesheet used by this control.
-     *
-     * @return the user agent stylesheet
-     */
-    @Override
-    public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(Skeleton.class.getResource("skeleton.css")).toExternalForm();
     }
 
     private final ObjectProperty<Variant> variant = new StyleableObjectProperty<>(DEFAULT_VARIANT) {
@@ -798,5 +761,28 @@ public class Skeleton extends Control {
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
         return getClassCssMetaData();
+    }
+
+
+    /**
+     * Geometric form of a {@link Skeleton}.
+     */
+    public enum Variant {
+        /**
+         * A rounded rectangle whose corner radius is driven by
+         * {@link Skeleton#cornerRadiusProperty() cornerRadius}.
+         */
+        ROUNDED_RECTANGLE,
+
+        /**
+         * A circle inscribed in {@code min(width, height)}.
+         */
+        CIRCULAR,
+
+        /**
+         * A vertical stack of {@link Skeleton#lineCountProperty() lineCount}
+         * horizontal lines simulating a paragraph.
+         */
+        TEXT
     }
 }

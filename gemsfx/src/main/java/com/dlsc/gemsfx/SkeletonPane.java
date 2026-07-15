@@ -12,8 +12,6 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
 
-import java.util.Objects;
-
 /**
  * Two-slot container that swaps between a {@linkplain #skeletonProperty()
  * skeleton} placeholder and the {@linkplain #contentProperty() real content}
@@ -71,16 +69,6 @@ public class SkeletonPane extends Region {
         setSkeleton(skeleton);
         setContent(content);
         setLoading(loading);
-    }
-
-    /**
-     * Returns the stylesheet used by this pane.
-     *
-     * @return the user agent stylesheet
-     */
-    @Override
-    public String getUserAgentStylesheet() {
-        return Objects.requireNonNull(SkeletonPane.class.getResource("skeleton.css")).toExternalForm();
     }
 
     private final ObjectProperty<Node> skeleton = new SimpleObjectProperty<>(this, "skeleton") {
