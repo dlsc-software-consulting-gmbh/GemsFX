@@ -123,8 +123,7 @@ public class CascaderView<T> extends Control {
      * item to still be present, and {@link #cancelInFlight} clears the whole set
      * at once so any late completion bails.
      */
-    private final Set<CascaderItem<T>> liveLoads =
-            Collections.newSetFromMap(new IdentityHashMap<>());
+    private final Set<CascaderItem<T>> liveLoads = Collections.newSetFromMap(new IdentityHashMap<>());
 
     /** Monotonic and never reset: its monotonicity is the stale-completion guarantee. */
     private long nextLoadToken;
