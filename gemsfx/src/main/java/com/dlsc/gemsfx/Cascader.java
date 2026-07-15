@@ -696,7 +696,10 @@ public class Cascader<T> extends Control {
     /**
      * Programmatically sets the single selection to the path ending at the given
      * leaf. Applies only in single-selection mode; ignored in multiple mode, or
-     * when the item is {@code null}, effectively disabled, or not a leaf.
+     * when the item is {@code null}, effectively disabled, or not a leaf. Like
+     * {@code TreeView}'s selection model, this method may keep a selection whose
+     * item is not currently reachable from the roots; the popup reveals it only
+     * when the leaf is reachable.
      *
      * @param leaf leaf item to select
      */
@@ -707,7 +710,8 @@ public class Cascader<T> extends Control {
     /**
      * Sets a cascading check state: the item and its enabled descendants are
      * (un)checked and ancestors roll up to the matching tri-state. Applies only in
-     * multiple-selection mode; ignored in single mode. This is the runtime entry
+     * multiple-selection mode; ignored in single mode, or when the item is not
+     * currently reachable from {@link #getRootItems()}. This is the runtime entry
      * point for programmatic checking (an item's checked state is read-only); to
      * seed an initial selection before display use {@link #seedChecked}.
      *
@@ -735,10 +739,12 @@ public class Cascader<T> extends Control {
      * cascade skips disabled descendants); to lock a disabled subtree checked, pass
      * its leaves individually — a disabled leaf given directly is honored.
      *
-     * <p>In lazy mode, seeding an unresolved branch behaves like
-     * {@link #setCheckedCascade}: the intent is recorded and the branch's load
-     * starts immediately (recursively, until the seed resolves to leaves).
-     * Prefer seeding leaves or resolved branches when that fetch is unwanted.
+     * <p>In lazy mode, seeding an unresolved branch that is already reachable
+     * from the roots behaves like {@link #setCheckedCascade}: the intent is
+     * recorded and the branch's load starts immediately (recursively, until the
+     * seed resolves to leaves). A detached item can still be pre-marked, but it
+     * does not start loading until it is reachable and operated on. Prefer
+     * seeding leaves or resolved branches when that fetch is unwanted.
      *
      * @param items items to mark checked (leaves, or branches with resolved children)
      */

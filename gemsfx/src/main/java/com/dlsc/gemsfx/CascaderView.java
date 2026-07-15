@@ -657,12 +657,13 @@ public class CascaderView<T> extends Control {
     // ==================== Public Operations ====================
 
     /**
-     * Handles normal row activation.
+     * Handles normal row activation. Ignored when the item is not currently
+     * reachable from {@link #getRootItems()}.
      *
      * @param item item to activate
      */
     public final void activate(CascaderItem<T> item) {
-        if (item == null || isEffectivelyDisabled(item)) {
+        if (item == null || !isInCurrentTree(item) || isEffectivelyDisabled(item)) {
             return;
         }
         if (getSelectionMode() == SelectionMode.MULTIPLE) {
@@ -692,12 +693,13 @@ public class CascaderView<T> extends Control {
     }
 
     /**
-     * Expands a branch item.
+     * Expands a branch item. Ignored when the item is not currently reachable
+     * from {@link #getRootItems()}.
      *
      * @param item branch item
      */
     public final void expand(CascaderItem<T> item) {
-        if (item == null || isEffectivelyDisabled(item) || isLeaf(item)) {
+        if (item == null || !isInCurrentTree(item) || isEffectivelyDisabled(item) || isLeaf(item)) {
             return;
         }
         // Three-step order: (1) establish the loading state so the loading frontier
@@ -728,9 +730,11 @@ public class CascaderView<T> extends Control {
      * leaf. Applies only in single-selection mode; ignored in multiple mode, or
      * when the item is {@code null}, effectively disabled, or not a leaf. Unlike
      * {@link #activate} it never expands a branch — it is the programmatic
-     * counterpart of clicking a leaf in single-selection mode. The columns are not
-     * navigated here; {@link #revealSelectedPath()} (invoked when the popup opens)
-     * expands to the selection.
+     * counterpart of clicking a leaf in single-selection mode. Like
+     * {@code TreeView}'s selection model, this method may keep a selection whose
+     * item is not currently reachable from the roots; the columns are not navigated
+     * here, and {@link #revealSelectedPath()} (invoked when the popup opens) expands
+     * to the selection only when the leaf is reachable.
      *
      * @param leaf leaf item to select
      */
@@ -783,12 +787,13 @@ public class CascaderView<T> extends Control {
     }
 
     /**
-     * Toggles a check state in multiple-selection mode.
+     * Toggles a check state in multiple-selection mode. Ignored when the item is
+     * not currently reachable from {@link #getRootItems()}.
      *
      * @param item item to toggle
      */
     public final void toggleCheck(CascaderItem<T> item) {
-        if (item == null || getSelectionMode() != SelectionMode.MULTIPLE) {
+        if (item == null || !isInCurrentTree(item) || getSelectionMode() != SelectionMode.MULTIPLE) {
             return;
         }
         setCheckedCascade(item, !areEnabledLeavesChecked(item));
@@ -797,7 +802,7 @@ public class CascaderView<T> extends Control {
     /**
      * Sets a cascading check state. Applies only in multiple-selection mode;
      * ignored in single mode, or when the item is {@code null} or effectively
-     * disabled.
+     * disabled, or not currently reachable from {@link #getRootItems()}.
      *
      * <p>Targeting an unresolved lazy branch records the intent, starts (or
      * reuses) the branch's load, and replays the check once the children
@@ -808,7 +813,8 @@ public class CascaderView<T> extends Control {
      * @param checked target checked state
      */
     public final void setCheckedCascade(CascaderItem<T> item, boolean checked) {
-        if (getSelectionMode() != SelectionMode.MULTIPLE || item == null || isEffectivelyDisabled(item)) {
+        if (getSelectionMode() != SelectionMode.MULTIPLE
+                || item == null || !isInCurrentTree(item) || isEffectivelyDisabled(item)) {
             return;
         }
         if (isUnresolvedLazyBranch(item)) {
@@ -838,10 +844,12 @@ public class CascaderView<T> extends Control {
      * no-op for its entire subtree); to pre-seed a locked subtree, pass its
      * leaves individually — a disabled leaf given directly is honored.
      *
-     * <p>In lazy mode, seeding an unresolved branch behaves like
-     * {@link #setCheckedCascade}: the intent is recorded and the branch's load
-     * starts immediately (recursively, until the seed resolves to leaves).
-     * Prefer seeding leaves or resolved branches when that fetch is unwanted.
+     * <p>In lazy mode, seeding an unresolved branch that is already reachable
+     * from the roots behaves like {@link #setCheckedCascade}: the intent is
+     * recorded and the branch's load starts immediately (recursively, until the
+     * seed resolves to leaves). A detached item can still be pre-marked, but it
+     * does not start loading until it is reachable and operated on. Prefer
+     * seeding leaves or resolved branches when that fetch is unwanted.
      *
      * @param items items to mark checked (leaves, or branches with resolved children)
      */
@@ -977,10 +985,14 @@ public class CascaderView<T> extends Control {
 
     /**
      * Starts loading children for an unloaded branch when a loader is present.
+     * Ignored when the item is not currently reachable from {@link #getRootItems()}.
      *
      * @param item branch item to load
      */
     public final void loadChildren(CascaderItem<T> item) {
+        if (item == null || !isInCurrentTree(item)) {
+            return;
+        }
         long token = startLoad(item);
         if (token != NO_LOAD) {
             runLoad(item, token);
@@ -1404,9 +1416,9 @@ public class CascaderView<T> extends Control {
 
     /**
      * Shared invalidation core for the three reset entry points: cancels
-     * in-flight loads and clears navigation. It intentionally leaves
-     * {@code checkedPaths} and each item's checked state alone — those are
-     * handled per entry point.
+     * in-flight loads and clears navigation plus single selection. It
+     * intentionally leaves {@code checkedPaths} and each item's checked state
+     * alone — those are handled per entry point.
      */
     private void clearNavAndPending() {
         cancelInFlight();
@@ -1487,6 +1499,9 @@ public class CascaderView<T> extends Control {
      * completes after its branch was detached from the tree.
      */
     private boolean isInCurrentTree(CascaderItem<T> item) {
+        if (item == null) {
+            return false;
+        }
         CascaderItem<T> current = item;
         while (current.getParent() != null) {
             current = current.getParent();
