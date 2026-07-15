@@ -247,7 +247,7 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
         double lineHeight = sanitizeFiniteNonNegative(getSkinnable().getLineHeight());
         double lineSpacing = sanitizeFiniteNonNegative(getSkinnable().getLineSpacing());
         double lastPercentSource = sanitizeNonNegative(getSkinnable().getLastLineFillPercent());
-        double lastPercent = clamp(lastPercentSource, 0.0, FULL_PERCENT);
+        double lastPercent = Math.min(FULL_PERCENT, lastPercentSource);
         int lineCount = Math.max(1, getSkinnable().getLineCount());
         double radius = lineHeight * HALF;
 
@@ -395,10 +395,6 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
             return 0.0;
         }
         return value;
-    }
-
-    private static double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(max, value));
     }
 
     private static final class Block {
