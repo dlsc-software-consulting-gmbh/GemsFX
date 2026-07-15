@@ -94,10 +94,6 @@
     -fx-background-color: derive(-fx-control-inner-background, -8%);
 }
 
-.cascader-cell:in-active-path {
-    -fx-background-color: derive(-fx-control-inner-background, -4%);
-}
-
 .cascader-cell:in-active-path > .container > .content > .label,
 .cascader-cell:active > .container > .content > .label,
 .cascader-cell:leaf:in-checked-path > .container > .content > .label {
