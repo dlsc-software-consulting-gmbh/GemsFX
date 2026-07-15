@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx;
 
 import javafx.beans.DefaultProperty;
-import javafx.beans.NamedArg;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -50,8 +49,7 @@ public class SkeletonPane extends Region {
      * @param skeleton placeholder shown while loading; may be {@code null}
      * @param content  real content shown when loaded; may be {@code null}
      */
-    public SkeletonPane(@NamedArg("skeleton") Node skeleton,
-                        @NamedArg("content") Node content) {
+    public SkeletonPane(Node skeleton, Node content) {
         this(skeleton, content, true);
     }
 
@@ -62,9 +60,7 @@ public class SkeletonPane extends Region {
      * @param content  real content; may be {@code null}
      * @param loading  initial loading state
      */
-    public SkeletonPane(@NamedArg("skeleton") Node skeleton,
-                        @NamedArg("content") Node content,
-                        @NamedArg(value = "loading", defaultValue = "true") boolean loading) {
+    public SkeletonPane(Node skeleton, Node content, boolean loading) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         setSkeleton(skeleton);
         setContent(content);
