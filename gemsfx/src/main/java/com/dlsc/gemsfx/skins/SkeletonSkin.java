@@ -32,9 +32,9 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
     private static final double HALF = 0.5;
     private static final double FULL_PERCENT = 100.0;
 
-    private final Group baseLayer = new Group();
-    private final Group shimmerViewport = new Group();
-    private final Group clipLayer = new Group();
+    private final Group shapeLayer = new Group();
+    private final Group shimmerLayer = new Group();
+    private final Group shimmerMask = new Group();
     private final Rectangle shimmerBand = new Rectangle();
     private final BooleanProperty treeShowing;
 
@@ -61,25 +61,24 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
     }
 
     private void initNodes() {
-        baseLayer.getStyleClass().add("base-layer");
-        baseLayer.setManaged(false);
-        baseLayer.setMouseTransparent(true);
+        shapeLayer.getStyleClass().add("shape-layer");
+        shapeLayer.setManaged(false);
+        shapeLayer.setMouseTransparent(true);
 
-        shimmerViewport.getStyleClass().add("shimmer-viewport");
-        shimmerViewport.setManaged(false);
-        shimmerViewport.setMouseTransparent(true);
-        shimmerViewport.setClip(clipLayer);
+        shimmerLayer.getStyleClass().add("shimmer-layer");
+        shimmerLayer.setManaged(false);
+        shimmerLayer.setMouseTransparent(true);
+        shimmerLayer.setClip(shimmerMask);
 
-        clipLayer.getStyleClass().add("clip-layer");
-        clipLayer.setManaged(false);
-        clipLayer.setMouseTransparent(true);
+        shimmerMask.setManaged(false);
+        shimmerMask.setMouseTransparent(true);
 
         shimmerBand.getStyleClass().add("shimmer-band");
         shimmerBand.setManaged(false);
         shimmerBand.setMouseTransparent(true);
 
-        shimmerViewport.getChildren().setAll(shimmerBand);
-        getChildren().setAll(baseLayer, shimmerViewport);
+        shimmerLayer.getChildren().setAll(shimmerBand);
+        getChildren().setAll(shapeLayer, shimmerLayer);
     }
 
     private void registerListeners(Skeleton control) {
@@ -102,7 +101,7 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
 
     private void applyBaseFill() {
         Paint fill = getSkinnable().getBaseColor();
-        for (Node node : baseLayer.getChildren()) {
+        for (Node node : shapeLayer.getChildren()) {
             if (node instanceof Rectangle) {
                 ((Rectangle) node).setFill(fill);
             }
@@ -199,17 +198,17 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
             return;
         }
 
-        syncLayer(baseLayer, blocks, contentX, contentY, getSkinnable().getBaseColor(), "base-block");
-        syncLayer(clipLayer, blocks, 0.0, 0.0, Color.BLACK, "clip-block");
+        syncShapeLayer(blocks, contentX, contentY);
+        syncShimmerMask(blocks);
 
         layoutShimmer(contentX, contentY, contentWidth, contentHeight);
         rebuildShimmerTimeline();
     }
 
     private void collapseAll() {
-        baseLayer.getChildren().clear();
-        clipLayer.getChildren().clear();
-        positionShimmerViewport(0.0, 0.0);
+        shapeLayer.getChildren().clear();
+        shimmerMask.getChildren().clear();
+        positionShimmerLayer(0.0, 0.0);
         shimmerBand.setWidth(0.0);
         shimmerBand.setHeight(0.0);
         cachedBandWidth = 0.0;
@@ -270,11 +269,17 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
         }
     }
 
-    private void syncLayer(Group layer, List<Block> blocks, double offsetX,
-                           double offsetY, Paint fill, String blockStyleClass) {
+    private void syncShapeLayer(List<Block> blocks, double contentX, double contentY) {
+        syncRectangles(shapeLayer, blocks, contentX, contentY, getSkinnable().getBaseColor());
+    }
+
+    private void syncShimmerMask(List<Block> blocks) {
+        syncRectangles(shimmerMask, blocks, 0.0, 0.0, Color.BLACK);
+    }
+
+    private void syncRectangles(Group layer, List<Block> blocks, double offsetX, double offsetY, Paint fill) {
         while (layer.getChildren().size() < blocks.size()) {
             Rectangle rectangle = new Rectangle();
-            rectangle.getStyleClass().add(blockStyleClass);
             rectangle.setManaged(false);
             rectangle.setMouseTransparent(true);
             layer.getChildren().add(rectangle);
@@ -298,7 +303,7 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
 
     private void layoutShimmer(double contentX, double contentY, double contentWidth, double contentHeight) {
         double bandWidth = sanitizeFiniteNonNegative(getSkinnable().getShimmerWidth());
-        positionShimmerViewport(contentX, contentY);
+        positionShimmerLayer(contentX, contentY);
         if (bandWidth <= 0.0) {
             shimmerBand.setWidth(0.0);
             shimmerBand.setHeight(contentHeight);
@@ -313,9 +318,9 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
         cachedBandWidth = bandWidth;
     }
 
-    private void positionShimmerViewport(double x, double y) {
-        shimmerViewport.setLayoutX(x);
-        shimmerViewport.setLayoutY(y);
+    private void positionShimmerLayer(double x, double y) {
+        shimmerLayer.setLayoutX(x);
+        shimmerLayer.setLayoutY(y);
     }
 
     @Override
@@ -386,7 +391,7 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
     @Override
     public void dispose() {
         stopAndClearTimeline();
-        shimmerViewport.setClip(null);
+        shimmerLayer.setClip(null);
         super.dispose();
     }
 
