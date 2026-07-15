@@ -32,13 +32,6 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
     private static final double HALF = 0.5;
     private static final double FULL_PERCENT = 100.0;
 
-    private static final String BASE_LAYER_STYLE_CLASS = "base-layer";
-    private static final String BASE_BLOCK_STYLE_CLASS = "base-block";
-    private static final String SHIMMER_VIEWPORT_STYLE_CLASS = "shimmer-viewport";
-    private static final String SHIMMER_BAND_STYLE_CLASS = "shimmer-band";
-    private static final String CLIP_LAYER_STYLE_CLASS = "clip-layer";
-    private static final String CLIP_BLOCK_STYLE_CLASS = "clip-block";
-
     private final Group baseLayer = new Group();
     private final Group shimmerViewport = new Group();
     private final Group clipLayer = new Group();
@@ -68,20 +61,20 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
     }
 
     private void initNodes() {
-        baseLayer.getStyleClass().add(BASE_LAYER_STYLE_CLASS);
+        baseLayer.getStyleClass().add("base-layer");
         baseLayer.setManaged(false);
         baseLayer.setMouseTransparent(true);
 
-        shimmerViewport.getStyleClass().add(SHIMMER_VIEWPORT_STYLE_CLASS);
+        shimmerViewport.getStyleClass().add("shimmer-viewport");
         shimmerViewport.setManaged(false);
         shimmerViewport.setMouseTransparent(true);
         shimmerViewport.setClip(clipLayer);
 
-        clipLayer.getStyleClass().add(CLIP_LAYER_STYLE_CLASS);
+        clipLayer.getStyleClass().add("clip-layer");
         clipLayer.setManaged(false);
         clipLayer.setMouseTransparent(true);
 
-        shimmerBand.getStyleClass().add(SHIMMER_BAND_STYLE_CLASS);
+        shimmerBand.getStyleClass().add("shimmer-band");
         shimmerBand.setManaged(false);
         shimmerBand.setMouseTransparent(true);
 
@@ -206,8 +199,8 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
             return;
         }
 
-        syncLayer(baseLayer, blocks, contentX, contentY, getSkinnable().getBaseColor(), BASE_BLOCK_STYLE_CLASS);
-        syncLayer(clipLayer, blocks, 0.0, 0.0, Color.BLACK, CLIP_BLOCK_STYLE_CLASS);
+        syncLayer(baseLayer, blocks, contentX, contentY, getSkinnable().getBaseColor(), "base-block");
+        syncLayer(clipLayer, blocks, 0.0, 0.0, Color.BLACK, "clip-block");
 
         layoutShimmer(contentX, contentY, contentWidth, contentHeight);
         rebuildShimmerTimeline();
