@@ -410,11 +410,16 @@ public class CascaderViewSkin<T> extends GemsSkinBase<CascaderView<T>> {
 
     /**
      * Makes the clicked column the keyboard column, focuses the clicked row, and
-     * drops every other column's highlight.
+     * drops every other column's highlight. Empty-area presses clear focus entirely.
      */
     private void syncKeyboardFocusToPointer(ListView<CascaderItem<T>> column, MouseEvent event) {
         int index = columns.indexOf(column);
         if (index < 0) {
+            return;
+        }
+        ListCell<?> cell = pressedCell(event);
+        if (cell == null || cell.isEmpty()) {
+            clearKeyboardFocus();
             return;
         }
         keyboardColumn = index;
@@ -423,10 +428,7 @@ public class CascaderViewSkin<T> extends GemsSkinBase<CascaderView<T>> {
                 columns.get(i).getFocusModel().focus(-1);
             }
         }
-        ListCell<?> cell = pressedCell(event);
-        if (cell != null && !cell.isEmpty()) {
-            column.getFocusModel().focus(cell.getIndex());
-        }
+        column.getFocusModel().focus(cell.getIndex());
     }
 
     /** The list cell containing the press target, or {@code null} for an empty-area press. */

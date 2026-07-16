@@ -429,9 +429,11 @@ public class CascaderSkin<T> extends GemsSkinBase<Cascader<T>> {
 
     @Override
     public void dispose() {
+        Cascader<T> control = getSkinnable();
         clearPathValueListeners();
-        popup.hide();
         popup.removeEventHandler(WindowEvent.WINDOW_HIDDEN, popupHiddenHandler);
+        control.hide();
+        popup.hide();
         popup.setSkin(null);
         super.dispose();
     }
