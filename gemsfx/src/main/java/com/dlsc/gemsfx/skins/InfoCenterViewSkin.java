@@ -249,8 +249,8 @@ public class InfoCenterViewSkin extends GemsSkinBase<InfoCenterView> {
         groupNameLabel.textProperty().bind(Bindings.createStringBinding(() -> view.getShowAllGroup() != null ? view.getShowAllGroup().getName() : "", view.showAllGroupProperty()));
         groupNameLabel.getStyleClass().add("group-name-label");
 
-        Button closeShowAllButton = new Button(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"single.group.header.close"));
-        closeShowAllButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"single.group.header.close.tip")));
+        Button closeShowAllButton = new Button(ResourceBundleManager.getString(ResourceBundleManager.BundleType.INFO_CENTER_VIEW,"single.group.header.close"));
+        closeShowAllButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.BundleType.INFO_CENTER_VIEW,"single.group.header.close.tip")));
         closeShowAllButton.getStyleClass().add("close-show-all-button");
         closeShowAllButton.setOnAction(evt -> view.setShowAllGroup(null));
 
@@ -258,7 +258,7 @@ public class InfoCenterViewSkin extends GemsSkinBase<InfoCenterView> {
         clearAllButton.setGraphic(new FontIcon());
         clearAllButton.getStyleClass().add("clear-all-button");
         clearAllButton.setOnAction(evt -> view.getShowAllGroup().getNotifications().clear());
-        clearAllButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"single.group.header.remove.all")));
+        clearAllButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.BundleType.INFO_CENTER_VIEW,"single.group.header.remove.all")));
 
         HBox singleGroupHeader = new HBox(groupNameLabel, new Spacer(), closeShowAllButton, clearAllButton);
         singleGroupHeader.getStyleClass().add("single-group-header");
@@ -493,28 +493,28 @@ public class InfoCenterViewSkin extends GemsSkinBase<InfoCenterView> {
             Label groupNameLabel = new Label(group.getName());
             groupNameLabel.getStyleClass().add("group-name-label");
 
-            Button showLessButton = new Button(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW, "group.header.show.less"));
+            Button showLessButton = new Button(ResourceBundleManager.getString(ResourceBundleManager.BundleType.INFO_CENTER_VIEW, "group.header.show.less"));
             showLessButton.getStyleClass().add("show-less-button");
             showLessButton.setOnAction(evt -> {
                 requestFocus();
                 group.setExpanded(false);
             });
-            showLessButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"group.header.show.less.tip")));
+            showLessButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.BundleType.INFO_CENTER_VIEW,"group.header.show.less.tip")));
 
             InfoCenterView infoCenterView = getSkinnable();
             infoCenterView.notificationSpacingProperty().addListener(weakSpacingListener);
 
             Button showAllButton = new Button();
-            showAllButton.textProperty().bind(Bindings.createStringBinding(() -> MessageFormat.format("{0} {1}", ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"group.header.show.all"), group.getNotifications().size()), group.getNotifications()));
+            showAllButton.textProperty().bind(Bindings.createStringBinding(() -> MessageFormat.format("{0} {1}", ResourceBundleManager.getString(ResourceBundleManager.BundleType.INFO_CENTER_VIEW,"group.header.show.all"), group.getNotifications().size()), group.getNotifications()));
             showAllButton.getStyleClass().add("show-all-button");
-            showAllButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"group.header.show.all.tip")));
+            showAllButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.BundleType.INFO_CENTER_VIEW,"group.header.show.all.tip")));
             showAllButton.setOnAction(evt -> infoCenterView.getOnShowAllGroupNotifications().accept(group));
             showAllButton.visibleProperty().bind(Bindings.createBooleanBinding(() -> infoCenterView.getOnShowAllGroupNotifications() != null && group.getNotifications().size() > group.getMaximumNumberOfNotifications(),
                     group.maximumNumberOfNotificationsProperty(), group.getNotifications(), infoCenterView.onShowAllGroupNotificationsProperty()));
 
             Button clearButton = new Button();
             clearButton.getStyleClass().add("clear-button");
-            clearButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"group.header.remove.all.tip")));
+            clearButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.BundleType.INFO_CENTER_VIEW,"group.header.remove.all.tip")));
             clearButton.setGraphic(new FontIcon());
             clearButton.setOnAction(evt -> {
                 group.setExpanded(false);
@@ -523,7 +523,7 @@ public class InfoCenterViewSkin extends GemsSkinBase<InfoCenterView> {
 
             ToggleButton pinButton = new ToggleButton();
             pinButton.getStyleClass().add("pin-button");
-            pinButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.Type.INFO_CENTER_VIEW,"group.header.pin.tip")));
+            pinButton.setTooltip(new Tooltip(ResourceBundleManager.getString(ResourceBundleManager.BundleType.INFO_CENTER_VIEW,"group.header.pin.tip")));
             pinButton.setGraphic(new FontIcon());
             pinButton.visibleProperty().bind(group.pinnableProperty());
             pinButton.managedProperty().bind(group.pinnableProperty());

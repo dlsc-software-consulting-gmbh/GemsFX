@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A view for displaying multiple columns where each column consists of a header
@@ -413,7 +414,7 @@ public class MultiColumnListView<T> extends Control {
             this.items.set(items);
         }
 
-        private final ObjectProperty<Node> header = new SimpleObjectProperty<>(this, "header", new Label("Column Header"));
+        private final ObjectProperty<Node> header = new SimpleObjectProperty<>(this, "header", new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "column.header.default", "Column Header")));
 
         public final Node getHeader() {
             return header.get();
@@ -777,9 +778,9 @@ public class MultiColumnListView<T> extends Control {
 
             if (!empty && item != null) {
                 if (item == multiColumnListView.getPlaceholderFrom()) {
-                    setText("From");
+                    setText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "placeholder.from", "From"));
                 } else if (item == multiColumnListView.getPlaceholderTo()) {
-                    setText("To");
+                    setText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "placeholder.to", "To"));
                 } else {
                     setText(item.toString());
                 }

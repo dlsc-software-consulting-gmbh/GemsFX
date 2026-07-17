@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A control for letting the user enter a time of day (see {@link LocalTime}). The control
@@ -99,15 +100,15 @@ public class TimePicker extends CustomComboBox<LocalTime> {
             }
         });
 
-        Label hourSeparator = new Label(":");
+        Label hourSeparator = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.TIME_PICKER, "format.separator.hour-minute", ":"));
         hourSeparator.getStyleClass().add("separator");
         setHoursSeparator(hourSeparator);
 
-        Label minutesSeparator = new Label(":");
+        Label minutesSeparator = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.TIME_PICKER, "format.separator.minute-second", ":"));
         minutesSeparator.getStyleClass().add("separator");
         setMinutesSeparator(minutesSeparator);
 
-        Label secondsSeparator = new Label(".");
+        Label secondsSeparator = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.TIME_PICKER, "format.separator.second-fraction", "."));
         secondsSeparator.getStyleClass().add("separator");
         setSecondsSeparator(secondsSeparator);
 

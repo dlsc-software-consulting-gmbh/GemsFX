@@ -41,6 +41,7 @@ import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.SizeConverter;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A custom stackpane that supports a drawer view sliding in from bottom to top. The content of the drawer gets added
@@ -455,7 +456,7 @@ public class DrawerStackPane extends StackPane {
         ToolBar toolBar = new ToolBar();
         Bindings.bindContent(toolBar.getItems(), toolbarItemsProperty());
 
-        Button closeButton = new Button("Close");
+        Button closeButton = new Button(ResourceBundleManager.getString(ResourceBundleManager.BundleType.DRAWER_STACK_PANE, "button.close", "Close"));
         closeButton.setOnAction(evt -> getOnCloseRequest().run());
         closeButton.getStyleClass().add("close-button");
         getToolbarItems().add(closeButton);
@@ -574,7 +575,7 @@ public class DrawerStackPane extends StackPane {
 
     // drawer title support
 
-    private final StringProperty drawerTitle = new SimpleStringProperty(this, "drawerTitle", "Untitled");
+    private final StringProperty drawerTitle = new SimpleStringProperty(this, "drawerTitle", ResourceBundleManager.getString(ResourceBundleManager.BundleType.DRAWER_STACK_PANE, "title.untitled", "Untitled"));
 
     public final String getDrawerTitle() {
         return drawerTitle.get();

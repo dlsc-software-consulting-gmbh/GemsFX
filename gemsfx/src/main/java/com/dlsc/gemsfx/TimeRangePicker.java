@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A custom control that allows users to select time ranges.
@@ -75,10 +76,10 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
     }
 
     private Node createExtraButtonsBox() {
-        Button clearButton = createExtraButton("Clear", getSelectionModel()::clearSelection);
+        Button clearButton = createExtraButton(ResourceBundleManager.getString(ResourceBundleManager.BundleType.TIME_RANGE_PICKER, "action.clear", "Clear"), getSelectionModel()::clearSelection);
         clearButton.getStyleClass().add("clear-button");
 
-        Button selectAllButton = createExtraButton("Select All", getSelectionModel()::selectAll);
+        Button selectAllButton = createExtraButton(ResourceBundleManager.getString(ResourceBundleManager.BundleType.TIME_RANGE_PICKER, "action.select-all", "Select All"), getSelectionModel()::selectAll);
         selectAllButton.getStyleClass().add("select-all-button");
         selectAllButton.managedProperty().bind(selectAllButton.visibleProperty());
         selectAllButton.visibleProperty().bind(currentSelectionModeProperty().isEqualTo(SelectionMode.MULTIPLE));

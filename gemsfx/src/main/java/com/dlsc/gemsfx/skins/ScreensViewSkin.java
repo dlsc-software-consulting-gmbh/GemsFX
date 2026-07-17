@@ -33,6 +33,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
+import java.text.MessageFormat;
 
 public class ScreensViewSkin extends GemsSkinBase<ScreensView> {
 
@@ -175,11 +177,11 @@ public class ScreensViewSkin extends GemsSkinBase<ScreensView> {
             setPrefWidth(bounds.getWidth());
             setPrefHeight(bounds.getHeight());
 
-            Label label = new Label("Screen " + Screen.getScreens().indexOf(screen));
+            Label label = new Label(MessageFormat.format(ResourceBundleManager.getString(ResourceBundleManager.BundleType.SCREENS_VIEW, "label.screen-index", "Screen {0}"), Screen.getScreens().indexOf(screen)));
             label.setTextAlignment(TextAlignment.CENTER);
             label.setWrapText(true);
             if (Screen.getPrimary().equals(screen)) {
-                label.setText("Primary");
+                label.setText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.SCREENS_VIEW, "label.primary", "Primary"));
             }
             getChildren().add(label);
         }

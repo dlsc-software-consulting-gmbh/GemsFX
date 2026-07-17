@@ -65,6 +65,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * The search field is a standard text field with auto suggest capabilities
@@ -159,12 +160,12 @@ public class SearchField<T> extends Control {
         editor.promptTextProperty().bindBidirectional(promptTextProperty());
 
         // history listView placeholder
-        Label placeholder = new Label("No items.");
+        Label placeholder = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.SEARCH_FIELD, "placeholder.history-empty", "No items."));
         placeholder.getStyleClass().add("history-placeholder");
         setHistoryPlaceholder(placeholder);
 
         // suggestion listView placeholder
-        setPlaceholder(new Label("No items found"));
+        setPlaceholder(new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.SEARCH_FIELD, "placeholder.suggestions-empty", "No items found")));
 
         focusedProperty().addListener(it -> {
             if (isFocused()) {

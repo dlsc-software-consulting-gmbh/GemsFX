@@ -287,16 +287,16 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
                     if (between.toHours() > 2) {
                         return DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(dateTime.toLocalTime());
                     } else if (between.toHours() > 0) {
-                        return MessageFormat.format("{0}{1}", between.toHours(), ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.hours.ago"));
+                        return MessageFormat.format("{0}{1}", between.toHours(), ResourceBundleManager.getString(ResourceBundleManager.BundleType.NOTIFICATION_VIEW, "time.hours.ago"));
                     } else if (between.toMinutes() > 0) {
-                        return MessageFormat.format("{0}{1}", between.toMinutes(), ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.minutes.ago"));
+                        return MessageFormat.format("{0}{1}", between.toMinutes(), ResourceBundleManager.getString(ResourceBundleManager.BundleType.NOTIFICATION_VIEW, "time.minutes.ago"));
                     } else {
-                        return ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.now");
+                        return ResourceBundleManager.getString(ResourceBundleManager.BundleType.NOTIFICATION_VIEW, "time.now");
                     }
                 } else if (between.toDays() == 1) {
-                    return MessageFormat.format("{0}, {1}", ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.yesterday"), SHORT_TIME_FORMATTER.format(dateTime.toLocalTime()));
+                    return MessageFormat.format("{0}, {1}", ResourceBundleManager.getString(ResourceBundleManager.BundleType.NOTIFICATION_VIEW, "time.yesterday"), SHORT_TIME_FORMATTER.format(dateTime.toLocalTime()));
                 } else if (between.toDays() < 7) {
-                    return MessageFormat.format("{0} {1}", between.toDays(), ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "time.days.ago"));
+                    return MessageFormat.format("{0} {1}", between.toDays(), ResourceBundleManager.getString(ResourceBundleManager.BundleType.NOTIFICATION_VIEW, "time.days.ago"));
                 } else {
                     return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).format(dateTime);
                 }
@@ -447,7 +447,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
             contentProperty().addListener(it -> updateCenterNode(center));
             showContentProperty().addListener(it -> updateCenterNode(center));
 
-            Label clearAllLabel = new Label(ResourceBundleManager.getString(ResourceBundleManager.Type.NOTIFICATION_VIEW, "group.clear.all"));
+            Label clearAllLabel = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.NOTIFICATION_VIEW, "group.clear.all"));
             clearAllLabel.getStyleClass().add("clear-all");
             clearAllLabel.setMouseTransparent(true);
 

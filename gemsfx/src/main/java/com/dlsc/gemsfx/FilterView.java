@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A view for presenting a set of predefined filter groups, each one with a list of filters.
@@ -269,7 +270,7 @@ public class FilterView<T> extends Control {
         this.extras.set(extras);
     }
 
-    private final StringProperty title = new SimpleStringProperty(this, "title", "Untitled");
+    private final StringProperty title = new SimpleStringProperty(this, "title", ResourceBundleManager.getString(ResourceBundleManager.BundleType.FILTER_VIEW, "title.untitled", "Untitled"));
 
     public final String getTitle() {
         return title.get();
@@ -540,7 +541,7 @@ public class FilterView<T> extends Control {
 
         // group name
 
-        private final StringProperty name = new SimpleStringProperty(this, "name", "Untitled");
+        private final StringProperty name = new SimpleStringProperty(this, "name", ResourceBundleManager.getString(ResourceBundleManager.BundleType.FILTER_VIEW, "group.name.untitled", "Untitled"));
 
         /**
          * The name of the filter as shown in the filter group's dropdown list.
@@ -652,7 +653,7 @@ public class FilterView<T> extends Control {
 
         // name
 
-        private final StringProperty name = new SimpleStringProperty(this, "name", "Untitled");
+        private final StringProperty name = new SimpleStringProperty(this, "name", ResourceBundleManager.getString(ResourceBundleManager.BundleType.FILTER_VIEW, "filter.name.untitled", "Untitled"));
 
         /**
          * The name of the filter as shown inside the UI.

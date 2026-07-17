@@ -84,6 +84,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A pane that allows applications to display a lightweight dialog right inside the application
@@ -492,7 +493,7 @@ public class DialogPane extends StackPane {
         return dialog;
     }
 
-    private final StringProperty sendButtonText = new SimpleStringProperty(this, "sendButtonText", "Send");
+    private final StringProperty sendButtonText = new SimpleStringProperty(this, "sendButtonText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.DIALOG_PANE, "button.send", "Send"));
 
     public final String getSendButtonText() {
         return sendButtonText.get();
@@ -1692,7 +1693,7 @@ public class DialogPane extends StackPane {
 
         // title
 
-        private final StringProperty title = new SimpleStringProperty(this, "title", "Dialog");
+        private final StringProperty title = new SimpleStringProperty(this, "title", ResourceBundleManager.getString(ResourceBundleManager.BundleType.DIALOG_PANE, "title.default", "Dialog"));
 
         public final StringProperty titleProperty() {
             return title;
@@ -1979,7 +1980,7 @@ public class DialogPane extends StackPane {
             setAlignment(Pos.CENTER);
             getStyleClass().add("header");
 
-            Label dialogTitle = new Label("Dialog");
+            Label dialogTitle = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.DIALOG_PANE, "header.title.fallback", "Dialog"));
             dialogTitle.setMaxWidth(Double.MAX_VALUE);
             dialogTitle.getStyleClass().add("title");
             dialogTitle.textProperty().bind(dialog.titleProperty());

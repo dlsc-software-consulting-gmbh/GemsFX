@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A view capable of displaying groups of different types of notifications. The user
@@ -588,7 +589,7 @@ public class InfoCenterView extends Control {
     }
 
     private static StackPane createDefaultPlaceholder() {
-        Label noNotifications = new Label("No notifications");
+        Label noNotifications = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.INFO_CENTER_VIEW, "placeholder.no-notifications", "No notifications"));
         StackPane placeholder = new StackPane(noNotifications);
         placeholder.getStyleClass().add("default-placeholder");
         return placeholder;

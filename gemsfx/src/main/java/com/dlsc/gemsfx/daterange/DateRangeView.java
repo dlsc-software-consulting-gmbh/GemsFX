@@ -21,6 +21,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * The date range view can be used to define a start and an end date via two {@link CalendarView} instances.
@@ -185,7 +186,7 @@ public class DateRangeView extends Control {
         return calendar;
     }
 
-    private final StringProperty toText = new SimpleStringProperty(this, "toText", "TO");
+    private final StringProperty toText = new SimpleStringProperty(this, "toText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.DATE_RANGE_VIEW, "label.to", "TO"));
 
     public final String getToText() {
         return toText.get();
@@ -204,7 +205,7 @@ public class DateRangeView extends Control {
         this.toText.set(toText);
     }
 
-    private final StringProperty cancelText = new SimpleStringProperty(this, "cancelText", "CANCEL");
+    private final StringProperty cancelText = new SimpleStringProperty(this, "cancelText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.DATE_RANGE_VIEW, "button.cancel", "CANCEL"));
 
     public final String getCancelText() {
         return cancelText.get();
@@ -223,7 +224,7 @@ public class DateRangeView extends Control {
         this.cancelText.set(cancelText);
     }
 
-    private final StringProperty applyText = new SimpleStringProperty(this, "applyText", "APPLY");
+    private final StringProperty applyText = new SimpleStringProperty(this, "applyText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.DATE_RANGE_VIEW, "button.apply", "APPLY"));
 
     public final String getApplyText() {
         return applyText.get();
@@ -242,7 +243,7 @@ public class DateRangeView extends Control {
         this.applyText.set(applyText);
     }
 
-    private final StringProperty presetTitle = new SimpleStringProperty(this, "presetsTitle", "QUICK SELECT");
+    private final StringProperty presetTitle = new SimpleStringProperty(this, "presetsTitle", ResourceBundleManager.getString(ResourceBundleManager.BundleType.DATE_RANGE_VIEW, "section.presets.title", "QUICK SELECT"));
 
     public final String getPresetTitle() {
         return presetTitle.get();
@@ -441,33 +442,38 @@ public class DateRangeView extends Control {
     }
 
     private DateRangePreset createTodayRangePreset() {
-        return new DateRangePreset("Today", () -> new DateRange("Today", LocalDate.now()));
+        String today = ResourceBundleManager.getString(ResourceBundleManager.BundleType.DATE_RANGE_VIEW, "preset.today", "Today");
+        return new DateRangePreset(today, () -> new DateRange(today, LocalDate.now()));
     }
 
     private DateRangePreset createYesterdayPreset() {
-        return new DateRangePreset("Yesterday", () -> new DateRange("Yesterday", LocalDate.now().minusDays(1)));
+        String yesterday = ResourceBundleManager.getString(ResourceBundleManager.BundleType.DATE_RANGE_VIEW, "preset.yesterday", "Yesterday");
+        return new DateRangePreset(yesterday, () -> new DateRange(yesterday, LocalDate.now().minusDays(1)));
     }
 
     private DateRangePreset createThisWeekPreset() {
-        return new DateRangePreset("This Week", () -> {
+        String thisWeek = ResourceBundleManager.getString(ResourceBundleManager.BundleType.DATE_RANGE_VIEW, "preset.this-week", "This Week");
+        return new DateRangePreset(thisWeek, () -> {
             TemporalField fieldISO = WeekFields.of(Locale.getDefault()).dayOfWeek();
-            return new DateRange("This Week", LocalDate.now().with(fieldISO, 1), LocalDate.now().with(fieldISO, 1).plusDays(6));
+            return new DateRange(thisWeek, LocalDate.now().with(fieldISO, 1), LocalDate.now().with(fieldISO, 1).plusDays(6));
         });
     }
 
     private DateRangePreset createThisMonthPreset() {
-        return new DateRangePreset("This Month", () -> {
+        String thisMonth = ResourceBundleManager.getString(ResourceBundleManager.BundleType.DATE_RANGE_VIEW, "preset.this-month", "This Month");
+        return new DateRangePreset(thisMonth, () -> {
             LocalDate start = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
             LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
-            return new DateRange("This Month", start, end);
+            return new DateRange(thisMonth, start, end);
         });
     }
 
     private DateRangePreset createLastMonthPreset() {
-        return new DateRangePreset("Last Month", () -> {
+        String lastMonth = ResourceBundleManager.getString(ResourceBundleManager.BundleType.DATE_RANGE_VIEW, "preset.last-month", "Last Month");
+        return new DateRangePreset(lastMonth, () -> {
             LocalDate start = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).minusMonths(1);
             LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
-            return new DateRange("Last Month", start, end);
+            return new DateRange(lastMonth, start, end);
         });
     }
 

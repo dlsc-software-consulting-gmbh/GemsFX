@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 public class InnerListViewSkin<T> extends ListViewSkin<T> {
 
@@ -68,7 +69,7 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
             Node placeholder = pagingListView.getPlaceholder();
             if (placeholder == null) {
                 if (placeholderLabel == null) {
-                    placeholderLabel = new Label("No items");
+                    placeholderLabel = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.INNER_LIST_VIEW, "placeholder.no-items", "No items"));
                     placeholderLabel.getStyleClass().add("placeholder");
                     VBox.setVgrow(placeholderLabel, Priority.ALWAYS);
                 }

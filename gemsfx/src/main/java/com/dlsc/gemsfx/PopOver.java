@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A control that is intended to provide detailed information about
@@ -91,7 +92,7 @@ public class PopOver extends PopupControl {
         /*
          * Create some initial content.
          */
-        Label label = new Label("Content");
+        Label label = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.POP_OVER, "content.default-label", "Content"));
         label.setPrefSize(200, 200);
         label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         label.setAlignment(Pos.CENTER);

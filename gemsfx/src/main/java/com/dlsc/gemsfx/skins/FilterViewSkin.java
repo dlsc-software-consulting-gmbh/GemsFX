@@ -26,6 +26,8 @@ import com.dlsc.gemsfx.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
+import java.text.MessageFormat;
 
 public class FilterViewSkin<T> extends GemsSkinBase<FilterView<T>> {
 
@@ -166,7 +168,7 @@ public class FilterViewSkin<T> extends GemsSkinBase<FilterView<T>> {
 
             HBox.setHgrow(menuButton, Priority.ALWAYS);
 
-            MenuItem all = new MenuItem("All");
+            MenuItem all = new MenuItem(ResourceBundleManager.getString(ResourceBundleManager.BundleType.FILTER_VIEW, "menu.select-all", "All"));
             ObservableList<Filter<T>> activeFilters = getSkinnable().getFilters();
 
             all.setOnAction(evt -> {
@@ -175,7 +177,7 @@ public class FilterViewSkin<T> extends GemsSkinBase<FilterView<T>> {
                 activeFilters.addAll(group.getFilters());
             });
 
-            MenuItem none = new MenuItem("None");
+            MenuItem none = new MenuItem(ResourceBundleManager.getString(ResourceBundleManager.BundleType.FILTER_VIEW, "menu.select-none", "None"));
             none.setOnAction(evt -> {
                 // first remove all, otherwise we end up with duplicates
                 activeFilters.removeAll(group.getFilters());
@@ -231,12 +233,12 @@ public class FilterViewSkin<T> extends GemsSkinBase<FilterView<T>> {
             if (StringUtils.isNotBlank(filterText)) {
                 ChipView<String> chipView = new ChipView<>();
                 chipView.setValue(filterView.getFilterText());
-                chipView.setText("\"" + filterView.getFilterText() + "\"");
+                chipView.setText(MessageFormat.format(ResourceBundleManager.getString(ResourceBundleManager.BundleType.FILTER_VIEW, "format.filter-text-quoted", "\"{0}\""), filterView.getFilterText()));
                 chipView.setOnClose(filter -> filterView.setFilterText(null));
                 filtersPane.getChildren().add(chipView);
             }
 
-            Label clearFilter = new Label("Clear Filter");
+            Label clearFilter = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.FILTER_VIEW, "action.clear-filter", "Clear Filter"));
             clearFilter.getStyleClass().add("clear-filter-label");
             clearFilter.setOnMouseClicked(evt -> {
                 filters.clear();

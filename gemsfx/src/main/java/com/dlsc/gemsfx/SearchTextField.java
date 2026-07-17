@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A custom text field specifically designed for search functionality. This class enhances a text field with features
@@ -75,9 +76,9 @@ public class SearchTextField extends CustomTextField {
         getStyleClass().add("search-text-field");
         UIUtil.toggleClassBasedOnObservable(this, "round", roundProperty());
 
-        setPromptText("Search...");
+        setPromptText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.SEARCH_TEXT_FIELD, "prompt.search", "Search..."));
 
-        Label placeholder = new Label("No items.");
+        Label placeholder = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.SEARCH_TEXT_FIELD, "placeholder.history-empty", "No items."));
         placeholder.getStyleClass().add("default-placeholder");
         setHistoryPlaceholder(placeholder);
 

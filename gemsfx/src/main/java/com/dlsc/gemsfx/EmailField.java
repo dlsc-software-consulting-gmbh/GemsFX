@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * EmailField is a custom control for inputting and validating email addresses.
@@ -456,7 +457,7 @@ public class EmailField extends Control {
     }
 
     // Property for the tooltip text displayed when hovering over the icon indicating an invalid email address.
-    private final StringProperty invalidText = new SimpleStringProperty(this, "invalidText", "Invalid email address.");
+    private final StringProperty invalidText = new SimpleStringProperty(this, "invalidText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.EMAIL_FIELD, "validation.invalid-email", "Invalid email address."));
 
     /**
      * Retrieves the tooltip text displayed when the email address validation fails and the user hovers over the invalid icon.

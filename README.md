@@ -53,6 +53,44 @@ implementation 'com.dlsc.gemsfx:gemsfx:4.2.1'
 - #### Other Controls
   [CircleProgressIndicator](#circle-progress-indicator), [FilterView](#filter-view), [InfoCenterPane](#info-center-pane), [StripView](#strip-view), [Spacer](#spacer), [ScreensView](#screens-view), [SessionManager](#session-manager), [StageManager](#stage-manager), [TreeNodeView](#tree-node-view), [MultiColumnListView](#multi-column-list-view)
 
+## Internationalization (gemsfx module)
+
+Scope is limited to the `gemsfx` library module. The `gemsfx-demo` module is intentionally out of scope.
+
+### For library consumers
+
+- GemsFX uses `ResourceBundleManager` (`com.dlsc.gemsfx.util`) for all built-in localized labels.
+- The active locale defaults to `Locale.getDefault()`. Set a custom locale before creating controls:
+  ```java
+  ResourceBundleManager.setLocale(Locale.GERMAN);
+  ```
+- Locale changes clear the internal bundle cache and affect future lookups. Existing control instances are not guaranteed to live-refresh already created texts.
+
+### Bundle and key conventions
+
+- Bundle files are in `gemsfx/src/main/resources`.
+- Base bundle names use kebab-case and map to `ResourceBundleManager.BundleType` entries (example: `duration-picker.properties`).
+- Locale-specific files follow standard Java `ResourceBundle` naming (example: `duration-picker_de.properties`, `notification-view_zh.properties`).
+- Keys use lowercase dot notation grouped by feature and intent (examples: `action.clear`, `placeholder.no-items`, `unit.long.minutes`).
+
+### Contributor workflow for new translatable strings
+
+1. Identify the target bundle from `ResourceBundleManager.BundleType`.
+2. Add the key/value to the base bundle (`<bundle>.properties`) with the default text.
+3. Add the same key to existing locale files for that bundle (`<bundle>_<locale>.properties`).
+4. Use typed lookup in code:
+   ```java
+   ResourceBundleManager.getString(ResourceBundleManager.BundleType.DIALOG_PANE, "button.send", "Send")
+   ```
+   Use `ResourceBundleManager.format(...)` when arguments are required.
+5. If a new bundle domain is needed, add a new `BundleType` enum constant and create its base/locale property files.
+
+### Fallback behavior
+
+- Java `ResourceBundle` locale fallback applies first (for example, `de_AT` → `de` → base bundle).
+- If a bundle or key is still missing, `ResourceBundleManager` returns the provided fallback value.
+- If no fallback value is provided, GemsFX falls back to the key itself.
+
 ## CalendarView
 
 <span id="calendar-view" ></span>

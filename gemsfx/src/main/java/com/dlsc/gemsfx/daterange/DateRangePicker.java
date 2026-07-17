@@ -14,6 +14,7 @@ import javafx.scene.layout.Region;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A control to let the user select a date range (start date, end date) via two {@link com.dlsc.gemsfx.CalendarView}
@@ -161,7 +162,7 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
 
     // custom range text
 
-    private final StringProperty customRangeText = new SimpleStringProperty(this, "customRangeText", "Date Range");
+    private final StringProperty customRangeText = new SimpleStringProperty(this, "customRangeText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.DATE_RANGE_PICKER, "label.custom-range", "Date Range"));
 
     public final String getCustomRangeText() {
         return customRangeText.get();

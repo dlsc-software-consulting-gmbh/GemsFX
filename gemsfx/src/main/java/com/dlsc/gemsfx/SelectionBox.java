@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * <p>
@@ -120,10 +121,10 @@ public class SelectionBox<T> extends Control {
     }
 
     private Node createExtraButtonsBox() {
-        Button clearButton = createExtraButton("Clear", () -> getSelectionModel().clearSelection());
+        Button clearButton = createExtraButton(ResourceBundleManager.getString(ResourceBundleManager.BundleType.SELECTION_BOX, "action.clear", "Clear"), () -> getSelectionModel().clearSelection());
         clearButton.getStyleClass().add("clear-button");
 
-        Button selectAllButton = createExtraButton("Select All", () -> getSelectionModel().selectAll());
+        Button selectAllButton = createExtraButton(ResourceBundleManager.getString(ResourceBundleManager.BundleType.SELECTION_BOX, "action.select-all", "Select All"), () -> getSelectionModel().selectAll());
         selectAllButton.managedProperty().bind(selectAllButton.visibleProperty());
         selectAllButton.visibleProperty().bind(currentSelectionModeProperty().isEqualTo(SelectionMode.MULTIPLE));
         selectAllButton.getStyleClass().add("select-all-button");

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A text view that allows you to display multiline text and supports the selection of
@@ -68,11 +69,11 @@ public class TextView extends Control {
 
         setOnContextMenuRequested(evt -> {
             if (getContextMenu() == null) {
-                MenuItem copySelectionItem = new MenuItem("Copy Selection");
+                MenuItem copySelectionItem = new MenuItem(ResourceBundleManager.getString(ResourceBundleManager.BundleType.TEXT_VIEW, "context.copy-selection", "Copy Selection"));
                 copySelectionItem.setOnAction(e -> copySelection());
                 copySelectionItem.visibleProperty().bind(selectedTextProperty().isNotEmpty());
 
-                MenuItem copyAllItem = new MenuItem("Copy All");
+                MenuItem copyAllItem = new MenuItem(ResourceBundleManager.getString(ResourceBundleManager.BundleType.TEXT_VIEW, "context.copy-all", "Copy All"));
                 copyAllItem.setOnAction(e -> copyAll());
 
                 ContextMenu contextMenu = new ContextMenu(copyAllItem, copySelectionItem);

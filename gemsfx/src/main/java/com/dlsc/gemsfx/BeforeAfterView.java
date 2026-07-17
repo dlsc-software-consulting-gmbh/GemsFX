@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A view capable of managing / displaying two nodes in such a way that the user can show more
@@ -174,7 +175,7 @@ public class BeforeAfterView extends Control {
         this.dividerPosition.set(dividerPosition);
     }
 
-    private final ObjectProperty<Node> before = new SimpleObjectProperty<>(this, "before", new Label("Before"){
+    private final ObjectProperty<Node> before = new SimpleObjectProperty<>(this, "before", new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.BEFORE_AFTER_VIEW, "placeholder.before", "Before")){
         {
             setPrefSize(600, 400);
             setStyle("-fx-background-color: red;");
@@ -198,7 +199,7 @@ public class BeforeAfterView extends Control {
         this.before.set(before);
     }
 
-    private final ObjectProperty<Node> after = new SimpleObjectProperty<>(this, "after", new Label("After"){
+    private final ObjectProperty<Node> after = new SimpleObjectProperty<>(this, "after", new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.BEFORE_AFTER_VIEW, "placeholder.after", "After")){
         {
             setPrefSize(600, 400);
             setStyle("-fx-background-color: green;");

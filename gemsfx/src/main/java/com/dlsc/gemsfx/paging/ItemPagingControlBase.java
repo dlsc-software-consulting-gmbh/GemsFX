@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * The abstract superclass for {@link PagingListView} and {@link PagingGridTableView}. It manages the common attributes
@@ -420,7 +421,7 @@ public abstract class ItemPagingControlBase<T> extends PagingControlBase {
      */
     public final ObjectProperty<Node> placeholderProperty() {
         if (placeholder == null) {
-            placeholder = new SimpleObjectProperty<>(this, "placeholder", new Label("No items"));
+            placeholder = new SimpleObjectProperty<>(this, "placeholder", new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.ITEM_PAGING_CONTROL, "placeholder.no-items", "No items")));
         }
         return placeholder;
     }

@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * Abstract base class for paging controls, providing common pagination properties and behaviour.
@@ -60,23 +61,23 @@ public abstract class PagingControlBase extends Control {
     public PagingControlBase() {
         setMessageLabelProvider(view -> {
             if (getPageCount() == 0) {
-                return "No items";
+                return ResourceBundleManager.getString(ResourceBundleManager.BundleType.PAGING_CONTROL, "message.no-items", "No items");
             }
 
             if (getPageCount() == 1) {
                 int total = getTotalItemCount();
                 if (total == 1) {
-                    return "Showing the only item.";
+                    return ResourceBundleManager.getString(ResourceBundleManager.BundleType.PAGING_CONTROL, "message.single-item", "Showing the only item.");
                 }
 
-                return MessageFormat.format("Showing all {0} items.", getTotalItemCount());
+                return MessageFormat.format(ResourceBundleManager.getString(ResourceBundleManager.BundleType.PAGING_CONTROL, "message.showing-all-items", "Showing all {0} items."), getTotalItemCount());
             }
 
             int startIndex = (view.getPage() * getPageSize()) + 1;
             int endIndex = startIndex + getPageSize() - 1;
 
             endIndex = Math.min(endIndex, getTotalItemCount());
-            return "Showing items " + startIndex + " to " + endIndex + " of " + getTotalItemCount() + ".";
+            return MessageFormat.format(ResourceBundleManager.getString(ResourceBundleManager.BundleType.PAGING_CONTROL, "message.showing-range", "Showing items {0} to {1} of {2}."), startIndex, endIndex, getTotalItemCount());
         });
 
         pageCount.bind(Bindings.createIntegerBinding(() -> {
@@ -123,7 +124,7 @@ public abstract class PagingControlBase extends Control {
         });
     }
 
-    private final StringProperty pageSizeSelectorLabel = new SimpleStringProperty(this, "pageSizeSelectorLabel", "Results per page");
+    private final StringProperty pageSizeSelectorLabel = new SimpleStringProperty(this, "pageSizeSelectorLabel", ResourceBundleManager.getString(ResourceBundleManager.BundleType.PAGING_CONTROL, "label.results-per-page", "Results per page"));
 
     public final String getPageSizeSelectorLabel() {
         return pageSizeSelectorLabel.get();
@@ -668,7 +669,7 @@ public abstract class PagingControlBase extends Control {
         this.alignment.set(alignment);
     }
 
-    private final StringProperty firstPageText = new SimpleStringProperty(this, "firstPageText", "First");
+    private final StringProperty firstPageText = new SimpleStringProperty(this, "firstPageText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.PAGING_CONTROL, "button.first-page", "First"));
 
     public final String getFirstPageText() {
         return firstPageText.get();
@@ -687,7 +688,7 @@ public abstract class PagingControlBase extends Control {
         this.firstPageText.set(firstPageText);
     }
 
-    private final StringProperty lastPageText = new SimpleStringProperty(this, "lastPageText", "Last");
+    private final StringProperty lastPageText = new SimpleStringProperty(this, "lastPageText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.PAGING_CONTROL, "button.last-page", "Last"));
 
     public final String getLastPageText() {
         return lastPageText.get();
@@ -706,7 +707,7 @@ public abstract class PagingControlBase extends Control {
         this.lastPageText.set(lastPageText);
     }
 
-    private final StringProperty previousPageText = new SimpleStringProperty(this, "previousPageText", "Previous");
+    private final StringProperty previousPageText = new SimpleStringProperty(this, "previousPageText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.PAGING_CONTROL, "button.previous-page", "Previous"));
 
     public final String getPreviousPageText() {
         return previousPageText.get();
@@ -725,7 +726,7 @@ public abstract class PagingControlBase extends Control {
         this.previousPageText.set(previousPageText);
     }
 
-    private final StringProperty nextPageText = new SimpleStringProperty(this, "nextPageText", "Next");
+    private final StringProperty nextPageText = new SimpleStringProperty(this, "nextPageText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.PAGING_CONTROL, "button.next-page", "Next"));
 
     public final String getNextPageText() {
         return nextPageText.get();

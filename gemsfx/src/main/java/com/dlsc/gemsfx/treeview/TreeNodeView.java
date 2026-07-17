@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 
 /**
@@ -427,7 +428,7 @@ public class TreeNodeView<T> extends Control {
     }
 
     private Node createDefaultPlaceholder() {
-        Label label = new Label("No tree root.");
+        Label label = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.TREE_NODE_VIEW, "placeholder.no-root", "No tree root."));
         label.getStyleClass().add("default-placeholder");
         return label;
     }

@@ -61,7 +61,8 @@ public class PopOverApp extends GemApplication {
 
         Button dateButton = new Button("Pick Date");
         dateButton.setOnAction(evt -> {
-            calendarPopOver.show(dateButton);
+            PopOver popover = new PopOver(new Label("This is a PopOver"));
+            popover.show(dateButton);
         });
 
         calendarPopOver.addEventHandler(WindowEvent.WINDOW_HIDING, evt1 -> {

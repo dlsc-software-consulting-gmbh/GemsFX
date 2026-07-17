@@ -23,6 +23,7 @@ import javafx.scene.layout.Region;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A small "badge-style" view representing a model object. One usage inside GemsFX
@@ -93,7 +94,7 @@ public class ChipView<T> extends Control {
 
     // text
 
-    private final StringProperty text = new SimpleStringProperty(this, "text", "Untitled");
+    private final StringProperty text = new SimpleStringProperty(this, "text", ResourceBundleManager.getString(ResourceBundleManager.BundleType.CHIP_VIEW, "default.text.untitled", "Untitled"));
 
     /**
      * The text shown by the view.

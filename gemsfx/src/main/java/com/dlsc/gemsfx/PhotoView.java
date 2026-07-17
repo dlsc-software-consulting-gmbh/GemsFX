@@ -47,6 +47,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * The photo view is mostly used to display a user profile picture.
@@ -114,7 +115,7 @@ public class PhotoView extends Control {
         FontIcon fontIcon = new FontIcon(MaterialDesign.MDI_UPLOAD);
         fontIcon.getStyleClass().add("upload-icon");
 
-        Label placeholder = new Label("DROP IMAGE FILE\nOR CLICK TO ADD");
+        Label placeholder = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.PHOTO_VIEW, "placeholder.drop-or-click", "DROP IMAGE FILE\nOR CLICK TO ADD"));
         placeholder.setTextAlignment(TextAlignment.CENTER);
         placeholder.setGraphic(fontIcon);
         placeholder.setContentDisplay(ContentDisplay.TOP);
@@ -124,9 +125,9 @@ public class PhotoView extends Control {
         setPhotoSupplier(() -> {
             if (fileChooser == null) {
                 fileChooser = new FileChooser();
-                fileChooser.setTitle("Load Image File");
+                fileChooser.setTitle(ResourceBundleManager.getString(ResourceBundleManager.BundleType.PHOTO_VIEW, "file-chooser.title.load-image", "Load Image File"));
 
-                ExtensionFilter imageFileFilter = new ExtensionFilter("Image Files", "*.png", "*.gif", "*.jpg", "*.jpeg");
+                ExtensionFilter imageFileFilter = new ExtensionFilter(ResourceBundleManager.getString(ResourceBundleManager.BundleType.PHOTO_VIEW, "file-chooser.filter.image-files", "Image Files"), "*.png", "*.gif", "*.jpg", "*.jpeg");
                 fileChooser.getExtensionFilters().add(imageFileFilter);
                 fileChooser.setSelectedExtensionFilter(imageFileFilter);
             }

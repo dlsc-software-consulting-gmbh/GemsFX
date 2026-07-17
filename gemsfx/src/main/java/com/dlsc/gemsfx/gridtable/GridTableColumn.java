@@ -18,6 +18,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A column in a {@link GridTableView}.
@@ -132,7 +133,7 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         this.graphic.set(graphic);
     }
 
-    private final StringProperty text = new SimpleStringProperty(this, "text", "Header");
+    private final StringProperty text = new SimpleStringProperty(this, "text", ResourceBundleManager.getString(ResourceBundleManager.BundleType.GRID_TABLE_COLUMN, "header.default-text", "Header"));
 
     public final String getText() {
         return text.get();

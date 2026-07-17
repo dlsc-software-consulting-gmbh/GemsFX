@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A custom control that allows users to select days of the week.
@@ -53,11 +54,11 @@ public class DayOfWeekPicker extends SelectionBox<DayOfWeek> {
             } else if (selectedDays.size() == 1) {
                 return selectedDays.get(0).getDisplayName(TextStyle.FULL, Locale.getDefault());
             } else if (isSelectedAll()) {
-                return "All Days";
+                return ResourceBundleManager.getString(ResourceBundleManager.BundleType.DAY_OF_WEEK_PICKER, "summary.all-days", "All Days");
             } else if (isOnlyWeekdaysSelected()) {
-                return "Weekdays";
+                return ResourceBundleManager.getString(ResourceBundleManager.BundleType.DAY_OF_WEEK_PICKER, "summary.weekdays", "Weekdays");
             } else if (isOnlyWeekendsSelected()) {
-                return "Weekends";
+                return ResourceBundleManager.getString(ResourceBundleManager.BundleType.DAY_OF_WEEK_PICKER, "summary.weekends", "Weekends");
             } else {
                 // Group selected days into consecutive ranges
                 List<List<DayOfWeek>> ranges = mergeConsecutiveItem(selectedDays);
@@ -80,20 +81,20 @@ public class DayOfWeekPicker extends SelectionBox<DayOfWeek> {
     }
 
     private VBox createExtraButtonsBox() {
-        Button clearButton = createExtraButton("Clear", () -> getSelectionModel().clearSelection());
+        Button clearButton = createExtraButton(ResourceBundleManager.getString(ResourceBundleManager.BundleType.DAY_OF_WEEK_PICKER, "action.clear", "Clear"), () -> getSelectionModel().clearSelection());
         clearButton.getStyleClass().add("clear-button");
 
-        Button todayButton = createExtraButton("Today", () -> getSelectionModel().clearAndSelect(getItems().indexOf(LocalDate.now().getDayOfWeek())));
+        Button todayButton = createExtraButton(ResourceBundleManager.getString(ResourceBundleManager.BundleType.DAY_OF_WEEK_PICKER, "action.today", "Today"), () -> getSelectionModel().clearAndSelect(getItems().indexOf(LocalDate.now().getDayOfWeek())));
         todayButton.getStyleClass().add("today-button");
         todayButton.managedProperty().bind(todayButton.visibleProperty());
         todayButton.visibleProperty().bind(currentSelectionModeProperty().isEqualTo(SelectionMode.SINGLE));
 
-        Button allButton = createExtraButton("All Days", () -> getSelectionModel().selectAll());
+        Button allButton = createExtraButton(ResourceBundleManager.getString(ResourceBundleManager.BundleType.DAY_OF_WEEK_PICKER, "action.all-days", "All Days"), () -> getSelectionModel().selectAll());
         allButton.getStyleClass().add("select-all-button");
         allButton.managedProperty().bind(allButton.visibleProperty());
         allButton.visibleProperty().bind(currentSelectionModeProperty().isEqualTo(SelectionMode.MULTIPLE));
 
-        Button weekdaysButton = createExtraButton("Weekdays", () -> {
+        Button weekdaysButton = createExtraButton(ResourceBundleManager.getString(ResourceBundleManager.BundleType.DAY_OF_WEEK_PICKER, "action.weekdays", "Weekdays"), () -> {
             getSelectionModel().clearSelection();
             for (DayOfWeek day : getWeekdays()) {
                 getSelectionModel().select(day);
@@ -103,7 +104,7 @@ public class DayOfWeekPicker extends SelectionBox<DayOfWeek> {
         weekdaysButton.managedProperty().bind(weekdaysButton.visibleProperty());
         weekdaysButton.visibleProperty().bind(currentSelectionModeProperty().isEqualTo(SelectionMode.MULTIPLE));
 
-        Button weekendsButton = createExtraButton("Weekends", () -> {
+        Button weekendsButton = createExtraButton(ResourceBundleManager.getString(ResourceBundleManager.BundleType.DAY_OF_WEEK_PICKER, "action.weekends", "Weekends"), () -> {
             getSelectionModel().clearSelection();
             for (DayOfWeek day : getWeekendDays()) {
                 getSelectionModel().select(day);

@@ -57,6 +57,7 @@ import java.util.Objects;
 import static java.lang.Double.MAX_VALUE;
 import static java.util.Objects.requireNonNull;
 import static javafx.geometry.Pos.CENTER;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * Displays a given month of a given year. The view can be configured in many
@@ -1094,7 +1095,7 @@ public class CalendarView extends Control {
         this.headerLayout.set(headerLayout);
     }
 
-    private final StringProperty todayText = new SimpleStringProperty(this, "todayText", "Today");
+    private final StringProperty todayText = new SimpleStringProperty(this, "todayText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.CALENDAR_VIEW, "button.today", "Today"));
 
     public final String getTodayText() {
         return todayText.get();

@@ -22,6 +22,7 @@ import javafx.scene.input.MouseButton;
 
 import java.util.Objects;
 import java.util.function.Supplier;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * An enhanced label that allows for selecting the (whole) label and copying to the clipboard
@@ -173,7 +174,7 @@ public class EnhancedLabel extends Label {
         this.selected.set(selected);
     }
 
-    private final StringProperty copyMenuItemText = new SimpleStringProperty(this, "copyMenuItemText", "Copy text");
+    private final StringProperty copyMenuItemText = new SimpleStringProperty(this, "copyMenuItemText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.ENHANCED_LABEL, "context.copy-text", "Copy text"));
 
     public final String getCopyMenuItemText() {
         return copyMenuItemText.get();

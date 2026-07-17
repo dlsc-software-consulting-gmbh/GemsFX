@@ -26,6 +26,7 @@ import javafx.util.Callback;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A simple table view implementation based on GridPane.
@@ -151,7 +152,7 @@ public class GridTableView<S> extends Control {
 
     // placeholder
 
-    private final ObjectProperty<Node> placeholder = new SimpleObjectProperty<>(this, "placeholder", new Label("No items"));
+    private final ObjectProperty<Node> placeholder = new SimpleObjectProperty<>(this, "placeholder", new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.GRID_TABLE_VIEW, "placeholder.no-items", "No items")));
 
     public final Node getPlaceholder() {
         return placeholder.get();

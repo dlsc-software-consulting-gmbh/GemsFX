@@ -21,6 +21,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A view for displaying the geometry of the currently available screens. This
@@ -90,7 +91,7 @@ public class ScreensView extends Control {
         stage.setScene(new Scene(view));
         stage.setX(10);
         stage.setY(20);
-        stage.setTitle("Screens");
+        stage.setTitle(ResourceBundleManager.getString(ResourceBundleManager.BundleType.SCREENS_VIEW, "window.title", "Screens"));
         stage.show();
         return view;
     }

@@ -13,6 +13,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.FlowPane;
 
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A container used for displaying several {@link ChipView} instances. This view is usually used in combination
@@ -91,7 +92,7 @@ public class ChipsViewContainer extends FlowPane {
 
     // clear hyperlink text
 
-    private final StringProperty clearText = new SimpleStringProperty(this, "clearText", "Clear");
+    private final StringProperty clearText = new SimpleStringProperty(this, "clearText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.CHIPS_VIEW_CONTAINER, "action.clear", "Clear"));
 
     public final String getClearText() {
         return clearText.get();

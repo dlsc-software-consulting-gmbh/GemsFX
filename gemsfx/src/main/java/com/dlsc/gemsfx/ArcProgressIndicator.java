@@ -16,6 +16,7 @@ import javafx.util.StringConverter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * ArcProgressIndicator is a visual control used to indicate the progress of a task.
@@ -76,7 +77,7 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
             }
             // completed
             if (progress == 1.0) {
-                return "Completed";
+                return ResourceBundleManager.getString(ResourceBundleManager.BundleType.ARC_PROGRESS_INDICATOR, "status.completed", "Completed");
             }
 
             int percent = (int) Math.floor(progress * 100); // make sure 99.8 becomes 99%, not 100%.

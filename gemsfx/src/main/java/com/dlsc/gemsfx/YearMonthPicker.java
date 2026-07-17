@@ -16,6 +16,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A control for quickly selecting the month of a year. The format used for the
@@ -42,7 +43,7 @@ public class YearMonthPicker extends CustomComboBox<YearMonth> {
 
         valueProperty().addListener(it -> updateTextAndHidedPopup());
 
-        editor.setPromptText("Example: March 2023");
+        editor.setPromptText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.YEAR_MONTH_PICKER, "prompt.example-month-year", "Example: March 2023"));
         editor.editableProperty().bind(editableProperty());
         editor.setOnAction(evt -> commit());
         editor.focusedProperty().addListener(it -> {

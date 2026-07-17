@@ -3,11 +3,11 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.DurationPicker;
 import com.dlsc.gemsfx.DurationPicker.LabelType;
 import com.dlsc.gemsfx.TimePicker;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
-import java.util.ResourceBundle;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -26,8 +26,6 @@ import javafx.scene.layout.Region;
  * A control used for visualizing digits as part of the {@link TimePicker} control.
  */
 public class DurationUnitField extends Label {
-    private final ResourceBundle i18n = ResourceBundle.getBundle("duration-picker");
-
     private final DurationPicker picker;
     private final ChronoUnit chronoUnit;
 
@@ -77,19 +75,19 @@ public class DurationUnitField extends Label {
 
                 switch (chronoUnit) {
                     case DAYS:
-                        result += shortLabels ? i18n.getString("unit.short.days") : " " + i18n.getString("unit.long.days");
+                        result += shortLabels ? getBundleString("unit.short.days") : " " + getBundleString("unit.long.days");
                         break;
                     case HOURS:
-                        result += shortLabels ? i18n.getString("unit.short.hours") : " " + i18n.getString("unit.long.hours");
+                        result += shortLabels ? getBundleString("unit.short.hours") : " " + getBundleString("unit.long.hours");
                         break;
                     case MINUTES:
-                        result += shortLabels ? i18n.getString("unit.short.minutes") : " " + i18n.getString("unit.long.minutes");
+                        result += shortLabels ? getBundleString("unit.short.minutes") : " " + getBundleString("unit.long.minutes");
                         break;
                     case SECONDS:
-                        result += shortLabels ? i18n.getString("unit.short.seconds") : " " + i18n.getString("unit.long.seconds");
+                        result += shortLabels ? getBundleString("unit.short.seconds") : " " + getBundleString("unit.long.seconds");
                         break;
                     case MILLIS:
-                        result += shortLabels ? i18n.getString("unit.short.millis") : " " + i18n.getString("unit.long.millis");
+                        result += shortLabels ? getBundleString("unit.short.millis") : " " + getBundleString("unit.long.millis");
                         break;
                 }
             }
@@ -194,6 +192,10 @@ public class DurationUnitField extends Label {
                 updating = false;
             }
         });
+    }
+
+    private String getBundleString(String key) {
+        return ResourceBundleManager.getString(ResourceBundleManager.BundleType.DURATION_PICKER, key);
     }
 
     private boolean updating;

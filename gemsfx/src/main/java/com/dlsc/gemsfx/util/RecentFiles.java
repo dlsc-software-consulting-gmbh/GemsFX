@@ -92,7 +92,7 @@ public class RecentFiles {
         historyManager.setMaxHistorySize(DEFAULT_MAX_FILES);
         historyManager.setFilter(file -> file != null && !file.getAbsolutePath().isBlank());
 
-        menu = new Menu("Recent Files");
+        menu = new Menu(ResourceBundleManager.getString(ResourceBundleManager.BundleType.RECENT_FILES, "menu.title", "Recent Files"));
         historyManager.getAllUnmodifiable().addListener((Observable obs) -> rebuildMenu());
         rebuildMenu();
     }
@@ -186,7 +186,7 @@ public class RecentFiles {
         ObservableList<File> files = historyManager.getAllUnmodifiable();
 
         if (files.isEmpty()) {
-            MenuItem empty = new MenuItem("No Recent Files");
+            MenuItem empty = new MenuItem(ResourceBundleManager.getString(ResourceBundleManager.BundleType.RECENT_FILES, "menu.empty", "No Recent Files"));
             empty.setDisable(true);
             menu.getItems().add(empty);
         } else {
@@ -201,7 +201,7 @@ public class RecentFiles {
                 menu.getItems().add(item);
             }
             menu.getItems().add(new SeparatorMenuItem());
-            MenuItem clearItem = new MenuItem("Clear Recent Files");
+            MenuItem clearItem = new MenuItem(ResourceBundleManager.getString(ResourceBundleManager.BundleType.RECENT_FILES, "menu.clear", "Clear Recent Files"));
             clearItem.setOnAction(evt -> clear());
             menu.getItems().add(clearItem);
         }

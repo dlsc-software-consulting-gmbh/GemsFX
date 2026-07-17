@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A picker control for selecting a {@link java.time.Duration} value. The picker consists of
@@ -74,7 +75,7 @@ public class DurationPicker extends CustomComboBox<Duration> {
         maximumDurationProperty().addListener(constrainListener);
 
         setSeparatorFactory(pair -> {
-            Label label = new Label(":");
+            Label label = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.DURATION_PICKER, "format.separator.time", ":"));
             label.getStyleClass().add("separator");
             return label;
         });
