@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.TagsFieldSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
@@ -12,6 +13,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.MultipleSelectionModel;
@@ -51,6 +53,7 @@ public class TagsField<T> extends SearchField<T> {
      */
     public TagsField() {
         getStyleClass().addAll("text-input", DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.COMBO_BOX);
 
         setFocusTraversable(false);
         setGraphic(null); // remove the history button

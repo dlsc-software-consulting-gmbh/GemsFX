@@ -3,12 +3,14 @@ package com.dlsc.gemsfx.paging;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
 import com.dlsc.gemsfx.gridtable.GridTableView;
 import com.dlsc.gemsfx.skins.PagingGridTableViewSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Skin;
 
 import java.util.Objects;
@@ -43,6 +45,7 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
      */
     public PagingGridTableView() {
         getStyleClass().add("paging-grid-table-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.TABLE_VIEW);
 
         gridTableView.columnsProperty().bind(columnsProperty());
         gridTableView.setItems(getItemsOnCurrentPage());

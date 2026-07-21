@@ -24,7 +24,9 @@ import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.SizeConverter;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.scene.AccessibleAttribute;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
@@ -67,6 +69,7 @@ public class StripView<T> extends Control {
      */
     public StripView() {
         getStyleClass().add("strip-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.LIST_VIEW);
 
         setPrefWidth(400);
         setPrefHeight(50);

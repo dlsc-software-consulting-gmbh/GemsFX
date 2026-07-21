@@ -30,8 +30,10 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.CustomTextFieldSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
@@ -48,6 +50,7 @@ public class CustomTextField extends TextField {
      */
     public CustomTextField() {
         getStyleClass().add("custom-text-field");
+        AccessibilityUtil.setRole(this, AccessibleRole.TEXT_FIELD);
     }
 
     /**

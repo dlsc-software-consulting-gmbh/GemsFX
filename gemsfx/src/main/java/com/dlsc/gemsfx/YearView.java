@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.YearViewSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.css.CssMetaData;
@@ -8,6 +10,7 @@ import javafx.css.Styleable;
 import javafx.css.StyleableIntegerProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.SizeConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
@@ -37,6 +40,7 @@ public class YearView extends Control {
      */
     public YearView() {
         getStyleClass().add("year-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.DATE_PICKER, ResourceBundleManager.getString(ResourceBundleManager.BundleType.YEAR_VIEW, "accessible.role-description", "year selector"));
 
         setFocusTraversable(false);
 

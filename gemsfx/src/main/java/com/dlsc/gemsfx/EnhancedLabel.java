@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -9,6 +10,7 @@ import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -72,6 +74,7 @@ public class EnhancedLabel extends Label {
 
     private void init() {
         getStyleClass().add("enhanced-label");
+        AccessibilityUtil.setRole(this, AccessibleRole.TEXT);
 
         setFocusTraversable(true);
 

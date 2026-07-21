@@ -4,6 +4,8 @@ import com.dlsc.gemsfx.util.HistoryManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.css.PseudoClass;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -43,6 +45,7 @@ public class HistoryButton<T> extends Button {
      */
     public HistoryButton() {
         getStyleClass().addAll(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.BUTTON);
 
         setGraphic(new FontIcon(MaterialDesign.MDI_HISTORY));
         setOnAction(evt -> showPopup());

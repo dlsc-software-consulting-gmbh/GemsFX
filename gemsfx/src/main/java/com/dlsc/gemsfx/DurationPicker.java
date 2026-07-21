@@ -1,7 +1,9 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.DurationPickerSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -17,6 +19,7 @@ import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.EnumConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
@@ -55,6 +58,11 @@ public class DurationPicker extends CustomComboBox<Duration> {
 
     public DurationPicker() {
         getStyleClass().setAll("duration-picker", "text-input");
+        AccessibilityUtil.setRole(this, AccessibleRole.COMBO_BOX);
+        AccessibilityUtil.bindAccessibleText(this, Bindings.createStringBinding(() -> {
+            Duration duration = getDuration();
+            return duration == null ? null : duration.toString();
+        }, durationProperty()));
 
         setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);

@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.MaskedViewSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.CssMetaData;
@@ -8,6 +9,7 @@ import javafx.css.Styleable;
 import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.SizeConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -42,6 +44,7 @@ public class MaskedView extends Control {
      */
     public MaskedView() {
         getStyleClass().add("masked-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.IMAGE_VIEW);
         setFocusTraversable(false);
     }
 

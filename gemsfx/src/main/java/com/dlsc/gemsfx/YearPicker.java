@@ -1,10 +1,13 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.YearPickerSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.css.PseudoClass;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
@@ -36,6 +39,11 @@ public class YearPicker extends CustomComboBox<Year> {
      */
     public YearPicker() {
         getStyleClass().setAll("year-picker", "text-input");
+        AccessibilityUtil.setRole(this, AccessibleRole.COMBO_BOX);
+        AccessibilityUtil.bindAccessibleText(this, Bindings.createStringBinding(() -> {
+            Year year = getValue();
+            return year == null ? null : year.toString();
+        }, valueProperty()));
 
         setFocusTraversable(false);
         setEditable(true);

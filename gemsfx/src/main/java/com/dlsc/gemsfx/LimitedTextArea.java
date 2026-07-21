@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.LimitedTextAreaSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.IntegerRange;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -20,6 +21,7 @@ import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.EnumConverter;
 import javafx.css.converter.SizeConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Skin;
 
 import java.util.ArrayList;
@@ -88,6 +90,7 @@ public class LimitedTextArea extends ResizableTextArea {
      */
     public LimitedTextArea() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.TEXT_AREA);
     }
 
     /**

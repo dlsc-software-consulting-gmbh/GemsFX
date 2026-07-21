@@ -15,6 +15,8 @@ import javafx.css.converter.EnumConverter;
 import javafx.css.converter.SizeConverter;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -70,6 +72,7 @@ public class TreeNodeView<T> extends Control {
 
     public TreeNodeView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.TREE_VIEW);
         layoutDirection.addListener(it -> activateDirectionPseudoClass());
     }
 

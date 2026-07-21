@@ -1,8 +1,10 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.ResizableTextAreaSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextArea;
 
@@ -24,6 +26,7 @@ public class ResizableTextArea extends TextArea {
      */
     public ResizableTextArea() {
         getStyleClass().add("resizable-text-area");
+        AccessibilityUtil.setRole(this, AccessibleRole.TEXT_AREA);
     }
 
     /**

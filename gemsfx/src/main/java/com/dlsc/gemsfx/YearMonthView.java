@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.YearMonthViewSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -9,6 +11,7 @@ import javafx.css.Styleable;
 import javafx.css.StyleableBooleanProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.util.StringConverter;
@@ -42,6 +45,7 @@ public class YearMonthView extends Control {
      */
     public YearMonthView() {
         getStyleClass().add("year-month-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.DATE_PICKER, ResourceBundleManager.getString(ResourceBundleManager.BundleType.YEAR_MONTH_VIEW, "accessible.role-description", "month selector"));
         setFocusTraversable(false);
 
         // the UI / the skin should prevent this from happening, but just in case, we make sure that the value is

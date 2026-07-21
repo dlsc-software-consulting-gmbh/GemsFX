@@ -15,6 +15,9 @@ import javafx.css.converter.DurationConverter;
 import javafx.css.converter.EnumConverter;
 import javafx.css.converter.PaintConverter;
 import javafx.css.converter.SizeConverter;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
@@ -116,6 +119,7 @@ public class Skeleton extends Control {
      */
     public Skeleton(@NamedArg("variant") Variant variant) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.NODE, ResourceBundleManager.getString(ResourceBundleManager.BundleType.SKELETON, "accessible.role-description", "loading placeholder"));
         if (variant != null) {
             setVariant(variant);
         }

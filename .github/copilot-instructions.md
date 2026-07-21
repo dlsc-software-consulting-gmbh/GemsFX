@@ -101,6 +101,21 @@ Controls expose JavaFX properties using the standard JavaFX bean pattern: a back
 setter, and a `*Property()` accessor. Read-only properties use `ReadOnlyXxxWrapper` internally and expose
 `ReadOnlyXxxProperty` publicly.
 
+### Accessibility
+
+Every user-facing control sets an appropriate `AccessibleRole` in its constructor and, where it
+carries a value, derives its `accessibleText` from its own state. Use the
+`com.dlsc.gemsfx.util.AccessibilityUtil` helper: `setRole(node, role[, roleDescription])` and
+`bindAccessibleText(node, observable)`. The text binding yields to application-set values (once
+consumer code calls `setAccessibleText`, the automatic updates stop). Set the role at the
+most-specific control class; do not re-set it in subclasses that only inherit.
+
+All accessibility strings (role descriptions and value-formatted accessible text such as
+"avatar of {0}" or "{0} percent") are localized through `ResourceBundleManager` using each
+control's `BundleType` and the keys `accessible.role-description` / `accessible.text.*`, with the
+English text passed as the fallback. Patterns are resolved once at construction (not on every
+value change) to avoid log spam. `AccessibilityTest` verifies each control's role.
+
 ### Icons
 
 Icons are provided by [Ikonli](https://kordamp.org/ikonli/) (`org.kordamp.ikonli`). The demo and library use

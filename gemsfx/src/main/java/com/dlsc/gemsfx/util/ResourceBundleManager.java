@@ -30,6 +30,7 @@ public class ResourceBundleManager {
      */
     public enum BundleType {
         ARC_PROGRESS_INDICATOR("arc-progress-indicator"),
+        AVATAR_VIEW("avatar-view"),
         BEFORE_AFTER_VIEW("before-after-view"),
         CALENDAR_VIEW("calendar-view"),
         CHIP_VIEW("chip-view"),
@@ -57,12 +58,17 @@ public class ResourceBundleManager {
         SCREENS_VIEW("screens-view"),
         SEARCH_FIELD("search-field"),
         SEARCH_TEXT_FIELD("search-text-field"),
+        SEGMENTED_BAR("segmented-bar"),
         SELECTION_BOX("selection-box"),
+        SIMPLE_FILTER_VIEW("simple-filter-view"),
+        SKELETON("skeleton"),
         TEXT_VIEW("text-view"),
         TIME_PICKER("time-picker"),
         TIME_RANGE_PICKER("time-range-picker"),
         TREE_NODE_VIEW("tree-node-view"),
-        YEAR_MONTH_PICKER("year-month-picker");
+        YEAR_MONTH_PICKER("year-month-picker"),
+        YEAR_MONTH_VIEW("year-month-view"),
+        YEAR_VIEW("year-view");
 
         private final String baseName;
 

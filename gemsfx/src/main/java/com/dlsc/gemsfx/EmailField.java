@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.EmailFieldSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -20,6 +21,7 @@ import javafx.css.Styleable;
 import javafx.css.StyleableBooleanProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Control;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -115,6 +117,8 @@ public class EmailField extends Control {
      */
     public EmailField() {
         getStyleClass().add("email-field");
+        AccessibilityUtil.setRole(this, AccessibleRole.TEXT_FIELD);
+        AccessibilityUtil.bindAccessibleText(this, emailAddressProperty());
 
         setFocusTraversable(false);
 

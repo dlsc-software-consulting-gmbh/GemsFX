@@ -2,6 +2,7 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.SearchFieldPopup;
 import com.dlsc.gemsfx.skins.SearchFieldSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
 import javafx.animation.Animation;
@@ -34,6 +35,7 @@ import javafx.css.converter.SizeConverter;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
@@ -150,6 +152,7 @@ public class SearchField<T> extends Control {
      */
     public SearchField() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.TEXT_FIELD);
 
         historyButton = createHistoryButton();
         setGraphic(historyButton);

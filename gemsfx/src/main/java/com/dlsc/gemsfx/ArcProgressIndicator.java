@@ -1,7 +1,10 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.AccessibleRole;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
 import javafx.css.Styleable;
@@ -16,6 +19,7 @@ import javafx.util.StringConverter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.text.MessageFormat;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
@@ -97,6 +101,15 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
     public ArcProgressIndicator(double progress) {
         super(progress);
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+
+        AccessibilityUtil.setRole(this, AccessibleRole.PROGRESS_INDICATOR);
+        String loadingText = ResourceBundleManager.getString(ResourceBundleManager.BundleType.ARC_PROGRESS_INDICATOR, "accessible.text.loading", "loading");
+        String percentPattern = ResourceBundleManager.getString(ResourceBundleManager.BundleType.ARC_PROGRESS_INDICATOR, "accessible.text.percent", "{0} percent");
+        AccessibilityUtil.bindAccessibleText(this, Bindings.createStringBinding(() -> {
+            double value = getProgress();
+            return value < 0 ? loadingText : MessageFormat.format(percentPattern, Math.round(value * 100));
+        }, progressProperty()));
+
         styleTypeProperty().addListener((o, oldV, newV) -> {
             updatePseudoClasses();
         });

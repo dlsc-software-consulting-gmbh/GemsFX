@@ -22,6 +22,8 @@ import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.event.Event;
 import javafx.event.EventType;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Control;
@@ -69,6 +71,7 @@ public class MultiColumnListView<T> extends Control {
      */
     public MultiColumnListView() {
         getStyleClass().add("multi-column-list-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.LIST_VIEW);
         setFocusTraversable(false);
     }
 

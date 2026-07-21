@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.daterange;
 import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.SelectionModel;
 import com.dlsc.gemsfx.skins.DateRangeViewSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.property.*;
 import javafx.beans.value.WritableValue;
 import javafx.collections.FXCollections;
@@ -12,6 +13,7 @@ import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.EnumConverter;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
@@ -55,6 +57,7 @@ public class DateRangeView extends Control {
      */
     public DateRangeView() {
         getStyleClass().add("date-range-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.DATE_PICKER, ResourceBundleManager.getString(ResourceBundleManager.BundleType.DATE_RANGE_VIEW, "accessible.role-description", "date range"));
 
         setFocusTraversable(false);
 

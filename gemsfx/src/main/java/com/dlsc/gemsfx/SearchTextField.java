@@ -2,6 +2,7 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.UIUtil;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -14,6 +15,7 @@ import javafx.css.StyleableBooleanProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.event.ActionEvent;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -74,6 +76,7 @@ public class SearchTextField extends CustomTextField {
      */
     public SearchTextField() {
         getStyleClass().add("search-text-field");
+        AccessibilityUtil.setRole(this, AccessibleRole.TEXT_FIELD);
         UIUtil.toggleClassBasedOnObservable(this, "round", roundProperty());
 
         setPromptText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.SEARCH_TEXT_FIELD, "prompt.search", "Search..."));

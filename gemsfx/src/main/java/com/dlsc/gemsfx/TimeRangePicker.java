@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.SimpleStringConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
@@ -46,6 +48,7 @@ public class TimeRangePicker extends SelectionBox<TimeRangePicker.TimeRange> {
      */
     public TimeRangePicker(TimeRange... ranges) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.COMBO_BOX);
 
         // Set time ranges
         getItems().setAll(ranges);

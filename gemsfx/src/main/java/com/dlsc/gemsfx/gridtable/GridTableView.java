@@ -14,6 +14,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
@@ -39,6 +41,7 @@ public class GridTableView<S> extends Control {
 
     public GridTableView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.TABLE_VIEW);
         setFocusTraversable(true);
         addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             if (evt.getButton() == MouseButton.PRIMARY && evt.isStillSincePress() && evt.getClickCount() == 1) {

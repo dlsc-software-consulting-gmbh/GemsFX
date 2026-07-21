@@ -1,9 +1,12 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.YearMonthPickerSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -37,6 +40,12 @@ public class YearMonthPicker extends CustomComboBox<YearMonth> {
         super();
 
         getStyleClass().setAll("year-month-picker", "text-input");
+        AccessibilityUtil.setRole(this, AccessibleRole.COMBO_BOX);
+        AccessibilityUtil.bindAccessibleText(this, Bindings.createStringBinding(() -> {
+            YearMonth value = getValue();
+            StringConverter<YearMonth> converter = getConverter();
+            return value == null ? null : converter != null ? converter.toString(value) : value.toString();
+        }, valueProperty(), converterProperty()));
 
         setFocusTraversable(false);
         setOnTouchPressed(evt -> commitValueAndShow());

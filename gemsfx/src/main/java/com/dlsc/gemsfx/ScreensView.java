@@ -7,6 +7,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -44,6 +46,7 @@ public class ScreensView extends Control {
      */
     public ScreensView() {
         getStyleClass().add("screens-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.NODE, ResourceBundleManager.getString(ResourceBundleManager.BundleType.SCREENS_VIEW, "accessible.role-description", "screens"));
         setWallpaperProvider(screen -> DEFAULT_WALLPAPER);
         setFocusTraversable(false);
 

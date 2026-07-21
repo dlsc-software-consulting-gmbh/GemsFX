@@ -17,6 +17,9 @@ import javafx.css.converter.EnumConverter;
 import javafx.css.converter.SizeConverter;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -94,6 +97,7 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
         listenToValues();
 
         getStyleClass().add(DEFAULT_STYLE);
+        AccessibilityUtil.setRole(this, AccessibleRole.NODE, ResourceBundleManager.getString(ResourceBundleManager.BundleType.SEGMENTED_BAR, "accessible.role-description", "segmented bar"));
 
         setSegmentViewFactory(SegmentView::new);
     }

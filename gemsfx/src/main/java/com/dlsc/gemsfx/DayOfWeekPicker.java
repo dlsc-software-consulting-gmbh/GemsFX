@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.SimpleStringConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.VBox;
@@ -37,6 +39,7 @@ public class DayOfWeekPicker extends SelectionBox<DayOfWeek> {
      */
     public DayOfWeekPicker() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.COMBO_BOX);
 
         // Set Items
         getItems().setAll(getLocalizedDayOrder());

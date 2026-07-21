@@ -14,6 +14,8 @@ import javafx.css.converter.EnumConverter;
 import javafx.css.converter.SizeConverter;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -55,6 +57,7 @@ public class BeforeAfterView extends Control {
      */
     public BeforeAfterView() {
         getStyleClass().add("before-after-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.SLIDER, ResourceBundleManager.getString(ResourceBundleManager.BundleType.BEFORE_AFTER_VIEW, "accessible.role-description", "before after comparison"));
 
         beforeProperty().addListener(it -> {
             Node node = getBefore();

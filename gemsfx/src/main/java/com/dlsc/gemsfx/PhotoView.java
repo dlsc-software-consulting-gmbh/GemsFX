@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.PhotoViewSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -20,6 +21,7 @@ import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.EnumConverter;
 import javafx.css.converter.SizeConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
@@ -99,6 +101,7 @@ public class PhotoView extends Control {
      */
     public PhotoView() {
         getStyleClass().add("photo-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.IMAGE_VIEW, ResourceBundleManager.getString(ResourceBundleManager.BundleType.PHOTO_VIEW, "accessible.role-description", "photo"));
 
         setFocusTraversable(true);
 

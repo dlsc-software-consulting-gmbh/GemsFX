@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.TextViewSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -15,6 +16,7 @@ import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.PaintConverter;
 import javafx.geometry.Orientation;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
@@ -58,6 +60,8 @@ public class TextView extends Control {
      */
     public TextView() {
         getStyleClass().add("text-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.TEXT);
+        AccessibilityUtil.bindAccessibleText(this, textProperty());
 
         setFocusTraversable(false);
 

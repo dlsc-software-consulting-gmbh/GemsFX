@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.EnhancedPasswordFieldSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.EchoCharConverter;
 import com.dlsc.gemsfx.util.UIUtil;
 import javafx.beans.property.BooleanProperty;
@@ -12,6 +13,7 @@ import javafx.css.PseudoClass;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Skin;
@@ -77,6 +79,7 @@ public class EnhancedPasswordField extends PasswordField {
     public EnhancedPasswordField() {
         super();
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.PASSWORD_FIELD);
 
         showPasswordProperty().addListener((obs, wasShowing, showing) -> pseudoClassStateChanged(SHOWING_PASSWORD_PSEUDO_CLASS, showing));
         pseudoClassStateChanged(SHOWING_PASSWORD_PSEUDO_CLASS, isShowPassword());

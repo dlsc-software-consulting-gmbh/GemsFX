@@ -4,6 +4,8 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.AvatarViewSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -18,11 +20,14 @@ import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.EnumConverter;
 import javafx.css.converter.SizeConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 import com.dlsc.gemsfx.util.StringUtils;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +77,13 @@ public class AvatarView extends Control {
      */
     public AvatarView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.IMAGE_VIEW);
+        String avatarLabel = ResourceBundleManager.getString(ResourceBundleManager.BundleType.AVATAR_VIEW, "accessible.text.avatar", "avatar");
+        String avatarOfPattern = ResourceBundleManager.getString(ResourceBundleManager.BundleType.AVATAR_VIEW, "accessible.text.avatar-of", "avatar of {0}");
+        AccessibilityUtil.bindAccessibleText(this, Bindings.createStringBinding(() -> {
+            String initials = getInitials();
+            return (initials == null || initials.isBlank()) ? avatarLabel : MessageFormat.format(avatarOfPattern, initials);
+        }, initialsProperty()));
         setFocusTraversable(false);
 
         initials.addListener((obs, oldInitials, newInitials) -> updateMagicNumber());

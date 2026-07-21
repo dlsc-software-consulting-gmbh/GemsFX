@@ -13,6 +13,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
@@ -21,6 +23,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.util.StringConverter;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 import com.dlsc.gemsfx.util.StringUtils;
 
 import java.time.LocalDate;
@@ -61,6 +64,7 @@ public class SimpleFilterView extends HBox {
      */
     public SimpleFilterView() {
         getStyleClass().add("simple-filter-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.NODE, ResourceBundleManager.getString(ResourceBundleManager.BundleType.SIMPLE_FILTER_VIEW, "accessible.role-description", "filter"));
 
         layoutModeProperty().addListener(it -> updatePseudoClass());
         updatePseudoClass();

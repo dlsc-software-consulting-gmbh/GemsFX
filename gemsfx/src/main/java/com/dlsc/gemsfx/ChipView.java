@@ -14,6 +14,8 @@ import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.EnumConverter;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
@@ -47,6 +49,7 @@ public class ChipView<T> extends Control {
      */
     public ChipView() {
         getStyleClass().add("chip-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.BUTTON, ResourceBundleManager.getString(ResourceBundleManager.BundleType.CHIP_VIEW, "accessible.role-description", "chip"));
 
         setMinWidth(Region.USE_PREF_SIZE);
     }

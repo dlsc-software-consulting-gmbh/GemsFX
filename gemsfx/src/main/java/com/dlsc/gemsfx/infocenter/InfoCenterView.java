@@ -22,6 +22,8 @@ import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.EnumConverter;
 import javafx.css.converter.SizeConverter;
 import javafx.geometry.HorizontalDirection;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -88,6 +90,7 @@ public class InfoCenterView extends Control {
      */
     public InfoCenterView() {
         getStyleClass().add("info-center-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.LIST_VIEW, ResourceBundleManager.getString(ResourceBundleManager.BundleType.INFO_CENTER_VIEW, "accessible.role-description", "notifications"));
 
         ListChangeListener<? super NotificationGroup<?, ?>> groupListListener = change -> {
             while (change.next()) {

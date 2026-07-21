@@ -1,12 +1,15 @@
 package com.dlsc.gemsfx.daterange;
 
 import com.dlsc.gemsfx.skins.DateRangePickerSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
@@ -32,6 +35,29 @@ public class DateRangePicker extends ComboBoxBase<DateRange> {
     public DateRangePicker() {
         super();
         getStyleClass().add("date-range-picker");
+        AccessibilityUtil.setRole(this, AccessibleRole.DATE_PICKER);
+        AccessibilityUtil.bindAccessibleText(this, Bindings.createStringBinding(() -> {
+            DateRange range = getValue();
+            if (range == null) {
+                return null;
+            }
+
+            DateTimeFormatter formatter = getFormatter();
+            String rangeText;
+            if (formatter == null) {
+                rangeText = range.toString();
+            } else if (range.getStartDate().equals(range.getEndDate())) {
+                rangeText = formatter.format(range.getStartDate());
+            } else {
+                rangeText = formatter.format(range.getStartDate()) + " - " + formatter.format(range.getEndDate());
+            }
+
+            String title = range.getTitle();
+            if (title == null || title.isBlank()) {
+                title = getCustomRangeText();
+            }
+            return title == null || title.isBlank() ? rangeText : title + ", " + rangeText;
+        }, valueProperty(), formatterProperty(), customRangeTextProperty()));
 
         dateRangeView = getDateRangeView();
 

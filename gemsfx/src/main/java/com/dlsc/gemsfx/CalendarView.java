@@ -18,6 +18,7 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.CalendarViewSkin;
 import com.dlsc.gemsfx.skins.DateCellSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ListProperty;
@@ -38,6 +39,7 @@ import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.EnumConverter;
 import javafx.css.converter.SizeConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Cell;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -136,6 +138,7 @@ public class CalendarView extends Control {
      */
     public CalendarView() {
         getStyleClass().add("calendar-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.DATE_PICKER, ResourceBundleManager.getString(ResourceBundleManager.BundleType.CALENDAR_VIEW, "accessible.role-description", "calendar"));
 
         addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> requestFocus());
         addEventFilter(TouchEvent.TOUCH_PRESSED, evt -> requestFocus());

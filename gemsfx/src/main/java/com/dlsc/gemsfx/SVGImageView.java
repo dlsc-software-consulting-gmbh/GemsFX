@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.SVGImageViewSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
@@ -13,6 +14,7 @@ import javafx.css.StyleableStringProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.css.converter.SizeConverter;
 import javafx.css.converter.URLConverter;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
@@ -62,6 +64,7 @@ public class SVGImageView extends Control {
      */
     public SVGImageView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.IMAGE_VIEW);
         setFocusTraversable(false);
     }
 

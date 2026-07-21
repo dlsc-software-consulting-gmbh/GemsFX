@@ -26,6 +26,8 @@ import javafx.css.Styleable;
 import javafx.css.StyleableBooleanProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -77,6 +79,7 @@ public class FilterView<T> extends Control {
 
     public FilterView() {
         getStyleClass().add("filter-view");
+        AccessibilityUtil.setRole(this, AccessibleRole.NODE, ResourceBundleManager.getString(ResourceBundleManager.BundleType.FILTER_VIEW, "accessible.role-description", "filter"));
 
         setMinHeight(Region.USE_PREF_SIZE);
 

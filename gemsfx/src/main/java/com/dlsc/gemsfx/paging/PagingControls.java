@@ -4,6 +4,8 @@ import com.dlsc.gemsfx.skins.PagingControlsSkin;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.collections.MapChangeListener;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Skin;
 import javafx.scene.input.MouseEvent;
 
@@ -21,6 +23,7 @@ public class PagingControls extends PagingControlBase {
      */
     public PagingControls() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.PAGINATION);
         addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> requestFocus());
 
         getProperties().addListener((MapChangeListener<? super Object, ? super Object>) change -> {

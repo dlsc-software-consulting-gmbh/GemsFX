@@ -1,10 +1,13 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.CalendarPickerSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
+import javafx.scene.AccessibleRole;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -38,6 +41,12 @@ public class CalendarPicker extends CustomComboBox<LocalDate> {
         super();
 
         getStyleClass().setAll("calendar-picker", "text-input");
+        AccessibilityUtil.setRole(this, AccessibleRole.DATE_PICKER);
+        AccessibilityUtil.bindAccessibleText(this, Bindings.createStringBinding(() -> {
+            LocalDate value = getValue();
+            StringConverter<LocalDate> converter = getConverter();
+            return value == null ? null : converter != null ? converter.toString(value) : value.toString();
+        }, valueProperty(), converterProperty()));
 
         setEditable(true);
 

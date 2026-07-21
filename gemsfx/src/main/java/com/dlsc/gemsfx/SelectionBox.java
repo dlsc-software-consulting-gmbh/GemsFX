@@ -1,8 +1,10 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.SelectionBoxSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.CustomMultipleSelectionModel;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -23,6 +25,7 @@ import javafx.css.Styleable;
 import javafx.css.StyleableBooleanProperty;
 import javafx.css.StyleableProperty;
 import javafx.event.EventHandler;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
@@ -83,6 +86,7 @@ public class SelectionBox<T> extends Control {
      */
     public SelectionBox() {
         getStyleClass().setAll("combo-box-base", "combo-box", DEFAULT_STYLE_CLASS);
+        AccessibilityUtil.setRole(this, AccessibleRole.COMBO_BOX);
 
         // Add quick selection buttons to the top of the popup
         setTop(createExtraButtonsBox());
@@ -93,6 +97,8 @@ public class SelectionBox<T> extends Control {
         CustomMultipleSelectionModel<T> model = new CustomMultipleSelectionModel<>();
         model.itemsProperty().bind(itemsProperty());
         setSelectionModel(model);
+        AccessibilityUtil.bindAccessibleText(this, Bindings.createStringBinding(this::getAccessibleSelectionText,
+                model.selectedItemProperty(), model.getSelectedItems(), model.selectionModeProperty(), selectedItemsConverterProperty(), itemConverterProperty(), promptTextProperty()));
 
         setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
@@ -118,6 +124,29 @@ public class SelectionBox<T> extends Control {
     public SelectionBox(T... items) {
         this();
         getItems().setAll(items);
+    }
+
+    private String getAccessibleSelectionText() {
+        SelectionMode mode = getSelectionModel().getSelectionMode();
+        List<T> selectedItems = mode == SelectionMode.MULTIPLE
+                ? new ArrayList<>(getSelectionModel().getSelectedItems())
+                : getSelectionModel().getSelectedItem() == null ? Collections.emptyList() : Collections.singletonList(getSelectionModel().getSelectedItem());
+
+        if (selectedItems.isEmpty()) {
+            return getPromptText();
+        }
+
+        StringConverter<List<T>> selectedItemsConverter = getSelectedItemsConverter();
+        if (selectedItemsConverter != null) {
+            return selectedItemsConverter.toString(selectedItems);
+        }
+
+        StringConverter<T> itemConverter = getItemConverter();
+        List<String> elements = new ArrayList<>();
+        for (T item : selectedItems) {
+            elements.add(itemConverter == null ? String.valueOf(item) : itemConverter.toString(item));
+        }
+        return String.join(", ", elements);
     }
 
     private Node createExtraButtonsBox() {
