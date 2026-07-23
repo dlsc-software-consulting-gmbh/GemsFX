@@ -3,8 +3,10 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.PopOver;
 import com.dlsc.gemsfx.PopOver.ArrowLocation;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,7 +15,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -24,6 +28,8 @@ public class PopOverApp2 extends GemApplication {
 
     private final BooleanProperty autoHide = new SimpleBooleanProperty(true);
 
+    private final DoubleProperty offset = new SimpleDoubleProperty(0);
+
     @Override
     public void start(Stage stage) {
         StackPane buttonPane = new StackPane();
@@ -33,7 +39,7 @@ public class PopOverApp2 extends GemApplication {
                 case BASELINE_CENTER, BASELINE_LEFT, BASELINE_RIGHT:
                     continue;
                 default:
-                    createButton(pos, buttonPane);
+                    createTarget(pos, buttonPane);
             }
         }
 
@@ -44,8 +50,8 @@ public class PopOverApp2 extends GemApplication {
         Scene scene = new Scene(root);
         stage.setTitle("Pop Over");
         stage.setScene(scene);
-        stage.setWidth(600);
-        stage.setHeight(500);
+        stage.setWidth(800);
+        stage.setHeight(700);
         stage.show();
     }
 
@@ -63,23 +69,47 @@ public class PopOverApp2 extends GemApplication {
         CheckBox autoHideBox = new CheckBox("Auto hide");
         autoHideBox.selectedProperty().bindBidirectional(autoHide);
 
-        VBox sidePanel = new VBox(10, title, comboBox, hint, autoHideBox);
+        Label offsetTitle = new Label("Arrow Offset");
+
+        Slider offsetSlider = new Slider(-5, 10, offset.get());
+        offsetSlider.setShowTickMarks(true);
+        offsetSlider.setShowTickLabels(true);
+        offsetSlider.setMajorTickUnit(5);
+        offsetSlider.setMinorTickCount(4);
+        offsetSlider.setMaxWidth(Double.MAX_VALUE);
+        offsetSlider.valueProperty().bindBidirectional(offset);
+
+        VBox sidePanel = new VBox(10, title, comboBox, hint, autoHideBox, offsetTitle, offsetSlider);
         sidePanel.setPadding(new Insets(20));
         sidePanel.setPrefWidth(220);
         sidePanel.setStyle("-fx-border-color: -fx-box-border; -fx-border-width: 0 1px 0 0;");
         return sidePanel;
     }
 
-    private void createButton(Pos pos, StackPane root) {
-        Button button = new Button(pos.toString());
-        StackPane.setAlignment(button, pos);
-        root.getChildren().add(button);
+    private void createTarget(Pos pos, StackPane root) {
+        StackPane pane = new StackPane(new Label(pos.toString()));
+        pane.setPrefSize(100, 200);
+        pane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        pane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        StackPane.setMargin(pane,  new Insets(10));
+        pane.setStyle("-fx-background-color: orange;");
+        StackPane.setAlignment(pane, pos);
+        root.getChildren().add(pane);
+
         PopOver popOver = new PopOver();
         popOver.arrowLocationProperty().bind(preferredArrowLocation);
         popOver.autoHideProperty().bind(autoHide);
-        Label content = new Label("PopOver for " + pos.toString());
-        content.setPrefSize(250, 250);
-        popOver.setContentNode(content);
-        button.setOnAction(evt -> popOver.show(button));
+
+        VBox box = new VBox(10);
+        Button button = new Button("Add");
+        box.getChildren().add(button);
+
+        button.setOnAction(event -> {
+            Label label = new Label("added");
+            box.getChildren().add(label);
+        });
+
+        popOver.setContentNode(box);
+        pane.setOnMouseClicked(evt -> popOver.show(pane, offset.get()));
     }
 }

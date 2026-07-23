@@ -2,6 +2,8 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.PopOverSkin;
 import javafx.animation.FadeTransition;
+import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -80,6 +82,29 @@ public class PopOver extends PopupControl {
 
     private final PopOverRoot root = new PopOverRoot();
 
+    /*
+     * The owner's bounds (in screen coordinates) and the offset that were passed
+     * to the last show(...) invocation. They are stored so that the popover can
+     * recompute its location whenever the preferred size of the content node
+     * changes while the popover is showing.
+     */
+    private Bounds ownerBounds;
+
+    private double ownerOffset = DEFAULT_OFFSET;
+
+    /*
+     * Reacts to changes of the content node's layout bounds by recomputing the
+     * popover's location and bounds so that the arrow keeps pointing at the owner
+     * node correctly.
+     */
+    private final InvalidationListener contentBoundsListener = it -> {
+        if (isShowing()) {
+            updateLocation();
+        }
+    };
+
+    private final WeakInvalidationListener weakContentBoundsListener = new WeakInvalidationListener(contentBoundsListener);
+
     /**
      * Creates a popover with a label as the content node.
      */
@@ -90,6 +115,19 @@ public class PopOver extends PopupControl {
 
         setAnchorLocation(AnchorLocation.WINDOW_TOP_LEFT);
         setOnHiding(evt -> setDetached(false));
+
+        /*
+         * Keep a listener on the content node's layout bounds in sync so that the
+         * popover can reposition itself when the content changes its size.
+         */
+        contentNode.addListener((obs, oldNode, newNode) -> {
+            if (oldNode != null) {
+                oldNode.layoutBoundsProperty().removeListener(weakContentBoundsListener);
+            }
+            if (newNode != null) {
+                newNode.layoutBoundsProperty().addListener(weakContentBoundsListener);
+            }
+        });
 
         /*
          * Create some initial content.
@@ -272,6 +310,34 @@ public class PopOver extends PopupControl {
          */
         super.show(owner, bounds.getMinX(), bounds.getMinY());
 
+        /*
+         * Remember the parameters of this show(...) invocation so that the popover
+         * can recompute its location when the content node's preferred size changes.
+         */
+        ownerBounds = bounds;
+        ownerOffset = offset;
+
+        updateLocation();
+
+        if (isAnimated()) {
+            showFadeInAnimation(getFadeInDuration());
+        }
+    }
+
+    /*
+     * Computes the effective arrow location and the anchor position of the popover
+     * based on the last known owner bounds and offset. This is called by show(...)
+     * and whenever the content node changes its preferred size while the popover is
+     * showing, so that the arrow keeps pointing at the owner node correctly.
+     */
+    private void updateLocation() {
+        if (ownerBounds == null) {
+            return;
+        }
+
+        final Bounds bounds = ownerBounds;
+        final double offset = ownerOffset;
+
         root.applyCss();
         root.layout();
 
@@ -330,10 +396,6 @@ public class PopOver extends PopupControl {
 
         setAnchorX(targetX - computeXOffset(location));
         setAnchorY(targetY - computeYOffset(location));
-
-        if (isAnimated()) {
-            showFadeInAnimation(getFadeInDuration());
-        }
     }
 
     private void showFadeInAnimation(Duration fadeInDuration) {
