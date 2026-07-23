@@ -96,11 +96,11 @@ public class PopOverSkin implements Skin<PopOver> {
         getPopupWindow().xProperty().addListener(updatePathAndClipListener);
         getPopupWindow().yProperty().addListener(updatePathAndClipListener);
 
-        popOver.arrowLocationProperty().addListener(updatePathAndClipListener);
+        popOver.computedArrowLocationProperty().addListener(updatePathAndClipListener);
         popOver.contentNodeProperty().addListener((value, oldContent, newContent) -> content.setCenter(newContent));
         popOver.detachedProperty().addListener((value, oldDetached, newDetached) -> {
             if (newDetached) {
-                switch (getSkinnable().getArrowLocation()) {
+                switch (getSkinnable().getComputedArrowLocation()) {
                     case LEFT_TOP:
                     case LEFT_CENTER:
                     case LEFT_BOTTOM:
@@ -509,7 +509,7 @@ public class PopOverSkin implements Skin<PopOver> {
     }
 
     private boolean isShowingArrow(PopOver.ArrowLocation location) {
-        PopOver.ArrowLocation arrowLocation = getSkinnable().getArrowLocation();
+        PopOver.ArrowLocation arrowLocation = getSkinnable().getComputedArrowLocation();
         return location.equals(arrowLocation) && !getSkinnable().isDetached() && !tornOff;
     }
 

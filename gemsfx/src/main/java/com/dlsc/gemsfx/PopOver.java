@@ -5,6 +5,8 @@ import javafx.animation.FadeTransition;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.CssMetaData;
@@ -15,11 +17,13 @@ import javafx.css.StyleableProperty;
 import javafx.css.converter.SizeConverter;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Screen;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -27,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
+
 import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
@@ -71,10 +76,7 @@ public class PopOver extends PopupControl {
     private static final double DEFAULT_ARROW_SIZE = 10;
     private static final double DEFAULT_ARROW_INDENT = 12;
     private static final double DEFAULT_CORNER_RADIUS = 6;
-
-    private double targetX;
-
-    private double targetY;
+    public static final int DEFAULT_OFFSET = 4;
 
     private final PopOverRoot root = new PopOverRoot();
 
@@ -107,6 +109,19 @@ public class PopOver extends PopupControl {
         });
 
         setAutoHide(true);
+        setAutoFix(false);
+
+        /*
+         * Keep the computed (effective) arrow location in sync with the preferred
+         * one while the popover is not showing. When it is showing, the effective
+         * location is managed by show(...) which may flip it to keep the popover
+         * on screen.
+         */
+        arrowLocation.addListener((obs, oldLoc, newLoc) -> {
+            if (!isShowing()) {
+                setComputedArrowLocation(newLoc);
+            }
+        });
     }
 
     /**
@@ -192,7 +207,7 @@ public class PopOver extends PopupControl {
      * @param owner the owner of the popover
      */
     public final void show(Node owner) {
-        show(owner, 4);
+        show(owner, DEFAULT_OFFSET);
     }
 
     /**
@@ -209,164 +224,116 @@ public class PopOver extends PopupControl {
      */
     public final void show(Node owner, double offset) {
         requireNonNull(owner);
+        show(owner, owner.localToScreen(owner.getBoundsInLocal()), offset);
+    }
 
+    public final void show(Node owner, Bounds bounds) {
+        requireNonNull(owner);
+        show(owner, bounds, DEFAULT_OFFSET);
+    }
+
+    /**
+     * Shows the popover in a position relative to the given bounds (in screen
+     * coordinates) of the owner node. The concrete side on which the popover
+     * appears is derived from the {@link #arrowLocationProperty() arrow location},
+     * which is treated as the <em>preferred</em> location: if the popover would
+     * not fit on the preferred side of the owner within the visual bounds of the
+     * screen, it is automatically flipped to the opposite side (Apple
+     * {@code NSPopover}-style behavior). The public {@link #arrowLocationProperty()
+     * arrow location} property is never modified by this method; the effective
+     * location is exposed via {@link #computedArrowLocationProperty()}.
+     *
+     * @param owner  the owner of the popover
+     * @param bounds the owner's bounds in screen coordinates that the popover
+     *               points at
+     * @param offset if positive specifies the number of pixels that the arrow will
+     *               overlap with the owner node (positive values are recommended)
+     */
+    public final void show(Node owner, Bounds bounds, double offset) {
+        requireNonNull(owner);
+        requireNonNull(bounds);
+
+        /*
+         * If the popover is already showing, do not show it again: re-showing it
+         * would re-run the fade-in animation (which resets the opacity to 0) and
+         * cause a visible "blink".
+         */
         if (isShowing()) {
             return;
         }
 
-        Bounds bounds = owner.localToScreen(owner.getBoundsInLocal());
+        /*
+         * Realize the popup so that its scene graph is created and laid out. Only
+         * then are the size and the "bounds in parent" of the root node (which
+         * account for the drop shadow) available, both of which are required to
+         * compute the final anchor position and to decide whether the popover has
+         * to be flipped to stay on screen. The temporary location is corrected
+         * right afterwards.
+         */
+        super.show(owner, bounds.getMinX(), bounds.getMinY());
 
-        switch (getArrowLocation()) {
-            case BOTTOM_CENTER:
-            case BOTTOM_LEFT:
-            case BOTTOM_RIGHT:
-                show(owner, bounds.getMinX() + bounds.getWidth() / 2, bounds.getMinY() + offset);
-                break;
-            case LEFT_BOTTOM:
-            case LEFT_CENTER:
-            case LEFT_TOP:
-                show(owner, bounds.getMaxX() - offset, bounds.getMinY() + bounds.getHeight() / 2);
-                break;
-            case RIGHT_BOTTOM:
-            case RIGHT_CENTER:
-            case RIGHT_TOP:
-                show(owner, bounds.getMinX() + offset, bounds.getMinY() + bounds.getHeight() / 2);
-                break;
-            case TOP_CENTER:
+        root.applyCss();
+        root.layout();
+
+        /*
+         * Determine the effective arrow location (preferred location, flipped when
+         * necessary to keep the popover on screen).
+         */
+        ArrowLocation location = determineArrowLocation(bounds);
+        setComputedArrowLocation(location);
+
+        /*
+         * Re-run layout in case flipping the arrow location changed the required
+         * size (e.g. because the arrow moved to another edge).
+         */
+        root.applyCss();
+        root.layout();
+
+        final double centerX = (bounds.getMinX() + bounds.getMaxX()) / 2;
+        final double centerY = (bounds.getMinY() + bounds.getMaxY()) / 2;
+
+        double targetX;
+        double targetY;
+
+        switch (location) {
             case TOP_LEFT:
+            case TOP_CENTER:
             case TOP_RIGHT:
-                show(owner, bounds.getMinX() + bounds.getWidth() / 2, bounds.getMinY() + bounds.getHeight() - offset);
+                // popover below the owner, arrow points up at the owner's bottom edge
+                targetX = centerX;
+                targetY = bounds.getMaxY() - offset;
+                break;
+            case BOTTOM_LEFT:
+            case BOTTOM_CENTER:
+            case BOTTOM_RIGHT:
+                // popover above the owner, arrow points down at the owner's top edge
+                targetX = centerX;
+                targetY = bounds.getMinY() + offset;
+                break;
+            case LEFT_TOP:
+            case LEFT_CENTER:
+            case LEFT_BOTTOM:
+                // popover to the right of the owner, arrow points at the owner's right edge
+                targetX = bounds.getMaxX() - offset;
+                targetY = centerY;
+                break;
+            case RIGHT_TOP:
+            case RIGHT_CENTER:
+            case RIGHT_BOTTOM:
+                // popover to the left of the owner, arrow points at the owner's left edge
+                targetX = bounds.getMinX() + offset;
+                targetY = centerY;
                 break;
             default:
-                break;
-        }
-    }
-
-    /**
-     * Makes the popover visible at the give location and associates it with
-     * the given owner node. The x and y coordinate will be the target location
-     * of the arrow of the popover and not the location of the window.
-     *
-     * @param owner the owning node
-     * @param x     the x coordinate for the popover arrow tip
-     * @param y     the y coordinate for the popover arrow tip
-     */
-    @Override
-    public final void show(Node owner, double x, double y) {
-        show(owner, x, y, getFadeInDuration());
-    }
-
-    /**
-     * Makes the popover visible at the give location and associates it with
-     * the given owner node. The x and y coordinate will be the target location
-     * of the arrow of the popover and not the location of the window.
-     *
-     * @param owner          the owning node
-     * @param x              the x coordinate for the popover arrow tip
-     * @param y              the y coordinate for the popover arrow tip
-     * @param fadeInDuration the time it takes for the popover to be fully visible. This duration takes precedence over the fade-in property without setting.
-     */
-    public final void show(Node owner, double x, double y, Duration fadeInDuration) {
-        if (isShowing()) {
-            return;
+                throw new IllegalStateException("Unexpected arrow location: " + location);
         }
 
-        targetX = x;
-        targetY = y;
-
-        if (owner == null) {
-            throw new IllegalArgumentException("owner can not be null");
-        }
-
-        if (fadeInDuration == null) {
-            fadeInDuration = DEFAULT_FADE_DURATION;
-        }
-
-        super.show(owner, x, y);
-
-        Bounds bounds = getContentNode().getBoundsInParent();
-
-        Bounds rootBounds = root.getBoundsInParent();
-        switch (getArrowLocation()) {
-            case TOP_CENTER:
-            case TOP_LEFT:
-            case TOP_RIGHT:
-                x -= computeXOffset();
-                y += computeYOffset();
-                break;
-            case BOTTOM_CENTER:
-            case BOTTOM_LEFT:
-            case BOTTOM_RIGHT:
-                x -= computeXOffset();
-                y -= computeYOffset();
-                break;
-            case LEFT_TOP:
-            case LEFT_CENTER:
-            case LEFT_BOTTOM:
-                x += computeXOffset();
-                y -= computeYOffset();
-                break;
-            case RIGHT_TOP:
-            case RIGHT_BOTTOM:
-            case RIGHT_CENTER:
-                x -= computeXOffset();
-                y -= computeYOffset();
-                break;
-        }
-
-        setX(x);
-        setY(y);
+        setAnchorX(targetX - computeXOffset(location));
+        setAnchorY(targetY - computeYOffset(location));
 
         if (isAnimated()) {
-            showFadeInAnimation(fadeInDuration);
+            showFadeInAnimation(getFadeInDuration());
         }
-    }
-
-    /**
-     * Repositions the popover so that the arrow tip is at the given screen coordinate,
-     * without hiding and re-showing it. Use this instead of calling {@link #show} again
-     * when the popover is already visible, to avoid flickering during event-to-event
-     * transitions.
-     *
-     * @param arrowTipX the screen X coordinate for the arrow tip
-     * @param arrowTipY the screen Y coordinate for the arrow tip
-     */
-    public final void relocate(double arrowTipX, double arrowTipY) {
-        targetX = arrowTipX;
-        targetY = arrowTipY;
-
-        double x = arrowTipX;
-        double y = arrowTipY;
-
-        switch (getArrowLocation()) {
-            case TOP_CENTER:
-            case TOP_LEFT:
-            case TOP_RIGHT:
-                x -= computeXOffset();
-                y += computeYOffset();
-                break;
-            case BOTTOM_CENTER:
-            case BOTTOM_LEFT:
-            case BOTTOM_RIGHT:
-                x -= computeXOffset();
-                y -= computeYOffset();
-                break;
-            case LEFT_TOP:
-            case LEFT_CENTER:
-            case LEFT_BOTTOM:
-                x += computeXOffset();
-                y -= computeYOffset();
-                break;
-            case RIGHT_TOP:
-            case RIGHT_BOTTOM:
-            case RIGHT_CENTER:
-                x -= computeXOffset();
-                y -= computeYOffset();
-                break;
-        }
-
-        setX(x);
-        setY(y);
     }
 
     private void showFadeInAnimation(Duration fadeInDuration) {
@@ -427,7 +394,7 @@ public class PopOver extends PopupControl {
      * The offset is always relative to the main four handle positions of the owning node. The positons are located in
      * the center of the top edge, bottom edge, left edge, and right edge.
      */
-    private double computeXOffset() {
+    private double computeXOffset(ArrowLocation arrowLocation) {
         final Bounds rootBounds = root.getBoundsInParent();
         final Bounds layoutBounds = root.getLayoutBounds();
 
@@ -438,7 +405,7 @@ public class PopOver extends PopupControl {
         final double arrowIndent = getArrowIndent();
         final double arrowSize = getArrowSize();
 
-        switch (getArrowLocation()) {
+        switch (arrowLocation) {
             case TOP_LEFT:
             case BOTTOM_LEFT:
                 return cornerRadius + arrowIndent + arrowSize - rootNodeMinX;
@@ -451,7 +418,7 @@ public class PopOver extends PopupControl {
             case LEFT_TOP:
             case LEFT_CENTER:
             case LEFT_BOTTOM:
-                return rootNodeMinX + arrowSize;
+                return -rootNodeMinX - arrowSize;
             case RIGHT_TOP:
             case RIGHT_CENTER:
             case RIGHT_BOTTOM:
@@ -470,7 +437,7 @@ public class PopOver extends PopupControl {
      * The offset is always relative to the main four handle positions of the owning node. The positons are located in
      * the center of the top edge, bottom edge, left edge, and right edge.
      */
-    private double computeYOffset() {
+    private double computeYOffset(ArrowLocation arrowLocation) {
         final Bounds rootBounds = root.getBoundsInParent();
         final Bounds layoutBounds = root.getLayoutBounds();
 
@@ -481,7 +448,7 @@ public class PopOver extends PopupControl {
         final double arrowSize = getArrowSize();
         final double cornerRadius = getCornerRadius();
 
-        switch (getArrowLocation()) {
+        switch (arrowLocation) {
             case LEFT_TOP:
             case RIGHT_TOP:
                 return cornerRadius + arrowIndent + arrowSize - rootNodeMinY;
@@ -498,7 +465,7 @@ public class PopOver extends PopupControl {
             case TOP_CENTER:
             case TOP_LEFT:
             case TOP_RIGHT:
-                return rootNodeMinY + arrowSize;
+                return -rootNodeMinY - arrowSize;
             default:
                 throw new IllegalStateException("Unexpected arrow location: " + getArrowLocation());
         }
@@ -614,16 +581,8 @@ public class PopOver extends PopupControl {
         cornerRadiusProperty().set(radius);
     }
 
+    private final ObjectProperty<ArrowLocation> arrowLocation = new SimpleObjectProperty<>(this, "arrowLocation", ArrowLocation.TOP_CENTER);
 
-    private final ObjectProperty<ArrowLocation> arrowLocation = new SimpleObjectProperty<>(this, "arrowLocation", ArrowLocation.LEFT_TOP);
-
-    /**
-     * Stores the preferred arrow location. This might not be the actual
-     * location of the arrow if auto fix is enabled.
-     *
-     * @return the arrow location property
-     * @see #setAutoFix(boolean)
-     */
     public final ObjectProperty<ArrowLocation> arrowLocationProperty() {
         return arrowLocation;
     }
@@ -634,6 +593,232 @@ public class PopOver extends PopupControl {
 
     public final ArrowLocation getArrowLocation() {
         return arrowLocationProperty().get();
+    }
+
+    private ArrowLocation determineArrowLocation(Bounds ownerBounds) {
+        return findPopOverArrowLocation(getArrowLocation(), ownerBounds);
+    }
+
+    /**
+     * Determines the effective arrow location for the given preferred location and
+     * owner bounds. The preferred location is honored whenever the popover fits on
+     * the corresponding side of the owner within the visual bounds of the screen.
+     * Otherwise the location is flipped to the opposite side if that side offers
+     * enough room. A {@code null} preferred location triggers a fully automatic
+     * choice of the side with the most available space.
+     * <p>
+     * After the side (top / bottom / left / right) has been decided, the alignment
+     * along that edge (i.e. the {@code *_LEFT} / {@code *_CENTER} / {@code *_RIGHT}
+     * or {@code *_TOP} / {@code *_CENTER} / {@code *_BOTTOM} suffix) is adjusted so
+     * that the popover does not stick out of the screen along the edge either.
+     */
+    private ArrowLocation findPopOverArrowLocation(ArrowLocation preferred, Bounds ownerBounds) {
+        final Bounds popBounds = root.getBoundsInParent();
+        final double popWidth = popBounds.getWidth();
+        final double popHeight = popBounds.getHeight();
+
+        final Rectangle2D screen = getScreenBounds(ownerBounds);
+
+        final double spaceAbove = ownerBounds.getMinY() - screen.getMinY();
+        final double spaceBelow = screen.getMaxY() - ownerBounds.getMaxY();
+        final double spaceLeft = ownerBounds.getMinX() - screen.getMinX();
+        final double spaceRight = screen.getMaxX() - ownerBounds.getMaxX();
+
+        // 1. Decide on which side of the owner the popover is placed (and flip it
+        //    to the opposite side if the preferred side lacks room).
+        ArrowLocation side;
+        if (preferred == null) {
+            if (spaceBelow >= popHeight) {
+                side = ArrowLocation.TOP_CENTER;
+            } else if (spaceAbove >= popHeight) {
+                side = ArrowLocation.BOTTOM_CENTER;
+            } else if (spaceRight >= popWidth) {
+                side = ArrowLocation.LEFT_CENTER;
+            } else if (spaceLeft >= popWidth) {
+                side = ArrowLocation.RIGHT_CENTER;
+            } else {
+                side = ArrowLocation.TOP_CENTER;
+            }
+        } else {
+            switch (preferred) {
+                case TOP_LEFT:
+                case TOP_CENTER:
+                case TOP_RIGHT:
+                    // popover below the owner
+                    side = (spaceBelow < popHeight && spaceAbove >= popHeight) ? flipVertically(preferred) : preferred;
+                    break;
+                case BOTTOM_LEFT:
+                case BOTTOM_CENTER:
+                case BOTTOM_RIGHT:
+                    // popover above the owner
+                    side = (spaceAbove < popHeight && spaceBelow >= popHeight) ? flipVertically(preferred) : preferred;
+                    break;
+                case LEFT_TOP:
+                case LEFT_CENTER:
+                case LEFT_BOTTOM:
+                    // popover to the right of the owner
+                    side = (spaceRight < popWidth && spaceLeft >= popWidth) ? flipHorizontally(preferred) : preferred;
+                    break;
+                case RIGHT_TOP:
+                case RIGHT_CENTER:
+                case RIGHT_BOTTOM:
+                    // popover to the left of the owner
+                    side = (spaceLeft < popWidth && spaceRight >= popWidth) ? flipHorizontally(preferred) : preferred;
+                    break;
+                default:
+                    side = preferred;
+                    break;
+            }
+        }
+
+        // 2. Adjust the alignment along the chosen edge so the popover stays on
+        //    screen in the direction parallel to the edge as well.
+        return fitAlongEdge(side, ownerBounds, screen);
+    }
+
+    /**
+     * Picks the alignment suffix (along the edge) that keeps the popover within the
+     * screen's visual bounds parallel to the edge, while staying as close as
+     * possible to the requested alignment. The exact tip position of each candidate
+     * is obtained from {@link #computeXOffset(ArrowLocation)} /
+     * {@link #computeYOffset(ArrowLocation)}, so it matches how {@code show(...)}
+     * ultimately anchors the popover.
+     */
+    private ArrowLocation fitAlongEdge(ArrowLocation location, Bounds ownerBounds, Rectangle2D screen) {
+        final ArrowLocation[] candidates;
+        final boolean horizontal;
+
+        switch (location) {
+            case TOP_LEFT:
+            case TOP_CENTER:
+            case TOP_RIGHT:
+                candidates = new ArrowLocation[]{ArrowLocation.TOP_LEFT, ArrowLocation.TOP_CENTER, ArrowLocation.TOP_RIGHT};
+                horizontal = true;
+                break;
+            case BOTTOM_LEFT:
+            case BOTTOM_CENTER:
+            case BOTTOM_RIGHT:
+                candidates = new ArrowLocation[]{ArrowLocation.BOTTOM_LEFT, ArrowLocation.BOTTOM_CENTER, ArrowLocation.BOTTOM_RIGHT};
+                horizontal = true;
+                break;
+            case LEFT_TOP:
+            case LEFT_CENTER:
+            case LEFT_BOTTOM:
+                candidates = new ArrowLocation[]{ArrowLocation.LEFT_TOP, ArrowLocation.LEFT_CENTER, ArrowLocation.LEFT_BOTTOM};
+                horizontal = false;
+                break;
+            case RIGHT_TOP:
+            case RIGHT_CENTER:
+            case RIGHT_BOTTOM:
+                candidates = new ArrowLocation[]{ArrowLocation.RIGHT_TOP, ArrowLocation.RIGHT_CENTER, ArrowLocation.RIGHT_BOTTOM};
+                horizontal = false;
+                break;
+            default:
+                return location;
+        }
+
+        final Bounds popBounds = root.getBoundsInParent();
+        final double size = horizontal ? popBounds.getWidth() : popBounds.getHeight();
+        final double center = horizontal
+                ? (ownerBounds.getMinX() + ownerBounds.getMaxX()) / 2
+                : (ownerBounds.getMinY() + ownerBounds.getMaxY()) / 2;
+        final double screenMin = horizontal ? screen.getMinX() : screen.getMinY();
+        final double screenMax = horizontal ? screen.getMaxX() : screen.getMaxY();
+
+        ArrowLocation best = location;
+        double bestOverflow = Double.MAX_VALUE;
+        double preferredOverflow = Double.MAX_VALUE;
+
+        for (ArrowLocation candidate : candidates) {
+            // Tip offset from the popover's leading (left / top) edge, i.e. where
+            // the arrow tip sits within the popover window for this candidate.
+            final double tip = horizontal ? computeXOffset(candidate) : computeYOffset(candidate);
+            final double start = center - tip;
+            final double end = start + size;
+            final double overflow = Math.max(0, screenMin - start) + Math.max(0, end - screenMax);
+
+            if (candidate == location) {
+                preferredOverflow = overflow;
+            }
+            if (overflow < bestOverflow) {
+                bestOverflow = overflow;
+                best = candidate;
+            }
+        }
+
+        // Keep the requested alignment when it is already among the best fits.
+        return preferredOverflow <= bestOverflow ? location : best;
+    }
+
+    private Rectangle2D getScreenBounds(Bounds ownerBounds) {
+        List<Screen> screens = Screen.getScreensForRectangle(
+                ownerBounds.getMinX(), ownerBounds.getMinY(),
+                Math.max(1, ownerBounds.getWidth()), Math.max(1, ownerBounds.getHeight()));
+        Screen screen = screens.isEmpty() ? Screen.getPrimary() : screens.get(0);
+        return screen.getVisualBounds();
+    }
+
+    private static ArrowLocation flipVertically(ArrowLocation location) {
+        switch (location) {
+            case TOP_LEFT:
+                return ArrowLocation.BOTTOM_LEFT;
+            case TOP_CENTER:
+                return ArrowLocation.BOTTOM_CENTER;
+            case TOP_RIGHT:
+                return ArrowLocation.BOTTOM_RIGHT;
+            case BOTTOM_LEFT:
+                return ArrowLocation.TOP_LEFT;
+            case BOTTOM_CENTER:
+                return ArrowLocation.TOP_CENTER;
+            case BOTTOM_RIGHT:
+                return ArrowLocation.TOP_RIGHT;
+            default:
+                return location;
+        }
+    }
+
+    private static ArrowLocation flipHorizontally(ArrowLocation location) {
+        switch (location) {
+            case LEFT_TOP:
+                return ArrowLocation.RIGHT_TOP;
+            case LEFT_CENTER:
+                return ArrowLocation.RIGHT_CENTER;
+            case LEFT_BOTTOM:
+                return ArrowLocation.RIGHT_BOTTOM;
+            case RIGHT_TOP:
+                return ArrowLocation.LEFT_TOP;
+            case RIGHT_CENTER:
+                return ArrowLocation.LEFT_CENTER;
+            case RIGHT_BOTTOM:
+                return ArrowLocation.LEFT_BOTTOM;
+            default:
+                return location;
+        }
+    }
+
+    // computed (effective) arrow location support
+
+    private final ReadOnlyObjectWrapper<ArrowLocation> computedArrowLocation = new ReadOnlyObjectWrapper<>(this, "computedArrowLocation", ArrowLocation.TOP_LEFT);
+
+    /**
+     * The effective arrow location that is actually used to draw and position the
+     * popover. It equals the preferred {@link #arrowLocationProperty() arrow
+     * location} unless the popover had to be flipped to the opposite side in order
+     * to stay on screen. Skins should render the arrow based on this property
+     * rather than on {@link #arrowLocationProperty()}.
+     *
+     * @return the read-only computed arrow location property
+     */
+    public final ReadOnlyObjectProperty<ArrowLocation> computedArrowLocationProperty() {
+        return computedArrowLocation.getReadOnlyProperty();
+    }
+
+    public final ArrowLocation getComputedArrowLocation() {
+        return computedArrowLocation.get();
+    }
+
+    private void setComputedArrowLocation(ArrowLocation location) {
+        computedArrowLocation.set(location);
     }
 
     /**
