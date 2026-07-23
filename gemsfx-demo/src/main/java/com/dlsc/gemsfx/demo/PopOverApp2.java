@@ -96,20 +96,11 @@ public class PopOverApp2 extends GemApplication {
         StackPane.setAlignment(pane, pos);
         root.getChildren().add(pane);
 
-        PopOver popOver = new PopOver();
+        PopOver popOver = new PopOver.CalendarPopOver();
         popOver.arrowLocationProperty().bind(preferredArrowLocation);
         popOver.autoHideProperty().bind(autoHide);
 
-        VBox box = new VBox(10);
-        Button button = new Button("Add");
-        box.getChildren().add(button);
-
-        button.setOnAction(event -> {
-            Label label = new Label("added");
-            box.getChildren().add(label);
-        });
-
-        popOver.setContentNode(box);
+        // popOver.setContentNode(box);
         pane.setOnMouseClicked(evt -> popOver.show(pane, offset.get()));
     }
 }
