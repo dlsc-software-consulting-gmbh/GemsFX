@@ -11,6 +11,7 @@ import com.dlsc.gemsfx.treeview.TreeNodeView;
 import javafx.application.Platform;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -34,6 +35,9 @@ public class AccessibilityTest {
 
     @BeforeClass
     public static void initToolkit() {
+        // These tests need a real JavaFX toolkit, which is not available on the CI runners.
+        Assume.assumeTrue("Skipping accessibility tests inside GitHub Actions", System.getenv("GITHUB_ACTIONS") == null);
+
         // The JavaFX toolkit must be running before controls (fonts, skins) can be created.
         try {
             CountDownLatch latch = new CountDownLatch(1);
