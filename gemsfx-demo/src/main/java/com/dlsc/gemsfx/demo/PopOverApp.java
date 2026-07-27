@@ -83,15 +83,18 @@ public class PopOverApp extends GemApplication {
 
         ComboBox<Double> radiusBox = new ComboBox<>();
         radiusBox.getItems().addAll(0.0, 6.0, 10.0, 15.0, 20.0, 32.0);
-        radiusBox.valueProperty().bindBidirectional(radius.asObject());
+        radiusBox.setValue(radius.get());
+        radiusBox.valueProperty().addListener((obs, oldValue, newValue) -> radius.set(newValue));
 
         ComboBox<Double> arrowSizeBox = new ComboBox<>();
         arrowSizeBox.getItems().addAll(0.0, 5.0, 10.0, 15.0, 20.0, 32.0);
-        arrowSizeBox.valueProperty().bindBidirectional(arrowSize.asObject());
+        arrowSizeBox.setValue(arrowSize.get());
+        arrowSizeBox.valueProperty().addListener((obs, oldValue, newValue) -> arrowSize.set(newValue));
 
         ComboBox<Double> arrowIndentBox = new ComboBox<>();
         arrowIndentBox.getItems().addAll(0.0, 5.0, 12.0, 15.0);
-        arrowIndentBox.valueProperty().bindBidirectional(arrowIndent.asObject());
+        arrowIndentBox.setValue(arrowIndent.get());
+        arrowIndentBox.valueProperty().addListener((obs, oldValue, newValue) -> arrowIndent.set(newValue));
 
         CheckBox autoHideBox = new CheckBox("Auto Hide");
         autoHideBox.selectedProperty().bindBidirectional(autoHide);
