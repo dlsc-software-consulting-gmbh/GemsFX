@@ -461,6 +461,9 @@ img { max-width: 100%; display: block; }
 
 .card-footer {
   margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .card-api-link {

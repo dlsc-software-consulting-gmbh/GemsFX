@@ -1,17 +1,30 @@
 package com.dlsc.gemsfx.demo;
 
+import com.dlsc.gemsfx.AdvancedTableView;
+import com.dlsc.gemsfx.AutoscrollListView;
 import com.dlsc.gemsfx.CircleProgressIndicator;
 import com.dlsc.gemsfx.BeforeAfterView;
 import com.dlsc.gemsfx.ChipView;
+import com.dlsc.gemsfx.ChipsViewContainer;
+import com.dlsc.gemsfx.DayOfWeekPicker;
+import com.dlsc.gemsfx.EnhancedLabel;
 import com.dlsc.gemsfx.GlassPane;
+import com.dlsc.gemsfx.HiddenSidesPane;
+import com.dlsc.gemsfx.HistoryButton;
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.MaskedView;
 import com.dlsc.gemsfx.PopOver;
 import com.dlsc.gemsfx.SegmentedBar;
+import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.SemiCircleProgressIndicator;
+import com.dlsc.gemsfx.SimpleFilterView;
+import com.dlsc.gemsfx.Skeleton;
+import com.dlsc.gemsfx.SkeletonPane;
 import com.dlsc.gemsfx.StretchingTilePane;
 import com.dlsc.gemsfx.TextView;
 import com.dlsc.gemsfx.ThreeItemsPane;
+import com.dlsc.gemsfx.TimeRangePicker;
+import com.dlsc.gemsfx.util.InMemoryHistoryManager;
 import com.dlsc.gemsfx.gridtable.GridTableColumn;
 import com.dlsc.gemsfx.gridtable.GridTableView;
 import com.dlsc.gemsfx.paging.PagingControlBase;
@@ -28,26 +41,35 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.Duration;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * Generates PNG screenshots for GemsFX controls that are missing preview images
@@ -102,6 +124,17 @@ public class ScreenshotGenerator extends Application {
         addSimpleTask("masked-view.png", 500, 120, this::createMaskedView, 0.2);
         addSimpleTask("segmented-bar.png", 700, 220, this::createSegmentedBar, 0.2);
         addSimpleTask("text-view.png", 560, 340, this::createTextView, 0.2);
+        addSimpleTask("skeleton.png", 620, 190, this::createSkeleton, 0.4);
+        addSimpleTask("hidden-sides-pane.png", 640, 360, this::createHiddenSidesPane, 1.5);
+        addSimpleTask("simple-filter-view.png", 760, 150, this::createSimpleFilterView, 0.4);
+        addSimpleTask("chips-view-container.png", 620, 130, this::createChipsViewContainer, 0.3);
+        addSimpleTask("advanced-table-view.png", 700, 300, this::createAdvancedTableView, 0.4);
+        addSimpleTask("autoscroll-list-view.png", 460, 340, this::createAutoscrollListView, 0.4);
+        addSimpleTask("enhanced-label.png", 560, 170, this::createEnhancedLabel, 0.2);
+        addPopupTask("selection-box.png", 360, 80, this::createSelectionBox);
+        addPopupTask("day-of-week-picker.png", 360, 80, this::createDayOfWeekPicker);
+        addPopupTask("time-range-picker.png", 380, 80, this::createTimeRangePicker);
+        addPopupTask("history-button.png", 380, 80, this::createHistoryButtonBox);
         tasks.add(new Task("pop-over.png", this::handlePopOverTask));
     }
 
@@ -120,6 +153,10 @@ public class ScreenshotGenerator extends Application {
             stage.setTitle("Generating: " + filename);
             stage.show();
 
+            // move the focus away from the control so that no focus ring shows up in the image
+            root.setFocusTraversable(true);
+            root.requestFocus();
+
             PauseTransition pause = new PauseTransition(Duration.seconds(pauseSeconds));
             pause.setOnFinished(e -> {
                 snapshot(scene, filename);
@@ -127,6 +164,94 @@ public class ScreenshotGenerator extends Application {
             });
             pause.play();
         }));
+    }
+
+    /**
+     * A control that shows its value inside a popup window. The setup provides the node that
+     * goes into the scene and a runnable that opens the popup.
+     */
+    record PopupSetup(Node node, Runnable opener) {}
+
+    /**
+     * Convenience: adds a task that snapshots a control together with its opened popup. The
+     * control snapshot and the popup snapshot are composed into a single image.
+     */
+    private void addPopupTask(String filename, int width, int height, Supplier<PopupSetup> setupSupplier) {
+        tasks.add(new Task(filename, (stage, done) -> {
+            PopupSetup setup = setupSupplier.get();
+
+            StackPane root = new StackPane(setup.node());
+            root.setStyle("-fx-background-color: #f5f5f5; -fx-padding: 16;");
+            StackPane.setAlignment(setup.node(), Pos.CENTER);
+
+            Scene scene = new Scene(root, width, height);
+            stage.setScene(scene);
+            stage.setTitle("Generating: " + filename);
+            stage.show();
+
+            Platform.runLater(() -> {
+                setup.opener().run();
+
+                PauseTransition wait = new PauseTransition(Duration.millis(500));
+                wait.setOnFinished(e -> {
+                    Scene popupScene = findPopupScene();
+                    if (popupScene == null) {
+                        System.err.println("  ✗ " + filename + ": popup scene not available");
+                        snapshot(scene, filename);
+                    } else {
+                        writeImage(compose(scene.snapshot(null), popupScene.snapshot(null)), filename);
+                    }
+                    closePopups();
+                    done.run();
+                });
+                wait.play();
+            });
+        }));
+    }
+
+    /** Returns the scene of the first visible window that is not the primary stage. */
+    private Scene findPopupScene() {
+        return Window.getWindows().stream()
+                .filter(window -> window != primaryStage && window.isShowing() && window.getScene() != null)
+                .map(Window::getScene)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void closePopups() {
+        new ArrayList<>(Window.getWindows()).stream()
+                .filter(window -> window != primaryStage && window.isShowing())
+                .forEach(Window::hide);
+    }
+
+    /** Stacks the control image on top of the popup image, both centered on a light background. */
+    private BufferedImage compose(WritableImage controlImage, WritableImage popupImage) {
+        BufferedImage top = SwingFXUtils.fromFXImage(controlImage, null);
+        BufferedImage bottom = SwingFXUtils.fromFXImage(popupImage, null);
+
+        int gap = 4;
+        int padding = 16;
+        int width = Math.max(top.getWidth(), bottom.getWidth()) + 2 * padding;
+        int height = top.getHeight() + gap + bottom.getHeight() + padding;
+
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        java.awt.Graphics2D g = result.createGraphics();
+        g.setColor(new java.awt.Color(0xF5, 0xF5, 0xF5));
+        g.fillRect(0, 0, width, height);
+        g.drawImage(top, (width - top.getWidth()) / 2, 0, null);
+        g.drawImage(bottom, (width - bottom.getWidth()) / 2, top.getHeight() + gap, null);
+        g.dispose();
+        return result;
+    }
+
+    private void writeImage(BufferedImage image, String filename) {
+        File outFile = OUTPUT_DIR.resolve(filename).toFile();
+        try {
+            ImageIO.write(image, "PNG", outFile);
+            System.out.println("  ✓ " + filename);
+        } catch (IOException ex) {
+            System.err.println("  ✗ Failed to save " + filename + ": " + ex.getMessage());
+        }
     }
 
     private void processNext() {
@@ -511,8 +636,220 @@ public class ScreenshotGenerator extends Application {
         return tv;
     }
 
-    // ---- Helpers ----
+    // ---- Node factories for controls that were missing preview images ----
 
+    private Node createSkeleton() {
+        SkeletonPane pane = new SkeletonPane(createProfileSkeleton(), null, true);
+        pane.setPrefWidth(520);
+        pane.setStyle("-fx-background-color: white; -fx-background-radius: 8; "
+                + "-fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-padding: 20;");
+        return pane;
+    }
+
+    private Node createProfileSkeleton() {
+        Skeleton avatar = new Skeleton(Skeleton.Variant.CIRCULAR);
+        avatar.setPrefSize(56, 56);
+        avatar.setMaxSize(56, 56);
+
+        Skeleton title = new Skeleton(Skeleton.Variant.ROUNDED_RECTANGLE);
+        title.setPrefSize(160, 16);
+        title.setMaxWidth(160);
+
+        Skeleton paragraph = new Skeleton(Skeleton.Variant.TEXT);
+        paragraph.setLineCount(3);
+        paragraph.setLineHeight(11);
+        paragraph.setLineSpacing(8);
+        paragraph.setLastLineFillPercent(62);
+
+        VBox textColumn = new VBox(10, title, paragraph);
+        HBox.setHgrow(textColumn, Priority.ALWAYS);
+
+        HBox row = new HBox(16, avatar, textColumn);
+        row.setAlignment(Pos.TOP_LEFT);
+        return row;
+    }
+
+    private Node createHiddenSidesPane() {
+        Label contentLabel = new Label("Content Area");
+        contentLabel.setStyle("-fx-font-size: 15; -fx-text-fill: #888;");
+
+        StackPane content = new StackPane(contentLabel);
+        content.setStyle("-fx-background-color: white;");
+
+        VBox sidebar = new VBox(10,
+                titled("Navigation"),
+                new Label("Dashboard"),
+                new Label("Reports"),
+                new Label("Settings"));
+        sidebar.setPadding(new Insets(16));
+        sidebar.setPrefWidth(180);
+        sidebar.setStyle("-fx-background-color: #6366f1; -fx-text-fill: white;");
+        sidebar.getChildren().forEach(node -> node.setStyle("-fx-text-fill: white;"));
+
+        HiddenSidesPane pane = new HiddenSidesPane();
+        pane.setContent(content);
+        pane.setLeft(sidebar);
+        pane.setPinnedSide(Side.LEFT);
+        pane.setPrefSize(600, 320);
+        pane.setStyle("-fx-border-color: #e0e0e0; -fx-border-radius: 6;");
+        return pane;
+    }
+
+    private Node createSimpleFilterView() {
+        SimpleFilterView filterView = new SimpleFilterView();
+        filterView.addSearchTextField("Search");
+        filterView.addSelectionBox("Status", List.of("Open", "In Progress", "Closed"));
+        filterView.addSelectionBox("Priority", List.of("Low", "Medium", "High"));
+        filterView.addDateRangePicker("Date Range");
+        filterView.addCheckBox("Only mine");
+
+        VBox box = new VBox(10, titled("Filters"), filterView);
+        box.setPadding(new Insets(16));
+        box.setPrefWidth(720);
+        box.setStyle("-fx-background-color: white; -fx-background-radius: 8; "
+                + "-fx-border-color: #e0e0e0; -fx-border-radius: 8;");
+        return box;
+    }
+
+    private Node createChipsViewContainer() {
+        ChipsViewContainer container = new ChipsViewContainer();
+        container.setOnClear(() -> {});
+        container.getChips().addAll(
+                chip("Status: Open"),
+                chip("Priority: High"),
+                chip("Assignee: Jane Doe"),
+                chip("Type: Bug"));
+
+        VBox box = new VBox(container);
+        box.setPadding(new Insets(16));
+        box.setPrefWidth(580);
+        box.setStyle("-fx-background-color: white; -fx-background-radius: 8; "
+                + "-fx-border-color: #e0e0e0; -fx-border-radius: 8;");
+        return box;
+    }
+
+    private ChipView<String> chip(String text) {
+        ChipView<String> chipView = new ChipView<>();
+        chipView.setValue(text);
+        chipView.setText(text);
+        return chipView;
+    }
+
+    private Node createAdvancedTableView() {
+        AdvancedTableView<Person> table = new AdvancedTableView<>();
+        table.getItems().addAll(
+                new Person("Alice Johnson", "Engineer", "New York"),
+                new Person("Bob Smith", "Manager", "Chicago"),
+                new Person("Carol White", "Designer", "San Francisco"),
+                new Person("David Lee", "Director", "Boston"),
+                new Person("Eva Martinez", "Developer", "Austin"));
+
+        table.getColumns().addAll(
+                personColumn("Name", "name"),
+                personColumn("Role", "role"),
+                personColumn("City", "city"));
+
+        table.autoResizeAllColumns();
+        table.setPrefSize(660, 300);
+        return table;
+    }
+
+    private TableColumn<Person, String> personColumn(String title, String property) {
+        TableColumn<Person, String> column = new TableColumn<>(title);
+        column.setCellValueFactory(new PropertyValueFactory<>(property));
+        return column;
+    }
+
+    /** Simple bean used by the advanced table view screenshot. */
+    public static class Person {
+
+        private final String name;
+        private final String role;
+        private final String city;
+
+        public Person(String name, String role, String city) {
+            this.name = name;
+            this.role = role;
+            this.city = city;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getRole() {
+            return role;
+        }
+
+        public String getCity() {
+            return city;
+        }
+    }
+
+    private Node createAutoscrollListView() {
+        AutoscrollListView<String> listView = new AutoscrollListView<>();
+        for (int i = 1; i <= 30; i++) {
+            listView.getItems().add("Draggable Item " + i);
+        }
+        listView.setPrefSize(420, 300);
+        return listView;
+    }
+
+    private Node createEnhancedLabel() {
+        EnhancedLabel label1 = new EnhancedLabel("Select this text and copy it via CTRL-C.");
+        EnhancedLabel label2 = new EnhancedLabel("Or use the context menu to copy the label.");
+        label1.setStyle("-fx-font-size: 14;");
+        label2.setStyle("-fx-font-size: 14;");
+
+        VBox box = new VBox(12, titled("EnhancedLabel"), label1, label2);
+        box.setPadding(new Insets(16));
+        box.setPrefWidth(500);
+        box.setStyle("-fx-background-color: white; -fx-background-radius: 8; "
+                + "-fx-border-color: #e0e0e0; -fx-border-radius: 8;");
+        return box;
+    }
+
+    private PopupSetup createSelectionBox() {
+        SelectionBox<String> box = new SelectionBox<>("New York", "London", "Paris", "Tokyo", "Sydney");
+        box.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        box.getSelectionModel().selectIndices(0, 2);
+        return new PopupSetup(box, box::show);
+    }
+
+    private PopupSetup createDayOfWeekPicker() {
+        DayOfWeekPicker picker = new DayOfWeekPicker();
+        picker.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        picker.getSelectionModel().select(DayOfWeek.MONDAY);
+        picker.getSelectionModel().select(DayOfWeek.WEDNESDAY);
+        picker.getSelectionModel().select(DayOfWeek.FRIDAY);
+        picker.setPrefWidth(180);
+        return new PopupSetup(picker, picker::show);
+    }
+
+    private PopupSetup createTimeRangePicker() {
+        TimeRangePicker picker = new TimeRangePicker();
+        picker.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        picker.getSelectionModel().selectIndices(1, 2);
+        picker.setPrefWidth(220);
+        return new PopupSetup(picker, picker::show);
+    }
+
+    private PopupSetup createHistoryButtonBox() {
+        javafx.scene.control.TextField textField = new javafx.scene.control.TextField();
+        textField.setPromptText("Enter a search term");
+        textField.setPrefColumnCount(16);
+
+        HistoryButton<String> historyButton = new HistoryButton<>(textField);
+        InMemoryHistoryManager<String> historyManager = new InMemoryHistoryManager<>();
+        historyManager.set(List.of("JavaFX controls", "GemsFX", "Calendar view", "Search field"));
+        historyButton.setHistoryManager(historyManager);
+
+        HBox box = new HBox(6, textField, historyButton);
+        box.setAlignment(Pos.CENTER);
+        return new PopupSetup(box, historyButton::showPopup);
+    }
+
+    // ---- Helpers ----
     private Button styledButton(String text, String color) {
         Button btn = new Button(text);
         btn.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; "
@@ -537,6 +874,8 @@ public class ScreenshotGenerator extends Application {
     }
 
     public static void main(String[] args) {
+        // the website is in English, so the screenshots must be, too
+        java.util.Locale.setDefault(java.util.Locale.ENGLISH);
         launch(args);
     }
 }
