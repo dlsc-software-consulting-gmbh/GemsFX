@@ -61,6 +61,18 @@ public class YearMonthView extends Control {
                 }
             }
         });
+
+        latestMonthProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue != null && newValue.isBefore(getValue())) {
+                setValue(newValue);
+            }
+        });
+
+        earliestMonthProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue != null && newValue.isAfter(getValue())) {
+                setValue(newValue);
+            }
+        });
     }
 
     /**
