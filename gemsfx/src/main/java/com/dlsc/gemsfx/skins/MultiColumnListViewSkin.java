@@ -59,6 +59,13 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
         gridPane.getChildren().clear();
         gridPane.getColumnConstraints().clear();
 
+        MultiColumnListView<T> view = getSkinnable();
+        ObservableList<ListViewColumn<T>> columns = view.getColumns();
+
+        if (columns.isEmpty()) {
+            return;
+        }
+
         RowConstraints row1 = new RowConstraints();
         row1.setVgrow(Priority.NEVER);
         row1.setFillHeight(true);
@@ -67,15 +74,12 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
         row2.setVgrow(Priority.ALWAYS);
         row2.setFillHeight(true);
 
-        MultiColumnListView<T> view = getSkinnable();
-
         if (view.isShowHeaders()) {
             gridPane.getRowConstraints().setAll(row1, row2);
         } else {
             gridPane.getRowConstraints().setAll(row2);
         }
 
-        ObservableList<ListViewColumn<T>> columns = view.getColumns();
         int numberOfColumns = columns.size();
 
         Callback<Integer, Node> separatorFactory = view.getSeparatorFactory();
