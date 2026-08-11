@@ -3,7 +3,9 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.LoadingPane.Size;
 import com.dlsc.gemsfx.LoadingPane.Status;
 import com.dlsc.gemsfx.skins.MultiColumnListViewSkin;
+import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.ListUtils;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -22,7 +24,6 @@ import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.event.Event;
 import javafx.event.EventType;
-import com.dlsc.gemsfx.util.AccessibilityUtil;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
@@ -45,24 +46,29 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import com.dlsc.gemsfx.util.ResourceBundleManager;
 
 /**
  * A view for displaying multiple columns where each column consists of a header
  * control and a {@link ListView}. The control allows the user to rearrange the items in each
  * {@link ListView} and also to drag and drop items from one column to another.
  *
+ * <p>The two placeholder items (see {@link #placeholderFromProperty()} and
+ * {@link #placeholderToProperty()}) that are used to visualize the drag and drop
+ * operations have to be specified <b>before</b> the control gets added to the scene
+ * graph. Setting them later can result in the placeholders not being shown properly
+ * during drag and drop.</p>
+ *
  * @param <T> the item types, e.g. "Issues" or "Tickets"
  *
- * <p><b>CSS Styleable Properties:</b>
- * <table class="striped">
- *   <caption>CSS Properties</caption>
- *   <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
- *   <tbody>
- *     <tr><td>{@code -fx-disable-drag-and-drop}</td><td>{@code Boolean}</td><td>Whether to disable drag and drop.</td></tr>
- *     <tr><td>{@code -fx-show-headers}</td><td>{@code Boolean}</td><td>Whether to show column headers.</td></tr>
- *   </tbody>
- * </table>
+ *            <p><b>CSS Styleable Properties:</b>
+ *            <table class="striped">
+ *              <caption>CSS Properties</caption>
+ *              <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+ *              <tbody>
+ *                <tr><td>{@code -fx-disable-drag-and-drop}</td><td>{@code Boolean}</td><td>Whether to disable drag and drop.</td></tr>
+ *                <tr><td>{@code -fx-show-headers}</td><td>{@code Boolean}</td><td>Whether to show column headers.</td></tr>
+ *              </tbody>
+ *            </table>
  */
 public class MultiColumnListView<T> extends Control {
 
@@ -176,7 +182,7 @@ public class MultiColumnListView<T> extends Control {
      * Represents the size of the loading status indicator used in the control.
      * This property determines the visual size (e.g., SMALL, MEDIUM, LARGE) of the loading status
      * and can be updated dynamically to reflect size changes in the UI.
-     *
+     * <p>
      * The default value is {@code Size.MEDIUM}.
      *
      * @see #loadingStatusProperty()
@@ -197,9 +203,15 @@ public class MultiColumnListView<T> extends Control {
 
     private final StyleableBooleanProperty showHeaders = new StyleableBooleanProperty(true) {
         @Override
-        public Object getBean() { return MultiColumnListView.this; }
+        public Object getBean() {
+            return MultiColumnListView.this;
+        }
+
         @Override
-        public String getName() { return "showHeaders"; }
+        public String getName() {
+            return "showHeaders";
+        }
+
         @Override
         public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
             return StyleableProperties.SHOW_HEADERS;
@@ -315,9 +327,15 @@ public class MultiColumnListView<T> extends Control {
 
     private final StyleableBooleanProperty disableDragAndDrop = new StyleableBooleanProperty(false) {
         @Override
-        public Object getBean() { return MultiColumnListView.this; }
+        public Object getBean() {
+            return MultiColumnListView.this;
+        }
+
         @Override
-        public String getName() { return "disableDragAndDrop"; }
+        public String getName() {
+            return "disableDragAndDrop";
+        }
+
         @Override
         public CssMetaData<? extends Styleable, Boolean> getCssMetaData() {
             return StyleableProperties.DISABLE_DRAG_AND_DROP;
@@ -349,30 +367,33 @@ public class MultiColumnListView<T> extends Control {
     private static class StyleableProperties {
 
         private static final CssMetaData<MultiColumnListView, Boolean> SHOW_HEADERS =
-            new CssMetaData<>("-fx-show-headers", BooleanConverter.getInstance(), true) {
-                @Override
-                public boolean isSettable(MultiColumnListView c) {
-                    return !c.showHeaders.isBound();
-                }
-                @Override
-                public StyleableProperty<Boolean> getStyleableProperty(MultiColumnListView c) {
-                    return (StyleableProperty<Boolean>) c.showHeaders;
-                }
-            };
+                new CssMetaData<>("-fx-show-headers", BooleanConverter.getInstance(), true) {
+                    @Override
+                    public boolean isSettable(MultiColumnListView c) {
+                        return !c.showHeaders.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(MultiColumnListView c) {
+                        return (StyleableProperty<Boolean>) c.showHeaders;
+                    }
+                };
 
         private static final CssMetaData<MultiColumnListView, Boolean> DISABLE_DRAG_AND_DROP =
-            new CssMetaData<>("-fx-disable-drag-and-drop", BooleanConverter.getInstance(), false) {
-                @Override
-                public boolean isSettable(MultiColumnListView c) {
-                    return !c.disableDragAndDrop.isBound();
-                }
-                @Override
-                public StyleableProperty<Boolean> getStyleableProperty(MultiColumnListView c) {
-                    return (StyleableProperty<Boolean>) c.disableDragAndDrop;
-                }
-            };
+                new CssMetaData<>("-fx-disable-drag-and-drop", BooleanConverter.getInstance(), false) {
+                    @Override
+                    public boolean isSettable(MultiColumnListView c) {
+                        return !c.disableDragAndDrop.isBound();
+                    }
+
+                    @Override
+                    public StyleableProperty<Boolean> getStyleableProperty(MultiColumnListView c) {
+                        return (StyleableProperty<Boolean>) c.disableDragAndDrop;
+                    }
+                };
 
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
         static {
             List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
             styleables.add(SHOW_HEADERS);
@@ -579,7 +600,7 @@ public class MultiColumnListView<T> extends Control {
                     multiColumnListView.getDraggedItems().setAll(getListView().getSelectionModel().getSelectedItems());
 
                     ListUtils.replaceIf(getListView().getItems(), item -> item == getItem(), multiColumnListView.getPlaceholderFrom());
-                    
+
                     fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_STARTED, getItem(), getColumn(), getIndex()));
                 } else {
                     fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_NOT_POSSIBLE, getItem(), getColumn(), getIndex()));
@@ -856,10 +877,10 @@ public class MultiColumnListView<T> extends Control {
      * Represents an event specific to the {@code MultiColumnListView} component.
      * This event is triggered during user interactions such as drag and drop activities
      * or changes in the state of the list view.
-     *
+     * <p>
      * The class provides a set of predefined event types to handle common scenarios,
      * such as item movement, drag operations, and drop validation.
-     *
+     * <p>
      * Event Types:
      * - {@link #ANY}: Represents a generic {@code MultiColumnListViewEvent}.
      * - {@link #ITEM_MOVED}: Indicates that an item has been moved to a new location.
@@ -867,7 +888,7 @@ public class MultiColumnListView<T> extends Control {
      * - {@link #DRAG_OVER}: Fired when a drag operation hovers over the target area.
      * - {@link #DRAG_STARTED}: Specifies the start of a drag operation.
      * - {@link #DRAG_ENDED}: Fired when a drag operation has completed.
-     *
+     * <p>
      * This event also provides access to the dragged item and the associated column
      * where the interaction occurs.
      */
