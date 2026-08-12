@@ -8,19 +8,13 @@ import com.dlsc.gemsfx.paging.PagingControls;
 import com.dlsc.gemsfx.paging.PagingGridTableView;
 import com.dlsc.gemsfx.paging.PagingListView;
 import com.dlsc.gemsfx.treeview.TreeNodeView;
-import javafx.application.Platform;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
-import org.junit.Assume;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
@@ -31,47 +25,10 @@ import static org.junit.Assert.assertTrue;
  * Verifies that the GemsFX controls expose a sensible {@link AccessibleRole} (and, where
  * applicable, an {@code accessibleText}) as part of the baseline accessibility support.
  */
-public class AccessibilityTest {
-
-    @BeforeClass
-    public static void initToolkit() {
-        // These tests need a real JavaFX toolkit, which is not available on the CI runners.
-        Assume.assumeTrue("Skipping accessibility tests inside GitHub Actions", System.getenv("GITHUB_ACTIONS") == null);
-
-        // The JavaFX toolkit must be running before controls (fonts, skins) can be created.
-        try {
-            CountDownLatch latch = new CountDownLatch(1);
-            Platform.startup(latch::countDown);
-            latch.await(10, TimeUnit.SECONDS);
-        } catch (IllegalStateException alreadyStarted) {
-            // toolkit was started by a previous test - that is fine
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
+public class AccessibilityTest extends FxTestBase {
 
     private static Node create(Supplier<Node> supplier) {
-        AtomicReference<Node> ref = new AtomicReference<>();
-        AtomicReference<RuntimeException> error = new AtomicReference<>();
-        CountDownLatch latch = new CountDownLatch(1);
-        Platform.runLater(() -> {
-            try {
-                ref.set(supplier.get());
-            } catch (RuntimeException e) {
-                error.set(e);
-            } finally {
-                latch.countDown();
-            }
-        });
-        try {
-            assertTrue("Timed out creating control on FX thread", latch.await(10, TimeUnit.SECONDS));
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        if (error.get() != null) {
-            throw error.get();
-        }
-        return ref.get();
+        return invoke(supplier);
     }
 
     private static Map<String, Supplier<Node>> controls() {

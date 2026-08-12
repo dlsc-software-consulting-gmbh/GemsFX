@@ -108,6 +108,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Headless JavaFX toolkit (Monocle) so that the control tests can run on CI servers. -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>openjfx-monocle</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -115,6 +122,54 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <rules combine.children="override">
+                                <requireMavenVersion>
+                                    <version>${maven.version}</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>${java.version}</version>
+                                </requireJavaVersion>
+                                <enforceBytecodeVersion>
+                                    <maxJdkVersion>${java.version}</maxJdkVersion>
+                                    <!-- test-only headless JavaFX toolkit, never shipped to consumers -->
+                                    <excludes>
+                                        <exclude>org.testfx:openjfx-monocle</exclude>
+                                    </excludes>
+                                </enforceBytecodeVersion>
+                                <dependencyConvergence/>
+                                <requireUpperBoundDeps/>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Monocle hooks into the (unnamed) javafx.graphics module, hence classpath mode. -->
+                    <useModulePath>false</useModulePath>
+                    <systemPropertyVariables>
+                        <glass.platform>Monocle</glass.platform>
+                        <monocle.platform>Headless</monocle.platform>
+                        <prism.order>sw</prism.order>
+                        <prism.verbose>false</prism.verbose>
+                        <java.awt.headless>true</java.awt.headless>
+                        <testfx.headless>true</testfx.headless>
+                        <headless.geometry>1600x1200-32</headless.geometry>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

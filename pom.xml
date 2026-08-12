@@ -53,6 +53,7 @@
         <gemsfx.java.version>11</gemsfx.java.version>
         <gemsfx.javafx.version>17.0.16</gemsfx.javafx.version>
         <ikonli.version>12.4.0</ikonli.version>
+        <monocle.version>17.0.10</monocle.version>
         <sonar.projectKey>dlsc-software-consulting-gmbh_GemsFX</sonar.projectKey>
         <sonar.organization>dlsc-software-consulting-gmbh</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -208,6 +209,12 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.13.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testfx</groupId>
+                <artifactId>openjfx-monocle</artifactId>
+                <version>${monocle.version}</version>
             </dependency>
 
             <dependency>

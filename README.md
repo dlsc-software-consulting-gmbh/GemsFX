@@ -13,8 +13,27 @@ GemsFX is a collection of custom controls and utilities for JavaFX. The website 
 
 The `gemsfx` library module targets **Java 11** and **JavaFX 17+**. The `gemsfx-demo` module uses **Java 24** / **JavaFX 25.0.2**.
 
-## AtlantaFX
-If you want to use **_AtlantaFX_** for your application then copy the stylesheet called `atlantafx.css` from the demo module into
+## Testing
+
+The unit tests of the `gemsfx` module create real controls and therefore need a running JavaFX
+toolkit. To make them work on CI servers without a display, the tests run on the
+[Monocle](https://github.com/TestFX/Monocle) headless platform. The required system properties
+(`glass.platform=Monocle`, `monocle.platform=Headless`, `prism.order=sw`, ...) are configured for the
+surefire plugin in `gemsfx/pom.xml`, so no additional setup (Xvfb or similar) is needed.
+
+All tests that need the toolkit extend `com.dlsc.gemsfx.FxTestBase`, which starts the toolkit once
+per JVM and offers helpers to run code on the JavaFX application thread (`runFx`, `invoke`) and to
+force skin creation (`layout`).
+
+```bash
+# run all tests of the library module
+./mvnw test -pl gemsfx
+
+# run a single test class
+./mvnw test -pl gemsfx -Dtest=CalendarViewTest
+```
+
+## AtlantaFXIf you want to use **_AtlantaFX_** for your application then copy the stylesheet called `atlantafx.css` from the demo module into
 your project. You will need to add it to the list of stylesheets that you are attaching to your application's scene. For
 more information on **_AtlantaFX_** please see the [AtlantaFX](https://github.com/mkpaz/AtlantaFX)
 project.
