@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class MultiColumnListViewApp extends GemApplication {
-    ListViewColumn<Issue> col1 = new ListViewColumn<>();
-    ListViewColumn<Issue> col2 = new ListViewColumn<>();
-    ListViewColumn<Issue> col3 = new ListViewColumn<>();
-    ListViewColumn<Issue> col4 = new ListViewColumn<>();
-    ListViewColumn<Issue> col5 = new ListViewColumn<>();
+    private final ListViewColumn<Issue> col1 = new ListViewColumn<>();
+    private final ListViewColumn<Issue> col2 = new ListViewColumn<>();
+    private final ListViewColumn<Issue> col3 = new ListViewColumn<>();
+    private final ListViewColumn<Issue> col4 = new ListViewColumn<>();
+    private final ListViewColumn<Issue> col5 = new ListViewColumn<>();
 
     @Override
     public void start(Stage stage) { super.start(stage);
