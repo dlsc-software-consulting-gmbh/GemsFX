@@ -58,6 +58,12 @@ import java.util.Objects;
  * graph. Setting them later can result in the placeholders not being shown properly
  * during drag and drop.</p>
  *
+ * <p>In addition the view supports a placeholder node (see {@link #placeholderProperty()})
+ * which will be shown instead of the columns whenever the list of columns is empty. The
+ * default placeholder is a label that reads "No columns defined." and that is surrounded
+ * by a dashed border. The placeholder can be replaced with any other node or removed
+ * completely by setting the property to null.</p>
+ *
  * @param <T> the item types, e.g. "Issues" or "Tickets"
  *
  *            <p><b>CSS Styleable Properties:</b>
