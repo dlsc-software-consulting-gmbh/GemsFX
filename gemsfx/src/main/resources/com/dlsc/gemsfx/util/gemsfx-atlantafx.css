@@ -2829,3 +2829,10 @@
 .selection-box .selection-popup > .content > .options-scroll-pane .options-box > .radio-button:selected > .radio > .dot {
     -fx-background-color: -color-fg-default;
 }
+/* -----------------------------------------------------------------------
+ * skeleton
+ */
+.skeleton {
+    /* clearly visible on -color-bg-default and -color-bg-subtle in light and dark themes */
+    -fx-base-color: -color-border-muted;
+}

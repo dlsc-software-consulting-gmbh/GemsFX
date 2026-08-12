@@ -30,6 +30,7 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Single-unit skeleton placeholder with a horizontal shimmer animation,
@@ -67,6 +68,13 @@ import java.util.List;
  *     <tr><td>{@code -fx-last-line-fill-percent}</td><td>{@code Size}</td><td>Width percentage of the final text line</td></tr>
  *   </tbody>
  * </table>
+ *
+ * <p>The control ships its own user agent stylesheet, {@code skeleton.css},
+ * which declares the default values for all of the properties listed above.
+ * The default base color is derived from the Modena theme
+ * ({@code derive(-fx-background, -8%)}), so the placeholder follows the look of
+ * the surrounding scene. Applications can override any of the properties with a
+ * regular stylesheet added to the scene or the control itself.
  *
  * @see SkeletonPane
  */
@@ -128,6 +136,11 @@ public class Skeleton extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new SkeletonSkin(this);
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return Objects.requireNonNull(Skeleton.class.getResource("skeleton.css")).toExternalForm();
     }
 
     private final ObjectProperty<Variant> variant = new StyleableObjectProperty<>(DEFAULT_VARIANT) {

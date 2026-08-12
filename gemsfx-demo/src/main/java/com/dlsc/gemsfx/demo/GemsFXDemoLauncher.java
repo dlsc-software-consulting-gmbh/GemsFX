@@ -120,6 +120,31 @@ public class GemsFXDemoLauncher extends GemApplication {
     private Stage launcherStage;
 
     /**
+     * All AtlantaFX themes supported by the demos, in the order in which they are presented
+     * to the user. Also used by {@link GemApplication#createThemeSwitcher()}.
+     */
+    static final List<Theme> ALL_THEMES = List.of(
+            new NordLight(), new NordDark(),
+            new CupertinoLight(), new CupertinoDark(),
+            new PrimerLight(), new PrimerDark(),
+            new Dracula(),
+            new ArmyDark(), new ArmyLight(),
+            new Autumn(),
+            new Blacky(),
+            new BlueDark(), new BlueLight(),
+            new Browny(),
+            new FallDark(), new FallLight(),
+            new GithubDarkColorblind(), new GithubDarkTritanopia(),
+            new GithubLightColorblind(), new GithubLightDefault(), new GithubLightTritanopia(),
+            new GithubSoftDark(),
+            new NavyDark(), new NavyLight(),
+            new News(),
+            new SpringDark(), new SpringLight(),
+            new SummerDark(), new SummerLight(),
+            new WinterDark(), new WinterLight(),
+            new Yacht());
+
+    /**
      * All demos, in category / alphabetical order.
      */
     static final List<DemoEntry> ALL_DEMOS = List.of(
@@ -161,6 +186,7 @@ public class GemsFXDemoLauncher extends GemApplication {
             demo("Lists & Tables", "Filter View (Simple)", SimpleFilterViewApp::new),
             demo("Lists & Tables", "Grid Table View", GridTableViewApp::new),
             desktopDemoOnly("Lists & Tables", "Multi Column List View", MultiColumnListViewApp::new),
+            desktopDemoOnly("Lists & Tables", "Multi Column List View (Simple)", MultiColumnListViewApp2::new),
             demo("Lists & Tables", "Paging Controls", PagingControlsApp::new),
             demo("Lists & Tables", "Paging Grid Table View", PagingGridTableViewApp::new),
             demo("Lists & Tables", "Paging Grid Table View (Simple)", SimplePagingGridTableViewApp::new),
@@ -269,26 +295,7 @@ public class GemsFXDemoLauncher extends GemApplication {
 
         List<MarkdownView> markdownViews = List.of(markdownView, codeMarkdownView, cssMarkdownView);
 
-        List<Theme> themes = List.of(
-                new NordLight(), new NordDark(),
-                new CupertinoLight(), new CupertinoDark(),
-                new PrimerLight(), new PrimerDark(),
-                new Dracula(),
-                new ArmyDark(), new ArmyLight(),
-                new Autumn(),
-                new Blacky(),
-                new BlueDark(), new BlueLight(),
-                new Browny(),
-                new FallDark(), new FallLight(),
-                new GithubDarkColorblind(), new GithubDarkTritanopia(),
-                new GithubLightColorblind(), new GithubLightDefault(), new GithubLightTritanopia(),
-                new GithubSoftDark(),
-                new NavyDark(), new NavyLight(),
-                new News(),
-                new SpringDark(), new SpringLight(),
-                new SummerDark(), new SummerLight(),
-                new WinterDark(), new WinterLight(),
-                new Yacht());
+        List<Theme> themes = ALL_THEMES;
         Map<String, Theme> themeOptions = new LinkedHashMap<>();
         themeOptions.put("Modena", null);
         for (Theme theme : themes) {

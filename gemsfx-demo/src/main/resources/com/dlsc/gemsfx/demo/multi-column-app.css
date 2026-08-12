@@ -1,44 +1,293 @@
 .root {
-    -slate-green: #63946a;
-    -yellowish-orange: #ffa208;
-    -tomato: #e94b35;
-    -blue: #4a90e2;
+    -slate-green: #2da44e;
+    -yellowish-orange: #d29922;
+    -tomato: #cf222e;
+    -blue: #0969da;
+    -purple: #8250df;
+    -grey: #57606a;
+    -light-grey: #d0d7de;
+    -very-light-grey: #f6f8fa;
 }
 
 .issue-list-cell {
     -fx-background-color: transparent;
-    -fx-pref-height: 135px;
-    -fx-padding: 10px;
+    -fx-pref-height: 190px;
+    -fx-padding: 6px 8px 6px 8px;
 }
+
+/* the card itself */
 
 .issue-list-cell .content {
-    -fx-background-color: #e0e0e0;
-    -fx-shadow: dropshadow(gaussian, rgba(255, 0, 0, .26), 10, 0.12, -1, 2);
-    -fx-background-radius: 4px;
+    -fx-background-color: white;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-color: -light-grey;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(27, 31, 36, .15), 6, 0, 0, 2);
+    -fx-padding: 10px;
+    -fx-spacing: 8px;
 }
 
-.issue-list-cell.todo .content {
-    -fx-background-color: -blue;
+.issue-list-cell:selected .content {
+    -fx-border-color: -blue;
+    -fx-border-width: 2px;
+    -fx-padding: 9px;
 }
 
-.issue-list-cell.in-progress .content {
-    -fx-background-color: -yellowish-orange;
+/* header: type icon, issue ID, priority */
+
+.issue-list-cell .content .header {
+    -fx-spacing: 5px;
 }
 
-.issue-list-cell.done .content {
-    -fx-background-color: -slate-green;
+.issue-list-cell .content .type-icon {
+    -fx-icon-size: 15px;
 }
 
-.issue-list-cell .label {
-    -fx-font-size: 1.5em;
-    -fx-text-fill: white;
+.issue-list-cell .content.type-bug .type-icon {
+    -fx-icon-color: -tomato;
+}
+
+.issue-list-cell .content.type-feature .type-icon {
+    -fx-icon-color: -purple;
+}
+
+.issue-list-cell .content.type-improvement .type-icon {
+    -fx-icon-color: -slate-green;
+}
+
+.issue-list-cell .content.type-task .type-icon {
+    -fx-icon-color: -blue;
+}
+
+.issue-list-cell .content .id-label {
+    -fx-text-fill: -grey;
+    -fx-font-size: .85em;
     -fx-font-weight: bold;
 }
 
+.issue-list-cell .content .priority-label {
+    -fx-font-size: .8em;
+    -fx-font-weight: bold;
+    -fx-graphic-text-gap: 2px;
+    -fx-background-radius: 10px;
+    -fx-padding: 1px 7px 1px 5px;
+}
+
+.issue-list-cell .content .priority-label .ikonli-font-icon {
+    -fx-icon-size: 12px;
+}
+
+.issue-list-cell .content.priority-low .priority-label {
+    -fx-background-color: #ddf4e4;
+    -fx-text-fill: -slate-green;
+    -fx-icon-color: -slate-green;
+}
+
+.issue-list-cell .content.priority-medium .priority-label {
+    -fx-background-color: #ddf4ff;
+    -fx-text-fill: -blue;
+    -fx-icon-color: -blue;
+}
+
+.issue-list-cell .content.priority-high .priority-label {
+    -fx-background-color: #fff1e5;
+    -fx-text-fill: -yellowish-orange;
+    -fx-icon-color: -yellowish-orange;
+}
+
+.issue-list-cell .content.priority-critical .priority-label {
+    -fx-background-color: #ffebe9;
+    -fx-text-fill: -tomato;
+    -fx-icon-color: -tomato;
+}
+
+/* title */
+
+.issue-list-cell .content .title-label {
+    -fx-font-size: 1.05em;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f2328;
+}
+
+/* labels / tags */
+
+.issue-list-cell .content .labels-pane {
+    -fx-hgap: 4px;
+    -fx-vgap: 4px;
+}
+
+.issue-list-cell .content .issue-label {
+    -fx-background-color: -very-light-grey;
+    -fx-background-radius: 10px;
+    -fx-border-color: -light-grey;
+    -fx-border-radius: 10px;
+    -fx-padding: 0px 8px 1px 8px;
+    -fx-font-size: .75em;
+    -fx-text-fill: -grey;
+}
+
+.issue-list-cell .content .issue-label-ui,
+.issue-list-cell .content .issue-label-css {
+    -fx-background-color: #ddf4ff;
+    -fx-border-color: #b6e3ff;
+    -fx-text-fill: -blue;
+}
+
+.issue-list-cell .content .issue-label-regression,
+.issue-list-cell .content .issue-label-a11y {
+    -fx-background-color: #ffebe9;
+    -fx-border-color: #ffcecb;
+    -fx-text-fill: -tomato;
+}
+
+.issue-list-cell .content .issue-label-performance,
+.issue-list-cell .content .issue-label-core {
+    -fx-background-color: #fbefff;
+    -fx-border-color: #ecd8ff;
+    -fx-text-fill: -purple;
+}
+
+/* subtask progress */
+
+.issue-list-cell .content .progress-box {
+    -fx-spacing: 3px;
+}
+
+.issue-list-cell .content .subtasks-label {
+    -fx-font-size: .75em;
+    -fx-text-fill: -grey;
+}
+
+.issue-list-cell .content .subtasks-progress {
+    -fx-pref-height: 6px;
+    -fx-min-height: 6px;
+    -fx-max-height: 6px;
+}
+
+.issue-list-cell .content .subtasks-progress > .track {
+    -fx-background-color: #eaeef2;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 0;
+}
+
+.issue-list-cell .content .subtasks-progress > .bar {
+    -fx-background-color: -blue;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 0;
+    -fx-padding: 3px;
+}
+
+.issue-list-cell.done .content .subtasks-progress > .bar {
+    -fx-background-color: -slate-green;
+}
+
+/* footer: avatar, due date, counters, story points */
+
+.issue-list-cell .content .footer {
+    -fx-spacing: 6px;
+}
+
+.issue-list-cell .content .footer .avatar-view {
+    -fx-font-size: .7em;
+}
+
+.issue-list-cell .content .counter-label,
+.issue-list-cell .content .due-date-label {
+    -fx-font-size: .75em;
+    -fx-text-fill: -grey;
+    -fx-icon-color: -grey;
+    -fx-graphic-text-gap: 3px;
+}
+
+.issue-list-cell .content .counter-label .ikonli-font-icon,
+.issue-list-cell .content .due-date-label .ikonli-font-icon {
+    -fx-icon-size: 13px;
+}
+
+.issue-list-cell .content .due-date-label.due-soon {
+    -fx-text-fill: -yellowish-orange;
+    -fx-icon-color: -yellowish-orange;
+}
+
+.issue-list-cell .content .due-date-label.overdue {
+    -fx-text-fill: -tomato;
+    -fx-icon-color: -tomato;
+    -fx-font-weight: bold;
+}
+
+.issue-list-cell .content .story-points-label {
+    -fx-background-color: -very-light-grey;
+    -fx-border-color: -light-grey;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-min-width: 20px;
+    -fx-alignment: center;
+    -fx-padding: 0px 6px 1px 6px;
+    -fx-font-size: .75em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -grey;
+}
+
+/* skeleton placeholder shown when no columns are present */
+
+.multi-column-list-view > .skeleton-placeholder {
+    -fx-spacing: 10px;
+    -fx-padding: 0;
+    /* same background as the list views that are shown when columns are present */
+    -fx-background-color: -fx-control-inner-background;
+}
+
+/*
+ * The cards of this demo are always drawn with a light (GitHub like) palette, even when the
+ * application runs with a dark theme. The skeletons must therefore not use their default base
+ * color, which is derived from the theme's background color and would turn dark (and invisible
+ * on the white cards) when a dark theme is active.
+ */
+.multi-column-list-view > .skeleton-placeholder .skeleton {
+    -fx-base-color: -light-grey;
+    -fx-shimmer-fill: linear-gradient(to right, rgba(255, 255, 255, 0.0) 0%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.0) 100%);
+}
+
+.multi-column-list-view > .skeleton-placeholder > .skeleton-column {
+    -fx-spacing: 12px;
+    -fx-padding: 10px;
+    -fx-min-height: 0px;
+    -fx-background-color: white;
+    -fx-background-radius: 6px;
+    -fx-border-color: -light-grey;
+    -fx-border-radius: 6px;
+}
+
+.multi-column-list-view > .skeleton-placeholder .skeleton-card {
+    -fx-spacing: 8px;
+    -fx-padding: 10px;
+    -fx-pref-height: 150px;
+    -fx-min-height: 90px;
+    -fx-background-color: white;
+    -fx-background-radius: 6px;
+    -fx-border-color: -light-grey;
+    -fx-border-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(27, 31, 36, .1), 5, 0, 0, 1);
+}
+
+.multi-column-list-view > .skeleton-placeholder .skeleton-card > .header,
+.multi-column-list-view > .skeleton-placeholder .skeleton-card > .footer {
+    -fx-spacing: 6px;
+}
+
+/* drag and drop placeholders */
+
 .issue-list-cell .placeholder {
-    -fx-border-color: #e0e0e0;
+    -fx-border-color: -light-grey;
     -fx-border-width: 2px;
     -fx-border-style: dashed;
+    -fx-border-radius: 6px;
+}
+
+.issue-list-cell .placeholder-label {
+    -fx-text-fill: -grey;
+    -fx-font-weight: bold;
 }
 
 .issue-list-cell:from {

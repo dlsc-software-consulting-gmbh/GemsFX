@@ -34,6 +34,11 @@ public class SkeletonPaneApp extends GemApplication {
 
         Scene scene = new Scene(root, 620.0, 320.0);
         scene.getStylesheets().add(Objects.requireNonNull(SkeletonPaneApp.class.getResource("skeleton-pane-app.css")).toExternalForm());
+        if (Boolean.getBoolean("atlantafx")) {
+            scene.getStylesheets().add(Objects.requireNonNull(SkeletonPaneApp.class.getResource("skeleton-pane-app-atlantafx.css")).toExternalForm());
+        } else {
+            scene.getStylesheets().add(Objects.requireNonNull(SkeletonPaneApp.class.getResource("skeleton-pane-app-modena.css")).toExternalForm());
+        }
         CSSFX.start(scene);
 
         stage.setScene(scene);
@@ -42,7 +47,9 @@ public class SkeletonPaneApp extends GemApplication {
     }
 
     private Node createProfileCardDemo() {
-        SkeletonPane pane = new SkeletonPane(createProfileSkeleton(), createProfileContent(), true);
+        Node skeleton = createProfileSkeleton();
+
+        SkeletonPane pane = new SkeletonPane(skeleton, createProfileContent(), true);
         pane.getStyleClass().add("social-card");
         pane.setPrefWidth(520.0);
 
@@ -52,7 +59,7 @@ public class SkeletonPaneApp extends GemApplication {
         Button devToolsButton = configureDevToolsButton(new Button());
         devToolsButton.setMaxWidth(Double.MAX_VALUE);
 
-        HBox controls = new HBox(8.0, toggleButton, devToolsButton);
+        HBox controls = new HBox(8.0, toggleButton, createShimmerToggle(skeleton), devToolsButton);
         controls.setAlignment(Pos.CENTER_LEFT);
         return new VBox(12.0, pane, controls);
     }

@@ -1,0 +1,26 @@
+.skeleton {
+    -fx-variant: rounded-rectangle;
+    -fx-corner-radius: 4px;
+    /* derived from the Modena background so that the placeholder follows the theme */
+    -fx-base-color: derive(-fx-background, -8%);
+    /* theme-neutral: the translucent edges of the band are invisible on any base color */
+    -fx-shimmer-fill: linear-gradient(to right, rgba(255, 255, 255, 0.0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.0) 100%);
+    -fx-cycle-duration: 1500ms;
+    -fx-shimmer-width: 56px;
+    -fx-line-count: 1;
+    -fx-line-height: 14px;
+    -fx-line-spacing: 8px;
+    -fx-last-line-fill-percent: 70;
+}
+
+/* the layer holding the shapes that are filled with the base color */
+.skeleton > .shape-layer {
+}
+
+/* the clipped layer in which the shimmer band travels */
+.skeleton > .shimmer-layer {
+}
+
+/* the moving band, its fill is driven by -fx-shimmer-fill */
+.skeleton > .shimmer-layer > .shimmer-band {
+}

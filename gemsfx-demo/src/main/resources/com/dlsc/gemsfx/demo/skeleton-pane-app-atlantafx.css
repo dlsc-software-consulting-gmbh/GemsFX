@@ -1,0 +1,31 @@
+/*
+ * AtlantaFX variant of the SkeletonPane demo. All colors are taken from the theme's
+ * palette so that the demo follows the currently selected light or dark theme. The
+ * skeletons deliberately do not override -fx-base-color or -fx-shimmer-fill here:
+ * both are already mapped to theme colors by gemsfx-atlantafx.css.
+ */
+
+.demo-content {
+    -fx-background-color: -color-bg-default;
+}
+
+.social-card {
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: -color-border-default;
+}
+
+.real-avatar > .text-wrapper {
+    -fx-background-color: -color-accent-muted;
+}
+
+.real-avatar > .text-wrapper > .initials-text {
+    -fx-fill: -color-fg-default;
+}
+
+.real-name {
+    -fx-text-fill: -color-fg-default;
+}
+
+.real-body {
+    -fx-text-fill: -color-fg-muted;
+}

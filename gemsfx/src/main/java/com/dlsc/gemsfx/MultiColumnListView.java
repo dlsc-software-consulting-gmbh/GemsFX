@@ -7,6 +7,7 @@ import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.ListUtils;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -25,6 +26,8 @@ import javafx.css.StyleableProperty;
 import javafx.css.converter.BooleanConverter;
 import javafx.event.Event;
 import javafx.event.EventType;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
@@ -40,7 +43,9 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Callback;
 
 import java.util.ArrayList;
@@ -66,6 +71,82 @@ import java.util.Objects;
  * default placeholder is a label that reads "No columns defined." and that is surrounded
  * by a dashed border. The placeholder can be replaced with any other node or removed
  * completely by setting the property to null.</p>
+ *
+ * <p><b>Controlling drag and drop:</b> two callbacks allow applications to restrict which
+ * items may be dragged and where they may be dropped. Both callbacks return {@code true}
+ * for everything by default, and drag and drop can be switched off completely via
+ * {@link #disableDragAndDropProperty()}.</p>
+ *
+ * <table class="striped">
+ *   <caption>Drag and drop callbacks</caption>
+ *   <thead><tr><th>Callback</th><th>Signature</th><th>Description</th></tr></thead>
+ *   <tbody>
+ *     <tr>
+ *       <td>{@link #dragPossibleCallbackProperty() dragPossibleCallback}</td>
+ *       <td>{@code Callback<T, Boolean>}</td>
+ *       <td>Invoked when the user starts to drag an item. The callback receives the model
+ *           object of type {@code T} that is about to be dragged and returns {@code true}
+ *           if the drag operation is allowed for that item. Returning {@code false} makes
+ *           the item non-draggable.</td>
+ *     </tr>
+ *     <tr>
+ *       <td>{@link #dropPossibleCallbackProperty() dropPossibleCallback}</td>
+ *       <td>{@code Callback<DropParameter<T>, Boolean>}</td>
+ *       <td>Invoked while the user drags an item over a possible drop location. The callback
+ *           receives a {@link DropParameter} which carries the dragged item
+ *           ({@link DropParameter#getItem()}) and the target column
+ *           ({@link DropParameter#getColumn()}). Returning {@code false} rejects the drop,
+ *           so that neither the drop markers appear nor the drop itself is performed.</td>
+ *     </tr>
+ *   </tbody>
+ * </table>
+ *
+ * <p>Example: only allow "done" items to be dragged and only allow drops into a column
+ * that is not full.</p>
+ *
+ * <pre>{@code
+ * MultiColumnListView<Task> view = new MultiColumnListView<>();
+ * view.setDragPossibleCallback(task -> task.isDone());
+ * view.setDropPossibleCallback(param -> param.getColumn().getItems().size() < 10);
+ * }</pre>
+ *
+ * <p><b>Drag and drop events:</b> the view fires instances of {@link MultiColumnListViewEvent}
+ * for all relevant steps of a drag and drop operation, including the steps that were vetoed by
+ * the two callbacks described above. Every event carries the dragged item
+ * ({@link MultiColumnListViewEvent#getDraggedItem()}), the involved column
+ * ({@link MultiColumnListViewEvent#getColumn()}), and the item index inside that column
+ * ({@link MultiColumnListViewEvent#getIndex()}).</p>
+ *
+ * <table class="striped">
+ *   <caption>Event types</caption>
+ *   <thead><tr><th>Event type</th><th>Fired when</th></tr></thead>
+ *   <tbody>
+ *     <tr><td>{@link MultiColumnListViewEvent#ANY}</td>
+ *         <td>Super type of all events fired by this control, useful for registering a single
+ *             handler for all drag and drop events.</td></tr>
+ *     <tr><td>{@link MultiColumnListViewEvent#DRAG_STARTED}</td>
+ *         <td>The user started to drag an item and the {@code dragPossibleCallback} allowed it.</td></tr>
+ *     <tr><td>{@link MultiColumnListViewEvent#DRAG_NOT_POSSIBLE}</td>
+ *         <td>The user tried to drag an item but the {@code dragPossibleCallback} returned
+ *             {@code false}.</td></tr>
+ *     <tr><td>{@link MultiColumnListViewEvent#DRAG_OVER}</td>
+ *         <td>A dragged item is hovering over a valid drop location.</td></tr>
+ *     <tr><td>{@link MultiColumnListViewEvent#DROP_NOT_POSSIBLE}</td>
+ *         <td>A dragged item is hovering over, or was dropped on, a location that the
+ *             {@code dropPossibleCallback} rejected.</td></tr>
+ *     <tr><td>{@link MultiColumnListViewEvent#ITEM_MOVED}</td>
+ *         <td>An item was successfully dropped and hence moved to its new column and index.</td></tr>
+ *     <tr><td>{@link MultiColumnListViewEvent#DRAG_ENDED}</td>
+ *         <td>The drag operation has finished, no matter whether it was successful or not. This
+ *             event type is currently not fired by the control itself and is meant to be used by
+ *             applications that implement their own drag and drop handling.</td></tr>
+ *   </tbody>
+ * </table>
+ *
+ * <pre>{@code
+ * view.addEventHandler(MultiColumnListViewEvent.ITEM_MOVED, evt ->
+ *         System.out.println(evt.getDraggedItem() + " moved to index " + evt.getIndex()));
+ * }</pre>
  *
  * @param <T> the item types, e.g. "Issues" or "Tickets"
  *
@@ -328,7 +409,9 @@ public class MultiColumnListView<T> extends Control {
     }
 
     /**
-     * The cell factory that will be used for each one of the {@link ListView} instances.
+     * The cell factory that will be used for each one of the {@link ListView} instances. The
+     * default factory produces {@link ColumnListCell} instances which show the item inside a
+     * pane with a dashed border and a centered label.
      *
      * @return the cell factory
      */
@@ -806,6 +889,9 @@ public class MultiColumnListView<T> extends Control {
         private final MultiColumnListView<T> multiColumnListView;
         private ListViewColumn<T> column;
 
+        private Label contentLabel;
+        private StackPane contentPane;
+
         /**
          * Creates a new list cell.
          *
@@ -1092,19 +1178,84 @@ public class MultiColumnListView<T> extends Control {
          * {@link #isFromPlaceholder()} and {@link #isToPlaceholder()} to distinguish these
          * cases.</p>
          *
+         * <p>The default implementation does not use the text of the cell but rather shows a
+         * "rich" graphic (see {@link #getContentPane()}): a pane with a dashed border that
+         * contains a centered label (see {@link #getContentLabel()}). Subclasses that override
+         * this method can either keep using that pane, replace the graphic with a node of their
+         * own, or simply call {@link #setText(String)} for a text-only cell.</p>
+         *
          * @param userObject the model object shown by this cell, possibly {@code null}
          * @param empty      true if the cell is empty
          */
         protected void updateUserObject(T userObject, boolean empty) {
+            String text;
+
             if (isFromPlaceholder()) {
-                setText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "placeholder.from", "From"));
+                text = ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "placeholder.from", "From");
             } else if (isToPlaceholder()) {
-                setText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "placeholder.to", "To"));
+                text = ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "placeholder.to", "To");
             } else if (!empty && userObject != null) {
-                setText(userObject.toString());
+                text = userObject.toString();
             } else {
-                setText("");
+                text = null;
             }
+
+            setText(null);
+
+            if (text == null) {
+                setGraphic(null);
+            } else {
+                getContentLabel().setText(text);
+                setGraphic(getContentPane());
+            }
+        }
+
+        /**
+         * Returns the label that is used by the default implementation of
+         * {@link #updateUserObject(Object, boolean)} to show the text of the cell. The label is
+         * centered inside the {@link #getContentPane() content pane} and uses the style class
+         * "content-label".
+         *
+         * @return the label showing the text of the cell
+         */
+        protected final Label getContentLabel() {
+            if (contentLabel == null) {
+                contentLabel = new Label();
+                contentLabel.getStyleClass().add("content-label");
+                contentLabel.setWrapText(true);
+                contentLabel.setAlignment(Pos.CENTER);
+                contentLabel.setTextAlignment(TextAlignment.CENTER);
+                contentLabel.setMaxWidth(Double.MAX_VALUE);
+            }
+
+            return contentLabel;
+        }
+
+        /**
+         * Returns the pane that is used as the graphic of the cell by the default implementation
+         * of {@link #updateUserObject(Object, boolean)}. The pane uses the style class
+         * "content-pane", is styled with a dashed border, and centers the
+         * {@link #getContentLabel() content label}. The pane always spans the entire width of
+         * the cell.
+         *
+         * @return the pane used as the graphic of the cell
+         */
+        protected final StackPane getContentPane() {
+            if (contentPane == null) {
+                contentPane = new StackPane(getContentLabel());
+                contentPane.getStyleClass().add("content-pane");
+                contentPane.setAlignment(Pos.CENTER);
+                contentPane.setMinWidth(0);
+
+                // the graphic of a labeled node is sized to its preferred width, hence the pane
+                // has to follow the width of the cell explicitly
+                contentPane.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> {
+                    Insets insets = getInsets();
+                    return Math.max(0, getWidth() - insets.getLeft() - insets.getRight());
+                }, widthProperty(), insetsProperty()));
+            }
+
+            return contentPane;
         }
 
         private final ReadOnlyBooleanWrapper placeholder = new ReadOnlyBooleanWrapper(this, "placeholder");
@@ -1177,6 +1328,8 @@ public class MultiColumnListView<T> extends Control {
      * Event Types:
      * - {@link #ANY}: Represents a generic {@code MultiColumnListViewEvent}.
      * - {@link #ITEM_MOVED}: Indicates that an item has been moved to a new location.
+     * - {@link #DRAG_NOT_POSSIBLE}: Signifies a rejected drag operation, see
+     *   {@link MultiColumnListView#dragPossibleCallbackProperty()}.
      * - {@link #DROP_NOT_POSSIBLE}: Signifies a failed drop operation due to validation failures.
      * - {@link #DRAG_OVER}: Fired when a drag operation hovers over the target area.
      * - {@link #DRAG_STARTED}: Specifies the start of a drag operation.

@@ -1,0 +1,47 @@
+/*
+ * Modena variant of the SkeletonPane demo. The card is always drawn with a light
+ * palette here, so the skeletons must not use their default base color, which is
+ * derived from the theme background.
+ */
+
+.demo-content {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f8fafc);
+}
+
+.social-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e4e7ec;
+}
+
+.social-card .skeleton {
+    -fx-base-color: #e0e0e0;
+    -fx-shimmer-fill: linear-gradient(to right, rgba(255, 255, 255, 0.0) 0%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.0) 100%);
+}
+
+.real-avatar > .text-wrapper {
+    -fx-background-color: #c7d2fe;
+}
+
+.real-avatar > .text-wrapper > .initials-text {
+    -fx-fill: #1d2433;
+}
+
+.real-name {
+    -fx-text-fill: #1d2433;
+}
+
+.real-body {
+    -fx-text-fill: #344054;
+}
+
+.button {
+    -fx-background-color: #1e90ff;
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 6px;
+    -fx-padding: 6px 14px;
+    -fx-font-size: 13px;
+}
+
+.button:hover {
+    -fx-background-color: #1976d2;
+}
