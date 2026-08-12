@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.MultiColumnListView;
+import com.dlsc.gemsfx.MultiColumnListView.ColumnItem;
 import com.dlsc.gemsfx.MultiColumnListView.ColumnListCell;
 import com.dlsc.gemsfx.MultiColumnListView.DropParameter;
 import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
@@ -130,7 +131,7 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
                 ((Region) header).setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             }
 
-            ListView<T> listView = view.getListViewFactory().call(view);
+            ListView<ColumnItem<T>> listView = view.getListViewFactory().call(view);
             if (listView.getPlaceholder() == null) {
                 createPlaceholder(listView);
             }
@@ -143,7 +144,7 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
                 initPlaceholder(listView, listView.getPlaceholder(), column);
             });
 
-            listView.itemsProperty().bind(column.itemsProperty());
+            listView.setItems(column.getItemWrappers());
 
             listView.cellFactoryProperty().bind(Bindings.createObjectBinding(() -> lv -> {
                 Callback<MultiColumnListView<T>, ColumnListCell<T>> cellFactory = view.getCellFactory();
@@ -197,7 +198,7 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
         } while (columnIndex < numberOfColumns);
     }
 
-    private void createPlaceholder(ListView<T> listView) {
+    private void createPlaceholder(ListView<ColumnItem<T>> listView) {
         Label label = new Label();
         label.getStyleClass().add("placeholder");
         label.setAlignment(Pos.CENTER);
@@ -205,7 +206,7 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
         listView.setPlaceholder(label);
     }
 
-    private void initPlaceholder(ListView<T> listView, Node placeholder, ListViewColumn<T> column) {
+    private void initPlaceholder(ListView<ColumnItem<T>> listView, Node placeholder, ListViewColumn<T> column) {
         placeholder.setOnDragOver(event -> {
             MultiColumnListView<T> multiColumnListView = getSkinnable();
             T draggedItem = multiColumnListView.getDraggedItem();
@@ -223,7 +224,10 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
         placeholder.setOnDragDropped(event -> {
             MultiColumnListView<T> multiColumnListView = getSkinnable();
             T draggedItem = multiColumnListView.getDraggedItem();
-            listView.getItems().add(getSkinnable().getDraggedItem());
+            ColumnItem<T> draggedColumnItem = multiColumnListView.getDraggedColumnItem();
+            if (draggedColumnItem != null) {
+                listView.getItems().add(draggedColumnItem);
+            }
             event.setDropCompleted(true);
             event.consume();
             getSkinnable().fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_OVER, draggedItem, column, 0));

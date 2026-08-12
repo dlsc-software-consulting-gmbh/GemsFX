@@ -5,8 +5,6 @@ import com.dlsc.gemsfx.MultiColumnListView.ColumnListCell;
 import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
 import com.dlsc.gemsfx.MultiColumnListView.MultiColumnListViewEvent;
 import fr.brouillard.oss.cssfx.CSSFX;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -38,8 +36,6 @@ public class MultiColumnListViewApp extends GemApplication {
         MultiColumnListView<Issue> multiColumnListView = new MultiColumnListView<>();
         multiColumnListView.setCellFactory(listView -> new IssueListCell(multiColumnListView));
         multiColumnListView.getColumns().setAll(createColumns());
-        multiColumnListView.setPlaceholderFrom(new Issue("From"));
-        multiColumnListView.setPlaceholderTo(new Issue("To"));
         multiColumnListView.setDragPossibleCallback(issue -> !issue.getStatus().equals("done"));
         multiColumnListView.setDropPossibleCallback(para -> !para.getColumn().getUserObject().equals("col1"));
         multiColumnListView.addEventHandler(MultiColumnListViewEvent.ANY, System.out::println);
@@ -162,13 +158,13 @@ public class MultiColumnListViewApp extends GemApplication {
 
             VBox content = new VBox();
             content.getStyleClass().add("content");
-            content.visibleProperty().bind(placeholder.not().and(emptyProperty().not()));
-            content.managedProperty().bind(placeholder.not().and(emptyProperty().not()));
+            content.visibleProperty().bind(placeholderProperty().not().and(emptyProperty().not()));
+            content.managedProperty().bind(placeholderProperty().not().and(emptyProperty().not()));
 
             VBox contentPlaceholder = new VBox();
             contentPlaceholder.getStyleClass().add("placeholder");
-            contentPlaceholder.visibleProperty().bind(placeholder);
-            contentPlaceholder.managedProperty().bind(placeholder);
+            contentPlaceholder.visibleProperty().bind(placeholderProperty());
+            contentPlaceholder.managedProperty().bind(placeholderProperty());
 
             Label label = new Label();
             label.textProperty().bind(textProperty());
@@ -183,27 +179,17 @@ public class MultiColumnListViewApp extends GemApplication {
             return wrapper;
         }
 
-        private final BooleanProperty placeholder = new SimpleBooleanProperty(this, "placeholder", false);
-
         @Override
-        protected void updateItem(Issue item, boolean empty) {
-            super.updateItem(item, empty);
-
-            placeholder.set(false);
-
+        protected void updateUserObject(Issue item, boolean empty) {
             getStyleClass().removeAll("todo", "in-progress", "done");
 
-            if (item != null && !empty) {
-                if (item == getMultiColumnListView().getPlaceholderFrom()) {
-                    placeholder.set(true);
-                    setText("From");
-                } else if (item == getMultiColumnListView().getPlaceholderTo()) {
-                    placeholder.set(true);
-                    setText("To");
-                } else {
-                    setText(item.getTitle() + "\n(" + item.getStatus() + ")");
-                    getStyleClass().add(item.getStatus());
-                }
+            if (isFromPlaceholder()) {
+                setText("From");
+            } else if (isToPlaceholder()) {
+                setText("To");
+            } else if (item != null && !empty) {
+                setText(item.getTitle() + "\n(" + item.getStatus() + ")");
+                getStyleClass().add(item.getStatus());
             } else {
                 setText("");
             }

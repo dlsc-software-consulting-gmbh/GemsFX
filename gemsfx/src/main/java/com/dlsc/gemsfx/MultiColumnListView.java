@@ -15,6 +15,7 @@ import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
@@ -44,7 +45,9 @@ import javafx.util.Callback;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -52,11 +55,11 @@ import java.util.Objects;
  * control and a {@link ListView}. The control allows the user to rearrange the items in each
  * {@link ListView} and also to drag and drop items from one column to another.
  *
- * <p>The two placeholder items (see {@link #placeholderFromProperty()} and
- * {@link #placeholderToProperty()}) that are used to visualize the drag and drop
- * operations have to be specified <b>before</b> the control gets added to the scene
- * graph. Setting them later can result in the placeholders not being shown properly
- * during drag and drop.</p>
+ * <p>Internally the control wraps every model object inside an instance of
+ * {@link ColumnItem}. This allows the control to create the two marker items that are
+ * used to visualize the "from" and the "to" location of a drag and drop operation all
+ * by itself. Applications only ever deal with their own model objects of type
+ * {@code T}.</p>
  *
  * <p>In addition the view supports a placeholder node (see {@link #placeholderProperty()})
  * which will be shown instead of the columns whenever the list of columns is empty. The
@@ -247,9 +250,9 @@ public class MultiColumnListView<T> extends Control {
         this.showHeaders.set(showHeaders);
     }
 
-    private final ObjectProperty<Callback<MultiColumnListView<T>, ListView<T>>> listViewFactory = new SimpleObjectProperty<>(this, "listViewFactory", m -> new AutoscrollListView<>());
+    private final ObjectProperty<Callback<MultiColumnListView<T>, ListView<ColumnItem<T>>>> listViewFactory = new SimpleObjectProperty<>(this, "listViewFactory", m -> new AutoscrollListView<>());
 
-    public final Callback<MultiColumnListView<T>, ListView<T>> getListViewFactory() {
+    public final Callback<MultiColumnListView<T>, ListView<ColumnItem<T>>> getListViewFactory() {
         return listViewFactory.get();
     }
 
@@ -258,11 +261,11 @@ public class MultiColumnListView<T> extends Control {
      *
      * @return the factory for creating the required list views, one for each column
      */
-    public final ObjectProperty<Callback<MultiColumnListView<T>, ListView<T>>> listViewFactoryProperty() {
+    public final ObjectProperty<Callback<MultiColumnListView<T>, ListView<ColumnItem<T>>>> listViewFactoryProperty() {
         return listViewFactory;
     }
 
-    public final void setListViewFactory(Callback<MultiColumnListView<T>, ListView<T>> listViewFactory) {
+    public final void setListViewFactory(Callback<MultiColumnListView<T>, ListView<ColumnItem<T>>> listViewFactory) {
         this.listViewFactory.set(listViewFactory);
     }
 
@@ -458,6 +461,124 @@ public class MultiColumnListView<T> extends Control {
 
         private final ListProperty<T> items = new SimpleListProperty<>(this, "items", FXCollections.observableArrayList());
 
+        private final ObservableList<ColumnItem<T>> itemWrappers = FXCollections.observableArrayList();
+
+        private boolean updating;
+
+        public ListViewColumn() {
+            items.addListener((ListChangeListener<T>) change -> updateWrappers());
+            itemWrappers.addListener((ListChangeListener<ColumnItem<T>>) change -> updateItems());
+        }
+
+        /**
+         * The list of wrapped items that is being shown by the {@link ListView} of this column. This
+         * list is maintained by the control itself. It is kept in sync with the list returned by
+         * {@link #getItems()} and it might temporarily contain the two placeholder items that are used
+         * to visualize an ongoing drag and drop operation.
+         *
+         * @return the internal list of wrapped items
+         */
+        public final ObservableList<ColumnItem<T>> getItemWrappers() {
+            return itemWrappers;
+        }
+
+        private void updateWrappers() {
+            if (updating) {
+                return;
+            }
+
+            updating = true;
+
+            try {
+                Map<T, List<ColumnItem<T>>> reusableWrappers = new IdentityHashMap<>();
+                for (ColumnItem<T> wrapper : itemWrappers) {
+                    if (!wrapper.isPlaceholder()) {
+                        reusableWrappers.computeIfAbsent(wrapper.getUserObject(), key -> new ArrayList<>()).add(wrapper);
+                    }
+                }
+
+                List<ColumnItem<T>> newWrappers = new ArrayList<>();
+                for (T item : items) {
+                    List<ColumnItem<T>> candidates = reusableWrappers.get(item);
+                    if (candidates != null && !candidates.isEmpty()) {
+                        newWrappers.add(candidates.remove(0));
+                    } else {
+                        newWrappers.add(new ColumnItem<>(item));
+                    }
+                }
+
+                // the placeholders of an ongoing drag and drop operation are not part of the
+                // user's item list, hence they have to be re-inserted at their current location
+                for (int index = 0; index < itemWrappers.size(); index++) {
+                    ColumnItem<T> wrapper = itemWrappers.get(index);
+                    if (wrapper.isPlaceholder()) {
+                        newWrappers.add(Math.min(index, newWrappers.size()), wrapper);
+                    }
+                }
+
+                if (!sameWrappers(newWrappers)) {
+                    itemWrappers.setAll(newWrappers);
+                }
+            } finally {
+                updating = false;
+            }
+        }
+
+        private void updateItems() {
+            if (updating || items.get() == null) {
+                return;
+            }
+
+            List<T> newItems = new ArrayList<>();
+            for (ColumnItem<T> wrapper : itemWrappers) {
+                if (!wrapper.isPlaceholder()) {
+                    newItems.add(wrapper.getUserObject());
+                }
+            }
+
+            if (sameItems(newItems)) {
+                return;
+            }
+
+            updating = true;
+
+            try {
+                items.setAll(newItems);
+            } finally {
+                updating = false;
+            }
+        }
+
+        private boolean sameWrappers(List<ColumnItem<T>> newWrappers) {
+            if (itemWrappers.size() != newWrappers.size()) {
+                return false;
+            }
+
+            for (int i = 0; i < newWrappers.size(); i++) {
+                if (itemWrappers.get(i) != newWrappers.get(i)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private boolean sameItems(List<T> newItems) {
+            ObservableList<T> currentItems = items.get();
+
+            if (currentItems.size() != newItems.size()) {
+                return false;
+            }
+
+            for (int i = 0; i < newItems.size(); i++) {
+                if (currentItems.get(i) != newItems.get(i)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public final ObservableList<T> getItems() {
             return items.get();
         }
@@ -535,42 +656,132 @@ public class MultiColumnListView<T> extends Control {
         return draggedItems;
     }
 
-    private final ObjectProperty<T> placeholderFrom = new SimpleObjectProperty<>(this, "placeholderFrom");
+    private final ColumnItem<T> fromPlaceholder = ColumnItem.createFromPlaceholder();
 
-    public final T getPlaceholderFrom() {
-        return placeholderFrom.get();
+    private final ColumnItem<T> toPlaceholder = ColumnItem.createToPlaceholder();
+
+    private ColumnItem<T> draggedColumnItem;
+
+    /**
+     * The item that is used to visualize the "from" location of an ongoing drag and drop
+     * operation. The item is created and managed by the control itself.
+     *
+     * @return the "from" placeholder item
+     */
+    public final ColumnItem<T> getFromPlaceholder() {
+        return fromPlaceholder;
     }
 
     /**
-     * A model item that represents the "from" location during drag and drop operations.
+     * The item that is used to visualize the "to" location of an ongoing drag and drop
+     * operation. The item is created and managed by the control itself.
      *
-     * @return the placeholder model item for the "from" location
+     * @return the "to" placeholder item
      */
-    public final ObjectProperty<T> placeholderFromProperty() {
-        return placeholderFrom;
-    }
-
-    public final void setPlaceholderFrom(T placeholderFrom) {
-        this.placeholderFrom.set(placeholderFrom);
-    }
-
-    private final ObjectProperty<T> placeholderTo = new SimpleObjectProperty<>(this, "placeholderTo");
-
-    public final T getPlaceholderTo() {
-        return placeholderTo.get();
+    public final ColumnItem<T> getToPlaceholder() {
+        return toPlaceholder;
     }
 
     /**
-     * A model item that represents the "to" location during drag and drop operations.
+     * The wrapper of the item that is currently being dragged, or {@code null} if no drag
+     * operation is in progress.
      *
-     * @return the placeholder model item for the "to" location
+     * @return the wrapper of the currently dragged item
      */
-    public final ObjectProperty<T> placeholderToProperty() {
-        return placeholderTo;
+    public final ColumnItem<T> getDraggedColumnItem() {
+        return draggedColumnItem;
     }
 
-    public final void setPlaceholderTo(T placeholderTo) {
-        this.placeholderTo.set(placeholderTo);
+    private void setDraggedColumnItem(ColumnItem<T> draggedColumnItem) {
+        this.draggedColumnItem = draggedColumnItem;
+    }
+
+    /**
+     * A wrapper around the model objects shown by the {@link MultiColumnListView} control. All
+     * list views managed by the control show instances of this type. This allows the control to
+     * add and remove the two marker / placeholder items that are used to visualize an ongoing
+     * drag and drop operation without requiring the application to provide model objects for
+     * these markers.
+     *
+     * @param <T> the type of the wrapped model object
+     */
+    public static final class ColumnItem<T> {
+
+        private enum Kind {
+            ITEM,
+            FROM_PLACEHOLDER,
+            TO_PLACEHOLDER
+        }
+
+        private final T userObject;
+
+        private final Kind kind;
+
+        /**
+         * Creates a new wrapper for the given model object.
+         *
+         * @param userObject the model object shown by the control
+         */
+        public ColumnItem(T userObject) {
+            this(userObject, Kind.ITEM);
+        }
+
+        private ColumnItem(T userObject, Kind kind) {
+            this.userObject = userObject;
+            this.kind = kind;
+        }
+
+        private static <T> ColumnItem<T> createFromPlaceholder() {
+            return new ColumnItem<>(null, Kind.FROM_PLACEHOLDER);
+        }
+
+        private static <T> ColumnItem<T> createToPlaceholder() {
+            return new ColumnItem<>(null, Kind.TO_PLACEHOLDER);
+        }
+
+        /**
+         * The model object wrapped by this item. Returns {@code null} for the two placeholder
+         * items.
+         *
+         * @return the wrapped model object
+         */
+        public T getUserObject() {
+            return userObject;
+        }
+
+        /**
+         * Determines if this item is one of the two placeholder items used during drag and drop.
+         *
+         * @return true if the item is the "from" or the "to" placeholder
+         */
+        public boolean isPlaceholder() {
+            return kind != Kind.ITEM;
+        }
+
+        /**
+         * Determines if this item is the placeholder marking the location where the currently
+         * dragged item came from.
+         *
+         * @return true if the item is the "from" placeholder
+         */
+        public boolean isFromPlaceholder() {
+            return kind == Kind.FROM_PLACEHOLDER;
+        }
+
+        /**
+         * Determines if this item is the placeholder marking the location where the currently
+         * dragged item will be dropped.
+         *
+         * @return true if the item is the "to" placeholder
+         */
+        public boolean isToPlaceholder() {
+            return kind == Kind.TO_PLACEHOLDER;
+        }
+
+        @Override
+        public String toString() {
+            return "ColumnItem{kind=" + kind + ", userObject=" + userObject + "}";
+        }
     }
 
     /**
@@ -578,9 +789,19 @@ public class MultiColumnListView<T> extends Control {
      * The cell adds drag and drop support for re-arranging list cells and for dragging them from
      * one column to another.
      *
-     * @param <T> the type of items in the list
+     * <p>The cells of the control show instances of {@link ColumnItem}, which are wrappers around
+     * the application's model objects. Subclasses do not have to deal with these wrappers as they
+     * can simply override {@link ColumnListCell#updateUserObject(Object, boolean)} which receives
+     * the model object itself. The model object will be {@code null} whenever the cell shows one of the two
+     * placeholders used during drag and drop (see {@link #placeholderProperty()},
+     * {@link #fromPlaceholderProperty()}, {@link #toPlaceholderProperty()}).</p>
+     *
+     * @param <T> the type of the model objects shown by the list
      */
-    public static class ColumnListCell<T> extends ListCell<T> {
+    public static class ColumnListCell<T> extends ListCell<ColumnItem<T>> {
+
+        private static final PseudoClass FROM_PSEUDO_CLASS = PseudoClass.getPseudoClass("from");
+        private static final PseudoClass TO_PSEUDO_CLASS = PseudoClass.getPseudoClass("to");
 
         private final MultiColumnListView<T> multiColumnListView;
         private ListViewColumn<T> column;
@@ -595,14 +816,7 @@ public class MultiColumnListView<T> extends Control {
 
             getStyleClass().add("column-list-cell");
 
-            fromPlaceholder.bind(itemProperty().isEqualTo(multiColumnListView.placeholderFromProperty()));
-            toPlaceholder.bind(itemProperty().isEqualTo(multiColumnListView.placeholderToProperty()));
             placeholder.bind(fromPlaceholder.or(toPlaceholder));
-
-            InvalidationListener updateDraggedPseudoStateListener = it -> updateDraggedPseudoState();
-
-            multiColumnListView.draggedItemProperty().addListener(updateDraggedPseudoStateListener);
-            itemProperty().addListener(updateDraggedPseudoStateListener);
 
             setOnDragDetected(event -> {
                 if (multiColumnListView.isDisableDragAndDrop()) {
@@ -610,12 +824,15 @@ public class MultiColumnListView<T> extends Control {
                 }
 
                 log("drag detected");
-                if (isEmpty() || getItem() == null) {
+                if (isEmpty() || getItem() == null || getItem().isPlaceholder()) {
                     return;
                 }
 
+                ColumnItem<T> columnItem = getItem();
+                T userObject = columnItem.getUserObject();
+
                 Callback<T, Boolean> dragPossibleCallback = multiColumnListView.getDragPossibleCallback();
-                if (dragPossibleCallback.call(getItem())) {
+                if (dragPossibleCallback.call(userObject)) {
                     ClipboardContent content = new ClipboardContent();
                     content.putString(Integer.toString(getIndex()));
 
@@ -632,37 +849,44 @@ public class MultiColumnListView<T> extends Control {
 
                     event.consume();
 
-                    multiColumnListView.setDraggedItem(getItem());
+                    multiColumnListView.setDraggedColumnItem(columnItem);
+                    multiColumnListView.setDraggedItem(userObject);
 
-                    multiColumnListView.getDraggedItems().setAll(getListView().getSelectionModel().getSelectedItems());
+                    List<T> selectedItems = new ArrayList<>();
+                    for (ColumnItem<T> selectedItem : getListView().getSelectionModel().getSelectedItems()) {
+                        if (selectedItem != null && !selectedItem.isPlaceholder()) {
+                            selectedItems.add(selectedItem.getUserObject());
+                        }
+                    }
+                    multiColumnListView.getDraggedItems().setAll(selectedItems);
 
-                    ListUtils.replaceIf(getListView().getItems(), item -> item == getItem(), multiColumnListView.getPlaceholderFrom());
+                    ListUtils.replaceIf(getListView().getItems(), item -> item == columnItem, multiColumnListView.getFromPlaceholder());
 
-                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_STARTED, getItem(), getColumn(), getIndex()));
+                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_STARTED, userObject, getColumn(), getIndex()));
                 } else {
-                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_NOT_POSSIBLE, getItem(), getColumn(), getIndex()));
+                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_NOT_POSSIBLE, userObject, getColumn(), getIndex()));
                 }
             });
 
             setOnDragOver(event -> {
                 log("drag over");
-                if (event.getGestureSource() != this && multiColumnListView.getPlaceholderFrom() != getItem()) {
-                    DropParameter<T> dropParameter = new DropParameter<>(getItem(), column);
+                if (event.getGestureSource() != this && multiColumnListView.getFromPlaceholder() != getItem()) {
+                    DropParameter<T> dropParameter = new DropParameter<>(getUserObject(), column);
                     Callback<DropParameter<T>, Boolean> callback = multiColumnListView.getDropPossibleCallback();
                     if (callback.call(dropParameter)) {
                         log("   drop possible callback is accepting, " + hashCode() + ", txt: " + getText());
                         updateItems(event);
                         event.acceptTransferModes(TransferMode.MOVE);
-                        fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_OVER, getItem(), getColumn(), getIndex()));
+                        fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DRAG_OVER, getUserObject(), getColumn(), getIndex()));
                     } else {
                         log("   drop possible callback is not accepting drag");
                         event.acceptTransferModes(TransferMode.NONE);
-                        fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DROP_NOT_POSSIBLE, getItem(), getColumn(), getIndex()));
+                        fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DROP_NOT_POSSIBLE, getUserObject(), getColumn(), getIndex()));
                     }
                 } else {
                     log("   not accepting transfer");
                     event.acceptTransferModes(TransferMode.NONE);
-                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DROP_NOT_POSSIBLE, getItem(), getColumn(), getIndex()));
+                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DROP_NOT_POSSIBLE, getUserObject(), getColumn(), getIndex()));
                 }
                 event.consume();
             });
@@ -671,7 +895,7 @@ public class MultiColumnListView<T> extends Control {
 
             setOnDragExited(event -> {
                 log("drag exited");
-                getListView().getItems().remove(multiColumnListView.getPlaceholderTo());
+                getListView().getItems().remove(multiColumnListView.getToPlaceholder());
             });
 
             setOnDragDropped(event -> {
@@ -681,59 +905,66 @@ public class MultiColumnListView<T> extends Control {
                     return;
                 }
 
-                if (multiColumnListView.getPlaceholderFrom() == getItem()) {
+                if (multiColumnListView.getFromPlaceholder() == getItem()) {
                     log("   not performing drop, drop happened on 'from' placeholder");
                     return;
                 }
 
                 Callback<DropParameter<T>, Boolean> dropCallback = multiColumnListView.getDropPossibleCallback();
-                if (dropCallback.call(new DropParameter<>(getItem(), column))) {
+                if (dropCallback.call(new DropParameter<>(getUserObject(), column))) {
                     log("   drop is possible, performing drop");
-                    ListView<T> listView = getListView();
-                    ObservableList<T> items = listView.getItems();
+                    ListView<ColumnItem<T>> listView = getListView();
+                    ObservableList<ColumnItem<T>> items = listView.getItems();
 
-                    items.remove(multiColumnListView.getPlaceholderFrom());
+                    items.remove(multiColumnListView.getFromPlaceholder());
 
-                    T draggedItem = multiColumnListView.getDraggedItem();
-                    ListUtils.replaceIf(items, item -> item == multiColumnListView.getPlaceholderTo(), draggedItem);
-
-                    if (!items.contains(draggedItem)) {
-                        // probably dropped on same list view / same column (hence no "to" placeholder)
-                        items.add(draggedItem);
+                    ColumnItem<T> draggedColumnItem = multiColumnListView.getDraggedColumnItem();
+                    if (draggedColumnItem == null) {
+                        return;
                     }
 
-                    listView.getSelectionModel().select(draggedItem);
+                    ListUtils.replaceIf(items, item -> item == multiColumnListView.getToPlaceholder(), draggedColumnItem);
+
+                    if (!items.contains(draggedColumnItem)) {
+                        // probably dropped on same list view / same column (hence no "to" placeholder)
+                        items.add(draggedColumnItem);
+                    }
+
+                    listView.getSelectionModel().select(draggedColumnItem);
 
                     event.setDropCompleted(true);
 
-                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.ITEM_MOVED, getItem(), getColumn(), getIndex()));
-//                } else {
-//                    log("   drop is not possible, ignoring");
-//                    event.setDropCompleted(false);
-                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DROP_NOT_POSSIBLE, getItem(), getColumn(), getIndex()));
+                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.ITEM_MOVED, draggedColumnItem.getUserObject(), getColumn(), getIndex()));
+                } else {
+                    fireEvent(new MultiColumnListViewEvent(MultiColumnListViewEvent.DROP_NOT_POSSIBLE, getUserObject(), getColumn(), getIndex()));
                 }
 
                 event.consume();
             });
 
             setOnDragDone(evt -> {
+                ColumnItem<T> draggedColumnItem = multiColumnListView.getDraggedColumnItem();
+
                 if (evt.isAccepted()) {
                     log("drag done, accepted");
                     if (Objects.equals(evt.getAcceptedTransferMode(), TransferMode.MOVE)) {
                         log("   drop was completed, removing the 'from' placeholder");
-                        getListView().getItems().removeIf(item -> item == multiColumnListView.getPlaceholderFrom());
-                    } else {
+                        getListView().getItems().remove(multiColumnListView.getFromPlaceholder());
+                    } else if (draggedColumnItem != null) {
                         log("   drop was not completed, replacing placeholder with dragged item");
-                        ListUtils.replaceIf(getListView().getItems(), item -> item == multiColumnListView.getPlaceholderFrom(), multiColumnListView.getDraggedItem());
+                        ListUtils.replaceIf(getListView().getItems(), item -> item == multiColumnListView.getFromPlaceholder(), draggedColumnItem);
                     }
                 } else {
                     log("drag done, not accepted");
 
                     // put the item back into the "from" location
                     log("putting item back into 'from' location");
-                    ListUtils.replaceIf(getListView().getItems(), item -> item == multiColumnListView.getPlaceholderFrom(), multiColumnListView.getDraggedItem());
+                    if (draggedColumnItem != null) {
+                        ListUtils.replaceIf(getListView().getItems(), item -> item == multiColumnListView.getFromPlaceholder(), draggedColumnItem);
+                    }
                 }
 
+                multiColumnListView.setDraggedColumnItem(null);
                 multiColumnListView.setDraggedItem(null);
                 evt.consume();
             });
@@ -741,6 +972,18 @@ public class MultiColumnListView<T> extends Control {
 
         public final ListViewColumn<T> getColumn() {
             return column;
+        }
+
+        /**
+         * Returns the model object currently shown by this cell. The method returns {@code null}
+         * if the cell is empty or if the cell currently shows one of the two drag and drop
+         * placeholders.
+         *
+         * @return the model object shown by this cell
+         */
+        public final T getUserObject() {
+            ColumnItem<T> item = getItem();
+            return item == null ? null : item.getUserObject();
         }
 
         /**
@@ -767,12 +1010,12 @@ public class MultiColumnListView<T> extends Control {
             if (event.getGestureSource() != this) {
                 int toIndex = getIndex();
 
-                T fromItem = multiColumnListView.getPlaceholderFrom();
-                T toItem = multiColumnListView.getPlaceholderTo();
+                ColumnItem<T> fromItem = multiColumnListView.getFromPlaceholder();
+                ColumnItem<T> toItem = multiColumnListView.getToPlaceholder();
 
                 int fromIndex = getListView().getItems().indexOf(fromItem);
 
-                ObservableList<T> items = getListView().getItems();
+                ObservableList<ColumnItem<T>> items = getListView().getItems();
                 log("item count: " + items.size());
                 items.remove(toItem);
                 log("item count now: " + items.size());
@@ -823,28 +1066,42 @@ public class MultiColumnListView<T> extends Control {
             return true;
         }
 
-        private void updateDraggedPseudoState() {
-            T from = multiColumnListView.getPlaceholderFrom();
-            pseudoClassStateChanged(PseudoClass.getPseudoClass("from"), from != null && from == getItem());
-
-            T to = multiColumnListView.getPlaceholderTo();
-            pseudoClassStateChanged(PseudoClass.getPseudoClass("to"), to != null && to == getItem());
-        }
-
         @Override
-        protected void updateItem(T item, boolean empty) {
+        protected final void updateItem(ColumnItem<T> item, boolean empty) {
             super.updateItem(item, empty);
 
-            updateDraggedPseudoState();
+            boolean from = !empty && item != null && item.isFromPlaceholder();
+            boolean to = !empty && item != null && item.isToPlaceholder();
 
-            if (!empty && item != null) {
-                if (item == multiColumnListView.getPlaceholderFrom()) {
-                    setText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "placeholder.from", "From"));
-                } else if (item == multiColumnListView.getPlaceholderTo()) {
-                    setText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "placeholder.to", "To"));
-                } else {
-                    setText(item.toString());
-                }
+            fromPlaceholder.set(from);
+            toPlaceholder.set(to);
+
+            pseudoClassStateChanged(FROM_PSEUDO_CLASS, from);
+            pseudoClassStateChanged(TO_PSEUDO_CLASS, to);
+
+            updateUserObject(item == null ? null : item.getUserObject(), empty);
+        }
+
+        /**
+         * Updates the cell for the given model object. This method will be called by the cell
+         * whenever its item changes. Subclasses should override this method instead of
+         * {@link #updateItem(ColumnItem, boolean)}, which is final.
+         *
+         * <p>The given model object will be {@code null} when the cell is empty or when the cell
+         * currently shows one of the two drag and drop placeholders. Use
+         * {@link #isFromPlaceholder()} and {@link #isToPlaceholder()} to distinguish these
+         * cases.</p>
+         *
+         * @param userObject the model object shown by this cell, possibly {@code null}
+         * @param empty      true if the cell is empty
+         */
+        protected void updateUserObject(T userObject, boolean empty) {
+            if (isFromPlaceholder()) {
+                setText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "placeholder.from", "From"));
+            } else if (isToPlaceholder()) {
+                setText(ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "placeholder.to", "To"));
+            } else if (!empty && userObject != null) {
+                setText(userObject.toString());
             } else {
                 setText("");
             }
@@ -858,13 +1115,12 @@ public class MultiColumnListView<T> extends Control {
 
         /**
          * A read-only property that is being set to true if the item in the cell is currently
-         * either one of the two placeholder items (see {@link MultiColumnListView#placeholderFromProperty()}
-         * or {@link MultiColumnListView#placeholderToProperty()}).
+         * either the "from" or the "to" placeholder item used during drag and drop operations.
          *
          * @return true if the currently shown item is either the "from" or the "to" placeholder object
          */
-        public final ReadOnlyBooleanWrapper placeholderProperty() {
-            return placeholder;
+        public final ReadOnlyBooleanProperty placeholderProperty() {
+            return placeholder.getReadOnlyProperty();
         }
 
         private final ReadOnlyBooleanWrapper fromPlaceholder = new ReadOnlyBooleanWrapper(this, "fromPlaceholder");
@@ -875,7 +1131,7 @@ public class MultiColumnListView<T> extends Control {
 
         /**
          * A read-only property that is being set to true if the item in the cell is currently
-         * the "from" placeholder item (see {@link MultiColumnListView#placeholderFromProperty()}).
+         * the "from" placeholder item.
          *
          * @return true if the currently shown item is the "from" placeholder object
          */
@@ -891,7 +1147,7 @@ public class MultiColumnListView<T> extends Control {
 
         /**
          * A read-only property that is being set to true if the item in the cell is currently
-         * the "to" placeholder item (see {@link MultiColumnListView#placeholderToProperty()}).
+         * the "to" placeholder item.
          *
          * @return true if the currently shown item is the "to" placeholder object
          */
