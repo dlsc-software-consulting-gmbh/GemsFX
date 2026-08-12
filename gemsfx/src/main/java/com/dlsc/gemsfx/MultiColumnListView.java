@@ -281,6 +281,37 @@ public class MultiColumnListView<T> extends Control {
         this.columns.set(columns);
     }
 
+    private final ObjectProperty<Node> placeholder = new SimpleObjectProperty<>(this, "placeholder", createDefaultPlaceholder());
+
+    public final Node getPlaceholder() {
+        return placeholder.get();
+    }
+
+    /**
+     * The node that will be shown instead of the columns when no columns have been
+     * added to the view (see {@link #columnsProperty()}). The default placeholder is a
+     * label that reads "No columns defined." and that is surrounded by a dashed border.
+     * <p>
+     * The placeholder node will be resized to fill the entire area of the control. No
+     * placeholder will be shown if this property is set to null.
+     * </p>
+     *
+     * @return the node shown when the view does not have any columns
+     */
+    public final ObjectProperty<Node> placeholderProperty() {
+        return placeholder;
+    }
+
+    public final void setPlaceholder(Node placeholder) {
+        this.placeholder.set(placeholder);
+    }
+
+    private Node createDefaultPlaceholder() {
+        Label label = new Label(ResourceBundleManager.getString(ResourceBundleManager.BundleType.MULTI_COLUMN_LIST_VIEW, "placeholder.no-columns", "No columns defined."));
+        label.getStyleClass().add("placeholder");
+        return label;
+    }
+
     private final ObjectProperty<Callback<MultiColumnListView<T>, ColumnListCell<T>>> cellFactory = new SimpleObjectProperty<>(this, "cellFactory", ColumnListCell::new);
 
     public final Callback<MultiColumnListView<T>, ColumnListCell<T>> getCellFactory() {

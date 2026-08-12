@@ -30,19 +30,14 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
 
     private final GridPane gridPane = new GridPane();
 
+    private final LoadingPane loadingPane;
+
     public MultiColumnListViewSkin(MultiColumnListView<T> view) {
         super(view);
 
-        InvalidationListener updateListener = (Observable it) -> updateView();
-        register(view.columnsProperty(), updateListener);
-        register(view.showHeadersProperty(), updateListener);
-        register(view.separatorFactoryProperty(), updateListener);
-        register(view.listViewFactoryProperty(), updateListener);
-        updateView();
-
         gridPane.getStyleClass().add("grid-pane");
 
-        LoadingPane loadingPane = new LoadingPane(gridPane) {
+        loadingPane = new LoadingPane(gridPane) {
             @Override
             public String getUserAgentStylesheet() {
                 return null;
@@ -52,7 +47,30 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
         loadingPane.sizeProperty().bind(view.loadingStatusSizeProperty());
         loadingPane.progressIndicatorProperty().bind(view.progressIndicatorProperty());
 
-        getChildren().setAll(loadingPane);
+        InvalidationListener updateListener = (Observable it) -> updateView();
+        register(view.columnsProperty(), updateListener);
+        register(view.showHeadersProperty(), updateListener);
+        register(view.separatorFactoryProperty(), updateListener);
+        register(view.listViewFactoryProperty(), updateListener);
+        register(view.placeholderProperty(), updateListener);
+
+        updateView();
+    }
+
+    private void updateChildren() {
+        MultiColumnListView<T> view = getSkinnable();
+
+        Node placeholder = view.getPlaceholder();
+        boolean showPlaceholder = view.getColumns().isEmpty() && placeholder != null;
+
+        if (showPlaceholder) {
+            if (placeholder instanceof Region) {
+                ((Region) placeholder).setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            }
+            getChildren().setAll(placeholder);
+        } else {
+            getChildren().setAll(loadingPane);
+        }
     }
 
     private void updateView() {
@@ -61,6 +79,8 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
 
         MultiColumnListView<T> view = getSkinnable();
         ObservableList<ListViewColumn<T>> columns = view.getColumns();
+
+        updateChildren();
 
         if (columns.isEmpty()) {
             return;

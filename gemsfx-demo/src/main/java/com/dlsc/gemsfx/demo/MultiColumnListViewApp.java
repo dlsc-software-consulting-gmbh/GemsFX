@@ -11,6 +11,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -62,7 +63,15 @@ public class MultiColumnListViewApp extends GemApplication {
             }
         });
 
-        HBox optionsBox = new HBox(10, separators, showHeaders, disableDragAndDrop);
+        Button clearColumns = new Button("Clear Columns");
+        clearColumns.setOnAction(evt -> multiColumnListView.getColumns().clear());
+        clearColumns.disableProperty().bind(multiColumnListView.columnsProperty().emptyProperty());
+
+        Button restoreColumns = new Button("Restore Columns");
+        restoreColumns.setOnAction(evt -> multiColumnListView.getColumns().setAll(col1, col2, col3, col4, col5));
+        restoreColumns.disableProperty().bind(multiColumnListView.columnsProperty().emptyProperty().not());
+
+        HBox optionsBox = new HBox(10, clearColumns, restoreColumns, separators, showHeaders, disableDragAndDrop);
         optionsBox.setAlignment(Pos.CENTER_RIGHT);
 
         StatusBar statusBar = new StatusBar();

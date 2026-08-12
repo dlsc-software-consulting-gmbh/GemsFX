@@ -3,6 +3,15 @@
 .multi-column-list-view {
 }
 
+.multi-column-list-view > .placeholder {
+    -fx-pref-width: 600px;
+    -fx-pref-height: 450px;
+    -fx-alignment: center;
+    -fx-border-color: -fx-box-border;
+    -fx-border-width: 1px;
+    -fx-border-style: dashed;
+}
+
 .multi-column-list-view > .loading-pane > .grid-pane {
     -fx-hgap: 10px;
     -fx-vgap: 10px;
