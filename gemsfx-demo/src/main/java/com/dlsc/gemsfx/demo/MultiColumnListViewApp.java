@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.AvatarView;
+import com.dlsc.gemsfx.LoadingPane.Status;
 import com.dlsc.gemsfx.MultiColumnListView;
 import com.dlsc.gemsfx.MultiColumnListView.ColumnListCell;
 import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
@@ -15,6 +16,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -94,7 +96,14 @@ public class MultiColumnListViewApp extends GemApplication {
         restoreColumns.setOnAction(evt -> multiColumnListView.getColumns().setAll(col1, col2, col3, col4, col5));
         restoreColumns.disableProperty().bind(multiColumnListView.columnsProperty().emptyProperty().not());
 
-        HBox optionsBox = new HBox(10, clearColumns, restoreColumns, createShimmerToggle(placeholder), separators, showHeaders, disableDragAndDrop);
+        ComboBox<Status> loadingStatusBox = new ComboBox<>();
+        loadingStatusBox.getItems().addAll(Status.values());
+        loadingStatusBox.valueProperty().bindBidirectional(multiColumnListView.loadingStatusProperty());
+
+        HBox loadingStatusOption = new HBox(5, new Label("Loading Status:"), loadingStatusBox);
+        loadingStatusOption.setAlignment(Pos.CENTER_LEFT);
+
+        HBox optionsBox = new HBox(10, clearColumns, restoreColumns, createShimmerToggle(placeholder), loadingStatusOption, separators, showHeaders, disableDragAndDrop);
         optionsBox.setAlignment(Pos.CENTER_RIGHT);
         createThemeSwitcher().ifPresent(switcher -> optionsBox.getChildren().add(0, switcher));
 

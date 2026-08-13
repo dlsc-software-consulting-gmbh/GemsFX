@@ -383,7 +383,9 @@ public class MultiColumnListView<T> extends Control {
      * label that reads "No columns defined." and that is surrounded by a dashed border.
      * <p>
      * The placeholder node will be resized to fill the entire area of the control. No
-     * placeholder will be shown if this property is set to null.
+     * placeholder will be shown if this property is set to null. The placeholder will also
+     * not be shown while the control is loading or showing an error (see
+     * {@link #loadingStatusProperty()}).
      * </p>
      *
      * @return the node shown when the view does not have any columns

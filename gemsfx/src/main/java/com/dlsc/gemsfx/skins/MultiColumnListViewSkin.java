@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.LoadingPane;
+import com.dlsc.gemsfx.LoadingPane.Status;
 import com.dlsc.gemsfx.MultiColumnListView;
 import com.dlsc.gemsfx.MultiColumnListView.ColumnItem;
 import com.dlsc.gemsfx.MultiColumnListView.ColumnListCell;
@@ -54,15 +55,33 @@ public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView
         register(view.separatorFactoryProperty(), updateListener);
         register(view.listViewFactoryProperty(), updateListener);
         register(view.placeholderProperty(), updateListener);
+        register(view.loadingStatusProperty(), (Observable it) -> updateChildren());
 
         updateView();
+    }
+
+    @Override
+    public void dispose() {
+        loadingPane.statusProperty().unbind();
+        loadingPane.sizeProperty().unbind();
+        loadingPane.progressIndicatorProperty().unbind();
+        super.dispose();
     }
 
     private void updateChildren() {
         MultiColumnListView<T> view = getSkinnable();
 
+        if (view == null) {
+            return;
+        }
+
         Node placeholder = view.getPlaceholder();
-        boolean showPlaceholder = view.getColumns().isEmpty() && placeholder != null;
+
+        // the loading pane takes precedence, otherwise the placeholder would hide the
+        // progress indicator or the error message while the columns are still loading
+        boolean showPlaceholder = view.getColumns().isEmpty()
+                && placeholder != null
+                && view.getLoadingStatus() == Status.OK;
 
         if (showPlaceholder) {
             if (placeholder instanceof Region) {
