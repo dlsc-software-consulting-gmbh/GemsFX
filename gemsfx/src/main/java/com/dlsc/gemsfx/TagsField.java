@@ -22,9 +22,16 @@ import javafx.scene.control.Skin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -65,8 +72,17 @@ public class TagsField<T> extends SearchField<T> {
         });
 
         setTagViewFactory(tag -> {
+            Region closeIcon = new Region();
+            closeIcon.getStyleClass().add("close");
+
+            StackPane closeIconWrapper = new StackPane(closeIcon);
+            closeIconWrapper.getStyleClass().add("close-icon");
+            closeIconWrapper.setOnMouseClicked(evt -> getTags().remove(tag));
+
             Label tagLabel = new Label();
             tagLabel.setText(getConverter().toString(tag));
+            tagLabel.setGraphic(closeIconWrapper);
+
             return tagLabel;
         });
 
@@ -101,6 +117,34 @@ public class TagsField<T> extends SearchField<T> {
                 tagSelectionModel.selectAll();
             } else if (evt.getCode().equals(KeyCode.ESCAPE)) {
                 tagSelectionModel.clearSelection();
+            } else if (evt.getCode().equals(KeyCode.LEFT) && getEditor().getCaretPosition() == 0) {
+                if (!getTags().isEmpty()) {
+                    MultipleSelectionModel<T> selectionModel = getTagSelectionModel();
+                    if (selectionModel.isEmpty()) {
+                        selectionModel.select(getTags().size() - 1);
+                    } else {
+                        int index = selectionModel.getSelectedIndex();
+                        if (!evt.isShiftDown()) {
+                            selectionModel.clearSelection();
+                        }
+                        selectionModel.select(Math.max(0, index - 1));
+                    }
+                }
+            } else if (evt.getCode().equals(KeyCode.RIGHT) && getEditor().getCaretPosition() == 0) {
+                MultipleSelectionModel<T> selectionModel = getTagSelectionModel();
+                if (!selectionModel.isEmpty()) {
+                    int selectedIndex = selectionModel.getSelectedIndex();
+                    if (evt.isShiftDown()) {
+                        selectionModel.select(Math.min(getTags().size() - 1, selectedIndex + 1));
+                    } else {
+                        selectionModel.clearSelection();
+                        if (selectedIndex < getTags().size() - 1) {
+                            selectionModel.select(selectedIndex + 1);
+                        } else {
+                            selectionModel.clearSelection();
+                        }
+                    }
+                }
             }
         });
 

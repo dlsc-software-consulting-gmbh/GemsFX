@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import javafx.collections.FXCollections;
+import javafx.scene.control.Label;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -85,7 +86,7 @@ public class TagsFieldTest extends FxTestBase {
     @Test
     public void testTagViewFactory() {
         TagsField<String> field = invoke(TagsField::new);
-        runFx(() -> field.setTagViewFactory(item -> new javafx.scene.control.Label(item)));
+        runFx(() -> field.setTagViewFactory(Label::new));
         assertNotNull(field.getTagViewFactory());
     }
 

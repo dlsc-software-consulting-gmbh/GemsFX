@@ -580,8 +580,19 @@
 }
 
 .tags-field > .flow-pane > .tag-view:selected {
-    -fx-background-color: -color-accent-emphasis, -color-accent-muted;
-    -fx-text-fill: -color-accent-emphasis;
+    -fx-background-color: -color-fg-default, -color-bg-default;
+    -fx-text-fill: -color-fg-default;
+}
+
+.tags-field > .flow-pane > .tag-view > .close-icon {
+}
+
+.tags-field > .flow-pane > .tag-view > .close-icon > .close {
+    -fx-background-color: -color-fg-emphasis;
+}
+
+.tags-field > .flow-pane > .tag-view:selected > .close-icon > .close {
+    -fx-background-color: -color-fg-default;
 }
 
 /* -----------------------------------------------------------------------

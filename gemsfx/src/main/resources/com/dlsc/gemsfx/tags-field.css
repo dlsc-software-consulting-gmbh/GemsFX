@@ -64,3 +64,17 @@
     -fx-background-insets: 0em, 0.083333em;
     -fx-text-fill: -fx-accent;
 }
+
+.tags-field > .flow-pane > .tag-view > .close-icon {
+    -fx-cursor: hand;
+}
+
+.tags-field > .flow-pane > .tag-view > .close-icon > .close {
+    -fx-padding: 4px;
+    -fx-background-color: -fx-text-background-color;
+    -fx-shape: "M18.9844 6.4219 L13.4062 12 L18.9844 17.5781 L17.5781 18.9844 L12 13.4062 L6.4219 18.9844 L5.0156 17.5781 L10.5938 12 L5.0156 6.4219 L6.4219 5.0156 L12 10.5938 L17.5781 5.0156 L18.9844 6.4219 Z";
+}
+
+.tags-field > .flow-pane > .tag-view:selected > .close-icon > .close {
+    -fx-background-color: -fx-accent;
+}
