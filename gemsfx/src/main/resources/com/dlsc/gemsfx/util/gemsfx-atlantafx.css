@@ -156,6 +156,10 @@
 .multi-column-list-view {
 }
 
+.multi-column-list-view > .placeholder {
+    -fx-border-color: -color-border-default;
+}
+
 .multi-column-list-view > .loading-pane > .grid-pane {
 }
 
@@ -164,6 +168,10 @@
 }
 
 .multi-column-list-view > .loading-pane > .grid-pane > .list-view .column-list-cell {
+}
+
+.multi-column-list-view > .loading-pane > .grid-pane > .list-view .column-list-cell > .content-pane {
+    -fx-border-color: -color-border-default;
 }
 
 .multi-column-list-view > .loading-pane > .grid-pane > .list-view .column-list-cell:from {

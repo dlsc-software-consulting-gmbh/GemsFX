@@ -1,8 +1,86 @@
 /*
- * AtlantaFX variant of the MultiColumnListView demo. The issue cards themselves are
- * intentionally drawn with a light, GitHub like palette in all themes, but the skeleton
- * placeholder is a generic "loading" visual and therefore follows the selected theme.
+ * AtlantaFX variant of the MultiColumnListView demo. The base stylesheet uses a light,
+ * GitHub like palette. This file maps that palette onto the semantic colors of the
+ * currently selected AtlantaFX theme so that the issue cards, the list cells and the
+ * skeleton placeholder work with light and dark themes alike.
  */
+
+.root {
+    -slate-green: -color-success-fg;
+    -yellowish-orange: -color-warning-fg;
+    -tomato: -color-danger-fg;
+    -blue: -color-accent-fg;
+    /* AtlantaFX has no purple in its palette, this one works on light and dark backgrounds */
+    -purple: #a371f7;
+    -grey: -color-fg-muted;
+    -light-grey: -color-border-default;
+    -very-light-grey: -color-bg-subtle;
+}
+
+/* the card itself */
+
+.issue-list-cell .content {
+    -fx-background-color: -color-bg-subtle;
+    -fx-effect: none;
+}
+
+/* header: issue ID, priority */
+
+.issue-list-cell .content.priority-low .priority-label {
+    -fx-background-color: -color-success-subtle;
+}
+
+.issue-list-cell .content.priority-medium .priority-label {
+    -fx-background-color: -color-accent-subtle;
+}
+
+.issue-list-cell .content.priority-high .priority-label {
+    -fx-background-color: -color-warning-subtle;
+}
+
+.issue-list-cell .content.priority-critical .priority-label {
+    -fx-background-color: -color-danger-subtle;
+}
+
+/* title */
+
+.issue-list-cell .content .title-label {
+    -fx-text-fill: -color-fg-default;
+}
+
+/* labels / tags */
+
+.issue-list-cell .content .issue-label,
+.issue-list-cell .content .story-points-label {
+    -fx-background-color: -color-bg-inset;
+    -fx-border-color: -color-border-muted;
+}
+
+.issue-list-cell .content .issue-label-ui,
+.issue-list-cell .content .issue-label-css {
+    -fx-background-color: -color-accent-subtle;
+    -fx-border-color: -color-accent-muted;
+}
+
+.issue-list-cell .content .issue-label-regression,
+.issue-list-cell .content .issue-label-a11y {
+    -fx-background-color: -color-danger-subtle;
+    -fx-border-color: -color-danger-muted;
+}
+
+.issue-list-cell .content .issue-label-performance,
+.issue-list-cell .content .issue-label-core {
+    -fx-background-color: -color-bg-inset;
+    -fx-border-color: -color-border-muted;
+}
+
+/* subtask progress */
+
+.issue-list-cell .content .subtasks-progress > .track {
+    -fx-background-color: -color-bg-inset;
+}
+
+/* skeleton placeholder shown when no columns are present */
 
 .multi-column-list-view > .skeleton-placeholder {
     /* same background as the list views that are shown when columns are present */

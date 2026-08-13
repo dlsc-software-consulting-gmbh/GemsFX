@@ -3,7 +3,9 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.MultiColumnListView;
 import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
 import com.dlsc.gemsfx.MultiColumnListView.MultiColumnListViewEvent;
+import com.dlsc.gemsfx.Skeleton;
 import fr.brouillard.oss.cssfx.CSSFX;
+import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -16,6 +18,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import org.controlsfx.control.StatusBar;
 
 import java.util.ArrayList;
@@ -29,6 +32,12 @@ import java.util.List;
  * implementation is needed.
  */
 public class MultiColumnListViewApp2 extends GemApplication {
+
+    /**
+     * Time that passes before the columns are added to the view. Simulates a slow backend
+     * so that the skeleton placeholder can be seen when the demo starts.
+     */
+    private static final Duration LOADING_DELAY = Duration.seconds(2);
 
     private static final List<String> CITIES = Arrays.asList(
             "Amsterdam", "Athens", "Auckland", "Bangkok", "Barcelona", "Beijing", "Berlin",
@@ -51,7 +60,9 @@ public class MultiColumnListViewApp2 extends GemApplication {
         super.start(stage);
 
         MultiColumnListView<String> multiColumnListView = new MultiColumnListView<>();
-        multiColumnListView.getColumns().setAll(createColumns());
+
+        Node placeholder = createSkeletonPlaceholder();
+        multiColumnListView.setPlaceholder(placeholder);
         VBox.setVgrow(multiColumnListView, Priority.ALWAYS);
 
         CheckBox showHeaders = new CheckBox("Show Headers");
@@ -84,7 +95,7 @@ public class MultiColumnListViewApp2 extends GemApplication {
         restoreColumns.setOnAction(evt -> multiColumnListView.getColumns().setAll(col1, col2, col3, col4, col5));
         restoreColumns.disableProperty().bind(multiColumnListView.columnsProperty().emptyProperty().not());
 
-        HBox optionsBox = new HBox(10, shuffle, clearColumns, restoreColumns, separators, showHeaders, disableDragAndDrop);
+        HBox optionsBox = new HBox(10, shuffle, clearColumns, restoreColumns, createShimmerToggle(placeholder), separators, showHeaders, disableDragAndDrop);
         optionsBox.setAlignment(Pos.CENTER_RIGHT);
         createThemeSwitcher().ifPresent(switcher -> optionsBox.getChildren().add(0, switcher));
 
@@ -106,10 +117,45 @@ public class MultiColumnListViewApp2 extends GemApplication {
 
         stage.setTitle("MultiColumnListView (Strings)");
         stage.setScene(scene);
-        stage.setWidth(1000);
+        stage.setWidth(1200);
         stage.setHeight(850);
 
         stage.show();
+
+        // start out empty so that the skeleton placeholder becomes visible, then "load" the data
+        List<ListViewColumn<String>> columns = createColumns();
+        PauseTransition loadingDelay = new PauseTransition(LOADING_DELAY);
+        loadingDelay.setOnFinished(evt -> multiColumnListView.getColumns().setAll(columns));
+        loadingDelay.play();
+    }
+
+    /**
+     * Creates the placeholder that will be shown as long as no columns have been added to the
+     * view. It uses the {@link Skeleton} control to mimic five columns of cells that are still
+     * being loaded.
+     *
+     * @return the placeholder node
+     */
+    private Node createSkeletonPlaceholder() {
+        HBox placeholder = new HBox(10);
+        placeholder.setFillHeight(true);
+
+        for (int i = 0; i < 5; i++) {
+            VBox column = new VBox(12);
+            column.setPadding(new Insets(10));
+
+            for (int j = 0; j < 8; j++) {
+                Skeleton cell = new Skeleton(Skeleton.Variant.ROUNDED_RECTANGLE);
+                cell.setPrefHeight(30);
+                cell.setMinHeight(30);
+                column.getChildren().add(cell);
+            }
+
+            HBox.setHgrow(column, Priority.ALWAYS);
+            placeholder.getChildren().add(column);
+        }
+
+        return placeholder;
     }
 
     private List<ListViewColumn<String>> createColumns() {

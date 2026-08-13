@@ -7,6 +7,7 @@ import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
 import com.dlsc.gemsfx.MultiColumnListView.MultiColumnListViewEvent;
 import com.dlsc.gemsfx.Skeleton;
 import fr.brouillard.oss.cssfx.CSSFX;
+import javafx.animation.PauseTransition;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,6 +18,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -25,6 +27,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import org.controlsfx.control.StatusBar;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -39,8 +42,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.random.RandomGenerator;
+import java.util.stream.IntStream;
 
 public class MultiColumnListViewApp extends GemApplication {
+
+    /**
+     * Time that passes before the columns are added to the view. Simulates a slow backend
+     * so that the skeleton placeholder can be seen when the demo starts.
+     */
+    private static final Duration LOADING_DELAY = Duration.seconds(2);
+
     private final ListViewColumn<Issue> col1 = new ListViewColumn<>();
     private final ListViewColumn<Issue> col2 = new ListViewColumn<>();
     private final ListViewColumn<Issue> col3 = new ListViewColumn<>();
@@ -54,7 +65,6 @@ public class MultiColumnListViewApp extends GemApplication {
 
         Node placeholder = createSkeletonPlaceholder();
         multiColumnListView.setPlaceholder(placeholder);
-        multiColumnListView.getColumns().setAll(createColumns());
         multiColumnListView.addEventHandler(MultiColumnListViewEvent.ANY, System.out::println);
         VBox.setVgrow(multiColumnListView, Priority.ALWAYS);
 
@@ -115,6 +125,12 @@ public class MultiColumnListViewApp extends GemApplication {
         stage.setHeight(950);
 
         stage.show();
+
+        // start out empty so that the skeleton placeholder becomes visible, then "load" the data
+        List<ListViewColumn<Issue>> columns = createColumns();
+        PauseTransition loadingDelay = new PauseTransition(LOADING_DELAY);
+        loadingDelay.setOnFinished(evt -> multiColumnListView.getColumns().setAll(columns));
+        loadingDelay.play();
     }
 
     /**
@@ -129,7 +145,7 @@ public class MultiColumnListViewApp extends GemApplication {
         placeholder.getStyleClass().add("skeleton-placeholder");
         placeholder.setFillHeight(true);
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             VBox column = createSkeletonColumn(2 + i % 3);
             HBox.setHgrow(column, Priority.ALWAYS);
             placeholder.getChildren().add(column);
@@ -286,6 +302,15 @@ public class MultiColumnListViewApp extends GemApplication {
         private static final List<String> ASSIGNEES = List.of("Dirk Lemmermann", "Katja Meier",
                 "Philip Jordan", "Jule Winter", "Armin Fischer", "Paula Sousa");
 
+        /**
+         * One AI generated portrait per assignee. The images are taken from the MIT licensed
+         * AGFD-20K data set, hence they do not show real people.
+         */
+        private static final List<Image> AVATARS = IntStream.rangeClosed(1, ASSIGNEES.size())
+                .mapToObj(index -> new Image(Objects.requireNonNull(
+                        MultiColumnListViewApp.class.getResource("avatar-" + index + ".jpg")).toExternalForm()))
+                .toList();
+
         private static final List<String> LABELS = List.of("ui", "core", "css", "a11y", "docs",
                 "performance", "regression", "api");
 
@@ -295,6 +320,7 @@ public class MultiColumnListViewApp extends GemApplication {
         private final String title;
         private final Type type;
         private final Priority priority;
+        private final int assigneeIndex;
         private final String assignee;
         private final List<String> labels;
         private final int storyPoints;
@@ -310,7 +336,8 @@ public class MultiColumnListViewApp extends GemApplication {
             this.title = title;
             this.type = type;
             this.priority = Priority.values()[RANDOM.nextInt(Priority.values().length)];
-            this.assignee = ASSIGNEES.get(RANDOM.nextInt(ASSIGNEES.size()));
+            this.assigneeIndex = RANDOM.nextInt(ASSIGNEES.size());
+            this.assignee = ASSIGNEES.get(assigneeIndex);
             this.storyPoints = 1 << RANDOM.nextInt(4);
             this.comments = RANDOM.nextInt(12);
             this.attachments = RANDOM.nextInt(4);
@@ -341,6 +368,13 @@ public class MultiColumnListViewApp extends GemApplication {
 
         public String getAssignee() {
             return assignee;
+        }
+
+        /**
+         * Returns the portrait of the assignee.
+         */
+        public Image getAssigneeImage() {
+            return AVATARS.get(assigneeIndex);
         }
 
         /**
@@ -545,7 +579,7 @@ public class MultiColumnListViewApp extends GemApplication {
             progressBox.getStyleClass().add("progress-box");
 
             avatarView.setSize(24);
-            avatarView.setAvatarShape(AvatarView.AvatarShape.SQUARE);
+            avatarView.setAvatarShape(AvatarView.AvatarShape.ROUND);
 
             commentsLabel.getStyleClass().add("counter-label");
             commentsLabel.setGraphic(new FontIcon(MaterialDesign.MDI_COMMENT_OUTLINE));
@@ -634,6 +668,7 @@ public class MultiColumnListViewApp extends GemApplication {
             subtasksLabel.setText(item.getCompletedSubtasks() + " of " + item.getSubtasks() + " subtasks");
             progressBar.setProgress((double) item.getCompletedSubtasks() / item.getSubtasks());
 
+            avatarView.setImage(item.getAssigneeImage());
             avatarView.setInitials(item.getAssigneeInitials());
             avatarView.setAccessibleText(item.getAssignee());
 
