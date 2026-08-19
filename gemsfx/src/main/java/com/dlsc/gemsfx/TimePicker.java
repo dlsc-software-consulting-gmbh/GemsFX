@@ -62,7 +62,13 @@ public class TimePicker extends CustomComboBox<LocalTime> {
      */
     public enum ClockType {
         // TODO:implement support
+        /**
+         * Uses a 24-hour clock.
+         */
         TWENTY_FOUR_HOUR_CLOCK,
+        /**
+         * Uses a 12-hour clock with an AM / PM field.
+         */
         TWELVE_HOUR_CLOCK
     }
 
@@ -70,8 +76,17 @@ public class TimePicker extends CustomComboBox<LocalTime> {
      * An enum for supported time units. See {@link #formatProperty()}
      */
     public enum Format {
+        /**
+         * Shows hours and minutes.
+         */
         HOURS_MINUTES,
+        /**
+         * Shows hours, minutes, and seconds.
+         */
         HOURS_MINUTES_SECONDS,
+        /**
+         * Shows hours, minutes, seconds, and milliseconds.
+         */
         HOURS_MINUTES_SECONDS_MILLIS
     }
 
@@ -198,6 +213,11 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         return adjusted.get();
     }
 
+    /**
+     * A read-only property indicating whether the value was adjusted to match bounds or step size.
+     *
+     * @return the adjusted property
+     */
     public final ReadOnlyBooleanProperty adjustedProperty() {
         return adjusted.getReadOnlyProperty();
     }
@@ -854,6 +874,11 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata for this class.
+     *
+     * @return the CSS metadata for this class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

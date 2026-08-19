@@ -216,6 +216,11 @@ public class YearView extends Control {
         }
     }
 
+    /**
+     * Returns the CSS metadata for this control class.
+     *
+     * @return the CSS metadata for this control class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

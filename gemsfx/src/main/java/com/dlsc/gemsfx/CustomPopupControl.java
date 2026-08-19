@@ -18,6 +18,13 @@ public class CustomPopupControl extends PopupControl {
     private static final PseudoClass BELOW_PSEUDO_CLASS = PseudoClass.getPseudoClass("below");
 
     /**
+     * Constructs a new custom popup control.
+     */
+    public CustomPopupControl() {
+        super();
+    }
+
+    /**
      * Shows the popup relative to the given node.
      *
      * @param node the node used to position the popup

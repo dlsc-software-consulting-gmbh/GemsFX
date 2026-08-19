@@ -22,6 +22,12 @@ import java.util.List;
 public class LogarithmicLink<T> extends AbstractLinkStrategy<T> {
 
     /**
+     * Creates a logarithmic link strategy.
+     */
+    public LogarithmicLink() {
+    }
+
+    /**
      * Draws the link for the given start and end coordinates.
      *
      * @param direction the layout direction

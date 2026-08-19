@@ -17,6 +17,14 @@ import javafx.scene.layout.FlowPane;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Skin for {@link TagsField}.
+ * <p>
+ * The skin arranges tag nodes and the search-field editor in a wrapping flow
+ * pane and keeps tag selection pseudo classes synchronized.
+ *
+ * @param <T> the tag item type
+ */
 public class TagsFieldSkin<T> extends GemsSkinBase<TagsField<T>> {
 
     private static final PseudoClass FILLED = PseudoClass.getPseudoClass("filled");
@@ -27,6 +35,11 @@ public class TagsFieldSkin<T> extends GemsSkinBase<TagsField<T>> {
 
     private final Map<T, Node> tagViewMap = new HashMap<>();
 
+    /**
+     * Creates a new skin for the given tags field.
+     *
+     * @param field the tags field to skin
+     */
     public TagsFieldSkin(TagsField<T> field) {
         super(field);
 

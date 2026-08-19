@@ -10,8 +10,19 @@ import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Insets;
 import javafx.util.Duration;
 
+/**
+ * Skin for the {@link CircleProgressIndicator} control.
+ * <p>
+ * The skin renders a complete circular track and progress arc with a centered
+ * label or graphic and supplies the circular indeterminate animation.
+ */
 public class CircleProgressIndicatorSkin extends ArcProgressIndicatorSkin<CircleProgressIndicator> {
 
+    /**
+     * Creates a skin for the given circle progress indicator.
+     *
+     * @param control the circle progress indicator rendered by this skin
+     */
     public CircleProgressIndicatorSkin(CircleProgressIndicator control) {
         super(control);
     }

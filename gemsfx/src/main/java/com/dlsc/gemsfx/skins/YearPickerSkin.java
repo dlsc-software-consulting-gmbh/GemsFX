@@ -14,6 +14,12 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Objects;
 
+/**
+ * Skin for {@link YearPicker}.
+ * <p>
+ * The skin combines the picker editor with a calendar trigger button and shows
+ * the embedded {@link YearView} as popup content.
+ */
 public class YearPickerSkin extends ToggleVisibilityComboBoxSkin<YearPicker> {
 
     private final HBox box;
@@ -21,6 +27,11 @@ public class YearPickerSkin extends ToggleVisibilityComboBoxSkin<YearPicker> {
     private final StackPane editButton;
     private YearView yearView;
 
+    /**
+     * Creates a new skin for the given year picker.
+     *
+     * @param picker the year picker to skin
+     */
     public YearPickerSkin(YearPicker picker) {
         super(picker);
 

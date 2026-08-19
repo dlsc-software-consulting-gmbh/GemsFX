@@ -18,6 +18,12 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Objects;
 
+/**
+ * Skin for the {@link CalendarPicker} control.
+ * <p>
+ * The skin renders the editor and arrow button and uses the associated
+ * {@link CalendarView} as popup content for choosing a single date.
+ */
 public class CalendarPickerSkin extends ToggleVisibilityComboBoxSkin<CalendarPicker> {
 
     private CalendarView view;
@@ -35,6 +41,11 @@ public class CalendarPickerSkin extends ToggleVisibilityComboBoxSkin<CalendarPic
     private final ChangeListener<SelectionModel> selectionModelChangeListener = (obs, oldModel, newModel) ->
             bindSelectionModel(oldModel, newModel);
 
+    /**
+     * Creates a skin for the given calendar picker.
+     *
+     * @param picker the calendar picker rendered by this skin
+     */
     public CalendarPickerSkin(CalendarPicker picker) {
         super(picker);
 

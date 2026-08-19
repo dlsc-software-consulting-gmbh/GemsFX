@@ -26,10 +26,23 @@ public abstract class DigitsField extends TimeField {
     
     private int numberOfDigits;
 
+    /**
+     * Creates a two-digit field for the given time picker.
+     *
+     * @param timePicker the time picker that owns this field
+     * @param fillDigits whether single digit values are padded with leading zeroes
+     */
     public DigitsField(TimePicker timePicker, boolean fillDigits) {
         this(timePicker, fillDigits, 2);
     }
     
+    /**
+     * Creates a digit field for the given time picker.
+     *
+     * @param timePicker the time picker that owns this field
+     * @param fillDigits whether shorter values are padded with leading zeroes
+     * @param numberOfDigits the number of digits accepted before focus advances
+     */
     public DigitsField(TimePicker timePicker, boolean fillDigits, int numberOfDigits) {
         super(timePicker);
         this.numberOfDigits = numberOfDigits;

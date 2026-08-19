@@ -499,6 +499,11 @@ public class DialogPane extends StackPane {
         return sendButtonText.get();
     }
 
+    /**
+     * The text used for the send button in error dialogs with details.
+     *
+     * @return the send button text property
+     */
     public final StringProperty sendButtonTextProperty() {
         return sendButtonText;
     }
@@ -523,6 +528,7 @@ public class DialogPane extends StackPane {
      *
      * @param title   the text shown in the header of the dialog
      * @param message the warning message
+     * @param buttonTypes the buttons to show in the footer
      * @return the dialog
      */
     public final Dialog<ButtonType> showWarning(String title, String message, List<ButtonType> buttonTypes) {
@@ -633,6 +639,7 @@ public class DialogPane extends StackPane {
      * @param prompt    the prompt text for the text input control
      * @param text      the initial text to show
      * @param multiline if true the dialog will show a text area, otherwise a text field
+     * @param buttonTypes the buttons to show in the footer
      * @return the dialog
      */
     public final Dialog<String> showTextInput(String title, String message, String prompt, String text, boolean multiline, List<ButtonType> buttonTypes) {
@@ -1251,6 +1258,11 @@ public class DialogPane extends StackPane {
             return prefWidth.get();
         }
 
+        /**
+         * The preferred width requested for this dialog.
+         *
+         * @return the preferred width property
+         */
         public final DoubleProperty prefWidthProperty() {
             return prefWidth;
         }
@@ -1265,6 +1277,11 @@ public class DialogPane extends StackPane {
             return prefHeight.get();
         }
 
+        /**
+         * The preferred height requested for this dialog.
+         *
+         * @return the preferred height property
+         */
         public final DoubleProperty prefHeightProperty() {
             return prefHeight;
         }
@@ -1279,6 +1296,11 @@ public class DialogPane extends StackPane {
             return minWidth.get();
         }
 
+        /**
+         * The minimum width requested for this dialog.
+         *
+         * @return the minimum width property
+         */
         public final DoubleProperty minWidthProperty() {
             return minWidth;
         }
@@ -1293,6 +1315,11 @@ public class DialogPane extends StackPane {
             return minHeight.get();
         }
 
+        /**
+         * The minimum height requested for this dialog.
+         *
+         * @return the minimum height property
+         */
         public final DoubleProperty minHeightProperty() {
             return minHeight;
         }
@@ -1307,6 +1334,11 @@ public class DialogPane extends StackPane {
             return maxWidth.get();
         }
 
+        /**
+         * The maximum width requested for this dialog.
+         *
+         * @return the maximum width property
+         */
         public final DoubleProperty maxWidthProperty() {
             return maxWidth;
         }
@@ -1321,6 +1353,11 @@ public class DialogPane extends StackPane {
             return maxHeight.get();
         }
 
+        /**
+         * The maximum height requested for this dialog.
+         *
+         * @return the maximum height property
+         */
         public final DoubleProperty maxHeightProperty() {
             return maxHeight;
         }
@@ -1490,6 +1527,9 @@ public class DialogPane extends StackPane {
             this.value.set(value);
         }
 
+        /**
+         * Shows this dialog in its owning {@link DialogPane}.
+         */
         public void show() {
             pane.showDialog(this);
         }
@@ -1510,6 +1550,11 @@ public class DialogPane extends StackPane {
 
         private Consumer<ButtonType> onButtonPressed;
 
+        /**
+         * Returns the consumer invoked when a standard dialog button is pressed.
+         *
+         * @return the button pressed consumer
+         */
         public Consumer<ButtonType> getOnButtonPressed() {
             return onButtonPressed;
         }
@@ -1533,6 +1578,11 @@ public class DialogPane extends StackPane {
             return onClose.get();
         }
 
+        /**
+         * The consumer invoked when the dialog closes.
+         *
+         * @return the close handler property
+         */
         public final ObjectProperty<Consumer<ButtonType>> onCloseProperty() {
             return onClose;
         }
@@ -1545,6 +1595,7 @@ public class DialogPane extends StackPane {
          * Sets a consumer that will be invoked when the dialog is being closed.
          *
          * @param onClose the "close dialog" handler
+         * @return this dialog
          */
         public final Dialog<T> onClose(Consumer<ButtonType> onClose) {
             Objects.requireNonNull(onClose, "onCommit handler can not be null");
@@ -1597,6 +1648,11 @@ public class DialogPane extends StackPane {
 
         private final ObservableList<ButtonType> buttonTypes = FXCollections.observableArrayList();
 
+        /**
+         * Returns the button types shown in the dialog footer.
+         *
+         * @return the button types
+         */
         public final ObservableList<ButtonType> getButtonTypes() {
             return buttonTypes;
         }
@@ -1695,6 +1751,11 @@ public class DialogPane extends StackPane {
 
         private final StringProperty title = new SimpleStringProperty(this, "title", ResourceBundleManager.getString(ResourceBundleManager.BundleType.DIALOG_PANE, "title.default", "Dialog"));
 
+        /**
+         * The title shown by the default dialog header.
+         *
+         * @return the title property
+         */
         public final StringProperty titleProperty() {
             return title;
         }
@@ -2017,6 +2078,11 @@ public class DialogPane extends StackPane {
             return showCloseButton.get();
         }
 
+        /**
+         * Controls whether this header shows its close button.
+         *
+         * @return the show close button property
+         */
         public final BooleanProperty showCloseButtonProperty() {
             return showCloseButton;
         }
@@ -2031,6 +2097,11 @@ public class DialogPane extends StackPane {
             return showIcon.get();
         }
 
+        /**
+         * Controls whether the default header shows the dialog icon.
+         *
+         * @return the show icon property
+         */
         public final BooleanProperty showIconProperty() {
             return showIcon;
         }
@@ -2164,6 +2235,7 @@ public class DialogPane extends StackPane {
          * Determines whether validation should be run for the given button data / button type.
          *
          * @param data the button data / button type to check
+         * @return true if validation should be triggered
          */
         protected boolean isTriggeringValidation(ButtonData data) {
             switch (data) {
@@ -2545,6 +2617,11 @@ public class DialogPane extends StackPane {
 
         private final Dialog<?> dialog;
 
+        /**
+         * Creates a new resize handler for the given dialog.
+         *
+         * @param dialog the dialog whose size should be stored
+         */
         public DefaultResizeHandler(Dialog<?> dialog) {
             this.dialog = Objects.requireNonNull(dialog, "dialog can not be null");
         }

@@ -8,13 +8,34 @@ package com.dlsc.gemsfx.infocenter;
  */
 public enum InfoCenterViewPos {
 
+    /**
+     * Places the info center at the top-left edge of the pane.
+     */
     TOP_LEFT,
+
+    /**
+     * Places the info center at the top-right edge of the pane.
+     */
     TOP_RIGHT,
 
+    /**
+     * Places the info center centered on the left edge of the pane.
+     */
     CENTER_LEFT,
+
+    /**
+     * Places the info center centered on the right edge of the pane.
+     */
     CENTER_RIGHT,
 
+    /**
+     * Places the info center at the bottom-left edge of the pane.
+     */
     BOTTOM_LEFT,
+
+    /**
+     * Places the info center at the bottom-right edge of the pane.
+     */
     BOTTOM_RIGHT;
 
     /**

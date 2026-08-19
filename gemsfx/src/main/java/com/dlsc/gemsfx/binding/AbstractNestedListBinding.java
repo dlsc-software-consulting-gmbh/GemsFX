@@ -23,6 +23,9 @@ import java.util.stream.Stream;
  */
 public abstract class AbstractNestedListBinding<T, U> extends ObjectBinding<U> {
 
+    /**
+     * The observable outer list whose nested observable lists are observed by this binding.
+     */
     protected final ObservableList<ObservableList<T>> source;
     private final ListChangeListener<T> innerListChangeListener = change -> {
         while (change.next()) {

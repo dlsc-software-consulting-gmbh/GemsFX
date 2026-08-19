@@ -56,6 +56,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Skin for {@link InfoCenterView}.
+ * <p>
+ * The skin builds the notification center from pinned and unpinned group containers, a scrollable group overview, and
+ * a single-group list view used when one notification group is expanded.
+ */
 public class InfoCenterViewSkin extends GemsSkinBase<InfoCenterView> {
 
     private final VBox allGroupsContainer;
@@ -83,6 +89,11 @@ public class InfoCenterViewSkin extends GemsSkinBase<InfoCenterView> {
 
     private final VBox pinnedGroupsContainer = new VBox();
 
+    /**
+     * Creates a skin for the given info center view.
+     *
+     * @param view the info center view rendered by this skin
+     */
     public InfoCenterViewSkin(InfoCenterView view) {
         super(view);
 

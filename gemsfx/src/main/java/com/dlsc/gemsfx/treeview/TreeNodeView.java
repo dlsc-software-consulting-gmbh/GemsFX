@@ -53,6 +53,8 @@ import com.dlsc.gemsfx.util.ResourceBundleManager;
  *     <tr><td>{@code -fx-vgap}</td><td>{@code double}</td><td>Vertical gap between cells.</td></tr>
  *   </tbody>
  * </table>
+ *
+ * @param <T> the type of the value stored in each tree node
  */
 public class TreeNodeView<T> extends Control {
     private static final int DEFAULT_CELL_WIDTH = 60;
@@ -70,12 +72,20 @@ public class TreeNodeView<T> extends Control {
     private static final PseudoClass BTT_PSEUDOCLASS_STATE = PseudoClass.getPseudoClass("btt");
     private static final String DEFAULT_STYLE_CLASS = "tree-node-view";
 
+    /**
+     * Creates an empty tree node view.
+     */
     public TreeNodeView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         AccessibilityUtil.setRole(this, AccessibleRole.TREE_VIEW);
         layoutDirection.addListener(it -> activateDirectionPseudoClass());
     }
 
+    /**
+     * Creates a tree node view with the given root node.
+     *
+     * @param root the root node to display
+     */
     public TreeNodeView(TreeNode<T> root) {
         this();
         setRoot(root);
@@ -108,6 +118,11 @@ public class TreeNodeView<T> extends Control {
         return cellFactory.get();
     }
 
+    /**
+     * The cell factory property used to create cells for tree node values.
+     *
+     * @return the cell factory property
+     */
     public final ObjectProperty<Callback<T, TreeNodeCell<T>>> cellFactoryProperty() {
         return cellFactory;
     }
@@ -118,6 +133,11 @@ public class TreeNodeView<T> extends Control {
         return root.get();
     }
 
+    /**
+     * The root property.
+     *
+     * @return the root property
+     */
     public final ObjectProperty<TreeNode<T>> rootProperty() {
         return root;
     }
@@ -231,7 +251,6 @@ public class TreeNodeView<T> extends Control {
      * The fixed width of each cell (tree node) in the view.
      * <p>
      * Can be set via CSS using the {@code -fx-cell-width} property.
-     * Valid values are: positive numbers.
      * The default value is {@code 60}.
      * </p>
      *
@@ -271,7 +290,6 @@ public class TreeNodeView<T> extends Control {
      * The fixed height of each cell (tree node) in the view.
      * <p>
      * Can be set via CSS using the {@code -fx-cell-height} property.
-     * Valid values are: positive numbers.
      * The default value is {@code 30}.
      * </p>
      *
@@ -310,7 +328,6 @@ public class TreeNodeView<T> extends Control {
      * The horizontal gap between cells in the tree view.
      * <p>
      * Can be set via CSS using the {@code -fx-hgap} property.
-     * Valid values are: positive numbers.
      * The default value is {@code 20}.
      * </p>
      *
@@ -349,7 +366,6 @@ public class TreeNodeView<T> extends Control {
      * The vertical gap between cells in the tree view.
      * <p>
      * Can be set via CSS using the {@code -fx-vgap} property.
-     * Valid values are: positive numbers.
      * The default value is {@code 50}.
      * </p>
      *
@@ -388,7 +404,6 @@ public class TreeNodeView<T> extends Control {
      * The gap between the tree node cell and the connecting lines.
      * <p>
      * Can be set via CSS using the {@code -fx-node-line-gap} property.
-     * Valid values are: positive numbers.
      * The default value is {@code 10}.
      * </p>
      *
@@ -408,6 +423,11 @@ public class TreeNodeView<T> extends Control {
         return placeholder.get();
     }
 
+    /**
+     * The placeholder property used when no root node is set.
+     *
+     * @return the placeholder property
+     */
     public final ObjectProperty<Node> placeholderProperty() {
         return placeholder;
     }
@@ -422,6 +442,11 @@ public class TreeNodeView<T> extends Control {
         return linkStrategy.get();
     }
 
+    /**
+     * The link strategy property used to draw connections between nodes.
+     *
+     * @return the link strategy property
+     */
     public final ObjectProperty<LinkStrategy<T>> linkStrategyProperty() {
         return linkStrategy;
     }
@@ -436,6 +461,9 @@ public class TreeNodeView<T> extends Control {
         return label;
     }
 
+    /**
+     * Specifies how tree nodes are arranged within the view.
+     */
     public enum LayoutType {
         /**
          * The tree node view will be layout in a regular way. may be wider
@@ -486,6 +514,9 @@ public class TreeNodeView<T> extends Control {
         this.layoutType.set(layoutType);
     }
 
+    /**
+     * Specifies the direction in which the tree grows from its root.
+     */
     public enum LayoutDirection {
         /**
          * The tree node view will be layout from left to right.
@@ -544,6 +575,9 @@ public class TreeNodeView<T> extends Control {
         this.layoutDirection.set(layoutDirection);
     }
 
+    /**
+     * Rebuilds the visual tree from the current model and properties.
+     */
     public void refresh() {
         Skin<?> skin = getSkin();
         if (skin instanceof TreeNodeViewSkin) {
@@ -694,6 +728,11 @@ public class TreeNodeView<T> extends Control {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata for this control class.
+     *
+     * @return the CSS metadata for this control class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

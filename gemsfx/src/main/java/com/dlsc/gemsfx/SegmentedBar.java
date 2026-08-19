@@ -484,6 +484,8 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends Control {
     }
 
     /**
+     * Returns the CSS metadata for this control class.
+     *
      * @return The CssMetaData associated with this class, which may include the
      * CssMetaData of its super classes.
      */

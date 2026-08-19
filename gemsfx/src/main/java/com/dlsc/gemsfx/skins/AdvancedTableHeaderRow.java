@@ -5,6 +5,12 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.control.skin.TableViewSkinBase;
 
+/**
+ * A table header row that creates advanced nested column headers.
+ * <p>
+ * The row is installed by {@link AdvancedTableViewSkin} and supplies an
+ * {@link AdvancedNestedTableColumnHeader} as its root header.
+ */
 public class AdvancedTableHeaderRow extends TableHeaderRow {
 
     /**

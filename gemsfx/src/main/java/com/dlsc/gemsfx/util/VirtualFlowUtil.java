@@ -23,6 +23,12 @@ public class VirtualFlowUtil {
     private static final Logger LOG = Logger.getLogger(VirtualFlowUtil.class.getName());
 
     /**
+     * Creates a virtual-flow utility instance.
+     */
+    public VirtualFlowUtil() {
+    }
+
+    /**
      * Bind the virtual flows found somewhere inside the two given controls to each other
      * so that vertical scrolling will be performed in sync.
      *

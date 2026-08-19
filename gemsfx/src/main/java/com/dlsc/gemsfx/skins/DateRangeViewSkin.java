@@ -25,6 +25,13 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Objects;
 
+/**
+ * Skin for the {@link DateRangeView} control.
+ * <p>
+ * The skin arranges two {@link CalendarView} instances for selecting start and
+ * end dates, displays optional presets, and provides optional apply and cancel
+ * buttons.
+ */
 public class DateRangeViewSkin extends GemsSkinBase<DateRangeView> {
 
     private final CalendarView startCalendarView;
@@ -43,6 +50,11 @@ public class DateRangeViewSkin extends GemsSkinBase<DateRangeView> {
     private final InvalidationListener orientationChangeListener = it -> updateCalendarLayout();
     private final InvalidationListener presetsLocationChangeListener = it -> updateLayout();
 
+    /**
+     * Creates a skin for the given date range view.
+     *
+     * @param view the date range view rendered by this skin
+     */
     public DateRangeViewSkin(DateRangeView view) {
         super(view);
 

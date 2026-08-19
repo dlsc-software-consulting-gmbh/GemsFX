@@ -19,6 +19,12 @@ import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Skin for {@link SVGImageView}.
+ * <p>
+ * The skin renders the loaded SVG in an {@link ImageView} and reloads it when
+ * the source, requested fit size, or window render scale changes.
+ */
 public class SVGImageViewSkin extends GemsSkinBase<SVGImageView> {
 
     private final Logger LOG = Logger.getLogger(SVGImageViewSkin.class.getName());
@@ -28,6 +34,11 @@ public class SVGImageViewSkin extends GemsSkinBase<SVGImageView> {
     private final InvalidationListener listener = it -> loadingImage();
     private final WeakInvalidationListener weakListener = new WeakInvalidationListener(listener);
 
+    /**
+     * Creates a new skin for the given SVG image view.
+     *
+     * @param svgImageView the SVG image view to skin
+     */
     public SVGImageViewSkin(SVGImageView svgImageView) {
         super(svgImageView);
 

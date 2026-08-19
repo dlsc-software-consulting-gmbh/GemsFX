@@ -38,17 +38,41 @@ public class ResizingBehaviour {
     private double startX;
     private double startY;
 
-    /*
-     * List of possible resizing operations.
+    /**
+     * The possible drag directions used while resizing a region.
      */
     public enum Operation {
+        /**
+         * Resizes from the north edge.
+         */
         RESIZE_N,
+        /**
+         * Resizes from the south edge.
+         */
         RESIZE_S,
+        /**
+         * Resizes from the west edge.
+         */
         RESIZE_W,
+        /**
+         * Resizes from the east edge.
+         */
         RESIZE_E,
+        /**
+         * Resizes from the north-west corner.
+         */
         RESIZE_NW,
+        /**
+         * Resizes from the north-east corner.
+         */
         RESIZE_NE,
+        /**
+         * Resizes from the south-west corner.
+         */
         RESIZE_SW,
+        /**
+         * Resizes from the south-east corner.
+         */
         RESIZE_SE
     }
 

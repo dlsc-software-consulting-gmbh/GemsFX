@@ -36,6 +36,9 @@ import java.util.Objects;
  */
 public final class ControlsFXAtlantaFX {
 
+    /**
+     * The URL of the ControlsFX AtlantaFX companion stylesheet.
+     */
     public static final String STYLESHEET = Objects.requireNonNull(ControlsFXAtlantaFX.class.getResource("controlsfx-atlantafx.css")).toExternalForm();
 
     /**

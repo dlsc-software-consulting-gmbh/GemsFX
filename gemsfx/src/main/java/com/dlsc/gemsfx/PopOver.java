@@ -78,6 +78,9 @@ public class PopOver extends PopupControl {
     private static final double DEFAULT_ARROW_SIZE = 10;
     private static final double DEFAULT_ARROW_INDENT = 12;
     private static final double DEFAULT_CORNER_RADIUS = 6;
+    /**
+     * The default overlap offset between the arrow and the owner node.
+     */
     public static final int DEFAULT_OFFSET = 4;
 
     private final PopOverRoot root = new PopOverRoot();
@@ -265,6 +268,12 @@ public class PopOver extends PopupControl {
         show(owner, owner.localToScreen(owner.getBoundsInLocal()), offset);
     }
 
+    /**
+     * Shows the popover relative to the given owner bounds using the default offset.
+     *
+     * @param owner the owner of the popover
+     * @param bounds the owner bounds in screen coordinates
+     */
     public final void show(Node owner, Bounds bounds) {
         requireNonNull(owner);
         show(owner, bounds, DEFAULT_OFFSET);
@@ -645,6 +654,11 @@ public class PopOver extends PopupControl {
 
     private final ObjectProperty<ArrowLocation> arrowLocation = new SimpleObjectProperty<>(this, "arrowLocation", ArrowLocation.TOP_CENTER);
 
+    /**
+     * The preferred arrow location used to place the popover around its owner.
+     *
+     * @return the preferred arrow location property
+     */
     public final ObjectProperty<ArrowLocation> arrowLocationProperty() {
         return arrowLocation;
     }
@@ -887,17 +901,53 @@ public class PopOver extends PopupControl {
      * Locations where the arrow of the popover can be placed.
      */
     public enum ArrowLocation {
+        /**
+         * Places the arrow on the left side near the top edge.
+         */
         LEFT_TOP,
+        /**
+         * Places the arrow centered on the left side.
+         */
         LEFT_CENTER,
+        /**
+         * Places the arrow on the left side near the bottom edge.
+         */
         LEFT_BOTTOM,
+        /**
+         * Places the arrow on the right side near the top edge.
+         */
         RIGHT_TOP,
+        /**
+         * Places the arrow centered on the right side.
+         */
         RIGHT_CENTER,
+        /**
+         * Places the arrow on the right side near the bottom edge.
+         */
         RIGHT_BOTTOM,
+        /**
+         * Places the arrow on the top side near the left edge.
+         */
         TOP_LEFT,
+        /**
+         * Places the arrow centered on the top side.
+         */
         TOP_CENTER,
+        /**
+         * Places the arrow on the top side near the right edge.
+         */
         TOP_RIGHT,
+        /**
+         * Places the arrow on the bottom side near the left edge.
+         */
         BOTTOM_LEFT,
+        /**
+         * Places the arrow centered on the bottom side.
+         */
         BOTTOM_CENTER,
+        /**
+         * Places the arrow on the bottom side near the right edge.
+         */
         BOTTOM_RIGHT;
     }
 

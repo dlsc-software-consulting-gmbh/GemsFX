@@ -53,6 +53,11 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
 
     private final TextField control;
 
+    /**
+     * Creates a skin for the given text field.
+     *
+     * @param control the text field rendered by this skin
+     */
     public CustomTextFieldSkin(final TextField control) {
         super(control);
 
@@ -63,8 +68,18 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
         registerChangeListener(rightProperty(), e -> updateChildren());
     }
 
+    /**
+     * The node displayed on the left side of the text field.
+     *
+     * @return the left node property
+     */
     public abstract ObjectProperty<Node> leftProperty();
 
+    /**
+     * The node displayed on the right side of the text field.
+     *
+     * @return the right node property
+     */
     public abstract ObjectProperty<Node> rightProperty();
 
     private void updateChildren() {

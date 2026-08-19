@@ -77,6 +77,9 @@ public class FilterView<T> extends Control {
 
     private final SearchTextField searchTextField = new SearchTextField();
 
+    /**
+     * Constructs a new filter view.
+     */
     public FilterView() {
         getStyleClass().add("filter-view");
         AccessibilityUtil.setRole(this, AccessibleRole.NODE, ResourceBundleManager.getString(ResourceBundleManager.BundleType.FILTER_VIEW, "accessible.role-description", "filter"));
@@ -159,6 +162,8 @@ public class FilterView<T> extends Control {
     /**
      * The threshold number of filters at which a ScrollPane is introduced to handle large number of elements.
      * If the number of filters is equal to or exceeds this value, the filters will be displayed within a ScrollPane.
+     *
+     * @return the scroll threshold property
      */
     public final IntegerProperty scrollThresholdProperty() {
         return scrollThreshold;
@@ -176,6 +181,8 @@ public class FilterView<T> extends Control {
 
     /**
      * The graphic node displayed alongside the title label.
+     *
+     * @return the title graphic property
      */
     public final ObjectProperty<Node> titleGraphicProperty() {
         return titleGraphic;
@@ -193,6 +200,8 @@ public class FilterView<T> extends Control {
 
     /**
      * The graphic node displayed alongside the title postfix label.
+     *
+     * @return the title postfix graphic property
      */
     public final ObjectProperty<Node> titlePostfixGraphicProperty() {
         return titlePostfixGraphic;
@@ -210,6 +219,8 @@ public class FilterView<T> extends Control {
 
     /**
      * The graphic node displayed alongside the subtitle label.
+     *
+     * @return the subtitle graphic property
      */
     public final ObjectProperty<Node> subtitleGraphicProperty() {
         return subtitleGraphic;
@@ -351,6 +362,11 @@ public class FilterView<T> extends Control {
 
     private final ReadOnlyListWrapper<T> filteredItems = new ReadOnlyListWrapper<>();
 
+    /**
+     * A read-only list containing the items that match the currently selected filters.
+     *
+     * @return the filtered items property
+     */
     public final ReadOnlyListProperty<T> filteredItemsProperty() {
         return filteredItems.getReadOnlyProperty();
     }
@@ -412,6 +428,11 @@ public class FilterView<T> extends Control {
         return filterGroups.get();
     }
 
+    /**
+     * The groups that define the available filters shown by this view.
+     *
+     * @return the filter groups property
+     */
     public final ListProperty<FilterGroup<T>> filterGroupsProperty() {
         return filterGroups;
     }
@@ -428,6 +449,11 @@ public class FilterView<T> extends Control {
         return filters.get();
     }
 
+    /**
+     * The currently selected filters.
+     *
+     * @return the selected filters property
+     */
     public final ListProperty<Filter<T>> filtersProperty() {
         return filters;
     }
@@ -444,6 +470,11 @@ public class FilterView<T> extends Control {
         return additionalFilterPredicate.get();
     }
 
+    /**
+     * An additional predicate that is combined with the filter and text predicates.
+     *
+     * @return the additional filter predicate property
+     */
     public final ObjectProperty<Predicate<T>> additionalFilterPredicateProperty() {
         return additionalFilterPredicate;
     }
@@ -460,6 +491,11 @@ public class FilterView<T> extends Control {
         return filterPredicate.get();
     }
 
+    /**
+     * A read-only predicate combining selected filters, filter text, and the additional predicate.
+     *
+     * @return the combined filter predicate property
+     */
     public final ReadOnlyObjectProperty<Predicate<T>> filterPredicateProperty() {
         return filterPredicate.getReadOnlyProperty();
     }
@@ -485,6 +521,11 @@ public class FilterView<T> extends Control {
         }
     }
 
+    /**
+     * Returns the CSS metadata for this class.
+     *
+     * @return the CSS metadata for this class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }
@@ -522,6 +563,11 @@ public class FilterView<T> extends Control {
             });
         }
 
+        /**
+         * Constructs a new group with an identifier derived from its name.
+         *
+         * @param name the name that will be shown in the UI
+         */
         public FilterGroup(String name) {
             this(name, StringUtils.replaceEach(name, new String[]{"(", ")", "&", "_", " "}, new String[]{"", "", "and", "-", "-"}).toLowerCase());
         }
@@ -534,6 +580,11 @@ public class FilterView<T> extends Control {
             return filters.get();
         }
 
+        /**
+         * The filters that belong to this group.
+         *
+         * @return the filters property
+         */
         public final ListProperty<Filter<T>> filtersProperty() {
             return filters;
         }

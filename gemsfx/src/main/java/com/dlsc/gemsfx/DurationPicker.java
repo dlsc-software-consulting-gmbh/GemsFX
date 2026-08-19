@@ -56,6 +56,9 @@ import com.dlsc.gemsfx.util.ResourceBundleManager;
  */
 public class DurationPicker extends CustomComboBox<Duration> {
 
+    /**
+     * Constructs a new duration picker.
+     */
     public DurationPicker() {
         getStyleClass().setAll("duration-picker", "text-input");
         AccessibilityUtil.setRole(this, AccessibleRole.COMBO_BOX);
@@ -164,6 +167,11 @@ public class DurationPicker extends CustomComboBox<Duration> {
         return duration.get();
     }
 
+    /**
+     * Stores the duration displayed by the picker.
+     *
+     * @return the duration property
+     */
     public final ObjectProperty<Duration> durationProperty() {
         return duration;
     }
@@ -183,6 +191,8 @@ public class DurationPicker extends CustomComboBox<Duration> {
     /**
      * The list of fields that will be displayed inside the control. Supported units are:
      * weeks, days, hours, minutes, seconds, millis.
+     *
+     * @return the fields property
      */
     public final ListProperty<ChronoUnit> fieldsProperty() {
         return fields;
@@ -570,6 +580,11 @@ public class DurationPicker extends CustomComboBox<Duration> {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata for this class.
+     *
+     * @return the CSS metadata for this class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

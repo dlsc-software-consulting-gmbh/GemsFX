@@ -45,6 +45,11 @@ public class SkeletonSkin extends GemsSkinBase<Skeleton> {
     private double timelineSpan = Double.NaN;
     private Duration timelineCycle;
 
+    /**
+     * Creates a new skin for the given skeleton control.
+     *
+     * @param control the skeleton control to skin
+     */
     public SkeletonSkin(Skeleton control) {
         super(control);
 

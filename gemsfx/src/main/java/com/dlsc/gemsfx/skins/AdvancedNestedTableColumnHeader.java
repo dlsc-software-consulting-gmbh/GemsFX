@@ -4,6 +4,13 @@ import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.skin.NestedTableColumnHeader;
 import javafx.scene.control.skin.TableColumnHeader;
 
+/**
+ * A nested column header that creates GemsFX advanced table column headers.
+ * <p>
+ * The header renders grouped table columns and returns
+ * {@link AdvancedTableColumnHeader} or nested {@link AdvancedNestedTableColumnHeader}
+ * instances for child columns.
+ */
 public class AdvancedNestedTableColumnHeader extends NestedTableColumnHeader {
 
     /**

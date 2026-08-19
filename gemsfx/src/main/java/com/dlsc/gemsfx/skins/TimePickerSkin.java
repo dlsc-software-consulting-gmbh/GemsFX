@@ -19,6 +19,12 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.time.LocalTime;
 import java.util.Objects;
 
+/**
+ * Skin for {@link TimePicker}.
+ * <p>
+ * The skin builds the inline time fields, separator nodes, popup trigger
+ * button, and popup content used to select a time value.
+ */
 public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
 
     private static final PseudoClass EMPTY_PSEUDO_CLASS = PseudoClass.getPseudoClass("empty");
@@ -50,6 +56,11 @@ public class TimePickerSkin extends ToggleVisibilityComboBoxSkin<TimePicker> {
         }
     };
 
+    /**
+     * Creates a new skin for the given time picker.
+     *
+     * @param picker the time picker to skin
+     */
     public TimePickerSkin(TimePicker picker) {
         super(picker);
 

@@ -20,6 +20,12 @@ import java.util.List;
 public class CurvedLineLink<T> extends AbstractLinkStrategy<T> {
 
     /**
+     * Creates a curved-line link strategy.
+     */
+    public CurvedLineLink() {
+    }
+
+    /**
      * Draws the link for the given start and end coordinates.
      *
      * @param direction the layout direction

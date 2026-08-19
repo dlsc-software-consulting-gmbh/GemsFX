@@ -418,6 +418,8 @@ public abstract class ItemPagingControlBase<T> extends PagingControlBase {
      * The {@code Node} to show to the user when the {@code PagingListView} has no content to show.
      * This happens when the list model has no data or when a filter has been applied to the list model, resulting in
      * there being nothing to show the user.
+     *
+     * @return the placeholder property
      */
     public final ObjectProperty<Node> placeholderProperty() {
         if (placeholder == null) {

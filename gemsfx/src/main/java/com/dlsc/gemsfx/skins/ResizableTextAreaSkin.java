@@ -14,6 +14,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
+/**
+ * Skin for {@link ResizableTextArea}.
+ * <p>
+ * The skin wraps the standard text area scroll pane with a resize corner node
+ * and updates resize-related pseudo classes from the enabled resize directions.
+ */
 public class ResizableTextAreaSkin extends TextAreaSkin {
 
     private static final PseudoClass RESIZE_HORIZONTAL_PSEUDO_CLASS = PseudoClass.getPseudoClass("h-resize");
@@ -21,17 +27,40 @@ public class ResizableTextAreaSkin extends TextAreaSkin {
     private static final PseudoClass RESIZE_BOTH_PSEUDO_CLASS = PseudoClass.getPseudoClass("both-resize");
     private static final PseudoClass RESIZE_NONE_PSEUDO_CLASS = PseudoClass.getPseudoClass("no-resize");
 
+    /**
+     * The corner node used as the resize handle.
+     */
     protected final StackPane resizeCorner;
+
+    /**
+     * The scroll pane created by the standard text area skin.
+     */
     protected final ScrollPane scrollPane;
+
+    /**
+     * The pane containing the scroll pane and resize corner.
+     */
     protected final StackPane contentPane;
     private double startX;
     private double startY;
     private double startW;
     private double startH;
 
+    /**
+     * The vertical scroll bar discovered in the text area scroll pane.
+     */
     protected ScrollBar verticalScrollBar;
+
+    /**
+     * The horizontal scroll bar discovered in the text area scroll pane.
+     */
     protected ScrollBar horizontalScrollBar;
 
+    /**
+     * Creates a new skin for the given resizable text area.
+     *
+     * @param control the resizable text area to skin
+     */
     public ResizableTextAreaSkin(ResizableTextArea control) {
         super(control);
 

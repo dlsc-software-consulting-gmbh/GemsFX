@@ -23,7 +23,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 
 /**
- * A control used for visualizing digits as part of the {@link TimePicker} control.
+ * A field for editing one duration unit in a {@link DurationPicker}.
+ * <p>
+ * The field renders one {@link ChronoUnit}, accepts digit and arrow-key input,
+ * and can link focus and rollover behavior with neighboring fields.
  */
 public class DurationUnitField extends Label {
     private final DurationPicker picker;
@@ -35,6 +38,12 @@ public class DurationUnitField extends Label {
 
     private DurationUnitField previousField;
 
+    /**
+     * Creates a field for one duration unit.
+     *
+     * @param picker the duration picker that owns this field
+     * @param chronoUnit the duration unit edited by this field
+     */
     public DurationUnitField(DurationPicker picker, ChronoUnit chronoUnit) {
         super();
 
@@ -200,6 +209,11 @@ public class DurationUnitField extends Label {
 
     private boolean updating;
 
+    /**
+     * Returns whether the field is currently synchronizing from the bound duration.
+     *
+     * @return {@code true} while the field is updating from the duration property
+     */
     public boolean isUpdating() {
         return updating;
     }
@@ -221,6 +235,11 @@ public class DurationUnitField extends Label {
         getStyleClass().add(getChronoUnit().name().toLowerCase());
     }
 
+    /**
+     * Returns the duration unit edited by this field.
+     *
+     * @return the duration unit
+     */
     public final ChronoUnit getChronoUnit() {
         return chronoUnit;
     }
@@ -437,6 +456,11 @@ public class DurationUnitField extends Label {
 
     private final ObjectProperty<Duration> duration = new SimpleObjectProperty<>(this, "duration");
 
+    /**
+     * The duration synchronized with this unit field.
+     *
+     * @return the duration property
+     */
     public final ObjectProperty<Duration> durationProperty() {
         return duration;
     }
@@ -447,6 +471,11 @@ public class DurationUnitField extends Label {
         return labelType.get();
     }
 
+    /**
+     * The label type used when displaying the unit text.
+     *
+     * @return the label type property
+     */
     public final ObjectProperty<LabelType> labelTypeProperty() {
         return labelType;
     }
@@ -457,6 +486,11 @@ public class DurationUnitField extends Label {
         return fillDigits.get();
     }
 
+    /**
+     * Whether the field pads shorter values with leading zeroes.
+     *
+     * @return the fill digits property
+     */
     public final BooleanProperty fillDigitsProperty() {
         return fillDigits;
     }

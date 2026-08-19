@@ -42,11 +42,18 @@ import java.util.List;
  * <p>Usage: instead of manually calling {@code obs.addListener(l)} in the constructor
  * and {@code obs.removeListener(l)} in {@code dispose()}, call {@code register(obs, l)}.
  * The listener will be added immediately and removed automatically on disposal.</p>
+ *
+ * @param <C> the type of control rendered by this skin
  */
 public abstract class GemsSkinBase<C extends Control> extends SkinBase<C> {
 
     private final List<Runnable> disposers = new ArrayList<>();
 
+    /**
+     * Creates a skin for the given control.
+     *
+     * @param control the control rendered by this skin
+     */
     protected GemsSkinBase(C control) {
         super(control);
     }
@@ -55,6 +62,8 @@ public abstract class GemsSkinBase<C extends Control> extends SkinBase<C> {
      * Adds an {@link InvalidationListener} to the given {@link Observable} and tracks
      * it for automatic removal when this skin is disposed.
      *
+     * @param obs the observable to listen to
+     * @param listener the listener to add and later remove
      * @return the listener, for use as a field initializer
      */
     protected InvalidationListener register(Observable obs, InvalidationListener listener) {
@@ -67,6 +76,9 @@ public abstract class GemsSkinBase<C extends Control> extends SkinBase<C> {
      * Adds a {@link ChangeListener} to the given {@link ObservableValue} and tracks
      * it for automatic removal when this skin is disposed.
      *
+     * @param <T> the value type observed by the listener
+     * @param obs the observable value to listen to
+     * @param listener the listener to add and later remove
      * @return the listener, for use as a field initializer
      */
     protected <T> ChangeListener<T> register(ObservableValue<T> obs, ChangeListener<T> listener) {
@@ -79,6 +91,9 @@ public abstract class GemsSkinBase<C extends Control> extends SkinBase<C> {
      * Adds a {@link ListChangeListener} to the given {@link ObservableList} and tracks
      * it for automatic removal when this skin is disposed.
      *
+     * @param <T> the list element type observed by the listener
+     * @param list the observable list to listen to
+     * @param listener the listener to add and later remove
      * @return the listener, for use as a field initializer
      */
     protected <T> ListChangeListener<T> register(ObservableList<T> list, ListChangeListener<T> listener) {
@@ -91,6 +106,10 @@ public abstract class GemsSkinBase<C extends Control> extends SkinBase<C> {
      * Adds a {@link MapChangeListener} to the given {@link ObservableMap} and tracks
      * it for automatic removal when this skin is disposed.
      *
+     * @param <K> the key type observed by the listener
+     * @param <V> the value type observed by the listener
+     * @param map the observable map to listen to
+     * @param listener the listener to add and later remove
      * @return the listener, for use as a field initializer
      */
     protected <K, V> MapChangeListener<K, V> register(ObservableMap<K, V> map, MapChangeListener<K, V> listener) {
@@ -103,6 +122,10 @@ public abstract class GemsSkinBase<C extends Control> extends SkinBase<C> {
      * Adds an event handler to the given {@link Node} and tracks it for
      * automatic removal when this skin is disposed.
      *
+     * @param <E> the event type handled by the handler
+     * @param target the node receiving the handler
+     * @param type the event type to handle
+     * @param handler the handler to add and later remove
      * @return the handler, for use as a field initializer
      */
     protected <E extends Event> EventHandler<E> registerHandler(Node target, EventType<E> type, EventHandler<E> handler) {
@@ -115,6 +138,10 @@ public abstract class GemsSkinBase<C extends Control> extends SkinBase<C> {
      * Adds an event filter to the given {@link Node} and tracks it for
      * automatic removal when this skin is disposed.
      *
+     * @param <E> the event type filtered by the filter
+     * @param target the node receiving the filter
+     * @param type the event type to filter
+     * @param filter the filter to add and later remove
      * @return the filter, for use as a field initializer
      */
     protected <E extends Event> EventHandler<E> registerFilter(Node target, EventType<E> type, EventHandler<E> filter) {

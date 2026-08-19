@@ -9,6 +9,14 @@ import javafx.util.Callback;
 
 import java.util.*;
 
+/**
+ * Skin for {@link SegmentedBar}.
+ * <p>
+ * The skin creates one segment node per model segment using the control's
+ * segment view factory and lays them out proportionally to their values.
+ *
+ * @param <T> the segment type
+ */
 public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends GemsSkinBase<SegmentedBar<T>> {
 
     private final Map<T, Node> segmentNodes = new HashMap<>();
@@ -21,6 +29,11 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends GemsSkinBa
 
     private final WeakInvalidationListener weakLayoutListener = new WeakInvalidationListener(layoutListener);
 
+    /**
+     * Creates a new skin for the given segmented bar.
+     *
+     * @param bar the segmented bar to skin
+     */
     public SegmentedBarSkin(SegmentedBar<T> bar) {
         super(bar);
 

@@ -24,6 +24,12 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Skin for {@link PagingControls}.
+ * <p>
+ * The skin builds navigation buttons, page number buttons, an optional page-size selector, and an optional message
+ * label, arranging them horizontally or vertically according to the control alignment.
+ */
 public class PagingControlsSkin extends GemsSkinBase<PagingControls> {
 
     private static final String PAGE_BUTTON = "page-button";
@@ -69,6 +75,11 @@ public class PagingControlsSkin extends GemsSkinBase<PagingControls> {
             getSkinnable().messageLabelStrategyProperty(),
             getSkinnable().pageSizeProperty()));
 
+    /**
+     * Creates a skin for the given paging controls.
+     *
+     * @param view the paging controls rendered by this skin
+     */
     public PagingControlsSkin(PagingControls view) {
         super(view);
 
@@ -338,6 +349,12 @@ public class PagingControlsSkin extends GemsSkinBase<PagingControls> {
         column++;
     }
 
+    /**
+     * Creates a button that selects the given zero-based page index.
+     *
+     * @param page the zero-based page index selected by the button
+     * @return the page button
+     */
     protected Button createPageButton(int page) {
         Button pageButton = new Button(Integer.toString(page + 1));
         pageButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);

@@ -19,13 +19,27 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * A model node used by {@link TreeNodeView} to describe a tree hierarchy.
+ * <p>
+ * Each node stores a value, parent-child relationships, optional additional linked nodes,
+ * expansion state, and optional dimensions used by the view when laying out cells.
+ *
+ * @param <T> the type of the value stored in the node
+ */
 public class TreeNode<T> {
 
     private static final boolean DEFAULT_EXPANDED = true;
+    /**
+     * Sentinel value indicating that the view's default cell width or height should be used.
+     */
     public static final double USE_TREE_CELL_SIZE = Double.NEGATIVE_INFINITY;
     private static final double DEFAULT_WIDTH = USE_TREE_CELL_SIZE;
     private static final double DEFAULT_HEIGHT = USE_TREE_CELL_SIZE;
 
+    /**
+     * Creates an empty tree node.
+     */
     public TreeNode() {
         children.addListener((ListChangeListener.Change<? extends TreeNode<T>> c) -> {
             while (c.next()) {
@@ -39,6 +53,11 @@ public class TreeNode<T> {
         });
     }
 
+    /**
+     * Creates a tree node with the given value.
+     *
+     * @param value the value stored in this node
+     */
     public TreeNode(T value) {
         this();
         setValue(value);
@@ -63,16 +82,31 @@ public class TreeNode<T> {
      */
     private String name;
 
+    /**
+     * Returns the optional name used for styling this node and its links.
+     *
+     * @return the node name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the optional name used for styling this node and its links.
+     *
+     * @param name the node name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
     private final ReadOnlyObjectWrapper<TreeNode<T>> parent = new ReadOnlyObjectWrapper<>(this, "parent", null);
 
+    /**
+     * The read-only parent property.
+     *
+     * @return the parent property
+     */
     public final ReadOnlyObjectProperty<TreeNode<T>> parentProperty() {
         return parent.getReadOnlyProperty();
     }
@@ -94,6 +128,11 @@ public class TreeNode<T> {
      */
     private final ObservableList<TreeNode<T>> children = FXCollections.observableArrayList();
 
+    /**
+     * Returns the observable list of child nodes.
+     *
+     * @return the child nodes
+     */
     public ObservableList<TreeNode<T>> getChildren() {
         return children;
     }
@@ -106,6 +145,11 @@ public class TreeNode<T> {
      */
     private final ObservableList<TreeNode<T>> linkedNodes = FXCollections.observableArrayList();
 
+    /**
+     * Returns the observable list of additional nodes linked to this node.
+     *
+     * @return the linked nodes
+     */
     public ObservableList<TreeNode<T>> getLinkedNodes() {
         return linkedNodes;
     }
@@ -116,6 +160,11 @@ public class TreeNode<T> {
         return expanded.get();
     }
 
+    /**
+     * The expanded property.
+     *
+     * @return the expanded property
+     */
     public final BooleanProperty expandedProperty() {
         return expanded;
     }
@@ -130,6 +179,11 @@ public class TreeNode<T> {
         return valueProperty().get();
     }
 
+    /**
+     * The value property.
+     *
+     * @return the value property
+     */
     public final ObjectProperty<T> valueProperty() {
         return value;
     }
@@ -144,6 +198,13 @@ public class TreeNode<T> {
         return width.get();
     }
 
+    /**
+     * The preferred width property.
+     * <p>
+     * A value of {@link #USE_TREE_CELL_SIZE} lets the view use its default cell width.
+     *
+     * @return the width property
+     */
     public final DoubleProperty widthProperty() {
         return width;
     }
@@ -158,6 +219,13 @@ public class TreeNode<T> {
         return height.get();
     }
 
+    /**
+     * The preferred height property.
+     * <p>
+     * A value of {@link #USE_TREE_CELL_SIZE} lets the view use its default cell height.
+     *
+     * @return the height property
+     */
     public final DoubleProperty heightProperty() {
         return height;
     }
@@ -166,13 +234,21 @@ public class TreeNode<T> {
         this.height.set(height);
     }
 
+    /**
+     * Sets the preferred width and height of this node.
+     *
+     * @param width the preferred node width
+     * @param height the preferred node height
+     */
     public void setSize(double width, double height) {
         setWidth(width);
         setHeight(height);
     }
 
     /**
-     * @return true: if the node is a leaf node
+     * Checks whether this node has no children.
+     *
+     * @return true if the node is a leaf node
      */
     public boolean isLeaf() {
         return this.children.isEmpty();
@@ -191,6 +267,11 @@ public class TreeNode<T> {
         }
     }
 
+    /**
+     * Returns the level of this node in the tree.
+     *
+     * @return the level of this node, equivalent to {@link #getDepth()}
+     */
     public int getLevel() {
         return getDepth();
     }
@@ -205,7 +286,9 @@ public class TreeNode<T> {
     }
 
     /**
-     * @return The last node in the child node list.
+     * Returns the last child node.
+     *
+     * @return the last node in the child node list, or {@code null} if this node has no children
      */
     public TreeNode<T> getLastChild() {
         if (!this.children.isEmpty()) {
@@ -215,7 +298,9 @@ public class TreeNode<T> {
     }
 
     /**
-     * @return true: if this node is the last node of the parent
+     * Checks whether this node is the last child of its parent.
+     *
+     * @return true if this node is the last node of the parent
      */
     public boolean isLastChild() {
         if (getParent() == null || getParent().getChildren().isEmpty()) {
@@ -225,7 +310,9 @@ public class TreeNode<T> {
     }
 
     /**
-     * @return true: if this node is the first node of the parent
+     * Checks whether this node is the first child of its parent.
+     *
+     * @return true if this node is the first node of the parent
      */
     public boolean isFirstChild() {
         if (getParent() == null || getParent().getChildren().isEmpty()) {
@@ -235,7 +322,9 @@ public class TreeNode<T> {
     }
 
     /**
-     * @return The first node in the child node list.
+     * Returns the first child node.
+     *
+     * @return the first node in the child node list, or {@code null} if this node has no children
      */
     public TreeNode<T> getFirstChild() {
         if (!this.children.isEmpty()) {
@@ -245,7 +334,9 @@ public class TreeNode<T> {
     }
 
     /**
-     * @return true if the node is parent is collapsed
+     * Checks whether any ancestor of this node is collapsed.
+     *
+     * @return true if one of this node's ancestors is collapsed
      */
     public boolean isAncestorCollapsed() {
         TreeNode<T> parentNode = this.getParent();
@@ -260,7 +351,9 @@ public class TreeNode<T> {
     }
 
     /**
-     * Convenient for traversing tree nodes.
+     * Creates a breadth-first stream starting with this node.
+     *
+     * @return a stream traversing this node and its descendants
      */
     public Stream<TreeNode<T>> stream() {
         return StreamSupport.stream(new TreeNodeSpliterator<>(this), false);

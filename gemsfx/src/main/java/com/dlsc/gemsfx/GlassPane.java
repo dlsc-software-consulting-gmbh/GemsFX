@@ -41,6 +41,9 @@ public class GlassPane extends StackPane {
 
     private final FadeTransition fadeTransition = new FadeTransition();
 
+    /**
+     * Constructs a new glass pane.
+     */
     public GlassPane() {
         getStyleClass().add("glass-pane");
 
@@ -243,6 +246,11 @@ public class GlassPane extends StackPane {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata for this pane class.
+     *
+     * @return the CSS metadata for this pane class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

@@ -196,6 +196,8 @@ public class EmailField extends Control {
 
     /**
      * Constructs a new email field with the given initial email address.
+     *
+     * @param emailAddress the initial email address
      */
     public EmailField(String emailAddress) {
         this();
@@ -649,6 +651,11 @@ public class EmailField extends Control {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata for this control class.
+     *
+     * @return the CSS metadata for this control class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

@@ -30,6 +30,10 @@ public abstract class AbstractChangeTracker<T extends Observable> {
         }
     };
     private final WeakListChangeListener<T> weakOuterListChangeListener = new WeakListChangeListener<>(outerListChangeListener);
+
+    /**
+     * The callback invoked with the tracked source list whenever the source list or one of its observed elements changes.
+     */
     protected Consumer<ObservableList<T>> onChanged;
 
     /**

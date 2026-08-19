@@ -665,6 +665,11 @@ public class SearchField<T> extends Control {
             return new SearchTask(text);
         }
 
+        /**
+         * Returns the text used by the current search task.
+         *
+         * @return the current search text
+         */
         public String getText() {
             return text;
         }
@@ -1146,13 +1151,27 @@ public class SearchField<T> extends Control {
          */
         public static final EventType<SearchEvent> SEARCH_FINISHED = new EventType<>(Event.ANY, "SEARCH_FINISHED");
 
+        /**
+         * The search text associated with the event.
+         */
         private final String text;
 
+        /**
+         * Constructs a new search event.
+         *
+         * @param eventType the event type
+         * @param text the search text associated with the event
+         */
         public SearchEvent(EventType<? extends SearchEvent> eventType, String text) {
             super(eventType);
             this.text = text;
         }
 
+        /**
+         * Returns the search text associated with this event.
+         *
+         * @return the search text
+         */
         public String getText() {
             return text;
         }
@@ -1408,6 +1427,11 @@ public class SearchField<T> extends Control {
         private final Text text2 = new Text();
         private final Text text3 = new Text();
 
+        /**
+         * Constructs a new list cell for the given search field.
+         *
+         * @param searchField the search field that owns this cell
+         */
         public SearchFieldListCell(SearchField<T> searchField) {
             this.searchField = searchField;
 
@@ -1450,6 +1474,11 @@ public class SearchField<T> extends Control {
 
     }
 
+    /**
+     * Returns the popup used to display suggestions for this search field.
+     *
+     * @return the search field popup
+     */
     public final SearchFieldPopup<T> getPopup() {
         return popup;
     }
@@ -1581,6 +1610,11 @@ public class SearchField<T> extends Control {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata for this class.
+     *
+     * @return the CSS metadata for this class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

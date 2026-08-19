@@ -9,7 +9,7 @@ import java.util.Objects;
 
 /**
  * Actions can be attached to notifications via {@link Notification#getActions()}. The UI
- * will create a control (button or menu item) for each action so that the user can trigger
+ * will create a button for each action so that the user can trigger
  * the action. This allows for a quick response on incoming notifications, e.g. "open the
  * mail".
  *
@@ -20,9 +20,8 @@ public class NotificationAction<T> {
     private Callback<Notification<T>, OnClickBehaviour> onAction;
 
     /**
-     * Constructs a new action with the given text. The default action behaviour
-     * will be to remove the notification from its group. No additional application
-     * logic will be executed.
+     * Constructs a new action with the given text. The default callback returns
+     * {@link OnClickBehaviour#REMOVE}.
      *
      * @param text the text of the action as shown in the UI
      */

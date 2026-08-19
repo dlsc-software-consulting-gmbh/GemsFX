@@ -42,6 +42,12 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.VLineTo;
 import javafx.stage.Window;
 
+/**
+ * Skin for {@link PopOver}.
+ * <p>
+ * The skin uses paths for the popover background and border, embeds the popover content in a border pane, clips the
+ * content to the rounded shape, and updates the arrow geometry while the popover moves or is detached.
+ */
 public class PopOverSkin implements Skin<PopOver> {
 
     private static final String DETACHED_STYLE_CLASS = "detached";
@@ -60,6 +66,11 @@ public class PopOverSkin implements Skin<PopOver> {
     private Point2D dragStartLocation;
     private final PopOver popOver;
 
+    /**
+     * Creates a skin for the given popover.
+     *
+     * @param popOver the popover rendered by this skin
+     */
     public PopOverSkin(final PopOver popOver) {
 
         this.popOver = popOver;

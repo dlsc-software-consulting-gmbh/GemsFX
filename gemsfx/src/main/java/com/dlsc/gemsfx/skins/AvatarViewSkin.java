@@ -17,6 +17,12 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import com.dlsc.gemsfx.util.StringUtils;
 
+/**
+ * Skin for the {@link AvatarView} control.
+ * <p>
+ * The skin switches between an image, initials text, or a fallback icon and
+ * clips the content according to the avatar shape.
+ */
 public class AvatarViewSkin extends GemsSkinBase<AvatarView> {
 
     private final StackPane imageWrapper;
@@ -41,6 +47,11 @@ public class AvatarViewSkin extends GemsSkinBase<AvatarView> {
         updateView();
     };
 
+    /**
+     * Creates a skin for the given avatar view.
+     *
+     * @param avatar the avatar view rendered by this skin
+     */
     public AvatarViewSkin(AvatarView avatar) {
         super(avatar);
 

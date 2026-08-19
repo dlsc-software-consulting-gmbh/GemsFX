@@ -11,16 +11,53 @@ import javafx.scene.shape.Arc;
 import javafx.scene.transform.Rotate;
 import javafx.util.StringConverter;
 
+/**
+ * Base skin for arc-based progress indicators.
+ * <p>
+ * The skin renders the control with a track arc, a progress arc, and an optional
+ * label or graphic. Subclasses provide geometry and animation details
+ * for concrete {@link ArcProgressIndicator} controls.
+ *
+ * @param <T> the type of progress indicator rendered by this skin
+ */
 public abstract class ArcProgressIndicatorSkin<T extends ArcProgressIndicator> extends GemsSkinBase<T> {
 
     private static final PseudoClass PSEUDO_CLASS_COMPLETED = PseudoClass.getPseudoClass("completed");
+    /**
+     * The label used to display the formatted progress value or control graphic.
+     */
     protected final Label progressLabel = new Label();
+
+    /**
+     * The arc that renders the full track behind the progress arc.
+     */
     protected final Arc trackArc = new Arc();
+
+    /**
+     * The arc that renders the current progress value.
+     */
     protected final Arc progressArc = new Arc();
+
+    /**
+     * The rotation transform used while the progress is indeterminate.
+     */
     protected final Rotate rotate = new Rotate();
+
+    /**
+     * Binding that computes the arc radius from the skinnable control.
+     */
     protected DoubleBinding radiusBinding;
+
+    /**
+     * Timeline used for indeterminate progress animation.
+     */
     protected Timeline indeterminateAnimation;
 
+    /**
+     * Creates a skin for the given arc progress indicator.
+     *
+     * @param control the progress indicator rendered by this skin
+     */
     public ArcProgressIndicatorSkin(T control) {
         super(control);
 
@@ -31,6 +68,9 @@ public abstract class ArcProgressIndicatorSkin<T extends ArcProgressIndicator> e
         updateProgress();
     }
 
+    /**
+     * Initializes the arcs, label, and child nodes used by this skin.
+     */
     protected void initComponents() {
         T control = getSkinnable();
 
@@ -98,6 +138,9 @@ public abstract class ArcProgressIndicatorSkin<T extends ArcProgressIndicator> e
         }
     }
 
+    /**
+     * Stops the indeterminate animation and removes its rotation transform.
+     */
     protected void stopAnimation() {
         progressArc.getTransforms().remove(rotate);
         if (animationIsRunning()) {
@@ -166,46 +209,84 @@ public abstract class ArcProgressIndicatorSkin<T extends ArcProgressIndicator> e
         progressLabel.resizeRelocate(labelX, labelY, labelWidth, labelHeight);
     }
 
+    /**
+     * Computes the maximum width available for the progress label.
+     *
+     * @param diameter the available diameter inside the progress arc
+     * @return the label width
+     */
     protected double computeLabelWidth(double diameter) {
         return diameter;
     }
 
+    /**
+     * Computes the x-coordinate of the center of the progress arc and track arc.
+     *
+     * @param contentX the x-coordinate of the content area
+     * @param contentWidth the width of the content area
+     * @return the x-coordinate of the arc center
+     */
     protected double computeAcrCenterX(double contentX, double contentWidth) {
         return contentX + contentWidth / 2;
     }
 
+    /**
+     * Computes the x-coordinate of the progress label.
+     *
+     * @param arcCenterX the x-coordinate of the arc center
+     * @param labelWidth the computed label width
+     * @return the x-coordinate of the label
+     */
     protected double computeLabelX(double arcCenterX, double labelWidth) {
         return arcCenterX - (labelWidth / 2);
     }
 
     /**
      * Returns the height of the label.
+     *
+     * @param diameter the available diameter inside the progress arc
+     * @return the label height
      */
     protected abstract double computeLabelHeight(double diameter);
 
     /**
-     * Returns the y-coordinate of the center of the progress arc / track arc.
+     * Returns the y-coordinate of the center of the progress arc and track arc.
+     *
+     * @param contentY the y-coordinate of the content area
+     * @param contentHeight the height of the content area
+     * @return the y-coordinate of the arc center
      */
     protected abstract double computeArcCenterY(double contentY, double contentHeight);
 
 
     /**
      * Returns the y-coordinate of the label.
+     *
+     * @param arcCenterY the y-coordinate of the arc center
+     * @param labelHeight the computed label height
+     * @return the y-coordinate of the label
      */
     protected abstract double computeLabelY(double arcCenterY, double labelHeight);
 
     /**
      * Initializes the animation that is used when the progress is indeterminate.
+     *
+     * @return the indeterminate animation timeline
      */
     protected abstract Timeline initIndeterminateAnimation();
 
     /**
      * Returns a binding that calculates the radius of the circle based on the size of the control.
+     *
+     * @param control the progress indicator rendered by this skin
+     * @return the radius binding
      */
     protected abstract DoubleBinding getRadiusBinding(T control);
 
     /**
      * Returns the maximum length of the progress arc.
+     *
+     * @return the maximum progress arc length
      */
     protected abstract double getProgressMaxLength();
 

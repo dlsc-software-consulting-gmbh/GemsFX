@@ -19,6 +19,7 @@ public class EnumUtil {
      * If the input string is null, returns an empty string.
      *
      * @param enumValue The enum value to convert.
+     * @param <T> the enum type
      * @return A capitalized string representation of the enum name.
      * <p> Example: 1. null -> ""
      * <p> Example: 2. MY_ENUM_VALUE -> My enum value
@@ -34,6 +35,7 @@ public class EnumUtil {
      *
      * @param enumValue The enum value to convert.
      * @param nullDefaultValue The default value to return if the input is null.
+     * @param <T> the enum type
      * @return A capitalized string representation of the enum name.
      * <p> Example: 1. null -> nullDefaultValue
      * <p> Example: 2. Example: MY_ENUM_VALUE -> My enum value
@@ -48,6 +50,7 @@ public class EnumUtil {
      * If the input string is null, returns an empty string.
      *
      * @param enumName The enum name to convert.
+     * @param <T> the enum type
      * @return A capitalized string representation of the enum name.
      * <p> Example: 1. null -> ""
      * <p> Example: 2. Example: MY_ENUM_VALUE -> My enum value
@@ -61,6 +64,7 @@ public class EnumUtil {
      * capitalizing the first letter of each word. If the enum value is null, returns an empty string.
      *
      * @param enumValue The enum value to be formatted.
+     * @param <T> the enum type
      * @return A title-cased string representation of the enum value.
      * <p> Example: 1. null -> ""
      * <p> Example: 2. MY_ENUM_VALUE -> My Enum Value
@@ -75,6 +79,7 @@ public class EnumUtil {
      *
      * @param enumValue The enum value to be formatted.
      * @param nullDefaultValue The default value to return if the input is null.
+     * @param <T> the enum type
      * @return A title-cased string representation of the enum value.
      * <p> Example: 1. null -> nullDefaultValue
      * <p> Example: 2. MY_ENUM_VALUE -> My Enum Value
@@ -88,6 +93,7 @@ public class EnumUtil {
      * capitalizing the first letter of each word. If the enum value is null, returns an empty string.
      *
      * @param enumName The string representation of the enum value to be formatted.
+     * @param <T> the enum type
      * @return A title-cased string representation of the enum value.
      * <p> Example: 1. null -> ""
      * <p> Example: 2. MY_ENUM_VALUE -> My Enum Value
@@ -102,6 +108,7 @@ public class EnumUtil {
      *
      * @param enumName The string representation of the enum value to be formatted.
      * @param nullDefaultValue The default value to return if the input is null.
+     * @param <T> the enum type
      * @return A title-cased string representation of the enum value.
      * <p> Example: 1. null -> nullDefaultValue
      * <p> Example: 2. MY_ENUM_VALUE -> My Enum Value
@@ -135,6 +142,7 @@ public class EnumUtil {
      * Does not change letter case. If the input string is null, returns an empty string.
      *
      * @param enumValue The enum value to be formatted.
+     * @param <T> the enum type
      * @return A string representation of the enum name with underscores replaced by spaces.
      * <p> Example: 1. null -> ""
      * <p> Example: 2. MY_ENUM_VALUE -> MY ENUM VALUE
@@ -148,6 +156,7 @@ public class EnumUtil {
      * Does not change letter case. If the input string is null, returns an empty string.
      *
      * @param enumName The string representation of the enum name to be formatted.
+     * @param <T> the enum type
      * @return A string representation of the enum name with underscores replaced by spaces.
      * <p> Example: 1. null -> ""
      * <p> Example: 2. MY_ENUM_VALUE -> MY ENUM VALUE
@@ -161,6 +170,7 @@ public class EnumUtil {
      * suitable for use as a CSS class name. This method does not accept null values for enumValue.
      *
      * @param enumValue The enum value to be converted. Must not be null.
+     * @param <T> the enum type
      * @return A string suitable for use as a CSS class name.
      * Example: MY_ENUM_VALUE -> my-enum-value
      */

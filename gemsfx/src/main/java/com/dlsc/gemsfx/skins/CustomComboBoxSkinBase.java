@@ -18,12 +18,26 @@ import javafx.scene.control.Skinnable;
 import javafx.scene.layout.Region;
 import javafx.stage.WindowEvent;
 
+/**
+ * Base skin for custom combo-box controls with popup content.
+ * <p>
+ * The skin manages a {@link PopupControl}, sizes and positions it relative to
+ * the skinnable combo box, and delegates creation of the popup node to
+ * subclasses.
+ *
+ * @param <T> the combo-box control type rendered by this skin
+ */
 public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends GemsSkinBase<T> {
 
     private boolean popupNeedsReconfiguring = true;
 
     private PopupControl popup;
 
+    /**
+     * Creates a skin for the given combo-box control.
+     *
+     * @param control the combo-box control rendered by this skin
+     */
     public CustomComboBoxSkinBase(T control) {
         super(control);
 
@@ -50,6 +64,11 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Gem
         return popup;
     }
 
+    /**
+     * Returns the content node shown inside the popup.
+     *
+     * @return the popup content node
+     */
     protected abstract Node getPopupContent();
 
     private void positionAndShowPopup() {
@@ -213,9 +232,17 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Gem
         }
     }
 
+    /**
+     * Handles popup auto-hide events.
+     *
+     * @param event the auto-hide event
+     */
     protected void popupOnAutoHide(Event event) {
     }
 
+    /**
+     * Shows the popup and requests focus for its content.
+     */
     public void show() {
         T control = getSkinnable();
         if (control == null) {
@@ -231,6 +258,9 @@ public abstract class CustomComboBoxSkinBase<T extends ComboBoxBase> extends Gem
         positionAndShowPopup();
     }
 
+    /**
+     * Hides the popup if it is currently showing.
+     */
     public void hide() {
         if (popup != null && popup.isShowing()) {
             popup.hide();

@@ -28,12 +28,25 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.util.Callback;
 
+/**
+ * Skin for {@link MultiColumnListView}.
+ * <p>
+ * The skin builds a grid of list-view columns, optional headers and separators, a loading overlay, and placeholders
+ * that participate in drag-and-drop between columns.
+ *
+ * @param <T> the item type displayed in the columns
+ */
 public class MultiColumnListViewSkin<T> extends GemsSkinBase<MultiColumnListView<T>> {
 
     private final GridPane gridPane = new GridPane();
 
     private final LoadingPane loadingPane;
 
+    /**
+     * Creates a skin for the given multi-column list view.
+     *
+     * @param view the multi-column list view rendered by this skin
+     */
     public MultiColumnListViewSkin(MultiColumnListView<T> view) {
         super(view);
 

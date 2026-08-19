@@ -136,6 +136,7 @@ public class UIUtil {
      * @param node      The Node to update.
      * @param enumValue The enum value determining the style to apply.
      *                  <p> Example     If Dir.UP is passed, add "up" style and removes {"down", "left", "right"} styles.
+     * @param <T> the enum type
      */
     public static <T extends Enum<T>> void updateStyleFromEnum(Styleable node, T enumValue) {
         updateStyles(node, EnumUtil.convertAllToStylesClassName(enumValue.getClass()), EnumUtil.convertToStyleClassName(enumValue));
@@ -147,6 +148,7 @@ public class UIUtil {
      * @param node      The Node to clear styles from.
      * @param enumClass The enum class whose associated styles will be removed.
      *                  <p> Example     If Dir.class is passed, removes all styles {"up","down","left", "right"}.
+     * @param <T> the enum type
      */
     public static <T extends Enum<T>> void clearStylesByEnum(Styleable node, Class<T> enumClass) {
         node.getStyleClass().removeAll(EnumUtil.convertAllToStylesClassName(enumClass));

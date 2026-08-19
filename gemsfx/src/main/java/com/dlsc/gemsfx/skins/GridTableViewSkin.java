@@ -25,6 +25,12 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
+ * Skin for {@link GridTableView}.
+ * <p>
+ * The skin renders the table as a {@link GridPane} with column headers, rows of {@link GridTableCell} instances,
+ * optional row headers and footers, a placeholder for empty content, and a {@link LoadingPane} overlay for loading
+ * states.
+ *
  * @param <S> grid table item type
  */
 public class GridTableViewSkin<S> extends GemsSkinBase<GridTableView<S>> {
@@ -39,6 +45,11 @@ public class GridTableViewSkin<S> extends GemsSkinBase<GridTableView<S>> {
         }
     };
 
+    /**
+     * Creates a skin for the given grid table view.
+     *
+     * @param tableView the grid table view rendered by this skin
+     */
     public GridTableViewSkin(GridTableView<S> tableView) {
         super(tableView);
 

@@ -19,6 +19,12 @@ import java.util.List;
 public class StraightLineLink<T> extends AbstractLinkStrategy<T> {
 
     /**
+     * Creates a straight-line link strategy.
+     */
+    public StraightLineLink() {
+    }
+
+    /**
      * Draws the link for the given start and end coordinates.
      *
      * @param direction the layout direction

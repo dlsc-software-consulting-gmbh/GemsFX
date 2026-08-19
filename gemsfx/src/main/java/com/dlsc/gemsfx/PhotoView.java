@@ -89,8 +89,17 @@ public class PhotoView extends Control {
 
     private static final String[] SUPPORTED_EXTENSIONS = {".bmp", ".png", ".gif", ".jpg", ".jpeg"};
 
+    /**
+     * Defines the shape used to clip the displayed photo.
+     */
     public enum ClipShape {
+        /**
+         * Clips the photo to a circle.
+         */
         CIRCLE,
+        /**
+         * Clips the photo to a rectangle.
+         */
         RECTANGLE
     }
 
@@ -233,20 +242,19 @@ public class PhotoView extends Control {
 
     // cropped image support
 
-    public final BooleanProperty createCroppedImage = new SimpleBooleanProperty(this, "createCroppedImage", true);
-
-    public final boolean isCreateCroppedImage() {
-        return createCroppedImage.get();
-    }
-
     /**
      * Specifies whether the view should constantly create a cropped image version of the
      * original image whenever the user edits the original. Creating a cropped image can have
      * a performance impact on slower hardware (e.g. embedded).
      *
      * @see #croppedImageProperty()
-     * @return true if the view should create the cropped image
      */
+    public final BooleanProperty createCroppedImage = new SimpleBooleanProperty(this, "createCroppedImage", true);
+
+    public final boolean isCreateCroppedImage() {
+        return createCroppedImage.get();
+    }
+
     public final BooleanProperty createCroppedImageProperty() {
         return createCroppedImage;
     }
@@ -611,6 +619,11 @@ public class PhotoView extends Control {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata for this class.
+     *
+     * @return the CSS metadata for this class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

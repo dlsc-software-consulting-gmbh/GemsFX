@@ -12,6 +12,9 @@ import java.util.Objects;
  */
 public class InfoCenterEvent extends Event {
 
+    /**
+     * The root event type for all info center events.
+     */
     public static final EventType<InfoCenterEvent> ANY = new EventType<>(Event.ANY, "ANY");
 
     /**
@@ -34,6 +37,9 @@ public class InfoCenterEvent extends Event {
      */
     public static final EventType<InfoCenterEvent> HIDE = new EventType<>(ANY, "HIDE");
 
+    /**
+     * The notification associated with this event, or {@code null} if the event is not notification-specific.
+     */
     private Notification<?> notification;
 
     /**

@@ -17,6 +17,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+/**
+ * Default skin for {@link TreeNodeView}.
+ * <p>
+ * The skin computes node positions for regular and compact layouts, creates cells
+ * through the view's cell factory, and draws links using the configured link strategy.
+ *
+ * @param <T> the type of the value stored in each tree node
+ */
 public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
     private final Map<TreeNode<T>, InvalidationListener> expandListenerMap = new HashMap<>();
     private final Map<TreeNode<T>, InvalidationListener> invailidateListenerMap = new HashMap<>();
@@ -49,6 +57,11 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
 
     private final Group contentGroup = new Group();
 
+    /**
+     * Creates a skin for the given tree node view.
+     *
+     * @param view the control shown by this skin
+     */
     public TreeNodeViewSkin(TreeNodeView<T> view) {
         super(view);
         contentGroup.getStyleClass().add("tree-content");
@@ -760,10 +773,22 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
         childrenListListenerMap.clear();
     }
 
+    /**
+     * Computes the width used to lay out the given node.
+     *
+     * @param node the node whose width is computed
+     * @return the node-specific width or the view's default cell width
+     */
     public double computeNodeWidth(TreeNode<T> node) {
         return node.getWidth() == TreeNode.USE_TREE_CELL_SIZE ? getSkinnable().getCellWidth() : node.getWidth();
     }
 
+    /**
+     * Computes the height used to lay out the given node.
+     *
+     * @param node the node whose height is computed
+     * @return the node-specific height or the view's default cell height
+     */
     public double computeNodeHeight(TreeNode<T> node) {
         return node.getHeight() == TreeNode.USE_TREE_CELL_SIZE ? getSkinnable().getCellHeight() : node.getHeight();
     }
@@ -788,6 +813,9 @@ public class TreeNodeViewSkin<T> extends SkinBase<TreeNodeView<T>> {
         return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
     }
 
+    /**
+     * Rebuilds the visual tree.
+     */
     public void refresh() {
         buildTree();
     }

@@ -94,10 +94,18 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
         }
     };
 
+    /**
+     * Constructs a new arc progress indicator in indeterminate mode.
+     */
     public ArcProgressIndicator() {
         this(INDETERMINATE_PROGRESS);
     }
 
+    /**
+     * Constructs a new arc progress indicator with the specified progress.
+     *
+     * @param progress the initial progress value
+     */
     public ArcProgressIndicator(double progress) {
         super(progress);
         getStyleClass().add(DEFAULT_STYLE_CLASS);
@@ -245,10 +253,25 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
         trackArcTypeProperty().set(trackArcType);
     }
 
+    /**
+     * Defines the visual style used to render the progress arc.
+     */
     public enum StyleType {
+        /**
+         * The default arc style.
+         */
         DEFAULT,
+        /**
+         * A thicker arc style.
+         */
         BOLD,
+        /**
+         * A thinner arc style.
+         */
         THIN,
+        /**
+         * A filled sector style.
+         */
         SECTOR;
     }
 
@@ -352,6 +375,11 @@ public abstract class ArcProgressIndicator extends ProgressIndicator {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata for this class.
+     *
+     * @return the CSS metadata for this class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return ArcProgressIndicator.StyleableProperties.STYLEABLES;
     }

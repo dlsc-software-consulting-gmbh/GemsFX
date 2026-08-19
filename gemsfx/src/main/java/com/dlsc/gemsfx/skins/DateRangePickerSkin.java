@@ -20,6 +20,12 @@ import com.dlsc.gemsfx.util.StringUtils;
 
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Skin for the {@link DateRangePicker} control.
+ * <p>
+ * The skin renders the selected date range, optional title and icon, and uses
+ * the associated {@link DateRangeView} as popup content.
+ */
 public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangePicker> {
 
     private final DateRangePicker picker;
@@ -36,6 +42,11 @@ public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangeP
     private final EventHandler<MouseEvent> mouseExitedHandler = this::mouseExited;
     private final EventHandler<MouseEvent> mouseReleasedHandler = this::mouseReleased;
 
+    /**
+     * Creates a skin for the given date range picker.
+     *
+     * @param picker the date range picker rendered by this skin
+     */
     public DateRangePickerSkin(DateRangePicker picker) {
         super(picker);
         this.picker = picker;
@@ -159,6 +170,12 @@ public class DateRangePickerSkin extends ToggleVisibilityComboBoxSkin<DateRangeP
         }
     }
 
+    /**
+     * Formats the given date range with the picker formatter.
+     *
+     * @param range the date range to format
+     * @return the formatted date range
+     */
     public String toString(DateRange range) {
         DateTimeFormatter formatter = getSkinnable().getFormatter();
 

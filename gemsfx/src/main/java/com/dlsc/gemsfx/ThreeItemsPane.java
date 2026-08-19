@@ -176,6 +176,11 @@ public class ThreeItemsPane extends Pane {
         return spacing.get();
     }
 
+    /**
+     * The spacing between the three managed items.
+     *
+     * @return the spacing property
+     */
     public final DoubleProperty spacingProperty() {
         return spacing;
     }

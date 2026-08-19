@@ -19,6 +19,14 @@ import javafx.scene.layout.StackPane;
 
 import java.util.Objects;
 
+/**
+ * Default visual cell used by {@link TreeNodeView} to render a {@link TreeNode}.
+ * <p>
+ * The cell displays text and an optional graphic, binds its expanded state to the
+ * associated tree node, and shows a disclosure arrow when children are available.
+ *
+ * @param <T> the type of the item represented by this cell
+ */
 public class TreeNodeCell<T> extends BorderPane {
 
     private static final boolean DEFAULT_EXPANDED = true;
@@ -30,6 +38,9 @@ public class TreeNodeCell<T> extends BorderPane {
     private final Label innerLabel;
     private final StackPane arrowWrapper;
 
+    /**
+     * Creates an empty tree node cell.
+     */
     public TreeNodeCell() {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
         innerLabel = new Label();
@@ -79,6 +90,11 @@ public class TreeNodeCell<T> extends BorderPane {
 
     }
 
+    /**
+     * Creates a tree node cell for the given item.
+     *
+     * @param item the item displayed by this cell
+     */
     public TreeNodeCell(T item) {
         this();
         setItem(item);
@@ -90,6 +106,11 @@ public class TreeNodeCell<T> extends BorderPane {
         return item.get();
     }
 
+    /**
+     * The item property.
+     *
+     * @return the item property
+     */
     public final ObjectProperty<T> itemProperty() {
         return item;
     }
@@ -104,6 +125,11 @@ public class TreeNodeCell<T> extends BorderPane {
         return treeNode.get();
     }
 
+    /**
+     * The read-only tree node property.
+     *
+     * @return the tree node property
+     */
     public final ReadOnlyObjectProperty<TreeNode<T>> treeNodeProperty() {
         return treeNode.getReadOnlyProperty();
     }
@@ -118,6 +144,11 @@ public class TreeNodeCell<T> extends BorderPane {
         return expanded.get();
     }
 
+    /**
+     * The expanded property.
+     *
+     * @return the expanded property
+     */
     public final BooleanProperty expandedProperty() {
         return expanded;
     }
@@ -132,6 +163,11 @@ public class TreeNodeCell<T> extends BorderPane {
         return graphic.get();
     }
 
+    /**
+     * The graphic property.
+     *
+     * @return the graphic property
+     */
     public final ObjectProperty<Node> graphicProperty() {
         return graphic;
     }
@@ -146,6 +182,11 @@ public class TreeNodeCell<T> extends BorderPane {
         return text.get();
     }
 
+    /**
+     * The text property.
+     *
+     * @return the text property
+     */
     public final StringProperty textProperty() {
         return text;
     }
@@ -154,6 +195,11 @@ public class TreeNodeCell<T> extends BorderPane {
         this.text.set(text);
     }
 
+    /**
+     * Updates this cell's displayed content for the given item.
+     *
+     * @param item the new item value
+     */
     protected void updateItem(T item) {
         if (item != null) {
             setText(item.toString());

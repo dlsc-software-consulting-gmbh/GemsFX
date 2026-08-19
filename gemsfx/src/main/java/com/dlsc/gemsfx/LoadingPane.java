@@ -82,8 +82,19 @@ public class LoadingPane extends StackPane {
      * @see #sizeProperty()
      */
     public enum Size {
+        /**
+         * Uses the smallest progress indicator size.
+         */
         SMALL,
+
+        /**
+         * Uses the medium progress indicator size.
+         */
         MEDIUM,
+
+        /**
+         * Uses the largest progress indicator size.
+         */
         LARGE
     }
 

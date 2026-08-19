@@ -29,6 +29,14 @@ import java.util.Map;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
 import java.text.MessageFormat;
 
+/**
+ * Skin for {@link FilterView}.
+ * <p>
+ * The skin builds a header with title, subtitle, optional extras, and a search field, followed by filter group menus
+ * and chips for the currently active filters.
+ *
+ * @param <T> the item type filtered by the view
+ */
 public class FilterViewSkin<T> extends GemsSkinBase<FilterView<T>> {
 
     private final SearchTextField searchTextField;
@@ -60,6 +68,11 @@ public class FilterViewSkin<T> extends GemsSkinBase<FilterView<T>> {
         }
     };
 
+    /**
+     * Creates a skin for the given filter view.
+     *
+     * @param view the filter view rendered by this skin
+     */
     public FilterViewSkin(FilterView<T> view) {
         super(view);
 

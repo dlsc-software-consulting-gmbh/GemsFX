@@ -24,12 +24,23 @@ import com.dlsc.gemsfx.util.StringUtils;
 
 import java.util.Objects;
 
+/**
+ * Skin for {@link EmailField}.
+ * <p>
+ * The skin places the field's editor in the control, adds optional mail and validation icons, installs the validation
+ * tooltip, and shows a popup list with matching domain suggestions while the user types after the at sign.
+ */
 public class EmailFieldSkin extends GemsSkinBase<EmailField> {
 
     private final CustomTextField customTextField;
     private final DomainPopup domainPopup;
     private javafx.beans.value.ChangeListener<String> invalidTextListener;
 
+    /**
+     * Creates a skin for the given email field.
+     *
+     * @param field the email field rendered by this skin
+     */
     public EmailFieldSkin(EmailField field) {
         super(field);
 

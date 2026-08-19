@@ -48,6 +48,12 @@ import java.util.List;
  */
 public class Utils {
 
+    /**
+     * Creates a utility instance.
+     */
+    public Utils() {
+    }
+
     /***************************************************************************
      *                                                                         *
      * Math-related utilities                                                  *

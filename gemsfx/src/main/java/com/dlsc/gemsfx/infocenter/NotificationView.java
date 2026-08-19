@@ -243,7 +243,7 @@ public class NotificationView<T, S extends Notification<T>> extends StackPane {
      * An (optional) detailed UI that can be revealed interactively by the user.
      * Example: a map view that shows the location of a meeting scheduled in a calendar.
      *
-     * @return the optional graphic
+     * @return the optional content property
      */
     public final ObjectProperty<Node> contentProperty() {
         return content;

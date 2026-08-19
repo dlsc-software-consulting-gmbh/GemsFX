@@ -82,6 +82,9 @@ public class Skeleton extends Control {
 
     private static final String DEFAULT_STYLE_CLASS = "skeleton";
 
+    /**
+     * The default skeleton placeholder variant.
+     */
     public static final Variant DEFAULT_VARIANT = Variant.ROUNDED_RECTANGLE;
     private static final double DEFAULT_CORNER_RADIUS = 4.0;
     private static final Duration DEFAULT_CYCLE_DURATION = Duration.millis(1500.0);

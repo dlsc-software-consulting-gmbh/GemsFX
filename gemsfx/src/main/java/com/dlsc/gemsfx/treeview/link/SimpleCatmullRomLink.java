@@ -10,17 +10,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A {@link LinkStrategy} that draws a smooth S-curve link using a cubic Bézier
- * approximation of a Catmull-Rom spline.
+ * A {@link LinkStrategy} that draws a smooth cubic Bézier curve between a parent
+ * and a child node.
  *
- * <p>The control points are placed at half the gap distance along the primary axis,
- * offset toward the child, producing a gentle S-shaped curve that flows naturally
- * between parent and child. A directional arrow is added at the child end, oriented
- * along the curve's tangent.
+ * <p>The control points are placed half a gap away from the start and end points along
+ * the primary axis. A directional arrow is added at the child end and oriented along
+ * the curve's tangent.
  *
  * @param <T> the type of the data value stored in each tree node
  */
 public class SimpleCatmullRomLink<T> extends AbstractLinkStrategy<T> {
+
+    /**
+     * Creates a simple Catmull-Rom link strategy.
+     */
+    public SimpleCatmullRomLink() {
+    }
 
     /**
      * Draws the link for the given start and end coordinates.

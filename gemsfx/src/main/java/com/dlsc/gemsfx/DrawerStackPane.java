@@ -1028,6 +1028,11 @@ public class DrawerStackPane extends StackPane {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata for this pane class.
+     *
+     * @return the CSS metadata for this pane class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

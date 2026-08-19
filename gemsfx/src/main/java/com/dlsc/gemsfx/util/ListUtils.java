@@ -11,6 +11,12 @@ import java.util.function.Predicate;
 public class ListUtils {
 
     /**
+     * Creates a list utility instance.
+     */
+    public ListUtils() {
+    }
+
+    /**
      * Replaces matching elements in the list with the provided new value.
      *
      * @param list the list to operate on
@@ -36,4 +42,3 @@ public class ListUtils {
         return success;
     }
 }
-

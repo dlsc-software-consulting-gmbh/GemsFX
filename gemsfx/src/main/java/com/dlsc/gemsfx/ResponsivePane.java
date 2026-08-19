@@ -73,6 +73,9 @@ public class ResponsivePane extends StackPane {
 
     private final GlassPane glassPane = new GlassPane();
 
+    /**
+     * Constructs a new responsive pane.
+     */
     public ResponsivePane() {
         super();
 
@@ -95,6 +98,11 @@ public class ResponsivePane extends StackPane {
 
     private ObjectProperty<Node> content;
 
+    /**
+     * The main content node displayed next to the active sidebar.
+     *
+     * @return the content property
+     */
     public final ObjectProperty<Node> contentProperty() {
         if (content == null) {
             content = new ResponsivePane.NodeProperty("content");
@@ -110,6 +118,9 @@ public class ResponsivePane extends StackPane {
         return content == null ? null : content.get();
     }
 
+    /**
+     * The compact sidebar node shown when there is not enough space for the large sidebar.
+     */
     public ObjectProperty<Node> smallSidebar;
 
     public final ObjectProperty<Node> smallSidebarProperty() {
@@ -127,6 +138,9 @@ public class ResponsivePane extends StackPane {
         return smallSidebar == null ? null : smallSidebar.get();
     }
 
+    /**
+     * The large sidebar node shown when enough space is available or display is forced.
+     */
     public ObjectProperty<Node> largeSidebar;
 
     public final ObjectProperty<Node> largeSidebarProperty() {
@@ -155,6 +169,8 @@ public class ResponsivePane extends StackPane {
      * When set to true, the large sidebar will cover the small sidebar.
      * When set to false, the large sidebar will position itself next to the small sidebar without overlaying, ensuring both sidebars are visible
      * and accessible to the user.
+     *
+     * @return the large-sidebar-covers-small property
      */
     public final BooleanProperty largeSidebarCoversSmallProperty() {
         if (largeSidebarCoversSmall == null) {
@@ -180,6 +196,8 @@ public class ResponsivePane extends StackPane {
 
     /**
      * This property, when value is true, forces the display of the large sidebar even when the small sidebar is visible.
+     *
+     * @return the force-large-sidebar-display property
      */
     public final BooleanProperty forceLargeSidebarDisplayProperty() {
         if (forceLargeSidebarDisplay == null) {
@@ -345,6 +363,11 @@ public class ResponsivePane extends StackPane {
         }
     }
 
+    /**
+     * Returns the CSS metadata for this class.
+     *
+     * @return the CSS metadata for this class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

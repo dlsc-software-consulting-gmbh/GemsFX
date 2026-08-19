@@ -25,7 +25,16 @@ import javafx.util.Callback;
  */
 public class LoadingService<T> extends Service<PagingLoadResponse<T>> {
 
+    /**
+     * Sentinel value used before a page or page size has been supplied by the owning paging control.
+     */
     public static int UNDEFINED = -1;
+
+    /**
+     * Constructs a loading service with undefined page settings and the default load delay.
+     */
+    public LoadingService() {
+    }
 
     /**
      * Creates a task for loading the current page.

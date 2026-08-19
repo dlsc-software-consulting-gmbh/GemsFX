@@ -691,6 +691,9 @@ public class CalendarView extends Control {
      */
     public static class DateCell extends Cell<LocalDate> {
 
+        /**
+         * Creates a new date cell.
+         */
         public DateCell() {
             getStyleClass().add("date-cell");
             setMaxSize(MAX_VALUE, MAX_VALUE);
@@ -702,6 +705,11 @@ public class CalendarView extends Control {
             return new DateCellSkin(this);
         }
 
+        /**
+         * Returns the date currently shown by this cell.
+         *
+         * @return the current date, or {@code null} if the cell is empty
+         */
         public final LocalDate getDate() {
             return getItem();
         }
@@ -1011,6 +1019,11 @@ public class CalendarView extends Control {
         return selectionModel.get();
     }
 
+    /**
+     * The selection model used to track selected dates.
+     *
+     * @return the selection model property
+     */
     public final ObjectProperty<SelectionModel> selectionModelProperty() {
         return selectionModel;
     }
@@ -1025,6 +1038,11 @@ public class CalendarView extends Control {
         return weekNumberColumnWidth == null ? DEFAULT_WEEK_NUMBER_COLUMN_WIDTH : weekNumberColumnWidth.get();
     }
 
+    /**
+     * The width of the week number column.
+     *
+     * @return the week number column width property
+     */
     public final DoubleProperty weekNumberColumnWidthProperty() {
         if (weekNumberColumnWidth == null) {
             weekNumberColumnWidth = new StyleableDoubleProperty(DEFAULT_WEEK_NUMBER_COLUMN_WIDTH) {
@@ -1267,18 +1285,39 @@ public class CalendarView extends Control {
         monthDisplayModeProperty().set(monthDisplayMode);
     }
 
+    /**
+     * Tracks selected dates for a {@link CalendarView}.
+     */
     public static class SelectionModel {
 
+        /**
+         * Defines how many dates can be selected.
+         */
         public enum SelectionMode {
+            /**
+             * Allows at most one selected date.
+             */
             SINGLE_DATE,
+            /**
+             * Allows multiple individual selected dates.
+             */
             MULTIPLE_DATES,
+            /**
+             * Uses a start date and an end date for range selection.
+             */
             DATE_RANGE
         }
 
+        /**
+         * Creates a new selection model.
+         */
         public SelectionModel() {
             selectionMode.addListener(it -> clearSelection());
         }
 
+        /**
+         * Clears all selected dates.
+         */
         public final void clearSelection() {
             setSelectedDate(null);
             setSelectedEndDate(null);
@@ -1291,6 +1330,11 @@ public class CalendarView extends Control {
             return selectionMode.get();
         }
 
+        /**
+         * The current selection mode.
+         *
+         * @return the selection mode property
+         */
         public final ObjectProperty<SelectionMode> selectionModeProperty() {
             return selectionMode;
         }
@@ -1299,12 +1343,22 @@ public class CalendarView extends Control {
             this.selectionMode.set(selectionMode);
         }
 
+        /**
+         * Clears the current selection and selects the given date.
+         *
+         * @param date the date to select
+         */
         public void clearAndSelect(LocalDate date) {
             clearSelection();
             select(date);
         }
 
 
+        /**
+         * Selects the given date according to the current selection mode.
+         *
+         * @param date the date to select
+         */
         public void select(LocalDate date) {
             if (date == null) {
                 return;
@@ -1327,6 +1381,11 @@ public class CalendarView extends Control {
             }
         }
 
+        /**
+         * Clears or removes the given date according to the current selection mode.
+         *
+         * @param date the date to clear
+         */
         public void clearSelection(LocalDate date) {
             switch (getSelectionMode()) {
                 case SINGLE_DATE:
@@ -1345,6 +1404,12 @@ public class CalendarView extends Control {
             }
         }
 
+        /**
+         * Checks whether the given date is selected.
+         *
+         * @param date the date to test
+         * @return true if the date is selected
+         */
         public boolean isSelected(LocalDate date) {
             if (date == null) {
                 return false;
@@ -1378,6 +1443,11 @@ public class CalendarView extends Control {
             return selectedDate.get();
         }
 
+        /**
+         * The primary selected date.
+         *
+         * @return the selected date property
+         */
         public final ObjectProperty<LocalDate> selectedDateProperty() {
             return selectedDate;
         }
@@ -1392,6 +1462,11 @@ public class CalendarView extends Control {
             return selectedEndDate.get();
         }
 
+        /**
+         * The selected end date used by range selection.
+         *
+         * @return the selected end date property
+         */
         public final ObjectProperty<LocalDate> selectedEndDateProperty() {
             return selectedEndDate;
         }
@@ -1406,6 +1481,11 @@ public class CalendarView extends Control {
             return selectedDates.get();
         }
 
+        /**
+         * The selected dates used by multiple-date selection.
+         *
+         * @return the selected dates property
+         */
         public final ListProperty<LocalDate> selectedDatesProperty() {
             return selectedDates;
         }
@@ -1700,6 +1780,11 @@ public class CalendarView extends Control {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata for this control class.
+     *
+     * @return the CSS metadata
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return CalendarView.StyleableProperties.STYLEABLES;
     }

@@ -10,8 +10,21 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
+/**
+ * Skin for the {@link ChipView} control.
+ * <p>
+ * The skin renders the chip text and graphic and shows a close icon when the
+ * control has a close handler.
+ *
+ * @param <T> the chip value type
+ */
 public class ChipViewSkin<T> extends GemsSkinBase<ChipView<T>> {
 
+    /**
+     * Creates a skin for the given chip view.
+     *
+     * @param chip the chip view rendered by this skin
+     */
     public ChipViewSkin(ChipView<T> chip) {
         super(chip);
 

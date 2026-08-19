@@ -12,13 +12,19 @@ import java.util.List;
  * A {@link LinkStrategy} that draws a quadratic Bézier curve between a parent and a
  * child node, with a directional arrow at the child end.
  *
- * <p>A single control point is placed at the midpoint between parent and child along
- * the perpendicular axis, producing a smooth, single-bowed curve. A directional
- * arrow is oriented along the tangent at the child end of the curve.
+ * <p>A single control point is placed according to the current layout direction,
+ * using the configured horizontal or vertical gap. A directional arrow is oriented
+ * along the tangent at the child end of the curve.
  *
  * @param <T> the type of the data value stored in each tree node
  */
 public class QuadCurveLink<T> extends AbstractLinkStrategy<T> {
+
+    /**
+     * Creates a quadratic-curve link strategy.
+     */
+    public QuadCurveLink() {
+    }
 
     /**
      * Draws the link for the given start and end coordinates.

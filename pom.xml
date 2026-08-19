@@ -261,10 +261,10 @@
                     <windowtitle>GemsFX API</windowtitle>
                     <additionalJOption>-J-Djavafx.javadoc=true
                     </additionalJOption>
-                    <!-- Validate syntax, HTML, and cross-references in all existing comments.
-                         The "missing" group is excluded because com.dlsc.gemsfx.skins is
-                         exported but intentionally left without full method-level docs. -->
-                    <doclint>accessibility,html,reference,syntax</doclint>
+                    <!-- Full doclint: validates syntax, HTML, cross-references and reports
+                         missing documentation on public and protected API. Warnings do not
+                         break the build, but Javadoc errors do (see failOnError above). -->
+                    <doclint>all</doclint>
                     <docfilessubdirs>true</docfilessubdirs>
                 </configuration>
                 <executions>

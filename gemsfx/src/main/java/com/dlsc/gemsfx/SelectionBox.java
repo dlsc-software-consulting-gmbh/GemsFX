@@ -66,6 +66,8 @@ import com.dlsc.gemsfx.util.ResourceBundleManager;
  *     <tr><td>{@code -fx-read-only}</td><td>{@code Boolean}</td><td>Whether the box is in read-only mode.</td></tr>
  *   </tbody>
  * </table>
+ *
+ * @param <T> the type of items displayed by the selection box
  */
 public class SelectionBox<T> extends Control {
 
@@ -215,6 +217,11 @@ public class SelectionBox<T> extends Control {
 
     private final ObjectProperty<Node> top = new SimpleObjectProperty<>(this, "top");
 
+    /**
+     * A node displayed at the top of the popup content.
+     *
+     * @return the top node property
+     */
     public final ObjectProperty<Node> topProperty() {
         return top;
     }
@@ -231,6 +238,11 @@ public class SelectionBox<T> extends Control {
 
     private final ObjectProperty<Node> bottom = new SimpleObjectProperty<>(this, "bottom");
 
+    /**
+     * A node displayed at the bottom of the popup content.
+     *
+     * @return the bottom node property
+     */
     public final ObjectProperty<Node> bottomProperty() {
         return bottom;
     }
@@ -247,6 +259,11 @@ public class SelectionBox<T> extends Control {
 
     private final ObjectProperty<Node> left = new SimpleObjectProperty<>(this, "left");
 
+    /**
+     * A node displayed on the left side of the popup content.
+     *
+     * @return the left node property
+     */
     public final ObjectProperty<Node> leftProperty() {
         return left;
     }
@@ -263,6 +280,11 @@ public class SelectionBox<T> extends Control {
 
     private final ObjectProperty<Node> right = new SimpleObjectProperty<>(this, "right");
 
+    /**
+     * A node displayed on the right side of the popup content.
+     *
+     * @return the right node property
+     */
     public final ObjectProperty<Node> rightProperty() {
         return right;
     }
@@ -899,6 +921,11 @@ public class SelectionBox<T> extends Control {
         }
     }
 
+    /**
+     * Returns the CSS metadata for this class.
+     *
+     * @return the CSS metadata for this class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }

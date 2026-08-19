@@ -192,17 +192,15 @@ public class GridTableColumn<S, T> extends ColumnConstraints {
         this.cellFactory.set(cellFactory);
     }
 
+    /**
+     * Stores the factory used to extract the value of this column from a row item.
+     */
     public ObjectProperty<Callback<S, T>> cellValueFactory = new SimpleObjectProperty<>(this, "cellValueFactory");
 
     public final Callback<S, T> getCellValueFactory() {
         return cellValueFactory.get();
     }
 
-    /**
-     * Stores the factory used to extract cell values from row items.
-     *
-     * @return the cell value factory property
-     */
     public final ObjectProperty<Callback<S, T>> cellValueFactoryProperty() {
         return cellValueFactory;
     }

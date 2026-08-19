@@ -25,6 +25,8 @@ import java.util.List;
  *     <tr><td>{@code -fx-button-display}</td><td>{@code ButtonDisplay}</td><td>Display mode of the picker button</td></tr>
  *   </tbody>
  * </table>
+ *
+ * @param <T> the type of value edited by the combo box
  */
 public class CustomComboBox<T> extends ComboBoxBase<T> {
 

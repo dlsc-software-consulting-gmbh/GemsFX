@@ -4,6 +4,14 @@ import javafx.scene.control.Control;
 import javafx.scene.control.TableView;
 import javafx.scene.control.skin.TableViewSkin;
 
+/**
+ * A {@link TableViewSkin} variant that installs advanced header row classes.
+ * <p>
+ * The skin renders a {@link TableView} using the standard JavaFX table skin
+ * while replacing the table header row with {@link AdvancedTableHeaderRow}.
+ *
+ * @param <T> the table row item type
+ */
 public class AdvancedTableViewSkin<T> extends TableViewSkin<T> {
 
     private AdvancedTableHeaderRow tableHeaderRow;

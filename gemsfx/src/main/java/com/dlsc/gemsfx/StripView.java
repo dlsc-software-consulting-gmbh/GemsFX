@@ -255,13 +255,11 @@ public class StripView<T> extends Control {
 
     // Selection model support.
 
-    public final ObjectProperty<T> selectedItem = new SimpleObjectProperty<>(this, "selectedItem");
-
     /**
      * Stores the currently selected item.
-     *
-     * @return the selected item
      */
+    public final ObjectProperty<T> selectedItem = new SimpleObjectProperty<>(this, "selectedItem");
+
     public final ObjectProperty<T> selectedItemProperty () {
         return selectedItem;
     }
@@ -316,6 +314,11 @@ public class StripView<T> extends Control {
         this.cellFactory.set(cellFactory);
     }
 
+    /**
+     * Requests that the skin scrolls to the given item.
+     *
+     * @param item the item to scroll to
+     */
     public void scrollTo(T item) {
         getProperties().put("scroll.to", item);
     }
@@ -556,6 +559,11 @@ public class StripView<T> extends Control {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata for this control class.
+     *
+     * @return the CSS metadata for this control class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StripView.StyleableProperties.STYLEABLES;
     }

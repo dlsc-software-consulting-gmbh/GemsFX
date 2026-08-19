@@ -1,3 +1,10 @@
+/**
+ * GemsFX, a collection of custom controls and utilities for JavaFX.
+ * <p>
+ * The controls themselves are located in {@link com.dlsc.gemsfx} and its subpackages, while their
+ * skin implementations can be found in {@link com.dlsc.gemsfx.skins}. Each control ships with its
+ * own user agent stylesheet, so no additional setup is required to use it.
+ */
 open module com.dlsc.gemsfx {
     requires java.desktop;
     requires java.logging;

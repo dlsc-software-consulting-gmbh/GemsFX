@@ -33,10 +33,65 @@ force skin creation (`layout`).
 ./mvnw test -pl gemsfx -Dtest=CalendarViewTest
 ```
 
-## AtlantaFXIf you want to use **_AtlantaFX_** for your application then copy the stylesheet called `atlantafx.css` from the demo module into
-your project. You will need to add it to the list of stylesheets that you are attaching to your application's scene. For
-more information on **_AtlantaFX_** please see the [AtlantaFX](https://github.com/mkpaz/AtlantaFX)
-project.
+## Documentation (Javadoc)
+
+The published `gemsfx` module is held to a strict documentation standard, enforced by the Java
+compiler's *DocLint* checker. The `maven-javadoc-plugin` in the root `pom.xml` runs with
+`<doclint>all</doclint>` for the library, which validates syntax, HTML, accessibility and
+cross-references **and** reports every undocumented public or protected type, method, constructor
+and field. Warnings do not break the build, but Javadoc errors (such as broken `{@link}`
+references) do. The `gemsfx-demo` module is exempt from the `missing` check because the demo
+applications are not part of the published API.
+
+Rules for new code in the `gemsfx` module:
+
+* Every public and protected type, method, constructor and field carries a Javadoc comment.
+* `@param` (including type parameters), `@return` and `@throws` are complete.
+* For a JavaFX property triplet the documentation belongs **only** on the property accessor
+  (`colorProperty()`); the getter, the setter and the backing field stay comment-free. The
+  standard doclet copies the documentation over automatically and does not report those as
+  missing.
+* Methods annotated with `@Override` inherit their documentation and only need a comment when the
+  behaviour genuinely deviates from the overridden method.
+* Every package has a `package-info.java` with a short summary.
+
+To check the documentation locally:
+
+```bash
+# generates the aggregated Javadoc and prints all DocLint warnings
+./mvnw -B package -pl gemsfx
+```
+
+## AtlantaFX
+
+GemsFX controls ship with their own user agent stylesheets, which are based on the CSS variables of
+the standard JavaFX theme (Modena). When an application switches to an
+[AtlantaFX](https://github.com/mkpaz/AtlantaFX) theme, those controls would keep their Modena look.
+
+To avoid this, the library ships a companion stylesheet that redefines the GemsFX control rules in
+terms of the AtlantaFX CSS variables. Use the utility class
+`com.dlsc.gemsfx.util.GemsFXAtlantaFX` to apply it:
+
+```java
+// 1. Apply the AtlantaFX theme globally, before showing the stage
+Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+
+// 2. Apply the GemsFX companion stylesheet to the scene
+GemsFXAtlantaFX.applyTo(scene);
+```
+
+`applyTo(Scene)` and `applyTo(Parent)` both add the stylesheet only once, so they are safe to call
+repeatedly. The URL of the stylesheet is also available via the `GemsFXAtlantaFX.STYLESHEET`
+constant, should you prefer to add it yourself. Note that the companion stylesheet only *consumes*
+AtlantaFX colour variables (`-color-fg-default`, `-color-bg-subtle`, `-color-accent-emphasis`, ...):
+GemsFX has no compile-time or runtime dependency on AtlantaFX, and without an active AtlantaFX theme
+the controls simply fall back to their default appearance.
+
+A sibling class, `com.dlsc.gemsfx.util.ControlsFXAtlantaFX`, does the same for the
+[ControlsFX](https://github.com/controlsfx/controlsfx) controls that GemsFX uses internally.
+
+The demo module shows this in action: `GemApplication` calls `GemsFXAtlantaFX.applyTo(scene)` when
+the demos are started with the system property `-Datlantafx=true`.
 
 ## Installation
 Adding GemsFX to your project.

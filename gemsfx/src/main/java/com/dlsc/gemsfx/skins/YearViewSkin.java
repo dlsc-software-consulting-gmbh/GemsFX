@@ -22,6 +22,12 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.Optional;
 
+/**
+ * Skin for {@link YearView}.
+ * <p>
+ * The skin builds a header showing the current year range and a configurable
+ * grid of year nodes with selected and current year styling.
+ */
 public class YearViewSkin extends GemsSkinBase<YearView> {
 
     private final Label yearRangeLabel;
@@ -30,6 +36,11 @@ public class YearViewSkin extends GemsSkinBase<YearView> {
 
     private int offset = 0;
 
+    /**
+     * Creates a new skin for the given year view.
+     *
+     * @param yearView the year view to skin
+     */
     public YearViewSkin(YearView yearView) {
         super(yearView);
 

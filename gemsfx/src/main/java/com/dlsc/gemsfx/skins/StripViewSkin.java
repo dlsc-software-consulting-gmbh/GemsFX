@@ -38,6 +38,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Skin for {@link StripView}.
+ * <p>
+ * The skin lays out strip cells in a horizontal container, clips them through a
+ * {@link MaskedView}, and provides keyboard, mouse, and scroll navigation.
+ *
+ * @param <T> the strip item type
+ */
 public class StripViewSkin<T> extends GemsSkinBase<StripView<T>> {
 
     private static final String SCROLL_TO_KEY = "scroll.to";

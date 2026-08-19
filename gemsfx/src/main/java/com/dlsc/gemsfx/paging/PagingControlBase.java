@@ -58,6 +58,9 @@ import com.dlsc.gemsfx.util.ResourceBundleManager;
  */
 public abstract class PagingControlBase extends Control {
 
+    /**
+     * Constructs a paging control base and initializes the default message label provider and page count binding.
+     */
     public PagingControlBase() {
         setMessageLabelProvider(view -> {
             if (getPageCount() == 0) {

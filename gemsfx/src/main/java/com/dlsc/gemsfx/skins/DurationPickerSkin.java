@@ -21,6 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Skin for the {@link DurationPicker} control.
+ * <p>
+ * The skin renders editable duration unit fields with separators and shows a
+ * PickerFX duration picker in its popup.
+ */
 public class DurationPickerSkin extends ToggleVisibilityComboBoxSkin<DurationPicker> {
 
     private final HBox box;
@@ -33,6 +39,11 @@ public class DurationPickerSkin extends ToggleVisibilityComboBoxSkin<DurationPic
 
     private final InvalidationListener buildViewListener = it -> buildView();
 
+    /**
+     * Creates a skin for the given duration picker.
+     *
+     * @param picker the duration picker rendered by this skin
+     */
     public DurationPickerSkin(DurationPicker picker) {
         super(picker);
 

@@ -15,6 +15,12 @@ public class EmptySelectionModel<T> extends MultipleSelectionModel<T> {
 
     private final ObservableList<T> selectedItems = FXCollections.observableArrayList();
 
+    /**
+     * Creates an empty selection model that never selects any item.
+     */
+    public EmptySelectionModel() {
+    }
+
     @Override
     public ObservableList<Integer> getSelectedIndices() {
         return indices;

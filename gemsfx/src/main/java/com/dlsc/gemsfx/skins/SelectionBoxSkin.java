@@ -44,6 +44,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Skin for {@link SelectionBox}.
+ * <p>
+ * The skin renders the selected item text and arrow button, and manages a popup
+ * containing check boxes or radio buttons depending on the selection mode.
+ *
+ * @param <T> the item type
+ */
 public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
 
     private static final PseudoClass READ_ONLY_PSEUDO_CLASS = PseudoClass.getPseudoClass("readonly");
@@ -75,6 +83,11 @@ public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
     private final EventHandler<MouseEvent> mouseClickedHandler;
     private final MapChangeListener<Object, Object> propertiesChangeListener;
 
+    /**
+     * Creates a new skin for the given selection box.
+     *
+     * @param control the selection box to skin
+     */
     public SelectionBoxSkin(SelectionBox<T> control) {
         super(control);
         this.control = control;
@@ -195,12 +208,18 @@ public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
         register(control.getProperties(), propertiesChangeListener);
     }
 
+    /**
+     * Shows the selection popup when the control is interactive.
+     */
     public void showPopup() {
         if (!control.isDisabled() && !control.isReadOnly()) {
             popup.show(control);
         }
     }
 
+    /**
+     * Hides the selection popup.
+     */
     public void hidePopup() {
         popup.hide();
     }
@@ -239,6 +258,9 @@ public class SelectionBoxSkin<T> extends GemsSkinBase<SelectionBox<T>> {
         control.pseudoClassStateChanged(MULTIPLE_PSEUDO_CLASS, mode == SelectionMode.MULTIPLE);
     }
 
+    /**
+     * Updates the display label from the current selection and converters.
+     */
     public void updateDisplayLabelText() {
         SelectionMode mode = control.getSelectionModel().getSelectionMode();
         List<T> selectedItems;

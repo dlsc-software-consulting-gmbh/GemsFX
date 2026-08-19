@@ -352,6 +352,9 @@ public class HistoryButton<T> extends Button {
      */
     public class HistoryPopup extends CustomPopupControl {
 
+        /**
+         * The default style class for the history popup.
+         */
         public static final String DEFAULT_STYLE_CLASS = "history-popup";
 
         /**

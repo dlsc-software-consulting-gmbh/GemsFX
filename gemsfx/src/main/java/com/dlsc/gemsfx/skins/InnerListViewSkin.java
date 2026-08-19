@@ -16,6 +16,14 @@ import javafx.util.Callback;
 import java.util.Objects;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
 
+/**
+ * Internal skin for the list view used by {@link PagingListView}.
+ * <p>
+ * The skin wraps the list content in a {@link LoadingPane}, lays out the cells for the current page, and shows the
+ * configured placeholder when the paged list has no items.
+ *
+ * @param <T> the item type displayed by the list view
+ */
 public class InnerListViewSkin<T> extends ListViewSkin<T> {
 
     private final VBox content = new VBox() {
@@ -30,6 +38,12 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
 
     private final LoadingPane loadingPane;
 
+    /**
+     * Creates a skin for the inner list view used by the given paging list view.
+     *
+     * @param control the list view rendered by this skin
+     * @param pagingListView the paging list view that supplies paging state and cells
+     */
     public InnerListViewSkin(ListView<T> control, PagingListView<T> pagingListView) {
         super(control);
 
@@ -62,6 +76,9 @@ public class InnerListViewSkin<T> extends ListViewSkin<T> {
 
     private Label placeholderLabel;
 
+    /**
+     * Rebuilds the visible page content from the current paging list view state.
+     */
     public void refresh() {
         content.getChildren().clear();
 

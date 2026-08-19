@@ -191,7 +191,7 @@ public class InfoCenterView extends Control {
     /**
      * A read-only list of the currently unpinned groups.
      *
-     * @return the list of pinned groups
+     * @return the list of unpinned groups
      */
     public final ObservableList<NotificationGroup<?, ?>> getUnmodifiableUnpinnedGroups() {
         return unmodifiableUnpinnedGroups;
@@ -536,7 +536,7 @@ public class InfoCenterView extends Control {
      * The default value is {@code false}.
      * </p>
      *
-     * @return true if the control is not transparent
+     * @return true if the control is transparent
      */
     public final BooleanProperty transparentProperty() {
         if (transparent == null) {
@@ -572,7 +572,7 @@ public class InfoCenterView extends Control {
     private ObjectProperty<Node> placeholder;
 
     /**
-     * A placeholder node that is shown when the info is empty.
+     * A placeholder node that is shown when the view has no notifications.
      *
      * @return the placeholder node
      */
@@ -750,10 +750,18 @@ public class InfoCenterView extends Control {
         return getClassCssMetaData();
     }
 
+    /**
+     * Returns the CSS metadata supported by this control class.
+     *
+     * @return the CSS metadata for this control class
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return InfoCenterView.StyleableProperties.STYLEABLES;
     }
 
+    /**
+     * Removes all notifications from all groups.
+     */
     public void clearAll() {
         getGroups().forEach(group -> group.getNotifications().clear());
     }

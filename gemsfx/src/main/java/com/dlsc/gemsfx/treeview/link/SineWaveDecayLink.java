@@ -10,18 +10,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A {@link LinkStrategy} that draws a link whose path follows a sine-wave easing
- * curve (specifically a quarter-sine from 0 to π/2).
+ * A {@link LinkStrategy} that draws a link whose path follows a quarter-sine curve.
  *
  * <p>The path is approximated by 10 line segments whose positions are computed using
- * {@code sin(π/2 · fraction)} along the primary axis. This produces a smooth,
- * ease-in-out-style path that starts slowly from the parent, accelerates through
- * the middle, and arrives smoothly at the child. A directional arrow is added at the
- * child end.
+ * {@code sin(π/2 · fraction)} along the primary axis. This produces a smooth path
+ * that changes fastest near the parent and flattens as it approaches the child. A
+ * directional arrow is added at the child end.
  *
  * @param <T> the type of the data value stored in each tree node
  */
 public class SineWaveDecayLink<T> extends AbstractLinkStrategy<T> {
+
+    /**
+     * Creates a sine-wave decay link strategy.
+     */
+    public SineWaveDecayLink() {
+    }
 
     /**
      * Draws the link for the given start and end coordinates.

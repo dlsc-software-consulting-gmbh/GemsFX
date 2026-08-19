@@ -36,6 +36,9 @@ import java.util.Objects;
  */
 public final class GemsFXAtlantaFX {
 
+    /**
+     * The URL of the GemsFX AtlantaFX companion stylesheet.
+     */
     public static final String STYLESHEET = Objects.requireNonNull(GemsFXAtlantaFX.class.getResource("gemsfx-atlantafx.css")).toExternalForm();
 
     /**

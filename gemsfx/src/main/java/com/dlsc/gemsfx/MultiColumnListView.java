@@ -181,19 +181,40 @@ public class MultiColumnListView<T> extends Control {
         return Objects.requireNonNull(MultiColumnListView.class.getResource("multi-column-list-view.css")).toExternalForm();
     }
 
+    /**
+     * Parameters passed to the drop validation callback.
+     *
+     * @param <T> the type of items shown by the columns
+     */
     public static class DropParameter<T> {
         private final T item;
         private final ListViewColumn<T> column;
 
+        /**
+         * Creates a new parameter object.
+         *
+         * @param item the item at the current drop target
+         * @param column the column that is the current drop target
+         */
         public DropParameter(T item, ListViewColumn<T> column) {
             this.item = item;
             this.column = column;
         }
 
+        /**
+         * Returns the item at the current drop target.
+         *
+         * @return the target item
+         */
         public T getItem() {
             return item;
         }
 
+        /**
+         * Returns the column that is the current drop target.
+         *
+         * @return the target column
+         */
         public ListViewColumn<T> getColumn() {
             return column;
         }
@@ -205,6 +226,11 @@ public class MultiColumnListView<T> extends Control {
         return dropPossibleCallback.get();
     }
 
+    /**
+     * The callback used to decide whether a dragged item may be dropped on a column.
+     *
+     * @return the drop validation callback property
+     */
     public final ObjectProperty<Callback<DropParameter<T>, Boolean>> dropPossibleCallbackProperty() {
         return dropPossibleCallback;
     }
@@ -219,6 +245,11 @@ public class MultiColumnListView<T> extends Control {
         return dragPossibleCallback.get();
     }
 
+    /**
+     * The callback used to decide whether an item may be dragged.
+     *
+     * @return the drag validation callback property
+     */
     public ObjectProperty<Callback<T, Boolean>> dragPossibleCallbackProperty() {
         return dragPossibleCallback;
     }
@@ -527,6 +558,11 @@ public class MultiColumnListView<T> extends Control {
         }
     }
 
+    /**
+     * Returns the CSS metadata for this control class.
+     *
+     * @return the CSS metadata
+     */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
     }
@@ -550,6 +586,9 @@ public class MultiColumnListView<T> extends Control {
 
         private boolean updating;
 
+        /**
+         * Creates an empty column.
+         */
         public ListViewColumn() {
             items.addListener((ListChangeListener<T>) change -> updateWrappers());
             itemWrappers.addListener((ListChangeListener<ColumnItem<T>>) change -> updateItems());
@@ -727,6 +766,11 @@ public class MultiColumnListView<T> extends Control {
         return draggedItem.get();
     }
 
+    /**
+     * The item currently being dragged, or {@code null} if no drag operation is in progress.
+     *
+     * @return the dragged item property
+     */
     public final ObjectProperty<T> draggedItemProperty() {
         return draggedItem;
     }
@@ -737,6 +781,11 @@ public class MultiColumnListView<T> extends Control {
 
     private final ObservableList<T> draggedItems = FXCollections.observableArrayList();
 
+    /**
+     * Returns the items currently involved in a drag operation.
+     *
+     * @return the dragged items
+     */
     public final ObservableList<T> getDraggedItems() {
         return draggedItems;
     }
@@ -1058,6 +1107,11 @@ public class MultiColumnListView<T> extends Control {
             });
         }
 
+        /**
+         * Returns the column containing this cell.
+         *
+         * @return the column containing this cell
+         */
         public final ListViewColumn<T> getColumn() {
             return column;
         }
@@ -1313,6 +1367,11 @@ public class MultiColumnListView<T> extends Control {
             // System.out.println(text);
         }
 
+        /**
+         * Updates the column reference used by this cell.
+         *
+         * @param column the column containing this cell
+         */
         public void updateColumn(ListViewColumn<T> column) {
             this.column = column;
         }
@@ -1342,19 +1401,57 @@ public class MultiColumnListView<T> extends Control {
      */
     public static class MultiColumnListViewEvent extends Event {
 
+        /**
+         * The common super type for all multi-column list view events.
+         */
         public static final EventType<MultiColumnListViewEvent> ANY = new EventType<>(Event.ANY, "MULTI_COLUMN_LIST_VIEW_EVENT");
+        /**
+         * Event type fired after an item was moved to a new column or index.
+         */
         public static final EventType<MultiColumnListViewEvent> ITEM_MOVED = new EventType<>(MultiColumnListViewEvent.ANY, "ITEM_MOVED");
+        /**
+         * Event type fired when the drag validation callback rejects a drag.
+         */
         public static final EventType<MultiColumnListViewEvent> DRAG_NOT_POSSIBLE = new EventType<>(MultiColumnListViewEvent.ANY, "DRAG_NOT_POSSIBLE");
+        /**
+         * Event type fired when the drop validation callback rejects a drop target.
+         */
         public static final EventType<MultiColumnListViewEvent> DROP_NOT_POSSIBLE = new EventType<>(MultiColumnListViewEvent.ANY, "DROP_NOT_POSSIBLE");
+        /**
+         * Event type fired while a valid dragged item is over a drop target.
+         */
         public static final EventType<MultiColumnListViewEvent> DRAG_OVER = new EventType<>(MultiColumnListViewEvent.ANY, "DRAG_OVER");
+        /**
+         * Event type fired when a drag operation starts.
+         */
         public static final EventType<MultiColumnListViewEvent> DRAG_STARTED = new EventType<>(MultiColumnListViewEvent.ANY, "DRAG_STARTED");
+        /**
+         * Event type representing the end of a drag operation.
+         */
         public static final EventType<MultiColumnListViewEvent> DRAG_ENDED = new EventType<>(MultiColumnListViewEvent.ANY, "DRAG_ENDED");
 
+        /**
+         * The item associated with the event.
+         */
         private final Object draggedItem;
+        /**
+         * The column involved in the event.
+         */
         private final ListViewColumn column;
+        /**
+         * The item index involved in the event.
+         */
         private final int index;
 
 
+        /**
+         * Creates a new multi-column list view event.
+         *
+         * @param eventType the specific event type
+         * @param draggedItem the item associated with the event
+         * @param column the column involved in the event
+         * @param index the item index involved in the event
+         */
         public MultiColumnListViewEvent(EventType<? extends Event> eventType, Object draggedItem, ListViewColumn column, int index) {
             super(eventType);
             this.draggedItem = draggedItem;
@@ -1362,14 +1459,29 @@ public class MultiColumnListView<T> extends Control {
             this.index = index;
         }
 
+        /**
+         * Returns the item associated with the event.
+         *
+         * @return the event item
+         */
         public Object getDraggedItem() {
             return draggedItem;
         }
 
+        /**
+         * Returns the column involved in the event.
+         *
+         * @return the column involved in the event
+         */
         public ListViewColumn getColumn() {
             return column;
         }
 
+        /**
+         * Returns the item index involved in the event.
+         *
+         * @return the item index
+         */
         public int getIndex() {
             return index;
         }

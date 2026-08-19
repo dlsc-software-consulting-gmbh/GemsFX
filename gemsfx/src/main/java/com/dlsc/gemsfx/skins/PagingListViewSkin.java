@@ -17,8 +17,19 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Skin for {@link PagingListView}.
+ * <p>
+ * The skin combines the inner list view with {@link PagingControls}, optionally wraps the list in a scroll pane, and
+ * overlays the configured placeholder when the current page has no items.
+ *
+ * @param <T> the item type displayed by the list view
+ */
 public class PagingListViewSkin<T> extends GemsSkinBase<PagingListView<T>> {
 
+    /**
+     * Style class added to the content when the list view is wrapped in a scroll pane.
+     */
     public static final String USING_SCROLL_PANE = "using-scroll-pane";
 
     private final VBox content = new VBox();
@@ -34,6 +45,11 @@ public class PagingListViewSkin<T> extends GemsSkinBase<PagingListView<T>> {
     private final ListChangeListener<T> itemsOnCurrentPageListener = it -> bindPlaceholderVisibility(null, getSkinnable().getPlaceholder());
     private final InvalidationListener updateViewListener = it -> updateView();
 
+    /**
+     * Creates a skin for the given paging list view.
+     *
+     * @param pagingListView the paging list view rendered by this skin
+     */
     public PagingListViewSkin(PagingListView<T> pagingListView) {
         super(pagingListView);
 

@@ -69,19 +69,17 @@ public class ChipsViewContainer extends FlowPane {
 
     // clearing callback
 
+    /**
+     * A callback that will be invoked when the user clicks on the "clear" hyperlink.
+     *
+     * @see #clearTextProperty()
+     */
     public final ObjectProperty<Runnable> onClear = new SimpleObjectProperty<>(this, "onClear");
 
     public final Runnable getOnClear() {
         return onClear.get();
     }
 
-    /**
-     * A callback that will be invoked when the user clicks on the "clear" hyperlink.
-     *
-     * @see #clearTextProperty()
-     *
-     * @return the "on clear" callback
-     */
     public final ObjectProperty<Runnable> onClearProperty() {
         return onClear;
     }

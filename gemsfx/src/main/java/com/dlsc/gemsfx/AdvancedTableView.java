@@ -14,7 +14,7 @@ import javafx.scene.control.skin.TableColumnHeader;
  * ability to optimize the column width based on their content.
  *
  * @see #autoResizeAllColumns
- * @param <T>
+ * @param <T> the type of items shown by the table view
  */
 public class AdvancedTableView<T> extends TableView<T> {
 

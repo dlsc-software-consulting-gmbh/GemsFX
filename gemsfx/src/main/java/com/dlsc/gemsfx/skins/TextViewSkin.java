@@ -15,10 +15,21 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import com.dlsc.gemsfx.util.StringUtils;
 
+/**
+ * Skin for {@link TextView}.
+ * <p>
+ * The skin renders selectable text in a text flow and manages selection,
+ * keyboard copy/select-all handling, and selection highlighting.
+ */
 public class TextViewSkin extends GemsSkinBase<TextView> {
 
     private final SelectableText selectableText;
 
+    /**
+     * Creates a new skin for the given text view.
+     *
+     * @param control the text view to skin
+     */
     public TextViewSkin(TextView control) {
         super(control);
 

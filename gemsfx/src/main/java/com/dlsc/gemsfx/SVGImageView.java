@@ -169,6 +169,8 @@ public class SVGImageView extends Control {
      * Valid values are: numbers (use {@code 0} to use the image's intrinsic width).
      * The default value is {@code 0}.
      * </p>
+     *
+     * @return the fit width property
      */
     public final DoubleProperty fitWidthProperty() {
         return fitWidth;
@@ -222,6 +224,8 @@ public class SVGImageView extends Control {
      * Valid values are: numbers (use {@code 0} to use the image's intrinsic height).
      * The default value is {@code 0}.
      * </p>
+     *
+     * @return the fit height property
      */
     public final DoubleProperty fitHeightProperty() {
         return fitHeight;
@@ -272,6 +276,8 @@ public class SVGImageView extends Control {
      * Valid values are: {@code true} or {@code false}.
      * The default value is {@code true}.
      * </p>
+     *
+     * @return the preserve-ratio property
      */
     public final BooleanProperty preserveRatioProperty() {
         return preserveRatio;
@@ -322,6 +328,8 @@ public class SVGImageView extends Control {
      * Valid values are: {@code true} or {@code false}.
      * The default value is {@code true}.
      * </p>
+     *
+     * @return the smooth property
      */
     public final BooleanProperty smoothProperty() {
         return smooth;
@@ -370,6 +378,8 @@ public class SVGImageView extends Control {
      * Valid values are: a URL string pointing to an SVG file.
      * The default value is {@code null}.
      * </p>
+     *
+     * @return the SVG URL property
      */
     public final StringProperty svgUrlProperty() {
         return svgUrl;
@@ -420,6 +430,8 @@ public class SVGImageView extends Control {
      * Valid values are: {@code true} or {@code false}.
      * The default value is {@code false}.
      * </p>
+     *
+     * @return the background-loading property
      */
     public final BooleanProperty backgroundLoadingProperty() {
         return backgroundLoading;

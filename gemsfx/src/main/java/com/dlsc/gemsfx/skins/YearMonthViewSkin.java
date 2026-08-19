@@ -23,6 +23,12 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 
+/**
+ * Skin for {@link YearMonthView}.
+ * <p>
+ * The skin builds a header for changing the displayed year and a two-column
+ * grid of month boxes with selected and current month pseudo classes.
+ */
 public class YearMonthViewSkin extends GemsSkinBase<YearMonthView> {
 
     private static final PseudoClass SELECTED_MONTH_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
@@ -31,6 +37,11 @@ public class YearMonthViewSkin extends GemsSkinBase<YearMonthView> {
     private final ObjectProperty<Integer> year = new SimpleObjectProperty<>(this, "year");
     private boolean updatingMonthBox;
 
+    /**
+     * Creates a new skin for the given year-month view.
+     *
+     * @param control the year-month view to skin
+     */
     public YearMonthViewSkin(YearMonthView control) {
         super(control);
 

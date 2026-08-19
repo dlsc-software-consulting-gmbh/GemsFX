@@ -12,6 +12,12 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
 
+/**
+ * Skin for {@link MaskedView}.
+ * <p>
+ * The skin places the view content in a stack pane clipped by left, center, and right rectangles; the edge clips switch
+ * between solid and gradient fills to fade overflowing translated content.
+ */
 public class MaskedViewSkin extends GemsSkinBase<MaskedView> {
 
     private final Rectangle leftClip;
@@ -20,6 +26,11 @@ public class MaskedViewSkin extends GemsSkinBase<MaskedView> {
 
     private final StackPane stackPane;
 
+    /**
+     * Creates a skin for the given masked view.
+     *
+     * @param view the masked view rendered by this skin
+     */
     public MaskedViewSkin(MaskedView view) {
         super(view);
 

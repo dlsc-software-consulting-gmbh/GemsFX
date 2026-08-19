@@ -24,6 +24,12 @@ import java.util.List;
 public class PolyLineLink<T> extends AbstractLinkStrategy<T> {
 
     /**
+     * Creates a polyline link strategy.
+     */
+    public PolyLineLink() {
+    }
+
+    /**
      * Draws the link for the given start and end coordinates.
      *
      * @param direction the layout direction

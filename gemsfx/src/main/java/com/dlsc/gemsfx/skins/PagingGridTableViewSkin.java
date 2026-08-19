@@ -11,8 +11,19 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Skin for {@link PagingGridTableView}.
+ * <p>
+ * The skin combines the wrapped {@link GridTableView} with {@link PagingControls}, optionally places the table inside a
+ * scroll pane, and positions the controls above or below the table.
+ *
+ * @param <T> the item type displayed by the grid table view
+ */
 public class PagingGridTableViewSkin<T> extends GemsSkinBase<PagingGridTableView<T>> {
 
+    /**
+     * Style class added to the content when the grid table is wrapped in a scroll pane.
+     */
     public static final String USING_SCROLL_PANE = "using-scroll-pane";
 
     private final VBox content = new VBox();
@@ -23,6 +34,11 @@ public class PagingGridTableViewSkin<T> extends GemsSkinBase<PagingGridTableView
 
     private final GridTableView<T> gridTableView;
 
+    /**
+     * Creates a skin for the given paging grid table view.
+     *
+     * @param pagingGridTableView the paging grid table view rendered by this skin
+     */
     public PagingGridTableViewSkin(PagingGridTableView<T> pagingGridTableView) {
         super(pagingGridTableView);
 

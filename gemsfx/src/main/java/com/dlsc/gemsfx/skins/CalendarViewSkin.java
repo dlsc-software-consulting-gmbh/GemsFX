@@ -67,6 +67,14 @@ import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.layout.Priority.ALWAYS;
 
+/**
+ * Skin for the {@link CalendarView} control.
+ * <p>
+ * The skin builds a header with month and year navigation, weekday and week
+ * number rows, and date cells backed by the control selection model. It also
+ * switches to embedded month or year selection views when enabled by the
+ * control.
+ */
 public class CalendarViewSkin extends GemsSkinBase<CalendarView> {
 
     private static final String WEEKDAY_NAME = "weekday-name";
@@ -146,6 +154,11 @@ public class CalendarViewSkin extends GemsSkinBase<CalendarView> {
     private final InvalidationListener selectionModelListener = it -> bindSelectionModel(getSkinnable().getSelectionModel());
     private final InvalidationListener updateStyleClassesListener = it -> updateStyleClasses();
 
+    /**
+     * Creates a skin for the given calendar view.
+     *
+     * @param view the calendar view rendered by this skin
+     */
     public CalendarViewSkin(CalendarView view) {
         super(view);
 

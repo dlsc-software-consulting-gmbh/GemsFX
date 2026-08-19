@@ -12,6 +12,11 @@ public abstract class TimeField extends Label {
 
     private final TimePicker timePicker;
 
+    /**
+     * Creates a new time field for the given time picker.
+     *
+     * @param timePicker the owning time picker
+     */
     protected TimeField(TimePicker timePicker) {
         this.timePicker = timePicker;
 
@@ -30,6 +35,11 @@ public abstract class TimeField extends Label {
         });
     }
 
+    /**
+     * Returns the owning time picker.
+     *
+     * @return the owning time picker
+     */
     protected TimePicker getTimePicker() {
         return timePicker;
     }

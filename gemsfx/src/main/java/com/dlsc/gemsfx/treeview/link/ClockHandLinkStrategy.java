@@ -24,6 +24,12 @@ import java.util.List;
 public class ClockHandLinkStrategy<T> extends AbstractLinkStrategy<T> {
 
     /**
+     * Creates a clock-hand link strategy.
+     */
+    public ClockHandLinkStrategy() {
+    }
+
+    /**
      * Draws the link for the given start and end coordinates.
      *
      * @param direction the layout direction

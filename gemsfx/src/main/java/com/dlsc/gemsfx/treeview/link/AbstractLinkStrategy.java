@@ -28,10 +28,28 @@ import java.util.ArrayList;
  */
 public abstract class AbstractLinkStrategy<T> implements LinkStrategy<T> {
 
+    /**
+     * The x-coordinate of the computed link start point.
+     */
     protected double startX;
+    /**
+     * The y-coordinate of the computed link start point.
+     */
     protected double startY;
+    /**
+     * The x-coordinate of the computed link end point.
+     */
     protected double endX;
+    /**
+     * The y-coordinate of the computed link end point.
+     */
     protected double endY;
+
+    /**
+     * Creates an abstract link strategy.
+     */
+    public AbstractLinkStrategy() {
+    }
 
     /**
      * Calculates the link endpoints for the given parent and child nodes.

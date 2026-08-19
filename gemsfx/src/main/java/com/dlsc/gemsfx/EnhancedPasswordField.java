@@ -65,6 +65,9 @@ import java.util.logging.Logger;
  */
 public class EnhancedPasswordField extends PasswordField {
 
+    /**
+     * The default character used to mask the password.
+     */
     public static final char DEFAULT_ECHO_CHAR = '●';
 
     private static final String DEFAULT_STYLE_CLASS = "enhanced-password-field";

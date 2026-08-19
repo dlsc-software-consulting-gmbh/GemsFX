@@ -27,6 +27,12 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 
+/**
+ * Skin for {@link LimitedTextArea}.
+ * <p>
+ * The skin extends the resizable text area with a bottom bar containing optional tips, a length label, and a progress
+ * indicator that reflect the configured character range.
+ */
 public class LimitedTextAreaSkin extends ResizableTextAreaSkin {
 
     private static final NavigableMap<Long, String> suffixes = new TreeMap<>();
@@ -50,6 +56,12 @@ public class LimitedTextAreaSkin extends ResizableTextAreaSkin {
     private final VBox contentBox;
     private final ReadOnlyBooleanWrapper outOfRange;
 
+    /**
+     * Creates a skin for the given limited text area.
+     *
+     * @param control the limited text area rendered by this skin
+     * @param outOfRange the read-only state wrapper updated when the text length is outside the configured range
+     */
     public LimitedTextAreaSkin(LimitedTextArea control, ReadOnlyBooleanWrapper outOfRange) {
         super(control);
         this.outOfRange = outOfRange;

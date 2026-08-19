@@ -88,6 +88,8 @@ public class InfoCenterPane extends StackPane {
 
     /**
      * Constructs a new pane with the given content node.
+     *
+     * @param content the content node shown behind the managed {@link InfoCenterView}
      */
     public InfoCenterPane(Node content) {
         getStyleClass().add("info-center-pane");
@@ -262,8 +264,8 @@ public class InfoCenterPane extends StackPane {
     }
 
     /**
-     * A flag that can be used to pin the info center view so that it will not hide
-     * under any circumstances.
+     * A flag that can be used to pin the info center view so that it will not be
+     * hidden by the pane's auto-hide handling.
      *
      * @return true if the info center view is pinned
      */
@@ -302,6 +304,11 @@ public class InfoCenterPane extends StackPane {
         autoHideProperty().set(autoHide);
     }
 
+    /**
+     * Returns the managed {@link InfoCenterView} instance.
+     *
+     * @return the managed info center view
+     */
     public final InfoCenterView getInfoCenterView() {
         return infoCenterView;
     }

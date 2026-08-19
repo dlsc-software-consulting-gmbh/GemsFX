@@ -39,6 +39,9 @@ public class GridTableView<S> extends Control {
 
     private static final String DEFAULT_STYLE_CLASS = "grid-table-view";
 
+    /**
+     * Constructs a grid table view with the default style class and table accessibility role.
+     */
     public GridTableView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         AccessibilityUtil.setRole(this, AccessibleRole.TABLE_VIEW);
@@ -76,6 +79,11 @@ public class GridTableView<S> extends Control {
         return rowHeaderFactory.get();
     }
 
+    /**
+     * The factory used to create an optional header node above the cells for a row item.
+     *
+     * @return the row header factory property
+     */
     public final ObjectProperty<Callback<S, Node>> rowHeaderFactoryProperty() {
         return rowHeaderFactory;
     }
@@ -91,6 +99,11 @@ public class GridTableView<S> extends Control {
         return rowFooterFactory.get();
     }
 
+    /**
+     * The factory used to create an optional footer node below the cells for a row item.
+     *
+     * @return the row footer factory property
+     */
     public final ObjectProperty<Callback<S, Node>> rowFooterFactoryProperty() {
         return rowFooterFactory;
     }
@@ -125,6 +138,11 @@ public class GridTableView<S> extends Control {
 
     private final ListProperty<S> items = new SimpleListProperty<>(this, "items", FXCollections.observableArrayList());
 
+    /**
+     * The items displayed as rows in this grid table view.
+     *
+     * @return the items property
+     */
     public final ListProperty<S> itemsProperty() {
         return items;
     }
@@ -141,6 +159,11 @@ public class GridTableView<S> extends Control {
 
     private final ListProperty<GridTableColumn<S, ?>> columns = new SimpleListProperty<>(this, "columns", FXCollections.observableArrayList());
 
+    /**
+     * The columns used to create headers and cells for each row.
+     *
+     * @return the columns property
+     */
     public final ListProperty<GridTableColumn<S, ?>> columnsProperty() {
         return this.columns;
     }
@@ -161,6 +184,11 @@ public class GridTableView<S> extends Control {
         return placeholder.get();
     }
 
+    /**
+     * The node displayed in the table body when there are columns but no items to show.
+     *
+     * @return the placeholder property
+     */
     public final ObjectProperty<Node> placeholderProperty() {
         return placeholder;
     }
@@ -196,6 +224,11 @@ public class GridTableView<S> extends Control {
         return minNumberOfRows.get();
     }
 
+    /**
+     * The minimum number of body rows created by the skin, including empty rows when there are fewer items.
+     *
+     * @return the minimum number of rows property
+     */
     public final IntegerProperty minNumberOfRowsProperty() {
         return minNumberOfRows;
     }
@@ -234,6 +267,11 @@ public class GridTableView<S> extends Control {
         return loadingStatusSize.get();
     }
 
+    /**
+     * The size used by the {@link LoadingPane} status indicator displayed over the table body.
+     *
+     * @return the loading status size property
+     */
     public final ObjectProperty<LoadingPane.Size> loadingStatusSizeProperty() {
         return loadingStatusSize;
     }

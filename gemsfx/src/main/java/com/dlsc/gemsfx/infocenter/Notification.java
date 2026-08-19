@@ -207,18 +207,16 @@ public class Notification<T> implements Comparable<Notification<T>> {
         HIDE_AND_REMOVE
     }
 
+    /**
+     * A callback that determines how the notification and the view will behave when the user clicks
+     * on it. The default behaviour is to hide the view and remove the notification from its group.
+     */
     public final ObjectProperty<Callback<Notification<T>, OnClickBehaviour>> onClick = new SimpleObjectProperty<>(this, "onClick", notification -> OnClickBehaviour.HIDE_AND_REMOVE);
 
     public final Callback<Notification<T>, OnClickBehaviour> getOnClick() {
         return onClick.get();
     }
 
-    /**
-     * A callback that determines how the notification and the view will behave when the user clicks
-     * on it. The default behaviour is to hide the view and remove the notification from its group.
-     *
-     * @return the behaviour upon click (do nothing, remove the notification, hide the view, ....)
-     */
     public final ObjectProperty<Callback<Notification<T>, OnClickBehaviour>> onClickProperty() {
         return onClick;
     }
@@ -231,9 +229,24 @@ public class Notification<T> implements Comparable<Notification<T>> {
      * The type of a notification.
      */
     public enum Type {
+        /**
+         * An informational notification.
+         */
         INFO,
+
+        /**
+         * A warning notification.
+         */
         WARNING,
+
+        /**
+         * An error notification.
+         */
         ERROR,
+
+        /**
+         * A success notification.
+         */
         SUCCESS;
     }
 

@@ -294,61 +294,229 @@ public class PaymentOptionView extends ImageView {
      * @see PaymentOptionView#setOption(Option)
      */
     public enum Option {
+        /**
+         * An unknown or unsupported payment option.
+         */
         UNKNOWN,
+        /**
+         * A generic credit card payment option.
+         */
         CREDIT_CARD,
+        /**
+         * The 2Checkout payment provider.
+         */
         CHECKOUT2,
+        /**
+         * The AliPay payment provider.
+         */
         ALI_PAY,
+        /**
+         * The Amazon payments provider.
+         */
         AMAZON,
+        /**
+         * The American Express card network.
+         */
         AMERICAN_EXPRESS,
+        /**
+         * The Apple Pay payment provider.
+         */
         APPLE_PAY,
+        /**
+         * The Bancontact payment provider.
+         */
         BANCONTACT,
+        /**
+         * The Bitcoin payment option.
+         */
         BITCOIN,
+        /**
+         * The BitPay payment provider.
+         */
         BITPAY,
+        /**
+         * The Cirrus card network.
+         */
         CIRRUS,
+        /**
+         * The ClickandBuy payment provider.
+         */
         CLICKANDBUY,
+        /**
+         * The CoinKite payment provider.
+         */
         COINKITE,
+        /**
+         * The Diners Club card network.
+         */
         DINERSCLUB,
+        /**
+         * The direct debit payment option.
+         */
         DIRECTDEBIT,
+        /**
+         * The Discover card network.
+         */
         DISCOVER,
+        /**
+         * The Dwolla payment provider.
+         */
         DWOLLA,
+        /**
+         * The eBay payment provider.
+         */
         EBAY,
+        /**
+         * The eWAY payment provider.
+         */
         EWAY,
+        /**
+         * The giropay payment provider.
+         */
         GIROPAY,
+        /**
+         * The Google Wallet payment provider.
+         */
         GOOGLEWALLET,
+        /**
+         * The Ingenico payment provider.
+         */
         INGENICO,
+        /**
+         * The JCB card network.
+         */
         JCB,
+        /**
+         * The Klarna payment provider.
+         */
         KLARNA,
+        /**
+         * The Laser card network.
+         */
         LASER,
+        /**
+         * The Maestro card network.
+         */
         MAESTRO,
+        /**
+         * The MasterCard card network.
+         */
         MASTERCARD,
+        /**
+         * The Monero payment option.
+         */
         MONERO,
+        /**
+         * The Neteller payment provider.
+         */
         NETELLER,
+        /**
+         * The Ogone payment provider.
+         */
         OGONE,
+        /**
+         * The OKPAY payment provider.
+         */
         OKPAY,
+        /**
+         * The Paybox payment provider.
+         */
         PAYBOX,
+        /**
+         * The Paymill payment provider.
+         */
         PAYMILL,
+        /**
+         * The PAYONE payment provider.
+         */
         PAYONE,
+        /**
+         * The Payoneer payment provider.
+         */
         PAYONEER,
+        /**
+         * The PayPal payment provider.
+         */
         PAYPAL,
+        /**
+         * The paysafecard payment provider.
+         */
         PAYSAFECARD,
+        /**
+         * The PayU payment provider.
+         */
         PAYU,
+        /**
+         * The Payza payment provider.
+         */
         PAYZA,
+        /**
+         * The Ripple payment option.
+         */
         RIPPLE,
+        /**
+         * The Sage payment provider.
+         */
         SAGE,
+        /**
+         * The SEPA bank transfer payment option.
+         */
         SEPA,
+        /**
+         * The Shopify payment provider.
+         */
         SHOPIFY,
+        /**
+         * The Skrill payment provider.
+         */
         SKRILL,
+        /**
+         * The Solo card network.
+         */
         SOLO,
+        /**
+         * The Square payment provider.
+         */
         SQUARE,
+        /**
+         * The Stripe payment provider.
+         */
         STRIPE,
+        /**
+         * The Switch card network.
+         */
         SWITCH,
+        /**
+         * The Ukash payment provider.
+         */
         UKASH,
+        /**
+         * The UnionPay card network.
+         */
         UNIONPAY,
+        /**
+         * The Verifone payment provider.
+         */
         VERIFONE,
+        /**
+         * The VeriSign payment provider.
+         */
         VERISIGN,
+        /**
+         * The Visa card network.
+         */
         VISA,
+        /**
+         * The WebMoney payment provider.
+         */
         WEBMONEY,
+        /**
+         * The Western Union payment provider.
+         */
         WESTERNUNION,
+        /**
+         * The WorldPay payment provider.
+         */
         WORLDPAY
     }
 }

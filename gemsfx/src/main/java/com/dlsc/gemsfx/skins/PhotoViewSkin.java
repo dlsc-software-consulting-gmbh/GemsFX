@@ -27,8 +27,19 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.function.Supplier;
 
+/**
+ * Skin for {@link PhotoView}.
+ * <p>
+ * The skin builds an editable photo area with an image box, circular or rectangular clipping, drag and zoom handling,
+ * an optional placeholder, and a slider for controlling the photo zoom.
+ */
 public class PhotoViewSkin extends GemsSkinBase<PhotoView> {
 
+    /**
+     * Creates a skin for the given photo view.
+     *
+     * @param view the photo view rendered by this skin
+     */
     public PhotoViewSkin(PhotoView view) {
         super(view);
 
@@ -78,6 +89,12 @@ public class PhotoViewSkin extends GemsSkinBase<PhotoView> {
         getChildren().setAll(controlsWrapper);
     }
 
+    /**
+     * Displays, clips, and optionally crops the photo shown by the enclosing {@link PhotoViewSkin}.
+     * <p>
+     * The image box owns the image view, border shape, placeholder handling, drag translation, and delayed crop service
+     * used to store the cropped image in the skinnable control's properties.
+     */
     public class ImageBox extends StackPane {
 
         private final CropService cropService;
@@ -95,6 +112,11 @@ public class PhotoViewSkin extends GemsSkinBase<PhotoView> {
         private ChangeListener<Image> photoChangeListenerForCrop;
         private InvalidationListener cropListener;
 
+        /**
+         * Creates an image box for the given photo view.
+         *
+         * @param view the photo view supplying image, clip, zoom, translation, and cropping state
+         */
         public ImageBox(PhotoView view) {
             cropService = new CropService();
 
@@ -294,6 +316,9 @@ public class PhotoViewSkin extends GemsSkinBase<PhotoView> {
             }
         }
 
+        /**
+         * Starts or restarts the delayed crop operation when cropped image creation is enabled.
+         */
         public void crop() {
             if (getSkinnable().isCreateCroppedImage()) {
                 cropService.restart();

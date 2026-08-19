@@ -9,8 +9,19 @@ import javafx.scene.text.Text;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Base skin for {@link EnhancedPasswordField}.
+ * <p>
+ * The skin replaces the text node binding installed by the text field skin so that the displayed text follows the
+ * field's show-password and echo-character properties.
+ */
 public abstract class EnhancedPasswordFieldSkin extends CustomTextFieldSkin {
 
+    /**
+     * Creates a skin for the given enhanced password field.
+     *
+     * @param control the enhanced password field rendered by this skin
+     */
     public EnhancedPasswordFieldSkin(EnhancedPasswordField control) {
         super(control);
 

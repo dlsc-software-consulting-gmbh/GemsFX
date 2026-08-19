@@ -10,8 +10,19 @@ import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Insets;
 import javafx.util.Duration;
 
+/**
+ * Skin for {@link SemiCircleProgressIndicator}.
+ * <p>
+ * The skin specializes {@link ArcProgressIndicatorSkin} with a half-circle
+ * track, matching progress arc, label placement, and indeterminate animation.
+ */
 public class SemiCircleProgressIndicatorSkin extends ArcProgressIndicatorSkin<SemiCircleProgressIndicator> {
 
+    /**
+     * Creates a new skin for the given semi-circle progress indicator.
+     *
+     * @param control the semi-circle progress indicator to skin
+     */
     public SemiCircleProgressIndicatorSkin(SemiCircleProgressIndicator control) {
         super(control);
     }
@@ -29,6 +40,9 @@ public class SemiCircleProgressIndicatorSkin extends ArcProgressIndicatorSkin<Se
         return -180;
     }
 
+    /**
+     * Stops the animation and resets the progress arc start angle.
+     */
     protected void stopAnimation() {
         super.stopAnimation();
         progressArc.setStartAngle(180);
@@ -39,6 +53,11 @@ public class SemiCircleProgressIndicatorSkin extends ArcProgressIndicatorSkin<Se
         return diameter / 2;
     }
 
+    /**
+     * Creates the indeterminate animation for the semi-circle progress arc.
+     *
+     * @return the indeterminate animation timeline
+     */
     protected Timeline initIndeterminateAnimation() {
         Timeline timeline = new Timeline(
                 new KeyFrame(Duration.ZERO,
@@ -71,6 +90,13 @@ public class SemiCircleProgressIndicatorSkin extends ArcProgressIndicatorSkin<Se
         return contentY + contentHeight / 2 + radiusBinding.get() / 2;
     }
 
+    /**
+     * Computes the label y-coordinate above the arc center.
+     *
+     * @param centerY the arc center y-coordinate
+     * @param labelHeight the label height
+     * @return the label y-coordinate
+     */
     protected double computeLabelY(double centerY, double labelHeight) {
         return centerY - labelHeight;
     }

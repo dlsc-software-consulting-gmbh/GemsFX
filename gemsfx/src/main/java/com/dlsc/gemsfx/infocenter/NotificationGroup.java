@@ -25,6 +25,11 @@ import java.util.Objects;
  */
 public class NotificationGroup<T, S extends Notification<T>> implements Comparable<NotificationGroup> {
 
+    /**
+     * Constructs a new notification group with the given name.
+     *
+     * @param name the display name of the group
+     */
     public NotificationGroup(String name) {
         setName(Objects.requireNonNull(name));
 
@@ -82,8 +87,8 @@ public class NotificationGroup<T, S extends Notification<T>> implements Comparab
     }
 
     /**
-     * An (optional) value for the sort order. Can be used to influence the order in which
-     * the groups are showing up in the info center. The value can be null.
+     * The sort order used to influence the order in which the groups are shown in
+     * the info center. The default value is {@code 0}.
      *
      * @return the sort order
      */
@@ -125,18 +130,16 @@ public class NotificationGroup<T, S extends Notification<T>> implements Comparab
         this.expanded.set(expanded);
     }
 
+    /**
+     * Determines if this group will show its name and controls when
+     * in expanded state. Default is true.
+     */
     public final BooleanProperty showHeader = new SimpleBooleanProperty(this, "showHeader", true);
 
     public final boolean isShowHeader() {
         return showHeader.get();
     }
 
-    /**
-     * Determines if this group will show its name and controls when
-     * in expanded state. Default is true.
-     *
-     * @return true if the group will show its header
-     */
     public final BooleanProperty showHeaderProperty() {
         return showHeader;
     }
@@ -145,18 +148,16 @@ public class NotificationGroup<T, S extends Notification<T>> implements Comparab
         this.showHeader.set(showHeader);
     }
 
+    /**
+     * Determines whether the user is allowed to pin the group so that is always
+     * stays visible at the top of the info center.
+     */
     public final BooleanProperty pinnable = new SimpleBooleanProperty(this, "pinnable", true);
 
     public final boolean isPinnable() {
         return pinnable.get();
     }
 
-    /**
-     * Determines whether the user is allowed to pin the group so that is always
-     * stays visible at the top of the info center.
-     *
-     * @return true if the group can be pinned
-     */
     public final BooleanProperty pinnableProperty() {
         return pinnable;
     }
@@ -165,18 +166,16 @@ public class NotificationGroup<T, S extends Notification<T>> implements Comparab
         this.pinnable.set(pinnable);
     }
 
+    /**
+     * Pinned groups will always be shown at the top of the info center. They can not
+     * be scrolled out of the visible area.
+     */
     public final BooleanProperty pinned = new SimpleBooleanProperty(this, "pinned");
 
     public final boolean isPinned() {
         return pinned.get();
     }
 
-    /**
-     * Pinned groups will always be shown at the top of the info center. They can not
-     * be scrolled out of the visible area.
-     *
-     * @return true if the group is pinned
-     */
     public final BooleanProperty pinnedProperty() {
         return pinned;
     }

@@ -29,10 +29,21 @@ import com.dlsc.gemsfx.CalendarView.DateCell;
 import javafx.scene.control.skin.CellSkinBase;
 import javafx.scene.text.Text;
 
+/**
+ * Skin for {@link DateCell} instances used by {@link com.dlsc.gemsfx.CalendarView}.
+ * <p>
+ * The skin keeps date cells at a minimum preferred size and positions an optional
+ * secondary text node in the bottom-right corner.
+ */
 public class DateCellSkin extends CellSkinBase<DateCell> {
 
     private static final double DEFAULT_CELL_SIZE = 24.0;
 
+    /**
+     * Creates a skin for the given date cell.
+     *
+     * @param control the date cell rendered by this skin
+     */
     public DateCellSkin(DateCell control) {
         super(control);
 

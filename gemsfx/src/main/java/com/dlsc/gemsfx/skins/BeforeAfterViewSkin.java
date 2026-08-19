@@ -10,6 +10,12 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 
+/**
+ * Skin for the {@link BeforeAfterView} control.
+ * <p>
+ * The skin layers the before and after nodes, clips them at the divider
+ * position, and displays a draggable divider with a handle.
+ */
 public class BeforeAfterViewSkin extends GemsSkinBase<BeforeAfterView> {
 
     private final StackPane content = new StackPane();
@@ -22,6 +28,11 @@ public class BeforeAfterViewSkin extends GemsSkinBase<BeforeAfterView> {
     private final InvalidationListener updateListener = it -> updateView();
     private final InvalidationListener dividerPositionListener = it -> getSkinnable().requestLayout();
 
+    /**
+     * Creates a skin for the given before-after view.
+     *
+     * @param view the before-after view rendered by this skin
+     */
     public BeforeAfterViewSkin(BeforeAfterView view) {
         super(view);
 
