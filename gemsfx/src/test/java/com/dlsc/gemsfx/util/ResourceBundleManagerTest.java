@@ -25,6 +25,9 @@ public class ResourceBundleManagerTest {
     private static final Pattern REQUIRED_KEY_LOOKUP_PATTERN = Pattern.compile(
             "ResourceBundleManager\\.getString\\(\\s*ResourceBundleManager\\.BundleType\\.([A-Z_]+)\\s*,\\s*\"([^\"]+)\"\\s*\\)");
 
+    private static final Pattern FALLBACK_KEY_LOOKUP_PATTERN = Pattern.compile(
+            "ResourceBundleManager\\.getString\\(\\s*ResourceBundleManager\\.BundleType\\.([A-Z_]+)\\s*,\\s*\"([^\"]+)\"\\s*,\\s*\"[^\"]*\"\\s*\\)");
+
     private Locale originalLocale;
 
     @Before
@@ -74,9 +77,17 @@ public class ResourceBundleManagerTest {
 
     @Test
     public void requiredKeysWithoutFallback_existInBundleDomains() throws IOException {
-        ResourceBundleManager.setLocale(Locale.ENGLISH);
-        Map<ResourceBundleManager.BundleType, Set<String>> requiredKeysByBundleType = collectRequiredKeysWithoutFallback();
+        ResourceBundleManager.setLocale(Locale.ROOT);
+        assertKeysExist(collectKeys(REQUIRED_KEY_LOOKUP_PATTERN));
+    }
 
+    @Test
+    public void keysWithFallback_existInBundleDomains() throws IOException {
+        ResourceBundleManager.setLocale(Locale.ROOT);
+        assertKeysExist(collectKeys(FALLBACK_KEY_LOOKUP_PATTERN));
+    }
+
+    private void assertKeysExist(Map<ResourceBundleManager.BundleType, Set<String>> requiredKeysByBundleType) {
         for (Map.Entry<ResourceBundleManager.BundleType, Set<String>> entry : requiredKeysByBundleType.entrySet()) {
             ResourceBundle bundle = ResourceBundleManager.getBundle(entry.getKey());
             for (String key : entry.getValue()) {
@@ -108,7 +119,7 @@ public class ResourceBundleManagerTest {
         assertEquals("Bonjour Duke", ResourceBundleManager.format("test-i18n", "hello.pattern", "Duke"));
     }
 
-    private Map<ResourceBundleManager.BundleType, Set<String>> collectRequiredKeysWithoutFallback() throws IOException {
+    private Map<ResourceBundleManager.BundleType, Set<String>> collectKeys(Pattern pattern) throws IOException {
         Map<ResourceBundleManager.BundleType, Set<String>> required = new TreeMap<>();
         Path sourceRoot = resolveSourceRoot();
 
@@ -116,7 +127,7 @@ public class ResourceBundleManagerTest {
             stream.filter(path -> path.toString().endsWith(".java")).forEach(path -> {
                 try {
                     String source = Files.readString(path);
-                    Matcher matcher = REQUIRED_KEY_LOOKUP_PATTERN.matcher(source);
+                    Matcher matcher = pattern.matcher(source);
                     while (matcher.find()) {
                         ResourceBundleManager.BundleType bundleType = ResourceBundleManager.BundleType.valueOf(matcher.group(1));
                         String key = matcher.group(2);
