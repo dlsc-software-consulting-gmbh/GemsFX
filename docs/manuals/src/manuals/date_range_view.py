@@ -1,0 +1,43 @@
+from manualkit import (Bullets, Callout, Chapter, Code, Figure, Manual, Numbered, Para, Property, PropertyTable, Section, Table)
+
+G="date-range-view"
+MANUAL=Manual(control="DateRangeView", package="com.dlsc.gemsfx.daterange", subtitle="Two CalendarViews for selecting a DateRange", abstract="DateRangeView combines two CalendarView instances, a preset list and optional apply/cancel buttons to create DateRange values.", cover_svg=f"{G}/cover.svg", cover_caption="DateRangeView places presets next to two coordinated calendars.", chapters=[
+Chapter("Introduction",[Para("<b>DateRangeView</b> is the popup content used by DateRangePicker and can also be embedded directly. It creates two CalendarView instances sharing a DATE_RANGE selection model and keeps their months ordered so the end calendar stays after the start calendar."),Section("Key features"),Bullets(["Horizontal or vertical calendar layout.","Preset section on the left or right.","Default presets: Today, Yesterday, This Week, This Month and Last Month.","Optional apply/cancel buttons.","Localized labels and accessible date-range role description."]),Section("Maven dependency"),Code("""<dependency>
+    <groupId>com.dlsc.gemsfx</groupId>
+    <artifactId>gemsfx</artifactId>
+    <version>4.4.1</version>
+</dependency>""", caption="DateRangeView is in package <font face='Courier'>com.dlsc.gemsfx.daterange</font>.")]),
+Chapter("Getting started",[Code("""DateRangeView view = new DateRangeView();
+view.setOrientation(Orientation.HORIZONTAL);
+view.setPresetsLocation(Side.LEFT);
+view.setOnClose(() -> System.out.println("closed"));
+
+view.valueProperty().addListener((obs, oldRange, range) -> {
+    if (range != null) {
+        System.out.println(range.getStartDate() + " to " + range.getEndDate());
+    }
+});""", caption="A complete DateRangeView setup."),Figure(f"{G}/cover.svg","DateRangeView with presets and two calendars.")]),
+Chapter("Anatomy",[Figure(f"{G}/anatomy.svg","The parts of a DateRangeView."),Table(["Part","Style class","Description"],[["Root","date-range-view","Control with accessible role DATE_PICKER and role description 'date range'."],["Container","range-view-container","HBox holding presets and the calendar stack."],["Presets","presets-box","VBox with title, labels, separators, filler and optional buttons."],["Preset title","presets-title","Bound to presetTitle."],["Preset item","preset-name-label","Click applies preset range to the calendars but does not commit value."],["Calendars","start-calendar / end-calendar","CalendarView instances sharing the selection model."],["To label","to-label","Centered label between calendars, bound to toText."],["Button bar","buttons-box, apply-button, cancel-button","Visible when showCancelAndApplyButton is true."]], widths=[22,32,46])]),
+Chapter("Control API",[Section("Value and calendars"),PropertyTable([Property("value","ObjectProperty&lt;DateRange&gt;","Today DateRange","Committed selected range."),Property("selectionModel","CalendarView.SelectionModel","DATE_RANGE model","Shared by the two calendars; other modes throw UnsupportedOperationException."),Property("startCalendarView","CalendarView","YearMonth.now()","Created with showDaysOfPreviousOrNextMonth true, showToday false and markSelectedDaysOfPreviousOrNextMonth false."),Property("endCalendarView","CalendarView","YearMonth.now().plusMonths(1)","Uses the same selection model as the start calendar."),Property("onClose","ObjectProperty&lt;Runnable&gt;","empty runnable","Invoked by Apply and Cancel buttons.")]),Section("Text and presets"),PropertyTable([Property("toText","StringProperty","\"TO\"","Label between the calendars."),Property("cancelText","StringProperty","\"CANCEL\"","Cancel button text."),Property("applyText","StringProperty","\"APPLY\"","Apply button text."),Property("presetTitle","StringProperty","\"QUICK SELECT\"","Title of the preset section."),Property("presets","ObservableList&lt;DateRangePreset&gt;","Today, Yesterday, This Week, This Month, Last Month","Preset definitions evaluated on click.")]),Section("Styleable behaviour"),PropertyTable([Property("orientation","ObjectProperty&lt;Orientation&gt;","HORIZONTAL","HORIZONTAL or VERTICAL; toggles :horizontal / :vertical pseudo classes. Styleable."),Property("presetsLocation","ObjectProperty&lt;Side&gt;","LEFT","LEFT or RIGHT only; other sides throw IllegalArgumentException. Styleable."),Property("showPresets","BooleanProperty","true","Shows the presets box. Styleable."),Property("showCancelAndApplyButton","BooleanProperty","true","Shows the button bar. Styleable.")])]),
+Chapter("Layout and month coordination",[Figure(f"{G}/orientation.svg","The calendar pair can be horizontal or vertical; presets can be left or right."),Para("The skin binds the latest selectable date of the start calendar to the last day of the month before the end calendar, and the earliest selectable date of the end calendar to the first day of the month after the start calendar. It also disables the adjacent month arrow when the two calendars are already consecutive."),Code("""view.setOrientation(Orientation.VERTICAL);
+view.setPresetsLocation(Side.RIGHT);
+view.setShowPresets(true);""")]),
+Chapter("Preset and apply flow",[Figure(f"{G}/flow.svg","A preset or cell click updates the selection model; Apply writes the value."),Para("Clicking a preset only applies that preset's supplier to the calendars. Pressing Apply creates a DateRange from the selected start/end dates, reuses a matching preset DateRange when possible, writes <font face='Courier'>value</font> and then invokes <font face='Courier'>onClose</font>. Cancel only invokes <font face='Courier'>onClose</font>."),Code("""view.getPresets().add(new DateRangePreset("Next Month", () -> {
+    LocalDate start = LocalDate.now().plusMonths(1).withDayOfMonth(1);
+    return new DateRange("Next Month", start, start.withDayOfMonth(start.lengthOfMonth()));
+}));""")]),
+Chapter("Styling",[Section("Style classes and pseudo classes"),Table(["Selector","Meaning"],[[".date-range-view","Root."],[".range-view-container","Top-level HBox."],[".stack-pane > .months-box","HBox or VBox containing the two calendars."],[".to-label","Circular TO label."],[".presets-box","Preset column."],[".presets-title","Preset section title."],[".preset-name-label","Clickable preset labels."],[".buttons-box","Apply/cancel HBox."],[":horizontal, :vertical","Root pseudo classes reflecting orientation." ]], widths=[45,55]),Section("Styleable CSS properties"),Table(["CSS property","Type","Default"],[["-fx-orientation","Orientation","HORIZONTAL"],["-fx-presets-location","Side","LEFT"],["-fx-show-cancel-and-apply-button","boolean","true"],["-fx-show-presets","boolean","true"]]),Code(""".date-range-view {
+    -fx-orientation: vertical;
+    -fx-presets-location: right;
+    -fx-show-presets: true;
+}
+
+.date-range-view > .range-view-container > .presets-box > .preset-name-label {
+    -fx-text-fill: -fx-accent;
+}""")]),
+Chapter("Localization",[Table(["Key","English default"],[["label.to","TO"],["button.cancel","CANCEL"],["button.apply","APPLY"],["section.presets.title","QUICK SELECT"],["preset.today","Today"],["preset.yesterday","Yesterday"],["preset.this-week","This Week"],["preset.this-month","This Month"],["preset.last-month","Last Month"],["accessible.role-description","date range"]], widths=[48,52])]),
+Chapter("Accessibility",[Para("DateRangeView sets <font face='Courier'>AccessibleRole.DATE_PICKER</font> with localized role description <font face='Courier'>date range</font>. It does not bind automatic accessible text for the current value.")]),
+Chapter("Recipes",[Section("Hide presets"),Code("view.setShowPresets(false);") ,Section("Use without buttons"),Code("view.setShowCancelAndApplyButton(false);") ,Section("Right-side presets"),Code("view.setPresetsLocation(Side.RIGHT);") ,Section("Replace defaults"),Code("""view.getPresets().setAll(
+    new DateRangePreset("Current quarter", () -> quarterRange(LocalDate.now()))
+);"""),Section("Checklist"),Numbered(["Keep the selection model in DATE_RANGE mode.","Use DateRangePreset suppliers, not fixed dates, for relative presets.","Use onClose when embedding the view in a popup or drawer.","Use presetsLocation only with LEFT or RIGHT."])]),
+Chapter("See also",[Bullets(["Demo application: <font face='Courier'>com.dlsc.gemsfx.demo.DateRangeViewApp</font> (run with <font face='Courier'>mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.DateRangeViewApp</font>)","Related controls: <font face='Courier'>DateRangePicker</font>, <font face='Courier'>CalendarView</font>, <font face='Courier'>CalendarPicker</font>.","API documentation: https://dlsc-software-consulting-gmbh.github.io/GemsFX/api/"])])])
