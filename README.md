@@ -11,7 +11,22 @@
 
 GemsFX is a collection of custom controls and utilities for JavaFX. The website is located at [https://gemsfx.dlsc.com](https://gemsfx.dlsc.com).
 
-The `gemsfx` library module targets **Java 11** and **JavaFX 17+**. The `gemsfx-demo` module uses **Java 24** / **JavaFX 25.0.2**.
+The `gemsfx` library module targets **Java 11** and **JavaFX 17+**. The `gemsfx-demo` and
+`gemsfx-showcase` modules use **Java 24** / **JavaFX 25.0.2**.
+
+## Showcase
+
+The `gemsfx-showcase` module contains a single application that lists all controls of the library,
+grouped by category and filterable via a search field. Selecting a control shows the PDF manual of
+that control (taken from `docs/manuals`), double-clicking a control additionally launches its demo
+application. Holding down the shift key while double-clicking also opens the developer tools for the
+launched demo. The application uses AtlantaFX for its styling and supports switching between the
+light, the dark and the system color scheme.
+
+```bash
+# run the showcase application
+mvn javafx:run -f gemsfx-showcase/pom.xml
+```
 
 ## Testing
 

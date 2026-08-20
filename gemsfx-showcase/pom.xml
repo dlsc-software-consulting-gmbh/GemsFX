@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>GemsFXShowcase</name>
+
+    <parent>
+        <groupId>com.dlsc.gemsfx</groupId>
+        <artifactId>parent</artifactId>
+        <version>4.4.1</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>gemsfx-showcase</artifactId>
+
+    <description>Showcase application for GemsFX</description>
+
+    <url>https://github.com/dlemmermann/GemsFX</url>
+
+    <licenses>
+        <license>
+            <name>Apache 2.0</name>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/dlsc-software-consulting-gmbh/GemsFX</url>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>jpro-repo</id>
+            <url>https://sandec.jfrog.io/artifactory/repo</url>
+        </repository>
+    </repositories>
+
+    <properties>
+        <main.class>com.dlsc.gemsfx.showcase.ShowcaseApp</main.class>
+        <!-- Showcase module is not published; skip Central releasability enforcement -->
+        <enforcer.skip>true</enforcer.skip>
+        <devtoolsfx.version>1.0.1</devtoolsfx.version>
+        <manuals.directory>${project.basedir}/../docs/manuals</manuals.directory>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <!-- The showcase application is not part of the published API, hence the
+                         "missing" doclint group is not enforced here. -->
+                    <doclint>accessibility,html,reference,syntax</doclint>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- The PDF manuals live outside of this module. They are copied into the
+                             build output so that they can be loaded from the classpath. -->
+                        <id>copy-manuals</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${project.build.outputDirectory}/com/dlsc/gemsfx/showcase/manuals
+                            </outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${manuals.directory}</directory>
+                                    <includes>
+                                        <include>*.pdf</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${project.build.directory}/libs
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>libs/</classpathPrefix>
+                            <mainClass>${main.class}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>${main.class}</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- Default configuration for running -->
+                        <!-- Usage: mvn clean javafx:run -->
+                        <id>default-cli</id>
+                        <configuration>
+                            <options>
+                                <option>-Djavafx.enablePreview=true</option>
+                            </options>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- Configuration for manual attach debugging -->
+                        <!-- Usage: mvn clean javafx:run@debug -->
+                        <id>debug</id>
+                        <configuration>
+                            <options>
+                                <option>-Djavafx.enablePreview=true</option>
+                                <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:8000
+                                </option>
+                            </options>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.dlsc.gemsfx</groupId>
+            <artifactId>gemsfx</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dlsc.gemsfx</groupId>
+            <artifactId>gemsfx-demo</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dlsc.pdfviewfx</groupId>
+            <artifactId>pdfviewfx</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>atlantafx-base</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>atlantafx-decorations</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dlsc.atlantafx</groupId>
+            <artifactId>themes</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>devtoolsfx-connector</artifactId>
+            <version>${devtoolsfx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>devtoolsfx-gui</artifactId>
+            <version>${devtoolsfx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-javafx</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-materialdesign-pack</artifactId>
+        </dependency>
+
+        <!-- required if any dependency intends to log -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>

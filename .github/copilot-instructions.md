@@ -2,11 +2,12 @@
 
 ## Project Overview
 
-GemsFX is a JavaFX custom controls library. The `gemsfx` module targets Java 11 and JavaFX 17, while `gemsfx-demo` uses
-Java 24 and JavaFX 25.0.2. It is a two-module Maven project:
+GemsFX is a JavaFX custom controls library. The `gemsfx` module targets Java 11 and JavaFX 17, while `gemsfx-demo` and
+`gemsfx-showcase` use Java 24 and JavaFX 25.0.2. It is a three-module Maven project:
 
 - `gemsfx/` — the library (published to Maven Central as `com.dlsc.gemsfx:gemsfx`)
 - `gemsfx-demo/` — standalone demo applications, one per control
+- `gemsfx-showcase/` — the showcase application listing all controls with their PDF manuals
 
 ## Build & Test Commands
 
@@ -22,6 +23,9 @@ Java 24 and JavaFX 25.0.2. It is a two-module Maven project:
 
 # Run a specific demo app
 mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.FilterViewApp
+
+# Run the showcase application
+mvn javafx:run -f gemsfx-showcase/pom.xml
 ```
 
 CI runs: `./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar`1
@@ -80,6 +84,15 @@ The library is an **open** JPMS module (`open module com.dlsc.gemsfx`). All sub-
 
 Each control has a dedicated `*App.java` in `gemsfx-demo/src/main/java/com/dlsc/gemsfx/demo/`. Demo apps extend
 `Application` and are self-contained. Use `-Dmain.class=com.dlsc.gemsfx.demo.XxxApp` to run them.
+
+### Showcase App
+
+`gemsfx-showcase/src/main/java/com/dlsc/gemsfx/showcase/` contains the `ShowcaseApp`, a catalogue of all controls.
+`ShowcaseRegistry` maps every PDF manual in `docs/manuals` to a category and (optionally) to a demo app of the
+`gemsfx-demo` module. The manuals are copied into the module's build output by the `maven-resources-plugin` and are
+loaded from the classpath. `ShowcaseThemeManager` applies the AtlantaFX theme (`ThemeFamily` plus `ThemeMode`) and the
+matching AtlantaFX window decoration. The window buttons in the `HeaderBar` come from `atlantafx-decorations`
+(`HeaderButtonGroup.standardGroup().install(headerBar, stage)`); do not hand-craft window buttons.
 
 ## Key Conventions
 
