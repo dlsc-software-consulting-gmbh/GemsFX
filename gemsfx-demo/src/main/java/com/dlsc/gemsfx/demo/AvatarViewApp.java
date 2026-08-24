@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.AvatarView;
 import com.dlsc.gemsfx.AvatarView.AvatarShape;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -123,6 +124,7 @@ public class AvatarViewApp extends GemApplication {
         Label shapeLabel = new Label("Shape:");
         ComboBox<AvatarShape> shapeComboBox = new ComboBox<>();
         shapeComboBox.getItems().addAll(AvatarShape.values());
+        shapeComboBox.setConverter(new EnumStringConverter<>());
         shapeComboBox.setValue(AvatarShape.SQUARE);
         shapeComboBox.setMaxWidth(Double.MAX_VALUE);
         avatarView.avatarShapeProperty().bind(shapeComboBox.valueProperty());

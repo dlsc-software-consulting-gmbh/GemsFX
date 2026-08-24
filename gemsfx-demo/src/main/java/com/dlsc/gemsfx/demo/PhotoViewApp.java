@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PhotoView;
 import com.dlsc.gemsfx.PhotoView.ClipShape;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -34,6 +35,7 @@ public class PhotoViewApp extends GemApplication {
 
         ComboBox<ClipShape> comboBox = new ComboBox<>();
         comboBox.getItems().setAll(ClipShape.values());
+        comboBox.setConverter(new EnumStringConverter<>());
         comboBox.valueProperty().bindBidirectional(photoView.clipShapeProperty());
 
         CheckBox editableBox = new CheckBox("Editable");

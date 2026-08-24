@@ -11,6 +11,7 @@ import com.dlsc.gemsfx.treeview.link.QuadCurveLink;
 import com.dlsc.gemsfx.treeview.link.SimpleCatmullRomLink;
 import com.dlsc.gemsfx.treeview.link.SineWaveDecayLink;
 import com.dlsc.gemsfx.treeview.link.StraightLineLink;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -88,6 +89,7 @@ public class TreeNodeViewApp extends GemApplication {
 
         ComboBox<TreeNodeView.LayoutType> layoutTypeComboBox = new ComboBox<>();
         layoutTypeComboBox.getItems().setAll(TreeNodeView.LayoutType.values());
+        layoutTypeComboBox.setConverter(new EnumStringConverter<>());
         layoutTypeComboBox.setValue(TreeNodeView.LayoutType.REGULAR);
         treePane.layoutTypeProperty().bind(layoutTypeComboBox.valueProperty());
         VBox layoutTypeBox = createControlBox("Layout Type", layoutTypeComboBox);
@@ -124,6 +126,7 @@ public class TreeNodeViewApp extends GemApplication {
 
         ComboBox<TreeNodeView.LayoutDirection> layoutDirectionComboBox = new ComboBox<>();
         layoutDirectionComboBox.getItems().setAll(TreeNodeView.LayoutDirection.values());
+        layoutDirectionComboBox.setConverter(new EnumStringConverter<>());
         layoutDirectionComboBox.setValue(TreeNodeView.LayoutDirection.TOP_TO_BOTTOM);
         treePane.layoutDirectionProperty().bind(layoutDirectionComboBox.valueProperty());
         VBox layoutDirectionBox = createControlBox("Layout Direction", layoutDirectionComboBox);

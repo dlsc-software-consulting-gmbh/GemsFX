@@ -10,6 +10,7 @@ import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
 import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import com.dlsc.gemsfx.infocenter.NotificationView;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
@@ -150,6 +151,7 @@ public class InfoCenterApp extends GemApplication {
 
         ComboBox<InfoCenterViewPos> infoCenterViewPosition = new ComboBox<>();
         infoCenterViewPosition.getItems().addAll(InfoCenterViewPos.values());
+        infoCenterViewPosition.setConverter(new EnumStringConverter<>());
         infoCenterViewPosition.setValue(infoCenterPane.getInfoCenterViewPos());
         infoCenterViewPosition.setMaxWidth(Double.MAX_VALUE);
         infoCenterViewPosition.valueProperty().bindBidirectional(infoCenterPane.infoCenterViewPosProperty());
@@ -158,6 +160,10 @@ public class InfoCenterApp extends GemApplication {
         hideInBrowser(scenicView);
         configureDevToolsButton(scenicView);
         scenicView.setMaxWidth(Double.MAX_VALUE);
+
+        // switching the theme would also change the theme of the showcase application, hence
+        // the toggle is only shown when the demo runs on its own
+        boolean showDarkMode = atlantafx && !isRunningInShowcase();
 
         ToggleButton darkMode = new ToggleButton("Dark Mode");
         darkMode.selectedProperty().addListener(it -> {
@@ -168,8 +174,8 @@ public class InfoCenterApp extends GemApplication {
             }
         });
         darkMode.setMaxWidth(Double.MAX_VALUE);
-        darkMode.setVisible(atlantafx);
-        darkMode.setManaged(atlantafx);
+        darkMode.setVisible(showDarkMode);
+        darkMode.setManaged(showDarkMode);
 
         Label counterLabel = new Label();
         if (atlantafx) {

@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DayOfWeekPicker;
 import com.dlsc.gemsfx.demo.fake.SimpleControlPane;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -42,6 +43,7 @@ public class DayOfWeekPickerApp extends GemApplication {
     public Node getControlPanel() {
         ComboBox<SelectionMode> selectionModeComboBox = new ComboBox<>();
         selectionModeComboBox.getItems().addAll(SelectionMode.values());
+        selectionModeComboBox.setConverter(new EnumStringConverter<>());
         selectionModeComboBox.valueProperty().bindBidirectional(dayOfWeekPicker.getSelectionModel().selectionModeProperty());
 
         CheckBox autoHideOnSelection = new CheckBox("Hide On Selection");

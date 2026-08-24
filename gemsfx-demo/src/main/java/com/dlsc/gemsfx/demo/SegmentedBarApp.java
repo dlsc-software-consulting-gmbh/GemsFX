@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.SegmentedBar;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -50,6 +51,7 @@ public class SegmentedBarApp extends GemApplication {
 
         ComboBox<Orientation> orientationComboBox = new ComboBox<>();
         orientationComboBox.getItems().addAll(Orientation.values());
+        orientationComboBox.setConverter(new EnumStringConverter<>());
         orientationComboBox.getSelectionModel().select(Orientation.HORIZONTAL);
         orientationComboBox.valueProperty().bindBidirectional(orientation);
 

@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ThreeItemsPane;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -67,6 +68,7 @@ public class ThreeItemsPaneApp extends GemApplication {
     public Node getControlPanel() {
         ComboBox<Orientation> box = new ComboBox<>();
         box.getItems().setAll(Orientation.values());
+        box.setConverter(new EnumStringConverter<>());
         box.valueProperty().bindBidirectional(pane.orientationProperty());
 
         Button scenicView = new Button("Dev Tools");

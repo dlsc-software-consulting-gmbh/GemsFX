@@ -5,6 +5,7 @@ import com.dlsc.gemsfx.infocenter.Notification;
 import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import com.dlsc.gemsfx.infocenter.NotificationView;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
@@ -45,6 +46,7 @@ public class NotificationViewApp extends GemApplication {
 
         ComboBox<Notification.Type> typeComboBox = new ComboBox<>();
         typeComboBox.getItems().addAll(Notification.Type.values());
+        typeComboBox.setConverter(new EnumStringConverter<>());
         typeComboBox.valueProperty().bindBidirectional(notification.typeProperty());
 
         CheckBox expandedBox = new CheckBox("Expanded");

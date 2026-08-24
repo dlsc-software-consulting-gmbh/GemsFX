@@ -1,6 +1,5 @@
 package com.dlsc.gemsfx.showcase;
 
-import atlantafx.base.theme.Theme;
 import atlantafx.decorations.Decoration;
 import com.dlsc.gemsfx.util.ControlsFXAtlantaFX;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
@@ -22,6 +21,10 @@ import java.util.prefs.Preferences;
  * mode is {@link ThemeMode#SYSTEM} then the manager listens to the color scheme reported by the
  * operating system and switches between the light and the dark variant of the family
  * accordingly. The current selection is stored in the user preferences.
+ * <p>
+ * The special family {@link ThemeFamily#MODENA} switches the application back to the standard
+ * JavaFX theme, in which case no AtlantaFX styling is applied at all and the theme mode is
+ * being ignored.
  */
 public class ShowcaseThemeManager {
 
@@ -34,9 +37,6 @@ public class ShowcaseThemeManager {
     public ShowcaseThemeManager(Scene scene, Preferences preferences) {
         this.scene = Objects.requireNonNull(scene, "scene can not be null");
         this.preferences = Objects.requireNonNull(preferences, "preferences can not be null");
-
-        // ensures that the demo applications will also use the AtlantaFX styling of GemsFX
-        System.setProperty("atlantafx", "true");
 
         setThemeFamily(ThemeFamily.findByName(preferences.get(KEY_FAMILY, ThemeFamily.DEFAULT_NAME)));
         setThemeMode(readMode());
@@ -57,22 +57,32 @@ public class ShowcaseThemeManager {
     }
 
     private void updateTheme() {
-        boolean dark = switch (getThemeMode()) {
+        ThemeFamily family = getThemeFamily();
+
+        // the standard JavaFX theme only exists in a light variant
+        boolean dark = !family.isModena() && switch (getThemeMode()) {
             case LIGHT -> false;
             case DARK -> true;
             case SYSTEM -> Platform.getPreferences().getColorScheme() == ColorScheme.DARK;
         };
 
-        Theme theme = getThemeFamily().getTheme(dark);
-
-        Application.setUserAgentStylesheet(theme.getUserAgentStylesheet());
-        GemsFXAtlantaFX.applyTo(scene);
-        ControlsFXAtlantaFX.applyTo(scene);
+        // the system property ensures that the demo applications use the same styling
+        if (family.isModena()) {
+            System.setProperty("atlantafx", "false");
+            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+            scene.getStylesheets().remove(GemsFXAtlantaFX.STYLESHEET);
+            scene.getStylesheets().remove(ControlsFXAtlantaFX.STYLESHEET);
+        } else {
+            System.setProperty("atlantafx", "true");
+            Application.setUserAgentStylesheet(family.getTheme(dark).getUserAgentStylesheet());
+            GemsFXAtlantaFX.applyTo(scene);
+            ControlsFXAtlantaFX.applyTo(scene);
+        }
 
         applyDecoration(dark);
 
-        scene.getRoot().getStyleClass().remove("atlantafx-active");
-        scene.getRoot().getStyleClass().add("atlantafx-active");
+        scene.getRoot().getStyleClass().removeAll("atlantafx-active", "modena-active");
+        scene.getRoot().getStyleClass().add(family.isModena() ? "modena-active" : "atlantafx-active");
         scene.getRoot().getStyleClass().remove("dark-theme");
         if (dark) {
             scene.getRoot().getStyleClass().add("dark-theme");

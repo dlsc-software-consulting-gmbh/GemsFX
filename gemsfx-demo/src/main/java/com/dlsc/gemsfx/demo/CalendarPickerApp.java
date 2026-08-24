@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.CalendarPicker;
 import com.dlsc.gemsfx.CustomComboBox;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -57,6 +58,7 @@ public class CalendarPickerApp extends GemApplication {
 
         ComboBox<CustomComboBox.ButtonDisplay> buttonDisplayComboBox = new ComboBox<>();
         buttonDisplayComboBox.getItems().addAll(CustomComboBox.ButtonDisplay.values());
+        buttonDisplayComboBox.setConverter(new EnumStringConverter<>());
         buttonDisplayComboBox.valueProperty().bindBidirectional(calendarPicker.buttonDisplayProperty());
         Label buttonDisplayLabel = new Label("Button Display:");
         HBox buttonDisplayBox = new HBox(10, buttonDisplayLabel, buttonDisplayComboBox);

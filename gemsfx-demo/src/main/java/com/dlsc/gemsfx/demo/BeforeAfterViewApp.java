@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.BeforeAfterView;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -28,6 +29,7 @@ public class BeforeAfterViewApp extends GemApplication {
 
         ComboBox<Orientation> orientationComboBox = new ComboBox<>();
         orientationComboBox.getItems().addAll(Orientation.values());
+        orientationComboBox.setConverter(new EnumStringConverter<>());
         orientationComboBox.valueProperty().bindBidirectional(beforeAfterView.orientationProperty());
 
         VBox vBox = new VBox(40, beforeAfterView, orientationComboBox);

@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.paging.PagingControlBase;
 import com.dlsc.gemsfx.paging.PagingControls;
 import com.dlsc.gemsfx.Spacer;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
@@ -32,6 +33,7 @@ public class PagingControlsSettingsView extends VBox {
 
         ChoiceBox<PagingControls.FirstLastPageDisplayMode> firstLastPageDisplayModeBox = new ChoiceBox<>();
         firstLastPageDisplayModeBox.getItems().setAll(PagingControls.FirstLastPageDisplayMode.values());
+        firstLastPageDisplayModeBox.setConverter(new EnumStringConverter<>());
         firstLastPageDisplayModeBox.valueProperty().bindBidirectional(pagingControls.firstLastPageDisplayModeProperty());
 
         CheckBox showPreviousNextButton = new CheckBox("Show prev / next buttons");
@@ -42,6 +44,7 @@ public class PagingControlsSettingsView extends VBox {
 
         ChoiceBox<PagingControlBase.MessageLabelStrategy> strategyChoiceBox = new ChoiceBox<>();
         strategyChoiceBox.getItems().addAll(PagingControlBase.MessageLabelStrategy.values());
+        strategyChoiceBox.setConverter(new EnumStringConverter<>());
         strategyChoiceBox.valueProperty().bindBidirectional(pagingControls.messageLabelStrategyProperty());
 
         ChoiceBox<Integer> maxPageIndicatorsBox = new ChoiceBox<>();

@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.paging.PagingControlBase.MessageLabelStrategy;
 import com.dlsc.gemsfx.paging.PagingControls;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
@@ -42,6 +43,7 @@ public class PagingControlsApp extends GemApplication {
 
         ChoiceBox<HPos> alignmentChoiceBox = new ChoiceBox<>();
         alignmentChoiceBox.getItems().setAll(HPos.values());
+        alignmentChoiceBox.setConverter(new EnumStringConverter<>());
         alignmentChoiceBox.valueProperty().bindBidirectional(alignmentProperty);
 
         Button scenicViewButton = new Button("Dev Tools");

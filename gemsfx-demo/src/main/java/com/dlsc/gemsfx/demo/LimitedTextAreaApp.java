@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.LimitedTextArea;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import com.dlsc.gemsfx.util.IntegerRange;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
@@ -59,6 +60,7 @@ public class LimitedTextAreaApp extends GemApplication {
         ComboBox<LimitedTextArea.LengthDisplayMode> lengthDisplayModeComboBox = new ComboBox<>();
         lengthDisplayModeComboBox.setPrefWidth(Double.MAX_VALUE);
         lengthDisplayModeComboBox.getItems().addAll(LimitedTextArea.LengthDisplayMode.values());
+        lengthDisplayModeComboBox.setConverter(new EnumStringConverter<>());
         lengthDisplayModeComboBox.setValue(LimitedTextArea.LengthDisplayMode.ALWAYS_SHOW);
         textArea.lengthDisplayModeProperty().bind(lengthDisplayModeComboBox.valueProperty());
 

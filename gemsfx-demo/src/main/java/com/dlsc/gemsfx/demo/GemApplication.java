@@ -43,9 +43,22 @@ public abstract class GemApplication extends Application {
     }
 
     static {
-        if (Boolean.getBoolean("atlantafx")) {
+        if (Boolean.getBoolean("atlantafx") && !isRunningInShowcase()) {
             setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
         }
+    }
+
+    /**
+     * Determines whether the demos are running inside of the showcase application. The showcase
+     * runs the demos in its own JVM and applies the theme that the user has selected in its own
+     * user interface. Setting the user agent stylesheet from within a demo would therefore
+     * change the appearance of the entire showcase, hence the demos must not apply a theme of
+     * their own in that case.
+     *
+     * @return true if the demos are being started by the showcase application
+     */
+    public static boolean isRunningInShowcase() {
+        return Boolean.getBoolean("showcase");
     }
 
     public GemApplication() {
@@ -73,12 +86,14 @@ public abstract class GemApplication extends Application {
      * Creates a combo box that allows the user to switch the AtlantaFX theme of the running
      * demo at runtime. The switcher is only useful when the demo is started with AtlantaFX
      * support (system property {@code atlantafx}), hence an empty optional is returned when
-     * the application runs with the standard Modena stylesheet.
+     * the application runs with the standard Modena stylesheet. No switcher is created either
+     * when the demo runs inside of the showcase application, which comes with a theme switcher
+     * of its own.
      *
      * @return the theme switcher or an empty optional if AtlantaFX is not being used
      */
     protected final Optional<Node> createThemeSwitcher() {
-        if (!Boolean.getBoolean("atlantafx")) {
+        if (!Boolean.getBoolean("atlantafx") || isRunningInShowcase()) {
             return Optional.empty();
         }
 

@@ -7,6 +7,7 @@ import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.SimpleFilterView;
 import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -118,6 +119,7 @@ public class SimpleFilterViewApp extends GemApplication {
 
         ComboBox<SimpleFilterView.LayoutMode> layoutModeComboBox = new ComboBox<>();
         layoutModeComboBox.getItems().addAll(SimpleFilterView.LayoutMode.values());
+        layoutModeComboBox.setConverter(new EnumStringConverter<>());
         layoutModeComboBox.valueProperty().bindBidirectional(layoutMode);
         layoutModeComboBox.setValue(SimpleFilterView.LayoutMode.COMPACT);
 

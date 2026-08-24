@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import atlantafx.base.controls.RingProgressIndicator;
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.LoadingPane.Status;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -47,10 +48,12 @@ public class LoadingPaneApp extends GemApplication {
 
         ComboBox<Status> statusBox = new ComboBox<>();
         statusBox.getItems().addAll(Status.values());
+        statusBox.setConverter(new EnumStringConverter<>());
         statusBox.valueProperty().bindBidirectional(loadingPane.statusProperty());
 
         ComboBox<LoadingPane.Size> sizeBox = new ComboBox<>();
         sizeBox.getItems().addAll(LoadingPane.Size.values());
+        sizeBox.setConverter(new EnumStringConverter<>());
         sizeBox.valueProperty().bindBidirectional(loadingPane.sizeProperty());
 
         Button simulateLoading = new Button("Load");

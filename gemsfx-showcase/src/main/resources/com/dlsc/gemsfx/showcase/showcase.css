@@ -51,7 +51,8 @@
 .showcase .left-side .tree-view {
     -fx-background-color: transparent;
     -fx-fixed-cell-size: 22px;
-    -fx-padding: 6px 0 6px 0;
+    /* the first and the last cell have to touch the border of the surrounding box */
+    -fx-padding: 0;
 }
 
 .showcase .left-side .tree-cell {
@@ -76,9 +77,14 @@
     -fx-opacity: .7;
 }
 
+/* ------------------------------------------------------------------
+ * Right-hand side: the manual, framed by the same border as the list of controls on the
+ * left-hand side.
+ */
 .showcase .manual-pane {
-    -fx-background-color: -color-bg-default;
-    -fx-padding: 0;
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0, 1px;
+    -fx-padding: 1px;
 }
 
 /* round floating action buttons in the lower right corner of the manual */
@@ -116,6 +122,112 @@
 
 .dialog-pane > .content-pane.demo-dialog > .vbox > .content {
     -fx-padding: 0;
+}
+
+/* the dialogs get a border so that they stand out from the dimmed background behind them */
+.showcase .dialog-pane > .content-pane {
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+/* ------------------------------------------------------------------
+ * Scroll bars
+ *
+ * The AtlantaFX themes round the thumbs of the scroll bars, which does not fit the rectangular
+ * look of the showcase, hence the rounding is removed for all scroll bars of the application,
+ * no matter which theme is currently active.
+ * ------------------------------------------------------------------ */
+
+.scroll-bar > .thumb {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+/* ------------------------------------------------------------------
+ * Standard JavaFX theme (Modena)
+ *
+ * The showcase and the PDF view are styled with the color variables of AtlantaFX. Those
+ * variables do not exist when the standard JavaFX theme is active, in which case all rules
+ * using them would simply be dropped and the application would end up without any styling at
+ * all. The block below therefore maps the variables to the standard Modena colors. It is only
+ * applied when the "modena-active" style class is present, hence it never interferes with the
+ * definitions coming from AtlantaFX.
+ * ------------------------------------------------------------------ */
+
+.showcase.modena-active {
+    -color-bg-default: -fx-control-inner-background;
+    -color-bg-subtle: -fx-background;
+    -color-border-default: -fx-box-border;
+    -color-default-bg: -fx-background;
+
+    -color-fg-default: -fx-text-background-color;
+    -color-fg-muted: derive(-fx-text-background-color, 45%);
+    -color-fg-emphasis: white;
+
+    -color-accent-emphasis: -fx-accent;
+    -color-accent-fg: derive(-fx-accent, -30%);
+    /* muted and subtle are used as background tints, e.g. for the thumbnail bar of the PDF
+     * view, hence they have to stay very light
+     */
+    -color-accent-muted: derive(-fx-accent, 85%);
+    -color-accent-subtle: derive(-fx-accent, 92%);
+
+    -color-danger-muted: #f8d7da;
+    -color-neutral-emphasis-plus: #24292f;
+
+    /* used by the glass panes, normally defined by the AtlantaFX support of GemsFX */
+    -color-dark: #1e1e1e;
+}
+
+/* AtlantaFX style classes such as "flat" or "button-icon" have no meaning in Modena, hence the
+ * buttons of the header bar have to be flattened by hand
+ */
+.showcase.modena-active .showcase-header-bar .theme-menu-button,
+.showcase.modena-active .showcase-header-bar .mode-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4px;
+    -fx-border-color: transparent;
+    -fx-effect: null;
+}
+
+.showcase.modena-active .showcase-header-bar .theme-menu-button:hover,
+.showcase.modena-active .showcase-header-bar .theme-menu-button:showing,
+.showcase.modena-active .showcase-header-bar .mode-button:hover,
+.showcase.modena-active .showcase-header-bar .mode-button:armed {
+    -fx-background-color: derive(-fx-background, -12%);
+}
+
+.showcase.modena-active .showcase-header-bar .theme-menu-button:disabled,
+.showcase.modena-active .showcase-header-bar .mode-button:disabled {
+    -fx-background-color: transparent;
+}
+
+/* AtlantaFX draws the disclosure arrow with an unscaled shape, Modena scales the shape to the
+ * size of the arrow region. Since the disclosure node is stretched to the height of the tree
+ * cell (see above), the Modena arrow would be stretched along with it, hence the scaling has
+ * to be switched off.
+ */
+.showcase.modena-active .left-side .tree-cell > .tree-disclosure-node > .arrow {
+    -fx-scale-shape: false;
+}
+
+/* the "accent" and "button-circle" style classes of AtlantaFX do not exist in Modena either */
+.showcase.modena-active .manual-pane .fab .ikonli-font-icon {
+    -fx-icon-color: -fx-text-background-color;
+}
+
+.showcase.modena-active .manual-pane .fab.accent {
+    -fx-background-color: -fx-accent;
+}
+
+.showcase.modena-active .manual-pane .fab.accent:hover {
+    -fx-background-color: derive(-fx-accent, -10%);
+}
+
+.showcase.modena-active .manual-pane .fab.accent .ikonli-font-icon {
+    -fx-icon-color: white;
 }
 
 /* ------------------------------------------------------------------

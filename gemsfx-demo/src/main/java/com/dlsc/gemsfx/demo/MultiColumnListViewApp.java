@@ -7,6 +7,7 @@ import com.dlsc.gemsfx.MultiColumnListView.ColumnListCell;
 import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
 import com.dlsc.gemsfx.MultiColumnListView.MultiColumnListViewEvent;
 import com.dlsc.gemsfx.Skeleton;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.animation.PauseTransition;
 import javafx.beans.binding.Bindings;
@@ -98,6 +99,7 @@ public class MultiColumnListViewApp extends GemApplication {
 
         ComboBox<Status> loadingStatusBox = new ComboBox<>();
         loadingStatusBox.getItems().addAll(Status.values());
+        loadingStatusBox.setConverter(new EnumStringConverter<>());
         loadingStatusBox.valueProperty().bindBidirectional(multiColumnListView.loadingStatusProperty());
 
         HBox loadingStatusOption = new HBox(5, new Label("Loading Status:"), loadingStatusBox);

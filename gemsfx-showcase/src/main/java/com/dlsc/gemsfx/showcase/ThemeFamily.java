@@ -29,10 +29,14 @@ import java.util.List;
  * variant. Only themes that exist in both variants are supported by the showcase, which allows
  * the application to present them by their base name, e.g. "Nord" instead of "Nord Light" and
  * "Nord Dark".
+ * <p>
+ * The special family {@link #MODENA} represents the standard JavaFX theme. It does not provide
+ * any themes at all, which is the signal for the {@link ShowcaseThemeManager} to switch back to
+ * the default user agent stylesheet of JavaFX.
  *
  * @param name  the base name of the theme family, e.g. "Nord"
- * @param light the light variant of the theme
- * @param dark  the dark variant of the theme
+ * @param light the light variant of the theme, {@code null} for {@link #MODENA}
+ * @param dark  the dark variant of the theme, {@code null} for {@link #MODENA}
  */
 public record ThemeFamily(String name, Theme light, Theme dark) {
 
@@ -42,9 +46,18 @@ public record ThemeFamily(String name, Theme light, Theme dark) {
     public static final String DEFAULT_NAME = "Nord";
 
     /**
-     * All supported theme families, in alphabetical order.
+     * The standard JavaFX theme. Selecting this family switches the application back to the
+     * default user agent stylesheet, meaning no AtlantaFX styling will be applied at all. The
+     * family only exists in a light variant.
+     */
+    public static final ThemeFamily MODENA = new ThemeFamily("Modena", null, null);
+
+    /**
+     * All supported theme families. The standard JavaFX theme comes first, the AtlantaFX
+     * families follow in alphabetical order.
      */
     public static final List<ThemeFamily> ALL_FAMILIES = List.of(
+            MODENA,
             new ThemeFamily("Army", new ArmyLight(), new ArmyDark()),
             new ThemeFamily("Blue", new BlueLight(), new BlueDark()),
             new ThemeFamily("Cupertino", new CupertinoLight(), new CupertinoDark()),
@@ -82,9 +95,19 @@ public record ThemeFamily(String name, Theme light, Theme dark) {
      * Returns the theme to use for the given "darkness".
      *
      * @param dark if true the dark variant will be returned, otherwise the light variant
-     * @return the theme matching the requested variant
+     * @return the theme matching the requested variant, {@code null} for {@link #MODENA}
      */
     public Theme getTheme(boolean dark) {
         return dark ? this.dark : light;
+    }
+
+    /**
+     * Determines whether this family represents the standard JavaFX theme, which means that no
+     * AtlantaFX theme will be applied at all.
+     *
+     * @return true if this is the {@link #MODENA} family
+     */
+    public boolean isModena() {
+        return light == null;
     }
 }

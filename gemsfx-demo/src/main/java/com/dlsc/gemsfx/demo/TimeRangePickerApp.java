@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.TimeRangePicker;
 import com.dlsc.gemsfx.demo.fake.SimpleControlPane;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
@@ -44,6 +45,7 @@ public class TimeRangePickerApp extends GemApplication {
     private Node createControlPane() {
         ComboBox<SelectionMode> controlPane = new ComboBox<>();
         controlPane.getItems().addAll(SelectionMode.values());
+        controlPane.setConverter(new EnumStringConverter<>());
         controlPane.valueProperty().bindBidirectional(timeRangePicker.getSelectionModel().selectionModeProperty());
 
         return new SimpleControlPane(

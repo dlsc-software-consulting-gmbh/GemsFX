@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.TimePicker.Format;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -127,6 +128,7 @@ public class TimePickerApp extends GemApplication {
 
         ComboBox<CustomComboBox.ButtonDisplay> buttonDisplayBox = new ComboBox<>();
         buttonDisplayBox.getItems().addAll(CustomComboBox.ButtonDisplay.values());
+        buttonDisplayBox.setConverter(new EnumStringConverter<>());
         buttonDisplayBox.valueProperty().bindBidirectional(timePicker.buttonDisplayProperty());
 
         GridPane gridPane = new GridPane();

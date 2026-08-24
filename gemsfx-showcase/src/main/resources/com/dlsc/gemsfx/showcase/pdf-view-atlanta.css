@@ -2,6 +2,14 @@
     -color-thumbnail-bar: -color-accent-muted;
 }
 
+/* the standard JavaFX theme maps the AtlantaFX color variables to the Modena colors (see
+ * showcase.css), but its accent color is too saturated to be used as the background of the
+ * thumbnail bar, hence a neutral color is used instead
+ */
+.modena-active .pdf-view {
+    -color-thumbnail-bar: derive(-fx-background, -6%);
+}
+
 /* ------------------------------------------------------------------
  * Search Result List View
  */

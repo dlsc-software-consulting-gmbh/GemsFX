@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ArcProgressIndicator;
 import com.dlsc.gemsfx.SemiCircleProgressIndicator;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.geometry.Insets;
@@ -32,6 +33,7 @@ public class SemiCircleProgressIndicatorApp extends GemApplication {
         // styles
         ComboBox<ArcProgressIndicator.StyleType> styleComboBox = new ComboBox<>();
         styleComboBox.getItems().addAll(ArcProgressIndicator.StyleType.values());
+        styleComboBox.setConverter(new EnumStringConverter<>());
         styleComboBox.valueProperty().bindBidirectional(progressIndicator.styleTypeProperty());
         styleComboBox.setMaxWidth(Double.MAX_VALUE);
 

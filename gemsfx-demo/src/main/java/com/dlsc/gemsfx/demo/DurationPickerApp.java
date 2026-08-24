@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.DurationPicker;
 import com.dlsc.gemsfx.DurationPicker.LabelType;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -194,6 +195,7 @@ public class DurationPickerApp extends GemApplication {
 
         ComboBox<CustomComboBox.ButtonDisplay> buttonDisplayBox = new ComboBox<>();
         buttonDisplayBox.getItems().addAll(CustomComboBox.ButtonDisplay.values());
+        buttonDisplayBox.setConverter(new EnumStringConverter<>());
         buttonDisplayBox.valueProperty().bindBidirectional(durationPicker.buttonDisplayProperty());
 
         GridPane gridPane = new GridPane();

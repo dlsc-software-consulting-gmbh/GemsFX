@@ -4,6 +4,7 @@ import com.dlsc.gemsfx.CalendarView;
 import com.dlsc.gemsfx.CalendarView.SelectionModel.SelectionMode;
 import com.dlsc.gemsfx.CalendarView.YearDisplayMode;
 import com.dlsc.gemsfx.CalendarView.MonthDisplayMode;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -129,6 +130,7 @@ public class CalendarViewApp extends GemApplication {
 
     private <E extends Enum<E>> VBox createComboBoxOption(String title, E defaultEnum, ObjectProperty<E> property) {
         ComboBox<E> comboBox = new ComboBox<>();
+        comboBox.setConverter(new EnumStringConverter<>());
         comboBox.setMaxWidth(Double.MAX_VALUE);
         comboBox.getItems().addAll(defaultEnum.getDeclaringClass().getEnumConstants());
         comboBox.setValue(defaultEnum);

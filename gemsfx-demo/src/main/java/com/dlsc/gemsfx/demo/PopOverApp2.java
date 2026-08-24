@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.PopOver;
 import com.dlsc.gemsfx.PopOver.ArrowLocation;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -60,6 +61,7 @@ public class PopOverApp2 extends GemApplication {
 
         ComboBox<ArrowLocation> comboBox = new ComboBox<>();
         comboBox.getItems().setAll(ArrowLocation.values());
+        comboBox.setConverter(new EnumStringConverter<>());
         comboBox.valueProperty().bindBidirectional(preferredArrowLocation);
         comboBox.setMaxWidth(Double.MAX_VALUE);
 

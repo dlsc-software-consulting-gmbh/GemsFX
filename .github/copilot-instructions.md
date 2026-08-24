@@ -91,8 +91,11 @@ Each control has a dedicated `*App.java` in `gemsfx-demo/src/main/java/com/dlsc/
 `ShowcaseRegistry` maps every PDF manual in `docs/manuals` to a category and (optionally) to a demo app of the
 `gemsfx-demo` module. The manuals are copied into the module's build output by the `maven-resources-plugin` and are
 loaded from the classpath. `ShowcaseThemeManager` applies the AtlantaFX theme (`ThemeFamily` plus `ThemeMode`) and the
-matching AtlantaFX window decoration. The window buttons in the `HeaderBar` come from `atlantafx-decorations`
-(`HeaderButtonGroup.standardGroup().install(headerBar, stage)`); do not hand-craft window buttons.
+matching AtlantaFX window decoration. `ThemeFamily.MODENA` switches back to the standard JavaFX theme, in which case
+`showcase.css` maps the AtlantaFX color variables onto the Modena colors (guarded by the `modena-active` style class of
+the scene root). The window buttons in the `HeaderBar` come from `atlantafx-decorations`; do not hand-craft window
+buttons. `HeaderButtonGroup.standardGroup()` orders them the Windows way (minimize, maximize, close), hence macOS needs
+a group built explicitly with `HeaderButtonType.CLOSE` first.
 
 ## Key Conventions
 

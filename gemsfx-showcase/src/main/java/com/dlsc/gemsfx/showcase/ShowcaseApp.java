@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.showcase;
 
 import atlantafx.base.theme.Styles;
+import atlantafx.decorations.HeaderButton;
 import atlantafx.decorations.HeaderButtonGroup;
 import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.DialogPane.Dialog;
@@ -8,12 +9,17 @@ import com.dlsc.gemsfx.DialogPane.DialogHeader;
 import com.dlsc.gemsfx.GlassPane;
 import com.dlsc.gemsfx.showcase.DemoEmbedder.EmbeddedDemo;
 import com.dlsc.gemsfx.util.StageManager;
+import com.dlsc.pdfviewfx.PDFBoxDocument;
 import com.dlsc.pdfviewfx.PDFView;
 import devtoolsfx.gui.GUI;
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -26,6 +32,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
@@ -39,6 +46,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HeaderBar;
+import javafx.scene.layout.HeaderButtonType;
 import javafx.scene.layout.HeaderDragType;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -47,8 +55,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -57,9 +67,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
 
 /**
@@ -71,6 +84,12 @@ import java.util.prefs.Preferences;
  */
 public class ShowcaseApp extends Application {
 
+    static {
+        // the demos run inside of this application, hence they must not apply a theme of their
+        // own, which would replace the theme that the user has selected in the showcase
+        System.setProperty("showcase", "true");
+    }
+
     private static final String PREF_SELECTED_ENTRY = "selected.entry";
     private static final String PREF_SHOW_ALL = "pdf.show.all";
     private static final String PREF_SHOW_THUMBNAILS = "pdf.show.thumbnails";
@@ -78,6 +97,17 @@ public class ShowcaseApp extends Application {
 
     private final Preferences preferences = Preferences.userNodeForPackage(ShowcaseApp.class);
     private final List<Stage> openDemoStages = new ArrayList<>();
+
+    private final PauseTransition manualLoadDelay = new PauseTransition(Duration.millis(250));
+
+    private final ExecutorService manualLoaderService = Executors.newSingleThreadExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "Manual Loader Thread");
+        thread.setDaemon(true);
+        return thread;
+    });
+
+    private ShowcaseEntry pendingEntry;
+    private long manualLoadToken;
 
     private TreeView<Object> treeView;
     private PDFView pdfView;
@@ -89,14 +119,18 @@ public class ShowcaseApp extends Application {
     private Button launchButton;
     private Button downloadButton;
     private ShowcaseThemeManager themeManager;
+    private Stage showcaseStage;
 
     @Override
     public void start(Stage stage) {
+        showcaseStage = stage;
         stage.initStyle(StageStyle.EXTENDED);
 
         // ── manual (right-hand side) ─────────────────────────────────────────
         pdfView = new PDFView();
         pdfView.getStylesheets().add(Objects.requireNonNull(ShowcaseApp.class.getResource("pdf-view-atlanta.css")).toExternalForm());
+
+        manualLoadDelay.setOnFinished(evt -> loadManual(pendingEntry));
 
         pdfView.setShowAll(preferences.getBoolean(PREF_SHOW_ALL, pdfView.isShowAll()));
         pdfView.setShowThumbnails(preferences.getBoolean(PREF_SHOW_THUMBNAILS, pdfView.isShowThumbnails()));
@@ -282,10 +316,27 @@ public class ShowcaseApp extends Application {
 
         // AtlantaFX places the buttons on the side that matches the current operating system and
         // takes care of the interaction with the window, including the "inactive" and "maximized"
-        // states
-        HeaderButtonGroup.standardGroup().install(headerBar, stage);
+        // states. The standard group orders the buttons the way Windows does it (minimize,
+        // maximize, close), hence the order has to be reversed on macOS where the close button
+        // comes first.
+        createHeaderButtonGroup().install(headerBar, stage);
 
         return headerBar;
+    }
+
+    /**
+     * Creates the group of window buttons shown inside of the header bar. The buttons are
+     * provided by AtlantaFX, but their order depends on the operating system.
+     */
+    private HeaderButtonGroup createHeaderButtonGroup() {
+        if (System.getProperty("os.name", "").toLowerCase().contains("mac")) {
+            return new HeaderButtonGroup(
+                    new HeaderButton(HeaderButtonType.CLOSE),
+                    new HeaderButton(HeaderButtonType.ICONIFY),
+                    new HeaderButton(HeaderButtonType.MAXIMIZE));
+        }
+
+        return HeaderButtonGroup.standardGroup();
     }
 
     private MenuButton createThemeMenuButton() {
@@ -302,6 +353,11 @@ public class ShowcaseApp extends Application {
             item.setToggleGroup(group);
             item.setSelected(family.equals(themeManager.getThemeFamily()));
             menuButton.getItems().add(item);
+
+            // separate the standard JavaFX theme from the AtlantaFX themes
+            if (family.isModena()) {
+                menuButton.getItems().add(new SeparatorMenuItem());
+            }
         }
 
         group.selectedToggleProperty().addListener(it -> {
@@ -399,8 +455,16 @@ public class ShowcaseApp extends Application {
             };
 
             ((FontIcon) button.getGraphic()).setIconCode(icon);
-            button.getTooltip().setText("Color scheme: " + mode.getDisplayName() + " (click to switch)");
+
+            if (themeManager.getThemeFamily().isModena()) {
+                button.getTooltip().setText("The standard JavaFX theme only supports a light color scheme");
+            } else {
+                button.getTooltip().setText("Color scheme: " + mode.getDisplayName() + " (click to switch)");
+            }
         };
+
+        // the standard JavaFX theme does not come with a dark variant
+        button.disableProperty().bind(Bindings.createBooleanBinding(() -> themeManager.getThemeFamily().isModena(), themeManager.themeFamilyProperty()));
 
         button.setOnAction(evt -> {
             ThemeMode[] modes = ThemeMode.values();
@@ -408,6 +472,7 @@ public class ShowcaseApp extends Application {
         });
 
         themeManager.themeModeProperty().addListener(it -> updateButton.run());
+        themeManager.themeFamilyProperty().addListener(it -> updateButton.run());
         updateButton.run();
 
         return button;
@@ -570,24 +635,74 @@ public class ShowcaseApp extends Application {
         launchButton.setVisible(demoAvailable);
         launchButton.setManaged(demoAvailable);
 
+        pendingEntry = entry;
+
+        if (entry == null) {
+            // nothing to load, so there is no reason to wait
+            manualLoadDelay.stop();
+            loadManual(null);
+            return;
+        }
+
+        /*
+         * Loading a document causes the PDF view to re-render its main area and all of its
+         * thumbnails. Delaying the load a little prevents this expensive work from being
+         * triggered over and over again while the user is quickly walking through the tree
+         * with the arrow keys.
+         */
+        manualLoadDelay.playFromStart();
+    }
+
+    private void loadManual(ShowcaseEntry entry) {
+        final long token = ++manualLoadToken;
+
         if (entry == null) {
             pdfView.unload();
             setManualVisible(false, "Select a control to display its manual.");
             return;
         }
 
-        try (InputStream stream = entry.openManual()) {
-            if (stream == null) {
+        Task<PDFView.Document> task = new Task<>() {
+            @Override
+            protected PDFView.Document call() throws Exception {
+                try (InputStream stream = entry.openManual()) {
+                    if (stream == null) {
+                        return null;
+                    }
+                    return new PDFBoxDocument(stream);
+                }
+            }
+        };
+
+        /*
+         * Parsing a PDF file takes a moment. Doing it in the background keeps the UI responsive
+         * and the currently shown manual stays visible until the new one is ready.
+         */
+        task.setOnSucceeded(evt -> {
+            if (token != manualLoadToken) {
+                // a newer document has been requested in the meantime
+                return;
+            }
+
+            PDFView.Document document = task.getValue();
+            if (document == null) {
                 pdfView.unload();
                 setManualVisible(false, "No manual available for \"" + entry.name() + "\".");
             } else {
-                pdfView.load(stream);
+                pdfView.setDocument(document);
                 setManualVisible(true, null);
             }
-        } catch (Exception ex) {
+        });
+
+        task.setOnFailed(evt -> {
+            if (token != manualLoadToken) {
+                return;
+            }
             pdfView.unload();
             setManualVisible(false, "The manual for \"" + entry.name() + "\" can not be displayed.");
-        }
+        });
+
+        manualLoaderService.execute(task);
     }
 
     private void setManualVisible(boolean visible, String placeholderText) {
@@ -681,6 +796,8 @@ public class ShowcaseApp extends Application {
             demoStage.setTitle(entry.name());
             app.start(demoStage);
 
+            moveToShowcaseScreen(demoStage);
+
             openDemoStages.add(demoStage);
             demoStage.setOnHidden(evt -> openDemoStages.remove(demoStage));
 
@@ -694,6 +811,55 @@ public class ShowcaseApp extends Application {
             alert.setContentText(ex.getMessage());
             alert.show();
         }
+    }
+
+    /**
+     * Centers the given demo window on the screen that is currently showing the showcase
+     * window. The demo applications are not aware of the showcase, hence they end up on the
+     * primary screen, which might not be the screen that the user is working on. Demos that
+     * place themselves on the screen of the showcase are left alone.
+     */
+    private void moveToShowcaseScreen(Stage demoStage) {
+        double width = demoStage.getWidth();
+        double height = demoStage.getHeight();
+
+        if (Double.isNaN(width) || Double.isNaN(height) || width <= 0 || height <= 0) {
+            return;
+        }
+
+        Screen showcaseScreen = screenOf(showcaseStage);
+        if (showcaseScreen.equals(screenOf(demoStage))) {
+            return;
+        }
+
+        Rectangle2D bounds = showcaseScreen.getVisualBounds();
+        demoStage.setX(bounds.getMinX() + (bounds.getWidth() - Math.min(width, bounds.getWidth())) / 2);
+        demoStage.setY(bounds.getMinY() + (bounds.getHeight() - Math.min(height, bounds.getHeight())) / 2);
+    }
+
+    /**
+     * Returns the screen that shows the biggest part of the given window, the primary screen if
+     * the window is not located on any of the currently attached screens.
+     */
+    private Screen screenOf(Stage stage) {
+        if (stage == null || Double.isNaN(stage.getX()) || Double.isNaN(stage.getY())
+                || Double.isNaN(stage.getWidth()) || Double.isNaN(stage.getHeight())) {
+            return Screen.getPrimary();
+        }
+
+        return Screen.getScreensForRectangle(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight())
+                .stream()
+                .max(Comparator.comparingDouble(screen -> overlap(screen.getBounds(), stage)))
+                .orElseGet(Screen::getPrimary);
+    }
+
+    /**
+     * Returns the size of the area in which the given window and the given screen overlap.
+     */
+    private double overlap(Rectangle2D screenBounds, Stage stage) {
+        double width = Math.max(0, Math.min(screenBounds.getMaxX(), stage.getX() + stage.getWidth()) - Math.max(screenBounds.getMinX(), stage.getX()));
+        double height = Math.max(0, Math.min(screenBounds.getMaxY(), stage.getY() + stage.getHeight()) - Math.max(screenBounds.getMinY(), stage.getY()));
+        return width * height;
     }
 
     public static void main(String[] args) {

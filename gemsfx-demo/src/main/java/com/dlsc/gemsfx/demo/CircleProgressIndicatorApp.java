@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ArcProgressIndicator.StyleType;
 import com.dlsc.gemsfx.CircleProgressIndicator;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Service;
@@ -37,6 +38,7 @@ public class CircleProgressIndicatorApp extends GemApplication {
         // styles
         ComboBox<StyleType> styleComboBox = new ComboBox<>();
         styleComboBox.getItems().addAll(StyleType.values());
+        styleComboBox.setConverter(new EnumStringConverter<>());
         styleComboBox.valueProperty().bindBidirectional(progressIndicator.styleTypeProperty());
         styleComboBox.setMaxWidth(Double.MAX_VALUE);
 

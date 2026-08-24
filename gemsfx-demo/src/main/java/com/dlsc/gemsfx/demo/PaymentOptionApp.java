@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.PaymentOptionView;
 import com.dlsc.gemsfx.PaymentOptionView.Option;
 import com.dlsc.gemsfx.PaymentOptionView.Theme;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
@@ -19,10 +20,12 @@ public class PaymentOptionApp extends GemApplication {
 
         ComboBox<Option> optionsBox = new ComboBox<>();
         optionsBox.getItems().setAll(Option.values());
+        optionsBox.setConverter(new EnumStringConverter<>());
         optionsBox.valueProperty().bindBidirectional(paymentOptionView.optionProperty());
 
         ComboBox<Theme> themeBox = new ComboBox<>();
         themeBox.getItems().setAll(Theme.values());
+        themeBox.setConverter(new EnumStringConverter<>());
         themeBox.valueProperty().bindBidirectional(paymentOptionView.themeProperty());
 
         HBox box = new HBox(20, optionsBox, themeBox);

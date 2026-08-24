@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.PaymentOptionView;
 import com.dlsc.gemsfx.PaymentOptionView.Option;
 import com.dlsc.gemsfx.PaymentOptionView.Theme;
+import com.dlsc.gemsfx.util.EnumStringConverter;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
@@ -37,6 +38,7 @@ public class PaymentOptionTilesApp extends GemApplication {
 
         ComboBox<Theme> themeBox = new ComboBox<>();
         themeBox.getItems().setAll(Theme.values());
+        themeBox.setConverter(new EnumStringConverter<>());
         themeBox.valueProperty().bindBidirectional(theme);
 
         VBox.setVgrow(pane, Priority.ALWAYS);
