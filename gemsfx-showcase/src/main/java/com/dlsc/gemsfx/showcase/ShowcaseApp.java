@@ -2,6 +2,11 @@ package com.dlsc.gemsfx.showcase;
 
 import atlantafx.base.theme.Styles;
 import atlantafx.decorations.HeaderButtonGroup;
+import com.dlsc.gemsfx.DialogPane;
+import com.dlsc.gemsfx.DialogPane.Dialog;
+import com.dlsc.gemsfx.DialogPane.DialogHeader;
+import com.dlsc.gemsfx.GlassPane;
+import com.dlsc.gemsfx.showcase.DemoEmbedder.EmbeddedDemo;
 import com.dlsc.gemsfx.util.StageManager;
 import com.dlsc.pdfviewfx.PDFView;
 import devtoolsfx.gui.GUI;
@@ -10,9 +15,12 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
@@ -66,6 +74,7 @@ public class ShowcaseApp extends Application {
     private static final String PREF_SELECTED_ENTRY = "selected.entry";
     private static final String PREF_SHOW_ALL = "pdf.show.all";
     private static final String PREF_SHOW_THUMBNAILS = "pdf.show.thumbnails";
+    private static final String PREF_OPEN_IN_WINDOW = "demo.open.in.window";
 
     private final Preferences preferences = Preferences.userNodeForPackage(ShowcaseApp.class);
     private final List<Stage> openDemoStages = new ArrayList<>();
@@ -73,6 +82,9 @@ public class ShowcaseApp extends Application {
     private TreeView<Object> treeView;
     private PDFView pdfView;
     private StackPane manualPane;
+    private DialogPane dialogPane;
+    private CheckBox openInWindowBox;
+    private Label statusLabel;
     private Label placeholderLabel;
     private Button launchButton;
     private Button downloadButton;
@@ -102,7 +114,7 @@ public class ShowcaseApp extends Application {
             }
         });
 
-        launchButton = createFloatingActionButton(MaterialDesign.MDI_PLAY, "Launch the demo application. Hold down SHIFT to also open the developer tools.");
+        launchButton = createFloatingActionButton(MaterialDesign.MDI_PLAY, "Launch the demo application. Hold down SHIFT to open it in a separate window together with the developer tools.");
         launchButton.getStyleClass().add(Styles.ACCENT);
         launchButton.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             ShowcaseEntry entry = getSelectedEntry();
@@ -133,6 +145,7 @@ public class ShowcaseApp extends Application {
             if (entry != null) {
                 preferences.put(PREF_SELECTED_ENTRY, entry.name());
             }
+            updateStatusLabel(entry);
             showManual(entry);
         });
 
@@ -145,9 +158,22 @@ public class ShowcaseApp extends Application {
         HBox contentBox = new HBox(leftSide, manualPane);
         contentBox.getStyleClass().add("content-box");
 
+        dialogPane = new DialogPane();
+        dialogPane.setHeaderFactory(dialog -> {
+            DialogHeader header = new DialogHeader(dialog);
+            // the info icon of the default header makes no sense for an embedded demo
+            header.setShowIcon(!dialog.getStyleClass().contains("demo-dialog"));
+            return header;
+        });
+
+        // the dialogs are shown on top of the content, the header bar and the status bar are
+        // covered by glass panes of their own so that the entire window gets dimmed
+        StackPane centerPane = new StackPane(contentBox, dialogPane);
+
         BorderPane root = new BorderPane();
         root.getStyleClass().add("showcase");
-        root.setCenter(contentBox);
+        root.setCenter(centerPane);
+        root.setBottom(coverWithGlassPane(createStatusBar()));
 
         Scene scene = new Scene(root, 1400, 900);
         scene.getStylesheets().add(Objects.requireNonNull(ShowcaseApp.class.getResource("showcase.css")).toExternalForm());
@@ -155,14 +181,14 @@ public class ShowcaseApp extends Application {
         themeManager = new ShowcaseThemeManager(scene, preferences);
         themeManager.darkThemeProperty().addListener(it -> Platform.runLater(() -> updateLeftSideWidth(leftSide)));
 
-        root.setTop(createHeaderBar(stage));
+        root.setTop(coverWithGlassPane(createHeaderBar(stage)));
 
         updateTree();
         restoreSelection();
 
         stage.setTitle("GemsFX Showcase");
         stage.setScene(scene);
-        stage.setOnHidden(evt -> new ArrayList<>(openDemoStages).forEach(Stage::close));
+        stage.setOnHidden(evt -> closeAllDemos());
 
         StageManager.install(stage, "com/dlsc/gemsfx/showcase", 1200, 800);
 
@@ -206,7 +232,14 @@ public class ShowcaseApp extends Application {
 
     @Override
     public void stop() {
+        closeAllDemos();
+    }
+
+    private void closeAllDemos() {
         new ArrayList<>(openDemoStages).forEach(Stage::close);
+        if (dialogPane != null) {
+            dialogPane.hideAllDialogs();
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -288,6 +321,64 @@ public class ShowcaseApp extends Application {
     }
 
     /**
+     * Stacks a glass pane on top of the given node. The glass pane becomes visible whenever a
+     * dialog is showing inside the dialog pane. The dialog pane dims the content area all by
+     * itself, but the header bar and the status bar are located outside of it and would
+     * otherwise stay bright while a demo is showing.
+     *
+     * @param node the node to cover, e.g. the header bar or the status bar
+     * @return the node wrapped inside a stack pane together with the glass pane
+     */
+    private StackPane coverWithGlassPane(Node node) {
+        GlassPane glassPane = new GlassPane();
+        glassPane.hideProperty().bind(dialogPane.showingDialogProperty().not());
+        glassPane.fadeInOutProperty().bind(dialogPane.fadeInOutProperty());
+        glassPane.fadeInOutDurationProperty().bind(dialogPane.getGlassPane().fadeInOutDurationProperty());
+
+        StackPane stackPane = new StackPane(node, glassPane);
+        stackPane.getStyleClass().add("glass-pane-wrapper");
+        return stackPane;
+    }
+
+    /**
+     * Creates the status bar shown at the bottom of the window. The status bar displays the name
+     * of the currently selected control and the settings that control how the demos are being
+     * launched.
+     */
+    private HBox createStatusBar() {
+        statusLabel = new Label();
+        statusLabel.getStyleClass().add("status-label");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        openInWindowBox = new CheckBox("Open demos in separate window");
+        openInWindowBox.getStyleClass().add("open-in-window-box");
+        openInWindowBox.setFocusTraversable(false);
+        openInWindowBox.setSelected(preferences.getBoolean(PREF_OPEN_IN_WINDOW, false));
+        openInWindowBox.setTooltip(new Tooltip("If not selected then the demos will be shown as an overlay inside the showcase window."));
+        openInWindowBox.selectedProperty().addListener(it -> preferences.putBoolean(PREF_OPEN_IN_WINDOW, openInWindowBox.isSelected()));
+
+        HBox statusBar = new HBox(10, statusLabel, spacer, openInWindowBox);
+        statusBar.getStyleClass().add("status-bar");
+        statusBar.setAlignment(Pos.CENTER_LEFT);
+
+        return statusBar;
+    }
+
+    private void updateStatusLabel(ShowcaseEntry entry) {
+        if (statusLabel == null) {
+            return;
+        }
+
+        if (entry == null) {
+            statusLabel.setText(ShowcaseRegistry.ALL_ENTRIES.size() + " controls");
+        } else {
+            statusLabel.setText(entry.category() + "  \u203a  " + entry.name());
+        }
+    }
+
+    /**
      * Creates a single icon button that cycles through the available theme modes (light, dark,
      * and system).
      */
@@ -356,6 +447,7 @@ public class ShowcaseApp extends Application {
         }
 
         if (getSelectedEntry() == null) {
+            updateStatusLabel(null);
             showManual(null);
         }
     }
@@ -508,11 +600,80 @@ public class ShowcaseApp extends Application {
         }
     }
 
-    private void launchDemo(ShowcaseEntry entry, boolean withDevTools) {
+    /**
+     * Launches the demo of the given entry. The demo is shown as an overlay inside the showcase
+     * window unless the user asked for a separate window, either via the toggle button in the
+     * header bar or by holding down the SHIFT key. Only a demo running inside its own window can
+     * be inspected with the developer tools.
+     *
+     * @param entry           the entry whose demo shall be launched
+     * @param separateWindow  if true the demo will be shown in a window of its own
+     */
+    private void launchDemo(ShowcaseEntry entry, boolean separateWindow) {
         if (!entry.hasDemo()) {
             return;
         }
 
+        if (separateWindow || openInWindowBox.isSelected()) {
+            launchDemoStage(entry, separateWindow);
+        } else {
+            showDemoOverlay(entry);
+        }
+    }
+
+    /**
+     * Shows the demo of the given entry as an overlay dialog inside the showcase window.
+     */
+    private void showDemoOverlay(ShowcaseEntry entry) {
+        EmbeddedDemo demo;
+
+        try {
+            demo = DemoEmbedder.embed(entry.demoFactory().get());
+        } catch (Exception ex) {
+            dialogPane.showError("Launch Error", "The demo for \"" + entry.name()
+                    + "\" can not be shown inside the showcase window. It will be opened in a separate window instead.", ex);
+            launchDemoStage(entry, false);
+            return;
+        }
+
+        Dialog<ButtonType> dialog = new Dialog<>(dialogPane, DialogPane.Type.INFORMATION);
+        dialog.getStyleClass().add("demo-dialog");
+        dialog.setTitle(entry.name());
+        dialog.setContent(demo.content());
+        dialog.getButtonTypes().setAll(ButtonType.CLOSE);
+        dialog.setMaximize(false);
+        dialog.setResizable(true);
+        dialog.setPrefWidth(constrain(demo.prefWidth(), dialogPane.getWidth()));
+        dialog.setPrefHeight(constrain(demo.prefHeight(), dialogPane.getHeight()));
+
+        // remembers the size of the dialog after the user has resized it
+        dialog.setId("demo." + entry.manual());
+        dialog.setPreferences(preferences.node(dialog.getId()));
+
+        dialogPane.showDialog(dialog);
+    }
+
+    /**
+     * Ensures that a demo dialog never becomes larger than the space available inside the
+     * dialog pane.
+     *
+     * @param size      the preferred size of the demo
+     * @param available the size of the dialog pane, might be zero if the pane has not been laid out yet
+     */
+    private double constrain(double size, double available) {
+        if (available <= 0) {
+            return size;
+        }
+
+        // leave room for the padding of the dialog pane and for the header and footer of the dialog
+        double max = available - 2 * dialogPane.getMaximizedPadding() - 100;
+        return max <= 0 ? size : Math.min(size, max);
+    }
+
+    /**
+     * Launches the demo of the given entry inside a window of its own.
+     */
+    private void launchDemoStage(ShowcaseEntry entry, boolean withDevTools) {
         try {
             Application app = entry.demoFactory().get();
 

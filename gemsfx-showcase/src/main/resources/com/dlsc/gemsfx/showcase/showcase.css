@@ -35,7 +35,7 @@
 .showcase .content-box {
     -fx-background-color: -color-bg-subtle;
     -fx-spacing: 8px;
-    -fx-padding: 0 8px 8px 8px;
+    -fx-padding: 8px;
 }
 
 /* ------------------------------------------------------------------
@@ -107,4 +107,40 @@
 .showcase .manual-pane .placeholder-label {
     -fx-text-fill: -color-fg-muted;
     -fx-font-size: 1.1em;
+}
+
+/* the container wrapping the user interface of a demo that is shown as an overlay */
+.demo-container {
+    -fx-background-color: -color-bg-default;
+}
+
+.dialog-pane > .content-pane.demo-dialog > .vbox > .content {
+    -fx-padding: 0;
+}
+
+/* ------------------------------------------------------------------
+ * Status bar at the bottom of the window
+ * ------------------------------------------------------------------ */
+
+.showcase .status-bar {
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: -color-border-default transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 4px 10px 4px 10px;
+}
+
+.showcase .status-bar .status-label {
+    -fx-text-fill: -color-fg-muted;
+    -fx-font-size: .9em;
+}
+
+.showcase .status-bar .open-in-window-box {
+    -fx-font-size: .9em;
+}
+
+/* the glass panes covering the header bar and the status bar have to use the same color as the
+ * glass pane of the dialog pane, which is defined by the AtlantaFX support of GemsFX
+ */
+.showcase .glass-pane-wrapper > .glass-pane {
+    -fx-background-color: -color-dark;
 }
