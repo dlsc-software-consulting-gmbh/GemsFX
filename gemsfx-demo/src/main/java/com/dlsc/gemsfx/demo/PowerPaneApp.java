@@ -117,16 +117,19 @@ public class PowerPaneApp extends GemApplication {
                 createHiddenSidesPaneControls()
         );
 
-        if (Boolean.getBoolean("atlantafx")) {
-            controls.setStyle("-fx-background-color: -color-bg-default;");
-        }
-
         controls.setPadding(new Insets(20));
 
         ScrollPane scrollPane = new ScrollPane(controls);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        if (Boolean.getBoolean("atlantafx")) {
+            // AtlantaFX makes the scroll pane and its viewport transparent, hence the background
+            // has to be set on the scroll pane itself. Setting it on the content would leave the
+            // strip occupied by the vertical scroll bar transparent.
+            scrollPane.setStyle("-fx-background-color: -color-bg-default;");
+        }
 
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(powerPane);

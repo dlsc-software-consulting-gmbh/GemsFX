@@ -17,6 +17,8 @@ import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -44,6 +46,8 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -68,6 +72,8 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -95,6 +101,18 @@ public class ShowcaseApp extends Application {
         System.setProperty("showcase", "true");
     }
 
+    private static final Logger LOG = System.getLogger(ShowcaseApp.class.getName());
+
+    /**
+     * The font used by IntelliJ IDEA for source code. The font is bundled with the showcase
+     * because it can not be expected to be installed on the machine of the user.
+     */
+    private static final List<String> SOURCE_FONTS = List.of(
+            "fonts/JetBrainsMono-Regular.ttf",
+            "fonts/JetBrainsMono-Bold.ttf",
+            "fonts/JetBrainsMono-Italic.ttf",
+            "fonts/JetBrainsMono-BoldItalic.ttf");
+
     private static final String PREF_SELECTED_ENTRY = "selected.entry";
     private static final String PREF_SHOW_ALL = "pdf.show.all";
     private static final String PREF_SHOW_THUMBNAILS = "pdf.show.thumbnails";
@@ -105,6 +123,9 @@ public class ShowcaseApp extends Application {
     private final List<Stage> openDemoStages = new ArrayList<>();
 
     private final PauseTransition manualLoadDelay = new PauseTransition(Duration.millis(250));
+
+    /** The source code that is currently shown inside of the drawer. */
+    private final StringProperty currentSource = new SimpleStringProperty(this, "currentSource");
 
     private final ExecutorService manualLoaderService = Executors.newSingleThreadExecutor(runnable -> {
         Thread thread = new Thread(runnable, "Manual Loader Thread");
@@ -135,6 +156,8 @@ public class ShowcaseApp extends Application {
     public void start(Stage stage) {
         showcaseStage = stage;
         stage.initStyle(StageStyle.EXTENDED);
+
+        loadSourceFonts();
 
         // ── manual (right-hand side) ─────────────────────────────────────────
         pdfView = new PDFView();
@@ -672,6 +695,23 @@ public class ShowcaseApp extends Application {
     }
 
     /**
+     * Loads the font that is used for displaying source code. The font is shipped with the
+     * showcase, hence it is available no matter which fonts are installed on the machine of
+     * the user.
+     */
+    private void loadSourceFonts() {
+        for (String font : SOURCE_FONTS) {
+            try (InputStream stream = ShowcaseApp.class.getResourceAsStream(font)) {
+                if (stream == null || Font.loadFont(stream, 12) == null) {
+                    LOG.log(Level.WARNING, () -> "the font \"" + font + "\" can not be loaded");
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.WARNING, "the font \"" + font + "\" can not be loaded", ex);
+            }
+        }
+    }
+
+    /**
      * Creates the drawer that slides in from the bottom to show the source code of the demo
      * application of the currently selected control. The given node becomes the content over
      * which the drawer is displayed.
@@ -695,12 +735,41 @@ public class ShowcaseApp extends Application {
         drawer.setPreferredDrawerWidth(Double.MAX_VALUE);
         drawer.setDrawerContent(sourcePane);
 
+        Button copyButton = new Button("Copy");
+        copyButton.setFocusTraversable(false);
+        copyButton.setTooltip(new Tooltip("Copy the source code to the clipboard."));
+        copyButton.disableProperty().bind(currentSource.isNull());
+
+        // the label of the button confirms the copy operation for a moment
+        PauseTransition copyFeedbackDelay = new PauseTransition(Duration.seconds(2));
+        copyFeedbackDelay.setOnFinished(evt -> copyButton.setText("Copy"));
+
+        copyButton.setOnAction(evt -> copySourceCode(copyButton, copyFeedbackDelay));
+
         Button closeButton = new Button("Close");
         closeButton.setFocusTraversable(false);
         closeButton.setOnAction(evt -> drawer.setShowDrawer(false));
-        drawer.getToolbarItems().add(closeButton);
+
+        drawer.getToolbarItems().addAll(copyButton, closeButton);
 
         return drawer;
+    }
+
+    /**
+     * Copies the source code that is currently shown inside the drawer to the system clipboard.
+     */
+    private void copySourceCode(Button copyButton, PauseTransition feedbackDelay) {
+        String source = currentSource.get();
+        if (source == null) {
+            return;
+        }
+
+        ClipboardContent content = new ClipboardContent();
+        content.putString(source);
+        Clipboard.getSystemClipboard().setContent(content);
+
+        copyButton.setText("Copied");
+        feedbackDelay.playFromStart();
     }
 
     /**
@@ -714,6 +783,7 @@ public class ShowcaseApp extends Application {
         }
 
         String source = entry.loadDemoSource();
+        currentSource.set(source);
 
         sourceDrawer.setDrawerTitle("Source Code: " + entry.name());
 

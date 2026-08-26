@@ -211,9 +211,19 @@
     -fx-font-size: 1em;
 }
 
-/* the light theme of MDFX is barely readable on a dark background */
+/* the source code is displayed with the font that IntelliJ IDEA uses for its editor */
+.showcase .source-view .markdown-code-block > .code-text-flow,
+.showcase .source-view .markdown-code {
+    -fx-font-family: "JetBrains Mono";
+    -fx-font-size: .9em;
+}
+
+/* MDFX resolves the code theme as a classpath resource. Without an explicit value it uses its
+ * light theme, which is unreadable on the dark background of a dark AtlantaFX theme. An invalid
+ * value makes MDFX fall back to unhighlighted plain black text, hence the full path is required.
+ */
 .showcase.dark-theme .source-view .markdown-code-block {
-    -mdfx-code-theme: "github-dark-default";
+    -mdfx-code-theme: "/one/jpro/platform/mdfx/themes/github-dark-default.json";
 }
 
 /* ------------------------------------------------------------------
