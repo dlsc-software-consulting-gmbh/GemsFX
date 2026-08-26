@@ -1,10 +1,14 @@
 package com.dlsc.gemsfx.showcase;
 
+import com.dlsc.gemsfx.demo.ArcProgressIndicatorApp;
+import com.dlsc.gemsfx.demo.AutoscrollListViewApp;
 import com.dlsc.gemsfx.demo.AvatarViewApp;
 import com.dlsc.gemsfx.demo.BeforeAfterViewApp;
 import com.dlsc.gemsfx.demo.CalendarPickerApp;
 import com.dlsc.gemsfx.demo.CalendarViewApp;
 import com.dlsc.gemsfx.demo.CircleProgressIndicatorApp;
+import com.dlsc.gemsfx.demo.ChipViewApp;
+import com.dlsc.gemsfx.demo.ChipsViewContainerApp;
 import com.dlsc.gemsfx.demo.DateRangePickerApp;
 import com.dlsc.gemsfx.demo.DateRangeViewApp;
 import com.dlsc.gemsfx.demo.DayOfWeekPickerApp;
@@ -16,12 +20,14 @@ import com.dlsc.gemsfx.demo.EnhancedLabelApp;
 import com.dlsc.gemsfx.demo.EnhancedPasswordFieldApp;
 import com.dlsc.gemsfx.demo.ExpandingTextAreaApp;
 import com.dlsc.gemsfx.demo.FilterViewApp;
+import com.dlsc.gemsfx.demo.GlassPaneApp;
 import com.dlsc.gemsfx.demo.GridTableViewApp;
 import com.dlsc.gemsfx.demo.HiddenSidesPaneApp;
 import com.dlsc.gemsfx.demo.HistoryManagerApp;
 import com.dlsc.gemsfx.demo.InfoCenterApp;
 import com.dlsc.gemsfx.demo.LimitedTextAreaApp;
 import com.dlsc.gemsfx.demo.LoadingPaneApp;
+import com.dlsc.gemsfx.demo.MaskedViewApp;
 import com.dlsc.gemsfx.demo.MultiColumnListViewApp;
 import com.dlsc.gemsfx.demo.PagingControlsApp;
 import com.dlsc.gemsfx.demo.PagingGridTableViewApp;
@@ -60,7 +66,6 @@ import javafx.application.Application;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * The registry of all controls presented by the showcase application. Every entry is backed by
@@ -84,88 +89,88 @@ public final class ShowcaseRegistry {
     public static final List<ShowcaseEntry> ALL_ENTRIES = List.of(
 
             // --- Calendar & Date / Time -----------------------------------------
-            entry(CALENDAR, "Calendar Picker", "calendar-picker", CalendarPickerApp::new),
-            entry(CALENDAR, "Calendar View", "calendar-view", CalendarViewApp::new),
-            entry(CALENDAR, "Date Range Picker", "date-range-picker", DateRangePickerApp::new),
-            entry(CALENDAR, "Date Range View", "date-range-view", DateRangeViewApp::new),
-            entry(CALENDAR, "Day Of Week Picker", "day-of-week-picker", DayOfWeekPickerApp::new),
-            entry(CALENDAR, "Duration Picker", "duration-picker", DurationPickerApp::new),
-            entry(CALENDAR, "Time Picker", "time-picker", TimePickerApp::new),
-            entry(CALENDAR, "Time Range Picker", "time-range-picker", TimeRangePickerApp::new),
-            entry(CALENDAR, "Year Month Picker", "year-month-picker", YearMonthPickerApp::new),
-            entry(CALENDAR, "Year Month View", "year-month-view", YearMonthViewApp::new),
-            entry(CALENDAR, "Year Picker", "year-picker", YearPickerApp::new),
-            entry(CALENDAR, "Year View", "year-view", YearViewApp::new),
+            entry(CALENDAR, "Calendar Picker", "calendar-picker", CalendarPickerApp.class),
+            entry(CALENDAR, "Calendar View", "calendar-view", CalendarViewApp.class),
+            entry(CALENDAR, "Date Range Picker", "date-range-picker", DateRangePickerApp.class),
+            entry(CALENDAR, "Date Range View", "date-range-view", DateRangeViewApp.class),
+            entry(CALENDAR, "Day Of Week Picker", "day-of-week-picker", DayOfWeekPickerApp.class),
+            entry(CALENDAR, "Duration Picker", "duration-picker", DurationPickerApp.class),
+            entry(CALENDAR, "Time Picker", "time-picker", TimePickerApp.class),
+            entry(CALENDAR, "Time Range Picker", "time-range-picker", TimeRangePickerApp.class),
+            entry(CALENDAR, "Year Month Picker", "year-month-picker", YearMonthPickerApp.class),
+            entry(CALENDAR, "Year Month View", "year-month-view", YearMonthViewApp.class),
+            entry(CALENDAR, "Year Picker", "year-picker", YearPickerApp.class),
+            entry(CALENDAR, "Year View", "year-view", YearViewApp.class),
 
             // --- Text & Input ---------------------------------------------------
-            entry(TEXT_AND_INPUT, "Chip View", "chip-view", null),
-            entry(TEXT_AND_INPUT, "Chips View Container", "chips-view-container", null),
-            entry(TEXT_AND_INPUT, "Email Field", "email-field", EmailFieldApp::new),
-            entry(TEXT_AND_INPUT, "Enhanced Label", "enhanced-label", EnhancedLabelApp::new),
-            entry(TEXT_AND_INPUT, "Enhanced Password Field", "enhanced-password-field", EnhancedPasswordFieldApp::new),
-            entry(TEXT_AND_INPUT, "Expanding Text Area", "expanding-text-area", ExpandingTextAreaApp::new),
-            entry(TEXT_AND_INPUT, "History Button", "history-button", HistoryManagerApp::new),
-            entry(TEXT_AND_INPUT, "Limited Text Area", "limited-text-area", LimitedTextAreaApp::new),
-            entry(TEXT_AND_INPUT, "Resizable Text Area", "resizable-text-area", ResizableTextAreaApp::new),
-            entry(TEXT_AND_INPUT, "Search Field", "search-field", SearchFieldApp::new),
-            entry(TEXT_AND_INPUT, "Search Text Field", "search-text-field", SearchTextFieldApp::new),
-            entry(TEXT_AND_INPUT, "Selection Box", "selection-box", SelectionBoxApp::new),
-            entry(TEXT_AND_INPUT, "Tags Field", "tags-field", TagsFieldApp::new),
-            entry(TEXT_AND_INPUT, "Text View", "text-view", TextViewApp::new),
+            entry(TEXT_AND_INPUT, "Chip View", "chip-view", ChipViewApp.class),
+            entry(TEXT_AND_INPUT, "Chips View Container", "chips-view-container", ChipsViewContainerApp.class),
+            entry(TEXT_AND_INPUT, "Email Field", "email-field", EmailFieldApp.class),
+            entry(TEXT_AND_INPUT, "Enhanced Label", "enhanced-label", EnhancedLabelApp.class),
+            entry(TEXT_AND_INPUT, "Enhanced Password Field", "enhanced-password-field", EnhancedPasswordFieldApp.class),
+            entry(TEXT_AND_INPUT, "Expanding Text Area", "expanding-text-area", ExpandingTextAreaApp.class),
+            entry(TEXT_AND_INPUT, "History Button", "history-button", HistoryManagerApp.class),
+            entry(TEXT_AND_INPUT, "Limited Text Area", "limited-text-area", LimitedTextAreaApp.class),
+            entry(TEXT_AND_INPUT, "Resizable Text Area", "resizable-text-area", ResizableTextAreaApp.class),
+            entry(TEXT_AND_INPUT, "Search Field", "search-field", SearchFieldApp.class),
+            entry(TEXT_AND_INPUT, "Search Text Field", "search-text-field", SearchTextFieldApp.class),
+            entry(TEXT_AND_INPUT, "Selection Box", "selection-box", SelectionBoxApp.class),
+            entry(TEXT_AND_INPUT, "Tags Field", "tags-field", TagsFieldApp.class),
+            entry(TEXT_AND_INPUT, "Text View", "text-view", TextViewApp.class),
 
             // --- Lists & Tables -------------------------------------------------
-            entry(LISTS_AND_TABLES, "Advanced Table View", "advanced-table-view", TableViewExample::new),
-            entry(LISTS_AND_TABLES, "Autoscroll List View", "autoscroll-list-view", null),
-            entry(LISTS_AND_TABLES, "Filter View", "filter-view", FilterViewApp::new),
-            entry(LISTS_AND_TABLES, "Filter View (Simple)", "simple-filter-view", SimpleFilterViewApp::new),
-            entry(LISTS_AND_TABLES, "Grid Table View", "grid-table-view", GridTableViewApp::new),
-            entry(LISTS_AND_TABLES, "Multi Column List View", "multi-column-list-view", MultiColumnListViewApp::new),
-            entry(LISTS_AND_TABLES, "Paging Controls", "paging-controls", PagingControlsApp::new),
-            entry(LISTS_AND_TABLES, "Paging Grid Table View", "paging-grid-table-view", PagingGridTableViewApp::new),
-            entry(LISTS_AND_TABLES, "Paging List View", "paging-list-view", PagingListViewApp::new),
-            entry(LISTS_AND_TABLES, "Strip View", "strip-view", StripViewApp::new),
+            entry(LISTS_AND_TABLES, "Advanced Table View", "advanced-table-view", TableViewExample.class),
+            entry(LISTS_AND_TABLES, "Autoscroll List View", "autoscroll-list-view", AutoscrollListViewApp.class),
+            entry(LISTS_AND_TABLES, "Filter View", "filter-view", FilterViewApp.class),
+            entry(LISTS_AND_TABLES, "Filter View (Simple)", "simple-filter-view", SimpleFilterViewApp.class),
+            entry(LISTS_AND_TABLES, "Grid Table View", "grid-table-view", GridTableViewApp.class),
+            entry(LISTS_AND_TABLES, "Multi Column List View", "multi-column-list-view", MultiColumnListViewApp.class),
+            entry(LISTS_AND_TABLES, "Paging Controls", "paging-controls", PagingControlsApp.class),
+            entry(LISTS_AND_TABLES, "Paging Grid Table View", "paging-grid-table-view", PagingGridTableViewApp.class),
+            entry(LISTS_AND_TABLES, "Paging List View", "paging-list-view", PagingListViewApp.class),
+            entry(LISTS_AND_TABLES, "Strip View", "strip-view", StripViewApp.class),
 
             // --- Layout ---------------------------------------------------------
-            entry(LAYOUT, "Drawer Stack Pane", "drawer-stack-pane", DrawerStackPaneApp::new),
-            entry(LAYOUT, "Hidden Sides Pane", "hidden-sides-pane", HiddenSidesPaneApp::new),
-            entry(LAYOUT, "Loading Pane", "loading-pane", LoadingPaneApp::new),
-            entry(LAYOUT, "Masked View", "masked-view", null),
-            entry(LAYOUT, "Power Pane", "power-pane", PowerPaneApp::new),
-            entry(LAYOUT, "Responsive Pane", "responsive-pane", ResponsivePaneApp::new),
-            entry(LAYOUT, "Skeleton", "skeleton", SkeletonPaneApp::new),
-            entry(LAYOUT, "Spacer", "spacer", SpacerApp::new),
-            entry(LAYOUT, "Stretching Tile Pane", "stretching-tile-pane", StretchingTilePaneApp::new),
-            entry(LAYOUT, "Three Items Pane", "three-items-pane", ThreeItemsPaneApp::new),
+            entry(LAYOUT, "Drawer Stack Pane", "drawer-stack-pane", DrawerStackPaneApp.class),
+            entry(LAYOUT, "Hidden Sides Pane", "hidden-sides-pane", HiddenSidesPaneApp.class),
+            entry(LAYOUT, "Loading Pane", "loading-pane", LoadingPaneApp.class),
+            entry(LAYOUT, "Masked View", "masked-view", MaskedViewApp.class),
+            entry(LAYOUT, "Power Pane", "power-pane", PowerPaneApp.class),
+            entry(LAYOUT, "Responsive Pane", "responsive-pane", ResponsivePaneApp.class),
+            entry(LAYOUT, "Skeleton", "skeleton", SkeletonPaneApp.class),
+            entry(LAYOUT, "Spacer", "spacer", SpacerApp.class),
+            entry(LAYOUT, "Stretching Tile Pane", "stretching-tile-pane", StretchingTilePaneApp.class),
+            entry(LAYOUT, "Three Items Pane", "three-items-pane", ThreeItemsPaneApp.class),
 
             // --- Media & Graphics -----------------------------------------------
-            entry(MEDIA_AND_GRAPHICS, "Avatar View", "avatar-view", AvatarViewApp::new),
-            entry(MEDIA_AND_GRAPHICS, "Before / After View", "before-after-view", BeforeAfterViewApp::new),
-            entry(MEDIA_AND_GRAPHICS, "Payment Option View", "payment-option-view", PaymentOptionApp::new),
-            entry(MEDIA_AND_GRAPHICS, "Photo View", "photo-view", PhotoViewApp::new),
-            entry(MEDIA_AND_GRAPHICS, "Segmented Bar", "segmented-bar", SegmentedBarApp::new),
-            entry(MEDIA_AND_GRAPHICS, "SVG Image View", "svg-image-view", SVGImageViewApp::new),
+            entry(MEDIA_AND_GRAPHICS, "Avatar View", "avatar-view", AvatarViewApp.class),
+            entry(MEDIA_AND_GRAPHICS, "Before / After View", "before-after-view", BeforeAfterViewApp.class),
+            entry(MEDIA_AND_GRAPHICS, "Payment Option View", "payment-option-view", PaymentOptionApp.class),
+            entry(MEDIA_AND_GRAPHICS, "Photo View", "photo-view", PhotoViewApp.class),
+            entry(MEDIA_AND_GRAPHICS, "Segmented Bar", "segmented-bar", SegmentedBarApp.class),
+            entry(MEDIA_AND_GRAPHICS, "SVG Image View", "svg-image-view", SVGImageViewApp.class),
 
             // --- Progress -------------------------------------------------------
-            entry(PROGRESS, "Arc Progress Indicator", "arc-progress-indicator", null),
-            entry(PROGRESS, "Circle Progress Indicator", "circle-progress-indicator", CircleProgressIndicatorApp::new),
-            entry(PROGRESS, "Semi-Circle Progress Indicator", "semi-circle-progress-indicator", SemiCircleProgressIndicatorApp::new),
+            entry(PROGRESS, "Arc Progress Indicator", "arc-progress-indicator", ArcProgressIndicatorApp.class),
+            entry(PROGRESS, "Circle Progress Indicator", "circle-progress-indicator", CircleProgressIndicatorApp.class),
+            entry(PROGRESS, "Semi-Circle Progress Indicator", "semi-circle-progress-indicator", SemiCircleProgressIndicatorApp.class),
 
             // --- Overlays & Dialogs ---------------------------------------------
-            entry(OVERLAYS_AND_DIALOGS, "Dialog Pane", "dialog-pane", DialogPaneApp::new),
-            entry(OVERLAYS_AND_DIALOGS, "Glass Pane", "glass-pane", null),
-            entry(OVERLAYS_AND_DIALOGS, "Info Center Pane", "info-center-pane", InfoCenterApp::new),
-            entry(OVERLAYS_AND_DIALOGS, "Pop Over", "pop-over", PopOverApp::new),
+            entry(OVERLAYS_AND_DIALOGS, "Dialog Pane", "dialog-pane", DialogPaneApp.class),
+            entry(OVERLAYS_AND_DIALOGS, "Glass Pane", "glass-pane", GlassPaneApp.class),
+            entry(OVERLAYS_AND_DIALOGS, "Info Center Pane", "info-center-pane", InfoCenterApp.class),
+            entry(OVERLAYS_AND_DIALOGS, "Pop Over", "pop-over", PopOverApp.class),
 
             // --- Utilities ------------------------------------------------------
-            entry(UTILITIES, "Screens View", "screens-view", ScreensViewApp::new),
-            entry(UTILITIES, "Tree Node View", "tree-node-view", TreeNodeViewApp::new)
+            entry(UTILITIES, "Screens View", "screens-view", ScreensViewApp.class),
+            entry(UTILITIES, "Tree Node View", "tree-node-view", TreeNodeViewApp.class)
     );
 
     private ShowcaseRegistry() {
     }
 
-    private static ShowcaseEntry entry(String category, String name, String manual, Supplier<Application> factory) {
-        return new ShowcaseEntry(category, name, manual, factory);
+    private static ShowcaseEntry entry(String category, String name, String manual, Class<? extends Application> demoClass) {
+        return new ShowcaseEntry(category, name, manual, demoClass);
     }
 
     /**

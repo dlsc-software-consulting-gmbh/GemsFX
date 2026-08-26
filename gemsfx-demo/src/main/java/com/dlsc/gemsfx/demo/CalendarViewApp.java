@@ -5,7 +5,6 @@ import com.dlsc.gemsfx.CalendarView.SelectionModel.SelectionMode;
 import com.dlsc.gemsfx.CalendarView.YearDisplayMode;
 import com.dlsc.gemsfx.CalendarView.MonthDisplayMode;
 import com.dlsc.gemsfx.util.EnumStringConverter;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -109,7 +108,6 @@ public class CalendarViewApp extends GemApplication {
         }
 
         Scene scene = new Scene(stackPane);
-        CSSFX.start(scene);
 
         configureDevToolsButton(scenicViewButton);
 

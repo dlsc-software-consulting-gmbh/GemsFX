@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.DialogPane.Dialog;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -227,8 +226,6 @@ public class DialogPaneApp extends GemApplication {
         primaryStage.setHeight(900);
 
         primaryStage.show();
-
-        CSSFX.start();
     }
 
     private void later(Runnable runnable, int counter) {

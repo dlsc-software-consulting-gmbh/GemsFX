@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.FilterView;
 import com.dlsc.gemsfx.FilterView.Filter;
 import com.dlsc.gemsfx.FilterView.FilterGroup;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -184,8 +183,6 @@ public class FilterViewApp extends GemApplication {
         stage.setHeight(850);
 
         stage.show();
-
-        CSSFX.start();
     }
 
     public static class Person {

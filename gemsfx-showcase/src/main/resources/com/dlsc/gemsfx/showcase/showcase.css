@@ -38,6 +38,46 @@
     -fx-padding: 8px;
 }
 
+/* the banner above the list of controls and the manual explaining how the demos are launched */
+.showcase .hint-banner {
+    -fx-background-color: -color-warning-emphasis;
+    -fx-border-color: transparent transparent -color-border-default transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 5px 6px 5px 10px;
+    -fx-spacing: 8px;
+}
+
+.showcase .hint-banner .hint-label {
+    -fx-font-size: .85em;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.showcase .hint-banner .hint-icon {
+    -fx-icon-size: 16px;
+    -fx-icon-color: -color-fg-emphasis;
+}
+
+.showcase .hint-banner .hint-close-button {
+    -fx-padding: 2px;
+    -fx-background-color: transparent;
+}
+
+.showcase .hint-banner .hint-close-button:hover,
+.showcase .hint-banner .hint-close-button:armed {
+    -fx-background-color: rgba(255, 255, 255, .25);
+}
+
+.showcase .hint-banner .hint-close-button .ikonli-font-icon {
+    -fx-icon-size: 12px;
+    -fx-icon-color: -color-fg-emphasis;
+}
+
+.showcase .hint-banner .hint-link {
+    -fx-font-size: .85em;
+    -fx-padding: 0;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
 /* ------------------------------------------------------------------
  * Left-hand side: the list of controls, framed by a border so that it reaches from the top
  * to the bottom of the window.
@@ -132,6 +172,51 @@
 }
 
 /* ------------------------------------------------------------------
+ * Source code drawer
+ *
+ * The drawer slides in over the content area and shows the source code of the demo application
+ * of the currently selected control. The code is rendered by MDFX, which applies its own
+ * syntax highlighting theme. MDFX ships its styling as a user agent stylesheet, hence the
+ * rules below win over it.
+ * ------------------------------------------------------------------ */
+
+.showcase .drawer-stackpane > .drawer {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0, 1px;
+}
+
+.showcase .drawer-stackpane > .drawer > .top > .header > .title-label {
+    -fx-text-fill: -color-fg-default;
+    -fx-font-size: 1.3em;
+}
+
+.showcase .drawer-stackpane > .drawer > .top > .header > .tool-bar > .container > .button {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.showcase .source-scroll-pane,
+.showcase .source-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.showcase .source-view {
+    -fx-padding: 10px;
+    -mdfx-code-block-border: -color-border-default;
+    -mdfx-code-block-background: -color-bg-subtle;
+    -mdfx-font-color: -color-fg-default;
+}
+
+.showcase .source-view .markdown-text {
+    -fx-font-size: 1em;
+}
+
+/* the light theme of MDFX is barely readable on a dark background */
+.showcase.dark-theme .source-view .markdown-code-block {
+    -mdfx-code-theme: "github-dark-default";
+}
+
+/* ------------------------------------------------------------------
  * Scroll bars
  *
  * The AtlantaFX themes round the thumbs of the scroll bars, which does not fit the rectangular
@@ -174,6 +259,7 @@
     -color-accent-subtle: derive(-fx-accent, 92%);
 
     -color-danger-muted: #f8d7da;
+    -color-warning-emphasis: #bf8700;
     -color-neutral-emphasis-plus: #24292f;
 
     /* used by the glass panes, normally defined by the AtlantaFX support of GemsFX */
@@ -228,6 +314,14 @@
 
 .showcase.modena-active .manual-pane .fab.accent .ikonli-font-icon {
     -fx-icon-color: white;
+}
+
+/* the "flat" and "button-icon" style classes of AtlantaFX have no meaning in Modena either */
+.showcase.modena-active .hint-banner .hint-close-button {
+    -fx-background-insets: 0;
+    -fx-background-radius: 4px;
+    -fx-border-color: transparent;
+    -fx-effect: null;
 }
 
 /* ------------------------------------------------------------------

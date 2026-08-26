@@ -29,7 +29,7 @@ public class EmbedCheckApp extends Application {
             }
 
             try {
-                DemoEmbedder.EmbeddedDemo demo = DemoEmbedder.embed(entry.demoFactory().get());
+                DemoEmbedder.EmbeddedDemo demo = DemoEmbedder.embed(entry.createDemo());
                 System.out.println("OK    " + entry.name() + " -> " + Math.round(demo.prefWidth()) + "x" + Math.round(demo.prefHeight()));
                 ok++;
             } catch (Throwable ex) {

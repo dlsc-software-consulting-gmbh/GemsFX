@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.YearMonthPicker;
 import com.dlsc.gemsfx.util.EnumStringConverter;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -53,7 +52,6 @@ public class YearMonthPickerApp extends GemApplication {
         vBox.setAlignment(Pos.TOP_LEFT);
 
         Scene scene = new Scene(vBox);
-        CSSFX.start();
 
         stage.setTitle("YearMonthPicker");
         stage.setScene(scene);

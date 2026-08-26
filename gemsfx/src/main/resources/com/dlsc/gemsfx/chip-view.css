@@ -6,15 +6,24 @@
     -fx-background: -fx-accent;
     -fx-background-color: -fx-background;
     -fx-background-radius: 1000;
+
+    /* the color used for the text, the graphic, and the close icon of the chip */
+    -chip-text-fill: white;
 }
 
 .chip-view > .chip-container {
 }
 
 .chip-view > .chip-container > .label {
-    -fx-text-fill: white;
+    -fx-text-fill: -chip-text-fill;
     -fx-font-size: 12px;
     -fx-padding: 5 10 5 10;
+}
+
+/* the graphic of the chip uses the same color as the text of the chip */
+.chip-view > .chip-container > .label > .ikonli-font-icon {
+    -fx-icon-color: -chip-text-fill;
+    -fx-fill: -chip-text-fill;
 }
 
 .chip-view > .chip-container > .close-icon {
@@ -40,5 +49,6 @@
 
 .chip-view > .chip-container > .close-icon > .ikonli-font-icon {
     -fx-icon-size: 12px;
-    -fx-fill: white;
+    -fx-icon-color: -chip-text-fill;
+    -fx-fill: -chip-text-fill;
 }

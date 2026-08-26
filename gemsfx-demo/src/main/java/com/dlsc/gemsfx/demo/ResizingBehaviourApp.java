@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.util.ResizingBehaviour;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -80,7 +79,6 @@ public class ResizingBehaviourApp extends GemApplication {
         container.setBottom(controlsContainer);
 
         Scene scene = new Scene(container);
-        CSSFX.start(scene);
 
         stage.setTitle("Resizable Pane");
         stage.setScene(scene);

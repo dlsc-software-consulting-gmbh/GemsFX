@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.SearchField;
 import com.dlsc.gemsfx.util.HistoryManager;
 import com.dlsc.gemsfx.util.StringHistoryManager;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -155,8 +154,6 @@ public class SearchFieldApp extends GemApplication {
         primaryStage.sizeToScene();
 
         primaryStage.show();
-
-        CSSFX.start();
     }
 
     public static void main(String[] args) {

@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.CalendarPicker;
 import com.dlsc.gemsfx.daterange.DateRange;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.daterange.DateRangePreset;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -101,8 +100,6 @@ public class DateRangePickerApp extends GemApplication {
 
         Scene scene = new Scene(vBox);
         configureDevToolsButton(scenicViewButton);
-
-        CSSFX.start(scene);
 
         stage.setTitle("Date Range Picker");
         stage.setScene(scene);

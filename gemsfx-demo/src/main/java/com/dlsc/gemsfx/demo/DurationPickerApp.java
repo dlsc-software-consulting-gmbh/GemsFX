@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.DurationPicker;
 import com.dlsc.gemsfx.DurationPicker.LabelType;
 import com.dlsc.gemsfx.util.EnumStringConverter;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -245,7 +244,6 @@ public class DurationPickerApp extends GemApplication {
         stackPane.setPadding(new Insets(20));
 
         Scene scene = new Scene(stackPane);
-        CSSFX.start(scene);
 
         primaryStage.setTitle("DurationPicker");
         primaryStage.setScene(scene);

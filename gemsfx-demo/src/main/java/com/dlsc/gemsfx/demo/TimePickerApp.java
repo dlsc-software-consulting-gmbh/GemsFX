@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.TimePicker.Format;
 import com.dlsc.gemsfx.util.EnumStringConverter;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -178,7 +177,6 @@ public class TimePickerApp extends GemApplication {
         stackPane.setPadding(new Insets(20));
 
         Scene scene = new Scene(stackPane);
-        CSSFX.start();
 
         primaryStage.setTitle("TimePicker");
         primaryStage.setScene(scene);

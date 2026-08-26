@@ -6,7 +6,6 @@ import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
 import com.dlsc.gemsfx.MultiColumnListView.MultiColumnListViewEvent;
 import com.dlsc.gemsfx.Skeleton;
 import com.dlsc.gemsfx.util.EnumStringConverter;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -123,8 +122,6 @@ public class MultiColumnListViewApp2 extends GemApplication {
         VBox.setVgrow(vbox, Priority.ALWAYS);
 
         Scene scene = new Scene(outerBox);
-
-        CSSFX.start();
 
         stage.setTitle("MultiColumnListView (Strings)");
         stage.setScene(scene);

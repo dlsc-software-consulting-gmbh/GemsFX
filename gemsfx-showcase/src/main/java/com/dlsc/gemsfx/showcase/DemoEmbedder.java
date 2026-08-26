@@ -49,7 +49,7 @@ public final class DemoEmbedder {
     /**
      * Starts the given demo application without showing a window and returns its user interface.
      *
-     * @param app the demo application, usually created via {@link ShowcaseEntry#demoFactory()}
+     * @param app the demo application, usually created via {@link ShowcaseEntry#createDemo()}
      * @return the embedded demo
      * @throws IllegalStateException if the demo can not be started or does not create a scene
      */

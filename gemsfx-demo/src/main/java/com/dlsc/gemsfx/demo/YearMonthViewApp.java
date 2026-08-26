@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.YearMonthView;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -26,7 +25,6 @@ public class YearMonthViewApp extends GemApplication {
         vBox.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(vBox);
-        CSSFX.start(scene);
 
         stage.setTitle("YearMonthView");
         stage.setScene(scene);

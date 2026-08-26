@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.ScreensView;
 import com.dlsc.gemsfx.util.StageManager;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -19,7 +18,6 @@ public class StageManagerApp extends GemApplication {
         stackPane.setPadding(new Insets(20));
 
         Scene scene = new Scene(stackPane);
-        CSSFX.start();
 
         stage.setTitle("Stage Manager App");
         stage.setScene(scene);

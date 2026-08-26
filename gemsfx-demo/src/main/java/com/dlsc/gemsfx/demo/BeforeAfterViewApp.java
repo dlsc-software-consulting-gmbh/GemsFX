@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.BeforeAfterView;
 import com.dlsc.gemsfx.util.EnumStringConverter;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -38,7 +37,6 @@ public class BeforeAfterViewApp extends GemApplication {
         vBox.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(vBox);
-        CSSFX.start();
 
         stage.setTitle("BeforeAfterView");
         stage.setScene(scene);

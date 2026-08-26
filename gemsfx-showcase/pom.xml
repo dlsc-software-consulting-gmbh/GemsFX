@@ -203,6 +203,11 @@
         </dependency>
 
         <dependency>
+            <groupId>one.jpro.platform</groupId>
+            <artifactId>jpro-mdfx</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-javafx</artifactId>
         </dependency>

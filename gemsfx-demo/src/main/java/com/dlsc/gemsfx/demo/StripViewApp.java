@@ -5,7 +5,6 @@ import com.dlsc.gemsfx.StripView.StripCell;
 import com.dlsc.gemsfx.demo.fake.WeatherCondition;
 import com.dlsc.gemsfx.demo.fake.WeatherData;
 import com.dlsc.gemsfx.demo.fake.WeatherSummaryPane;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -132,8 +131,6 @@ public class StripViewApp extends GemApplication {
         } else {
             weatherView.getStylesheets().add(Objects.requireNonNull(StripViewApp.class.getResource("strip-view-app-modena.css")).toExternalForm());
         }
-
-        CSSFX.start();
 
         stage.setTitle("Strip View");
         stage.setScene(scene);

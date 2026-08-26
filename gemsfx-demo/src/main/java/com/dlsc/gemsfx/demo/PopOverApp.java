@@ -6,7 +6,6 @@ import com.dlsc.gemsfx.PopOver.CalendarPopOver;
 import com.dlsc.gemsfx.Spacer;
 import com.dlsc.gemsfx.util.EnumUtil;
 import com.dlsc.gemsfx.util.SimpleStringConverter;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -142,8 +141,6 @@ public class PopOverApp extends GemApplication {
         stage.sizeToScene();
 
         stage.show();
-
-        CSSFX.start();
     }
 
     public static void main(String[] args) {

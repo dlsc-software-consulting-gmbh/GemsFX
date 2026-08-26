@@ -6,6 +6,7 @@ import atlantafx.decorations.HeaderButtonGroup;
 import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.DialogPane.Dialog;
 import com.dlsc.gemsfx.DialogPane.DialogHeader;
+import com.dlsc.gemsfx.DrawerStackPane;
 import com.dlsc.gemsfx.GlassPane;
 import com.dlsc.gemsfx.showcase.DemoEmbedder.EmbeddedDemo;
 import com.dlsc.gemsfx.util.StageManager;
@@ -28,10 +29,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
@@ -59,6 +62,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import one.jpro.platform.mdfx.MarkdownView;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -71,6 +75,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
@@ -94,6 +99,7 @@ public class ShowcaseApp extends Application {
     private static final String PREF_SHOW_ALL = "pdf.show.all";
     private static final String PREF_SHOW_THUMBNAILS = "pdf.show.thumbnails";
     private static final String PREF_OPEN_IN_WINDOW = "demo.open.in.window";
+    private static final String PREF_SHOW_HINT = "hint.show";
 
     private final Preferences preferences = Preferences.userNodeForPackage(ShowcaseApp.class);
     private final List<Stage> openDemoStages = new ArrayList<>();
@@ -118,6 +124,10 @@ public class ShowcaseApp extends Application {
     private Label placeholderLabel;
     private Button launchButton;
     private Button downloadButton;
+    private Button sourceButton;
+    private DrawerStackPane sourceDrawer;
+    private MarkdownView sourceView;
+    private ScrollPane sourcePane;
     private ShowcaseThemeManager themeManager;
     private Stage showcaseStage;
 
@@ -157,7 +167,14 @@ public class ShowcaseApp extends Application {
             }
         });
 
-        VBox actionBox = new VBox(launchButton, downloadButton);
+        sourceButton = createFloatingActionButton(MaterialDesign.MDI_CODE_BRACES, "Show the source code of the demo application.");
+        sourceButton.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+            if (evt.getButton() == MouseButton.PRIMARY) {
+                showSourceCode(getSelectedEntry());
+            }
+        });
+
+        VBox actionBox = new VBox(launchButton, downloadButton, sourceButton);
         actionBox.getStyleClass().add("action-box");
         actionBox.setAlignment(Pos.BOTTOM_RIGHT);
         // only the buttons themselves must react to the mouse, not the entire overlay
@@ -191,6 +208,12 @@ public class ShowcaseApp extends Application {
 
         HBox contentBox = new HBox(leftSide, manualPane);
         contentBox.getStyleClass().add("content-box");
+        VBox.setVgrow(contentBox, Priority.ALWAYS);
+
+        // the banner spans the entire width of the window, above the list of controls and the manual
+        VBox mainBox = new VBox(createHintBanner(), contentBox);
+        mainBox.getStyleClass().add("main-box");
+        mainBox.setFillWidth(true);
 
         dialogPane = new DialogPane();
         dialogPane.setHeaderFactory(dialog -> {
@@ -200,9 +223,13 @@ public class ShowcaseApp extends Application {
             return header;
         });
 
+        // the drawer slides in over the entire content area and shows the source code of the
+        // currently selected demo application
+        sourceDrawer = createSourceDrawer(mainBox);
+
         // the dialogs are shown on top of the content, the header bar and the status bar are
         // covered by glass panes of their own so that the entire window gets dimmed
-        StackPane centerPane = new StackPane(contentBox, dialogPane);
+        StackPane centerPane = new StackPane(sourceDrawer, dialogPane);
 
         BorderPane root = new BorderPane();
         root.getStyleClass().add("showcase");
@@ -533,6 +560,55 @@ public class ShowcaseApp extends Application {
         return item != null && item.getValue() instanceof ShowcaseEntry entry ? entry : null;
     }
 
+    /**
+     * Creates the banner shown above the list of controls and the manual. The banner explains
+     * how the demo applications can be launched. The user can either close it for the current
+     * session or turn it off permanently.
+     */
+    private Node createHintBanner() {
+        FontIcon icon = new FontIcon(MaterialDesign.MDI_INFORMATION_OUTLINE);
+        icon.getStyleClass().add("hint-icon");
+
+        Label textLabel = new Label("Double-click a control or use the play button to launch its demo. Hold down SHIFT to launch it in a window of its own together with the developer tools.");
+        textLabel.getStyleClass().add("hint-label");
+        textLabel.setWrapText(true);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox banner = new HBox();
+        banner.getStyleClass().add("hint-banner");
+        banner.setAlignment(Pos.CENTER_LEFT);
+
+        Hyperlink doNotShowLink = new Hyperlink("Do not show again");
+        doNotShowLink.getStyleClass().add("hint-link");
+        doNotShowLink.setFocusTraversable(false);
+        doNotShowLink.setOnAction(evt -> hideHintBanner(banner, true));
+
+        Button closeButton = new Button(null, new FontIcon(MaterialDesign.MDI_CLOSE));
+        closeButton.getStyleClass().addAll("hint-close-button", Styles.BUTTON_ICON, Styles.FLAT);
+        closeButton.setFocusTraversable(false);
+        closeButton.setTooltip(new Tooltip("Hide this hint"));
+        closeButton.setOnAction(evt -> hideHintBanner(banner, false));
+
+        banner.getChildren().addAll(icon, textLabel, spacer, doNotShowLink, closeButton);
+
+        boolean showHint = preferences.getBoolean(PREF_SHOW_HINT, true);
+        banner.setVisible(showHint);
+        banner.setManaged(showHint);
+
+        return banner;
+    }
+
+    private void hideHintBanner(Node banner, boolean permanently) {
+        banner.setVisible(false);
+        banner.setManaged(false);
+
+        if (permanently) {
+            preferences.putBoolean(PREF_SHOW_HINT, false);
+        }
+    }
+
     private class ShowcaseTreeCell extends TreeCell<Object> {
 
         public ShowcaseTreeCell() {
@@ -596,6 +672,61 @@ public class ShowcaseApp extends Application {
     }
 
     /**
+     * Creates the drawer that slides in from the bottom to show the source code of the demo
+     * application of the currently selected control. The given node becomes the content over
+     * which the drawer is displayed.
+     */
+    private DrawerStackPane createSourceDrawer(Node content) {
+        sourceView = new MarkdownView() {
+            @Override
+            public Optional<String> getDefaultLanguage() {
+                return Optional.of("java");
+            }
+        };
+        sourceView.getStyleClass().add("source-view");
+
+        sourcePane = new ScrollPane(sourceView);
+        sourcePane.getStyleClass().add("source-scroll-pane");
+        sourcePane.setFitToWidth(true);
+
+        DrawerStackPane drawer = new DrawerStackPane(content);
+        drawer.setAnimateDrawer(true);
+        drawer.setShowDrawerTitle(true);
+        drawer.setPreferredDrawerWidth(Double.MAX_VALUE);
+        drawer.setDrawerContent(sourcePane);
+
+        Button closeButton = new Button("Close");
+        closeButton.setFocusTraversable(false);
+        closeButton.setOnAction(evt -> drawer.setShowDrawer(false));
+        drawer.getToolbarItems().add(closeButton);
+
+        return drawer;
+    }
+
+    /**
+     * Shows the source code of the demo application of the given entry inside the drawer. The
+     * source code is loaded from the classpath, the demo module adds its Java files to its own
+     * build output for exactly this purpose.
+     */
+    private void showSourceCode(ShowcaseEntry entry) {
+        if (entry == null || !entry.hasDemo()) {
+            return;
+        }
+
+        String source = entry.loadDemoSource();
+
+        sourceDrawer.setDrawerTitle("Source Code: " + entry.name());
+
+        // MDFX applies syntax highlighting to fenced code blocks
+        sourceView.setMdString(source != null
+                ? "```java\n" + source + "\n```"
+                : "*The source code of this demo application can not be found.*");
+
+        sourcePane.setVvalue(0);
+        sourceDrawer.setShowDrawer(true);
+    }
+
+    /**
      * Saves the manual of the given entry to a location chosen by the user.
      */
     private void downloadManual(ShowcaseEntry entry) {
@@ -634,6 +765,11 @@ public class ShowcaseApp extends Application {
         boolean demoAvailable = entry != null && entry.hasDemo();
         launchButton.setVisible(demoAvailable);
         launchButton.setManaged(demoAvailable);
+        sourceButton.setVisible(demoAvailable);
+        sourceButton.setManaged(demoAvailable);
+
+        // the drawer shows the source code of the previously selected demo
+        sourceDrawer.setShowDrawer(false);
 
         pendingEntry = entry;
 
@@ -743,7 +879,7 @@ public class ShowcaseApp extends Application {
         EmbeddedDemo demo;
 
         try {
-            demo = DemoEmbedder.embed(entry.demoFactory().get());
+            demo = DemoEmbedder.embed(entry.createDemo());
         } catch (Exception ex) {
             dialogPane.showError("Launch Error", "The demo for \"" + entry.name()
                     + "\" can not be shown inside the showcase window. It will be opened in a separate window instead.", ex);
@@ -790,7 +926,7 @@ public class ShowcaseApp extends Application {
      */
     private void launchDemoStage(ShowcaseEntry entry, boolean withDevTools) {
         try {
-            Application app = entry.demoFactory().get();
+            Application app = entry.createDemo();
 
             Stage demoStage = new Stage();
             demoStage.setTitle(entry.name());

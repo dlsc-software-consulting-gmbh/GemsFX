@@ -2,7 +2,6 @@ package com.dlsc.gemsfx.demo;
 
 import com.dlsc.gemsfx.daterange.DateRangeView;
 import com.jpro.webapi.WebAPI;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -72,8 +71,6 @@ public class DateRangeViewApp extends GemApplication {
         stage.sizeToScene();
 
         stage.show();
-
-        CSSFX.start(scene);
     }
 
     public static void main(String[] args) {

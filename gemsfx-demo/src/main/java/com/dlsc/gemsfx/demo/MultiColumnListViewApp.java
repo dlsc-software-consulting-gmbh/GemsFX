@@ -8,7 +8,6 @@ import com.dlsc.gemsfx.MultiColumnListView.ListViewColumn;
 import com.dlsc.gemsfx.MultiColumnListView.MultiColumnListViewEvent;
 import com.dlsc.gemsfx.Skeleton;
 import com.dlsc.gemsfx.util.EnumStringConverter;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.animation.PauseTransition;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -127,8 +126,6 @@ public class MultiColumnListViewApp extends GemApplication {
         if (Boolean.getBoolean("atlantafx")) {
             scene.getStylesheets().add(Objects.requireNonNull(MultiColumnListViewApp.class.getResource("multi-column-app-atlantafx.css")).toExternalForm());
         }
-
-        CSSFX.start();
 
         stage.setTitle("MultiColumnListView");
         stage.setScene(scene);

@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.CalendarPicker;
 import com.dlsc.gemsfx.CustomComboBox;
 import com.dlsc.gemsfx.util.EnumStringConverter;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -72,7 +71,6 @@ public class CalendarPickerApp extends GemApplication {
         vBox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vBox);
-        CSSFX.start();
 
         stage.setTitle("CalendarPicker");
         stage.setScene(scene);

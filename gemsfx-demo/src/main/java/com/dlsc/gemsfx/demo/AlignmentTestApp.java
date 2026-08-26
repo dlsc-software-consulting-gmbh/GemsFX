@@ -6,7 +6,6 @@ import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.SimpleFilterView;
 import com.dlsc.gemsfx.TimePicker;
 import com.dlsc.gemsfx.daterange.DateRangePicker;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
@@ -84,8 +83,6 @@ public class AlignmentTestApp extends GemApplication {
         stage.setHeight(500);
         stage.centerOnScreen();
         stage.show();
-
-        CSSFX.start();
     }
 
     public static void main(String[] args) {

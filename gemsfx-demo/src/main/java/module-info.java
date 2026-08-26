@@ -20,7 +20,6 @@ open module com.dlsc.gemsfx.demo {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign;
 
-    requires fr.brouillard.oss.cssfx;
     requires net.synedra.validatorfx;
     requires org.apache.commons.lang3;
     requires org.kordamp.ikonli.material;

@@ -4,7 +4,6 @@ import atlantafx.base.controls.RingProgressIndicator;
 import com.dlsc.gemsfx.LoadingPane;
 import com.dlsc.gemsfx.LoadingPane.Status;
 import com.dlsc.gemsfx.util.EnumStringConverter;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -101,7 +100,6 @@ public class LoadingPaneApp extends GemApplication {
         vBox.setMinSize(400, 400);
 
         Scene scene = new Scene(vBox);
-        CSSFX.start(scene);
 
         stage.setTitle("Loading Pane");
         stage.setScene(scene);

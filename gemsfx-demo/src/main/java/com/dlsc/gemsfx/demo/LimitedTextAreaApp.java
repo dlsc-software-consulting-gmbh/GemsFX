@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.LimitedTextArea;
 import com.dlsc.gemsfx.util.EnumStringConverter;
 import com.dlsc.gemsfx.util.IntegerRange;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -51,8 +50,6 @@ public class LimitedTextAreaApp extends GemApplication {
         primaryStage.setTitle("Limited Text Area Demo");
 
         primaryStage.show();
-
-        CSSFX.start();
     }
 
     private VBox getControlPanel() {

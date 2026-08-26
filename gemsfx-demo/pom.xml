@@ -268,12 +268,6 @@
         </dependency>
 
         <dependency>
-            <groupId>fr.brouillard.oss</groupId>
-            <artifactId>cssfx</artifactId>
-            <version>11.5.1</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.dlsc.gemsfx</groupId>
             <artifactId>gemsfx</artifactId>
             <version>4.4.1</version>

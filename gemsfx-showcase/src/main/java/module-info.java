@@ -14,6 +14,8 @@ open module com.dlsc.gemsfx.showcase {
     requires javafx.controls;
     requires javafx.graphics;
 
+    requires one.jpro.platform.mdfx;
+
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign;
 

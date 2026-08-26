@@ -10,7 +10,6 @@ import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import com.dlsc.gemsfx.infocenter.NotificationView;
 import com.dlsc.pdfviewfx.PDFView;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -141,7 +140,6 @@ public class PowerPaneApp extends GemApplication {
         blueprintCanvas.heightProperty().bind(stackPane.heightProperty());
 
         Scene scene = new Scene(stackPane);
-        CSSFX.start();
 
         stage.setTitle("PowerPane");
         stage.setScene(scene);

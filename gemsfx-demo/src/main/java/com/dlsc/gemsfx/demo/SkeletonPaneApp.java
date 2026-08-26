@@ -4,7 +4,6 @@ import com.dlsc.gemsfx.AvatarView;
 import com.dlsc.gemsfx.Skeleton;
 import com.dlsc.gemsfx.Skeleton.Variant;
 import com.dlsc.gemsfx.SkeletonPane;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -39,7 +38,6 @@ public class SkeletonPaneApp extends GemApplication {
         } else {
             scene.getStylesheets().add(Objects.requireNonNull(SkeletonPaneApp.class.getResource("skeleton-pane-app-modena.css")).toExternalForm());
         }
-        CSSFX.start(scene);
 
         stage.setScene(scene);
         stage.setTitle("SkeletonPane");

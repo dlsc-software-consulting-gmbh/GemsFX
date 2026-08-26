@@ -3,7 +3,6 @@ package com.dlsc.gemsfx.demo;
 import com.dlsc.gemsfx.SelectionBox;
 import com.dlsc.gemsfx.demo.fake.SimpleControlPane;
 import com.dlsc.gemsfx.util.SimpleStringConverter;
-import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
@@ -67,8 +66,6 @@ public class SelectionBoxApp extends GemApplication {
         primaryStage.setScene(new Scene(splitPane, 860, 600));
 
         primaryStage.show();
-
-        CSSFX.start();
     }
 
     private Region createControl() {
