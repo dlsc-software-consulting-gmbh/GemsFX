@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150">
+    <rect width="150" height="150" rx="7" fill="#fafafa" stroke="#a8b2c0" stroke-width="1"/>
+    <text x="14" y="22" font-family="sans-serif" font-size="10" fill="#333" font-weight="bold">Download</text>
+    <circle cx="75" cy="80" r="36" fill="none" stroke="#e0e0e0" stroke-width="10"/>
+    <circle cx="75" cy="80" r="36" fill="none" stroke="#1565C0" stroke-width="10" stroke-linecap="round"
+            stroke-dasharray="158.4 226.2" transform="rotate(-90 75 80)"/>
+    <text x="75" y="88" font-family="sans-serif" font-size="21" fill="#1565C0" text-anchor="middle" font-weight="bold">70%</text>
+    <text x="75" y="136" font-family="sans-serif" font-size="9" fill="#999999" text-anchor="middle">12.4 MB / 17.7 MB</text>
+</svg>

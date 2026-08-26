@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210" height="148" viewBox="0 0 210 148">
+    <rect width="210" height="148" rx="7" fill="#ffffff" stroke="#a8b2c0" stroke-width="1"/>
+    <path d="M0 7a7 7 0 0 1 7-7h196a7 7 0 0 1 7 7v21H0z" fill="#e8eaf0"/>
+    <line x1="85" y1="0" x2="85" y2="128" stroke="#dddddd" stroke-width="1"/>
+    <line x1="148" y1="0" x2="148" y2="128" stroke="#dddddd" stroke-width="1"/>
+    <g font-family="sans-serif" font-size="9" fill="#555555" font-weight="bold">
+        <text x="10" y="18">Name</text>
+        <text x="94" y="18">Category</text>
+        <text x="157" y="18">Version</text>
+    </g>
+    <rect y="28" width="210" height="20" fill="#e3f2fd"/>
+    <rect y="68" width="210" height="20" fill="#f8f9fa"/>
+    <rect y="108" width="210" height="20" fill="#f8f9fa"/>
+    <g font-family="sans-serif" font-size="9" fill="#333333">
+        <text x="10" y="41" fill="#1565C0">CalendarFX</text>
+        <text x="94" y="41">Controls</text>
+        <text x="157" y="41">21.0.3</text>
+        <text x="10" y="61">FlexGanttFX</text>
+        <text x="94" y="61">Gantt</text>
+        <text x="157" y="61">21.0.1</text>
+        <text x="10" y="81">GemsFX</text>
+        <text x="94" y="81">Library</text>
+        <text x="157" y="81">4.4.1</text>
+        <text x="10" y="101">PDFViewFX</text>
+        <text x="94" y="101">Viewer</text>
+        <text x="157" y="101">1.2.0</text>
+        <text x="10" y="121">PickerFX</text>
+        <text x="94" y="121">Controls</text>
+        <text x="157" y="121">1.1.0</text>
+    </g>
+    <g stroke="#eeeeee" stroke-width="1">
+        <line x1="0" y1="48" x2="210" y2="48"/>
+        <line x1="0" y1="68" x2="210" y2="68"/>
+        <line x1="0" y1="88" x2="210" y2="88"/>
+        <line x1="0" y1="108" x2="210" y2="108"/>
+        <line x1="0" y1="128" x2="210" y2="128"/>
+    </g>
+    <g font-family="sans-serif" font-size="9" text-anchor="middle">
+        <circle cx="86" cy="138" r="8" fill="#1565C0"/>
+        <text x="86" y="141" fill="white">1</text>
+        <text x="106" y="141" fill="#777777">2</text>
+        <text x="126" y="141" fill="#777777">3</text>
+        <text x="146" y="141" fill="#aaaaaa">…</text>
+    </g>
+</svg>

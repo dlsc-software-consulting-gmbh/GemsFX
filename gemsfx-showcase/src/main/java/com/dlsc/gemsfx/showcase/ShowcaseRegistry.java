@@ -74,14 +74,14 @@ import java.util.Map;
  */
 public final class ShowcaseRegistry {
 
-    public static final String CALENDAR = "Calendar & Date / Time";
-    public static final String TEXT_AND_INPUT = "Text & Input";
-    public static final String LISTS_AND_TABLES = "Lists & Tables";
-    public static final String LAYOUT = "Layout";
-    public static final String MEDIA_AND_GRAPHICS = "Media & Graphics";
-    public static final String PROGRESS = "Progress";
-    public static final String OVERLAYS_AND_DIALOGS = "Overlays & Dialogs";
-    public static final String UTILITIES = "Utilities";
+    public static final String CALENDAR = ShowcaseBundle.get("category.calendar");
+    public static final String TEXT_AND_INPUT = ShowcaseBundle.get("category.text");
+    public static final String LISTS_AND_TABLES = ShowcaseBundle.get("category.lists");
+    public static final String LAYOUT = ShowcaseBundle.get("category.layout");
+    public static final String MEDIA_AND_GRAPHICS = ShowcaseBundle.get("category.media");
+    public static final String PROGRESS = ShowcaseBundle.get("category.progress");
+    public static final String OVERLAYS_AND_DIALOGS = ShowcaseBundle.get("category.overlays");
+    public static final String UTILITIES = ShowcaseBundle.get("category.utilities");
 
     /**
      * All controls of the showcase, in category / alphabetical order.

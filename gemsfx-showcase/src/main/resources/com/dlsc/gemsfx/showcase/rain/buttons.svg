@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="96" viewBox="0 0 200 96">
+    <rect width="200" height="96" rx="7" fill="#fafafa" stroke="#a8b2c0" stroke-width="1"/>
+    <text x="14" y="22" font-family="sans-serif" font-size="10" fill="#333" font-weight="bold">Actions</text>
+    <rect x="14" y="32" width="54" height="22" rx="5" fill="#1565C0"/>
+    <rect x="76" y="32" width="60" height="22" rx="5" fill="white" stroke="#1565C0" stroke-width="1.5"/>
+    <rect x="144" y="32" width="42" height="22" rx="5" fill="#e53935"/>
+    <rect x="14" y="64" width="68" height="22" rx="5" fill="#43a047"/>
+    <rect x="90" y="64" width="50" height="22" rx="5" fill="#f5f5f5" stroke="#cccccc" stroke-width="1"/>
+    <rect x="148" y="64" width="38" height="22" rx="5" fill="#ff8f00"/>
+    <g font-family="sans-serif" font-size="9.5" text-anchor="middle" fill="white">
+        <text x="41" y="47">Save</text>
+        <text x="106" y="47" fill="#1565C0">Cancel</text>
+        <text x="165" y="47">Delete</text>
+        <text x="48" y="79">Confirm</text>
+        <text x="115" y="79" fill="#555555">More…</text>
+        <text x="167" y="79">Warn</text>
+    </g>
+</svg>

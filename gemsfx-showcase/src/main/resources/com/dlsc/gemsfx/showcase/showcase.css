@@ -9,11 +9,24 @@
     -fx-font-weight: bold;
 }
 
-.showcase .showcase-header-bar .mode-button {
+.showcase .showcase-header-bar .repository-link {
+    -fx-font-size: .9em;
+    -fx-padding: 0;
+    -fx-graphic-text-gap: 4px;
+}
+
+.showcase .showcase-header-bar .repository-link .ikonli-font-icon {
+    -fx-icon-size: 14px;
+    -fx-icon-color: -color-link-fg;
+}
+
+.showcase .showcase-header-bar .mode-button,
+.showcase .showcase-header-bar .welcome-button {
     -fx-padding: 4px;
 }
 
-.showcase .showcase-header-bar .mode-button .ikonli-font-icon {
+.showcase .showcase-header-bar .mode-button .ikonli-font-icon,
+.showcase .showcase-header-bar .welcome-button .ikonli-font-icon {
     -fx-icon-size: 14px;
     -fx-icon-color: -color-fg-default;
 }
@@ -272,6 +285,10 @@
     -color-warning-emphasis: #bf8700;
     -color-neutral-emphasis-plus: #24292f;
 
+    -color-success-fg: #2da44e;
+    -color-warning-fg: #bf8700;
+    -color-danger-fg: #cf222e;
+
     /* used by the glass panes, normally defined by the AtlantaFX support of GemsFX */
     -color-dark: #1e1e1e;
 }
@@ -280,7 +297,8 @@
  * buttons of the header bar have to be flattened by hand
  */
 .showcase.modena-active .showcase-header-bar .theme-menu-button,
-.showcase.modena-active .showcase-header-bar .mode-button {
+.showcase.modena-active .showcase-header-bar .mode-button,
+.showcase.modena-active .showcase-header-bar .welcome-button {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
     -fx-background-radius: 4px;
@@ -291,12 +309,15 @@
 .showcase.modena-active .showcase-header-bar .theme-menu-button:hover,
 .showcase.modena-active .showcase-header-bar .theme-menu-button:showing,
 .showcase.modena-active .showcase-header-bar .mode-button:hover,
-.showcase.modena-active .showcase-header-bar .mode-button:armed {
+.showcase.modena-active .showcase-header-bar .mode-button:armed,
+.showcase.modena-active .showcase-header-bar .welcome-button:hover,
+.showcase.modena-active .showcase-header-bar .welcome-button:armed {
     -fx-background-color: derive(-fx-background, -12%);
 }
 
 .showcase.modena-active .showcase-header-bar .theme-menu-button:disabled,
-.showcase.modena-active .showcase-header-bar .mode-button:disabled {
+.showcase.modena-active .showcase-header-bar .mode-button:disabled,
+.showcase.modena-active .showcase-header-bar .welcome-button:disabled {
     -fx-background-color: transparent;
 }
 
@@ -342,7 +363,7 @@
     -fx-background-color: -color-bg-subtle;
     -fx-border-color: -color-border-default transparent transparent transparent;
     -fx-border-width: 1px 0 0 0;
-    -fx-padding: 4px 10px 4px 10px;
+    -fx-padding: 8px 10px 8px 10px;
 }
 
 .showcase .status-bar .status-label {
@@ -354,9 +375,118 @@
     -fx-font-size: .9em;
 }
 
+.showcase .status-bar .themes-link {
+    -fx-font-size: .9em;
+    -fx-padding: 0;
+}
+
 /* the glass panes covering the header bar and the status bar have to use the same color as the
  * glass pane of the dialog pane, which is defined by the AtlantaFX support of GemsFX
  */
 .showcase .glass-pane-wrapper > .glass-pane {
     -fx-background-color: -color-dark;
+}
+
+/* ------------------------------------------------------------------
+ * Welcome page
+ *
+ * The welcome page covers the entire window at startup. Stylized mockups of user interface
+ * elements rain down the window in an endless loop while the foreground presents the logo, a
+ * tagline, some statistics, and the button that reveals the actual showcase.
+ * ------------------------------------------------------------------ */
+
+.showcase .welcome-pane {
+    -fx-background-color: -color-bg-default;
+}
+
+/* the welcome page has its own (transparent) header bar so that the window buttons remain
+ * available while the page covers the header bar of the showcase
+ */
+.showcase .welcome-pane .welcome-header-bar {
+    -fx-background-color: transparent;
+}
+
+.showcase .welcome-pane .welcome-header-bar .header-button-group > .container {
+    -fx-alignment: center-left;
+}
+
+/* The raining user interface graphics. The graphics themselves are light, hence they need to
+ * be far more opaque on a light background than on a dark one in order to be visible at all.
+ * The animation picks a fixed opacity per graphic from the range defined here.
+ */
+.showcase .welcome-pane .control-rain {
+    -fx-min-item-opacity: .55;
+    -fx-max-item-opacity: .9;
+}
+
+.showcase.dark-theme .welcome-pane .control-rain {
+    -fx-min-item-opacity: .2;
+    -fx-max-item-opacity: .45;
+}
+
+/* the shadow lifts the graphics off the background of the page */
+.showcase .welcome-pane .control-rain-item {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .25), 14, 0, 0, 5);
+}
+
+.showcase.dark-theme .welcome-pane .control-rain-item {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .5), 16, 0, 0, 6);
+}
+
+/* the foreground card with the logo, the texts, and the call-to-action button */
+.showcase .welcome-pane .welcome-content {
+    -fx-background-color: -color-border-default, -color-bg-default;
+    -fx-background-insets: 0, 1px;
+    -fx-background-radius: 16px, 15px;
+    -fx-padding: 50px 70px;
+    -fx-spacing: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .3), 30, 0, 0, 8);
+}
+
+.showcase .welcome-pane .welcome-title {
+    -fx-font-size: 3em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-fg-default;
+}
+
+.showcase .welcome-pane .welcome-tagline {
+    -fx-font-size: 1.3em;
+    -fx-text-fill: -color-fg-muted;
+}
+
+.showcase .welcome-pane .welcome-stats {
+    -fx-font-size: 1em;
+    -fx-text-fill: -color-accent-fg;
+    -fx-padding: 0 0 10px 0;
+}
+
+.showcase .welcome-pane .welcome-cta {
+    -fx-font-size: 1.2em;
+    -fx-padding: 10px 26px;
+    -fx-graphic-text-gap: 10px;
+}
+
+.showcase .welcome-pane .welcome-cta .ikonli-font-icon {
+    -fx-icon-size: 20px;
+    -fx-icon-color: -color-fg-emphasis;
+}
+
+.showcase .welcome-pane .welcome-do-not-show-box {
+    -fx-font-size: .85em;
+    -fx-text-fill: -color-fg-muted;
+    -fx-padding: 14px 0 0 0;
+}
+
+/* fallbacks for the standard JavaFX theme, where the AtlantaFX style classes have no effect */
+.showcase.modena-active .welcome-pane .welcome-cta {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+}
+
+.showcase.modena-active .welcome-pane .welcome-cta:hover {
+    -fx-background-color: derive(-fx-accent, -10%);
+}
+
+.showcase.modena-active .welcome-pane .welcome-cta .ikonli-font-icon {
+    -fx-icon-color: white;
 }

@@ -6,17 +6,22 @@ package com.dlsc.gemsfx.showcase;
  */
 public enum ThemeMode {
 
-    LIGHT("Light"),
-    DARK("Dark"),
-    SYSTEM("System");
+    LIGHT("mode.light"),
+    DARK("mode.dark"),
+    SYSTEM("mode.system");
 
-    private final String displayName;
+    private final String key;
 
-    ThemeMode(String displayName) {
-        this.displayName = displayName;
+    ThemeMode(String key) {
+        this.key = key;
     }
 
+    /**
+     * Returns the localized name of this mode, e.g. for the tooltip of the mode button.
+     *
+     * @return the display name
+     */
     public String getDisplayName() {
-        return displayName;
+        return ShowcaseBundle.get(key);
     }
 }

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="204" height="112" viewBox="0 0 204 112">
+    <rect width="204" height="112" rx="7" fill="#fafafa" stroke="#a8b2c0" stroke-width="1"/>
+    <text x="14" y="22" font-family="sans-serif" font-size="10" fill="#333" font-weight="bold">Search &amp; Tags</text>
+    <rect x="14" y="30" width="176" height="24" rx="12" fill="white" stroke="#1565C0" stroke-width="1.5"/>
+    <circle cx="30" cy="42" r="5" fill="none" stroke="#1565C0" stroke-width="1.8"/>
+    <line x1="34" y1="46" x2="38" y2="50" stroke="#1565C0" stroke-width="1.8" stroke-linecap="round"/>
+    <text x="46" y="46" font-family="sans-serif" font-size="9.5" fill="#aaaaaa">Search controls…</text>
+    <rect x="14" y="64" width="62" height="20" rx="10" fill="#e3f2fd" stroke="#90caf9"/>
+    <text x="45" y="78" font-family="sans-serif" font-size="9" fill="#1565C0" text-anchor="middle">Calendar</text>
+    <rect x="82" y="64" width="48" height="20" rx="10" fill="#e8f5e9" stroke="#a5d6a7"/>
+    <text x="106" y="78" font-family="sans-serif" font-size="9" fill="#2e7d32" text-anchor="middle">Layout</text>
+    <rect x="136" y="64" width="54" height="20" rx="10" fill="#fff3e0" stroke="#ffcc80"/>
+    <text x="163" y="78" font-family="sans-serif" font-size="9" fill="#ef6c00" text-anchor="middle">Overlays</text>
+    <rect x="14" y="90" width="80" height="14" rx="4" fill="#eeeeee"/>
+    <rect x="100" y="90" width="52" height="14" rx="4" fill="#eeeeee"/>
+</svg>

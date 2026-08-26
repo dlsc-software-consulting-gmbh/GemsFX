@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="128" viewBox="0 0 192 128">
+    <rect width="192" height="128" rx="7" fill="#fafafa" stroke="#a8b2c0" stroke-width="1"/>
+    <text x="14" y="22" font-family="sans-serif" font-size="10" fill="#333" font-weight="bold">Color Picker</text>
+    <g>
+        <rect x="14" y="30" width="19" height="19" rx="3" fill="#e53935"/>
+        <rect x="36" y="30" width="19" height="19" rx="3" fill="#e91e63"/>
+        <rect x="58" y="30" width="19" height="19" rx="3" fill="#9c27b0"/>
+        <rect x="80" y="30" width="19" height="19" rx="3" fill="#3f51b5"/>
+        <rect x="102" y="30" width="19" height="19" rx="3" fill="#2196f3"/>
+        <rect x="124" y="30" width="19" height="19" rx="3" fill="#03a9f4"/>
+        <rect x="146" y="30" width="19" height="19" rx="3" fill="#00bcd4"/>
+        <rect x="168" y="30" width="10" height="19" rx="3" fill="#009688"/>
+        <rect x="14" y="53" width="19" height="19" rx="3" fill="#4caf50"/>
+        <rect x="36" y="53" width="19" height="19" rx="3" fill="#8bc34a"/>
+        <rect x="58" y="53" width="19" height="19" rx="3" fill="#cddc39"/>
+        <rect x="80" y="53" width="19" height="19" rx="3" fill="#ffeb3b"/>
+        <rect x="102" y="53" width="19" height="19" rx="3" fill="#ffc107"/>
+        <rect x="124" y="53" width="19" height="19" rx="3" fill="#ff9800"/>
+        <rect x="146" y="53" width="19" height="19" rx="3" fill="#ff5722"/>
+        <rect x="168" y="53" width="10" height="19" rx="3" fill="#795548"/>
+        <rect x="14" y="76" width="19" height="19" rx="3" fill="#9e9e9e"/>
+        <rect x="36" y="76" width="19" height="19" rx="3" fill="#607d8b"/>
+        <rect x="58" y="76" width="19" height="19" rx="3" fill="#1a1a2e"/>
+        <rect x="80" y="76" width="19" height="19" rx="3" fill="#2196f3" stroke="#333333" stroke-width="2.5"/>
+        <rect x="102" y="76" width="19" height="19" rx="3" fill="#111111"/>
+        <rect x="124" y="76" width="19" height="19" rx="3" fill="#ffffff" stroke="#dddddd"/>
+    </g>
+    <rect x="14" y="102" width="110" height="18" rx="4" fill="white" stroke="#cccccc"/>
+    <text x="20" y="115" font-family="monospace" font-size="9" fill="#333333">#2196F3</text>
+    <rect x="130" y="102" width="48" height="18" rx="4" fill="#2196f3"/>
+    <text x="154" y="115" font-family="sans-serif" font-size="9" fill="white" text-anchor="middle">Apply</text>
+</svg>

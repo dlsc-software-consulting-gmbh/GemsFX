@@ -11,6 +11,20 @@
 }
 
 /* ------------------------------------------------------------------
+ * Tray
+ *
+ * AtlantaFX gives a list view no background of its own, it relies on the cells being opaque.
+ * The two list views of the tray are stacked on top of each other, though, and the color used
+ * for their cells is a semi-transparent accent color, hence the search results and the page
+ * thumbnails would show through each other. Making the list views themselves opaque fixes that
+ * and at the same time turns the translucent cell color into the intended accent tint.
+ */
+.pdf-view > .border-pane > .tray > .search-result-list-view,
+.pdf-view > .border-pane > .tray > .thumbnail-list-view {
+    -fx-background-color: -color-bg-default;
+}
+
+/* ------------------------------------------------------------------
  * Search Result List View
  */
 .pdf-view > .border-pane > .tray > .search-result-list-view{

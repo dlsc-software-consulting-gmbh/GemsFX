@@ -2041,7 +2041,7 @@
 }
 
 .dialog-pane > .content-pane {
-    -fx-background-color: -color-bg-overlay;
+    -fx-background-color: -color-bg-default;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, .26), 20, 0.19, -1, 6);
 }
 

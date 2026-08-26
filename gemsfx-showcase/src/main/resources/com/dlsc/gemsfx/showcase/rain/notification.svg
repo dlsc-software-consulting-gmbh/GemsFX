@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="216" height="104" viewBox="0 0 216 104">
+    <rect width="216" height="104" rx="9" fill="#ffffff" stroke="#a8b2c0" stroke-width="1"/>
+    <path d="M0 9a9 9 0 0 1 9-9h6v104H9a9 9 0 0 1-9-9z" fill="#1565C0"/>
+    <circle cx="42" cy="34" r="16" fill="#e3f2fd"/>
+    <text x="42" y="39" font-family="sans-serif" font-size="13" fill="#1565C0" text-anchor="middle" font-weight="bold">DL</text>
+    <text x="68" y="28" font-family="sans-serif" font-size="10.5" fill="#222222" font-weight="bold">Build finished</text>
+    <text x="68" y="43" font-family="sans-serif" font-size="9" fill="#777777">All 248 tests passed in 42 s.</text>
+    <text x="196" y="28" font-family="sans-serif" font-size="8" fill="#aaaaaa" text-anchor="end">2 min ago</text>
+    <line x1="26" y1="60" x2="202" y2="60" stroke="#eeeeee" stroke-width="1"/>
+    <rect x="26" y="70" width="58" height="20" rx="5" fill="#1565C0"/>
+    <text x="55" y="84" font-family="sans-serif" font-size="9" fill="white" text-anchor="middle">Open log</text>
+    <rect x="92" y="70" width="52" height="20" rx="5" fill="#f5f5f5" stroke="#cccccc"/>
+    <text x="118" y="84" font-family="sans-serif" font-size="9" fill="#555555" text-anchor="middle">Dismiss</text>
+</svg>

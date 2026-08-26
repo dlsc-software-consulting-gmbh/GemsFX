@@ -13,14 +13,22 @@ import com.dlsc.gemsfx.util.StageManager;
 import com.dlsc.pdfviewfx.PDFBoxDocument;
 import com.dlsc.pdfviewfx.PDFView;
 import devtoolsfx.gui.GUI;
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.ParallelTransition;
 import javafx.animation.PauseTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
@@ -118,6 +126,17 @@ public class ShowcaseApp extends Application {
     private static final String PREF_SHOW_THUMBNAILS = "pdf.show.thumbnails";
     private static final String PREF_OPEN_IN_WINDOW = "demo.open.in.window";
     private static final String PREF_SHOW_HINT = "hint.show";
+    private static final String PREF_SHOW_WELCOME = "welcome.show";
+
+    /**
+     * The GitHub repository of the additional AtlantaFX themes used by the showcase.
+     */
+    private static final String THEMES_URL = "https://github.com/dlsc-software-consulting-gmbh/atlantafx-themes";
+
+    /**
+     * The GitHub repository of GemsFX itself.
+     */
+    private static final String REPOSITORY_URL = "https://github.com/dlsc-software-consulting-gmbh/GemsFX";
 
     private final Preferences preferences = Preferences.userNodeForPackage(ShowcaseApp.class);
     private final List<Stage> openDemoStages = new ArrayList<>();
@@ -151,6 +170,11 @@ public class ShowcaseApp extends Application {
     private ScrollPane sourcePane;
     private ShowcaseThemeManager themeManager;
     private Stage showcaseStage;
+    private StackPane sceneRoot;
+    private WelcomePane welcomePane;
+
+    /** Whether the welcome page currently covers the main user interface. */
+    private final BooleanProperty welcomeShowing = new SimpleBooleanProperty(this, "welcomeShowing");
 
     @Override
     public void start(Stage stage) {
@@ -171,17 +195,17 @@ public class ShowcaseApp extends Application {
         pdfView.showAllProperty().addListener(it -> preferences.putBoolean(PREF_SHOW_ALL, pdfView.isShowAll()));
         pdfView.showThumbnailsProperty().addListener(it -> preferences.putBoolean(PREF_SHOW_THUMBNAILS, pdfView.isShowThumbnails()));
 
-        placeholderLabel = new Label("Select a control to display its manual.");
+        placeholderLabel = new Label(ShowcaseBundle.get("manual.placeholder"));
         placeholderLabel.getStyleClass().add("placeholder-label");
 
-        downloadButton = createFloatingActionButton(MaterialDesign.MDI_DOWNLOAD, "Save the manual as a PDF file.");
+        downloadButton = createFloatingActionButton(MaterialDesign.MDI_DOWNLOAD, ShowcaseBundle.get("fab.download.tooltip"));
         downloadButton.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             if (evt.getButton() == MouseButton.PRIMARY) {
                 downloadManual(getSelectedEntry());
             }
         });
 
-        launchButton = createFloatingActionButton(MaterialDesign.MDI_PLAY, "Launch the demo application. Hold down SHIFT to open it in a separate window together with the developer tools.");
+        launchButton = createFloatingActionButton(MaterialDesign.MDI_PLAY, ShowcaseBundle.get("fab.launch.tooltip"));
         launchButton.getStyleClass().add(Styles.ACCENT);
         launchButton.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             ShowcaseEntry entry = getSelectedEntry();
@@ -189,8 +213,18 @@ public class ShowcaseApp extends Application {
                 launchDemo(entry, evt.isShiftDown());
             }
         });
+        // the button is also the default button of the window, hence pressing ENTER launches the
+        // demo of the selected control; the default button fires an action event and not a mouse
+        // event, so there is no SHIFT modifier to evaluate here - only the "open in window"
+        // setting of the status bar decides where the demo is shown
+        launchButton.setOnAction(evt -> {
+            ShowcaseEntry entry = getSelectedEntry();
+            if (entry != null && entry.hasDemo()) {
+                launchDemo(entry, false);
+            }
+        });
 
-        sourceButton = createFloatingActionButton(MaterialDesign.MDI_CODE_BRACES, "Show the source code of the demo application.");
+        sourceButton = createFloatingActionButton(MaterialDesign.MDI_CODE_BRACES, ShowcaseBundle.get("fab.source.tooltip"));
         sourceButton.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             if (evt.getButton() == MouseButton.PRIMARY) {
                 showSourceCode(getSelectedEntry());
@@ -250,17 +284,36 @@ public class ShowcaseApp extends Application {
         // currently selected demo application
         sourceDrawer = createSourceDrawer(mainBox);
 
+        /*
+         * ENTER launches the demo of the selected control, but only while the manual is really
+         * the front-most part of the user interface. A dialog (which may be a running demo) and
+         * the source code drawer bring default buttons and key handlers of their own, and so
+         * does the welcome page, hence the launch button must step back while one of them is
+         * showing.
+         */
+        launchButton.defaultButtonProperty().bind(launchButton.visibleProperty()
+                .and(welcomeShowing.not())
+                .and(dialogPane.showingDialogProperty().not())
+                .and(sourceDrawer.showDrawerProperty().not()));
+
         // the dialogs are shown on top of the content, the header bar and the status bar are
         // covered by glass panes of their own so that the entire window gets dimmed
         StackPane centerPane = new StackPane(sourceDrawer, dialogPane);
 
         BorderPane root = new BorderPane();
-        root.getStyleClass().add("showcase");
         root.setCenter(centerPane);
         root.setBottom(coverWithGlassPane(createStatusBar()));
 
-        Scene scene = new Scene(root, 1400, 900);
+        // the welcome page is stacked on top of the main user interface and covers the entire
+        // window; the "showcase" style class has to sit on the scene root because the theme
+        // manager adds the theme-related style classes ("modena-active", "dark-theme", ...)
+        // to the scene root as well
+        sceneRoot = new StackPane(root);
+        sceneRoot.getStyleClass().add("showcase");
+
+        Scene scene = new Scene(sceneRoot, 1400, 900);
         scene.getStylesheets().add(Objects.requireNonNull(ShowcaseApp.class.getResource("showcase.css")).toExternalForm());
+        scene.setNodeOrientation(nodeOrientation());
 
         themeManager = new ShowcaseThemeManager(scene, preferences);
         themeManager.darkThemeProperty().addListener(it -> Platform.runLater(() -> updateLeftSideWidth(leftSide)));
@@ -270,11 +323,15 @@ public class ShowcaseApp extends Application {
         updateTree();
         restoreSelection();
 
-        stage.setTitle("GemsFX Showcase");
+        stage.setTitle(ShowcaseBundle.get("app.title"));
         stage.setScene(scene);
         stage.setOnHidden(evt -> closeAllDemos());
 
         StageManager.install(stage, "com/dlsc/gemsfx/showcase", 1200, 800);
+
+        if (preferences.getBoolean(PREF_SHOW_WELCOME, true)) {
+            showWelcomePane(false);
+        }
 
         stage.show();
 
@@ -335,16 +392,25 @@ public class ShowcaseApp extends Application {
         logoView.setPreserveRatio(true);
         logoView.setFitHeight(20);
 
-        Label titleLabel = new Label("GemsFX Showcase");
+        Label titleLabel = new Label(ShowcaseBundle.get("app.title"));
         titleLabel.getStyleClass().add("title-label");
+
+        Hyperlink repositoryLink = new Hyperlink(ShowcaseBundle.get("header.repository"));
+        repositoryLink.setGraphic(new FontIcon(MaterialDesign.MDI_GITHUB_CIRCLE));
+        repositoryLink.getStyleClass().add("repository-link");
+        repositoryLink.setMinWidth(Region.USE_PREF_SIZE);
+        repositoryLink.setFocusTraversable(false);
+        repositoryLink.setTooltip(new Tooltip(ShowcaseBundle.get("header.repository.tooltip")));
+        repositoryLink.setOnAction(evt -> getHostServices().showDocument(REPOSITORY_URL));
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         MenuButton themeMenuButton = createThemeMenuButton();
         Button modeButton = createModeButton();
+        Button welcomeButton = createWelcomeButton();
 
-        HBox center = new HBox(10, logoView, titleLabel, spacer, themeMenuButton, modeButton);
+        HBox center = new HBox(10, logoView, titleLabel, repositoryLink, spacer, welcomeButton, themeMenuButton, modeButton);
         center.getStyleClass().add("header-content");
         center.setAlignment(Pos.CENTER_LEFT);
         center.setPadding(new Insets(0, 6, 0, 10));
@@ -354,6 +420,8 @@ public class ShowcaseApp extends Application {
         HeaderBar.setDragType(center, HeaderDragType.DRAGGABLE_SUBTREE);
         HeaderBar.setDragType(themeMenuButton, HeaderDragType.NONE);
         HeaderBar.setDragType(modeButton, HeaderDragType.NONE);
+        HeaderBar.setDragType(welcomeButton, HeaderDragType.NONE);
+        HeaderBar.setDragType(repositoryLink, HeaderDragType.NONE);
 
         HeaderBar headerBar = new HeaderBar();
         headerBar.getStyleClass().add("showcase-header-bar");
@@ -378,7 +446,7 @@ public class ShowcaseApp extends Application {
      * Creates the group of window buttons shown inside of the header bar. The buttons are
      * provided by AtlantaFX, but their order depends on the operating system.
      */
-    private HeaderButtonGroup createHeaderButtonGroup() {
+    static HeaderButtonGroup createHeaderButtonGroup() {
         if (System.getProperty("os.name", "").toLowerCase().contains("mac")) {
             return new HeaderButtonGroup(
                     new HeaderButton(HeaderButtonType.CLOSE),
@@ -389,12 +457,92 @@ public class ShowcaseApp extends Application {
         return HeaderButtonGroup.standardGroup();
     }
 
+    /**
+     * Creates the header bar button that brings the welcome page back.
+     */
+    private Button createWelcomeButton() {
+        Button button = new Button(null, new FontIcon(MaterialDesign.MDI_DIAMOND));
+        button.getStyleClass().addAll("welcome-button", Styles.BUTTON_ICON, Styles.FLAT);
+        button.setFocusTraversable(false);
+        button.setTooltip(new Tooltip(ShowcaseBundle.get("header.welcome.tooltip")));
+        button.setOnAction(evt -> showWelcomePane(true));
+        return button;
+    }
+
+    // -----------------------------------------------------------------------
+    // welcome page
+    // -----------------------------------------------------------------------
+
+    /**
+     * Shows the welcome page on top of the main user interface and starts the rain of user
+     * interface graphics in its background.
+     *
+     * @param animated whether the page fades in (when brought back via the header bar button)
+     *                 or appears immediately (at startup)
+     */
+    private void showWelcomePane(boolean animated) {
+        if (welcomePane == null) {
+            welcomePane = new WelcomePane(showcaseStage);
+            welcomePane.setOnExplore(this::hideWelcomePane);
+            welcomePane.doNotShowAgainProperty().addListener(it -> preferences.putBoolean(PREF_SHOW_WELCOME, !welcomePane.isDoNotShowAgain()));
+        }
+
+        welcomePane.setDoNotShowAgain(!preferences.getBoolean(PREF_SHOW_WELCOME, true));
+
+        if (!sceneRoot.getChildren().contains(welcomePane)) {
+            sceneRoot.getChildren().add(welcomePane);
+        }
+
+        welcomePane.setScaleX(1);
+        welcomePane.setScaleY(1);
+        welcomePane.setTranslateY(0);
+        welcomePane.play();
+
+        welcomeShowing.set(true);
+
+        if (animated) {
+            welcomePane.setOpacity(0);
+            FadeTransition fade = new FadeTransition(Duration.millis(300), welcomePane);
+            fade.setToValue(1);
+            fade.play();
+        } else {
+            welcomePane.setOpacity(1);
+        }
+    }
+
+    /**
+     * Reveals the main user interface: the welcome page fades out while slightly scaling up
+     * and sliding towards the top, then it gets removed from the scene.
+     */
+    private void hideWelcomePane() {
+        Duration duration = Duration.millis(450);
+
+        FadeTransition fade = new FadeTransition(duration, welcomePane);
+        fade.setToValue(0);
+
+        ScaleTransition scale = new ScaleTransition(duration, welcomePane);
+        scale.setToX(1.05);
+        scale.setToY(1.05);
+
+        TranslateTransition slide = new TranslateTransition(duration, welcomePane);
+        slide.setToY(-40);
+        slide.setInterpolator(Interpolator.EASE_IN);
+
+        ParallelTransition exit = new ParallelTransition(fade, scale, slide);
+        exit.setOnFinished(evt -> {
+            welcomePane.stopAnimation();
+            sceneRoot.getChildren().remove(welcomePane);
+            welcomeShowing.set(false);
+        });
+        exit.play();
+    }
+
     private MenuButton createThemeMenuButton() {
         MenuButton menuButton = new MenuButton(themeText(themeManager.getThemeFamily()));
         menuButton.getStyleClass().addAll("theme-menu-button", Styles.FLAT, Styles.SMALL);
         menuButton.setFocusTraversable(false);
         menuButton.setMaxHeight(Region.USE_PREF_SIZE);
-        menuButton.setTooltip(new Tooltip("Select the color theme"));
+        menuButton.setTooltip(new Tooltip(ShowcaseBundle.get("header.theme.tooltip")));
 
         ToggleGroup group = new ToggleGroup();
         for (ThemeFamily family : ThemeFamily.ALL_FAMILIES) {
@@ -423,7 +571,7 @@ public class ShowcaseApp extends Application {
     }
 
     private String themeText(ThemeFamily family) {
-        return "Theme: " + family.name();
+        return ShowcaseBundle.format("header.theme.text", family.name());
     }
 
     /**
@@ -448,8 +596,8 @@ public class ShowcaseApp extends Application {
 
     /**
      * Creates the status bar shown at the bottom of the window. The status bar displays the name
-     * of the currently selected control and the settings that control how the demos are being
-     * launched.
+     * of the currently selected control, a link to the themes used by the showcase, and the
+     * settings that control how the demos are being launched.
      */
     private HBox createStatusBar() {
         statusLabel = new Label();
@@ -458,14 +606,22 @@ public class ShowcaseApp extends Application {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        openInWindowBox = new CheckBox("Open demos in separate window");
+        Hyperlink themesLink = new Hyperlink(ShowcaseBundle.get("status.themes"));
+        themesLink.getStyleClass().add("themes-link");
+        themesLink.setMinWidth(Region.USE_PREF_SIZE);
+        themesLink.setFocusTraversable(false);
+        themesLink.setTooltip(new Tooltip(ShowcaseBundle.get("status.themes.tooltip")));
+        themesLink.setOnAction(evt -> getHostServices().showDocument(THEMES_URL));
+
+        openInWindowBox = new CheckBox(ShowcaseBundle.get("status.openInWindow"));
+        openInWindowBox.setMinWidth(Region.USE_PREF_SIZE);
         openInWindowBox.getStyleClass().add("open-in-window-box");
         openInWindowBox.setFocusTraversable(false);
         openInWindowBox.setSelected(preferences.getBoolean(PREF_OPEN_IN_WINDOW, false));
-        openInWindowBox.setTooltip(new Tooltip("If not selected then the demos will be shown as an overlay inside the showcase window."));
+        openInWindowBox.setTooltip(new Tooltip(ShowcaseBundle.get("status.openInWindow.tooltip")));
         openInWindowBox.selectedProperty().addListener(it -> preferences.putBoolean(PREF_OPEN_IN_WINDOW, openInWindowBox.isSelected()));
 
-        HBox statusBar = new HBox(10, statusLabel, spacer, openInWindowBox);
+        HBox statusBar = new HBox(10, statusLabel, spacer, themesLink, openInWindowBox);
         statusBar.getStyleClass().add("status-bar");
         statusBar.setAlignment(Pos.CENTER_LEFT);
 
@@ -478,7 +634,7 @@ public class ShowcaseApp extends Application {
         }
 
         if (entry == null) {
-            statusLabel.setText(ShowcaseRegistry.ALL_ENTRIES.size() + " controls");
+            statusLabel.setText(ShowcaseBundle.format("status.controls", ShowcaseRegistry.ALL_ENTRIES.size()));
         } else {
             statusLabel.setText(entry.category() + "  \u203a  " + entry.name());
         }
@@ -486,7 +642,8 @@ public class ShowcaseApp extends Application {
 
     /**
      * Creates a single icon button that cycles through the available theme modes (light, dark,
-     * and system).
+     * and system). The button is only visible when the currently selected theme family comes
+     * with a light and a dark variant.
      */
     private Button createModeButton() {
         Button button = new Button();
@@ -505,16 +662,12 @@ public class ShowcaseApp extends Application {
             };
 
             ((FontIcon) button.getGraphic()).setIconCode(icon);
-
-            if (themeManager.getThemeFamily().isModena()) {
-                button.getTooltip().setText("The standard JavaFX theme only supports a light color scheme");
-            } else {
-                button.getTooltip().setText("Color scheme: " + mode.getDisplayName() + " (click to switch)");
-            }
+            button.getTooltip().setText(ShowcaseBundle.format("header.mode.tooltip", mode.getDisplayName()));
         };
 
-        // the standard JavaFX theme does not come with a dark variant
-        button.disableProperty().bind(Bindings.createBooleanBinding(() -> themeManager.getThemeFamily().isModena(), themeManager.themeFamilyProperty()));
+        // theme families with only a single variant do not offer a choice
+        button.visibleProperty().bind(Bindings.createBooleanBinding(() -> themeManager.getThemeFamily().hasBothVariants(), themeManager.themeFamilyProperty()));
+        button.managedProperty().bind(button.visibleProperty());
 
         button.setOnAction(evt -> {
             ThemeMode[] modes = ThemeMode.values();
@@ -522,7 +675,6 @@ public class ShowcaseApp extends Application {
         });
 
         themeManager.themeModeProperty().addListener(it -> updateButton.run());
-        themeManager.themeFamilyProperty().addListener(it -> updateButton.run());
         updateButton.run();
 
         return button;
@@ -592,7 +744,7 @@ public class ShowcaseApp extends Application {
         FontIcon icon = new FontIcon(MaterialDesign.MDI_INFORMATION_OUTLINE);
         icon.getStyleClass().add("hint-icon");
 
-        Label textLabel = new Label("Double-click a control or use the play button to launch its demo. Hold down SHIFT to launch it in a window of its own together with the developer tools.");
+        Label textLabel = new Label(ShowcaseBundle.get("hint.text"));
         textLabel.getStyleClass().add("hint-label");
         textLabel.setWrapText(true);
 
@@ -603,7 +755,7 @@ public class ShowcaseApp extends Application {
         banner.getStyleClass().add("hint-banner");
         banner.setAlignment(Pos.CENTER_LEFT);
 
-        Hyperlink doNotShowLink = new Hyperlink("Do not show again");
+        Hyperlink doNotShowLink = new Hyperlink(ShowcaseBundle.get("hint.doNotShow"));
         doNotShowLink.getStyleClass().add("hint-link");
         doNotShowLink.setFocusTraversable(false);
         doNotShowLink.setOnAction(evt -> hideHintBanner(banner, true));
@@ -611,7 +763,7 @@ public class ShowcaseApp extends Application {
         Button closeButton = new Button(null, new FontIcon(MaterialDesign.MDI_CLOSE));
         closeButton.getStyleClass().addAll("hint-close-button", Styles.BUTTON_ICON, Styles.FLAT);
         closeButton.setFocusTraversable(false);
-        closeButton.setTooltip(new Tooltip("Hide this hint"));
+        closeButton.setTooltip(new Tooltip(ShowcaseBundle.get("hint.close.tooltip")));
         closeButton.setOnAction(evt -> hideHintBanner(banner, false));
 
         banner.getChildren().addAll(icon, textLabel, spacer, doNotShowLink, closeButton);
@@ -695,6 +847,17 @@ public class ShowcaseApp extends Application {
     }
 
     /**
+     * Returns the orientation that matches the language of the user interface. Languages such
+     * as Arabic are written from right to left, in which case the entire user interface has to
+     * be mirrored.
+     */
+    private NodeOrientation nodeOrientation() {
+        String language = ShowcaseBundle.getLocale().getLanguage();
+        boolean rightToLeft = List.of("ar", "fa", "he", "iw", "ur").contains(language);
+        return rightToLeft ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT;
+    }
+
+    /**
      * Loads the font that is used for displaying source code. The font is shipped with the
      * showcase, hence it is available no matter which fonts are installed on the machine of
      * the user.
@@ -735,18 +898,18 @@ public class ShowcaseApp extends Application {
         drawer.setPreferredDrawerWidth(Double.MAX_VALUE);
         drawer.setDrawerContent(sourcePane);
 
-        Button copyButton = new Button("Copy");
+        Button copyButton = new Button(ShowcaseBundle.get("source.copy"));
         copyButton.setFocusTraversable(false);
-        copyButton.setTooltip(new Tooltip("Copy the source code to the clipboard."));
+        copyButton.setTooltip(new Tooltip(ShowcaseBundle.get("source.copy.tooltip")));
         copyButton.disableProperty().bind(currentSource.isNull());
 
         // the label of the button confirms the copy operation for a moment
         PauseTransition copyFeedbackDelay = new PauseTransition(Duration.seconds(2));
-        copyFeedbackDelay.setOnFinished(evt -> copyButton.setText("Copy"));
+        copyFeedbackDelay.setOnFinished(evt -> copyButton.setText(ShowcaseBundle.get("source.copy")));
 
         copyButton.setOnAction(evt -> copySourceCode(copyButton, copyFeedbackDelay));
 
-        Button closeButton = new Button("Close");
+        Button closeButton = new Button(ShowcaseBundle.get("source.close"));
         closeButton.setFocusTraversable(false);
         closeButton.setOnAction(evt -> drawer.setShowDrawer(false));
 
@@ -768,7 +931,7 @@ public class ShowcaseApp extends Application {
         content.putString(source);
         Clipboard.getSystemClipboard().setContent(content);
 
-        copyButton.setText("Copied");
+        copyButton.setText(ShowcaseBundle.get("source.copied"));
         feedbackDelay.playFromStart();
     }
 
@@ -785,12 +948,12 @@ public class ShowcaseApp extends Application {
         String source = entry.loadDemoSource();
         currentSource.set(source);
 
-        sourceDrawer.setDrawerTitle("Source Code: " + entry.name());
+        sourceDrawer.setDrawerTitle(ShowcaseBundle.format("source.title", entry.name()));
 
         // MDFX applies syntax highlighting to fenced code blocks
         sourceView.setMdString(source != null
                 ? "```java\n" + source + "\n```"
-                : "*The source code of this demo application can not be found.*");
+                : ShowcaseBundle.get("source.notFound"));
 
         sourcePane.setVvalue(0);
         sourceDrawer.setShowDrawer(true);
@@ -805,9 +968,9 @@ public class ShowcaseApp extends Application {
         }
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Manual");
+        fileChooser.setTitle(ShowcaseBundle.get("manual.save.title"));
         fileChooser.setInitialFileName(entry.manual() + ".pdf");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(ShowcaseBundle.get("manual.save.filter"), "*.pdf"));
 
         File file = fileChooser.showSaveDialog(manualPane.getScene().getWindow());
         if (file == null) {
@@ -816,12 +979,12 @@ public class ShowcaseApp extends Application {
 
         try (InputStream stream = entry.openManual()) {
             if (stream == null) {
-                showError("The manual for \"" + entry.name() + "\" can not be found.");
+                showError(ShowcaseBundle.format("manual.save.notFound", entry.name()));
             } else {
                 Files.copy(stream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception ex) {
-            showError("The manual for \"" + entry.name() + "\" can not be saved.\n\n" + ex.getMessage());
+            showError(ShowcaseBundle.format("manual.save.error", entry.name(), ex.getMessage()));
         }
     }
 
@@ -864,7 +1027,7 @@ public class ShowcaseApp extends Application {
 
         if (entry == null) {
             pdfView.unload();
-            setManualVisible(false, "Select a control to display its manual.");
+            setManualVisible(false, ShowcaseBundle.get("manual.placeholder"));
             return;
         }
 
@@ -893,7 +1056,7 @@ public class ShowcaseApp extends Application {
             PDFView.Document document = task.getValue();
             if (document == null) {
                 pdfView.unload();
-                setManualVisible(false, "No manual available for \"" + entry.name() + "\".");
+                setManualVisible(false, ShowcaseBundle.format("manual.none", entry.name()));
             } else {
                 pdfView.setDocument(document);
                 setManualVisible(true, null);
@@ -905,7 +1068,7 @@ public class ShowcaseApp extends Application {
                 return;
             }
             pdfView.unload();
-            setManualVisible(false, "The manual for \"" + entry.name() + "\" can not be displayed.");
+            setManualVisible(false, ShowcaseBundle.format("manual.error", entry.name()));
         });
 
         manualLoaderService.execute(task);
@@ -951,8 +1114,8 @@ public class ShowcaseApp extends Application {
         try {
             demo = DemoEmbedder.embed(entry.createDemo());
         } catch (Exception ex) {
-            dialogPane.showError("Launch Error", "The demo for \"" + entry.name()
-                    + "\" can not be shown inside the showcase window. It will be opened in a separate window instead.", ex);
+            dialogPane.showError(ShowcaseBundle.get("demo.error.title"),
+                    ShowcaseBundle.format("demo.error.embedded", entry.name()), ex);
             launchDemoStage(entry, false);
             return;
         }
@@ -1012,8 +1175,8 @@ public class ShowcaseApp extends Application {
             }
         } catch (Exception ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Launch Error");
-            alert.setHeaderText("Failed to launch the demo for \"" + entry.name() + "\"");
+            alert.setTitle(ShowcaseBundle.get("demo.error.title"));
+            alert.setHeaderText(ShowcaseBundle.format("demo.error.header", entry.name()));
             alert.setContentText(ex.getMessage());
             alert.show();
         }

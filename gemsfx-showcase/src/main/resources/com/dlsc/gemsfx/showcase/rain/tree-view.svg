@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="188" height="148" viewBox="0 0 188 148">
+    <rect width="188" height="148" rx="7" fill="#ffffff" stroke="#a8b2c0" stroke-width="1"/>
+    <text x="14" y="20" font-family="sans-serif" font-size="10" fill="#333" font-weight="bold">Controls Library</text>
+    <line x1="22" y1="28" x2="22" y2="142" stroke="#e0e0e0" stroke-width="1.5"/>
+    <polygon points="14,29 22,35 14,41" fill="#888888"/>
+    <polygon points="24,44 32,50 24,56" fill="#1565C0"/>
+    <polygon points="24,94 32,100 24,106" fill="#1565C0"/>
+    <g stroke="#e0e0e0" stroke-width="1.5">
+        <line x1="22" y1="50" x2="32" y2="50"/>
+        <line x1="32" y1="68" x2="44" y2="68"/>
+        <line x1="32" y1="84" x2="44" y2="84"/>
+        <line x1="22" y1="100" x2="32" y2="100"/>
+        <line x1="32" y1="118" x2="44" y2="118"/>
+        <line x1="22" y1="136" x2="32" y2="136"/>
+    </g>
+    <g fill="#42A5F5">
+        <rect x="40" y="63" width="8" height="8" rx="2"/>
+        <rect x="40" y="79" width="8" height="8" rx="2"/>
+        <rect x="40" y="113" width="8" height="8" rx="2"/>
+        <rect x="28" y="131" width="8" height="8" rx="2"/>
+    </g>
+    <g font-family="sans-serif" font-size="9" fill="#333333">
+        <text x="30" y="39">com.dlsc</text>
+        <text x="40" y="54">controls</text>
+        <text x="40" y="104">gantt</text>
+    </g>
+    <g font-family="sans-serif" font-size="9" fill="#555555">
+        <text x="54" y="70">CalendarFX.java</text>
+        <text x="54" y="86">GemsFX.java</text>
+        <text x="54" y="120">FlexGanttFX.java</text>
+        <text x="42" y="138">PDFViewFX.java</text>
+    </g>
+</svg>

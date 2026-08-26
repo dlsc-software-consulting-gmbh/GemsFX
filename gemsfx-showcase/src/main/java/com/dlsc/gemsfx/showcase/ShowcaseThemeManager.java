@@ -22,9 +22,9 @@ import java.util.prefs.Preferences;
  * operating system and switches between the light and the dark variant of the family
  * accordingly. The current selection is stored in the user preferences.
  * <p>
- * The special family {@link ThemeFamily#MODENA} switches the application back to the standard
- * JavaFX theme, in which case no AtlantaFX styling is applied at all and the theme mode is
- * being ignored.
+ * Theme families that only exist in a single variant ignore the theme mode altogether, and so
+ * does the special family {@link ThemeFamily#MODENA}, which switches the application back to
+ * the standard JavaFX theme without applying any AtlantaFX styling at all.
  */
 public class ShowcaseThemeManager {
 
@@ -59,12 +59,19 @@ public class ShowcaseThemeManager {
     private void updateTheme() {
         ThemeFamily family = getThemeFamily();
 
-        // the standard JavaFX theme only exists in a light variant
-        boolean dark = !family.isModena() && switch (getThemeMode()) {
-            case LIGHT -> false;
-            case DARK -> true;
-            case SYSTEM -> Platform.getPreferences().getColorScheme() == ColorScheme.DARK;
-        };
+        // families with a single variant (including the standard JavaFX theme) ignore the mode
+        boolean dark;
+        if (family.isModena()) {
+            dark = false;
+        } else if (!family.hasBothVariants()) {
+            dark = family.isDarkOnly();
+        } else {
+            dark = switch (getThemeMode()) {
+                case LIGHT -> false;
+                case DARK -> true;
+                case SYSTEM -> Platform.getPreferences().getColorScheme() == ColorScheme.DARK;
+            };
+        }
 
         // the system property ensures that the demo applications use the same styling
         if (family.isModena()) {

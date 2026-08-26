@@ -1,4 +1,5 @@
 open module com.dlsc.gemsfx.showcase {
+    requires java.logging;
     requires java.prefs;
 
     requires com.dlsc.gemsfx;

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="178" height="130" viewBox="0 0 178 130">
+    <rect width="178" height="130" rx="7" fill="#fafafa" stroke="#a8b2c0" stroke-width="1"/>
+    <text x="14" y="22" font-family="sans-serif" font-size="10" fill="#333" font-weight="bold">Options</text>
+    <circle cx="22" cy="40" r="7" fill="white" stroke="#1565C0" stroke-width="2"/>
+    <circle cx="22" cy="40" r="3.5" fill="#1565C0"/>
+    <circle cx="22" cy="62" r="7" fill="white" stroke="#cccccc" stroke-width="1.5"/>
+    <circle cx="22" cy="84" r="7" fill="white" stroke="#cccccc" stroke-width="1.5"/>
+    <g font-family="sans-serif" font-size="10" fill="#333333">
+        <text x="36" y="44">JavaFX 21 LTS</text>
+        <text x="36" y="66">JavaFX 24</text>
+        <text x="36" y="88">JavaFX 25</text>
+        <text x="14" y="120">Dark theme</text>
+    </g>
+    <line x1="14" y1="100" x2="164" y2="100" stroke="#eeeeee" stroke-width="1"/>
+    <rect x="112" y="108" width="38" height="16" rx="8" fill="#1565C0"/>
+    <circle cx="142" cy="116" r="6" fill="white"/>
+</svg>
