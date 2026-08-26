@@ -1,0 +1,130 @@
+name: Bug report
+description: Report a problem with a GemsFX control or utility
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report!
+
+        Please use [Discussions](https://github.com/dlsc-software-consulting-gmbh/GemsFX/discussions)
+        for questions and [SECURITY.md](https://github.com/dlsc-software-consulting-gmbh/GemsFX/blob/master/.github/SECURITY.md)
+        for security problems.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight checklist
+      options:
+        - label: I searched the existing issues and did not find a duplicate.
+          required: true
+        - label: I am using the latest released version of GemsFX (or I checked that the problem still exists there).
+          required: true
+
+  - type: input
+    id: control
+    attributes:
+      label: Affected control or class
+      description: Which control, skin or utility is affected?
+      placeholder: "e.g. CalendarView, SearchField, SessionManager"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce the problem?
+      placeholder: |
+        1. Start the sample application below
+        2. Click on ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: sample
+    attributes:
+      label: Minimal reproducible example
+      description: >
+        A small, self-contained JavaFX application that shows the problem. This is by far the most
+        helpful thing you can provide.
+      render: java
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include the full stack trace if an exception is thrown.
+    validations:
+      required: true
+
+  - type: input
+    id: gemsfx-version
+    attributes:
+      label: GemsFX version
+      placeholder: "e.g. 4.4.1"
+    validations:
+      required: true
+
+  - type: input
+    id: java-version
+    attributes:
+      label: Java version
+      placeholder: "e.g. Temurin 21.0.5"
+    validations:
+      required: true
+
+  - type: input
+    id: javafx-version
+    attributes:
+      label: JavaFX version
+      placeholder: "e.g. 21.0.5"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Screenshots or additional context
+      description: Screenshots, videos, custom CSS or anything else that helps.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: code-of-conduct
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow this project's [Code of Conduct](https://github.com/dlsc-software-consulting-gmbh/GemsFX/blob/master/.github/CODE_OF_CONDUCT.md).
+          required: true

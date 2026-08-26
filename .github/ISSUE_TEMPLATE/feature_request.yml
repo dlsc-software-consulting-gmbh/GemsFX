@@ -1,0 +1,87 @@
+name: Feature request
+description: Suggest a new control, a new API or an improvement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping to improve GemsFX! For open-ended ideas you may also start a
+        [Discussion](https://github.com/dlsc-software-consulting-gmbh/GemsFX/discussions) first.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight checklist
+      options:
+        - label: I searched the existing issues and discussions and did not find a duplicate.
+          required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Type of request
+      options:
+        - New control
+        - New feature or API for an existing control
+        - Styling / CSS improvement
+        - Accessibility improvement
+        - Localization / new translation
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: control
+    attributes:
+      label: Related control or package
+      description: Leave empty if this is about a completely new control.
+      placeholder: "e.g. DurationPicker, com.dlsc.gemsfx.paging"
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Which problem would this solve? What are you trying to build?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: >
+        Describe the control or API you have in mind. Sketches, mockups, links to similar controls
+        in other toolkits and example code are all welcome.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds you tried or other approaches you rejected.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: contribute
+    attributes:
+      label: Are you willing to contribute this?
+      options:
+        - "Yes, I would like to implement it"
+        - "Yes, with guidance from a maintainer"
+        - "No, I am only suggesting the idea"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: code-of-conduct
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow this project's [Code of Conduct](https://github.com/dlsc-software-consulting-gmbh/GemsFX/blob/master/.github/CODE_OF_CONDUCT.md).
+          required: true

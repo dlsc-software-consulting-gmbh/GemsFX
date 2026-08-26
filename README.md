@@ -5,7 +5,7 @@
 [![JavaFX Version](https://img.shields.io/badge/JavaFX_Version-17+-brightgreen)](https://github.com/openjdk/jfx)
 
 > Install the GemsFX demo launcher locally via jdeploy: [https://www.jdeploy.com/~gemsfxdemo](https://www.jdeploy.com/~gemsfxdemo)
-> The demo will automatically update itself when new versions of GemsFX are released. You can also run the demo via Maven (see below).
+> The demo will automatically update itself when new versions of GemsFX are released. You can also run the showcase application via Maven (see below).
 
 # GemsFX
 
@@ -14,19 +14,27 @@ GemsFX is a collection of custom controls and utilities for JavaFX. The website 
 The `gemsfx` library module targets **Java 11** and **JavaFX 17+**. The `gemsfx-demo` and
 `gemsfx-showcase` modules use **Java 24** / **JavaFX 25.0.2**.
 
-## Showcase
+## Running the showcase
 
-The `gemsfx-showcase` module contains a single application that lists all controls of the library,
-grouped by category and filterable via a search field. Selecting a control shows the PDF manual of
-that control (taken from `docs/manuals`), double-clicking a control additionally launches its demo
-application. Holding down the shift key while double-clicking also opens the developer tools for the
-launched demo. The application uses AtlantaFX for its styling and supports switching between the
-light, the dark and the system color scheme.
+The `gemsfx-showcase` module contains a single application that lists all controls of the library
+and is the recommended way to explore GemsFX. Run it with Maven:
 
 ```bash
-# run the showcase application
 mvn javafx:run -f gemsfx-showcase/pom.xml
 ```
+
+The controls are grouped by category and can be filtered via a search field:
+
+- **Selecting** a control shows the PDF manual of that control (taken from `docs/manuals`).
+- **Double-clicking** a control launches the demo application of that control.
+- **Shift + double-click** additionally opens the developer tools for the launched demo.
+
+The application uses AtlantaFX for its styling and supports switching between the light, the dark
+and the system color scheme.
+
+Alternatively, the demo launcher can be installed locally via
+[jdeploy](https://www.jdeploy.com/~gemsfxdemo). It updates itself whenever a new version of GemsFX
+is released.
 
 ## Testing
 
@@ -577,24 +585,18 @@ another.
 The TextView control can be used for displaying multi-line text. It includes the ability to select and 
 copy text.
 
-## Running the demos
+## Contributing
 
-You can run the demos using Maven by typing any of the following lines into your
-terminal:
+Contributions are very welcome! Please read the
+[contributing guidelines](.github/CONTRIBUTING.md) before opening a pull request — they describe the
+build, the testing setup and the conventions used for controls, skins, CSS, properties,
+accessibility and localization.
 
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.DialogPaneApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.DrawerStackPaneApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.DurationPickerApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.EmailFieldApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.EnhancedLabelApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.ExpandingTextAreaApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.FilterViewApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.InfoCenterApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PaymentOptionApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PaymentOptionTilesApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.PhotoViewApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.ResizableTextAreaApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.SearchFieldApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.SearchTextFieldApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.TagsFieldApp
-    mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.TimePickerApp
+- [Code of Conduct](.github/CODE_OF_CONDUCT.md)
+- [Support and questions](.github/SUPPORT.md) — please use
+  [Discussions](https://github.com/dlsc-software-consulting-gmbh/GemsFX/discussions) for questions
+- [Security policy](.github/SECURITY.md) — never report vulnerabilities in public issues
+
+## License
+
+GemsFX is licensed under the [Apache License 2.0](LICENSE).

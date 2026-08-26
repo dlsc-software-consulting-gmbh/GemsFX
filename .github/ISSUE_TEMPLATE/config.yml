@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or usage help
+    url: https://github.com/dlsc-software-consulting-gmbh/GemsFX/discussions
+    about: Ask questions, share ideas and get help from the community in GitHub Discussions.
+  - name: Documentation, Javadoc and control manuals
+    url: https://gemsfx.dlsc.com
+    about: API documentation, CSS reference and the manuals of all controls.
+  - name: Report a security vulnerability
+    url: https://github.com/dlsc-software-consulting-gmbh/GemsFX/security/policy
+    about: Please report security problems privately, never as a public issue.
+  - name: Commercial support, training and consulting
+    url: https://www.dlsc.com
+    about: DLSC Software & Consulting offers professional JavaFX services around GemsFX.
