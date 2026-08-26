@@ -9,7 +9,7 @@
     <parent>
         <groupId>com.dlsc.gemsfx</groupId>
         <artifactId>parent</artifactId>
-        <version>4.4.1</version>
+        <version>4.4.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -45,6 +45,26 @@
     </properties>
 
     <build>
+        <resources>
+            <!-- everything but the build properties is copied as it is, the property files of
+                 the resource bundles must not be touched by the filtering -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>com/dlsc/gemsfx/showcase/build.properties</exclude>
+                </excludes>
+            </resource>
+            <!-- the build properties carry the version of the project into the application -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>com/dlsc/gemsfx/showcase/build.properties</include>
+                </includes>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

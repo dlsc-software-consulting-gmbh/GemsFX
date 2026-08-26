@@ -7,12 +7,15 @@ import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HeaderBar;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -41,6 +44,9 @@ public class WelcomePane extends StackPane {
     private final CheckBox doNotShowBox;
 
     private Runnable onExplore;
+    private double dragOffsetX;
+    private double dragOffsetY;
+    private boolean dragging;
 
     public WelcomePane(Stage stage) {
         getStyleClass().add("welcome-pane");
@@ -98,6 +104,58 @@ public class WelcomePane extends StackPane {
 
         // the rain of user interface graphics sits behind the foreground content
         getChildren().addAll(controlRain, contentBox, headerBar);
+
+        installWindowDragging(stage, headerBar);
+    }
+
+    /**
+     * Makes the entire welcome page behave like the drag area of the window. The page covers the
+     * whole window, hence the header bar of the showcase - the area that usually moves the window -
+     * is not reachable while the page is showing. Dragging anywhere on the page therefore moves the
+     * window, except on the header bar of the page itself, which is a native drag area already, and
+     * except while the window is maximized or in full screen.
+     *
+     * @param stage     the window moved by the drag gesture
+     * @param headerBar the header bar of the page, which handles dragging on its own
+     */
+    private void installWindowDragging(Stage stage, HeaderBar headerBar) {
+        addEventHandler(MouseEvent.MOUSE_PRESSED, evt -> {
+            dragging = evt.getButton() == MouseButton.PRIMARY
+                    && !stage.isMaximized()
+                    && !stage.isFullScreen()
+                    && !isInsideHeaderBar(evt, headerBar);
+
+            if (dragging) {
+                dragOffsetX = evt.getScreenX() - stage.getX();
+                dragOffsetY = evt.getScreenY() - stage.getY();
+            }
+        });
+
+        addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
+            if (dragging) {
+                stage.setX(evt.getScreenX() - dragOffsetX);
+                stage.setY(evt.getScreenY() - dragOffsetY);
+            }
+        });
+
+        addEventHandler(MouseEvent.MOUSE_RELEASED, evt -> dragging = false);
+    }
+
+    /**
+     * Determines whether the given mouse event happened on the header bar of the page, which
+     * includes the window buttons.
+     */
+    private boolean isInsideHeaderBar(MouseEvent evt, HeaderBar headerBar) {
+        Node node = evt.getPickResult().getIntersectedNode();
+
+        while (node != null) {
+            if (node == headerBar) {
+                return true;
+            }
+            node = node.getParent();
+        }
+
+        return false;
     }
 
     /**

@@ -163,6 +163,7 @@ public class ShowcaseApp extends Application {
     private Label statusLabel;
     private Label placeholderLabel;
     private Button launchButton;
+    private boolean launchInSeparateWindow;
     private Button downloadButton;
     private Button sourceButton;
     private DrawerStackPane sourceDrawer;
@@ -207,20 +208,17 @@ public class ShowcaseApp extends Application {
 
         launchButton = createFloatingActionButton(MaterialDesign.MDI_PLAY, ShowcaseBundle.get("fab.launch.tooltip"));
         launchButton.getStyleClass().add(Styles.ACCENT);
-        launchButton.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-            ShowcaseEntry entry = getSelectedEntry();
-            if (evt.getButton() == MouseButton.PRIMARY && entry != null && entry.hasDemo()) {
-                launchDemo(entry, evt.isShiftDown());
-            }
-        });
-        // the button is also the default button of the window, hence pressing ENTER launches the
-        // demo of the selected control; the default button fires an action event and not a mouse
-        // event, so there is no SHIFT modifier to evaluate here - only the "open in window"
-        // setting of the status bar decides where the demo is shown
+        // the launch button reacts to action events only, so that a mouse click and the ENTER key
+        // (the button is the default button of the window) both trigger exactly one launch; the
+        // SHIFT modifier is not part of an action event, hence it is remembered while the mouse
+        // button is pressed and evaluated - and reset - when the action finally arrives
+        launchButton.addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> launchInSeparateWindow = evt.isShiftDown());
         launchButton.setOnAction(evt -> {
+            boolean separateWindow = launchInSeparateWindow;
+            launchInSeparateWindow = false;
             ShowcaseEntry entry = getSelectedEntry();
             if (entry != null && entry.hasDemo()) {
-                launchDemo(entry, false);
+                launchDemo(entry, separateWindow);
             }
         });
 
@@ -323,7 +321,7 @@ public class ShowcaseApp extends Application {
         updateTree();
         restoreSelection();
 
-        stage.setTitle(ShowcaseBundle.get("app.title"));
+        stage.setTitle(titleWithVersion());
         stage.setScene(scene);
         stage.setOnHidden(evt -> closeAllDemos());
 
@@ -387,12 +385,24 @@ public class ShowcaseApp extends Application {
     // header bar
     // -----------------------------------------------------------------------
 
+    /**
+     * Returns the name of the application followed by the version of the GemsFX library, for
+     * example "GemsFX Showcase 4.4.2". The version is omitted when it cannot be determined.
+     */
+    private static String titleWithVersion() {
+        String title = ShowcaseBundle.get("app.title");
+        String version = ShowcaseVersion.get();
+        return version.isEmpty() ? title : title + " " + version;
+    }
+
     private HeaderBar createHeaderBar(Stage stage) {
         ImageView logoView = new ImageView(new Image(Objects.requireNonNull(ShowcaseApp.class.getResourceAsStream("gems.png"))));
         logoView.setPreserveRatio(true);
         logoView.setFitHeight(20);
 
-        Label titleLabel = new Label(ShowcaseBundle.get("app.title"));
+        // the title of the application always shows the version of the library, e.g.
+        // "GemsFX Showcase 4.4.2"
+        Label titleLabel = new Label(titleWithVersion());
         titleLabel.getStyleClass().add("title-label");
 
         Hyperlink repositoryLink = new Hyperlink(ShowcaseBundle.get("header.repository"));
