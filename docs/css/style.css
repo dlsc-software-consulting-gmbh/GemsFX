@@ -216,6 +216,81 @@ img { max-width: 100%; display: block; }
 }
 
 /* ============================================================
+   SHOWCASE
+   ============================================================ */
+.showcase-section {
+  padding: 3rem 0 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.showcase-shot {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.showcase-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+}
+
+.showcase-features li {
+  position: relative;
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.showcase-features li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+.showcase-features strong { color: var(--text-primary); }
+
+.showcase-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.showcase-note {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.showcase-info pre {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  font-family: "SF Mono", "Fira Code", Consolas, monospace;
+  color: var(--text-code);
+  overflow-x: auto;
+}
+
+/* ============================================================
    INSTALLATION
    ============================================================ */
 .install-section {
@@ -570,6 +645,10 @@ img { max-width: 100%; display: block; }
 /* ============================================================
    RESPONSIVE
    ============================================================ */
+@media (max-width: 900px) {
+  .showcase-grid { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 640px) {
   .site-nav a span { display: none; }
   .hero { padding: 3rem 0 2.5rem; }

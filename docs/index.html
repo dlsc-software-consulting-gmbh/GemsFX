@@ -6,7 +6,7 @@
   <title>GemsFX — JavaFX Custom Controls &amp; Utilities</title>
   <meta name="description" content="GemsFX is a rich collection of custom JavaFX controls and utilities. Explore date pickers, search fields, paging, tree views, notifications and more." />
   <link rel="icon" type="image/png" href="screenshots/icon.png" />
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=4.4.2" />
 </head>
 <body>
 
@@ -22,6 +22,10 @@
     </a>
 
     <nav class="site-nav" aria-label="Site navigation">
+      <a href="#showcase">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+        <span>Showcase</span>
+      </a>
       <a href="#install">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v13m0 0-4-4m4 4 4-4M2 17v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3"/></svg>
         <span>Install</span>
@@ -52,9 +56,9 @@
 <section class="hero">
   <div class="container">
     <div class="hero-badges">
-      <span class="badge accent">v3.10.1</span>
-      <span class="badge teal">JavaFX 25</span>
-      <span class="badge">Java 24+</span>
+      <span class="badge accent">v4.4.2</span>
+      <span class="badge teal">JavaFX 17+</span>
+      <span class="badge">Java 11+</span>
       <span class="badge">Apache 2.0</span>
     </div>
 
@@ -69,7 +73,11 @@
     </p>
 
     <div class="hero-cta">
-      <a href="#controls" class="btn btn-primary">
+      <a href="https://www.jdeploy.com/~gemsfxdemo" class="btn btn-primary" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v13m0 0-4-4m4 4 4-4M2 17v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3"/></svg>
+        Download Showcase
+      </a>
+      <a href="#controls" class="btn btn-secondary">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Browse Controls
       </a>
@@ -81,6 +89,50 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
         GitHub
       </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SHOWCASE
+     ============================================================ -->
+<section class="showcase-section" id="showcase">
+  <div class="container">
+    <h2 class="section-heading">Showcase Application</h2>
+    <p class="section-sub">
+      The fastest way to explore GemsFX — browse every control, read its manual and run its demo,
+      without writing a single line of code.
+    </p>
+
+    <div class="showcase-grid">
+      <div class="showcase-shot">
+        <img src="screenshots/showcase.png" alt="Screenshot of the GemsFX showcase application" loading="lazy" />
+      </div>
+
+      <div class="showcase-info">
+        <ul class="showcase-features">
+          <li><strong>Browse &amp; search</strong> — all controls grouped by category and filtered via a search field.</li>
+          <li><strong>Read the manual</strong> — every control comes with a developer manual (PDF) shown inside the app.</li>
+          <li><strong>Try the control</strong> — double-click a control to launch its demo application.</li>
+          <li><strong>Switch themes</strong> — AtlantaFX theme families plus light, dark and system color scheme.</li>
+        </ul>
+
+        <div class="showcase-cta">
+          <a href="https://www.jdeploy.com/~gemsfxdemo" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v13m0 0-4-4m4 4 4-4M2 17v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3"/></svg>
+            Install via jDeploy
+          </a>
+        </div>
+
+        <p class="showcase-note">
+          The installer is provided by <a href="https://www.jdeploy.com/~gemsfxdemo" target="_blank" rel="noopener">jDeploy</a>
+          and is available for macOS, Windows and Linux. The application updates itself whenever a new
+          version of GemsFX is released.
+        </p>
+
+        <p class="showcase-note">Prefer running it from the sources? Use Maven:</p>
+        <pre>mvn javafx:run -f gemsfx-showcase/pom.xml</pre>
+      </div>
     </div>
   </div>
 </section>
@@ -104,12 +156,12 @@
         <pre>&lt;dependency&gt;
     &lt;groupId&gt;com.dlsc.gemsfx&lt;/groupId&gt;
     &lt;artifactId&gt;gemsfx&lt;/artifactId&gt;
-    &lt;version&gt;3.10.1&lt;/version&gt;
+    &lt;version&gt;4.4.2&lt;/version&gt;
 &lt;/dependency&gt;</pre>
       </div>
       <div class="tab-panel" data-tab="gradle">
         <button class="copy-btn" aria-label="Copy Gradle snippet">Copy</button>
-        <pre>implementation 'com.dlsc.gemsfx:gemsfx:3.10.1'</pre>
+        <pre>implementation 'com.dlsc.gemsfx:gemsfx:4.4.2'</pre>
       </div>
       <div class="tab-panel" data-tab="module">
         <button class="copy-btn" aria-label="Copy module-info snippet">Copy</button>
@@ -1474,15 +1526,16 @@ requires com.dlsc.gemsfx;</pre>
   <div class="container">
     <div class="footer-links">
       <a href="https://github.com/dlsc-software-consulting-gmbh/GemsFX" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.jdeploy.com/~gemsfxdemo" target="_blank" rel="noopener">Download Showcase</a>
       <a href="https://search.maven.org/search?q=g:com.dlsc.gemsfx" target="_blank" rel="noopener">Maven Central</a>
       <a href="https://www.jfx-central.com/libraries/gemsfx" target="_blank" rel="noopener">JFXCentral</a>
       <a href="api/index.html" target="_blank">API Javadoc</a>
       <a href="https://opensource.org/licenses/Apache-2.0" target="_blank" rel="noopener">Apache 2.0</a>
     </div>
-    <p>GemsFX v3.10.1 &mdash; &copy; DLSC Software &amp; Consulting GmbH &mdash; Licensed under the Apache License 2.0</p>
+    <p>GemsFX v4.4.2 &mdash; &copy; DLSC Software &amp; Consulting GmbH &mdash; Licensed under the Apache License 2.0</p>
   </div>
 </footer>
 
-<script src="js/main.js"></script>
+<script src="js/main.js?v=4.4.2"></script>
 </body>
 </html>
