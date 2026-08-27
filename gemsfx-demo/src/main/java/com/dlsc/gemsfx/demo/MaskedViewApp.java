@@ -37,7 +37,11 @@ public class MaskedViewApp extends GemApplication {
 
         for (int i = 1; i <= 30; i++) {
             Label label = new Label("Item " + i);
-            label.setStyle("-fx-padding: 10px 20px; -fx-background-color: -fx-accent; -fx-text-fill: white; -fx-background-radius: 4px;");
+            if (Boolean.getBoolean("atlantafx")) {
+                label.setStyle("-fx-padding: 10px 20px; -fx-background-color: -color-accent-emphasis; -fx-text-fill: -color-fg-emphasis; -fx-background-radius: 4px;");
+            } else {
+                label.setStyle("-fx-padding: 10px 20px; -fx-background-color: -fx-accent; -fx-text-fill: white; -fx-background-radius: 4px;");
+            }
             content.getChildren().add(label);
         }
 
@@ -76,10 +80,12 @@ public class MaskedViewApp extends GemApplication {
         descriptionLabel.setMinHeight(Region.USE_PREF_SIZE);
 
         VBox root = new VBox(20, descriptionLabel, maskedView, controls);
+        root.setMaxWidth(800);
         root.setPadding(new Insets(20));
 
         stage.setTitle("Masked View");
-        stage.setScene(new Scene(root, 800, 300));
+        stage.setScene(new Scene(root));
+        stage.sizeToScene();
         stage.show();
     }
 
