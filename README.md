@@ -200,7 +200,8 @@ Scope is limited to the `gemsfx` library module. The `gemsfx-demo` module is int
 3. Add the same key to existing locale files for that bundle (`<bundle>_<locale>.properties`).
 4. Use typed lookup in code:
    ```java
-   ResourceBundleManager.getString(ResourceBundleManager.BundleType.DIALOG_PANE, "button.send", "Send")
+   ResourceBundleManager.getString(
+           ResourceBundleManager.BundleType.DIALOG_PANE, "button.send", "Send")
    ```
    Use `ResourceBundleManager.format(...)` when arguments are required.
 5. If a new bundle domain is needed, add a new `BundleType` enum constant and create its base/locale property files.
