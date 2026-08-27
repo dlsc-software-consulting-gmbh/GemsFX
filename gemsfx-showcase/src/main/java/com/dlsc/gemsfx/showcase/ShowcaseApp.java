@@ -1,8 +1,8 @@
 package com.dlsc.gemsfx.showcase;
 
 import atlantafx.base.theme.Styles;
-import atlantafx.decorations.HeaderButton;
-import atlantafx.decorations.HeaderButtonGroup;
+import com.dlsc.gemsfx.showcase.decorations.HeaderButton;
+import com.dlsc.gemsfx.showcase.decorations.HeaderButtonGroup;
 import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.DialogPane.Dialog;
 import com.dlsc.gemsfx.DialogPane.DialogHeader;

@@ -7,7 +7,6 @@ open module com.dlsc.gemsfx.showcase {
     requires com.dlsc.pdfviewfx;
 
     requires atlantafx.base;
-    requires atlantafx.decorations;
     requires com.dlsc.atlantafx.themes;
     requires devtoolsfx.connector;
     requires devtoolsfx.gui;
@@ -21,4 +20,5 @@ open module com.dlsc.gemsfx.showcase {
     requires org.kordamp.ikonli.materialdesign;
 
     exports com.dlsc.gemsfx.showcase;
+    exports com.dlsc.gemsfx.showcase.decorations;
 }

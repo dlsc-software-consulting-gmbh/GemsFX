@@ -1,6 +1,6 @@
 package com.dlsc.gemsfx.showcase;
 
-import atlantafx.decorations.Decoration;
+import com.dlsc.gemsfx.showcase.decorations.Decoration;
 import com.dlsc.gemsfx.util.ControlsFXAtlantaFX;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import javafx.application.Application;

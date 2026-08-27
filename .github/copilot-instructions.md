@@ -93,8 +93,9 @@ Each control has a dedicated `*App.java` in `gemsfx-demo/src/main/java/com/dlsc/
 loaded from the classpath. `ShowcaseThemeManager` applies the AtlantaFX theme (`ThemeFamily` plus `ThemeMode`) and the
 matching AtlantaFX window decoration. `ThemeFamily.MODENA` switches back to the standard JavaFX theme, in which case
 `showcase.css` maps the AtlantaFX color variables onto the Modena colors (guarded by the `modena-active` style class of
-the scene root). The window buttons in the `HeaderBar` come from `atlantafx-decorations`; do not hand-craft window
-buttons. `HeaderButtonGroup.standardGroup()` orders them the Windows way (minimize, maximize, close), hence macOS needs
+the scene root). The window buttons in the `HeaderBar` come from the `com.dlsc.gemsfx.showcase.decorations` package, a
+vendored copy of the MIT-licensed `atlantafx-decorations` library (the library is currently not published to any Maven
+repository); do not hand-craft window buttons and do not modify the vendored code beyond what its file headers describe. `HeaderButtonGroup.standardGroup()` orders them the Windows way (minimize, maximize, close), hence macOS needs
 a group built explicitly with `HeaderButtonType.CLOSE` first.
 
 ## Key Conventions
