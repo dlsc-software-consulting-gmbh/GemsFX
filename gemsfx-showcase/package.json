@@ -8,7 +8,7 @@
     "preferGlobal": true,
     "title": "GemsFX Showcase",
     "scripts": {"test": "echo \"Error: no test specified\" && exit 1"},
-    "version": "4.4.3",
+    "version": "4.4.4",
     "jdeploy": {
         "args": [
             "-Djavafx.enablePreview=true",
@@ -24,7 +24,7 @@
             "url": ""
         }],
         "javaVersion": "25",
-        "jar": "target/gemsfx-showcase-4.4.2.jar",
+        "jar": "target/gemsfx-showcase-4.4.4.jar",
         "javafx": true,
         "title": "GemsFX Showcase Application",
         "platformBundlesEnabled": false,

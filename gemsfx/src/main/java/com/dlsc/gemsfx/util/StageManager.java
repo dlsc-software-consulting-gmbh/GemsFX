@@ -7,7 +7,10 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.text.MessageFormat;
+import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
@@ -17,17 +20,25 @@ import java.util.prefs.Preferences;
  * time. This manager also works with multiple screens and will ensure that the window
  * becomes visible if the last used screen is no longer available. In that case the stage
  * will be shown centered on the primary screen with the specified min width and min
- * height.
+ * height (the stage will also be resized to that minimum size in this case).
  */
 public class StageManager {
 
-    private final Logger LOG = Logger.getLogger(StageManager.class.getSimpleName());
+    private static final Logger LOG = Logger.getLogger(StageManager.class.getSimpleName());
+
+    private static final String KEY_X = "x";
+    private static final String KEY_Y = "y";
+    private static final String KEY_WIDTH = "width";
+    private static final String KEY_HEIGHT = "height";
+    private static final String KEY_ICONIFIED = "iconified";
+    private static final String KEY_MAXIMIZED = "maximized";
+    private static final String KEY_FULLSCREEN = "fullscreen";
 
     private final Stage stage;
     private final Preferences preferences;
 
-    private double minWidth;
-    private double minHeight;
+    private final double minWidth;
+    private final double minHeight;
 
     private boolean supportFullScreenAndMaximized;
 
@@ -41,7 +52,7 @@ public class StageManager {
      * @return the installed stage manager
      */
     public static StageManager install(Stage stage, String preferencesPath) {
-        return install(stage, Preferences.userRoot().node(preferencesPath));
+        return install(stage, Preferences.userRoot().node(Objects.requireNonNull(preferencesPath, "preferences path can not be null")));
     }
     
     /**
@@ -69,7 +80,7 @@ public class StageManager {
      * @return the installed stage manager
      */
     public static StageManager install(Stage stage, String preferencesPath, double minWidth, double minHeight) {
-        return install(stage, Preferences.userRoot().node(preferencesPath), minWidth, minHeight);
+        return install(stage, Preferences.userRoot().node(Objects.requireNonNull(preferencesPath, "preferences path can not be null")), minWidth, minHeight);
     }
 
     /**
@@ -83,13 +94,43 @@ public class StageManager {
      * @return the installed stage manager
      */
     public static StageManager install(Stage stage, Preferences preferences, double minWidth, double minHeight) {
-        return new StageManager(stage, preferences, minWidth, minHeight);
+        return install(stage, preferences, minWidth, minHeight, false);
     }
-       
+
+    /**
+     * Installs a new manager for the given stage. The location and dimension information will
+     * be stored in the user preferences at the given path.
+     *
+     * @param stage the stage to persist and restore
+     * @param preferencesPath the java.util preferences path used for storing the information
+     * @param minWidth the minimum width that will be used for the stage
+     * @param minHeight the minimum height that will be used for the stage
+     * @param supportFullScreenAndMaximized whether the maximized and the full screen state shall be persisted and restored
+     * @return the installed stage manager
+     */
+    public static StageManager install(Stage stage, String preferencesPath, double minWidth, double minHeight, boolean supportFullScreenAndMaximized) {
+        return install(stage, Preferences.userRoot().node(Objects.requireNonNull(preferencesPath, "preferences path can not be null")), minWidth, minHeight, supportFullScreenAndMaximized);
+    }
+
+    /**
+     * Installs a new manager for the given stage. The location and dimension information will
+     * be stored in the given preferences.
+     *
+     * @param stage the stage to persist and restore
+     * @param preferences the java.util preferences used for storing the information
+     * @param minWidth the minimum width that will be used for the stage
+     * @param minHeight the minimum height that will be used for the stage
+     * @param supportFullScreenAndMaximized whether the maximized and the full screen state shall be persisted and restored
+     * @return the installed stage manager
+     */
+    public static StageManager install(Stage stage, Preferences preferences, double minWidth, double minHeight, boolean supportFullScreenAndMaximized) {
+        return new StageManager(stage, preferences, minWidth, minHeight, supportFullScreenAndMaximized);
+    }
+
     /*
      * Constructs a new stage manager.
      */
-    private StageManager(Stage stage, Preferences preferences, double minWidth, double minHeight) {
+    private StageManager(Stage stage, Preferences preferences, double minWidth, double minHeight, boolean supportFullScreenAndMaximized) {
         if (minWidth <= 0) {
             throw new IllegalArgumentException("min width must be larger than 0");
         }
@@ -97,10 +138,11 @@ public class StageManager {
             throw new IllegalArgumentException("min height must be larger than 0");
         }
 
-        this.stage = stage;
-        this.preferences = preferences;
+        this.stage = Objects.requireNonNull(stage, "stage can not be null");
+        this.preferences = Objects.requireNonNull(preferences, "preferences can not be null");
         this.minWidth = minWidth;
         this.minHeight = minHeight;
+        this.supportFullScreenAndMaximized = supportFullScreenAndMaximized;
 
         restoreStage();
 
@@ -118,10 +160,19 @@ public class StageManager {
         stage.heightProperty().addListener(stageListener);
         stage.iconifiedProperty().addListener(stageListener);
         stage.maximizedProperty().addListener(stageListener);
+
+        stage.showingProperty().addListener(it -> {
+            if (!stage.isShowing()) {
+                flush();
+            }
+        });
     }
 
     /**
      * Sets whether full-screen and maximized states should be persisted.
+     *
+     * <p>Please note that the state can only be <em>restored</em> when the flag is passed to one of
+     * the {@code install} methods, as the restoration happens while the manager is being created.
      *
      * @param supportFullScreenAndMaximized {@code true} to persist full-screen and maximized states
      */
@@ -139,33 +190,64 @@ public class StageManager {
     }
 
     private void saveStage() throws SecurityException {
-        if (supportFullScreenAndMaximized && stage.isMaximized()) {
+        boolean maximizedOrFullScreen = supportFullScreenAndMaximized && (stage.isMaximized() || stage.isFullScreen());
+
+        if (maximizedOrFullScreen) {
             LOG.fine(MessageFormat.format("saving stage, iconified = {0}, maximized = {1}, fullscreen = {2}", stage.isIconified(), stage.isMaximized(), stage.isFullScreen()));
         } else {
             LOG.fine(MessageFormat.format("saving stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}, maximized = {5}, fullscreen = {6}", stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight(), stage.isIconified(), stage.isMaximized(), stage.isFullScreen()));
         }
 
-        if (!supportFullScreenAndMaximized || (!stage.isMaximized() && !stage.isFullScreen())) {
-            preferences.putDouble("x", stage.getX());
-            preferences.putDouble("y", stage.getY());
-            preferences.putDouble("width", stage.getWidth());
-            preferences.putDouble("height", stage.getHeight());
+        /*
+         * The bounds of a stage are "NaN" as long as the stage has not been shown, and they can
+         * not be restored in a meaningful way. Storing them would corrupt the values of a previous
+         * session, hence we only store bounds that are completely defined.
+         */
+        if (!maximizedOrFullScreen && hasValidBounds()) {
+            preferences.putDouble(KEY_X, stage.getX());
+            preferences.putDouble(KEY_Y, stage.getY());
+            preferences.putDouble(KEY_WIDTH, stage.getWidth());
+            preferences.putDouble(KEY_HEIGHT, stage.getHeight());
         }
 
-        preferences.putBoolean("iconified", stage.isIconified());
-        preferences.putBoolean("maximized", stage.isMaximized());
-        preferences.putBoolean("fullscreen", stage.isFullScreen());
+        preferences.putBoolean(KEY_ICONIFIED, stage.isIconified());
+        preferences.putBoolean(KEY_MAXIMIZED, stage.isMaximized());
+        preferences.putBoolean(KEY_FULLSCREEN, stage.isFullScreen());
+    }
+
+    /*
+     * Determines whether the current bounds of the stage are fully defined, which is not the
+     * case as long as the stage has never been shown.
+     */
+    private boolean hasValidBounds() {
+        return isDefined(stage.getX()) && isDefined(stage.getY()) && isDefined(stage.getWidth()) && isDefined(stage.getHeight());
+    }
+
+    private static boolean isDefined(double value) {
+        return !Double.isNaN(value) && !Double.isInfinite(value);
+    }
+
+    /*
+     * Writes the preferences to the backing store. Called when the stage gets hidden so that
+     * the values also survive a JVM that gets shut down without running any shutdown hooks.
+     */
+    private void flush() {
+        try {
+            preferences.flush();
+        } catch (BackingStoreException | SecurityException ex) {
+            LOG.log(Level.FINE, "unable to flush the preferences", ex);
+        }
     }
 
     private void restoreStage() throws SecurityException {
-        double x = preferences.getDouble("x", -1);
-        double y = preferences.getDouble("y", -1);
-        double w = preferences.getDouble("width", stage.getWidth());
-        double h = preferences.getDouble("height", stage.getHeight());
+        double x = preferences.getDouble(KEY_X, Double.NaN);
+        double y = preferences.getDouble(KEY_Y, Double.NaN);
+        double w = preferences.getDouble(KEY_WIDTH, Double.NaN);
+        double h = preferences.getDouble(KEY_HEIGHT, Double.NaN);
 
-        boolean iconified = preferences.getBoolean("iconified", false);
-        boolean maximized = preferences.getBoolean("maximized", false);
-        boolean fullscreen = preferences.getBoolean("fullscreen", false);
+        boolean iconified = preferences.getBoolean(KEY_ICONIFIED, false);
+        boolean maximized = preferences.getBoolean(KEY_MAXIMIZED, false);
+        boolean fullscreen = preferences.getBoolean(KEY_FULLSCREEN, false);
 
         if (supportFullScreenAndMaximized) {
             LOG.fine(MessageFormat.format("loading stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}, maximized = {5}, fullscreen = {6}", x, y, w, h, iconified, maximized, fullscreen));
@@ -173,15 +255,27 @@ public class StageManager {
             LOG.fine(MessageFormat.format("loading stage, x = {0}, y = {1}, width = {2}, height = {3}, iconified = {4}", x, y, w, h, iconified));
         }
 
-        if (x == -1 && y == -1) {
-            stage.centerOnScreen();
-        } else {
-            stage.setX(x);
-            stage.setY(y);
+        if (!isDefined(w)) {
+            // nothing stored, yet: fall back to the size that the application might have set
+            w = stage.getWidth();
         }
 
-        stage.setWidth(Math.max(minWidth, w));
-        stage.setHeight(Math.max(minHeight, h));
+        if (!isDefined(h)) {
+            h = stage.getHeight();
+        }
+
+        /*
+         * Math.max() returns NaN if one of its arguments is NaN, hence the explicit checks.
+         */
+        stage.setWidth(isDefined(w) ? Math.max(minWidth, w) : minWidth);
+        stage.setHeight(isDefined(h) ? Math.max(minHeight, h) : minHeight);
+
+        if (isDefined(x) && isDefined(y)) {
+            stage.setX(x);
+            stage.setY(y);
+        } else {
+            stage.centerOnScreen();
+        }
 
         Platform.runLater(() -> {
             stage.setIconified(iconified);
@@ -191,7 +285,7 @@ public class StageManager {
                 stage.setFullScreen(fullscreen);
             }
 
-            if (isWindowIsOutOfBounds()) {
+            if (isWindowOutOfBounds()) {
                 LOG.fine("stage is out of bounds, moving it to primary screen");
                 moveToPrimaryScreen();
             }
@@ -202,7 +296,16 @@ public class StageManager {
      * Performs a check on the stage to see if its bounds are fully visible on one of the
      * currently used screens.
      */
-    private boolean isWindowIsOutOfBounds() {
+    private boolean isWindowOutOfBounds() {
+        if (!hasValidBounds()) {
+            /*
+             * The stage has not been shown, yet, so its location is unknown. Any check would
+             * be meaningless and moving the stage would discard the size and location that
+             * were just restored.
+             */
+            return false;
+        }
+
         for (Screen screen : Screen.getScreens()) {
             Rectangle2D bounds = screen.getVisualBounds();
             if (stage.getX() + stage.getWidth() - minWidth >= bounds.getMinX() &&
