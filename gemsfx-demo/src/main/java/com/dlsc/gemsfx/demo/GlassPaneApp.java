@@ -135,6 +135,9 @@ public class GlassPaneApp extends GemApplication {
         CheckBox fadeBox = new CheckBox("Fade in / out");
         fadeBox.selectedProperty().bindBidirectional(glassPane.fadeInOutProperty());
 
+        CheckBox enableStageDraggingBox = new CheckBox("Enable stage dragging");
+        enableStageDraggingBox.selectedProperty().bindBidirectional(glassPane.enableStageDraggingProperty());
+
         Slider durationSlider = new Slider(0, 2000, glassPane.getFadeInOutDuration().toMillis());
         durationSlider.setShowTickLabels(true);
         durationSlider.setShowTickMarks(true);
@@ -156,6 +159,7 @@ public class GlassPaneApp extends GemApplication {
                 busyButton,
                 new Separator(),
                 fadeBox,
+                enableStageDraggingBox,
                 new Label("Fade duration (ms)"), durationSlider,
                 new Label("Blocking opacity"), opacitySlider,
                 devTools);
