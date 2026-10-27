@@ -37,6 +37,7 @@
     </repositories>
 
     <properties>
+        <java.version>25</java.version>
         <main.class>com.dlsc.gemsfx.showcase.ShowcaseApp</main.class>
         <!-- Showcase module is not published; skip Central releasability enforcement -->
         <enforcer.skip>true</enforcer.skip>

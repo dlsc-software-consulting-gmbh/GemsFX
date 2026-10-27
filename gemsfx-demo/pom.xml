@@ -44,6 +44,7 @@
     </pluginRepositories>
 
     <properties>
+        <java.version>25</java.version>
         <main.class>com.dlsc.gemsfx.demo.GemsFXDemoLauncher</main.class>
         <snapshot.filter></snapshot.filter>
         <!-- Demo module is not published; skip Central releasability enforcement -->

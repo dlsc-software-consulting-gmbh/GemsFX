@@ -49,7 +49,7 @@
         <project.identifier>gemsfx</project.identifier>
         <project.github.repository>dlsc-software-consulting-gmbh/GemsFX</project.github.repository>
         <local.repository.path>/tmp/repository</local.repository.path>
-        <java.version>27</java.version>
+        <java.version>11</java.version>
         <javafx.version>27</javafx.version>
         <gemsfx.java.version>11</gemsfx.java.version>
         <gemsfx.javafx.version>17.0.16</gemsfx.javafx.version>
