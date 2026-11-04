@@ -12,7 +12,6 @@
 
 package com.dlsc.gemsfx.showcase.decorations;
 
-import javafx.scene.Node;
 import javafx.scene.layout.HeaderBar;
 
 /**
@@ -28,12 +27,12 @@ public enum Alignment {
     AUTO,
 
     /**
-     * Aligns the button group on the left using the {@link HeaderBar#setLeading(Node)} method.
+     * Aligns the button group on the left side of the header bar.
      */
     LEADING,
 
     /**
-     * Aligns the button group on the right using the {@link HeaderBar#setTrailing(Node)} method.
+     * Aligns the button group on the right side of the header bar.
      */
     TRAILING
 }
