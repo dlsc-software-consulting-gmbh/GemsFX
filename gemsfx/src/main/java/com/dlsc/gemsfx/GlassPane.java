@@ -1,12 +1,10 @@
 package com.dlsc.gemsfx;
 
+import com.dlsc.gemsfx.util.StageDragBehaviour;
 import javafx.animation.Animation.Status;
 import javafx.animation.FadeTransition;
 import javafx.beans.property.*;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.Objects;
@@ -48,12 +46,6 @@ public class GlassPane extends StackPane {
 
     private final BooleanProperty enableStageDragging = new SimpleBooleanProperty(this, "enableStageDragging");
 
-    private Stage draggedStage;
-    private double dragStartScreenX;
-    private double dragStartScreenY;
-    private double dragStartStageX;
-    private double dragStartStageY;
-
     /**
      * Constructs a new glass pane.
      */
@@ -69,35 +61,7 @@ public class GlassPane extends StackPane {
         setMouseTransparent(false);
         setVisible(false);
 
-        addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> {
-            if (isEnableStageDragging() && evt.getButton() == MouseButton.PRIMARY
-                    && getScene() != null && getScene().getWindow() instanceof Stage) {
-                draggedStage = (Stage) getScene().getWindow();
-                dragStartScreenX = evt.getScreenX();
-                dragStartScreenY = evt.getScreenY();
-                dragStartStageX = draggedStage.getX();
-                dragStartStageY = draggedStage.getY();
-            }
-        });
-
-        addEventFilter(MouseEvent.MOUSE_DRAGGED, evt -> {
-            if (draggedStage == null) {
-                return;
-            }
-
-            if (isEnableStageDragging() && evt.isPrimaryButtonDown()) {
-                draggedStage.setX(dragStartStageX + evt.getScreenX() - dragStartScreenX);
-                draggedStage.setY(dragStartStageY + evt.getScreenY() - dragStartScreenY);
-            } else {
-                draggedStage = null;
-            }
-        });
-
-        addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-            if (evt.getButton() == MouseButton.PRIMARY) {
-                draggedStage = null;
-            }
-        });
+        StageDragBehaviour.install(this).enabledProperty().bind(enableStageDraggingProperty());
 
         fadeTransition.durationProperty().bind(fadeInOutDuration);
         fadeTransition.setNode(this);
