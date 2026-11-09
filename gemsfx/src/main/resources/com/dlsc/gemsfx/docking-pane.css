@@ -88,3 +88,45 @@
     -fx-opacity: 0.18;
 }
 
+.docking-pane .docking-pane-edge-target {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-radius: 5;
+    -fx-border-color: -fx-accent;
+    -fx-border-radius: 5;
+    -fx-border-width: 2;
+    -fx-padding: 7;
+}
+
+.docking-pane .docking-pane-edge-target:active {
+    -fx-background-color: -fx-accent;
+}
+
+.docking-pane .docking-pane-edge-target .icon {
+    -fx-background-color: -fx-accent;
+    -fx-pref-width: 20;
+    -fx-pref-height: 20;
+    -fx-max-width: 20;
+    -fx-max-height: 20;
+    -fx-scale-shape: true;
+}
+
+.docking-pane .docking-pane-edge-target:active .icon {
+    -fx-background-color: -fx-selection-bar-text;
+}
+
+.docking-pane .pane-edge-left .icon {
+    -fx-shape: "M0 0 H20 V20 H0 Z M7 2 V18 H18 V2 Z";
+}
+
+.docking-pane .pane-edge-right .icon {
+    -fx-shape: "M0 0 H20 V20 H0 Z M2 2 V18 H13 V2 Z";
+}
+
+.docking-pane .pane-edge-top .icon {
+    -fx-shape: "M0 0 H20 V20 H0 Z M2 7 V18 H18 V7 Z";
+}
+
+.docking-pane .pane-edge-bottom .icon {
+    -fx-shape: "M0 0 H20 V20 H0 Z M2 2 V13 H18 V2 Z";
+}
+

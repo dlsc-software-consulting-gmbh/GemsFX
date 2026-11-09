@@ -171,6 +171,29 @@ public class DockingPane extends Control {
     }
 
     /**
+     * Tests whether a dockable can be placed beside this pane's entire layout.
+     *
+     * @param id the ID of an open dockable in this context
+     * @param edge the outer edge: LEFT, RIGHT, TOP, or BOTTOM
+     * @return {@code true} if the move is valid; {@code false} for an invalid edge or a lone tab in this pane
+     */
+    public final boolean canMoveDockableToPaneEdge(String id, DockingPosition edge) {
+        return dockingContext.canMoveDockableToPaneEdge(this, id, edge);
+    }
+
+    /**
+     * Places a dockable beside this pane's entire layout, rather than beside one tab group.
+     * The dockable is removed from its source before the remaining layout is wrapped in a new split.
+     *
+     * @param id the ID of an open dockable in this context
+     * @param edge the outer edge: LEFT, RIGHT, TOP, or BOTTOM
+     * @return {@code true} if the move completed; {@code false} if it was invalid
+     */
+    public final boolean moveDockableToPaneEdge(String id, DockingPosition edge) {
+        return dockingContext.moveDockableToPaneEdge(this, id, edge);
+    }
+
+    /**
      * Resolves a drop target from pane-relative coordinates and moves the dockable there.
      *
      * @param id       the ID of the dockable to move
@@ -209,6 +232,19 @@ public class DockingPane extends Control {
         return true;
     }
 
+    final boolean canMoveInsideToPaneEdge(String id, DockingPosition edge) {
+        return tree.canMoveToPaneEdge(id, edge);
+    }
+
+    final boolean moveInsideToPaneEdge(String id, DockingPosition edge) {
+        if (!tree.moveToPaneEdge(id, edge, 0.5)) {
+            return false;
+        }
+        layoutRoot.set(tree.snapshot());
+        activeDockable.set(dockablesById.get(id));
+        return true;
+    }
+
     final Dockable removeDockableById(String id) {
         Dockable dockable = dockablesById.get(id);
         if (dockable == null) {
@@ -220,6 +256,13 @@ public class DockingPane extends Control {
 
     final void insertDockableRelativeTo(String targetId, Dockable dockable, DockingPosition position) {
         tree.insertRelativeTo(targetId, dockable, position, 0.5);
+        dockablesById.put(dockable.getId(), dockable);
+        layoutRoot.set(tree.snapshot());
+        activeDockable.set(dockable);
+    }
+
+    final void insertDockableAtPaneEdge(Dockable dockable, DockingPosition edge) {
+        tree.insertAtPaneEdge(dockable, edge, 0.5);
         dockablesById.put(dockable.getId(), dockable);
         layoutRoot.set(tree.snapshot());
         activeDockable.set(dockable);

@@ -47,6 +47,7 @@ MANUAL = Manual(
                         "Custom tab strip with title, optional graphic, and close button per dockable.",
                         "Split layouts with horizontal/vertical panes and divider positions in [0, 1].",
                         "Drag-and-drop within one pane and across panes in the same context.",
+                        "Four outer-edge indicators for docking beside the entire pane layout.",
                         "Detaching tabs into app-created floating stages.",
                         "Context-wide snapshot and restore via <font face='Courier'>getLayout()</font> and <font face='Courier'>restoreLayout()</font>.",
                         "Close policy hook via <font face='Courier'>setCanCloseDockable(...)</font>.",
@@ -224,6 +225,18 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                             "false if invalid",
                             "Moves a dockable by ID relative to a target dockable.",
                         ),
+                        Property(
+                            "canMoveDockableToPaneEdge(id, edge)",
+                            "boolean",
+                            "false if invalid",
+                            "Checks whether a dockable can move beside the entire pane layout.",
+                        ),
+                        Property(
+                            "moveDockableToPaneEdge(id, edge)",
+                            "boolean",
+                            "false if invalid",
+                            "Moves a dockable to an outer LEFT, RIGHT, TOP, or BOTTOM edge, spanning all existing groups.",
+                        ),
                     ]
                 ),
             ],
@@ -233,7 +246,10 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
             [
                 Para(
                     "Dragging a title inside the pane resolves a target from cursor position and the "
-                    "currently hovered title. Center drops merge into tabs, edge drops create a split."
+                    "currently hovered title. Center drops merge into tabs, while local edge drops split "
+                    "the targeted group. Four additional indicators appear near the outer edges during a "
+                    "valid docking drag. Dropping on one of these indicators docks beside the entire pane "
+                    "layout, not just the group under the pointer."
                 ),
                 Table(
                     ["Gesture", "Result"],
@@ -241,10 +257,23 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                         ["Drop on center zone", "Dockable joins target tab group and becomes selected."],
                         ["Drop on left/right zone", "Horizontal split is created around the target group."],
                         ["Drop on top/bottom zone", "Vertical split is created around the target group."],
+                        ["Drop on outer top/bottom indicator", "New group spans the full pane width above/below all remaining groups."],
+                        ["Drop on outer left/right indicator", "New group spans the full pane height beside all remaining groups."],
                         ["Drop on another pane (same context)", "Cross-pane move; source pane may become empty."],
                         ["ESC during drag", "Cancels external floating; no detachment happens."],
                     ],
                     widths=[43, 57],
+                ),
+                Para(
+                    "For example, with two groups side by side, drag a tab onto the bottom outer-edge "
+                    "indicator to place it below both groups. The preview spans the entire pane width. "
+                    "The source tab is removed first, empty branches collapse, and the remaining layout "
+                    "is wrapped in a new split. The same operation works when dragging from a floating pane "
+                    "in the same context. Indicators disappear after dropping, leaving the pane, or canceling."
+                ),
+                Code(
+                    'pane.moveDockableToPaneEdge("console", DockingPosition.BOTTOM);',
+                    caption="Place the console below the pane's entire remaining layout.",
                 ),
                 Para(
                     "Keyboard interactions of the title controls: LEFT/RIGHT switches selected tab, "
@@ -318,6 +347,8 @@ if (!result.getUnresolvedDockableIds().isEmpty()) {
                         ["<font face='Courier'>.docking-split</font>", "SplitPane wrappers created for split layout nodes."],
                         ["<font face='Courier'>.docking-drop-leaf-preview</font>", "Outline of target leaf during drag."],
                         ["<font face='Courier'>.docking-drop-zone-preview</font>", "Filled drop zone preview."],
+                        ["<font face='Courier'>.docking-pane-edge-target</font>", "Pane-wide drop indicator; :active highlights the hovered target."],
+                        ["<font face='Courier'>.pane-edge-left/right/top/bottom</font>", "Direction-specific style classes of the outer indicators."],
                     ],
                     widths=[46, 54],
                 ),

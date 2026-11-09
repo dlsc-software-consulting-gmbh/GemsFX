@@ -228,6 +228,44 @@ public final class DockingTree {
         return true;
     }
 
+    public boolean canMoveToPaneEdge(String id, DockingPosition edge) {
+        List<String> ids = dockableIds();
+        return edge != null && edge != DockingPosition.CENTER && ids.contains(id) && ids.size() > 1;
+    }
+
+    public boolean moveToPaneEdge(String id, DockingPosition edge, double dividerPosition) {
+        if (!canMoveToPaneEdge(id, edge)) {
+            return false;
+        }
+        requireDivider(dividerPosition);
+        remove(id);
+        insertAtPaneEdge(id, edge, dividerPosition);
+        return true;
+    }
+
+    public void insertAtPaneEdge(Dockable dockable, DockingPosition edge, double dividerPosition) {
+        String id = requireNew(dockable);
+        if (edge == null || edge == DockingPosition.CENTER) {
+            throw new IllegalArgumentException("A pane edge must be LEFT, RIGHT, TOP, or BOTTOM");
+        }
+        requireDivider(dividerPosition);
+        insertAtPaneEdge(id, edge, dividerPosition);
+    }
+
+    private void insertAtPaneEdge(String id, DockingPosition edge, double dividerPosition) {
+        DockingTabGroup created = new DockingTabGroup();
+        created.add(id);
+        if (root instanceof DockingTabGroup && ((DockingTabGroup) root).isEmpty()) {
+            root = created;
+            return;
+        }
+        Orientation orientation = edge == DockingPosition.LEFT || edge == DockingPosition.RIGHT
+                ? Orientation.HORIZONTAL : Orientation.VERTICAL;
+        root = edge == DockingPosition.LEFT || edge == DockingPosition.TOP
+                ? new DockingSplit(orientation, dividerPosition, created, root)
+                : new DockingSplit(orientation, dividerPosition, root, created);
+    }
+
     public boolean canInsertRelativeTo(String targetId, DockingPosition position) {
         if (!contains(targetId) || position == null) {
             return false;

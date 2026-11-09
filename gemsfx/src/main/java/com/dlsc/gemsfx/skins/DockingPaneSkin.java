@@ -2,12 +2,17 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.DockingLayoutNode;
 import com.dlsc.gemsfx.DockingPane;
+import com.dlsc.gemsfx.DockingPosition;
 import com.dlsc.gemsfx.docking.internal.DockingTree;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import javafx.beans.value.ChangeListener;
+import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -24,6 +29,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.robot.Robot;
 import javafx.stage.Window;
 
 /**
@@ -33,6 +39,7 @@ import javafx.stage.Window;
 public class DockingPaneSkin extends SkinBase<DockingPane> {
 
     private static final DataFormat DOCKABLE_ID_FORMAT = new DataFormat("application/x-gemsfx-dockable-id");
+    private static final PseudoClass ACTIVE = PseudoClass.getPseudoClass("active");
     private static final List<String> DROP_ZONE_STYLES = List.of(
             "drop-zone-center", "drop-zone-left", "drop-zone-right", "drop-zone-top", "drop-zone-bottom");
 
@@ -41,6 +48,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private final StackPane host = new StackPane();
     private final Region dropLeafPreview = previewRegion("docking-drop-leaf-preview");
     private final Region dropZonePreview = previewRegion("docking-drop-zone-preview");
+    private final Map<DockingPosition, StackPane> paneEdgeTargets = new EnumMap<>(DockingPosition.class);
     // Eagerly validate snapshots even when divider synchronization skips rebuilding.
     private final ChangeListener<DockingLayoutNode> layoutListener = (obs, oldLayout, newLayout) -> {
         if (!syncingDivider) {
@@ -49,14 +57,17 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     };
     private final EventHandler<DragEvent> dragOverHandler = this::handleDragOver;
     private final EventHandler<DragEvent> dragDroppedHandler = this::handleDragDropped;
-    private final EventHandler<DragEvent> dragExitedHandler = event -> clearDropPreview();
+    private final EventHandler<DragEvent> dragExitedHandler = event -> {
+        clearDropPreview();
+        hidePaneEdgeTargets();
+    };
     private final EventHandler<DragEvent> sceneDragOverHandler = this::handleSceneDragOver;
     private final EventHandler<DragEvent> sceneDragDroppedHandler = this::handleSceneDragDropped;
     private final EventHandler<KeyEvent> keyPressedHandler = this::handleKeyPressed;
     private String activeDragDockableId;
     private boolean dragCancelledByEscape;
     private boolean unsuccessfulDropObserved;
-    private boolean outsideContextDropObserved;
+    private Point2D outsideContextDropPosition;
     private Scene activeDragScene;
 
 
@@ -67,6 +78,17 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      */
     public DockingPaneSkin(DockingPane pane) {
         super(pane);
+        for (DockingPosition edge : List.of(DockingPosition.LEFT, DockingPosition.RIGHT,
+                DockingPosition.TOP, DockingPosition.BOTTOM)) {
+            Region icon = new Region();
+            icon.getStyleClass().add("icon");
+            StackPane target = new StackPane(icon);
+            target.getStyleClass().addAll("docking-pane-edge-target", "pane-edge-" + edge.name().toLowerCase(java.util.Locale.ROOT));
+            target.setManaged(false);
+            target.setMouseTransparent(true);
+            target.setVisible(false);
+            paneEdgeTargets.put(edge, target);
+        }
         pane.layoutRootProperty().addListener(layoutListener);
         pane.addEventHandler(DragEvent.DRAG_OVER, dragOverHandler);
         pane.addEventHandler(DragEvent.DRAG_DROPPED, dragDroppedHandler);
@@ -81,6 +103,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         detachContents();
         Node root = render(pane.getLayoutRoot(), new ArrayList<>());
         host.getChildren().setAll(root, dropLeafPreview, dropZonePreview);
+        host.getChildren().addAll(paneEdgeTargets.values());
         getChildren().setAll(host);
         clearDropPreview();
         if (focusedId != null) {
@@ -89,6 +112,34 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
                     title.requestFocus();
                 }
             }
+        }
+    }
+
+    @Override
+    protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
+        host.resizeRelocate(contentX, contentY, contentWidth, contentHeight);
+        double size = Math.min(36, Math.min(contentWidth, contentHeight) / 3);
+        double inset = Math.min(12, size / 3);
+        for (Map.Entry<DockingPosition, StackPane> entry : paneEdgeTargets.entrySet()) {
+            double x = (contentWidth - size) / 2;
+            double y = (contentHeight - size) / 2;
+            switch (entry.getKey()) {
+                case LEFT:
+                    x = inset;
+                    break;
+                case RIGHT:
+                    x = contentWidth - inset - size;
+                    break;
+                case TOP:
+                    y = inset;
+                    break;
+                case BOTTOM:
+                    y = contentHeight - inset - size;
+                    break;
+                default:
+                    break;
+            }
+            entry.getValue().resizeRelocate(x, y, size, size);
         }
     }
 
@@ -157,6 +208,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     @Override
     public void dispose() {
         clearDropPreview();
+        hidePaneEdgeTargets();
         uninstallSceneDragHandlers();
         DockingPane pane = getSkinnable();
         pane.removeEventHandler(DragEvent.DRAG_OVER, dragOverHandler);
@@ -202,6 +254,14 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             return;
         }
         DockingPane pane = getSkinnable();
+        showPaneEdgeTargets(draggedId);
+        DockingPosition paneEdge = resolvePaneEdgeTarget(event.getX(), event.getY());
+        if (paneEdge != null) {
+            showPaneEdgePreview(paneEdge);
+            event.acceptTransferModes(TransferMode.MOVE);
+            event.consume();
+            return;
+        }
         DockingTree.ResolvedDropTarget target = resolveDropTarget(event.getX(), event.getY(), intersectedNode(event), draggedId);
         if (target == null || !pane.canMoveDockable(draggedId, target.getTargetId(), target.getPosition())) {
             clearDropPreview();
@@ -218,16 +278,65 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             return;
         }
         DockingPane pane = getSkinnable();
-        DockingTree.ResolvedDropTarget target = resolveDropTarget(event.getX(), event.getY(), intersectedNode(event), draggedId);
-        if (target != null && pane.moveDockable(draggedId, target.getTargetId(), target.getPosition())) {
+        showPaneEdgeTargets(draggedId);
+        DockingPosition paneEdge = resolvePaneEdgeTarget(event.getX(), event.getY());
+        boolean moved;
+        if (paneEdge != null) {
+            moved = pane.moveDockableToPaneEdge(draggedId, paneEdge);
+        } else {
+            DockingTree.ResolvedDropTarget target = resolveDropTarget(event.getX(), event.getY(), intersectedNode(event), draggedId);
+            moved = target != null && pane.moveDockable(draggedId, target.getTargetId(), target.getPosition());
+        }
+        if (moved) {
             event.setDropCompleted(true);
-            clearDropPreview();
             event.consume();
         } else {
             recordUnsuccessfulDrop(draggedId);
             event.setDropCompleted(false);
-            clearDropPreview();
         }
+        clearDropPreview();
+        hidePaneEdgeTargets();
+    }
+
+    private void showPaneEdgeTargets(String draggedId) {
+        for (Map.Entry<DockingPosition, StackPane> entry : paneEdgeTargets.entrySet()) {
+            entry.getValue().setVisible(getSkinnable().canMoveDockableToPaneEdge(draggedId, entry.getKey()));
+        }
+    }
+
+    private void hidePaneEdgeTargets() {
+        for (StackPane target : paneEdgeTargets.values()) {
+            target.setVisible(false);
+            target.pseudoClassStateChanged(ACTIVE, false);
+        }
+    }
+
+    private DockingPosition resolvePaneEdgeTarget(double x, double y) {
+        Point2D point = host.sceneToLocal(getSkinnable().localToScene(x, y));
+        for (Map.Entry<DockingPosition, StackPane> entry : paneEdgeTargets.entrySet()) {
+            StackPane target = entry.getValue();
+            if (target.isVisible() && target.getBoundsInParent().contains(point)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    private void showPaneEdgePreview(DockingPosition edge) {
+        clearDropPreview();
+        double width = host.getWidth();
+        double height = host.getHeight();
+        boolean horizontal = edge == DockingPosition.LEFT || edge == DockingPosition.RIGHT;
+        double zoneWidth = horizontal ? width / 2 : width;
+        double zoneHeight = horizontal ? height : height / 2;
+        double x = edge == DockingPosition.RIGHT ? width / 2 : 0;
+        double y = edge == DockingPosition.BOTTOM ? height / 2 : 0;
+        dropLeafPreview.resizeRelocate(0, 0, width, height);
+        dropLeafPreview.setVisible(true);
+        dropZonePreview.getStyleClass().add(previewStyle(edge));
+        dropZonePreview.resizeRelocate(x, y, zoneWidth, zoneHeight);
+        dropZonePreview.setVisible(true);
+        paneEdgeTargets.get(edge).pseudoClassStateChanged(ACTIVE, true);
     }
 
     private static String dockableId(Node node) {
@@ -269,6 +378,8 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private void handleKeyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE && activeDragDockableId != null) {
             dragCancelledByEscape = true;
+            clearDropPreview();
+            hidePaneEdgeTargets();
         }
     }
 
@@ -276,7 +387,8 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         activeDragDockableId = dockableId;
         dragCancelledByEscape = false;
         unsuccessfulDropObserved = false;
-        outsideContextDropObserved = false;
+        outsideContextDropPosition = null;
+        showPaneEdgeTargets(dockableId);
         installSceneDragHandlers();
     }
 
@@ -338,17 +450,24 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         if (dockableId == null || !dockableId.equals(activeDragDockableId) || dragCancelledByEscape) {
             return false;
         }
-        outsideContextDropObserved = true;
+        outsideContextDropPosition = new Point2D(screenX, screenY);
         return true;
     }
 
     private void completeDrag(String dockableId, TransferMode transferMode, double screenX, double screenY) {
-        if (dockableId == null || !dockableId.equals(activeDragDockableId)) {
+        if (dockableId == null || !dockableId.equals(activeDragDockableId) || dragCancelledByEscape
+                || (outsideContextDropPosition == null && (transferMode != null || unsuccessfulDropObserved))) {
             finishDrag();
             return;
         }
-        if (shouldFloatAtDragDone(transferMode, screenX, screenY)) {
-            getSkinnable().getDockingContext().floatDockable(dockableId, screenX, screenY);
+        Point2D dropPosition = outsideContextDropPosition;
+        if (dropPosition == null) {
+            // Native JavaFX drag-done events can report zero coordinates instead of the drop location.
+            dropPosition = screenX == 0 && screenY == 0
+                    ? new Robot().getMousePosition() : new Point2D(screenX, screenY);
+        }
+        if (outsideContextDropPosition != null || isOutsideAllContextPanes(dropPosition.getX(), dropPosition.getY())) {
+            getSkinnable().getDockingContext().floatDockable(dockableId, dropPosition.getX(), dropPosition.getY());
         }
         finishDrag();
     }
@@ -357,22 +476,6 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         if (dockableId != null && dockableId.equals(activeDragDockableId)) {
             unsuccessfulDropObserved = true;
         }
-    }
-
-    private boolean shouldFloatAtDragDone(TransferMode transferMode, double screenX, double screenY) {
-        if (dragCancelledByEscape) {
-            return false;
-        }
-        if (outsideContextDropObserved) {
-            return true;
-        }
-        if (transferMode != null) {
-            return false;
-        }
-        if (unsuccessfulDropObserved) {
-            return false;
-        }
-        return isOutsideAllContextPanes(screenX, screenY);
     }
 
     private boolean isOutsideAllContextPanes(double screenX, double screenY) {
@@ -415,13 +518,14 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         activeDragDockableId = null;
         dragCancelledByEscape = false;
         unsuccessfulDropObserved = false;
-        outsideContextDropObserved = false;
+        outsideContextDropPosition = null;
     }
 
     private void finishDrag() {
         resetDragState();
         uninstallSceneDragHandlers();
         clearDropPreview();
+        hidePaneEdgeTargets();
     }
 
     private void showDropPreview(DockingTree.ResolvedDropTarget target) {
@@ -441,6 +545,9 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         dropLeafPreview.setVisible(false);
         dropZonePreview.setVisible(false);
         dropZonePreview.getStyleClass().removeAll(DROP_ZONE_STYLES);
+        for (StackPane target : paneEdgeTargets.values()) {
+            target.pseudoClassStateChanged(ACTIVE, false);
+        }
         previewTarget = null;
     }
 

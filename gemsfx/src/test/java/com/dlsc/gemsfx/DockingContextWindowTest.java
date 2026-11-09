@@ -3,7 +3,9 @@ package com.dlsc.gemsfx;
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import javafx.event.Event;
 import javafx.event.EventType;
+import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -16,8 +18,10 @@ import javafx.scene.input.PickResult;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.robot.Robot;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.junit.Assume;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -101,6 +105,14 @@ public class DockingContextWindowTest extends FxTestBase {
                 5, 5, 105, 105, MouseButton.PRIMARY, 1,
                 false, false, false, false, true, false, false,
                 false, false, true, new PickResult(title, 5, 5)));
+    }
+
+    private static Point2D paneEdgeTargetCenter(DockingPane pane, String selector) {
+        Node target = pane.lookup(".docking-pane-edge-target" + selector);
+        assertNotNull("The pane-wide drop indicator must exist", target);
+        assertTrue("The pane-wide drop indicator must be visible during a drag", target.isVisible());
+        Bounds bounds = pane.sceneToLocal(target.localToScene(target.getBoundsInLocal()));
+        return new Point2D(bounds.getCenterX(), bounds.getCenterY());
     }
 
     private static DragEvent fireDragEvent(Node target, EventType<DragEvent> type, Node gestureSource,
@@ -420,8 +432,14 @@ public class DockingContextWindowTest extends FxTestBase {
             Node title = title(host, "a");
 
             fireDragDetected(title);
+            for (Node indicator : host.lookupAll(".docking-pane-edge-target")) {
+                assertTrue(indicator.isVisible());
+            }
             Event.fireEvent(host, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ESCAPE,
                     false, false, false, false));
+            for (Node indicator : host.lookupAll(".docking-pane-edge-target")) {
+                assertFalse(indicator.isVisible());
+            }
             fireDragEvent(title, DragEvent.DRAG_DONE, title,
                     5, 5, 400, 500, null, title);
 
@@ -496,6 +514,75 @@ public class DockingContextWindowTest extends FxTestBase {
             assertEquals(List.of("b"), ids(host));
             assertEquals(777d, floatingStageRef.get().getX(), 0d);
             assertEquals(888d, floatingStageRef.get().getY(), 0d);
+            return null;
+        });
+    }
+
+    @Test
+    public void nativeDragDoneWithZeroCoordinatesFloatsAtThePointerPosition() {
+        Assume.assumeTrue("Keep pointer movement inside the headless test toolkit",
+                "Monocle".equals(System.getProperty("glass.platform")));
+        invoke(() -> {
+            List<Dockable> all = List.of(dockable("a"), dockable("b"));
+            AtomicReference<Stage> floatingStageRef = new AtomicReference<>();
+            DockingContext context = new DockingContext(factoryFor(all, new AtomicInteger()), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(pane, 200, 120));
+                floatingStageRef.set(stage);
+                return stage;
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.CENTER);
+            renderWithEventSkin(host);
+            Node source = title(host, "a");
+            Robot robot = new Robot();
+            Point2D originalPosition = robot.getMousePosition();
+            try {
+                fireDragDetected(source);
+                robot.mouseMove(620, 430);
+                fireDragEvent(source, DragEvent.DRAG_DONE, source, 0, 0, 0, 0, null, source);
+
+                assertNotNull(floatingStageRef.get());
+                assertEquals(620, floatingStageRef.get().getX(), 0);
+                assertEquals(430, floatingStageRef.get().getY(), 0);
+                assertEquals(List.of("b"), ids(host));
+                return null;
+            } finally {
+                robot.mouseMove(originalPosition);
+            }
+        });
+    }
+
+    @Test
+    public void externalDropCoordinatesSurviveZeroCoordinateDragDone() {
+        invoke(() -> {
+            List<Dockable> all = List.of(dockable("a"), dockable("b"));
+            AtomicReference<Stage> floatingStageRef = new AtomicReference<>();
+            DockingContext context = new DockingContext(factoryFor(all, new AtomicInteger()), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(pane, 200, 120));
+                floatingStageRef.set(stage);
+                return stage;
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.CENTER);
+            host.setSkin(new EventTestDockingPaneSkin(host));
+            StackPane outside = new StackPane();
+            layout(new HBox(host, outside));
+            Node source = title(host, "a");
+
+            fireDragDetected(source);
+            DragEvent dropped = fireDragEvent(outside, DragEvent.DRAG_DROPPED, source,
+                    5, 5, -320, 240, TransferMode.MOVE, outside);
+            fireDragEvent(source, DragEvent.DRAG_DONE, source, 0, 0, 0, 0, TransferMode.MOVE, source);
+
+            assertTrue(dropped.isDropCompleted());
+            assertNotNull(floatingStageRef.get());
+            assertEquals(-320, floatingStageRef.get().getX(), 0);
+            assertEquals(240, floatingStageRef.get().getY(), 0);
+            assertEquals(List.of("b"), ids(host));
             return null;
         });
     }
@@ -621,6 +708,145 @@ public class DockingContextWindowTest extends FxTestBase {
                 return null;
             });
         }
+    }
+
+    @Test
+    public void outerEdgeIndicatorsWrapAllGroupsAndPreviewTheWholePane() {
+        Object[][] cases = {
+                {".pane-edge-left", Orientation.HORIZONTAL, true, 0.5, 1.0},
+                {".pane-edge-right", Orientation.HORIZONTAL, false, 0.5, 1.0},
+                {".pane-edge-top", Orientation.VERTICAL, true, 1.0, 0.5},
+                {".pane-edge-bottom", Orientation.VERTICAL, false, 1.0, 0.5}
+        };
+        for (Object[] testCase : cases) {
+            invoke(() -> {
+                List<Dockable> all = List.of(dockable("a"), dockable("b"), dockable("c"));
+                DockingContext context = new DockingContext(factoryFor(all, new AtomicInteger()), pane -> {
+                    throw new AssertionError("An outer-edge drop must stay in the target pane");
+                });
+                DockingPane host = context.createPane();
+                context.openDockable(host, "a", DockingPosition.CENTER);
+                context.openDockable(host, "b", DockingPosition.RIGHT);
+                context.openDockable(host, "c", DockingPosition.CENTER);
+                renderWithEventSkin(host);
+                Node source = title(host, "c");
+
+                fireDragDetected(source);
+                host.applyCss();
+                host.layout();
+                Point2D point = paneEdgeTargetCenter(host, (String) testCase[0]);
+                fireDragEvent(host, DragEvent.DRAG_OVER, source,
+                        point.getX(), point.getY(), 200, 200, TransferMode.MOVE, host);
+                Node preview = host.lookup(".docking-drop-zone-preview");
+                assertTrue(preview.isVisible());
+                assertEquals(host.getWidth() * (double) testCase[3],
+                        preview.getBoundsInParent().getWidth(), 1);
+                assertEquals(host.getHeight() * (double) testCase[4],
+                        preview.getBoundsInParent().getHeight(), 1);
+
+                DragEvent dropped = fireDragEvent(host, DragEvent.DRAG_DROPPED, source,
+                        point.getX(), point.getY(), 200, 200, TransferMode.MOVE, host);
+                fireDragEvent(source, DragEvent.DRAG_DONE, source,
+                        point.getX(), point.getY(), 200, 200, TransferMode.MOVE, source);
+
+                assertTrue(dropped.isDropCompleted());
+                DockingLayoutNode.Split root = (DockingLayoutNode.Split) host.getLayoutRoot();
+                assertEquals(testCase[1], root.getOrientation());
+                DockingLayoutNode moved = (boolean) testCase[2] ? root.getFirst() : root.getSecond();
+                DockingLayoutNode.Split remainder = (DockingLayoutNode.Split)
+                        ((boolean) testCase[2] ? root.getSecond() : root.getFirst());
+                assertEquals(List.of("c"), allIds(moved));
+                assertEquals(Orientation.HORIZONTAL, remainder.getOrientation());
+                assertEquals(List.of("a"), allIds(remainder.getFirst()));
+                assertEquals(List.of("b"), allIds(remainder.getSecond()));
+                for (Node indicator : host.lookupAll(".docking-pane-edge-target")) {
+                    assertFalse(indicator.isVisible());
+                }
+                return null;
+            });
+        }
+    }
+
+    @Test
+    public void droppingAwayFromOuterIndicatorsStillSplitsOnlyTheHoveredGroup() {
+        invoke(() -> {
+            List<Dockable> all = List.of(dockable("a"), dockable("b"), dockable("c"));
+            DockingContext context = new DockingContext(factoryFor(all, new AtomicInteger()), pane -> {
+                throw new AssertionError("A local split must not create a floating stage");
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.RIGHT);
+            context.openDockable(host, "c", DockingPosition.CENTER);
+            renderWithEventSkin(host);
+            Node source = title(host, "c");
+
+            fireDragDetected(source);
+            DragEvent dropped = fireDragEvent(host, DragEvent.DRAG_DROPPED, source,
+                    host.getWidth() * 0.8, host.getHeight() - 2, 200, 200, TransferMode.MOVE, host);
+            fireDragEvent(source, DragEvent.DRAG_DONE, source, 5, 5, 200, 200, TransferMode.MOVE, source);
+
+            assertTrue(dropped.isDropCompleted());
+            DockingLayoutNode.Split root = (DockingLayoutNode.Split) host.getLayoutRoot();
+            assertEquals(Orientation.HORIZONTAL, root.getOrientation());
+            assertEquals(List.of("a"), allIds(root.getFirst()));
+            DockingLayoutNode.Split right = (DockingLayoutNode.Split) root.getSecond();
+            assertEquals(Orientation.VERTICAL, right.getOrientation());
+            assertEquals(List.of("b"), allIds(right.getFirst()));
+            assertEquals(List.of("c"), allIds(right.getSecond()));
+            return null;
+        });
+    }
+
+    @Test
+    public void floatingTabCanDropBelowAllMainGroupsAndCloseItsEmptyWindow() {
+        invoke(() -> {
+            List<Dockable> all = List.of(dockable("a"), dockable("b"), dockable("c"));
+            AtomicReference<Stage> floatingStageRef = new AtomicReference<>();
+            DockingContext context = new DockingContext(factoryFor(all, new AtomicInteger()), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(pane, 300, 200));
+                stage.show();
+                floatingStageRef.set(stage);
+                return stage;
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.RIGHT);
+            context.openDockable(host, "c", DockingPosition.CENTER);
+            renderWithEventSkin(host);
+            DockingPane floating = context.floatDockable("c", 900, 100);
+            Stage stage = floatingStageRef.get();
+            try {
+                floating.setSkin(new EventTestDockingPaneSkin(floating));
+                floating.applyCss();
+                floating.layout();
+                host.applyCss();
+                host.layout();
+                Node source = title(floating, "c");
+
+                fireDragDetected(source);
+                fireDragEvent(host, DragEvent.DRAG_OVER, source,
+                        host.getWidth() / 2, host.getHeight() / 2, 200, 200, TransferMode.MOVE, host);
+                Point2D point = paneEdgeTargetCenter(host, ".pane-edge-bottom");
+                DragEvent dropped = fireDragEvent(host, DragEvent.DRAG_DROPPED, source,
+                        point.getX(), point.getY(), 200, 200, TransferMode.MOVE, host);
+                fireDragEvent(source, DragEvent.DRAG_DONE, source,
+                        point.getX(), point.getY(), 200, 200, TransferMode.MOVE, source);
+
+                assertTrue(dropped.isDropCompleted());
+                assertFalse(stage.isShowing());
+                assertTrue(floating.getLayoutRoot() instanceof DockingLayoutNode.Empty);
+                DockingLayoutNode.Split root = (DockingLayoutNode.Split) host.getLayoutRoot();
+                assertEquals(Orientation.VERTICAL, root.getOrientation());
+                assertEquals(List.of("a", "b"), allIds(root.getFirst()));
+                assertEquals(List.of("c"), allIds(root.getSecond()));
+                assertEquals(3, context.getDockables().size());
+                return null;
+            } finally {
+                stage.close();
+            }
+        });
     }
 
     @Test

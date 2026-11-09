@@ -43,7 +43,7 @@ public class DockingPaneApp extends GemApplication {
         DockingPane rootPane = context.createPane();
         openInitialLayout(context, rootPane);
 
-        statusLabel = new Label("Drag tabs to reorder, split, or move between the main and floating panes.");
+        statusLabel = new Label("Drag tabs onto an outer-edge indicator to span the whole pane, or beside a group to split only that group.");
         statusLabel.setWrapText(true);
 
         BorderPane root = new BorderPane(rootPane);
@@ -57,7 +57,7 @@ public class DockingPaneApp extends GemApplication {
         stage.show();
 
         context.floatDockable("inspector", stage.getX() + stage.getWidth() + 20, stage.getY() + 80);
-        status("Opened app-created floating stage with 'Inspector'. Drag tabs between windows.");
+        status("Drag Inspector onto the main pane's bottom outer-edge indicator to place it below all groups.");
     }
 
     private HBox createToolbar(Stage stage, DockingContext context, DockingPane rootPane) {
@@ -120,7 +120,7 @@ public class DockingPaneApp extends GemApplication {
     }
 
     private Stage createFloatingStage(Stage owner, DockingPane pane) {
-        Label hint = new Label("Cross-pane move: drag tabs between this window and the main DockingPane.");
+        Label hint = new Label("Drag between windows. Outer-edge indicators dock beside the entire layout; other edge drops split one group.");
         hint.setWrapText(true);
 
         BorderPane wrapper = new BorderPane(pane);

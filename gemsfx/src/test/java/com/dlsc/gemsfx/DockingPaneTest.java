@@ -402,6 +402,8 @@ public class DockingPaneTest extends FxTestBase {
 
         assertThrows(IllegalStateException.class, () -> pane.selectDockable("a"));
         assertThrows(IllegalStateException.class, () -> pane.updateDividerPosition(List.of(), 0.7));
+        assertThrows(IllegalStateException.class, () -> pane.canMoveDockableToPaneEdge("a", DockingPosition.BOTTOM));
+        assertThrows(IllegalStateException.class, () -> pane.moveDockableToPaneEdge("a", DockingPosition.BOTTOM));
     }
 
     @Test
@@ -513,6 +515,34 @@ public class DockingPaneTest extends FxTestBase {
             assertEquals(Orientation.HORIZONTAL, split.getOrientation());
             assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) split.getFirst()).getDockableIds());
             assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) split.getSecond()).getDockableIds());
+            return null;
+        });
+    }
+
+    @Test
+    public void paneEdgeApiPlacesDockableBelowAllExistingGroups() {
+        invoke(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"), dockable("c"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.RIGHT);
+            context.openDockable(pane, "c", DockingPosition.CENTER);
+            layout(pane);
+
+            assertTrue(pane.canMoveDockableToPaneEdge("c", DockingPosition.BOTTOM));
+            assertTrue(pane.moveDockableToPaneEdge("c", DockingPosition.BOTTOM));
+            pane.applyCss();
+            pane.layout();
+
+            DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
+            assertEquals(Orientation.VERTICAL, root.getOrientation());
+            DockingLayoutNode.Split top = (DockingLayoutNode.Split) root.getFirst();
+            assertEquals(Orientation.HORIZONTAL, top.getOrientation());
+            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) top.getFirst()).getDockableIds());
+            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) top.getSecond()).getDockableIds());
+            assertEquals(List.of("c"), ((DockingLayoutNode.Tabs) root.getSecond()).getDockableIds());
+            assertEquals("c", pane.getActiveDockable().getId());
+            assertEquals(3, titles(pane).size());
             return null;
         });
     }

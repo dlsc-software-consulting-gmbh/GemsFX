@@ -410,6 +410,32 @@ public class DockingContext {
         return true;
     }
 
+    final boolean canMoveDockableToPaneEdge(DockingPane targetPane, String id, DockingPosition edge) {
+        requireFxThread();
+        if (targetPane == null || targetPane.getDockingContext() != this || !paneIdByPane.containsKey(targetPane)
+                || edge == null || edge == DockingPosition.CENTER) {
+            return false;
+        }
+        DockingPane sourcePane = dockablePaneById.get(id);
+        return sourcePane != null
+                && (sourcePane != targetPane || targetPane.canMoveInsideToPaneEdge(id, edge));
+    }
+
+    final boolean moveDockableToPaneEdge(DockingPane targetPane, String id, DockingPosition edge) {
+        if (!canMoveDockableToPaneEdge(targetPane, id, edge)) {
+            return false;
+        }
+        DockingPane sourcePane = dockablePaneById.get(id);
+        if (sourcePane == targetPane) {
+            return targetPane.moveInsideToPaneEdge(id, edge);
+        }
+        Dockable dockable = sourcePane.removeDockableById(id);
+        targetPane.insertDockableAtPaneEdge(dockable, edge);
+        dockablePaneById.put(id, targetPane);
+        closeFloatingStageIfEmpty(sourcePane);
+        return true;
+    }
+
     private void buildPaneTree(DockingPane pane, DockingLayoutNode root, Map<String, Dockable> dockablesById) {
         String seed = firstDockableId(root);
         pane.insertDockable(requireDockable(seed, dockablesById), DockingPosition.CENTER);

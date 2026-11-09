@@ -110,6 +110,63 @@ public class DockingTreeTest extends FxTestBase {
     }
 
     @Test
+    public void paneEdgeMovesWrapTheEntireRemainingLayout() {
+        Object[][] cases = {
+                {DockingPosition.LEFT, Orientation.HORIZONTAL, true},
+                {DockingPosition.RIGHT, Orientation.HORIZONTAL, false},
+                {DockingPosition.TOP, Orientation.VERTICAL, true},
+                {DockingPosition.BOTTOM, Orientation.VERTICAL, false}
+        };
+        for (Object[] testCase : cases) {
+            DockingTree tree = treeWith("left", "tools");
+            tree.splitAt("left", dockable("right"), DockingPosition.RIGHT, 0.4);
+
+            assertTrue(tree.moveToPaneEdge("tools", (DockingPosition) testCase[0], 0.5));
+
+            DockingLayoutNode.Split outer = (DockingLayoutNode.Split) tree.snapshot();
+            assertEquals(testCase[1], outer.getOrientation());
+            DockingLayoutNode moved = (boolean) testCase[2] ? outer.getFirst() : outer.getSecond();
+            DockingLayoutNode.Split remainder = (DockingLayoutNode.Split)
+                    ((boolean) testCase[2] ? outer.getSecond() : outer.getFirst());
+            assertEquals(List.of("tools"), ((DockingLayoutNode.Tabs) moved).getDockableIds());
+            assertEquals(Orientation.HORIZONTAL, remainder.getOrientation());
+            assertEquals(0.4, remainder.getDividerPosition(), 0);
+            assertEquals(List.of("left"), ((DockingLayoutNode.Tabs) remainder.getFirst()).getDockableIds());
+            assertEquals(List.of("right"), ((DockingLayoutNode.Tabs) remainder.getSecond()).getDockableIds());
+            assertEquals(3, tree.dockableIds().size());
+        }
+    }
+
+    @Test
+    public void paneEdgeMoveCollapsesTheOldSourceBranch() {
+        DockingTree tree = treeWith("left");
+        tree.splitAt("left", dockable("right"), DockingPosition.RIGHT, 0.4);
+
+        assertTrue(tree.moveToPaneEdge("left", DockingPosition.BOTTOM, 0.5));
+
+        DockingLayoutNode.Split root = (DockingLayoutNode.Split) tree.snapshot();
+        assertEquals(Orientation.VERTICAL, root.getOrientation());
+        assertEquals(List.of("right"), ((DockingLayoutNode.Tabs) root.getFirst()).getDockableIds());
+        assertEquals(List.of("left"), ((DockingLayoutNode.Tabs) root.getSecond()).getDockableIds());
+    }
+
+    @Test
+    public void paneEdgeMovesRejectInvalidTargetsWithoutRemovingTheSource() {
+        DockingTree tree = treeWith("a");
+        assertFalse(tree.moveToPaneEdge("a", DockingPosition.BOTTOM, 0.5));
+        tree.addToRoot(dockable("b"));
+
+        assertFalse(tree.moveToPaneEdge("a", DockingPosition.CENTER, 0.5));
+        assertFalse(tree.moveToPaneEdge("a", null, 0.5));
+        assertFalse(tree.moveToPaneEdge("missing", DockingPosition.BOTTOM, 0.5));
+        assertThrows(IllegalArgumentException.class,
+                () -> tree.moveToPaneEdge("a", DockingPosition.BOTTOM, Double.NaN));
+
+        assertEquals(List.of("a", "b"), tree.dockableIds());
+        assertTrue(tree.snapshot() instanceof DockingLayoutNode.Tabs);
+    }
+
+    @Test
     public void rejectsInvalidInputWithoutChangingTree() {
         DockingTree tree = treeWith("a", "b");
         assertThrows(IllegalArgumentException.class, () -> tree.addToRoot(dockable("a")));
