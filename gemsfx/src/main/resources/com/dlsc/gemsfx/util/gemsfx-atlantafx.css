@@ -2915,6 +2915,10 @@
     -fx-icon-color: -color-fg-emphasis;
 }
 
+.docking-pane:show-focus-border .docking-tab-pane:focus-highlighted {
+    -fx-border-color: -color-accent-emphasis;
+}
+
 .docking-pane .docking-tab:focused {
     -fx-border-color: -color-accent-emphasis;
 }

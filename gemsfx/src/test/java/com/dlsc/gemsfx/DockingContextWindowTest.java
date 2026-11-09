@@ -17,6 +17,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.robot.Robot;
 import javafx.stage.Stage;
@@ -434,6 +435,33 @@ public class DockingContextWindowTest extends FxTestBase {
                 assertNull("Title width " + label.getWidth() + ", preferred width " + label.prefWidth(-1),
                         label.getTooltip());
             }
+        });
+    }
+
+    @Test
+    public void lastTabHasNoRightSeparatorAfterSelectionAndClosing() {
+        runFx(() -> {
+            DockingContext context = new DockingContext(
+                    id -> Optional.of(dockable(id)), pane -> new Stage());
+            DockingPane pane = context.createPane();
+            Dockable first = context.openDockable(pane, "a", DockingPosition.CENTER).orElseThrow();
+            Dockable second = context.openDockable(pane, "b", DockingPosition.CENTER).orElseThrow();
+            Dockable last = context.openDockable(pane, "c", DockingPosition.CENTER).orElseThrow();
+            layout(pane);
+
+            assertEquals(1, ((Region) title(pane, "a")).getBorder().getStrokes().get(0).getWidths().getRight(), 0);
+            assertEquals(0, ((Region) title(pane, "c")).getBorder().getStrokes().get(0).getWidths().getRight(), 0);
+            pane.selectDockable(first.getId());
+            pane.applyCss();
+            assertEquals(0, ((Region) title(pane, "c")).getBorder().getStrokes().get(0).getWidths().getRight(), 0);
+
+            context.requestCloseDockable(last);
+            pane.applyCss();
+            assertEquals(1, ((Region) title(pane, "a")).getBorder().getStrokes().get(0).getWidths().getRight(), 0);
+            assertEquals(0, ((Region) title(pane, "b")).getBorder().getStrokes().get(0).getWidths().getRight(), 0);
+            context.requestCloseDockable(second);
+            pane.applyCss();
+            assertEquals(0, ((Region) title(pane, "a")).getBorder().getStrokes().get(0).getWidths().getRight(), 0);
         });
     }
 

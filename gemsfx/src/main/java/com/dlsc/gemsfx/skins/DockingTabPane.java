@@ -9,6 +9,7 @@ import com.dlsc.gemsfx.util.ResourceBundleManager.BundleType;
 import javafx.animation.FadeTransition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
+import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
@@ -36,6 +37,7 @@ import java.util.List;
 final class DockingTabPane extends VBox {
 
     static final String DOCKABLE_ID_KEY = "docking.dockable-id";
+    private static final PseudoClass LAST_TAB = PseudoClass.getPseudoClass("last-tab");
     private static final Object TITLE_ACCESSIBLE_TEXT_BINDING_KEY = new Object();
 
     private final DockingPane dockingPane;
@@ -66,6 +68,9 @@ final class DockingTabPane extends VBox {
             if (selected) {
                 contentArea.getChildren().setAll(dockable.getContent());
             }
+        }
+        if (!strip.getChildren().isEmpty()) {
+            strip.getChildren().get(strip.getChildren().size() - 1).pseudoClassStateChanged(LAST_TAB, true);
         }
         getChildren().addAll(strip, contentArea);
     }

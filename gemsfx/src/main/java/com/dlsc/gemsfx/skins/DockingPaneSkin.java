@@ -50,6 +50,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private static final DataFormat DOCKABLE_ID_FORMAT = new DataFormat("application/x-gemsfx-dockable-id");
     private static final DataFormat TAB_GROUP_FORMAT = new DataFormat("application/x-gemsfx-dockable-tab-group");
     private static final PseudoClass ACTIVE = PseudoClass.getPseudoClass("active");
+    private static final PseudoClass FOCUS_HIGHLIGHTED = PseudoClass.getPseudoClass("focus-highlighted");
     private static final List<String> DROP_ZONE_STYLES = List.of(
             "drop-zone-center", "drop-zone-left", "drop-zone-right", "drop-zone-top", "drop-zone-bottom");
 
@@ -59,6 +60,9 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private final StackPane emptyPane = new StackPane();
     private final List<StackPane> contentHosts = new ArrayList<>();
     private final List<Label> graphicLabels = new ArrayList<>();
+    private final List<DockingTabPane> tabGroups = new ArrayList<>();
+    private Scene focusScene;
+    private Window focusWindow;
     private final Region dropLeafPreview = previewRegion("docking-drop-leaf-preview");
     private final Region dropZonePreview = previewRegion("docking-drop-zone-preview");
     private final Map<DockingPosition, StackPane> paneEdgeTargets = new EnumMap<>(DockingPosition.class);
@@ -115,7 +119,50 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         pane.addEventFilter(DragEvent.DRAG_DROPPED, dragDroppedHandler);
         pane.addEventFilter(DragEvent.DRAG_EXITED, dragExitedHandler);
         pane.addEventFilter(KeyEvent.KEY_PRESSED, keyPressedHandler);
+        registerChangeListener(pane.showFocusBorderProperty(), obs -> updateFocusBorders());
+        registerChangeListener(pane.sceneProperty(), obs -> observeFocusScene(pane.getScene()));
+        observeFocusScene(pane.getScene());
         rebuild();
+    }
+
+    private void observeFocusScene(Scene scene) {
+        if (focusScene != null) {
+            unregisterChangeListeners(focusScene.focusOwnerProperty());
+            unregisterChangeListeners(focusScene.windowProperty());
+        }
+        focusScene = scene;
+        if (scene != null) {
+            registerChangeListener(scene.focusOwnerProperty(), obs -> updateFocusBorders());
+            registerChangeListener(scene.windowProperty(), obs -> observeFocusWindow(scene.getWindow()));
+        }
+        observeFocusWindow(scene == null ? null : scene.getWindow());
+    }
+
+    private void observeFocusWindow(Window window) {
+        if (focusWindow != null) {
+            unregisterChangeListeners(focusWindow.focusedProperty());
+        }
+        focusWindow = window;
+        if (window != null) {
+            registerChangeListener(window.focusedProperty(), obs -> updateFocusBorders());
+        }
+        updateFocusBorders();
+    }
+
+    private void updateFocusBorders() {
+        DockingTabPane focusedGroup = null;
+        if (getSkinnable().isShowFocusBorder() && focusScene != null
+                && focusWindow != null && focusWindow.isFocused()) {
+            for (Node node = focusScene.getFocusOwner(); node != null; node = node.getParent()) {
+                if (node instanceof DockingTabPane && tabGroups.contains(node)) {
+                    focusedGroup = (DockingTabPane) node;
+                    break;
+                }
+            }
+        }
+        for (DockingTabPane group : tabGroups) {
+            group.pseudoClassStateChanged(FOCUS_HIGHLIGHTED, group == focusedGroup);
+        }
     }
 
     private void rebuild() {
@@ -135,6 +182,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
                 }
             }
         }
+        updateFocusBorders();
     }
 
     @Override
@@ -172,6 +220,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             label.setGraphic(null);
         }
         graphicLabels.clear();
+        tabGroups.clear();
         for (StackPane content : contentHosts) {
             content.getChildren().clear();
         }
@@ -194,6 +243,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private Node render(DockingLayoutNode node, List<Integer> path) {
         if (node instanceof DockingLayoutNode.Tabs) {
             DockingTabPane tabs = new DockingTabPane(getSkinnable(), (DockingLayoutNode.Tabs) node);
+            tabGroups.add(tabs);
             contentHosts.add((StackPane) tabs.lookup(".docking-tab-content"));
             for (Node label : tabs.lookupAll(".docking-tab-title")) {
                 graphicLabels.add((Label) label);
@@ -239,6 +289,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
 
     @Override
     public void dispose() {
+        observeFocusScene(null);
         clearDropPreview();
         hidePaneEdgeTargets();
         uninstallSceneDragHandlers();

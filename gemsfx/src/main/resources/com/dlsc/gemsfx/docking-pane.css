@@ -7,6 +7,15 @@
     -fx-background-color: transparent;
 }
 
+.docking-pane:show-focus-border .docking-tab-pane {
+    -fx-border-color: transparent;
+    -fx-border-width: 1;
+}
+
+.docking-pane:show-focus-border .docking-tab-pane:focus-highlighted {
+    -fx-border-color: -fx-focus-color;
+}
+
 .docking-pane .docking-tab-strip {
     -fx-spacing: 0;
     -fx-padding: 0;
@@ -27,6 +36,10 @@
     -fx-border-color: -fx-focus-color;
     -fx-border-radius: 0;
     -fx-border-insets: 0;
+}
+
+.docking-pane .docking-tab:last-tab {
+    -fx-border-width: 1 0 1 1;
 }
 
 .docking-pane .docking-tab.selected {

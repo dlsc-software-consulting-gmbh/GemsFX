@@ -93,6 +93,10 @@
     -fx-border-insets: 0;
 }
 
+.docking-demo-app .docking-pane:show-focus-border .docking-tab-pane:focus-highlighted {
+    -fx-border-color: -color-accent-emphasis;
+}
+
 .docking-demo-app .docking-demo-map-footer {
     -fx-background-color: rgba(255, 255, 255, 0.65);
 }
