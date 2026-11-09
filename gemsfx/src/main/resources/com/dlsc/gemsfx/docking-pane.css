@@ -1,0 +1,90 @@
+.docking-pane {
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+}
+
+.docking-pane .docking-tab-pane {
+    -fx-background-color: transparent;
+}
+
+.docking-pane .docking-tab-strip {
+    -fx-spacing: 2;
+    -fx-padding: 4 4 0 4;
+    -fx-background-color: derive(-fx-base, -3%);
+}
+
+.docking-pane .docking-tab {
+    -fx-padding: 4 4 4 10;
+    -fx-spacing: 6;
+    -fx-background-color: derive(-fx-base, 8%);
+    -fx-background-radius: 6 6 0 0;
+    -fx-cursor: hand;
+}
+
+.docking-pane .docking-tab:focused {
+    -fx-border-color: -fx-focus-color;
+    -fx-border-radius: 6 6 0 0;
+    -fx-border-insets: 0;
+}
+
+.docking-pane .docking-tab.selected {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.docking-pane .docking-tab-title {
+    -fx-graphic-text-gap: 6;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-title {
+    -fx-font-weight: bold;
+}
+
+.docking-pane .docking-tab-close-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+    -fx-padding: 4;
+    -fx-min-width: 18;
+    -fx-min-height: 18;
+}
+
+.docking-pane .docking-tab-close-button:hover {
+    -fx-background-color: -fx-hover-base;
+}
+
+.docking-pane .docking-tab-close-button .icon {
+    -fx-shape: "M1 0 L5 4 L9 0 L10 1 L6 5 L10 9 L9 10 L5 6 L1 10 L0 9 L4 5 L0 1 Z";
+    -fx-scale-shape: true;
+    -fx-min-width: 8;
+    -fx-min-height: 8;
+    -fx-pref-width: 8;
+    -fx-pref-height: 8;
+    -fx-max-width: 8;
+    -fx-max-height: 8;
+    -fx-background-color: -fx-text-base-color;
+}
+
+.docking-pane .docking-tab-content {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.docking-pane .docking-split {
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+
+.docking-pane .docking-drop-leaf-preview {
+    -fx-border-color: -fx-accent;
+    -fx-border-width: 1;
+    -fx-background-color: transparent;
+    -fx-opacity: 0.7;
+}
+
+.docking-pane .docking-drop-zone-preview {
+    -fx-opacity: 0.35;
+    -fx-background-color: -fx-accent;
+}
+
+.docking-pane .docking-drop-zone-preview.drop-zone-center {
+    -fx-opacity: 0.18;
+}
+
