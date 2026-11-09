@@ -384,8 +384,10 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     }
 
     private void showPaneEdgeTargets(String draggedId) {
+        DockingPane pane = getSkinnable();
+        boolean splitLayout = pane.getLayoutRoot() instanceof DockingLayoutNode.Split;
         for (Map.Entry<DockingPosition, StackPane> entry : paneEdgeTargets.entrySet()) {
-            entry.getValue().setVisible(getSkinnable().canMoveDockableToPaneEdge(draggedId, entry.getKey()));
+            entry.getValue().setVisible(splitLayout && pane.canMoveDockableToPaneEdge(draggedId, entry.getKey()));
         }
     }
 

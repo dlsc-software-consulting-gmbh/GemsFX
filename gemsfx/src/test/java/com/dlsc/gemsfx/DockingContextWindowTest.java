@@ -427,7 +427,7 @@ public class DockingContextWindowTest extends FxTestBase {
             });
             DockingPane host = context.createPane();
             context.openDockable(host, "a", DockingPosition.CENTER);
-            context.openDockable(host, "b", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.RIGHT);
             renderWithEventSkin(host);
             Node title = title(host, "a");
 
@@ -444,7 +444,7 @@ public class DockingContextWindowTest extends FxTestBase {
                     5, 5, 400, 500, null, title);
 
             assertEquals(0, stageFactoryCalls.get());
-            assertEquals(List.of("a", "b"), ids(host));
+            assertEquals(List.of("a", "b"), allIds(host.getLayoutRoot()));
             assertEquals(2, context.getDockables().size());
             return null;
         });
@@ -691,9 +691,15 @@ public class DockingContextWindowTest extends FxTestBase {
                 double y = (double) testCase[1] * host.getHeight();
 
                 fireDragDetected(sourceTitle);
+                for (Node indicator : host.lookupAll(".docking-pane-edge-target")) {
+                    assertFalse("A single tab group must use its local edge drop zones", indicator.isVisible());
+                }
                 fireDragEvent(host, DragEvent.DRAG_OVER, sourceTitle,
                         x, y, 200, 200, TransferMode.MOVE, b.getContent());
                 assertTrue(host.lookup(".docking-drop-zone-preview").isVisible());
+                for (Node indicator : host.lookupAll(".docking-pane-edge-target")) {
+                    assertFalse(indicator.isVisible());
+                }
                 DragEvent dropped = fireDragEvent(host, DragEvent.DRAG_DROPPED, sourceTitle,
                         x, y, 200, 200, TransferMode.MOVE, b.getContent());
                 fireDragEvent(sourceTitle, DragEvent.DRAG_DONE, sourceTitle,
@@ -708,6 +714,30 @@ public class DockingContextWindowTest extends FxTestBase {
                 return null;
             });
         }
+    }
+
+    @Test
+    public void outerEdgeIndicatorsAreVisibleForVerticalSplits() {
+        invoke(() -> {
+            List<Dockable> all = List.of(dockable("a"), dockable("b"), dockable("c"));
+            DockingContext context = new DockingContext(factoryFor(all, new AtomicInteger()), pane -> {
+                throw new AssertionError("Starting a drag must not create a floating stage");
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.BOTTOM);
+            context.openDockable(host, "c", DockingPosition.CENTER);
+            renderWithEventSkin(host);
+
+            fireDragDetected(title(host, "c"));
+
+            for (Node indicator : host.lookupAll(".docking-pane-edge-target")) {
+                assertTrue(indicator.isVisible());
+            }
+            Event.fireEvent(host, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ESCAPE,
+                    false, false, false, false));
+            return null;
+        });
     }
 
     @Test
