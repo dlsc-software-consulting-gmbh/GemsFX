@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.Dockable;
 import com.dlsc.gemsfx.DockingLayoutNode;
 import com.dlsc.gemsfx.DockingPane;
 import com.dlsc.gemsfx.DockingPosition;
@@ -13,10 +14,15 @@ import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
@@ -29,7 +35,10 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
+import javafx.scene.transform.Transform;
 import javafx.stage.Window;
 
 /**
@@ -242,10 +251,86 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      * @return {@code true} if the dragboard accepted the dockable ID
      */
     protected boolean startDockableDrag(Node title, String dockableId) {
+        Image dragView = createDockableDragView(dockableId);
         Dragboard dragboard = title.startDragAndDrop(TransferMode.MOVE);
+        dragboard.setDragView(dragView, dragView.getWidth() / 2, 18);
         ClipboardContent content = new ClipboardContent();
         content.put(DOCKABLE_ID_FORMAT, dockableId);
         return dragboard.setContent(content);
+    }
+
+    private Image createDockableDragView(String dockableId) {
+        Dockable dockable = getSkinnable().getDockingContext().getDockables().stream()
+                .filter(item -> item.getId().equals(dockableId))
+                .findFirst().orElseThrow(() -> new IllegalArgumentException("Unknown dockable id: " + dockableId));
+        Image content = snapshotDockableContent(dockable.getContent());
+        Label title = new Label(dockable.getTitle());
+        title.getStyleClass().add("docking-drag-title");
+        title.setMnemonicParsing(false);
+        title.setMinWidth(0);
+        title.setMaxWidth(Double.MAX_VALUE);
+        VBox preview = new VBox(title, new ImageView(content));
+        preview.getStyleClass().addAll("docking-pane", "docking-drag-preview");
+        preview.setPrefWidth(Math.max(180, content.getWidth() + 18));
+        configureSnapshotScene(new Scene(preview));
+        preview.applyCss();
+        preview.autosize();
+        preview.layout();
+        return snapshot(preview, 320, 240);
+    }
+
+    private Image snapshotDockableContent(Node content) {
+        if (content.getParent() != null || content.getScene() != null) {
+            return snapshot(content, 280, 180);
+        }
+        Bounds bounds = content.getLayoutBounds();
+        double oldX = content.getLayoutX();
+        double oldY = content.getLayoutY();
+        double width = bounds.getWidth() > 0 ? bounds.getWidth() : content.prefWidth(-1);
+        if (!(width > 0)) {
+            width = Math.max(1, getSkinnable().getWidth());
+        }
+        double height = bounds.getHeight() > 0 ? bounds.getHeight() : content.prefHeight(width);
+        if (!(height > 0)) {
+            height = Math.max(1, getSkinnable().getHeight());
+        }
+        StackPane temporaryRoot = new StackPane(content);
+        temporaryRoot.getStyleClass().add("docking-pane");
+        try {
+            configureSnapshotScene(new Scene(temporaryRoot, width, height));
+            temporaryRoot.applyCss();
+            temporaryRoot.resize(width, height);
+            temporaryRoot.layout();
+            return snapshot(content, 280, 180);
+        } finally {
+            temporaryRoot.getChildren().clear();
+            content.resize(bounds.getWidth(), bounds.getHeight());
+            content.setLayoutX(oldX);
+            content.setLayoutY(oldY);
+        }
+    }
+
+    private void configureSnapshotScene(Scene scene) {
+        scene.getStylesheets().add(getSkinnable().getUserAgentStylesheet());
+        Scene source = getSkinnable().getScene();
+        if (source != null) {
+            scene.getStylesheets().addAll(source.getStylesheets());
+            scene.getStylesheets().addAll(source.getRoot().getStylesheets());
+        }
+        scene.getStylesheets().addAll(getSkinnable().getStylesheets());
+    }
+
+    private Image snapshot(Node node, double maxWidth, double maxHeight) {
+        Bounds bounds = node.getBoundsInParent();
+        double scale = Math.min(1, Math.min(maxWidth / Math.max(1, bounds.getWidth()),
+                maxHeight / Math.max(1, bounds.getHeight())));
+        SnapshotParameters parameters = new SnapshotParameters();
+        parameters.setFill(Color.TRANSPARENT);
+        parameters.setTransform(Transform.scale(scale, scale));
+        parameters.setViewport(new Rectangle2D(Math.floor(bounds.getMinX() * scale), Math.floor(bounds.getMinY() * scale),
+                Math.max(1, Math.min(maxWidth, Math.ceil(bounds.getWidth() * scale))),
+                Math.max(1, Math.min(maxHeight, Math.ceil(bounds.getHeight() * scale)))));
+        return node.snapshot(parameters, null);
     }
 
     private void handleDragOver(DragEvent event) {

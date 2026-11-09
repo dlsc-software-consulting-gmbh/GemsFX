@@ -4,16 +4,20 @@ import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Orientation;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.junit.Test;
 
@@ -76,6 +80,31 @@ public class DockingPaneTest extends FxTestBase {
         } catch (ReflectiveOperationException ex) {
             throw new AssertionError(ex);
         }
+    }
+
+    private static Rectangle2D coloredBounds(Image image, Color expected) {
+        int minX = (int) image.getWidth();
+        int minY = (int) image.getHeight();
+        int maxX = -1;
+        int maxY = -1;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                Color actual = image.getPixelReader().getColor(x, y);
+                if (actual.getOpacity() > 0.5
+                        && Math.abs(actual.getRed() - expected.getRed()) < 0.02
+                        && Math.abs(actual.getGreen() - expected.getGreen()) < 0.02
+                        && Math.abs(actual.getBlue() - expected.getBlue()) < 0.02) {
+                    minX = Math.min(minX, x);
+                    minY = Math.min(minY, y);
+                    maxX = Math.max(maxX, x);
+                    maxY = Math.max(maxY, y);
+                }
+            }
+        }
+        assertTrue("The drag image must contain the dockable's rendered content; center pixel: "
+                        + image.getPixelReader().getColor((int) image.getWidth() / 2, (int) image.getHeight() / 2),
+                maxX >= minX && maxY >= minY);
+        return new Rectangle2D(minX, minY, maxX - minX + 1, maxY - minY + 1);
     }
 
     @Test
@@ -211,6 +240,69 @@ public class DockingPaneTest extends FxTestBase {
                 assertSame("The pressed title must stay attached until drag detection", scene, source.getScene());
                 assertSame(source, title(pane, id));
             }
+            return null;
+        });
+    }
+
+    @Test
+    public void dragImageSnapshotsMountedContentWithoutReparentingOrResizingIt() {
+        invoke(() -> {
+            Region content = new Region();
+            content.setStyle("-fx-background-color: red;");
+            Dockable dockable = new Dockable("a", "Editor", content);
+            DockingContext context = context(dockable);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+            Node parent = content.getParent();
+            Scene scene = content.getScene();
+            double width = content.getWidth();
+            double height = content.getHeight();
+
+            Image image = (Image) invokeSkinPrivate((DockingPaneSkin) pane.getSkin(),
+                    "createDockableDragView", new Class<?>[]{String.class}, "a");
+
+            assertTrue("Drag image width: " + image.getWidth(), image.getWidth() <= 320);
+            assertTrue("Drag image height: " + image.getHeight(), image.getHeight() <= 240);
+            Rectangle2D renderedContent = coloredBounds(image, Color.RED);
+            assertEquals(width / height, renderedContent.getWidth() / renderedContent.getHeight(), 0.03);
+            assertSame(parent, content.getParent());
+            assertSame(scene, content.getScene());
+            assertEquals(width, content.getWidth(), 0);
+            assertEquals(height, content.getHeight(), 0);
+            assertSame(dockable, pane.getActiveDockable());
+            return null;
+        });
+    }
+
+    @Test
+    public void dragImageRendersUnselectedContentWithoutChangingSelectionOrLeavingItAttached() {
+        invoke(() -> {
+            Region content = new Region();
+            content.setPrefSize(800, 400);
+            content.setStyle("-fx-background-color: blue;");
+            Dockable hidden = new Dockable("a", "Background editor", content);
+            Dockable selected = dockable("b");
+            DockingContext context = context(hidden, selected);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            layout(pane);
+            double width = content.getWidth();
+            double height = content.getHeight();
+            Node selectedParent = selected.getContent().getParent();
+
+            Image image = (Image) invokeSkinPrivate((DockingPaneSkin) pane.getSkin(),
+                    "createDockableDragView", new Class<?>[]{String.class}, "a");
+
+            Rectangle2D renderedContent = coloredBounds(image, Color.BLUE);
+            assertEquals(2, renderedContent.getWidth() / renderedContent.getHeight(), 0.03);
+            assertNull(content.getParent());
+            assertNull(content.getScene());
+            assertEquals(width, content.getWidth(), 0);
+            assertEquals(height, content.getHeight(), 0);
+            assertSame(selected, pane.getActiveDockable());
+            assertSame(selectedParent, selected.getContent().getParent());
             return null;
         });
     }

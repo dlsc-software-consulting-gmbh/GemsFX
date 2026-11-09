@@ -130,3 +130,17 @@
     -fx-shape: "M0 0 H20 V20 H0 Z M2 2 V13 H18 V2 Z";
 }
 
+.docking-pane.docking-drag-preview {
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 9;
+    -fx-spacing: 7;
+    -fx-alignment: top-center;
+}
+
+.docking-pane.docking-drag-preview .docking-drag-title {
+    -fx-padding: 0 2 3 2;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-base-color;
+}
+
