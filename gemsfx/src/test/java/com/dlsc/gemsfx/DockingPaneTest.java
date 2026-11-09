@@ -18,6 +18,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.junit.Test;
 
@@ -170,6 +171,68 @@ public class DockingPaneTest extends FxTestBase {
             assertSame(a, pane.getActiveDockable());
             assertNotNull(a.getContent().getParent());
             assertNull(b.getContent().getParent());
+            return null;
+        });
+    }
+
+    @Test
+    public void singleDockableTitleFillsTheHeaderAndKeepsItsCloseButtonAtTheRight() {
+        invoke(() -> {
+            DockingContext context = context(dockable("a"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+            Region strip = (Region) pane.lookup(".docking-tab-strip");
+            Region header = (Region) title(pane, "a");
+            Node close = header.lookup(".docking-tab-close-button");
+
+            assertEquals(0, header.getLayoutX(), 0.01);
+            assertEquals(0, header.getLayoutY(), 0.01);
+            assertEquals(strip.getWidth(), header.getWidth(), 0.01);
+            assertEquals(strip.getHeight(), header.getHeight(), 0.01);
+            assertEquals(header.getWidth() - header.getInsets().getRight(),
+                    close.getBoundsInParent().getMaxX(), 1);
+            return null;
+        });
+    }
+
+    @Test
+    public void dockableHeadersShareTheStripEquallyAndTruncateLongTitlesWhenResized() {
+        invoke(() -> {
+            Region graphic = new Region();
+            graphic.setPrefSize(16, 40);
+            DockingContext context = context(
+                    new Dockable("a", "Long editor title ".repeat(20), new Label("Editor")),
+                    dockable("b"),
+                    new Dockable("c", "Inspector", graphic, new Label("Inspector")));
+            DockingPane pane = context.createPane();
+            for (String id : List.of("a", "b", "c")) {
+                context.openDockable(pane, id, DockingPosition.CENTER);
+            }
+            layout(pane);
+
+            for (double width : new double[]{800, 360}) {
+                pane.resize(width, 400);
+                pane.layout();
+                Region strip = (Region) pane.lookup(".docking-tab-strip");
+                int index = 0;
+                for (String id : List.of("a", "b", "c")) {
+                    Region header = (Region) title(pane, id);
+                    Node close = header.lookup(".docking-tab-close-button");
+                    assertEquals(strip.getWidth() / 3, header.getWidth(), 1);
+                    assertEquals(index++ * strip.getWidth() / 3, header.getLayoutX(), 1);
+                    assertEquals(0, header.getLayoutY(), 0.01);
+                    assertEquals(strip.getHeight(), header.getHeight(), 0.01);
+                    assertEquals(header.getWidth() - header.getInsets().getRight(),
+                            close.getBoundsInParent().getMaxX(), 1);
+                }
+                Label label = (Label) title(pane, "a").lookup(".docking-tab-title");
+                Text renderedTitle = (Text) label.lookup(".text");
+                assertTrue("Long titles must ellipsize instead of pushing other headers aside",
+                        renderedTitle.getText().endsWith("..."));
+                Node close = title(pane, "a").lookup(".docking-tab-close-button");
+                assertTrue(label.getBoundsInParent().getMaxX() <= close.getBoundsInParent().getMinX());
+            }
             return null;
         });
     }

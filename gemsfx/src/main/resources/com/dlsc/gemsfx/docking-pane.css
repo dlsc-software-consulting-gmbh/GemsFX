@@ -8,8 +8,8 @@
 }
 
 .docking-pane .docking-tab-strip {
-    -fx-spacing: 2;
-    -fx-padding: 4 4 0 4;
+    -fx-spacing: 0;
+    -fx-padding: 0;
     -fx-background-color: derive(-fx-base, -3%);
 }
 
@@ -17,13 +17,15 @@
     -fx-padding: 4 4 4 10;
     -fx-spacing: 6;
     -fx-background-color: derive(-fx-base, 8%);
-    -fx-background-radius: 6 6 0 0;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent -fx-box-border -fx-box-border transparent;
+    -fx-border-width: 1;
     -fx-cursor: hand;
 }
 
 .docking-pane .docking-tab:focused {
     -fx-border-color: -fx-focus-color;
-    -fx-border-radius: 6 6 0 0;
+    -fx-border-radius: 0;
     -fx-border-insets: 0;
 }
 

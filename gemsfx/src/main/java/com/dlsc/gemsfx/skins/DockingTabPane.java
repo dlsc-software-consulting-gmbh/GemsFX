@@ -84,6 +84,9 @@ final class DockingTabPane extends VBox {
             title.getStyleClass().add("selected");
         }
         title.setAlignment(Pos.CENTER_LEFT);
+        title.setMinWidth(0);
+        title.setPrefWidth(0);
+        HBox.setHgrow(title, Priority.ALWAYS);
         title.setFocusTraversable(true);
         title.getProperties().put(DOCKABLE_ID_KEY, dockable.getId());
         AccessibilityUtil.setRole(title, AccessibleRole.TAB_ITEM);
@@ -92,6 +95,9 @@ final class DockingTabPane extends VBox {
         Label label = new Label(dockable.getTitle(), dockable.getGraphic());
         label.getStyleClass().add("docking-tab-title");
         label.setMnemonicParsing(false);
+        label.setMinWidth(0);
+        label.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(label, Priority.ALWAYS);
 
         Button close = new Button();
         close.getStyleClass().add("docking-tab-close-button");
