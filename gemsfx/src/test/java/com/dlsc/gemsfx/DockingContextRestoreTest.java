@@ -131,6 +131,97 @@ public class DockingContextRestoreTest extends FxTestBase {
     }
 
     @Test
+    public void repeatedRestoreRendersFreshContentInMountedSplitAndTabbedGroups() {
+        invoke(() -> {
+            Map<String, Dockable> created = new HashMap<>();
+            DockingContext context = new DockingContext(id -> {
+                Dockable dockable = dockable(id);
+                created.put(id, dockable);
+                return Optional.of(dockable);
+            }, pane -> {
+                throw new AssertionError("Restoring a primary pane must not create a floating stage");
+            });
+            DockingPane primary = context.createPane();
+            context.openDockable(primary, "a", DockingPosition.CENTER);
+            context.openDockable(primary, "b", DockingPosition.CENTER);
+            primary.selectDockable("a");
+            context.openDockable(primary, "c", DockingPosition.RIGHT);
+            Stage host = new Stage();
+            host.setScene(new Scene(new StackPane(primary), 600, 400));
+            host.show();
+            try {
+                DockingLayout snapshot = context.getLayout();
+                for (int i = 0; i < 2; i++) {
+                    Dockable previous = created.get("a");
+
+                    context.restoreLayout(snapshot);
+                    primary.applyCss();
+                    primary.layout();
+
+                    assertLayoutEquals(snapshot, context.getLayout());
+                    assertEquals(3, primary.lookupAll(".docking-tab").size());
+                    assertNotSame(previous, created.get("a"));
+                    assertSame(host.getScene(), created.get("a").getContent().getScene());
+                    assertSame(host.getScene(), created.get("c").getContent().getScene());
+                    assertNull(created.get("b").getContent().getParent());
+
+                    primary.selectDockable("b");
+                    primary.applyCss();
+                    primary.layout();
+                    assertSame(host.getScene(), created.get("b").getContent().getScene());
+                    assertNull(created.get("a").getContent().getParent());
+                }
+            } finally {
+                host.close();
+            }
+            return null;
+        });
+    }
+
+    @Test
+    public void restoredFloatingWindowRendersItsNewContentWhenFactoryShowsTheStage() {
+        invoke(() -> {
+            Map<String, Dockable> created = new HashMap<>();
+            List<Stage> stages = new ArrayList<>();
+            DockingContext context = new DockingContext(id -> {
+                Dockable dockable = dockable(id);
+                created.put(id, dockable);
+                return Optional.of(dockable);
+            }, pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(new StackPane(pane), 300, 200));
+                stages.add(stage);
+                stage.show();
+                return stage;
+            });
+            DockingPane primary = context.createPane();
+            context.openDockable(primary, "a", DockingPosition.CENTER);
+            context.openDockable(primary, "b", DockingPosition.CENTER);
+            try {
+                context.floatDockable("b", 100, 100);
+                DockingLayout snapshot = context.getLayout();
+                Dockable previous = created.get("b");
+
+                context.restoreLayout(snapshot);
+
+                Stage restored = stages.get(stages.size() - 1);
+                restored.getScene().getRoot().applyCss();
+                restored.getScene().getRoot().layout();
+                assertTrue(restored.isShowing());
+                assertNotSame(previous, created.get("b"));
+                assertSame("The restored window must render the newly resolved dockable, not the old instance",
+                        restored.getScene(), created.get("b").getContent().getScene());
+                assertFalse(stages.get(0).isShowing());
+            } finally {
+                for (Stage stage : stages) {
+                    stage.close();
+                }
+            }
+            return null;
+        });
+    }
+
+    @Test
     public void emptyContextSnapshotCanBeRestored() {
         invoke(() -> {
             DockingContext context = new DockingContext(id -> Optional.empty(), pane -> {

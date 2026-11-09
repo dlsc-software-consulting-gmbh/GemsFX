@@ -1,7 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.Dockable;
-import com.dlsc.gemsfx.DockingContext;
 import com.dlsc.gemsfx.DockingLayoutNode;
 import com.dlsc.gemsfx.DockingPane;
 import com.dlsc.gemsfx.util.AccessibilityUtil;
@@ -53,9 +52,8 @@ final class DockingTabPane extends VBox {
         contentArea.getStyleClass().add("docking-tab-content");
         VBox.setVgrow(contentArea, Priority.ALWAYS);
 
-        DockingContext context = dockingPane.getDockingContext();
         for (String id : ids) {
-            Dockable dockable = find(context, id);
+            Dockable dockable = find(dockingPane, id);
             if (dockable == null) {
                 continue;
             }
@@ -68,8 +66,8 @@ final class DockingTabPane extends VBox {
         getChildren().addAll(strip, contentArea);
     }
 
-    private static Dockable find(DockingContext context, String id) {
-        for (Dockable dockable : context.getDockables()) {
+    private static Dockable find(DockingPane pane, String id) {
+        for (Dockable dockable : pane.getDockables()) {
             if (dockable.getId().equals(id)) {
                 return dockable;
             }

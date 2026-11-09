@@ -19,6 +19,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -137,30 +140,43 @@ public class DockingPaneApp extends GemApplication {
 
     private Map<String, Function<String, Dockable>> createTemplates() {
         Map<String, Function<String, Dockable>> templates = new LinkedHashMap<>();
-        templates.put("editor", id -> createTextDockable(id, "Editor", "public class Example {\n    // edit me\n}\n"));
-        templates.put("preview", id -> createTextDockable(id, "Preview", "# Preview\n\nThe selected content appears here."));
-        templates.put("console", id -> createTextDockable(id, "Console", "Build started...\nTests running...\nDone."));
-        templates.put("navigator", id -> createListDockable(id, "Navigator", "src", "resources", "docs", "build"));
-        templates.put("inspector", id -> createListDockable(id, "Inspector", "Properties", "Layout", "Accessibility"));
-        templates.put("search", id -> createTextDockable(id, "Search", "Search results\n- DockingContext\n- DockingPane\n- DockingLayout"));
-        templates.put("tasks", id -> createListDockable(id, "Tasks", "TODO: wire toolbar", "TODO: refresh preview", "DONE: snapshot layout"));
+        templates.put("editor", id -> createTextDockable(id, "Editor", MaterialDesign.MDI_CODE_TAGS,
+                "public class Example {\n    // edit me\n}\n"));
+        templates.put("preview", id -> createTextDockable(id, "Preview", MaterialDesign.MDI_EYE,
+                "# Preview\n\nThe selected content appears here."));
+        templates.put("console", id -> createTextDockable(id, "Console", MaterialDesign.MDI_CONSOLE,
+                "Build started...\nTests running...\nDone."));
+        templates.put("navigator", id -> createListDockable(id, "Navigator", MaterialDesign.MDI_FOLDER,
+                "src", "resources", "docs", "build"));
+        templates.put("inspector", id -> createListDockable(id, "Inspector", MaterialDesign.MDI_SETTINGS,
+                "Properties", "Layout", "Accessibility"));
+        templates.put("search", id -> createTextDockable(id, "Search", MaterialDesign.MDI_MAGNIFY,
+                "Search results\n- DockingContext\n- DockingPane\n- DockingLayout"));
+        templates.put("tasks", id -> createListDockable(id, "Tasks", MaterialDesign.MDI_CHECKBOX_MARKED_OUTLINE,
+                "TODO: wire toolbar", "TODO: refresh preview", "DONE: snapshot layout"));
         return templates;
     }
 
-    private Dockable createTextDockable(String id, String title, String content) {
+    private Dockable createTextDockable(String id, String title, Ikon icon, String content) {
         TextArea textArea = new TextArea(content);
         textArea.setWrapText(true);
         textArea.setPrefRowCount(8);
-        return new Dockable(id, title, textArea);
+        return new Dockable(id, title, createIcon(icon), textArea);
     }
 
-    private Dockable createListDockable(String id, String title, String... values) {
+    private Dockable createListDockable(String id, String title, Ikon icon, String... values) {
         ListView<String> listView = new ListView<>();
         listView.getItems().setAll(values);
 
         StackPane container = new StackPane(listView);
         container.setPadding(new Insets(8));
-        return new Dockable(id, title, container);
+        return new Dockable(id, title, createIcon(icon), container);
+    }
+
+    private FontIcon createIcon(Ikon icon) {
+        FontIcon graphic = new FontIcon(icon);
+        graphic.setIconSize(16);
+        return graphic;
     }
 
     private void status(String text) {

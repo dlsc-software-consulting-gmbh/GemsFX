@@ -55,6 +55,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private boolean syncingDivider;
     private DockingTree.ResolvedDropTarget previewTarget;
     private final StackPane host = new StackPane();
+    private final List<StackPane> contentHosts = new ArrayList<>();
     private final Region dropLeafPreview = previewRegion("docking-drop-leaf-preview");
     private final Region dropZonePreview = previewRegion("docking-drop-zone-preview");
     private final Map<DockingPosition, StackPane> paneEdgeTargets = new EnumMap<>(DockingPosition.class);
@@ -152,13 +153,12 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         }
     }
 
-    // Dockable contents are reused across rebuilds, so release them from the stale scene graph first.
+    // Unskinned SplitPane items are not reachable through scene-graph lookup.
     private void detachContents() {
-        for (Node old : getChildren()) {
-            for (Node content : old.lookupAll(".docking-tab-content")) {
-                ((StackPane) content).getChildren().clear();
-            }
+        for (StackPane content : contentHosts) {
+            content.getChildren().clear();
         }
+        contentHosts.clear();
     }
 
     private String focusedDockableId() {
@@ -177,6 +177,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private Node render(DockingLayoutNode node, List<Integer> path) {
         if (node instanceof DockingLayoutNode.Tabs) {
             DockingTabPane tabs = new DockingTabPane(getSkinnable(), (DockingLayoutNode.Tabs) node);
+            contentHosts.add((StackPane) tabs.lookup(".docking-tab-content"));
             installTitleDragHandlers(tabs);
             return tabs;
         }

@@ -268,7 +268,12 @@ public class DockingPane extends Control {
         activeDockable.set(dockable);
     }
 
-    final List<Dockable> getDockables() {
+    /**
+     * Returns an immutable snapshot of the dockables currently contained in this pane.
+     *
+     * @return the dockables in this pane
+     */
+    public final List<Dockable> getDockables() {
         return List.copyOf(dockablesById.values());
     }
 
