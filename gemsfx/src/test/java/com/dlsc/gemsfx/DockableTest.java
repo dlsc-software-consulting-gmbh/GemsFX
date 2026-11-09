@@ -4,6 +4,8 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import org.junit.Test;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import static org.junit.Assert.*;
 
 public class DockableTest extends FxTestBase {
@@ -18,6 +20,33 @@ public class DockableTest extends FxTestBase {
         assertEquals("editor:main", dockable.getId());
         assertEquals("Editor", dockable.getTitle());
         assertNotNull(dockable.getContent());
+    }
+
+    @Test
+    public void dockableTitleCanBeUpdatedAndObserved() {
+        Dockable dockable = invoke(() -> new Dockable("editor:main", "Editor", new Label("Editor")));
+        AtomicReference<String> observedTitle = new AtomicReference<>();
+        dockable.titleProperty().addListener((observable, oldTitle, newTitle) -> observedTitle.set(newTitle));
+
+        invoke(() -> {
+            dockable.setTitle("Renamed Editor");
+            return null;
+        });
+
+        assertEquals("Renamed Editor", dockable.getTitle());
+        assertEquals("Renamed Editor", dockable.titleProperty().get());
+        assertEquals("Renamed Editor", observedTitle.get());
+    }
+
+    @Test
+    public void dockableRejectsBlankUpdatedTitle() {
+        Dockable dockable = invoke(() -> new Dockable("editor:main", "Editor", new Label("Editor")));
+
+        assertThrows(IllegalArgumentException.class, () -> invoke(() -> {
+            dockable.setTitle("   ");
+            return null;
+        }));
+        assertEquals("Editor", dockable.getTitle());
     }
 
     @Test

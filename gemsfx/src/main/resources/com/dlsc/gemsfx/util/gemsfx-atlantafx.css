@@ -2877,6 +2877,14 @@
 .docking-pane {
 }
 
+.docking-pane-placeholder .illustration {
+    -fx-background-color: -color-fg-muted;
+}
+
+.docking-pane-placeholder .label {
+    -fx-text-fill: -color-fg-muted;
+}
+
 .docking-pane .docking-tab-strip {
     -fx-background-color: -color-neutral-emphasis;
 }

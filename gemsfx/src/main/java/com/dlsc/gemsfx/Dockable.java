@@ -1,19 +1,18 @@
 package com.dlsc.gemsfx;
 
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.Node;
 
 import java.util.Objects;
 
 /**
- * Immutable value object representing a dockable component.
- * 
- * A Dockable encapsulates the essential identity and content of a draggable/dockable pane,
- * including an ID, title, optional graphic, and content node.
+ * Represents a dockable component with an ID, a mutable display title, an optional graphic, and a content node.
  */
 public final class Dockable {
     
     private final String id;
-    private final String title;
+    private final ReadOnlyStringWrapper title;
     private final Node graphic;
     private final Node content;
     
@@ -43,10 +42,7 @@ public final class Dockable {
         if (id.isBlank()) {
             throw new IllegalArgumentException("id must not be blank");
         }
-        this.title = Objects.requireNonNull(title, "title must not be null");
-        if (title.isBlank()) {
-            throw new IllegalArgumentException("title must not be blank");
-        }
+        this.title = new ReadOnlyStringWrapper(this, "title", validateTitle(title));
         this.graphic = graphic;
         this.content = Objects.requireNonNull(content, "content must not be null");
     }
@@ -61,12 +57,20 @@ public final class Dockable {
     }
     
     /**
-     * Returns the display title of this Dockable.
+     * The display title property. The property is read-only; use {@link #setTitle(String)} to change the title.
      *
-     * @return the title
+     * @return the title property
      */
-    public String getTitle() {
-        return title;
+    public final ReadOnlyStringProperty titleProperty() {
+        return title.getReadOnlyProperty();
+    }
+
+    public final String getTitle() {
+        return title.get();
+    }
+
+    public final void setTitle(String title) {
+        this.title.set(validateTitle(title));
     }
     
     /**
@@ -85,5 +89,13 @@ public final class Dockable {
      */
     public Node getContent() {
         return content;
+    }
+
+    private static String validateTitle(String title) {
+        Objects.requireNonNull(title, "title must not be null");
+        if (title.isBlank()) {
+            throw new IllegalArgumentException("title must not be blank");
+        }
+        return title;
     }
 }

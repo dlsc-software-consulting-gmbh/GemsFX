@@ -196,6 +196,30 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     @Test
+    public void changingDockableTitleUpdatesTabAndAccessibilityText() {
+        invoke(() -> {
+            Dockable dockable = dockable("a");
+            DockingContext context = new DockingContext(id -> Optional.of(dockable), pane -> new Stage());
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+
+            Node tab = title(pane, "a");
+            Label titleLabel = (Label) tab.lookup(".docking-tab-title");
+            Node closeButton = tab.lookup(".docking-tab-close-button");
+            assertNotNull(titleLabel);
+            assertNotNull(closeButton);
+
+            dockable.setTitle("Renamed");
+
+            assertEquals("Renamed", titleLabel.getText());
+            assertEquals("Renamed", tab.getAccessibleText());
+            assertTrue(closeButton.getAccessibleText().contains("Renamed"));
+            return null;
+        });
+    }
+
+    @Test
     public void emptyFloatingPaneClosesAutomaticallyWhenLastDockableLeaves() {
         invoke(() -> {
             Dockable a = dockable("a");
@@ -714,6 +738,52 @@ public class DockingContextWindowTest extends FxTestBase {
                 return null;
             });
         }
+    }
+
+    @Test
+    public void dockingDragEventsAreHandledBeforeContentCanConsumeThem() {
+        invoke(() -> {
+            Dockable a = dockable("a");
+            Dockable b = dockable("b");
+            DockingContext context = new DockingContext(factoryFor(List.of(a, b), new AtomicInteger()), pane -> {
+                throw new AssertionError("An in-pane drop must not create a floating stage");
+            });
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            pane.selectDockable("b");
+            renderWithEventSkin(pane);
+
+            Node content = b.getContent();
+            AtomicInteger contentDragEvents = new AtomicInteger();
+            content.addEventHandler(DragEvent.DRAG_OVER, event -> {
+                contentDragEvents.incrementAndGet();
+                event.consume();
+            });
+            content.addEventHandler(DragEvent.DRAG_DROPPED, event -> {
+                contentDragEvents.incrementAndGet();
+                event.consume();
+            });
+
+            Node sourceTitle = title(pane, "a");
+            fireDragDetected(sourceTitle);
+            double x = content.getBoundsInLocal().getWidth() / 2;
+            double y = content.getBoundsInLocal().getHeight() / 2;
+            fireDragEvent(content, DragEvent.DRAG_OVER, sourceTitle,
+                    x, y, 200, 200, TransferMode.MOVE, content);
+
+            assertTrue(pane.lookup(".docking-drop-zone-preview").isVisible());
+            assertEquals(0, contentDragEvents.get());
+
+            DragEvent dropped = fireDragEvent(content, DragEvent.DRAG_DROPPED, sourceTitle,
+                    x, y, 200, 200, TransferMode.MOVE, content);
+            fireDragEvent(sourceTitle, DragEvent.DRAG_DONE, sourceTitle,
+                    x, y, 200, 200, TransferMode.MOVE, sourceTitle);
+
+            assertTrue(dropped.isDropCompleted());
+            assertEquals(0, contentDragEvents.get());
+            return null;
+        });
     }
 
     @Test

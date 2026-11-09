@@ -2,6 +2,7 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
+import com.dlsc.gemsfx.util.ResourceBundleManager;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Orientation;
@@ -25,6 +26,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.lang.reflect.Method;
 
@@ -120,6 +123,137 @@ public class DockingPaneTest extends FxTestBase {
             assertTrue(pane.getUserAgentStylesheet().endsWith("docking-pane.css"));
             assertTrue(pane.getStyleClass().contains("docking-pane"));
             assertTrue(pane.getLayoutRoot() instanceof DockingLayoutNode.Empty);
+            return null;
+        });
+    }
+
+    @Test
+    public void emptyPaneShowsCenteredDockingIllustrationAndRestoresItAfterClosing() {
+        invoke(() -> {
+            Dockable dockable = dockable("a");
+            DockingContext context = context(dockable, dockable("b"));
+            context.openDockable(context.createPane(), "b", DockingPosition.CENTER);
+            DockingPane pane = layout(context.createPane());
+            Node illustration = pane.lookup(".docking-pane-placeholder");
+            assertNotNull("An empty pane should show a docking illustration", illustration);
+            assertTrue(illustration.getBoundsInParent().getWidth() > 0);
+            assertTrue(illustration.getBoundsInParent().getHeight() > 0);
+            Region empty = (Region) pane.lookup(".docking-empty");
+            assertEquals(empty.getWidth() / 2, illustration.getBoundsInParent().getCenterX(), 0.5);
+            assertEquals(empty.getHeight() / 2, illustration.getBoundsInParent().getCenterY(), 0.5);
+
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            assertNull(pane.lookup(".docking-pane-placeholder"));
+            assertNull(illustration.getParent());
+
+            assertTrue(context.requestCloseDockable(dockable));
+            assertSame(illustration, pane.lookup(".docking-pane-placeholder"));
+            return null;
+        });
+    }
+
+    @Test
+    public void placeholderCanBeReplacedClearedAndChangedWhileDockablesAreOpen() {
+        invoke(() -> {
+            Dockable dockable = dockable("a");
+            DockingContext context = context(dockable);
+            DockingPane pane = layout(context.createPane());
+            Node original = pane.getPlaceholder();
+            Label first = new Label("Drop a dockable here");
+            pane.setPlaceholder(first);
+            assertNull(original.getParent());
+            assertNotNull(first.getParent());
+
+            Label replacement = new Label("Empty workspace");
+            pane.placeholderProperty().set(replacement);
+            assertNull(first.getParent());
+            assertNotNull(replacement.getParent());
+
+            pane.setPlaceholder(null);
+            assertNull(replacement.getParent());
+            assertTrue(((javafx.scene.Parent) pane.lookup(".docking-empty")).getChildrenUnmodifiable().isEmpty());
+
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            pane.setPlaceholder(first);
+            assertNull(first.getParent());
+            assertNotNull(dockable.getContent().getParent());
+            assertTrue(context.requestCloseDockable(dockable));
+            assertNotNull(first.getParent());
+            return null;
+        });
+    }
+
+    @Test
+    public void disposingSkinReleasesPlaceholderAndItsListener() {
+        invoke(() -> {
+            DockingPane pane = layout(context().createPane());
+            Node original = pane.getPlaceholder();
+            pane.setSkin(null);
+            assertNull(original.getParent());
+
+            Label replacement = new Label("Empty workspace");
+            pane.setPlaceholder(replacement);
+            assertNull(replacement.getParent());
+            pane.setSkin(new DockingPaneSkin(pane));
+            assertNotNull(replacement.getParent());
+            return null;
+        });
+    }
+
+    @Test
+    public void placeholderTextAppearsBelowIllustrationAndUpdatesWhenBound() {
+        invoke(() -> {
+            DockingPanePlaceholder placeholder = layout(new DockingPanePlaceholder("Drop views here"));
+            Label label = (Label) placeholder.lookup(".label");
+            Node illustration = placeholder.lookup(".illustration");
+            assertEquals("Drop views here", label.getText());
+            assertTrue(label.isVisible());
+            assertTrue(label.isManaged());
+            assertTrue(label.getBoundsInParent().getMinY() > illustration.getBoundsInParent().getMaxY());
+            assertEquals(illustration.getBoundsInParent().getCenterX(),
+                    label.getBoundsInParent().getCenterX(), 0.01);
+
+            javafx.beans.property.StringProperty text = new javafx.beans.property.SimpleStringProperty("An empty workspace. ".repeat(20));
+            placeholder.textProperty().bind(text);
+            placeholder.getParent().layout();
+            assertEquals(text.get(), label.getText());
+            assertEquals(text.get(), placeholder.getAccessibleText());
+            assertTrue("Long placeholder text should wrap", label.getHeight() > label.getFont().getSize() * 2);
+
+            text.set("");
+            placeholder.getParent().layout();
+            assertFalse(label.isVisible());
+            assertFalse(label.isManaged());
+            assertEquals(illustration.getBoundsInParent().getHeight(), placeholder.prefHeight(-1), 0.01);
+            text.set(null);
+            assertFalse(label.isVisible());
+            assertFalse(label.isManaged());
+            return null;
+        });
+    }
+
+    @Test
+    public void defaultPlaceholderDisplaysLocalizedTextIncludingRootBundle() {
+        invoke(() -> {
+            Locale originalLocale = ResourceBundleManager.getLocale();
+            try {
+                Map<Locale, String> translations = Map.of(
+                        Locale.ENGLISH, "Drag views here to dock them.",
+                        Locale.GERMAN, "Ziehen Sie Ansichten hierher, um sie anzudocken.",
+                        Locale.CHINESE, "将视图拖到此处以停靠。",
+                        Locale.ROOT, "Drag views here to dock them.");
+                translations.forEach((locale, expected) -> {
+                    ResourceBundleManager.setLocale(locale);
+                    DockingPanePlaceholder placeholder = layout(new DockingPanePlaceholder());
+                    Label label = (Label) placeholder.lookup(".label");
+                    assertEquals("Placeholder text for " + locale, expected, label.getText());
+                    assertTrue(label.isVisible());
+                    assertTrue(label.isManaged());
+                    assertEquals(expected, placeholder.getAccessibleText());
+                });
+            } finally {
+                ResourceBundleManager.setLocale(originalLocale);
+            }
             return null;
         });
     }

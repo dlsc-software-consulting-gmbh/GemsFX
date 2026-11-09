@@ -128,3 +128,8 @@
     -fx-background-color: -color-bg-default;
 }
 
+.docking-demo-app .docking-demo-drag-graphic,
+.docking-demo-app .docking-demo-target-graphic {
+    -fx-icon-size: 112px;
+}
+

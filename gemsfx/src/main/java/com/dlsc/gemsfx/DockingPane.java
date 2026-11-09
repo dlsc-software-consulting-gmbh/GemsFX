@@ -4,9 +4,12 @@ import com.dlsc.gemsfx.docking.internal.DockingTree;
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.AccessibleRole;
+import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
@@ -31,6 +34,7 @@ public class DockingPane extends Control {
         getStyleClass().add("docking-pane");
         AccessibilityUtil.setRole(this, AccessibleRole.NODE, ResourceBundleManager.getString(
                 ResourceBundleManager.BundleType.DOCKING_PANE, "accessible.role-description", "Docking pane"));
+        setPlaceholder(new DockingPanePlaceholder());
     }
 
     @Override
@@ -50,6 +54,28 @@ public class DockingPane extends Control {
      */
     public final DockingContext getDockingContext() {
         return dockingContext;
+    }
+
+    private final ObjectProperty<Node> placeholder = new SimpleObjectProperty<>(this, "placeholder");
+
+    /**
+     * The node displayed in the center of this pane when it contains no dockables.
+     * The default is a {@link DockingPanePlaceholder} with a theme-aware vector illustration
+     * of a docking workspace and optional text.
+     * Set this property to {@code null} to leave an empty pane blank.
+     *
+     * @return the placeholder property
+     */
+    public final ObjectProperty<Node> placeholderProperty() {
+        return placeholder;
+    }
+
+    public final Node getPlaceholder() {
+        return placeholder.get();
+    }
+
+    public final void setPlaceholder(Node placeholder) {
+        this.placeholder.set(placeholder);
     }
 
     private final ReadOnlyObjectWrapper<Dockable> activeDockable = new ReadOnlyObjectWrapper<>(this, "activeDockable");

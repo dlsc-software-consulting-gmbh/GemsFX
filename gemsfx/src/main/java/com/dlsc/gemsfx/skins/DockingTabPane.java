@@ -7,6 +7,7 @@ import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
 import com.dlsc.gemsfx.util.ResourceBundleManager.BundleType;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
 import javafx.geometry.Pos;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
@@ -33,6 +34,7 @@ import java.util.List;
 final class DockingTabPane extends VBox {
 
     static final String DOCKABLE_ID_KEY = "docking.dockable-id";
+    private static final Object TITLE_ACCESSIBLE_TEXT_BINDING_KEY = new Object();
 
     private final DockingPane dockingPane;
     private final List<String> ids;
@@ -88,9 +90,12 @@ final class DockingTabPane extends VBox {
         title.setFocusTraversable(true);
         title.getProperties().put(DOCKABLE_ID_KEY, dockable.getId());
         AccessibilityUtil.setRole(title, AccessibleRole.TAB_ITEM);
-        AccessibilityUtil.bindAccessibleText(title, Bindings.createStringBinding(dockable::getTitle));
+        StringBinding accessibleText = Bindings.createStringBinding(dockable::getTitle, dockable.titleProperty());
+        AccessibilityUtil.bindAccessibleText(title, accessibleText);
+        title.getProperties().put(TITLE_ACCESSIBLE_TEXT_BINDING_KEY, accessibleText);
 
-        Label label = new Label(dockable.getTitle(), dockable.getGraphic());
+        Label label = new Label("", dockable.getGraphic());
+        label.textProperty().bind(dockable.titleProperty());
         label.getStyleClass().add("docking-tab-title");
         label.setMnemonicParsing(false);
         label.setMinWidth(0);
@@ -104,7 +109,8 @@ final class DockingTabPane extends VBox {
         icon.getStyleClass().add("icon");
         close.setGraphic(icon);
         close.setTooltip(new Tooltip(closeTooltip));
-        close.setAccessibleText(MessageFormat.format(closePattern, dockable.getTitle()));
+        close.accessibleTextProperty().bind(Bindings.createStringBinding(
+                () -> MessageFormat.format(closePattern, dockable.getTitle()), dockable.titleProperty()));
         close.setOnAction(e -> dockingPane.getDockingContext().requestCloseDockable(dockable));
         close.addEventHandler(MouseEvent.MOUSE_CLICKED, MouseEvent::consume);
 

@@ -55,6 +55,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private boolean syncingDivider;
     private DockingTree.ResolvedDropTarget previewTarget;
     private final StackPane host = new StackPane();
+    private final StackPane emptyPane = new StackPane();
     private final List<StackPane> contentHosts = new ArrayList<>();
     private final Region dropLeafPreview = previewRegion("docking-drop-leaf-preview");
     private final Region dropZonePreview = previewRegion("docking-drop-zone-preview");
@@ -62,6 +63,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     // Eagerly validate snapshots even when divider synchronization skips rebuilding.
     private final ChangeListener<DockingLayoutNode> layoutListener = (obs, oldLayout, newLayout) -> {
         if (!syncingDivider) {
+            rebuild();
+        }
+    };
+    private final ChangeListener<Node> placeholderListener = (obs, oldPlaceholder, newPlaceholder) -> {
+        if (getSkinnable().getLayoutRoot() instanceof DockingLayoutNode.Empty) {
             rebuild();
         }
     };
@@ -88,6 +94,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      */
     public DockingPaneSkin(DockingPane pane) {
         super(pane);
+        emptyPane.getStyleClass().add("docking-empty");
         for (DockingPosition edge : List.of(DockingPosition.LEFT, DockingPosition.RIGHT,
                 DockingPosition.TOP, DockingPosition.BOTTOM)) {
             Region icon = new Region();
@@ -100,9 +107,10 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             paneEdgeTargets.put(edge, target);
         }
         pane.layoutRootProperty().addListener(layoutListener);
-        pane.addEventHandler(DragEvent.DRAG_OVER, dragOverHandler);
-        pane.addEventHandler(DragEvent.DRAG_DROPPED, dragDroppedHandler);
-        pane.addEventHandler(DragEvent.DRAG_EXITED, dragExitedHandler);
+        pane.placeholderProperty().addListener(placeholderListener);
+        pane.addEventFilter(DragEvent.DRAG_OVER, dragOverHandler);
+        pane.addEventFilter(DragEvent.DRAG_DROPPED, dragDroppedHandler);
+        pane.addEventFilter(DragEvent.DRAG_EXITED, dragExitedHandler);
         pane.addEventFilter(KeyEvent.KEY_PRESSED, keyPressedHandler);
         rebuild();
     }
@@ -111,6 +119,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         DockingPane pane = getSkinnable();
         String focusedId = focusedDockableId();
         detachContents();
+        emptyPane.getChildren().clear();
         Node root = render(pane.getLayoutRoot(), new ArrayList<>());
         host.getChildren().setAll(root, dropLeafPreview, dropZonePreview);
         host.getChildren().addAll(paneEdgeTargets.values());
@@ -191,9 +200,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             splitPane.getDividers().get(0).positionProperty().addListener((obs, old, value) -> syncDivider(path, value.doubleValue()));
             return splitPane;
         }
-        StackPane empty = new StackPane();
-        empty.getStyleClass().add("docking-empty");
-        return empty;
+        Node placeholder = getSkinnable().getPlaceholder();
+        if (placeholder != null) {
+            emptyPane.getChildren().setAll(placeholder);
+        }
+        return emptyPane;
     }
 
     private static List<Integer> child(List<Integer> path, int index) {
@@ -221,11 +232,13 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         hidePaneEdgeTargets();
         uninstallSceneDragHandlers();
         DockingPane pane = getSkinnable();
-        pane.removeEventHandler(DragEvent.DRAG_OVER, dragOverHandler);
-        pane.removeEventHandler(DragEvent.DRAG_DROPPED, dragDroppedHandler);
-        pane.removeEventHandler(DragEvent.DRAG_EXITED, dragExitedHandler);
+        pane.removeEventFilter(DragEvent.DRAG_OVER, dragOverHandler);
+        pane.removeEventFilter(DragEvent.DRAG_DROPPED, dragDroppedHandler);
+        pane.removeEventFilter(DragEvent.DRAG_EXITED, dragExitedHandler);
         pane.removeEventFilter(KeyEvent.KEY_PRESSED, keyPressedHandler);
         getSkinnable().layoutRootProperty().removeListener(layoutListener);
+        pane.placeholderProperty().removeListener(placeholderListener);
+        emptyPane.getChildren().clear();
         super.dispose();
     }
 
@@ -351,6 +364,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         DockingTree.ResolvedDropTarget target = resolveDropTarget(event.getX(), event.getY(), intersectedNode(event), draggedId);
         if (target == null || !pane.canMoveDockable(draggedId, target.getTargetId(), target.getPosition())) {
             clearDropPreview();
+            event.consume();
             return;
         }
         showDropPreview(target);
@@ -379,6 +393,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         } else {
             recordUnsuccessfulDrop(draggedId);
             event.setDropCompleted(false);
+            event.consume();
         }
         clearDropPreview();
         hidePaneEdgeTargets();
