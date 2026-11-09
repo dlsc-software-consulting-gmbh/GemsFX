@@ -94,8 +94,9 @@ final class DockingTabPane extends VBox {
         AccessibilityUtil.bindAccessibleText(title, accessibleText);
         title.getProperties().put(TITLE_ACCESSIBLE_TEXT_BINDING_KEY, accessibleText);
 
-        Label label = new Label("", dockable.getGraphic());
+        Label label = new Label();
         label.textProperty().bind(dockable.titleProperty());
+        label.graphicProperty().bind(dockable.graphicProperty());
         label.getStyleClass().add("docking-tab-title");
         label.setMnemonicParsing(false);
         label.setMinWidth(0);

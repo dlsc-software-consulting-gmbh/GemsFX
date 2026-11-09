@@ -220,6 +220,91 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     @Test
+    public void changingDockableGraphicUpdatesUnselectedTabWithoutRebuildingLayout() {
+        invoke(() -> {
+            Label initial = new Label("Initial icon");
+            Label replacement = new Label("Replacement icon");
+            Dockable a = new Dockable("a", "Title a", initial, new Label("Content a"));
+            Dockable b = dockable("b");
+            DockingContext context = new DockingContext(factoryFor(List.of(a, b), new AtomicInteger()), pane -> new Stage());
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            layout(pane);
+            Node tab = title(pane, "a");
+            Label label = (Label) tab.lookup(".docking-tab-title");
+            DockingLayoutNode originalLayout = pane.getLayoutRoot();
+
+            a.setGraphic(replacement);
+            assertSame(replacement, label.getGraphic());
+            pane.applyCss();
+            pane.layout();
+            assertNull(initial.getParent());
+
+            a.setGraphic(null);
+            assertNull(label.getGraphic());
+            pane.applyCss();
+            pane.layout();
+            assertNull(replacement.getParent());
+            assertSame(tab, title(pane, "a"));
+            assertSame(originalLayout, pane.getLayoutRoot());
+            assertSame(b, pane.getActiveDockable());
+            return null;
+        });
+    }
+
+    @Test
+    public void graphicBindingsFollowFloatingAndRedockingAndAreReleasedOnDisposal() {
+        invoke(() -> {
+            Dockable a = dockable("a");
+            Dockable b = dockable("b");
+            DockingContext context = new DockingContext(factoryFor(List.of(a, b), new AtomicInteger()), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(new StackPane(pane), 400, 300));
+                return stage;
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.CENTER);
+            layout(host);
+            Label originalLabel = (Label) title(host, "a").lookup(".docking-tab-title");
+            Label initial = new Label("Initial icon");
+            a.setGraphic(initial);
+            assertSame(initial, originalLabel.getGraphic());
+
+            DockingPane floating = context.floatDockable("a", 10, 20);
+            try {
+                floating.getScene().getRoot().applyCss();
+                floating.getScene().getRoot().layout();
+                Label floatingLabel = (Label) title(floating, "a").lookup(".docking-tab-title");
+                assertNull(originalLabel.getGraphic());
+                assertSame(initial, floatingLabel.getGraphic());
+
+                Label replacement = new Label("Floating icon");
+                a.setGraphic(replacement);
+                assertSame(replacement, floatingLabel.getGraphic());
+                assertNull(originalLabel.getGraphic());
+
+                assertTrue(host.moveDockable("a", "b", DockingPosition.CENTER));
+                Label restoredLabel = (Label) title(host, "a").lookup(".docking-tab-title");
+                assertNull(floatingLabel.getGraphic());
+                assertSame(replacement, restoredLabel.getGraphic());
+                a.setGraphic(null);
+                assertNull(restoredLabel.getGraphic());
+
+                a.setGraphic(initial);
+                host.setSkin(null);
+                assertNull(restoredLabel.getGraphic());
+                a.setGraphic(replacement);
+                assertNull(restoredLabel.getGraphic());
+            } finally {
+                context.requestCloseDockable(a);
+            }
+            return null;
+        });
+    }
+
+    @Test
     public void emptyFloatingPaneClosesAutomaticallyWhenLastDockableLeaves() {
         invoke(() -> {
             Dockable a = dockable("a");

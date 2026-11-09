@@ -81,6 +81,9 @@
     -fx-padding: 7px 12px;
     -fx-background-color: -color-bg-subtle;
     -fx-border-color: -color-border-default transparent transparent transparent;
+}
+
+.docking-demo-status .label {
     -fx-text-fill: -color-fg-muted;
 }
 
@@ -131,5 +134,34 @@
 .docking-demo-app .docking-demo-drag-graphic,
 .docking-demo-app .docking-demo-target-graphic {
     -fx-icon-size: 112px;
+}
+
+.docking-demo-app .docking-demo-rocket-icon,
+.docking-demo-app .docking-pane .docking-tab .docking-tab-title .ikonli-font-icon.docking-demo-rocket-icon {
+    -fx-icon-color: -color-success-emphasis;
+}
+
+.docking-demo-app .docking-demo-target-icon,
+.docking-demo-app .docking-pane .docking-tab .docking-tab-title .ikonli-font-icon.docking-demo-target-icon {
+    -fx-icon-color: -color-danger-emphasis;
+}
+
+.docking-demo-sidebar-drag-preview {
+    -fx-padding: 10px 16px;
+    -fx-graphic-text-gap: 8px;
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 8px;
+    -fx-text-fill: -color-fg-default;
+}
+
+.docking-demo-app .docking-demo-code {
+    -fx-font-family: monospace;
+}
+
+.docking-demo-app .docking-demo-view-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
 }
 

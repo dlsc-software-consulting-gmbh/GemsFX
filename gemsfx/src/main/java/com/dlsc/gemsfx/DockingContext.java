@@ -6,9 +6,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
+import javafx.scene.input.DragEvent;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
+import javafx.util.Callback;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,6 +44,8 @@ public class DockingContext {
     private final ObservableList<Dockable> dockables = FXCollections.observableArrayList();
     private final ObservableList<Dockable> unmodifiableDockables = FXCollections.unmodifiableObservableList(dockables);
     private Predicate<Dockable> canCloseDockable = dockable -> true;
+    private Predicate<DragEvent> dockableDropPredicate = event -> false;
+    private Callback<DragEvent, Dockable> dockableDropFactory;
     private boolean suppressEmptyFloatingClose;
 
     /**
@@ -71,6 +75,106 @@ public class DockingContext {
      */
     public final DockingStageFactory getStageFactory() {
         return stageFactory;
+    }
+
+    /**
+     * Returns the predicate recognizing external drags that should create dockables.
+     *
+     * @return the acceptance predicate, initially rejecting all events
+     */
+    public final Predicate<DragEvent> getDockableDropPredicate() {
+        return dockableDropPredicate;
+    }
+
+    /**
+     * Sets the lightweight predicate evaluated during drag-over and drop. It must not create dockables or
+     * mutate the layout. Reject unrelated content drags so their events remain available to dockable content.
+     *
+     * @param predicate the non-null acceptance predicate
+     */
+    public final void setDockableDropPredicate(Predicate<DragEvent> predicate) {
+        dockableDropPredicate = Objects.requireNonNull(predicate, "predicate must not be null");
+    }
+
+    /**
+     * Returns the factory invoked only when an accepted external drag is dropped at a valid docking location.
+     *
+     * @return the drop factory, or {@code null} if external docking is disabled
+     */
+    public final Callback<DragEvent, Dockable> getDockableDropFactory() {
+        return dockableDropFactory;
+    }
+
+    /**
+     * Sets the factory creating a new dockable from the drop event. The dockable must have a unique ID in this
+     * context. Returning {@code null} declines the drop without changing the layout.
+     *
+     * @param factory the drop factory, or {@code null} to disable external docking
+     */
+    public final void setDockableDropFactory(Callback<DragEvent, Dockable> factory) {
+        dockableDropFactory = factory;
+    }
+
+    /**
+     * Tests whether an external drag may create a dockable without invoking the drop factory.
+     *
+     * @param event the drag event
+     * @return {@code true} if a factory is configured and the predicate accepts the event
+     */
+    public final boolean canAcceptDockableDrop(DragEvent event) {
+        Objects.requireNonNull(event, "event must not be null");
+        return dockableDropFactory != null && dockableDropPredicate.test(event);
+    }
+
+    /**
+     * Creates and opens a dockable from an accepted drop, selecting it at the requested location. The factory
+     * is called once, after validating the target. Existing dockables are never replaced.
+     *
+     * @param pane the destination pane belonging to this context
+     * @param event the drop event passed to the factory
+     * @param targetId the target dockable ID, or {@code null} for an outer edge or an empty pane
+     * @param position the requested docking position; CENTER with a null target requires an empty pane
+     * @return the new dockable, or empty if the target or event is rejected or the factory declines
+     * @throws IllegalStateException if called off the FX thread or the factory returns an already-open ID
+     */
+    public final Optional<Dockable> dropDockable(DockingPane pane, DragEvent event,
+                                                String targetId, DockingPosition position) {
+        requireFxThread();
+        Objects.requireNonNull(event, "event must not be null");
+        if (pane == null || pane.getDockingContext() != this || !paneIdByPane.containsKey(pane)
+                || position == null
+                || (targetId != null && !pane.canInsertRelativeTo(targetId, position))
+                || (targetId == null && position == DockingPosition.CENTER
+                    && !(pane.getLayoutRoot() instanceof DockingLayoutNode.Empty))
+                || !canAcceptDockableDrop(event)) {
+            return Optional.empty();
+        }
+        Dockable dockable = dockableDropFactory.call(event);
+        if (dockable == null) {
+            return Optional.empty();
+        }
+        String id = dockable.getId();
+        if (dockablesById.containsKey(id)) {
+            throw new IllegalStateException("Drop factory returned an already-open dockable ID: " + id);
+        }
+        dockablesById.put(id, dockable);
+        dockablePaneById.put(id, pane);
+        dockables.add(dockable);
+        try {
+            if (targetId != null) {
+                pane.insertDockableRelativeTo(targetId, dockable, position);
+            } else if (position == DockingPosition.CENTER) {
+                pane.insertDockable(dockable, position);
+            } else {
+                pane.insertDockableAtPaneEdge(dockable, position);
+            }
+        } catch (RuntimeException | Error ex) {
+            dockablesById.remove(id);
+            dockablePaneById.remove(id);
+            dockables.remove(dockable);
+            throw ex;
+        }
+        return Optional.of(dockable);
     }
 
     /**

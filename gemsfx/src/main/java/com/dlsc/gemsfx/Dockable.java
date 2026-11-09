@@ -1,5 +1,7 @@
 package com.dlsc.gemsfx;
 
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.Node;
@@ -7,13 +9,13 @@ import javafx.scene.Node;
 import java.util.Objects;
 
 /**
- * Represents a dockable component with an ID, a mutable display title, an optional graphic, and a content node.
+ * Represents a dockable component with an ID, a mutable display title and optional graphic, and a content node.
  */
 public final class Dockable {
     
     private final String id;
     private final ReadOnlyStringWrapper title;
-    private final Node graphic;
+    private final ReadOnlyObjectWrapper<Node> graphic;
     private final Node content;
     
     /**
@@ -43,7 +45,7 @@ public final class Dockable {
             throw new IllegalArgumentException("id must not be blank");
         }
         this.title = new ReadOnlyStringWrapper(this, "title", validateTitle(title));
-        this.graphic = graphic;
+        this.graphic = new ReadOnlyObjectWrapper<>(this, "graphic", graphic);
         this.content = Objects.requireNonNull(content, "content must not be null");
     }
     
@@ -74,12 +76,21 @@ public final class Dockable {
     }
     
     /**
-     * Returns the optional icon/graphic of this Dockable.
+     * The optional graphic displayed in this dockable's tab, or {@code null} for no graphic.
+     * The property is read-only; use {@link #setGraphic(Node)} to replace or remove the graphic.
      *
-     * @return the graphic, or null if not set
+     * @return the graphic property
      */
-    public Node getGraphic() {
-        return graphic;
+    public final ReadOnlyObjectProperty<Node> graphicProperty() {
+        return graphic.getReadOnlyProperty();
+    }
+
+    public final Node getGraphic() {
+        return graphic.get();
+    }
+
+    public final void setGraphic(Node graphic) {
+        this.graphic.set(graphic);
     }
     
     /**

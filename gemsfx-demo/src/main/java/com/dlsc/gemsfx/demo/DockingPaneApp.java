@@ -11,6 +11,9 @@ import com.dlsc.gemsfx.DockingPosition;
 import com.dlsc.gemsfx.DockingRestoreResult;
 import com.dlsc.gemsfx.DockingStageFactory;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Worker;
@@ -24,13 +27,23 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
@@ -38,6 +51,7 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -56,12 +70,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 public class DockingPaneApp extends GemApplication {
 
     private static final DataFormat TITLE_SWAP_FORMAT = new DataFormat("com.dlsc.gemsfx.demo.dockable-title-swap");
+    private static final DataFormat SIDEBAR_VIEW_FORMAT = new DataFormat("com.dlsc.gemsfx.demo.sidebar-view");
+    private static final List<String> SIDEBAR_VIEW_TYPES = List.of("navigator", "editor", "preview", "console", "inspector");
 
+    private final Map<String, Function<String, Dockable>> templates = createTemplates();
     private DockingLayout savedLayout;
     private Label statusLabel;
     private Dockable dragDockable;
@@ -71,20 +89,18 @@ public class DockingPaneApp extends GemApplication {
     public void start(Stage stage) {
         super.start(stage);
 
-        Map<String, Function<String, Dockable>> templates = createTemplates();
-
-        DockableFactory dockableFactory = id -> Optional.ofNullable(templates.get(id)).map(factory -> factory.apply(id));
+        DockableFactory dockableFactory = this::createDockable;
         DockingStageFactory stageFactory = pane -> createFloatingStage(stage, pane);
         DockingContext context = new DockingContext(dockableFactory, stageFactory);
+        context.setDockableDropPredicate(event -> event.getDragboard() != null
+                && event.getDragboard().hasContent(SIDEBAR_VIEW_FORMAT)
+                && SIDEBAR_VIEW_TYPES.contains(event.getDragboard().getContent(SIDEBAR_VIEW_FORMAT)));
+        context.setDockableDropFactory(event ->
+                createSidebarDockable((String) event.getDragboard().getContent(SIDEBAR_VIEW_FORMAT)));
 
         DockingPane rootPane = context.createPane();
         rootPane.setPadding(new Insets(4));
         openInitialLayout(context, rootPane);
-
-        statusLabel = new Label("Drag tabs onto an outer-edge indicator to span the whole pane, or beside a group to split only that group.");
-        statusLabel.getStyleClass().add("docking-demo-status");
-        statusLabel.setWrapText(true);
-        statusLabel.setMaxWidth(Double.MAX_VALUE);
 
         BorderPane root = new BorderPane();
         root.getStyleClass().add("docking-demo-app");
@@ -92,7 +108,7 @@ public class DockingPaneApp extends GemApplication {
         root.setLeft(createNavigationRail());
         root.setCenter(rootPane);
         BorderPane.setMargin(rootPane, new Insets(0, 0, 0, 4));
-        root.setBottom(statusLabel);
+        root.setBottom(createStatusBar(rootPane));
 
         Scene scene = new Scene(root, 1280, 800);
         applyAppStyles(scene);
@@ -100,7 +116,27 @@ public class DockingPaneApp extends GemApplication {
         stage.setScene(scene);
         stage.show();
 
-        status("Drag the rocket between the adjacent panels. Docking tabs can still be dragged between groups or windows.");
+        status("Drag sidebar icons into the workspace to create views, or move the rocket between its panels. Drag tabs to rearrange views.");
+    }
+
+    HBox createStatusBar(DockingPane pane) {
+        statusLabel = new Label("Drag tabs onto an outer-edge indicator to span the whole pane, or beside a group to split only that group.");
+        statusLabel.setWrapText(true);
+        statusLabel.setMinWidth(0);
+        statusLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(statusLabel, Priority.ALWAYS);
+
+        Label active = new Label();
+        active.setMinWidth(Region.USE_PREF_SIZE);
+        active.textProperty().bind(pane.activeDockableProperty()
+                .flatMap(Dockable::titleProperty)
+                .map(title -> "Active: " + title)
+                .orElse("Active: None"));
+
+        HBox statusBar = new HBox(16, statusLabel, active);
+        statusBar.getStyleClass().add("docking-demo-status");
+        statusBar.setAlignment(Pos.CENTER_LEFT);
+        return statusBar;
     }
 
     private HBox createApplicationHeader() {
@@ -150,21 +186,40 @@ public class DockingPaneApp extends GemApplication {
 
     private VBox createNavigationRail() {
         VBox rail = new VBox(
-                createNavigationButton(MaterialDesign.MDI_FOLDER, "Navigator"),
-                createNavigationButton(MaterialDesign.MDI_CODE_TAGS, "Editor"),
-                createNavigationButton(MaterialDesign.MDI_EYE, "Preview"),
-                createNavigationButton(MaterialDesign.MDI_CONSOLE, "Console"),
-                createNavigationButton(MaterialDesign.MDI_SETTINGS, "Inspector"));
+                createNavigationButton(MaterialDesign.MDI_FOLDER, "Navigator", "navigator"),
+                createNavigationButton(MaterialDesign.MDI_CODE_TAGS, "Editor", "editor"),
+                createNavigationButton(MaterialDesign.MDI_EYE, "Preview", "preview"),
+                createNavigationButton(MaterialDesign.MDI_CONSOLE, "Console", "console"),
+                createNavigationButton(MaterialDesign.MDI_SETTINGS, "Inspector", "inspector"));
         rail.getStyleClass().add("docking-demo-navigation");
         rail.setAlignment(Pos.TOP_CENTER);
         return rail;
     }
 
-    private Button createNavigationButton(Ikon icon, String description) {
+    private Button createNavigationButton(Ikon icon, String description, String templateId) {
         Button button = new Button("", createIcon(icon));
         button.getStyleClass().add("docking-demo-navigation-button");
         button.setAccessibleText(description);
-        button.setTooltip(new Tooltip(description));
+        button.setTooltip(new Tooltip(description + " - drag into the workspace to create a view"));
+        button.setOnDragDetected(event -> {
+            Label preview = new Label(description, createIcon(icon));
+            preview.getStyleClass().add("docking-demo-sidebar-drag-preview");
+            StackPane previewRoot = new StackPane(preview);
+            Scene previewScene = new Scene(previewRoot);
+            previewScene.getStylesheets().setAll(button.getScene().getStylesheets());
+            previewRoot.applyCss();
+            previewRoot.autosize();
+            previewRoot.layout();
+            SnapshotParameters parameters = new SnapshotParameters();
+            parameters.setFill(Color.TRANSPARENT);
+            Image image = previewRoot.snapshot(parameters, null);
+            Dragboard dragboard = button.startDragAndDrop(TransferMode.COPY);
+            dragboard.setDragView(image, image.getWidth() / 2, image.getHeight() / 2);
+            ClipboardContent content = new ClipboardContent();
+            content.put(SIDEBAR_VIEW_FORMAT, templateId);
+            dragboard.setContent(content);
+            event.consume();
+        });
         return button;
     }
 
@@ -245,11 +300,49 @@ public class DockingPaneApp extends GemApplication {
                     : "Some dockables could not be closed.");
         });
 
-        HBox toolbar = new HBox(8, openSearch, openTasks, openView, floatActive, snapshot, restore, clearAll);
+        Button dumpJson = new Button("Dump Layout JSON");
+        dumpJson.setOnAction(event -> showLayoutJson(stage, context));
+
+        HBox toolbar = new HBox(8, openSearch, openTasks, openView, floatActive, snapshot, restore, dumpJson, clearAll);
         toolbar.getStyleClass().add("docking-demo-toolbar");
         toolbar.setAlignment(Pos.CENTER_LEFT);
         toolbar.setPadding(new Insets(8, 12, 8, 12));
         return toolbar;
+    }
+
+    private void showLayoutJson(Stage owner, DockingContext context) {
+        String json;
+        try {
+            json = layoutToJson(context.getLayout());
+        } catch (JsonProcessingException ex) {
+            status("Could not serialize layout: " + ex.getOriginalMessage());
+            return;
+        }
+
+        TextArea content = new TextArea(json);
+        content.setEditable(false);
+        content.setWrapText(false);
+        content.setPrefColumnCount(80);
+        content.setPrefRowCount(30);
+        content.getStyleClass().add("docking-demo-code");
+        content.setAccessibleText("Current docking layout JSON");
+
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.initOwner(owner);
+        dialog.setTitle("Docking Layout JSON");
+        dialog.setResizable(true);
+        dialog.getDialogPane().getStyleClass().add("docking-demo-app");
+        dialog.getDialogPane().getStylesheets().setAll(owner.getScene().getStylesheets());
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        dialog.show();
+    }
+
+    static String layoutToJson(DockingLayout layout) throws JsonProcessingException {
+        return new ObjectMapper()
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                .writerWithDefaultPrettyPrinter()
+                .writeValueAsString(layout);
     }
 
     private void openInitialLayout(DockingContext context, DockingPane rootPane) {
@@ -291,16 +384,11 @@ public class DockingPaneApp extends GemApplication {
 
     private Map<String, Function<String, Dockable>> createTemplates() {
         Map<String, Function<String, Dockable>> templates = new LinkedHashMap<>();
-        templates.put("editor", id -> createTextDockable(id, "Editor", MaterialDesign.MDI_CODE_TAGS,
-                "public class Example {\n    // edit me\n}\n"));
-        templates.put("preview", id -> createTextDockable(id, "Preview", MaterialDesign.MDI_EYE,
-                "# Preview\n\nThe selected content appears here."));
-        templates.put("console", id -> createTextDockable(id, "Console", MaterialDesign.MDI_CONSOLE,
-                "Build started...\nTests running...\nDone."));
-        templates.put("navigator", id -> createListDockable(id, "Navigator", MaterialDesign.MDI_FOLDER,
-                "src", "resources", "docs", "build"));
-        templates.put("inspector", id -> createListDockable(id, "Inspector", MaterialDesign.MDI_SETTINGS,
-                "Properties", "Layout", "Accessibility"));
+        templates.put("editor", this::createEditorDockable);
+        templates.put("preview", this::createPreviewDockable);
+        templates.put("console", this::createConsoleDockable);
+        templates.put("navigator", this::createNavigatorDockable);
+        templates.put("inspector", this::createInspectorDockable);
         templates.put("search", id -> createTextDockable(id, "Search", MaterialDesign.MDI_MAGNIFY,
                 "Search results\n- DockingContext\n- DockingPane\n- DockingLayout"));
         templates.put("tasks", id -> createListDockable(id, "Tasks", MaterialDesign.MDI_CHECKBOX_MARKED_OUTLINE,
@@ -313,9 +401,114 @@ public class DockingPaneApp extends GemApplication {
         return templates;
     }
 
+    Optional<Dockable> createDockable(String id) {
+        String templateId = id.split(":", 2)[0];
+        return Optional.ofNullable(templates.get(templateId)).map(factory -> factory.apply(id));
+    }
+
+    Dockable createSidebarDockable(String templateId) {
+        if (!SIDEBAR_VIEW_TYPES.contains(templateId)) {
+            return null;
+        }
+        return createDockable(templateId + ":" + UUID.randomUUID()).orElse(null);
+    }
+
+    private Dockable createNavigatorDockable(String id) {
+        TreeItem<String> project = new TreeItem<>("rocket-mission");
+        TreeItem<String> sources = new TreeItem<>("src");
+        sources.getChildren().add(new TreeItem<>("MissionControl.java"));
+        sources.getChildren().add(new TreeItem<>("Rocket.java"));
+        sources.setExpanded(true);
+        TreeItem<String> resources = new TreeItem<>("resources");
+        resources.getChildren().add(new TreeItem<>("mission.properties"));
+        project.getChildren().add(sources);
+        project.getChildren().add(resources);
+        project.getChildren().add(new TreeItem<>("README.md"));
+        project.setExpanded(true);
+        TreeView<String> tree = new TreeView<>(project);
+        tree.setAccessibleText("Mission project files");
+        return new Dockable(id, "Navigator", createIcon(MaterialDesign.MDI_FOLDER), tree);
+    }
+
+    private Dockable createEditorDockable(String id) {
+        Dockable editor = createTextDockable(id, "Editor", MaterialDesign.MDI_CODE_TAGS,
+                "public class MissionControl {\n\n"
+                        + "    public void launch() {\n"
+                        + "        System.out.println(\"Ready for liftoff!\");\n"
+                        + "    }\n}\n");
+        editor.getContent().getStyleClass().add("docking-demo-code");
+        editor.getContent().setAccessibleText("MissionControl.java editor");
+        return editor;
+    }
+
+    private Dockable createPreviewDockable(String id) {
+        Label title = new Label("Mission overview");
+        title.getStyleClass().add("docking-demo-view-title");
+        Label introduction = new Label("Welcome aboard! This preview shows the launch notes for our next rocket mission.");
+        introduction.setWrapText(true);
+        Label checklist = new Label("Launch checklist\n\n"
+                + "1. Review the flight plan\n2. Check fuel and telemetry\n3. Clear the launch pad\n4. Start the countdown");
+        checklist.setWrapText(true);
+        Label footer = new Label("All systems ready. Next stop: the stars.");
+        footer.setWrapText(true);
+        VBox document = new VBox(16, title, introduction, new Separator(), checklist, footer);
+        document.setPadding(new Insets(24));
+        ScrollPane preview = new ScrollPane(document);
+        preview.setFitToWidth(true);
+        return new Dockable(id, "Preview", createIcon(MaterialDesign.MDI_EYE), preview);
+    }
+
+    private Dockable createConsoleDockable(String id) {
+        TextArea output = new TextArea("[INFO] Mission control initialized\n"
+                + "[INFO] Connecting to rocket telemetry...\n"
+                + "[OK] Guidance, fuel, and communications ready\n"
+                + "[INFO] Waiting for launch clearance\n");
+        output.setEditable(false);
+        output.getStyleClass().add("docking-demo-code");
+        output.setAccessibleText("Mission console output");
+        Button clear = new Button("Clear output");
+        clear.setOnAction(event -> output.clear());
+        HBox toolbar = new HBox(8, new Label("Application output"), clear);
+        toolbar.setAlignment(Pos.CENTER_LEFT);
+        toolbar.setPadding(new Insets(8));
+        BorderPane content = new BorderPane(output);
+        content.setTop(toolbar);
+        return new Dockable(id, "Console", createIcon(MaterialDesign.MDI_CONSOLE), content);
+    }
+
+    private Dockable createInspectorDockable(String id) {
+        TextField name = new TextField("Explorer");
+        ComboBox<String> status = new ComboBox<>();
+        status.getItems().setAll("Preparing", "Ready", "Launched");
+        status.setValue("Ready");
+        CheckBox telemetry = new CheckBox("Enabled");
+        telemetry.setSelected(true);
+        Slider fuel = new Slider(0, 100, 85);
+        fuel.setShowTickLabels(true);
+        fuel.setShowTickMarks(true);
+        GridPane properties = new GridPane();
+        properties.setPadding(new Insets(16));
+        properties.setHgap(12);
+        properties.setVgap(16);
+        Label nameLabel = new Label("Rocket name");
+        nameLabel.setLabelFor(name);
+        Label statusLabel = new Label("Launch status");
+        statusLabel.setLabelFor(status);
+        Label telemetryLabel = new Label("Telemetry");
+        telemetryLabel.setLabelFor(telemetry);
+        Label fuelLabel = new Label("Fuel level");
+        fuelLabel.setLabelFor(fuel);
+        properties.addRow(0, nameLabel, name);
+        properties.addRow(1, statusLabel, status);
+        properties.addRow(2, telemetryLabel, telemetry);
+        properties.addRow(3, fuelLabel, fuel);
+        GridPane.setHgrow(name, Priority.ALWAYS);
+        return new Dockable(id, "Inspector", createIcon(MaterialDesign.MDI_SETTINGS), properties);
+    }
+
     private Dockable createDragDockable(String id) {
         FontIcon rocket = createIcon(MaterialDesign.MDI_ROCKET);
-        rocket.getStyleClass().add("docking-demo-drag-graphic");
+        rocket.getStyleClass().addAll("docking-demo-drag-graphic", "docking-demo-rocket-icon");
         rocket.setAccessibleText("Drag the rocket");
         rocket.setOnDragDetected(event -> {
             SnapshotParameters parameters = new SnapshotParameters();
@@ -334,7 +527,9 @@ public class DockingPaneApp extends GemApplication {
         graphicAndHint.setAlignment(Pos.CENTER);
         StackPane content = new StackPane(graphicAndHint);
 
-        Dockable dockable = new Dockable(id, "Rocket Source", createIcon(MaterialDesign.MDI_ROCKET), content);
+        FontIcon headerIcon = createIcon(MaterialDesign.MDI_ROCKET);
+        headerIcon.getStyleClass().add("docking-demo-rocket-icon");
+        Dockable dockable = new Dockable(id, "Rocket Source", headerIcon, content);
         dragDockable = dockable;
         configureContentDropTarget(dockable);
         return dockable;
@@ -342,14 +537,16 @@ public class DockingPaneApp extends GemApplication {
 
     private Dockable createDropDockable(String id) {
         FontIcon target = createIcon(MaterialDesign.MDI_TARGET);
-        target.getStyleClass().add("docking-demo-target-graphic");
+        target.getStyleClass().addAll("docking-demo-target-graphic", "docking-demo-target-icon");
         target.setAccessibleText("Rocket drop target");
         Label hint = new Label("Drop the rocket here");
         VBox graphicAndHint = new VBox(12, target, hint);
         graphicAndHint.setAlignment(Pos.CENTER);
         StackPane content = new StackPane(graphicAndHint);
 
-        Dockable dockable = new Dockable(id, "Rocket Target", createIcon(MaterialDesign.MDI_INBOX_ARROW_DOWN), content);
+        FontIcon headerIcon = createIcon(MaterialDesign.MDI_INBOX_ARROW_DOWN);
+        headerIcon.getStyleClass().add("docking-demo-target-icon");
+        Dockable dockable = new Dockable(id, "Rocket Target", headerIcon, content);
         dropDockable = dockable;
         configureContentDropTarget(dockable);
         return dockable;
@@ -370,18 +567,18 @@ public class DockingPaneApp extends GemApplication {
 
             boolean dropped = dockable == dropDockable && dragDockable != null;
             if (dropped) {
-                swapContentsAndTitles(dragDockable, dropDockable);
+                swapContentsAndHeaders(dragDockable, dropDockable);
                 Dockable previousSource = dragDockable;
                 dragDockable = dropDockable;
                 dropDockable = previousSource;
-                status("Rocket moved; dockable titles and instructions swapped.");
+                status("Rocket moved; dockable titles, icons, and instructions swapped.");
             }
             event.setDropCompleted(dropped);
             event.consume();
         });
     }
 
-    static void swapContentsAndTitles(Dockable drag, Dockable drop) {
+    static void swapContentsAndHeaders(Dockable drag, Dockable drop) {
         StackPane source = (StackPane) drag.getContent();
         StackPane target = (StackPane) drop.getContent();
         var sourceChildren = List.copyOf(source.getChildren());
@@ -394,6 +591,13 @@ public class DockingPaneApp extends GemApplication {
         String title = drag.getTitle();
         drag.setTitle(drop.getTitle());
         drop.setTitle(title);
+
+        var sourceGraphic = drag.getGraphic();
+        var targetGraphic = drop.getGraphic();
+        drag.setGraphic(null);
+        drop.setGraphic(null);
+        drag.setGraphic(targetGraphic);
+        drop.setGraphic(sourceGraphic);
     }
 
     private Dockable createMapDockable(String id) {

@@ -1,9 +1,13 @@
 package com.dlsc.gemsfx;
 
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.*;
@@ -61,6 +65,24 @@ public class DockableTest extends FxTestBase {
         assertEquals("Panel", dockable.getTitle());
         assertNotNull(dockable.getGraphic());
         assertNotNull(dockable.getContent());
+    }
+
+    @Test
+    public void dockableGraphicCanBeReplacedRemovedAndObserved() {
+        invoke(() -> {
+            ImageView initial = new ImageView();
+            ImageView replacement = new ImageView();
+            Dockable dockable = new Dockable("panel:1", "Panel", initial, new Label("Content"));
+            List<Node> changes = new ArrayList<>();
+            dockable.graphicProperty().addListener((obs, oldGraphic, newGraphic) -> changes.add(newGraphic));
+
+            dockable.setGraphic(replacement);
+            assertSame(replacement, dockable.getGraphic());
+            dockable.setGraphic(null);
+            assertNull(dockable.getGraphic());
+            assertEquals(Arrays.asList(replacement, null), changes);
+            return null;
+        });
     }
 
     @Test
