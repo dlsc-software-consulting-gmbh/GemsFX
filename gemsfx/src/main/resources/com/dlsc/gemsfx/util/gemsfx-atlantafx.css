@@ -2862,3 +2862,81 @@
     /* clearly visible on -color-bg-default and -color-bg-subtle in light and dark themes */
     -fx-base-color: -color-border-muted;
 }
+
+/* -----------------------------------------------------------------------
+ * DockingPane
+ */
+.docking-pane {
+    -fx-background-color: -color-border-default, -color-bg-default;
+}
+
+.docking-pane .docking-tab-strip {
+    -fx-background-color: -color-neutral-emphasis;
+}
+
+.docking-pane .docking-tab {
+    -fx-background-color: -color-neutral-emphasis;
+    -fx-border-color: transparent -color-border-muted -color-border-muted transparent;
+}
+
+.docking-pane .docking-tab-title {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.docking-pane .docking-tab.selected {
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: transparent -color-border-default transparent transparent;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-title {
+    -fx-text-fill: -color-fg-default;
+}
+
+.docking-pane .docking-tab:focused {
+    -fx-border-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-tab-close-button .icon {
+    -fx-background-color: -color-fg-emphasis;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-close-button .icon {
+    -fx-background-color: -color-fg-default;
+}
+
+.docking-pane .docking-tab-close-button:hover {
+    -fx-background-color: -color-neutral-muted;
+}
+
+.docking-pane .docking-tab-content {
+    -fx-background-color: -color-bg-default;
+}
+
+.docking-pane .docking-split > .split-pane-divider {
+    -fx-background-color: -color-border-default;
+}
+
+.docking-pane .docking-drop-leaf-preview {
+    -fx-border-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-drop-zone-preview {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-pane-edge-target {
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-pane-edge-target:active {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-pane-edge-target .icon {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-pane-edge-target:active .icon {
+    -fx-background-color: -color-fg-emphasis;
+}
