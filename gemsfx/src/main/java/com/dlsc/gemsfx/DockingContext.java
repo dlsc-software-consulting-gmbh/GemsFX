@@ -286,6 +286,29 @@ public class DockingContext {
     }
 
     /**
+     * Floats the entire tab group containing the given dockable in one window.
+     * Tab order and the group's selected tab are preserved.
+     *
+     * @param id a dockable in the group to float
+     * @param screenX target screen x coordinate
+     * @param screenY target screen y coordinate
+     * @return the floating pane
+     * @throws IllegalArgumentException if the dockable is not open in this context
+     */
+    public final DockingPane floatTabGroup(String id, double screenX, double screenY) {
+        requireFxThread();
+        Objects.requireNonNull(id, "id must not be null");
+        DockingPane source = dockablePaneById.get(id);
+        if (source == null) {
+            throw new IllegalArgumentException("Unknown dockable id: " + id);
+        }
+        DockingLayoutNode.Tabs group = findTabGroup(source.getLayoutRoot(), id);
+        DockingPane floating = floatDockable(group.getDockableIds().get(0), screenX, screenY);
+        moveRemainingTabs(floating, group);
+        return floating;
+    }
+
+    /**
      * Captures the complete context-wide docking layout.
      *
      * @return immutable layout snapshot
@@ -474,6 +497,83 @@ public class DockingContext {
      */
     public final boolean canCloseDockable(Dockable dockable) {
         return canCloseDockable.test(Objects.requireNonNull(dockable, "dockable must not be null"));
+    }
+
+    /**
+     * Tests whether a dockable's entire tab group can move to the given target.
+     * A {@code null} target ID addresses a pane-wide edge, or an empty pane for a center drop.
+     * Drops back onto the source group are rejected.
+     *
+     * @param targetPane the destination pane in this context
+     * @param id a dockable in the source group
+     * @param targetId a dockable in the target group, or {@code null} for the whole pane
+     * @param position the docking position
+     * @return whether the move is valid
+     */
+    public final boolean canMoveTabGroup(DockingPane targetPane, String id, String targetId, DockingPosition position) {
+        requireFxThread();
+        DockingPane source = dockablePaneById.get(id);
+        if (source == null || targetPane == null || targetPane.getDockingContext() != this
+                || !paneIdByPane.containsKey(targetPane) || position == null) {
+            return false;
+        }
+        DockingLayoutNode.Tabs group = findTabGroup(source.getLayoutRoot(), id);
+        if (targetId == null) {
+            if (targetPane.getLayoutRoot() instanceof DockingLayoutNode.Empty) {
+                return true;
+            }
+            return position != DockingPosition.CENTER
+                    && (source != targetPane || group.getDockableIds().size() < source.getDockables().size());
+        }
+        return !group.getDockableIds().contains(targetId)
+                && canMoveDockable(targetPane, group.getDockableIds().get(0), targetId, position);
+    }
+
+    /**
+     * Moves a dockable's entire tab group, preserving its order and selected tab.
+     * Center drops append the tabs to the target group; edge drops create one new group.
+     *
+     * @param targetPane the destination pane in this context
+     * @param id a dockable in the source group
+     * @param targetId a dockable in the target group, or {@code null} for a pane-wide edge or empty pane
+     * @param position the docking position
+     * @return {@code true} if the move completed, or {@code false} without changes for an invalid target
+     */
+    public final boolean moveTabGroup(DockingPane targetPane, String id, String targetId, DockingPosition position) {
+        if (!canMoveTabGroup(targetPane, id, targetId, position)) {
+            return false;
+        }
+        DockingLayoutNode.Tabs group = findTabGroup(dockablePaneById.get(id).getLayoutRoot(), id);
+        String first = group.getDockableIds().get(0);
+        if (targetId == null) {
+            moveDockableToPaneEdge(targetPane, first,
+                    position == DockingPosition.CENTER ? DockingPosition.LEFT : position);
+        } else {
+            moveDockable(targetPane, first, targetId, position);
+        }
+        moveRemainingTabs(targetPane, group);
+        return true;
+    }
+
+    private void moveRemainingTabs(DockingPane targetPane, DockingLayoutNode.Tabs group) {
+        List<String> ids = group.getDockableIds();
+        for (int i = 1; i < ids.size(); i++) {
+            moveDockable(targetPane, ids.get(i), ids.get(0), DockingPosition.CENTER);
+        }
+        targetPane.selectDockable(group.getSelectedId());
+    }
+
+    private static DockingLayoutNode.Tabs findTabGroup(DockingLayoutNode node, String id) {
+        if (node instanceof DockingLayoutNode.Tabs) {
+            DockingLayoutNode.Tabs tabs = (DockingLayoutNode.Tabs) node;
+            return tabs.getDockableIds().contains(id) ? tabs : null;
+        }
+        if (node instanceof DockingLayoutNode.Split) {
+            DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
+            DockingLayoutNode.Tabs first = findTabGroup(split.getFirst(), id);
+            return first != null ? first : findTabGroup(split.getSecond(), id);
+        }
+        return null;
     }
 
     final boolean canMoveDockable(DockingPane targetPane, String draggedId, String targetId, DockingPosition position) {

@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -101,9 +104,13 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     private static void fireDragDetected(Node title) {
+        fireDragDetected(title, false);
+    }
+
+    private static void fireDragDetected(Node title, boolean shiftDown) {
         Event.fireEvent(title, new MouseEvent(MouseEvent.DRAG_DETECTED,
                 5, 5, 105, 105, MouseButton.PRIMARY, 1,
-                false, false, false, false, true, false, false,
+                shiftDown, false, false, false, true, false, false,
                 false, false, true, new PickResult(title, 5, 5)));
     }
 
@@ -134,6 +141,144 @@ public class DockingContextWindowTest extends FxTestBase {
         protected boolean startDockableDrag(Node title, String dockableId) {
             return true;
         }
+    }
+
+    @Test
+    public void shiftDragMergesTheWholeGroupIntoAnotherPane() {
+        invoke(() -> {
+            List<Dockable> all = List.of(dockable("a"), dockable("b"), dockable("x"));
+            DockingContext context = new DockingContext(factoryFor(all, new AtomicInteger()), pane -> new Stage());
+            DockingPane source = context.createPane();
+            context.openDockable(source, "a", DockingPosition.CENTER);
+            context.openDockable(source, "b", DockingPosition.CENTER);
+            renderWithEventSkin(source);
+            DockingPane target = context.createPane();
+            context.openDockable(target, "x", DockingPosition.CENTER);
+            layout(target);
+            Node dragged = title(source, "a");
+
+            fireDragDetected(dragged, true);
+            DragEvent drop = fireDragEvent(target, DragEvent.DRAG_DROPPED, dragged,
+                    target.getWidth() / 2, target.getHeight() / 2, 400, 300, TransferMode.MOVE, title(target, "x"));
+            fireDragEvent(dragged, DragEvent.DRAG_DONE, dragged, 5, 5, 400, 300, TransferMode.MOVE, dragged);
+
+            assertTrue(drop.isDropCompleted());
+            assertTrue(source.getLayoutRoot() instanceof DockingLayoutNode.Empty);
+            assertEquals(List.of("x", "a", "b"), ids(target));
+            assertEquals("b", target.getActiveDockable().getId());
+            return null;
+        });
+    }
+
+    @Test
+    public void shiftDragIntoEmptyPaneShowsPreviewAndMovesTheGroup() {
+        invoke(() -> {
+            List<Dockable> all = List.of(dockable("a"), dockable("b"));
+            DockingContext context = new DockingContext(factoryFor(all, new AtomicInteger()), pane -> new Stage());
+            DockingPane source = context.createPane();
+            context.openDockable(source, "a", DockingPosition.CENTER);
+            context.openDockable(source, "b", DockingPosition.CENTER);
+            renderWithEventSkin(source);
+            DockingPane target = layout(context.createPane());
+            Node dragged = title(source, "a");
+            double x = target.getWidth() / 2;
+            double y = target.getHeight() / 2;
+
+            fireDragDetected(dragged, true);
+            fireDragEvent(target, DragEvent.DRAG_OVER, dragged, x, y, 400, 300, null, target);
+            assertTrue(target.lookup(".docking-drop-zone-preview").isVisible());
+            DragEvent drop = fireDragEvent(target, DragEvent.DRAG_DROPPED, dragged,
+                    x, y, 400, 300, TransferMode.MOVE, target);
+            fireDragEvent(dragged, DragEvent.DRAG_DONE, dragged, 5, 5, 400, 300, TransferMode.MOVE, dragged);
+
+            assertTrue(drop.isDropCompleted());
+            assertTrue(source.getLayoutRoot() instanceof DockingLayoutNode.Empty);
+            assertEquals(List.of("a", "b"), ids(target));
+            assertEquals("b", target.getActiveDockable().getId());
+            assertFalse(target.lookup(".docking-drop-zone-preview").isVisible());
+            return null;
+        });
+    }
+
+    @Test
+    public void shiftDragToPaneEdgeKeepsGroupTogetherAndDoesNotAffectNextNormalDrag() {
+        invoke(() -> {
+            List<Dockable> all = List.of(dockable("a"), dockable("b"), dockable("x"));
+            AtomicReference<DockingPane> floatingPane = new AtomicReference<>();
+            AtomicReference<Stage> floatingStage = new AtomicReference<>();
+            DockingContext context = new DockingContext(factoryFor(all, new AtomicInteger()), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(pane, 300, 200));
+                floatingPane.set(pane);
+                floatingStage.set(stage);
+                return stage;
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.CENTER);
+            context.openDockable(host, "x", DockingPosition.RIGHT);
+            host.selectDockable("b");
+            renderWithEventSkin(host);
+            Node dragged = title(host, "a");
+
+            fireDragDetected(dragged, true);
+            Point2D point = paneEdgeTargetCenter(host, ".pane-edge-bottom");
+            DragEvent drop = fireDragEvent(host, DragEvent.DRAG_DROPPED, dragged,
+                    point.getX(), point.getY(), 400, 300, TransferMode.MOVE, host);
+            fireDragEvent(dragged, DragEvent.DRAG_DONE, dragged, 5, 5, 400, 300, TransferMode.MOVE, dragged);
+            assertTrue(drop.isDropCompleted());
+            DockingLayoutNode.Split root = (DockingLayoutNode.Split) host.getLayoutRoot();
+            assertEquals(List.of("x"), ((DockingLayoutNode.Tabs) root.getFirst()).getDockableIds());
+            assertEquals(List.of("a", "b"), ((DockingLayoutNode.Tabs) root.getSecond()).getDockableIds());
+            assertEquals("b", host.getActiveDockable().getId());
+
+            host.applyCss();
+            host.layout();
+            Node next = title(host, "a");
+            fireDragDetected(next);
+            fireDragEvent(next, DragEvent.DRAG_DONE, next, 5, 5, 777, 888, null, next);
+            assertEquals(List.of("a"), ids(floatingPane.get()));
+            assertEquals(List.of("x", "b"), allIds(host.getLayoutRoot()));
+            floatingStage.get().close();
+            return null;
+        });
+    }
+
+    @Test
+    public void shiftDragOutsideFloatsOneGroupAndKeepsItsSelection() {
+        invoke(() -> {
+            List<Dockable> all = List.of(dockable("a"), dockable("b"), dockable("c"));
+            AtomicReference<DockingPane> floatingPane = new AtomicReference<>();
+            AtomicReference<Stage> floatingStage = new AtomicReference<>();
+            AtomicInteger stageCalls = new AtomicInteger();
+            DockingContext context = new DockingContext(factoryFor(all, new AtomicInteger()), pane -> {
+                stageCalls.incrementAndGet();
+                Stage stage = new Stage();
+                stage.setScene(new Scene(pane, 300, 200));
+                floatingPane.set(pane);
+                floatingStage.set(stage);
+                return stage;
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.CENTER);
+            context.openDockable(host, "c", DockingPosition.RIGHT);
+            host.selectDockable("b");
+            renderWithEventSkin(host);
+            Node dragged = title(host, "a");
+
+            fireDragDetected(dragged, true);
+            fireDragEvent(dragged, DragEvent.DRAG_DONE, dragged, 5, 5, 777, 888, null, dragged);
+
+            assertEquals(1, stageCalls.get());
+            assertEquals(List.of("a", "b"), ids(floatingPane.get()));
+            assertEquals("b", floatingPane.get().getActiveDockable().getId());
+            assertEquals(List.of("c"), ids(host));
+            assertEquals(777d, floatingStage.get().getX(), 0d);
+            assertEquals(888d, floatingStage.get().getY(), 0d);
+            floatingStage.get().close();
+            return null;
+        });
     }
 
     @Test
@@ -192,6 +337,103 @@ public class DockingContextWindowTest extends FxTestBase {
             assertEquals("a", rightPane.getActiveDockable().getId());
             assertEquals(2, context.getDockables().size());
             return null;
+        });
+    }
+
+    @Test
+    public void closeButtonsFadeInWhileTheirTabHeadersAreHovered() throws InterruptedException {
+        DockingPane pane = invoke(() -> {
+            DockingContext context = new DockingContext(
+                    id -> Optional.of(dockable(id)), floatingPane -> new Stage());
+            DockingPane created = context.createPane();
+            context.openDockable(created, "a", DockingPosition.CENTER);
+            context.openDockable(created, "b", DockingPosition.CENTER);
+            return layout(created);
+        });
+
+        for (String id : List.of("a", "b")) {
+            CountDownLatch fadedIn = new CountDownLatch(1);
+            AtomicBoolean intermediateOpacity = new AtomicBoolean();
+            double width = invoke(() -> {
+                Node tab = title(pane, id);
+                Node close = tab.lookup(".docking-tab-close-button");
+                assertEquals(0, close.getOpacity(), 0);
+                close.opacityProperty().addListener((obs, oldOpacity, newOpacity) -> {
+                    if (newOpacity.doubleValue() > 0 && newOpacity.doubleValue() < 1) {
+                        intermediateOpacity.set(true);
+                    }
+                    if (newOpacity.doubleValue() == 1) {
+                        fadedIn.countDown();
+                    }
+                });
+                fireHover(tab, true);
+                pane.applyCss();
+                assertEquals("Hover must start a fade, not instantly reveal the button", 0, close.getOpacity(), 0);
+                return tab.getBoundsInParent().getWidth();
+            });
+
+            assertTrue("Close button did not finish fading in", fadedIn.await(5, TimeUnit.SECONDS));
+            runFx(() -> {
+                Node tab = title(pane, id);
+                Node close = tab.lookup(".docking-tab-close-button");
+                assertTrue("The fade must include intermediate opacity values", intermediateOpacity.get());
+                assertEquals(1, close.getOpacity(), 0);
+                assertEquals(width, tab.getBoundsInParent().getWidth(), 0);
+
+                fireHover(tab, false);
+                pane.applyCss();
+                assertEquals(0, close.getOpacity(), 0);
+            });
+        }
+    }
+
+    private static void fireHover(Node node, boolean hovered) {
+        Event.fireEvent(node, new MouseEvent(hovered ? MouseEvent.MOUSE_ENTERED : MouseEvent.MOUSE_EXITED,
+                5, 5, 105, 105, MouseButton.NONE, 0,
+                false, false, false, false, false, false, false,
+                false, false, true, new PickResult(node, 5, 5)));
+    }
+
+    @Test
+    public void titleTooltipsFollowTruncationResizingAndRenaming() {
+        runFx(() -> {
+            DockingContext context = new DockingContext(
+                    id -> Optional.of(dockable(id)), pane -> new Stage());
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            layout(pane);
+            StackPane root = (StackPane) pane.getParent();
+
+            for (String id : List.of("a", "b")) {
+                Dockable dockable = pane.getDockables().stream()
+                        .filter(candidate -> id.equals(candidate.getId())).findFirst().orElseThrow();
+                Label label = (Label) title(pane, id).lookup(".docking-tab-title");
+                assertNull(label.getTooltip());
+
+                String fullTitle = "Mission Control ".repeat(10);
+                dockable.setTitle(fullTitle);
+                root.applyCss();
+                root.layout();
+                assertNotNull("Truncated titles need a full-name tooltip", label.getTooltip());
+                assertEquals(fullTitle, label.getTooltip().getText());
+
+                dockable.setTitle(fullTitle + "Renamed");
+                root.layout();
+                assertEquals(fullTitle + "Renamed", label.getTooltip().getText());
+
+                root.resize(4000, 600);
+                root.layout();
+                assertNull("A fully visible title must not have a tooltip", label.getTooltip());
+
+                root.resize(300, 600);
+                root.layout();
+                assertNotNull(label.getTooltip());
+                dockable.setTitle("Short");
+                root.layout();
+                assertNull("Title width " + label.getWidth() + ", preferred width " + label.prefWidth(-1),
+                        label.getTooltip());
+            }
         });
     }
 

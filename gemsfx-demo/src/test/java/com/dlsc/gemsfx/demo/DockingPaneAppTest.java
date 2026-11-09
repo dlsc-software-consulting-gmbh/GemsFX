@@ -137,7 +137,7 @@ public class DockingPaneAppTest {
     }
 
     @Test
-    public void rocketAndTargetIconsUseSemanticColorsInContentAndSelectedTabs() throws Exception {
+    public void rocketAndTargetContentColorsDoNotOverrideTabHeaderColors() throws Exception {
         runFx(() -> {
             DockingPaneApp app = new DockingPaneApp();
             DockingContext context = new DockingContext(app::createDockable, pane -> null);
@@ -146,7 +146,8 @@ public class DockingPaneAppTest {
             Dockable drop = context.openDockable(pane, "drop", DockingPosition.CENTER).orElseThrow();
             StackPane root = new StackPane(pane);
             root.getStyleClass().add("docking-demo-app");
-            root.setStyle("-color-success-emphasis: #123456; -color-danger-emphasis: #ab3456;");
+            root.setStyle("-color-success-emphasis: #123456; -color-danger-emphasis: #ab3456;"
+                    + " -color-fg-default: #654321; -color-fg-emphasis: #abcdef;");
             root.getStylesheets().add(DockingPaneApp.class.getResource("docking-pane-app-atlantafx.css").toExternalForm());
             Scene scene = new Scene(root, 800, 600);
             scene.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
@@ -156,8 +157,10 @@ public class DockingPaneAppTest {
                 pane.selectDockable(id);
                 root.applyCss();
                 root.layout();
-                assertEquals(Color.web("#123456"), ((FontIcon) drag.getGraphic()).getIconColor());
-                assertEquals(Color.web("#ab3456"), ((FontIcon) drop.getGraphic()).getIconColor());
+                assertEquals(Color.web(id.equals("drag") ? "#abcdef" : "#654321"),
+                        ((FontIcon) drag.getGraphic()).getIconColor());
+                assertEquals(Color.web(id.equals("drop") ? "#abcdef" : "#654321"),
+                        ((FontIcon) drop.getGraphic()).getIconColor());
                 Dockable selected = id.equals("drag") ? drag : drop;
                 FontIcon contentIcon = (FontIcon) selected.getContent().lookup(id.equals("drag")
                         ? ".docking-demo-drag-graphic" : ".docking-demo-target-graphic");

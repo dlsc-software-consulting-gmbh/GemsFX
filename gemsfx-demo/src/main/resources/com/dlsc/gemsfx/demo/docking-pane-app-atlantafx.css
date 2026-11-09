@@ -136,13 +136,11 @@
     -fx-icon-size: 112px;
 }
 
-.docking-demo-app .docking-demo-rocket-icon,
-.docking-demo-app .docking-pane .docking-tab .docking-tab-title .ikonli-font-icon.docking-demo-rocket-icon {
+.docking-demo-app .docking-demo-drag-graphic {
     -fx-icon-color: -color-success-emphasis;
 }
 
-.docking-demo-app .docking-demo-target-icon,
-.docking-demo-app .docking-pane .docking-tab .docking-tab-title .ikonli-font-icon.docking-demo-target-icon {
+.docking-demo-app .docking-demo-target-graphic {
     -fx-icon-color: -color-danger-emphasis;
 }
 

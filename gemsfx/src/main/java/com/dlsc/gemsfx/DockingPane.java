@@ -21,6 +21,7 @@ import java.util.Objects;
 /**
  * Control associated with exactly one {@link DockingContext}. It owns one pane tree and renders each dockable as a
  * title tab with a close affordance; only the selected tab's content is displayed.
+ * Hold Shift when starting a tab drag to move its entire tab group, preserving tab order and selection.
  */
 public class DockingPane extends Control {
 

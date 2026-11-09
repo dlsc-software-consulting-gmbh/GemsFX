@@ -6,6 +6,7 @@ import com.dlsc.gemsfx.DockingPane;
 import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
 import com.dlsc.gemsfx.util.ResourceBundleManager.BundleType;
+import javafx.animation.FadeTransition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.geometry.Pos;
@@ -23,6 +24,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -94,7 +96,16 @@ final class DockingTabPane extends VBox {
         AccessibilityUtil.bindAccessibleText(title, accessibleText);
         title.getProperties().put(TITLE_ACCESSIBLE_TEXT_BINDING_KEY, accessibleText);
 
-        Label label = new Label();
+        Tooltip titleTooltip = new Tooltip();
+        titleTooltip.textProperty().bind(dockable.titleProperty());
+        Label label = new Label() {
+            @Override
+            protected void layoutChildren() {
+                super.layoutChildren();
+                // Text measurements are current only after the skin has laid out the label.
+                setTooltip(getWidth() < prefWidth(-1) ? titleTooltip : null);
+            }
+        };
         label.textProperty().bind(dockable.titleProperty());
         label.graphicProperty().bind(dockable.graphicProperty());
         label.getStyleClass().add("docking-tab-title");
@@ -106,6 +117,18 @@ final class DockingTabPane extends VBox {
         Button close = new Button();
         close.getStyleClass().add("docking-tab-close-button");
         close.setFocusTraversable(false);
+        close.setOpacity(0);
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(300), close);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        title.hoverProperty().addListener((obs, wasHovered, hovered) -> {
+            if (hovered) {
+                fadeIn.playFromStart();
+            } else {
+                fadeIn.stop();
+                close.setOpacity(0);
+            }
+        });
         Region icon = new Region();
         icon.getStyleClass().add("icon");
         close.setGraphic(icon);
