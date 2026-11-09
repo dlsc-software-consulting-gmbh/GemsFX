@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
+import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Orientation;
@@ -334,6 +335,29 @@ public class DockingPaneTest extends FxTestBase {
             assertEquals(width, content.getWidth(), 0);
             assertEquals(height, content.getHeight(), 0);
             assertSame(dockable, pane.getActiveDockable());
+            return null;
+        });
+    }
+
+    @Test
+    public void dragImageUsesAtlantaFxPreviewColors() {
+        invoke(() -> {
+            DockingContext context = context(dockable("a"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+            Scene scene = pane.getScene();
+            scene.getStylesheets().add(getClass().getResource("docking-drag-theme.css").toExternalForm());
+            GemsFXAtlantaFX.applyTo(scene);
+            scene.getRoot().applyCss();
+            scene.getRoot().layout();
+
+            Image image = (Image) invokeSkinPrivate((DockingPaneSkin) pane.getSkin(),
+                    "createDockableDragView", new Class<?>[]{String.class}, "a");
+
+            assertEquals(Color.web("#123456"), image.getPixelReader().getColor(5, 5));
+            assertEquals(Color.web("#654321"), image.getPixelReader().getColor(0, 0));
+            coloredBounds(image, Color.LIME);
             return null;
         });
     }

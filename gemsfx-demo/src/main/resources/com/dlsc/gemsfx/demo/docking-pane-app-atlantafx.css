@@ -1,0 +1,130 @@
+.docking-demo-app {
+    -fx-background-color: -color-bg-default;
+}
+
+.docking-demo-header {
+    -fx-padding: 6px 12px;
+    -fx-spacing: 8px;
+    -fx-background-color: -color-neutral-emphasis;
+    -fx-alignment: center-left;
+}
+
+.docking-demo-header-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 3px;
+    -fx-padding: 6px 8px;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.docking-demo-header-button:hover {
+    -fx-background-color: -color-neutral-muted;
+}
+
+.docking-demo-header-button .ikonli-font-icon {
+    -fx-icon-color: -color-fg-emphasis;
+    -fx-icon-size: 16px;
+}
+
+.docking-demo-menu-icon {
+    -fx-shape: "M0 1 H16 V3 H0 Z M0 7 H16 V9 H0 Z M0 13 H16 V15 H0 Z";
+    -fx-background-color: -color-fg-emphasis;
+    -fx-pref-width: 16px;
+    -fx-pref-height: 16px;
+}
+
+.docking-demo-brand {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.docking-demo-user {
+    -fx-padding: 5px 8px;
+    -fx-background-color: -color-accent-muted;
+    -fx-background-radius: 3px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-fg-default;
+}
+
+.docking-demo-toolbar {
+    -fx-spacing: 8px;
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: transparent transparent -color-border-default transparent;
+}
+
+.docking-demo-navigation {
+    -fx-pref-width: 44px;
+    -fx-padding: 8px 5px;
+    -fx-spacing: 4px;
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: transparent -color-border-default transparent transparent;
+}
+
+.docking-demo-navigation-button {
+    -fx-pref-width: 34px;
+    -fx-pref-height: 34px;
+    -fx-padding: 6px;
+    -fx-background-color: transparent;
+}
+
+.docking-demo-navigation-button .ikonli-font-icon {
+    -fx-icon-color: -color-fg-muted;
+    -fx-icon-size: 18px;
+}
+
+.docking-demo-navigation-button:hover {
+    -fx-background-color: -color-neutral-subtle;
+}
+
+.docking-demo-status {
+    -fx-padding: 7px 12px;
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: -color-border-default transparent transparent transparent;
+    -fx-text-fill: -color-fg-muted;
+}
+
+.docking-demo-app .docking-pane .docking-tab-pane {
+    -fx-border-color: -color-neutral-emphasis-plus;
+    -fx-border-width: 1px;
+    -fx-border-insets: 0;
+}
+
+.docking-demo-app .docking-demo-map-footer {
+    -fx-background-color: rgba(255, 255, 255, 0.65);
+}
+
+.docking-demo-app .docking-pane .docking-tab {
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: transparent -color-neutral-emphasis-plus -color-neutral-emphasis-plus transparent;
+}
+
+.docking-demo-app .docking-pane .docking-tab.selected {
+    -fx-background-color: -color-neutral-emphasis;
+    -fx-border-color: transparent -color-neutral-emphasis-plus -color-neutral-emphasis-plus transparent;
+}
+
+.docking-demo-app .docking-pane .docking-tab:focused {
+    -fx-border-color: -color-accent-emphasis -color-neutral-emphasis-plus -color-neutral-emphasis-plus -color-accent-emphasis;
+}
+
+.docking-demo-app .docking-pane .docking-tab.selected .docking-tab-title {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.docking-demo-app .docking-pane .docking-tab-title .ikonli-font-icon {
+    -fx-icon-color: -color-fg-default;
+}
+
+.docking-demo-app .docking-pane .docking-tab.selected .docking-tab-title .ikonli-font-icon {
+    -fx-icon-color: -color-fg-emphasis;
+}
+
+.docking-demo-app .docking-pane .docking-tab.selected .docking-tab-close-button .icon {
+    -fx-background-color: -color-neutral-emphasis;
+}
+
+.docking-demo-app .docking-pane .docking-tab-content {
+    -fx-background-color: -color-bg-default;
+}
+

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Berlin - OpenStreetMap</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        html, body, #map { width: 100%; height: 100%; margin: 0; }
+        #status {
+            position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; padding: 8px 12px; background: white; color: #333;
+            font: 13px sans-serif; border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<div id="status" role="status">Loading map...</div>
+<!-- WebView can leave gaps when compositing 3D-transformed tiles. -->
+<script>window.L_DISABLE_3D = true;</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        onerror="document.getElementById('status').textContent = 'Map unavailable - internet access is required.'"></script>
+<script>
+    if (typeof L !== "undefined") {
+        const status = document.getElementById("status");
+        const map = L.map("map").setView([52.5163, 13.3777], 13);
+        const tiles = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap contributors"
+        });
+        tiles.on("tileload", function () { status.hidden = true; });
+        tiles.on("tileerror", function () {
+            status.textContent = "Map tiles unavailable - check your internet connection and reload.";
+            status.hidden = false;
+        });
+        tiles.addTo(map);
+        L.circleMarker([52.5163, 13.3777], {radius: 6}).addTo(map);
+        window.addEventListener("resize", function () { map.invalidateSize(); });
+    }
+</script>
+</body>
+</html>

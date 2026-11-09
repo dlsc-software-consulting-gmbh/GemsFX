@@ -2456,6 +2456,14 @@
     -fx-background-color: -color-border-default, -color-bg-default;
 }
 
+.docking-pane.docking-drag-preview {
+    -fx-background-color: -color-border-default, -color-bg-default;
+}
+
+.docking-pane.docking-drag-preview .docking-drag-title {
+    -fx-text-fill: -color-fg-default;
+}
+
 .date-range-view > .range-view-container > .presets-box {
 }
 
@@ -2867,7 +2875,6 @@
  * DockingPane
  */
 .docking-pane {
-    -fx-background-color: -color-border-default, -color-bg-default;
 }
 
 .docking-pane .docking-tab-strip {
@@ -2875,12 +2882,16 @@
 }
 
 .docking-pane .docking-tab {
-    -fx-background-color: -color-neutral-emphasis;
+    -fx-background-color: -color-bg-subtle;
     -fx-border-color: transparent -color-border-muted -color-border-muted transparent;
 }
 
 .docking-pane .docking-tab-title {
-    -fx-text-fill: -color-fg-emphasis;
+    -fx-text-fill: -color-fg-default;
+}
+
+.docking-pane .docking-tab-title .ikonli-font-icon {
+    -fx-icon-color: -color-fg-default;
 }
 
 .docking-pane .docking-tab.selected {
@@ -2889,19 +2900,31 @@
 }
 
 .docking-pane .docking-tab.selected .docking-tab-title {
-    -fx-text-fill: -color-fg-default;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-title .ikonli-font-icon {
+    -fx-icon-color: -color-fg-emphasis;
 }
 
 .docking-pane .docking-tab:focused {
     -fx-border-color: -color-accent-emphasis;
 }
 
+.docking-pane .docking-tab-close-button {
+    -fx-background-color: -color-neutral-emphasis;
+}
+
 .docking-pane .docking-tab-close-button .icon {
     -fx-background-color: -color-fg-emphasis;
 }
 
+.docking-pane .docking-tab.selected .docking-tab-close-button {
+    -fx-background-color: -color-fg-emphasis;
+}
+
 .docking-pane .docking-tab.selected .docking-tab-close-button .icon {
-    -fx-background-color: -color-fg-default;
+    -fx-background-color: -color-neutral-emphasis;
 }
 
 .docking-pane .docking-tab-close-button:hover {
@@ -2912,8 +2935,25 @@
     -fx-background-color: -color-bg-default;
 }
 
-.docking-pane .docking-split > .split-pane-divider {
-    -fx-background-color: -color-border-default;
+.docking-pane .docking-split > .split-pane-divider,
+.docking-pane .docking-split > .split-pane-divider:hover,
+.docking-pane .docking-split > .split-pane-divider:pressed,
+.docking-pane .docking-split > .split-pane-divider:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-insets: 0;
+    -fx-border-width: 0;
+    -fx-padding: 3px;
+}
+
+.docking-pane .docking-split > .split-pane-divider > .horizontal-grabber,
+.docking-pane .docking-split > .split-pane-divider > .vertical-grabber,
+.docking-pane .docking-split > .split-pane-divider:pressed > .horizontal-grabber,
+.docking-pane .docking-split > .split-pane-divider:pressed > .vertical-grabber {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-opacity: 0;
 }
 
 .docking-pane .docking-drop-leaf-preview {
