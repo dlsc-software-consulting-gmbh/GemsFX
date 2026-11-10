@@ -71,6 +71,15 @@ actions, and docking drag-and-drop. Custom close buttons request closure
 through `DockingContext.requestCloseDockable`. Changing the factory refreshes
 tabs in every pane belonging to the context, including floating panes.
 
+Applications can set `Dockable.onHelpProperty()` to a `Runnable` to provide
+help for an individual dockable. The default `DockingTab` then shows a help
+button immediately before Close, sharing its hover-only 300ms fade. A null
+callback hides the button without reserving layout space. Setting, replacing,
+or removing the callback updates existing tabs immediately; activating Help
+invokes the current callback on the JavaFX application thread without selecting
+or closing the dockable. The tooltip and title-aware accessible text are
+localized, and the icon is sized through CSS.
+
 Each pane maintains a runtime tree of split nodes and tab groups. Split nodes
 record orientation and divider proportions; tab groups record dockable IDs,
 order, and selection. The context coordinates moving content between pane

@@ -85,7 +85,8 @@ public class DockingContext {
 
     /**
      * Factory creating the entire tab header for each dockable. The default creates a {@link DockingTab},
-     * including its title, graphic, and close button. A {@code null} factory also uses this default.
+     * including its title, graphic, optional help button, and close button.
+     * A {@code null} factory also uses this default.
      * <p>
      * The factory is invoked on the JavaFX application thread whenever tabs are rebuilt and must return
      * a fresh, unparented, non-null node on every invocation. Changing the factory refreshes existing

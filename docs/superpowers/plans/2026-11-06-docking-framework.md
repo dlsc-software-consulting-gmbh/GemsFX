@@ -45,6 +45,7 @@
 - Consumes: none.
 - Produces:
   - `Dockable(String id, String title, Node content)` and `Dockable(String id, String title, Node graphic, Node content)`, with `getId()`, `getTitle()`, `getGraphic()`, and `getContent()`.
+  - Optional `Dockable.onHelpProperty()` of type `ObjectProperty<Runnable>`, with final getter/setter/accessor methods and a null default. The default tab shows Help before Close only when a callback is present, uses the same 300ms hover fade, and invokes the current callback without selecting or closing the dockable. Callback changes update existing headers; help strings are localized and icon sizing uses CSS.
   - `DockingPosition` values `CENTER`, `LEFT`, `RIGHT`, `TOP`, and `BOTTOM`.
   - Immutable `DockingLayout(String primaryPaneId, List<PaneLayout> panes)`.
   - `DockingLayoutNode` is an interface with immutable nested classes `Empty`, `Tabs(List<String> dockableIds, String selectedId)`, and `Split(Orientation orientation, double dividerPosition, DockingLayoutNode first, DockingLayoutNode second)`. Implement these as Java 11 classes, not records. Use an `Empty` root for an empty primary pane.

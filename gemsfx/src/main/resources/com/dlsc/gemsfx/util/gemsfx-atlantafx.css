@@ -2923,7 +2923,8 @@
     -fx-border-color: -color-accent-emphasis;
 }
 
-.docking-pane .docking-tab-close-button {
+.docking-pane .docking-tab-close-button,
+.docking-pane .docking-tab-help-button {
     -fx-background-color: -color-neutral-emphasis;
 }
 
@@ -2931,7 +2932,12 @@
     -fx-background-color: -color-fg-emphasis;
 }
 
-.docking-pane .docking-tab.selected .docking-tab-close-button {
+.docking-pane .docking-tab-help-button .ikonli-font-icon {
+    -fx-icon-color: -color-fg-emphasis;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-close-button,
+.docking-pane .docking-tab.selected .docking-tab-help-button {
     -fx-background-color: -color-fg-emphasis;
 }
 
@@ -2939,7 +2945,12 @@
     -fx-background-color: -color-neutral-emphasis;
 }
 
-.docking-pane .docking-tab-close-button:hover {
+.docking-pane .docking-tab.selected .docking-tab-help-button .ikonli-font-icon {
+    -fx-icon-color: -color-neutral-emphasis;
+}
+
+.docking-pane .docking-tab-close-button:hover,
+.docking-pane .docking-tab-help-button:hover {
     -fx-background-color: -color-neutral-muted;
 }
 

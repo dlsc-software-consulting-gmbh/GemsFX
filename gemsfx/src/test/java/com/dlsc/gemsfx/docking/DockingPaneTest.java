@@ -25,6 +25,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.junit.Test;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,6 +114,90 @@ public class DockingPaneTest extends FxTestBase {
                         + image.getPixelReader().getColor((int) image.getWidth() / 2, (int) image.getHeight() / 2),
                 maxX >= minX && maxY >= minY);
         return new Rectangle2D(minX, minY, maxX - minX + 1, maxY - minY + 1);
+    }
+
+    @Test
+    public void helpButtonTracksCallbackChangesWithoutSelectingOrClosingItsDockable() {
+        runFx(() -> {
+            Dockable first = dockable("a");
+            DockingContext context = context(first, dockable("b"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            layout(pane);
+            Node header = title(pane, "a");
+            Node unavailable = header.lookup(".docking-tab-help-button");
+            assertTrue(unavailable == null || (!unavailable.isVisible() && !unavailable.isManaged()));
+            AtomicInteger originalCalls = new AtomicInteger();
+            first.onHelpProperty().set(originalCalls::incrementAndGet);
+            Button help = (Button) header.lookup(".docking-tab-help-button");
+            assertNotNull(help);
+            assertTrue(help.isVisible());
+            assertTrue(help.isManaged());
+            List<Node> children = ((DockingTab) header).getChildren();
+            assertSame(header.lookup(".docking-tab-close-button"), children.get(children.indexOf(help) + 1));
+            help.fire();
+            mouse(help, MouseEvent.MOUSE_CLICKED, true);
+            assertEquals(1, originalCalls.get());
+            assertEquals("b", pane.getActiveDockable().getId());
+            assertEquals(2, context.getDockables().size());
+
+            AtomicInteger replacementCalls = new AtomicInteger();
+            first.setOnHelp(replacementCalls::incrementAndGet);
+            help.fire();
+            assertEquals(1, originalCalls.get());
+            assertEquals(1, replacementCalls.get());
+            first.setOnHelp(null);
+            Node removed = header.lookup(".docking-tab-help-button");
+            assertTrue(removed == null || (!removed.isVisible() && !removed.isManaged()));
+            help.fire();
+            assertEquals(1, replacementCalls.get());
+        });
+    }
+
+    @Test
+    public void helpButtonHasLocalizedTooltipAndTitleAwareAccessibleText() {
+        runFx(() -> {
+            Locale originalLocale = ResourceBundleManager.getLocale();
+            try {
+                ResourceBundleManager.setLocale(Locale.GERMAN);
+                Dockable dockable = dockable("a");
+                dockable.setOnHelp(() -> {});
+                DockingTab tab = new DockingTab(context(dockable), dockable);
+                Button help = (Button) tab.lookup(".docking-tab-help-button");
+                assertEquals("Hilfe", help.getTooltip().getText());
+                assertEquals("Hilfe zu Title a", help.getAccessibleText());
+                dockable.setTitle("Editor");
+                assertEquals("Hilfe zu Editor", help.getAccessibleText());
+            } finally {
+                ResourceBundleManager.setLocale(originalLocale);
+            }
+        });
+    }
+
+    @Test
+    public void helpIconUsesCssSizingAndThemeColorsForSelectedAndUnselectedTabs() {
+        runFx(() -> {
+            Dockable dockable = dockable("a");
+            dockable.setOnHelp(() -> {});
+            DockingContext context = context(dockable, dockable("b"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            layout(pane);
+            Scene scene = pane.getScene();
+            scene.getStylesheets().add(getClass().getResource("docking-drag-theme.css").toExternalForm());
+            GemsFXAtlantaFX.applyTo(scene);
+            scene.getRoot().applyCss();
+            FontIcon icon = (FontIcon) ((Button) title(pane, "a").lookup(".docking-tab-help-button")).getGraphic();
+            assertEquals(12, icon.getIconSize());
+            assertEquals(Color.WHITE, icon.getIconColor());
+
+            pane.selectDockable("a");
+            scene.getRoot().applyCss();
+            FontIcon selectedIcon = (FontIcon) ((Button) title(pane, "a").lookup(".docking-tab-help-button")).getGraphic();
+            assertEquals(Color.web("#333333"), selectedIcon.getIconColor());
+        });
     }
 
     @Test

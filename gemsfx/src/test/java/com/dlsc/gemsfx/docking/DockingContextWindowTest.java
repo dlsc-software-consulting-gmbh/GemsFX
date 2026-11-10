@@ -369,23 +369,31 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     @Test
-    public void closeButtonsFadeInWhileTheirTabHeadersAreHovered() throws InterruptedException {
+    public void closeAndHelpButtonsFadeInWhileTheirTabHeadersAreHovered() throws InterruptedException {
         DockingPane pane = invoke(() -> {
             DockingContext context = new DockingContext(
                     id -> Optional.of(dockable(id)), floatingPane -> new Stage());
             DockingPane created = context.createPane();
-            context.openDockable(created, "a", DockingPosition.CENTER);
-            context.openDockable(created, "b", DockingPosition.CENTER);
+            context.openDockable(created, "a", DockingPosition.CENTER).orElseThrow().setOnHelp(() -> {});
+            context.openDockable(created, "b", DockingPosition.CENTER).orElseThrow().setOnHelp(() -> {});
             return layout(created);
         });
 
         for (String id : List.of("a", "b")) {
             CountDownLatch fadedIn = new CountDownLatch(1);
             AtomicBoolean intermediateOpacity = new AtomicBoolean();
+            AtomicBoolean intermediateHelpOpacity = new AtomicBoolean();
             double width = invoke(() -> {
                 Node tab = title(pane, id);
                 Node close = tab.lookup(".docking-tab-close-button");
+                Node help = tab.lookup(".docking-tab-help-button");
                 assertEquals(0, close.getOpacity(), 0);
+                assertEquals(0, help.getOpacity(), 0);
+                help.opacityProperty().addListener((obs, oldOpacity, newOpacity) -> {
+                    if (newOpacity.doubleValue() > 0 && newOpacity.doubleValue() < 1) {
+                        intermediateHelpOpacity.set(true);
+                    }
+                });
                 close.opacityProperty().addListener((obs, oldOpacity, newOpacity) -> {
                     if (newOpacity.doubleValue() > 0 && newOpacity.doubleValue() < 1) {
                         intermediateOpacity.set(true);
@@ -404,13 +412,17 @@ public class DockingContextWindowTest extends FxTestBase {
             runFx(() -> {
                 Node tab = title(pane, id);
                 Node close = tab.lookup(".docking-tab-close-button");
+                Node help = tab.lookup(".docking-tab-help-button");
                 assertTrue("The fade must include intermediate opacity values", intermediateOpacity.get());
+                assertTrue("Help must fade in with Close", intermediateHelpOpacity.get());
                 assertEquals(1, close.getOpacity(), 0);
+                assertEquals(1, help.getOpacity(), 0);
                 assertEquals(width, tab.getBoundsInParent().getWidth(), 0);
 
                 fireHover(tab, false);
                 pane.applyCss();
                 assertEquals(0, close.getOpacity(), 0);
+                assertEquals(0, help.getOpacity(), 0);
             });
         }
     }

@@ -1,9 +1,11 @@
 package com.dlsc.gemsfx.docking;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 
 import java.util.Objects;
@@ -17,6 +19,7 @@ public final class Dockable {
     private final ReadOnlyStringWrapper title;
     private final ReadOnlyObjectWrapper<Node> graphic;
     private final Node content;
+    private final ObjectProperty<Runnable> onHelp = new SimpleObjectProperty<>(this, "onHelp");
     
     /**
      * Constructs a Dockable without a graphic.
@@ -91,6 +94,26 @@ public final class Dockable {
 
     public final void setGraphic(Node graphic) {
         this.graphic.set(graphic);
+    }
+
+    /**
+     * The optional callback invoked when help is requested for this dockable.
+     * Defaults to {@code null}, hiding the help button in the default {@link DockingTab}.
+     * Changes update the button's availability immediately; the callback runs on the JavaFX application thread
+     * when the user activates the button.
+     *
+     * @return the help callback property
+     */
+    public final ObjectProperty<Runnable> onHelpProperty() {
+        return onHelp;
+    }
+
+    public final Runnable getOnHelp() {
+        return onHelp.get();
+    }
+
+    public final void setOnHelp(Runnable onHelp) {
+        this.onHelp.set(onHelp);
     }
     
     /**

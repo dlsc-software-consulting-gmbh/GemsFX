@@ -28,6 +28,7 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -73,6 +74,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 public class DockingPaneApp extends GemApplication {
@@ -412,7 +414,23 @@ public class DockingPaneApp extends GemApplication {
 
     Optional<Dockable> createDockable(String id) {
         String templateId = id.split(":", 2)[0];
-        return Optional.ofNullable(templates.get(templateId)).map(factory -> factory.apply(id));
+        return Optional.ofNullable(templates.get(templateId)).map(factory -> {
+            Dockable dockable = factory.apply(id);
+            if (ThreadLocalRandom.current().nextBoolean()) {
+                dockable.setOnHelp(() -> {
+                    Alert help = new Alert(Alert.AlertType.INFORMATION);
+                    help.setTitle("Dockable Help");
+                    help.setHeaderText("Help for " + dockable.getTitle());
+                    help.setContentText("Drag the tab to rearrange this view, or use Close to remove it from the workspace.");
+                    Scene scene = dockable.getContent().getScene();
+                    if (scene != null) {
+                        help.initOwner(scene.getWindow());
+                    }
+                    help.show();
+                });
+            }
+            return dockable;
+        });
     }
 
     Dockable createSidebarDockable(String templateId) {

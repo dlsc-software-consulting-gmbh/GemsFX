@@ -15,11 +15,13 @@ import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.stage.Window;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -64,6 +67,38 @@ public class DockingPaneAppTest {
             }
             assertNull(app.createSidebarDockable("unknown"));
             assertNull(app.createSidebarDockable("drag"));
+        });
+    }
+
+    @Test
+    public void demoMixesOptionalHelpCallbacksAndShowsHelpForTheCurrentTitle() throws Exception {
+        runFx(() -> {
+            DockingPaneApp app = new DockingPaneApp();
+            Dockable withHelp = null;
+            Dockable withoutHelp = null;
+            for (int i = 0; i < 128 && (withHelp == null || withoutHelp == null); i++) {
+                Dockable dockable = app.createDockable("search:" + i).orElseThrow();
+                if (dockable.getOnHelp() == null) {
+                    withoutHelp = dockable;
+                } else {
+                    withHelp = dockable;
+                }
+            }
+            assertNotNull(withHelp, "Some demo dockables should offer help");
+            assertNotNull(withoutHelp, "Some demo dockables should omit help");
+            withHelp.setTitle("Renamed Search");
+            List<Window> previousWindows = List.copyOf(Window.getWindows());
+            try {
+                withHelp.getOnHelp().run();
+                Window helpWindow = Window.getWindows().stream()
+                        .filter(window -> !previousWindows.contains(window)).findFirst().orElseThrow();
+                DialogPane dialog = (DialogPane) helpWindow.getScene().getRoot().lookup(".dialog-pane");
+                assertEquals("Help for Renamed Search", dialog.getHeaderText());
+                assertTrue(dialog.getContentText().contains("Drag"));
+            } finally {
+                List.copyOf(Window.getWindows()).stream()
+                        .filter(window -> !previousWindows.contains(window)).forEach(Window::hide);
+            }
         });
     }
 

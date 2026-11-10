@@ -15,12 +15,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.util.Duration;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.text.MessageFormat;
 import java.util.Objects;
 
 /**
- * Default docking tab header, displaying a dockable's title, graphic, and close button.
+ * Default docking tab header, displaying a dockable's title, graphic, optional help button, and close button.
  * Selection, keyboard navigation, and docking drag-and-drop are installed by the workspace.
  * Applications can create or subclass this header in a {@link DockingContext#tabFactoryProperty() tab factory}.
  */
@@ -81,6 +82,25 @@ public class DockingTab extends HBox {
                 () -> MessageFormat.format(closePattern, dockable.getTitle()), dockable.titleProperty()));
         close.setOnAction(event -> context.requestCloseDockable(dockable));
         close.addEventHandler(MouseEvent.MOUSE_CLICKED, MouseEvent::consume);
-        getChildren().addAll(label, close);
+
+        Button help = new Button();
+        help.getStyleClass().add("docking-tab-help-button");
+        help.setFocusTraversable(false);
+        help.setGraphic(new FontIcon("bi-question-circle"));
+        help.visibleProperty().bind(dockable.onHelpProperty().isNotNull());
+        help.managedProperty().bind(help.visibleProperty());
+        help.opacityProperty().bind(close.opacityProperty());
+        help.setTooltip(new Tooltip(ResourceBundleManager.getString(BundleType.DOCKING_PANE, "tooltip.help", "Help")));
+        String helpPattern = ResourceBundleManager.getString(BundleType.DOCKING_PANE, "accessible.text.help", "Help for {0}");
+        help.accessibleTextProperty().bind(Bindings.createStringBinding(
+                () -> MessageFormat.format(helpPattern, dockable.getTitle()), dockable.titleProperty()));
+        help.setOnAction(event -> {
+            Runnable onHelp = dockable.getOnHelp();
+            if (onHelp != null) {
+                onHelp.run();
+            }
+        });
+        help.addEventHandler(MouseEvent.MOUSE_CLICKED, MouseEvent::consume);
+        getChildren().addAll(label, help, close);
     }
 }

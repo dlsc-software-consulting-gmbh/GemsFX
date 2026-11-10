@@ -54,7 +54,8 @@
     -fx-font-weight: bold;
 }
 
-.docking-pane .docking-tab-close-button {
+.docking-pane .docking-tab-close-button,
+.docking-pane .docking-tab-help-button {
     -fx-background-color: transparent;
     -fx-background-radius: 10;
     -fx-padding: 4;
@@ -62,7 +63,8 @@
     -fx-min-height: 18;
 }
 
-.docking-pane .docking-tab-close-button:hover {
+.docking-pane .docking-tab-close-button:hover,
+.docking-pane .docking-tab-help-button:hover {
     -fx-background-color: -fx-hover-base;
 }
 
@@ -76,6 +78,11 @@
     -fx-max-width: 8;
     -fx-max-height: 8;
     -fx-background-color: -fx-text-base-color;
+}
+
+.docking-pane .docking-tab-help-button .ikonli-font-icon {
+    -fx-icon-size: 12;
+    -fx-icon-color: -fx-text-base-color;
 }
 
 .docking-pane .docking-tab-content {
