@@ -1,4 +1,4 @@
-package com.dlsc.gemsfx;
+package com.dlsc.gemsfx.docking;
 
 /**
  * Enumeration defining the possible docking positions for a pane or content.

@@ -600,7 +600,7 @@ public class MultiColumnListView<T> extends Control {
          * {@link #getItems()} and it might temporarily contain the two placeholder items that are used
          * to visualize an ongoing drag and drop operation.
          *
-         * @return the internal list of wrapped items
+         * @return the model list of wrapped items
          */
         public final ObservableList<ColumnItem<T>> getItemWrappers() {
             return itemWrappers;

@@ -20,18 +20,26 @@
 - Accessibility roles and localized role/value text use the library's accessibility utilities and resource bundles.
 - Leave all changes uncommitted; the user handles commits.
 
+## Package Layout
+
+- Public API and controls: `com.dlsc.gemsfx.docking`.
+- Mutable layout model: `com.dlsc.gemsfx.docking.model` (not exported).
+- Skin and custom tab renderer: `com.dlsc.gemsfx.skins`.
+- Control stylesheets: `gemsfx/src/main/resources/com/dlsc/gemsfx/docking/`.
+- Tests mirror the API/model packages and import `com.dlsc.gemsfx.FxTestBase` where needed.
+
 ---
 
 ### Task 1: Define Dockables and the Context Layout DTO
 
 **Files:**
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/Dockable.java`
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingPosition.java`
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingLayout.java`
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingRestoreResult.java`
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingLayoutNode.java`
-- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/DockableTest.java`
-- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/DockingLayoutTest.java`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/Dockable.java`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingPosition.java`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingLayout.java`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingRestoreResult.java`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingLayoutNode.java`
+- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/DockableTest.java`
+- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/DockingLayoutTest.java`
 
 **Interfaces:**
 - Consumes: none.
@@ -76,11 +84,11 @@ Expected: PASS.
 ### Task 2: Add DockingContext and Factory Contracts
 
 **Files:**
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/DockableFactory.java`
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingStageFactory.java`
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingContext.java`
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingPane.java` (control shell)
-- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/DockingContextTest.java`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockableFactory.java`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingStageFactory.java`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingContext.java`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingPane.java` (control shell)
+- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/DockingContextTest.java`
 
 **Interfaces:**
 - Consumes: `Dockable`, `DockingPosition`, `DockingLayout`, `DockingRestoreResult`.
@@ -135,16 +143,16 @@ Expected: PASS.
 ### Task 3: Implement the Pane Tree and Invariants
 
 **Files:**
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/internal/DockingTree.java` (internal to the module; do not export the package)
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/internal/DockingTabGroup.java` (internal to the module; do not export the package)
-- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/internal/DockingSplit.java` (internal to the module; do not export the package)
-- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/internal/DockingTreeTest.java`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/model/DockingTree.java` (internal to the module; do not export the package)
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/model/DockingTabGroup.java` (internal to the module; do not export the package)
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/model/DockingSplit.java` (internal to the module; do not export the package)
+- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/model/DockingTreeTest.java`
 
 **Interfaces:**
 - Consumes: `Dockable`, `DockingPosition`, pane-tree values from `DockingLayout`.
 - Produces:
-  - Internal `DockingTree()` methods `addToRoot(Dockable)`, `splitAt(String existingId, Dockable inserted, DockingPosition edge, double dividerPosition)`, `remove(String id)`, `dockableIds()`, and `root()`, implemented as public types inside the unexported `com.dlsc.gemsfx.docking.internal` package so `DockingPaneSkin` can use them without making them exported API.
-  - An internal tree API to select/reorder tabs, move dockables, collapse empty groups/splits, and create a validated immutable snapshot.
+  - Runtime model `DockingTree()` methods `addToRoot(Dockable)`, `splitAt(String existingId, Dockable inserted, DockingPosition edge, double dividerPosition)`, `remove(String id)`, `dockableIds()`, and `root()`, implemented as public types inside the unexported `com.dlsc.gemsfx.docking.model` package so `DockingPane`, `DockingContext`, and `DockingPaneSkin` can use them without making them exported API.
+  - A runtime model API to select/reorder tabs, move dockables, collapse empty groups/splits, and create a validated immutable snapshot.
   - A tree invariant: each dockable ID occurs at most once in the entire `DockingContext`, while each pane owns exactly one root (empty or populated).
 
 - [ ] **Step 1: Write failing model tests.** Test center insertion, all four split edges and orientations, selected-tab changes, tab reordering, removal, and collapsing one-child splits. Create each JavaFX content node through `FxTestBase.invoke`; the tree implementation itself remains independent of the toolkit.
@@ -182,16 +190,17 @@ Expected: PASS.
 ### Task 4: Build DockingPane and the Custom Title-Tab Skin
 
 **Files:**
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingContext.java`
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingPane.java`
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/internal/DockingTree.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingContext.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingPane.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/model/DockingTree.java`
 - Create: `gemsfx/src/main/java/com/dlsc/gemsfx/skins/DockingPaneSkin.java`
-- Create: `gemsfx/src/main/resources/com/dlsc/gemsfx/docking-pane.css`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/skins/DockingTabPane.java`
+- Create: `gemsfx/src/main/resources/com/dlsc/gemsfx/docking/docking-pane.css`
 - Create: `gemsfx/src/main/resources/docking-pane.properties`
 - Create: `gemsfx/src/main/resources/docking-pane_{ar,da,de,en,es,fi,fr,it,ja,nl,no,pt,sv,uk,zh}.properties`
-- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/DockingPaneTest.java`
-- Modify: `gemsfx/src/test/java/com/dlsc/gemsfx/DockingContextTest.java`
-- Modify: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/internal/DockingTreeTest.java`
+- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/DockingPaneTest.java`
+- Modify: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/DockingContextTest.java`
+- Modify: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/model/DockingTreeTest.java`
 - Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/util/ResourceBundleManager.java`
 - Modify: `gemsfx/src/test/java/com/dlsc/gemsfx/AccessibilityTest.java`
 
@@ -245,11 +254,11 @@ Expected: PASS.
 
 **Files:**
 - Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/skins/DockingPaneSkin.java`
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingPane.java`
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/internal/DockingTree.java`
-- Modify: `gemsfx/src/main/resources/com/dlsc/gemsfx/docking-pane.css`
-- Modify: `gemsfx/src/test/java/com/dlsc/gemsfx/DockingPaneTest.java`
-- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/internal/DockingDropTargetTest.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingPane.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/model/DockingTree.java`
+- Modify: `gemsfx/src/main/resources/com/dlsc/gemsfx/docking/docking-pane.css`
+- Modify: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/DockingPaneTest.java`
+- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/model/DockingDropTargetTest.java`
 
 **Interfaces:**
 - Consumes: the custom title controls and tree operations from Tasks 3–4.
@@ -274,11 +283,11 @@ Expected: PASS.
 ### Task 6: Add Floating Panes and Cross-Pane Transfers
 
 **Files:**
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingContext.java`
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingPane.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingContext.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingPane.java`
 - Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/skins/DockingPaneSkin.java`
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/internal/DockingTree.java`
-- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/DockingContextWindowTest.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/model/DockingTree.java`
+- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/DockingContextWindowTest.java`
 
 **Interfaces:**
 - Consumes: `DockingStageFactory`, context membership checks, and in-pane drag support.
@@ -308,11 +317,11 @@ Expected: PASS.
 ### Task 7: Implement Context Snapshot and Restore
 
 **Files:**
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingContext.java`
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingLayout.java`
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/DockingRestoreResult.java`
-- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/internal/DockingTree.java`
-- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/DockingContextRestoreTest.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingContext.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingLayout.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingRestoreResult.java`
+- Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/model/DockingTree.java`
+- Create: `gemsfx/src/test/java/com/dlsc/gemsfx/docking/DockingContextRestoreTest.java`
 
 **Interfaces:**
 - Consumes: all context panes, the dockable factory, Stage factory, and immutable pane-tree values.

@@ -1,5 +1,6 @@
-package com.dlsc.gemsfx;
+package com.dlsc.gemsfx.docking;
 
+import com.dlsc.gemsfx.FxTestBase;
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import com.dlsc.gemsfx.util.ResourceBundleManager;

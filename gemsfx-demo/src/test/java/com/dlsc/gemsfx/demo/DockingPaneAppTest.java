@@ -1,12 +1,12 @@
 package com.dlsc.gemsfx.demo;
 
 import atlantafx.base.theme.NordLight;
-import com.dlsc.gemsfx.Dockable;
-import com.dlsc.gemsfx.DockingContext;
-import com.dlsc.gemsfx.DockingLayout;
-import com.dlsc.gemsfx.DockingLayoutNode;
-import com.dlsc.gemsfx.DockingPane;
-import com.dlsc.gemsfx.DockingPosition;
+import com.dlsc.gemsfx.docking.Dockable;
+import com.dlsc.gemsfx.docking.DockingContext;
+import com.dlsc.gemsfx.docking.DockingLayout;
+import com.dlsc.gemsfx.docking.DockingLayoutNode;
+import com.dlsc.gemsfx.docking.DockingPane;
+import com.dlsc.gemsfx.docking.DockingPosition;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

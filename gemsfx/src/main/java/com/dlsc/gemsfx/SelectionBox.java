@@ -82,7 +82,7 @@ public class SelectionBox<T> extends Control {
      * The constructor performs the following operations:
      * - Sets style classes for the control, including "combo-box-base," "combo-box," and the default style class.
      * - Adds customizable quick selection buttons to the top of the popup area.
-     * - Binds the current selection mode to an internal selection mode property.
+     * - Binds the current selection mode to an model selection mode property.
      * - Initializes a custom multiple selection model, binding it to the items property.
      * - Configures the component's size to use its preferred size as both minimum and maximum size.
      */

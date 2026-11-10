@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  * {@code local-part@domain}, where:
  * <ul>
  *   <li>The <em>local part</em> may contain letters, digits, and the characters
- *       {@code !#$%&'*+/=?^_`{|}~-}, with internal dots allowed between
+ *       {@code !#$%&'*+/=?^_`{|}~-}, with model dots allowed between
  *       non-dot segments (dots are not permitted at the start or end, nor
  *       consecutively).</li>
  *   <li>The <em>domain</em> consists of dot-separated labels. Each label may

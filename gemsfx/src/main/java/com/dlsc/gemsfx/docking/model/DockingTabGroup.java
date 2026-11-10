@@ -1,4 +1,4 @@
-package com.dlsc.gemsfx.docking.internal;
+package com.dlsc.gemsfx.docking.model;
 
 import java.util.ArrayList;
 import java.util.Collections;

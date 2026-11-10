@@ -55,7 +55,7 @@ def anatomy():
     
     _area(s, 80, 100, 560, 300, lines=7, fill=PAPER)
     s.box(100, 122, 520, 245, fill=None, stroke=TEAL, radius=8, dash="9 7")
-    keys = [("1", 120, 104, "TextArea root + expanding-text-area", 120), ("2", 365, 170, "internal Text node", 200), ("3", 620, 255, "scroll bars forced to NEVER", 280), ("4", 365, 368, "computed prefHeight", 360)]
+    keys = [("1", 120, 104, "TextArea root + expanding-text-area", 120), ("2", 365, 170, "model Text node", 200), ("3", 620, 255, "scroll bars forced to NEVER", 280), ("4", 365, 368, "computed prefHeight", 360)]
     lx = 710
     for key, tx, ty, label, ly in keys:
        s.badge(lx, ly, key, fill=INDIGO, size=16)

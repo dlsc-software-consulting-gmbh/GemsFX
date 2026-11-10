@@ -58,7 +58,7 @@ public class PaymentOptionViewTest extends FxTestBase {
     @Test
     public void testImageNotNullAfterOptionChange() {
         PaymentOptionView view = invoke(PaymentOptionView::new);
-        // After setting option the internal image should eventually be set;
+        // After setting option the model image should eventually be set;
         // we only check that no exception is thrown and the option was accepted.
         runFx(() -> view.setOption(PaymentOptionView.Option.MASTERCARD));
         waitForFxEvents();

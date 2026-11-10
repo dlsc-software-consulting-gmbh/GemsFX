@@ -1,6 +1,6 @@
-package com.dlsc.gemsfx;
+package com.dlsc.gemsfx.docking;
 
-import com.dlsc.gemsfx.docking.internal.DockingTree;
+import com.dlsc.gemsfx.docking.model.DockingTree;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;

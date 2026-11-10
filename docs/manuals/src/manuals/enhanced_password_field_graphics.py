@@ -96,7 +96,7 @@ def flow():
     s.arrow(325, 130, 395, 130, bend=0, stroke=INK_SOFT, width=2.4)
     s.arrow(645, 130, 715, 130, bend=0, stroke=INK_SOFT, width=2.4)
     _field(s, 255, 285, 530, text="■■■■■■", left=True, right=False)
-    s.label(520, 395, "the skin rebinds the internal text node", size=21, fill=INK_SOFT)
+    s.label(520, 395, "the skin rebinds the model text node", size=21, fill=INK_SOFT)
 
     return s
 

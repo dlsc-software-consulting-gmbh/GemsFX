@@ -1,4 +1,4 @@
-package com.dlsc.gemsfx;
+package com.dlsc.gemsfx.docking;
 
 import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.ResourceBundleManager;

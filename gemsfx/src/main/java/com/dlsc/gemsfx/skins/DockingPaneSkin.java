@@ -1,10 +1,10 @@
 package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.Dockable;
-import com.dlsc.gemsfx.DockingLayoutNode;
-import com.dlsc.gemsfx.DockingPane;
-import com.dlsc.gemsfx.DockingPosition;
-import com.dlsc.gemsfx.docking.internal.DockingTree;
+import com.dlsc.gemsfx.docking.Dockable;
+import com.dlsc.gemsfx.docking.DockingLayoutNode;
+import com.dlsc.gemsfx.docking.DockingPane;
+import com.dlsc.gemsfx.docking.DockingPosition;
+import com.dlsc.gemsfx.docking.model.DockingTree;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -783,13 +783,13 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return true;
     }
 
-    private static List<DockingPane> contextPanes(Node node, com.dlsc.gemsfx.DockingContext context) {
+    private static List<DockingPane> contextPanes(Node node, com.dlsc.gemsfx.docking.DockingContext context) {
         List<DockingPane> panes = new ArrayList<>();
         collectContextPanes(node, context, panes);
         return panes;
     }
 
-    private static void collectContextPanes(Node node, com.dlsc.gemsfx.DockingContext context, List<DockingPane> panes) {
+    private static void collectContextPanes(Node node, com.dlsc.gemsfx.docking.DockingContext context, List<DockingPane> panes) {
         if (node instanceof DockingPane && ((DockingPane) node).getDockingContext() == context) {
             panes.add((DockingPane) node);
         }
@@ -838,7 +838,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         previewTarget = null;
     }
 
-    private static String previewStyle(com.dlsc.gemsfx.DockingPosition position) {
+    private static String previewStyle(com.dlsc.gemsfx.docking.DockingPosition position) {
         switch (position) {
             case LEFT:
                 return "drop-zone-left";

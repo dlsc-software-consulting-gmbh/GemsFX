@@ -14,7 +14,7 @@ MANUAL = Manual(
         Chapter('Introduction', [
                 Para('<b>ResponsivePane</b> chooses between no sidebar, a compact sidebar and a large sidebar from the available width or height. LEFT and RIGHT layouts compare widths; TOP and BOTTOM compare heights.'),
                 Section('Key features'),
-                Bullets(["Root style class <font face='Courier'>responsive-pane</font> and user agent stylesheet <font face='Courier'>responsive-pane.css</font>.", "Styleable <font face='Courier'>side</font> and <font face='Courier'>gap</font> properties.", 'State pseudo classes indicate which sidebar is active.', 'Forced large display uses an internal GlassPane that closes on click.', 'Node properties keep the children list synchronized.']),
+                Bullets(["Root style class <font face='Courier'>responsive-pane</font> and user agent stylesheet <font face='Courier'>responsive-pane.css</font>.", "Styleable <font face='Courier'>side</font> and <font face='Courier'>gap</font> properties.", 'State pseudo classes indicate which sidebar is active.', 'Forced large display uses an model GlassPane that closes on click.', 'Node properties keep the children list synchronized.']),
                 Section('Maven dependency'),
                 Code('<dependency>\n    <groupId>com.dlsc.gemsfx</groupId>\n    <artifactId>gemsfx</artifactId>\n    <version>4.4.1</version>\n</dependency>', caption='Maven coordinates for the GemsFX control library.')
             ]),
@@ -48,7 +48,7 @@ MANUAL = Manual(
         Chapter('Child ownership and z-order', [
                 Para("ResponsivePane stores content and sidebars in custom node properties. Assigning a property removes the old node from <font face='Courier'>getChildren()</font> and adds the new node. Removing a node directly from the children list also clears the matching property."),
                 Table(['Operation', 'Effect'], [["<font face='Courier'>setContent(node)</font>", 'Old content is removed; new content is added.'], ['Remove content from children', 'The content property is set to null.'], ['Layout content', 'Content is sent to the back when necessary.'], ['Forced large sidebar', 'Large sidebar is brought to the front.']], widths=[38, 62]),
-                Para('The internal glass pane is added by the constructor before application nodes. During layout it is resized over the content area and its hide property follows whether a forced large sidebar needs display.'),
+                Para('The model glass pane is added by the constructor before application nodes. During layout it is resized over the content area and its hide property follows whether a forced large sidebar needs display.'),
                 Code('''glassPane.relocate(contentStartX, contentStartY);
 glassPane.resize(contentWidth, contentHeight);''')
             ]),

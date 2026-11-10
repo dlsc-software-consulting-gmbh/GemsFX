@@ -65,6 +65,25 @@ record orientation and divider proportions; tab groups record dockable IDs,
 order, and selection. The context coordinates moving content between pane
 trees and windows, respecting JavaFX's single-parent rule for a `Node`.
 
+## Package layout
+
+The public docking API and controls live in `com.dlsc.gemsfx.docking`,
+including `Dockable`, the factory interfaces, `DockingContext`, `DockingPane`,
+`DockingPanePlaceholder`, and the layout snapshot types.
+
+The mutable runtime layout model lives in `com.dlsc.gemsfx.docking.model`:
+`DockingTree`, `DockingSplit`, and `DockingTabGroup`. It is shared by the
+workspace control, context, and skin, but remains an unexported implementation
+detail rather than supported public API.
+
+`DockingPaneSkin` and the package-private `DockingTabPane` live in the shared
+`com.dlsc.gemsfx.skins` package. There is no separate docking skin package.
+The docking control stylesheets live alongside their controls under
+`gemsfx/src/main/resources/com/dlsc/gemsfx/docking/`.
+
+Docking tests mirror the API and model packages under `src/test/java`;
+JavaFX integration tests import the shared `com.dlsc.gemsfx.FxTestBase`.
+
 ## Docking interactions and lifecycle
 
 - Dragging a title onto the center of a tab group adds the dockable to that

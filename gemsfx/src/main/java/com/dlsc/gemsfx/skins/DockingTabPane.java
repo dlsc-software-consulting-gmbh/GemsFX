@@ -1,8 +1,8 @@
 package com.dlsc.gemsfx.skins;
 
-import com.dlsc.gemsfx.Dockable;
-import com.dlsc.gemsfx.DockingLayoutNode;
-import com.dlsc.gemsfx.DockingPane;
+import com.dlsc.gemsfx.docking.Dockable;
+import com.dlsc.gemsfx.docking.DockingLayoutNode;
+import com.dlsc.gemsfx.docking.DockingPane;
 import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
 import com.dlsc.gemsfx.util.ResourceBundleManager.BundleType;

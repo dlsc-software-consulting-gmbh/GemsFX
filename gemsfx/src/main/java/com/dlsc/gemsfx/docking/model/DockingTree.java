@@ -1,8 +1,8 @@
-package com.dlsc.gemsfx.docking.internal;
+package com.dlsc.gemsfx.docking.model;
 
-import com.dlsc.gemsfx.Dockable;
-import com.dlsc.gemsfx.DockingLayoutNode;
-import com.dlsc.gemsfx.DockingPosition;
+import com.dlsc.gemsfx.docking.Dockable;
+import com.dlsc.gemsfx.docking.DockingLayoutNode;
+import com.dlsc.gemsfx.docking.DockingPosition;
 import javafx.geometry.Orientation;
 
 import java.util.ArrayList;

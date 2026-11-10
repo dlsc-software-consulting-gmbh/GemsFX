@@ -1,4 +1,6 @@
-package com.dlsc.gemsfx;
+package com.dlsc.gemsfx.docking;
+
+import com.dlsc.gemsfx.FxTestBase;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Label;

@@ -2395,7 +2395,7 @@ public class DialogPane extends StackPane {
     }
 
     /*
-     * The default button bar skin centers its buttons because it aligns its internal container
+     * The default button bar skin centers its buttons because it aligns its model container
      * programmatically, which a user agent stylesheet can not override. This skin right-aligns the
      * buttons instead. Applications can still override the alignment via their own stylesheet
      * (".button-bar > .container").
