@@ -20,6 +20,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.lang.reflect.Method;
 
 import static org.junit.Assert.*;
@@ -111,6 +113,103 @@ public class DockingPaneTest extends FxTestBase {
                         + image.getPixelReader().getColor((int) image.getWidth() / 2, (int) image.getHeight() / 2),
                 maxX >= minX && maxY >= minY);
         return new Rectangle2D(minX, minY, maxX - minX + 1, maxY - minY + 1);
+    }
+
+    @Test
+    public void customTabHeadersKeepSelectionKeyboardActionsAndAccessibility() {
+        runFx(() -> {
+            Dockable first = dockable("a");
+            DockingContext context = context(first, dockable("b"));
+            context.setTabFactory(dockable -> new Label("Custom " + dockable.getTitle()));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            layout(pane);
+
+            Label header = (Label) title(pane, "a");
+            assertEquals("Custom Title a", header.getText());
+            assertTrue(header.getWidth() > 0);
+            assertEquals(javafx.scene.AccessibleRole.TAB_ITEM, header.getAccessibleRole());
+            first.setTitle("Renamed");
+            assertEquals("Renamed", header.getAccessibleText());
+            mouse(header, MouseEvent.MOUSE_CLICKED, true);
+            assertSame(first, pane.getActiveDockable());
+            assertTrue(title(pane, "a").getStyleClass().contains("selected"));
+            press(title(pane, "a"), KeyCode.RIGHT);
+            assertEquals("b", pane.getActiveDockable().getId());
+            press(title(pane, "a"), KeyCode.DELETE);
+            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) pane.getLayoutRoot()).getDockableIds());
+        });
+    }
+
+    @Test
+    public void changingTabFactoryRefreshesMainAndFloatingPanesAndCanRestoreDefaultTabs() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"));
+            DockingPane main = context.createPane();
+            context.openDockable(main, "a", DockingPosition.CENTER);
+            context.openDockable(main, "b", DockingPosition.CENTER);
+            layout(main);
+            DockingPane floating = context.floatDockable("b", 100, 100);
+            Stage stage = (Stage) floating.getScene().getWindow();
+            try {
+                floating.applyCss();
+                assertTrue(title(main, "a") instanceof DockingTab);
+                assertTrue(title(floating, "b") instanceof DockingTab);
+                Node oldHeader = title(main, "a");
+                context.tabFactoryProperty().set(dockable -> {
+                    StackPane custom = new StackPane(new Label("Custom " + dockable.getId()));
+                    custom.getStyleClass().add("docking-tab-title");
+                    return custom;
+                });
+                assertTrue(title(main, "a") instanceof StackPane);
+                assertTrue(title(floating, "b") instanceof StackPane);
+                assertNotSame(oldHeader, title(main, "a"));
+
+                context.setTabFactory(null);
+                assertTrue(title(main, "a") instanceof DockingTab);
+                assertTrue(title(floating, "b") instanceof DockingTab);
+                assertNotNull(title(main, "a").lookup(".docking-tab-close-button"));
+            } finally {
+                stage.close();
+            }
+        });
+    }
+
+    @Test
+    public void disposedSkinStopsObservingTabFactoryChanges() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+            pane.setSkin(null);
+            AtomicInteger calls = new AtomicInteger();
+            context.setTabFactory(dockable -> {
+                calls.incrementAndGet();
+                return new Label(dockable.getTitle());
+            });
+            assertEquals(0, calls.get());
+        });
+    }
+
+    @Test
+    public void tabFactoryRejectsNullAndReusedHeaders() {
+        runFx(() -> {
+            DockingContext missing = context(dockable("a"));
+            missing.setTabFactory(dockable -> null);
+            DockingPane missingPane = missing.createPane();
+            missing.openDockable(missingPane, "a", DockingPosition.CENTER);
+            assertThrows(NullPointerException.class, () -> new DockingPaneSkin(missingPane));
+
+            DockingContext reused = context(dockable("a"), dockable("b"));
+            Label shared = new Label("Shared header");
+            reused.setTabFactory(dockable -> shared);
+            DockingPane reusedPane = reused.createPane();
+            reused.openDockable(reusedPane, "a", DockingPosition.CENTER);
+            reused.openDockable(reusedPane, "b", DockingPosition.CENTER);
+            assertThrows(IllegalArgumentException.class, () -> new DockingPaneSkin(reusedPane));
+        });
     }
 
     @Test

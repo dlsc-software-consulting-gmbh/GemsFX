@@ -193,6 +193,7 @@ Expected: PASS.
 - Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingContext.java`
 - Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingPane.java`
 - Modify: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/model/DockingTree.java`
+- Create: `gemsfx/src/main/java/com/dlsc/gemsfx/docking/DockingTab.java`
 - Create: `gemsfx/src/main/java/com/dlsc/gemsfx/skins/DockingPaneSkin.java`
 - Create: `gemsfx/src/main/java/com/dlsc/gemsfx/skins/DockingTabPane.java`
 - Create: `gemsfx/src/main/resources/com/dlsc/gemsfx/docking/docking-pane.css`
@@ -211,6 +212,7 @@ Expected: PASS.
   - Dragging a divider updates the tree's stored divider proportion and the pane's layout snapshot, so later snapshots preserve the visible split layout.
   - `DockingPaneSkin extends SkinBase<DockingPane>`.
   - A package-private custom `DockingTabPane` that renders individual title controls; it must not instantiate JavaFX `TabPane`.
+  - `DockingContext.tabFactoryProperty()` with type `Callback<Dockable, Node>` creates complete tab headers. The default and a null factory use the public `DockingTab` component with the standard title, graphic, tooltip, and fading close button. Custom factories return fresh, unparented, non-null nodes; framework-managed selection, accessibility, keyboard actions, and docking drag-and-drop remain intact. Changing the factory refreshes all context panes, including floating panes.
   - Localized close-button and accessibility strings through a new `BundleType.DOCKING_PANE`.
   - `DockingContext.requestCloseDockable(Dockable)` removes the dockable only when its configured close policy permits it and returns whether removal occurred; a veto leaves the pane and context unchanged. The title close affordance calls this method.
 

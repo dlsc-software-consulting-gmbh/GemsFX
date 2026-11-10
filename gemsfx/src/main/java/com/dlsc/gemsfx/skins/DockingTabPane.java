@@ -3,19 +3,13 @@ package com.dlsc.gemsfx.skins;
 import com.dlsc.gemsfx.docking.Dockable;
 import com.dlsc.gemsfx.docking.DockingLayoutNode;
 import com.dlsc.gemsfx.docking.DockingPane;
+import com.dlsc.gemsfx.docking.DockingTab;
 import com.dlsc.gemsfx.util.AccessibilityUtil;
-import com.dlsc.gemsfx.util.ResourceBundleManager;
-import com.dlsc.gemsfx.util.ResourceBundleManager.BundleType;
-import javafx.animation.FadeTransition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.css.PseudoClass;
-import javafx.geometry.Pos;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -25,14 +19,14 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
+import javafx.util.Callback;
 
-import java.text.MessageFormat;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Renders one tab group: a strip with one title control per dockable (each with its own close button) above the
- * content of the selected dockable only. This deliberately does not use the JavaFX {@code TabPane}.
+ * Renders one tab group: a strip of factory-created headers above the content of the selected dockable only.
+ * This deliberately does not use the JavaFX {@code TabPane}.
  */
 final class DockingTabPane extends VBox {
 
@@ -42,14 +36,10 @@ final class DockingTabPane extends VBox {
 
     private final DockingPane dockingPane;
     private final List<String> ids;
-    private final String closePattern;
-    private final String closeTooltip;
 
     DockingTabPane(DockingPane dockingPane, DockingLayoutNode.Tabs tabs) {
         this.dockingPane = dockingPane;
         this.ids = tabs.getDockableIds();
-        this.closePattern = ResourceBundleManager.getString(BundleType.DOCKING_PANE, "accessible.text.close", "Close {0}");
-        this.closeTooltip = ResourceBundleManager.getString(BundleType.DOCKING_PANE, "tooltip.close", "Close");
         getStyleClass().add("docking-tab-pane");
 
         HBox strip = new HBox();
@@ -85,14 +75,27 @@ final class DockingTabPane extends VBox {
     }
 
     private Node createTitle(Dockable dockable, boolean selected) {
-        HBox title = new HBox();
-        title.getStyleClass().add("docking-tab");
+        Callback<Dockable, Node> factory = dockingPane.getDockingContext().getTabFactory();
+        Node title = Objects.requireNonNull(factory == null
+                ? new DockingTab(dockingPane.getDockingContext(), dockable)
+                : factory.call(dockable), "tabFactory must not return null");
+        if (title.getParent() != null || title.getProperties().containsKey(DOCKABLE_ID_KEY)) {
+            throw new IllegalArgumentException("tabFactory must return a fresh, unparented node");
+        }
+        if (!title.getStyleClass().contains("docking-tab")) {
+            title.getStyleClass().add("docking-tab");
+        }
         if (selected) {
             title.getStyleClass().add("selected");
+        } else {
+            title.getStyleClass().remove("selected");
         }
-        title.setAlignment(Pos.CENTER_LEFT);
-        title.setMinWidth(0);
-        title.setPrefWidth(0);
+        if (title instanceof Region) {
+            Region region = (Region) title;
+            region.setMinWidth(0);
+            region.setPrefWidth(0);
+            region.setMaxWidth(Double.MAX_VALUE);
+        }
         HBox.setHgrow(title, Priority.ALWAYS);
         title.setFocusTraversable(true);
         title.getProperties().put(DOCKABLE_ID_KEY, dockable.getId());
@@ -101,49 +104,6 @@ final class DockingTabPane extends VBox {
         AccessibilityUtil.bindAccessibleText(title, accessibleText);
         title.getProperties().put(TITLE_ACCESSIBLE_TEXT_BINDING_KEY, accessibleText);
 
-        Tooltip titleTooltip = new Tooltip();
-        titleTooltip.textProperty().bind(dockable.titleProperty());
-        Label label = new Label() {
-            @Override
-            protected void layoutChildren() {
-                super.layoutChildren();
-                // Text measurements are current only after the skin has laid out the label.
-                setTooltip(getWidth() < prefWidth(-1) ? titleTooltip : null);
-            }
-        };
-        label.textProperty().bind(dockable.titleProperty());
-        label.graphicProperty().bind(dockable.graphicProperty());
-        label.getStyleClass().add("docking-tab-title");
-        label.setMnemonicParsing(false);
-        label.setMinWidth(0);
-        label.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(label, Priority.ALWAYS);
-
-        Button close = new Button();
-        close.getStyleClass().add("docking-tab-close-button");
-        close.setFocusTraversable(false);
-        close.setOpacity(0);
-        FadeTransition fadeIn = new FadeTransition(Duration.millis(300), close);
-        fadeIn.setFromValue(0);
-        fadeIn.setToValue(1);
-        title.hoverProperty().addListener((obs, wasHovered, hovered) -> {
-            if (hovered) {
-                fadeIn.playFromStart();
-            } else {
-                fadeIn.stop();
-                close.setOpacity(0);
-            }
-        });
-        Region icon = new Region();
-        icon.getStyleClass().add("icon");
-        close.setGraphic(icon);
-        close.setTooltip(new Tooltip(closeTooltip));
-        close.accessibleTextProperty().bind(Bindings.createStringBinding(
-                () -> MessageFormat.format(closePattern, dockable.getTitle()), dockable.titleProperty()));
-        close.setOnAction(e -> dockingPane.getDockingContext().requestCloseDockable(dockable));
-        close.addEventHandler(MouseEvent.MOUSE_CLICKED, MouseEvent::consume);
-
-        title.getChildren().addAll(label, close);
         // Selecting on press rebuilds the titles and detaches the drag source before drag detection.
         title.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             if (e.getButton() == MouseButton.PRIMARY && e.isStillSincePress()) {

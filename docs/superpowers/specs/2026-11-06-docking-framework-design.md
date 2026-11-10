@@ -60,6 +60,17 @@ control, visually consistent with the title of a single dockable. Selecting a
 title displays that dockable's content. The tab pane is an implementation
 detail rather than a separately supported public control.
 
+`DockingContext.tabFactoryProperty()` is a `Callback<Dockable, Node>` that
+creates each complete tab header, including any close button. The default
+factory creates the public `DockingTab` component with the existing title,
+graphic, truncation tooltip, and fading close button. A null factory restores
+this default. Custom factories must return a fresh, unparented, non-null node
+for every invocation; headers can be recreated whenever the layout changes.
+The framework continues to provide selection styling, accessibility, keyboard
+actions, and docking drag-and-drop. Custom close buttons request closure
+through `DockingContext.requestCloseDockable`. Changing the factory refreshes
+tabs in every pane belonging to the context, including floating panes.
+
 Each pane maintains a runtime tree of split nodes and tab groups. Split nodes
 record orientation and divider proportions; tab groups record dockable IDs,
 order, and selection. The context coordinates moving content between pane
@@ -69,7 +80,7 @@ trees and windows, respecting JavaFX's single-parent rule for a `Node`.
 
 The public docking API and controls live in `com.dlsc.gemsfx.docking`,
 including `Dockable`, the factory interfaces, `DockingContext`, `DockingPane`,
-`DockingPanePlaceholder`, and the layout snapshot types.
+`DockingPanePlaceholder`, `DockingTab`, and the layout snapshot types.
 
 The mutable runtime layout model lives in `com.dlsc.gemsfx.docking.model`:
 `DockingTree`, `DockingSplit`, and `DockingTabGroup`. It is shared by the
@@ -101,7 +112,8 @@ JavaFX integration tests import the shared `com.dlsc.gemsfx.FxTestBase`.
 - If the Stage factory fails while creating a floating pane, the dockable
   remains in its source pane.
 - Floating windows use standard JavaFX Stage decorations in the first version.
-- Each title has an individual close affordance. Closing requests removal from
+- Each default title has an individual close affordance; custom tab factories
+  can replace or omit it. Closing requests removal from
   the workspace; an application close-request handler can veto the removal.
   A veto leaves that dockable in its current location. Closing a floating Stage
   requests removal of all its dockables; if any request is vetoed, the Stage

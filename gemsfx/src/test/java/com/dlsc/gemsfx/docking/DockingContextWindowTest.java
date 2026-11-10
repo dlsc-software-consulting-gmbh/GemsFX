@@ -146,6 +146,32 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     @Test
+    public void customTabHeadersCanBeDraggedBetweenPanes() {
+        runFx(() -> {
+            DockingContext context = new DockingContext(
+                    id -> Optional.of(dockable(id)), pane -> new Stage());
+            context.setTabFactory(dockable -> new Label("Custom " + dockable.getTitle()));
+            DockingPane source = context.createPane();
+            context.openDockable(source, "a", DockingPosition.CENTER);
+            renderWithEventSkin(source);
+            DockingPane target = context.createPane();
+            context.openDockable(target, "x", DockingPosition.CENTER);
+            layout(target);
+            Node dragged = title(source, "a");
+
+            fireDragDetected(dragged);
+            DragEvent drop = fireDragEvent(target, DragEvent.DRAG_DROPPED, dragged,
+                    target.getWidth() / 2, target.getHeight() / 2, 400, 300, TransferMode.MOVE, title(target, "x"));
+            fireDragEvent(dragged, DragEvent.DRAG_DONE, dragged, 5, 5, 400, 300, TransferMode.MOVE, dragged);
+
+            assertTrue(drop.isDropCompleted());
+            assertTrue(source.getLayoutRoot() instanceof DockingLayoutNode.Empty);
+            assertEquals(List.of("x", "a"), ids(target));
+            assertEquals("Custom Title a", ((Label) title(target, "a")).getText());
+        });
+    }
+
+    @Test
     public void shiftDragMergesTheWholeGroupIntoAnotherPane() {
         invoke(() -> {
             List<Dockable> all = List.of(dockable("a"), dockable("b"), dockable("x"));

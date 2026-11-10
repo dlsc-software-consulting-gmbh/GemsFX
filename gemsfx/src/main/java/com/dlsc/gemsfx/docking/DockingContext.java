@@ -2,10 +2,13 @@ package com.dlsc.gemsfx.docking;
 
 import com.dlsc.gemsfx.docking.model.DockingTree;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.input.DragEvent;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -75,6 +78,35 @@ public class DockingContext {
      */
     public final DockingStageFactory getStageFactory() {
         return stageFactory;
+    }
+
+    private final ObjectProperty<Callback<Dockable, Node>> tabFactory = new SimpleObjectProperty<>(
+            this, "tabFactory", dockable -> new DockingTab(this, dockable));
+
+    /**
+     * Factory creating the entire tab header for each dockable. The default creates a {@link DockingTab},
+     * including its title, graphic, and close button. A {@code null} factory also uses this default.
+     * <p>
+     * The factory is invoked on the JavaFX application thread whenever tabs are rebuilt and must return
+     * a fresh, unparented, non-null node on every invocation. Changing the factory refreshes existing
+     * tabs in all panes of this context, including floating panes.
+     * <p>
+     * The workspace applies the {@code docking-tab} and {@code selected} style classes, accessibility,
+     * keyboard actions, and docking drag handlers to the returned node. A custom header supplies its own
+     * close button, if desired, invoking {@link #requestCloseDockable(Dockable)}.
+     *
+     * @return the tab factory property
+     */
+    public final ObjectProperty<Callback<Dockable, Node>> tabFactoryProperty() {
+        return tabFactory;
+    }
+
+    public final Callback<Dockable, Node> getTabFactory() {
+        return tabFactory.get();
+    }
+
+    public final void setTabFactory(Callback<Dockable, Node> factory) {
+        tabFactory.set(factory);
     }
 
     /**
