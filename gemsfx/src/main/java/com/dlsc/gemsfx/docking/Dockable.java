@@ -8,7 +8,10 @@ import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.MenuItem;
 
 import java.util.Objects;
 
@@ -23,6 +26,7 @@ public class Dockable {
     private final ReadOnlyObjectWrapper<Node> graphic;
     private final Node content;
     private final ObjectProperty<Node> toolbar = new SimpleObjectProperty<>(this, "toolbar");
+    private final ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
     private final ObjectProperty<Runnable> onHelp = new SimpleObjectProperty<>(this, "onHelp");
     
     /**
@@ -120,9 +124,9 @@ public class Dockable {
     }
 
     /**
-     * The optional toolbar displayed to the left of the help and close buttons in the default {@link DockingTab}.
+     * The optional toolbar displayed to the left of the menu, help and close buttons in the default {@link DockingTab}.
      * Defaults to {@code null}. Changes replace or remove the displayed toolbar immediately.
-     * The toolbar fades in with the buttons when the tab is hovered.
+     * The toolbar shares the action buttons' hover fade.
      *
      * @return the toolbar property
      */
@@ -136,6 +140,18 @@ public class Dockable {
 
     public final void setToolbar(Node toolbar) {
         this.toolbar.set(toolbar);
+    }
+
+    /**
+     * Returns the live list of actions displayed in the default {@link DockingTab}'s More dropdown.
+     * The list is initially empty, hiding the menu button without reserving layout space.
+     * Adding, removing or reordering items updates the dropdown immediately.
+     * Each menu item should belong to only one dockable.
+     *
+     * @return the modifiable menu item list
+     */
+    public final ObservableList<MenuItem> getMenuItems() {
+        return menuItems;
     }
 
     /**

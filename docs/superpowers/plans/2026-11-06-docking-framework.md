@@ -45,6 +45,7 @@
 - Consumes: none.
 - Produces:
   - `Dockable(String id, String title, Node content)` and `Dockable(String id, String title, Node graphic, Node content)`, with `getId()`, `getTitle()`, `getGraphic()`, and `getContent()`.
+  - `Dockable.getMenuItems()` returns a live, initially empty `ObservableList<MenuItem>`. Nonempty lists show an icon-only vertical-dots dropdown after the toolbar and before Help/Close, sharing their colors and 150ms hover fade. Changes update existing menus; an empty list hides the button and closes its popup. Open menus keep the actions visible, and detached headers release menu items and their list bindings.
   - Optional `Dockable.onHelpProperty()` of type `ObjectProperty<Runnable>`, with final getter/setter/accessor methods and a null default. The default tab shows Help before Close only when a callback is present, shares its 150ms fade-in/out when the tab or its displayed content area is hovered, and invokes the current callback without selecting or closing the dockable. Hover reversals continue from the current opacity without affecting other dockables. Callback changes update existing headers; help strings are localized and icon sizing uses CSS.
   - `DockingPosition` values `CENTER`, `LEFT`, `RIGHT`, `TOP`, and `BOTTOM`.
   - Immutable `DockingLayout(String primaryPaneId, List<PaneLayout> panes)`.
@@ -213,7 +214,7 @@ Expected: PASS.
   - Dragging a divider updates the tree's stored divider proportion and the pane's layout snapshot, so later snapshots preserve the visible split layout.
   - `DockingPaneSkin extends SkinBase<DockingPane>`.
   - A package-private custom `DockingTabPane` that renders individual title controls; it must not instantiate JavaFX `TabPane`.
-  - `DockingContext.tabFactoryProperty()` with type `Callback<Dockable, Node>` creates complete tab headers. The default and a null factory use the public `DockingTab` component with the standard title, graphic, tooltip, and fading close button. Custom factories return fresh, unparented, non-null nodes; framework-managed selection, accessibility, keyboard actions, and docking drag-and-drop remain intact. Changing the factory refreshes all context panes, including floating panes.
+  - `DockingContext.tabFactoryProperty()` with type `Callback<Dockable, Node>` creates complete tab headers. The default and a null factory use the public `DockingTab` component with the standard title, graphic, tooltip, optional toolbar, actions menu and Help, and fading Close button. Custom factories return fresh, unparented, non-null nodes; framework-managed selection, accessibility, keyboard actions, and docking drag-and-drop remain intact. Changing the factory refreshes all context panes, including floating panes.
   - Localized close-button and accessibility strings through a new `BundleType.DOCKING_PANE`.
   - `DockingContext.requestCloseDockable(Dockable)` removes the dockable only when its configured close policy permits it and returns whether removal occurred; a veto leaves the pane and context unchanged. The title close affordance calls this method.
 

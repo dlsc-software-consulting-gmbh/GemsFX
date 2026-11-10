@@ -63,13 +63,25 @@ detail rather than a separately supported public control.
 `DockingContext.tabFactoryProperty()` is a `Callback<Dockable, Node>` that
 creates each complete tab header, including any close button. The default
 factory creates the public `DockingTab` component with the existing title,
-graphic, truncation tooltip, and fading close button. A null factory restores
+graphic, truncation tooltip, optional toolbar, actions menu and Help, and fading
+Close button. A null factory restores
 this default. Custom factories must return a fresh, unparented, non-null node
 for every invocation; headers can be recreated whenever the layout changes.
 The framework continues to provide selection styling, accessibility, keyboard
 actions, and docking drag-and-drop. Custom close buttons request closure
 through `DockingContext.requestCloseDockable`. Changing the factory refreshes
 tabs in every pane belonging to the context, including floating panes.
+Selection updates tab styling and displayed content in place, preserving
+header nodes and ongoing button fades.
+
+`Dockable.getMenuItems()` exposes a live, initially empty
+`ObservableList<MenuItem>`. Nonempty lists add an icon-only More dropdown with
+three vertical dots after the toolbar and before Help and Close. List changes
+update existing dropdowns immediately; an empty list hides the button without
+reserving space. More shares the other action buttons' colors and 150ms hover
+fade, keeping the actions visible while its menu is open. Using the dropdown
+does not select or close the dockable. Menu items retain their application-set
+actions and state, and each item should belong to only one dockable.
 
 Applications can set `Dockable.onHelpProperty()` to a `Runnable` to provide
 help for an individual dockable. The default `DockingTab` then shows a help

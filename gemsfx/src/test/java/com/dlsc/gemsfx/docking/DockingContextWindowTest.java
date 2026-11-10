@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.docking;
 
 import com.dlsc.gemsfx.FxTestBase;
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
+import javafx.animation.PauseTransition;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Bounds;
@@ -10,6 +11,8 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -23,6 +26,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.robot.Robot;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -377,6 +381,9 @@ public class DockingContextWindowTest extends FxTestBase {
             context.openDockable(created, "a", DockingPosition.CENTER).orElseThrow().setOnHelp(() -> {});
             context.openDockable(created, "b", DockingPosition.CENTER).orElseThrow().setOnHelp(() -> {});
             context.openDockable(created, "c", DockingPosition.RIGHT).orElseThrow().setOnHelp(() -> {});
+            for (Dockable dockable : context.getDockables()) {
+                dockable.getMenuItems().add(new MenuItem("Inspect"));
+            }
             return layout(created);
         });
 
@@ -396,8 +403,10 @@ public class DockingContextWindowTest extends FxTestBase {
                 Node tab = title(pane, id);
                 Node close = tab.lookup(".docking-tab-close-button");
                 Node help = tab.lookup(".docking-tab-help-button");
+                Node menu = tab.lookup(".docking-tab-menu-button");
                 assertEquals(0, close.getOpacity(), 0);
                 assertEquals(0, help.getOpacity(), 0);
+                assertEquals(0, menu.getOpacity(), 0);
                 help.opacityProperty().addListener((obs, oldOpacity, newOpacity) -> {
                     if (newOpacity.doubleValue() > 0 && newOpacity.doubleValue() < 1) {
                         intermediateHelpOpacity.set(true);
@@ -428,17 +437,38 @@ public class DockingContextWindowTest extends FxTestBase {
                 Node tab = title(pane, id);
                 Node close = tab.lookup(".docking-tab-close-button");
                 Node help = tab.lookup(".docking-tab-help-button");
+                Node menu = tab.lookup(".docking-tab-menu-button");
                 assertTrue("The fade must include intermediate opacity values", intermediateOpacity.get());
                 assertTrue("Help must fade in with Close", intermediateHelpOpacity.get());
                 assertEquals(1, close.getOpacity(), 0);
                 assertEquals(1, help.getOpacity(), 0);
+                assertEquals(1, menu.getOpacity(), 0);
                 assertEquals(width, tab.getBoundsInParent().getWidth(), 0);
                 for (String otherId : List.of("a", "b", "c")) {
                     if (!otherId.equals(id)) {
                         Node otherTab = title(pane, otherId);
                         assertEquals(0, otherTab.lookup(".docking-tab-close-button").getOpacity(), 0);
                         assertEquals(0, otherTab.lookup(".docking-tab-help-button").getOpacity(), 0);
+                        assertEquals(0, otherTab.lookup(".docking-tab-menu-button").getOpacity(), 0);
                     }
+                }
+                if (!target.equals("content")) {
+                    Node otherGroupTitle = title(pane, "c");
+                    Event.fireEvent(tab, new MouseEvent(MouseEvent.MOUSE_CLICKED,
+                            5, 5, 105, 105, MouseButton.PRIMARY, 1,
+                            false, false, false, false, false, false, false,
+                            false, false, true, new PickResult(tab, 5, 5)));
+                    pane.applyCss();
+                    pane.layout();
+                    assertSame("Selection must retain the hovered tab header", tab, title(pane, id));
+                    assertSame(otherGroupTitle, title(pane, "c"));
+                    assertEquals(id, pane.getActiveDockable().getId());
+                    assertTrue(tab.getStyleClass().contains("selected"));
+                    assertEquals(1, close.getOpacity(), 0);
+                    assertEquals(1, help.getOpacity(), 0);
+                    assertEquals(1, menu.getOpacity(), 0);
+                    assertSame(tab.getParent().getParent(),
+                            pane.getActiveDockable().getContent().getParent().getParent());
                 }
 
                 if (target.equals("content")) {
@@ -454,16 +484,76 @@ public class DockingContextWindowTest extends FxTestBase {
                 pane.applyCss();
                 assertEquals("Leaving must fade the button out, not instantly hide it", 1, close.getOpacity(), 0);
                 assertEquals(1, help.getOpacity(), 0);
+                assertEquals(1, menu.getOpacity(), 0);
             });
             assertTrue("Close button did not finish fading out", fadedOut.await(5, TimeUnit.SECONDS));
             runFx(() -> {
                 Node tab = title(pane, id);
                 Node close = tab.lookup(".docking-tab-close-button");
                 Node help = tab.lookup(".docking-tab-help-button");
+                Node menu = tab.lookup(".docking-tab-menu-button");
                 assertTrue("The fade-out must include intermediate opacity values", intermediateFadeOut.get());
                 assertEquals(0, close.getOpacity(), 0);
                 assertEquals(0, help.getOpacity(), 0);
+                assertEquals(0, menu.getOpacity(), 0);
             });
+        }
+    }
+
+    @Test
+    public void menuKeepsActionsVisibleWhileOpenAndClosesWhenItemsAreCleared() throws InterruptedException {
+        DockingPane pane = invoke(() -> {
+            DockingContext context = new DockingContext(id -> {
+                Dockable dockable = dockable(id);
+                dockable.getMenuItems().add(new MenuItem("Inspect"));
+                return Optional.of(dockable);
+            }, floatingPane -> new Stage());
+            DockingPane created = context.createPane();
+            context.openDockable(created, "a", DockingPosition.CENTER);
+            context.openDockable(created, "b", DockingPosition.CENTER);
+            return layout(created);
+        });
+        CountDownLatch fadedIn = new CountDownLatch(1);
+        CountDownLatch fadedOut = new CountDownLatch(1);
+        try {
+            runFx(() -> {
+                Stage stage = (Stage) pane.getScene().getWindow();
+                stage.show();
+                Node tab = title(pane, "a");
+                Node close = tab.lookup(".docking-tab-close-button");
+                close.opacityProperty().addListener((obs, oldValue, value) -> {
+                    if (value.doubleValue() == 1) {
+                        fadedIn.countDown();
+                    } else if (value.doubleValue() == 0) {
+                        fadedOut.countDown();
+                    }
+                });
+                ((MenuButton) tab.lookup(".docking-tab-menu-button")).show();
+            });
+            assertTrue("An open menu must reveal its tab actions", fadedIn.await(5, TimeUnit.SECONDS));
+            CountDownLatch popupPulse = new CountDownLatch(1);
+            runFx(() -> {
+                fireHover(title(pane, "a"), false);
+                PauseTransition pause = new PauseTransition(Duration.millis(200));
+                pause.setOnFinished(event -> popupPulse.countDown());
+                pause.play();
+            });
+            assertTrue(popupPulse.await(5, TimeUnit.SECONDS));
+            runFx(() -> {
+                Node tab = title(pane, "a");
+                MenuButton menu = (MenuButton) tab.lookup(".docking-tab-menu-button");
+                assertTrue(menu.isShowing());
+                assertEquals(1, menu.getOpacity(), 0);
+                assertEquals(1, tab.lookup(".docking-tab-close-button").getOpacity(), 0);
+                assertEquals("b", pane.getActiveDockable().getId());
+                pane.getDockables().stream().filter(dockable -> dockable.getId().equals("a"))
+                        .findFirst().orElseThrow().getMenuItems().clear();
+                assertFalse(menu.isShowing());
+                assertFalse(menu.isManaged());
+            });
+            assertTrue("Actions must fade out when the menu closes", fadedOut.await(5, TimeUnit.SECONDS));
+        } finally {
+            runFx(() -> ((Stage) pane.getScene().getWindow()).close());
         }
     }
 

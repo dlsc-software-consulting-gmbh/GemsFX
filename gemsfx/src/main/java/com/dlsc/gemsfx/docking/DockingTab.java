@@ -16,6 +16,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
@@ -33,7 +34,8 @@ import java.text.MessageFormat;
 import java.util.Objects;
 
 /**
- * Default docking tab header, displaying a dockable's title, graphic, optional toolbar and help button, and close button.
+ * Default docking tab header, displaying a dockable's title, graphic, optional toolbar, actions menu and help button,
+ * and close button.
  * Selection, keyboard navigation, and docking drag-and-drop are installed by the workspace.
  * Applications can create or subclass this header in a {@link DockingContext#tabFactoryProperty() tab factory}.
  * Double-clicking edits the title when {@link Dockable#titleEditableProperty()} permits it.
@@ -80,6 +82,7 @@ public class DockingTab extends HBox {
         label.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(label, Priority.ALWAYS);
 
+        MenuButton menu = new MenuButton();
         Button close = new Button();
         close.getStyleClass().add("docking-tab-close-button");
         close.setFocusTraversable(false);
@@ -95,7 +98,7 @@ public class DockingTab extends HBox {
         };
         dockable.getContent().parentProperty().addListener(new WeakChangeListener<>(contentParentListener));
         contentParentListener.changed(dockable.getContent().parentProperty(), null, dockable.getContent().getParent());
-        dockableHovered = hoverProperty().or(contentHovered);
+        dockableHovered = hoverProperty().or(contentHovered).or(menu.showingProperty());
         FadeTransition fade = new FadeTransition(Duration.millis(150), close);
         fade.setFromValue(0);
         fade.setToValue(1);
@@ -138,6 +141,33 @@ public class DockingTab extends HBox {
         });
         help.addEventHandler(MouseEvent.MOUSE_CLICKED, MouseEvent::consume);
 
+        menu.getStyleClass().add("docking-tab-menu-button");
+        menu.setFocusTraversable(false);
+        menu.setGraphic(new FontIcon("bi-three-dots-vertical"));
+        menu.visibleProperty().bind(Bindings.isNotEmpty(dockable.getMenuItems()));
+        menu.managedProperty().bind(menu.visibleProperty());
+        menu.opacityProperty().bind(close.opacityProperty());
+        menu.setTooltip(new Tooltip(ResourceBundleManager.getString(BundleType.DOCKING_PANE, "tooltip.more", "More actions")));
+        String menuPattern = ResourceBundleManager.getString(BundleType.DOCKING_PANE, "accessible.text.more", "Actions for {0}");
+        menu.accessibleTextProperty().bind(Bindings.createStringBinding(
+                () -> MessageFormat.format(menuPattern, dockable.getTitle()), dockable.titleProperty()));
+        menu.addEventHandler(MouseEvent.MOUSE_CLICKED, MouseEvent::consume);
+        menu.visibleProperty().addListener((obs, wasVisible, visible) -> {
+            if (!visible) {
+                menu.hide();
+            }
+        });
+        Bindings.bindContent(menu.getItems(), dockable.getMenuItems());
+        sceneProperty().addListener((obs, oldScene, newScene) -> {
+            menu.hide();
+            Bindings.unbindContent(menu.getItems(), dockable.getMenuItems());
+            if (newScene == null) {
+                menu.getItems().clear();
+            } else {
+                Bindings.bindContent(menu.getItems(), dockable.getMenuItems());
+            }
+        });
+
         StackPane toolbar = new StackPane();
         toolbar.getStyleClass().add("docking-tab-toolbar");
         toolbar.setAlignment(Pos.CENTER_LEFT);
@@ -148,7 +178,7 @@ public class DockingTab extends HBox {
         toolbarListener = (obs, oldToolbar, newToolbar) -> updateToolbar(toolbar, newToolbar);
         dockable.toolbarProperty().addListener(new WeakChangeListener<>(toolbarListener));
         updateToolbar(toolbar, dockable.getToolbar());
-        getChildren().addAll(label, toolbar, help, close);
+        getChildren().addAll(label, toolbar, menu, help, close);
 
         titleEditableListener = (obs, wasEditable, editable) -> {
             if (!editable) {

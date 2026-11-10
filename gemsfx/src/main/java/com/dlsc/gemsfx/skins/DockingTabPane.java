@@ -36,15 +36,17 @@ final class DockingTabPane extends VBox {
 
     private final DockingPane dockingPane;
     private final List<String> ids;
+    private final HBox strip = new HBox();
+    private final StackPane contentArea = new StackPane();
+    private String selectedId;
 
     DockingTabPane(DockingPane dockingPane, DockingLayoutNode.Tabs tabs) {
         this.dockingPane = dockingPane;
         this.ids = tabs.getDockableIds();
+        this.selectedId = tabs.getSelectedId();
         getStyleClass().add("docking-tab-pane");
 
-        HBox strip = new HBox();
         strip.getStyleClass().add("docking-tab-strip");
-        StackPane contentArea = new StackPane();
         contentArea.getStyleClass().add("docking-tab-content");
         VBox.setVgrow(contentArea, Priority.ALWAYS);
 
@@ -53,7 +55,7 @@ final class DockingTabPane extends VBox {
             if (dockable == null) {
                 continue;
             }
-            boolean selected = id.equals(tabs.getSelectedId());
+            boolean selected = id.equals(selectedId);
             strip.getChildren().add(createTitle(dockable, selected));
             if (selected) {
                 contentArea.getChildren().setAll(dockable.getContent());
@@ -63,6 +65,25 @@ final class DockingTabPane extends VBox {
             strip.getChildren().get(strip.getChildren().size() - 1).pseudoClassStateChanged(LAST_TAB, true);
         }
         getChildren().addAll(strip, contentArea);
+    }
+
+    void updateSelection(String id) {
+        if (selectedId.equals(id)) {
+            return;
+        }
+        selectedId = id;
+        for (Node title : strip.getChildren()) {
+            title.getStyleClass().remove("selected");
+            if (id.equals(title.getProperties().get(DOCKABLE_ID_KEY))) {
+                title.getStyleClass().add("selected");
+            }
+        }
+        Dockable dockable = find(dockingPane, id);
+        if (dockable == null) {
+            contentArea.getChildren().clear();
+        } else {
+            contentArea.getChildren().setAll(dockable.getContent());
+        }
     }
 
     private static Dockable find(DockingPane pane, String id) {
@@ -104,7 +125,7 @@ final class DockingTabPane extends VBox {
         AccessibilityUtil.bindAccessibleText(title, accessibleText);
         title.getProperties().put(TITLE_ACCESSIBLE_TEXT_BINDING_KEY, accessibleText);
 
-        // Selecting on press rebuilds the titles and detaches the drag source before drag detection.
+        // Select on click so pressing an unselected tab can still initiate a drag.
         title.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             if (!e.isConsumed() && e.getButton() == MouseButton.PRIMARY && e.isStillSincePress()) {
                 dockingPane.selectDockable(dockable.getId());

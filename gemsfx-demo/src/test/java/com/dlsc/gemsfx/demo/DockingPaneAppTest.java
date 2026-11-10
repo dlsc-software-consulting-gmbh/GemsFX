@@ -17,8 +17,11 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
@@ -55,7 +58,7 @@ public class DockingPaneAppTest {
     }
 
     @Test
-    public void editorToolbarTogglesWrappingIndependentlyForEachView() throws Exception {
+    public void editorMenuAndToolbarToggleWrappingIndependentlyForEachView() throws Exception {
         runFx(() -> {
             DockingPaneApp app = new DockingPaneApp();
             Dockable editor = app.createDockable("editor").orElseThrow();
@@ -64,17 +67,28 @@ public class DockingPaneAppTest {
             CheckBox wrap = (CheckBox) editor.getToolbar();
             assertNotNull(wrap);
             assertEquals("Wrap text", wrap.getAccessibleText());
+            assertTrue(!editor.getMenuItems().isEmpty(), "Editor should offer a wrapping action");
+            CheckMenuItem wrapItem = (CheckMenuItem) editor.getMenuItems().get(0);
             boolean initialWrap = text.isWrapText();
+            assertEquals(initialWrap, wrapItem.isSelected());
             wrap.fire();
             assertNotEquals(initialWrap, text.isWrapText());
+            assertEquals(text.isWrapText(), wrapItem.isSelected());
             assertEquals(initialWrap, ((TextArea) copy.getContent()).isWrapText());
             wrap.fire();
             assertEquals(initialWrap, text.isWrapText());
+            wrapItem.setSelected(!initialWrap);
+            assertEquals(!initialWrap, text.isWrapText());
+            assertEquals(!initialWrap, wrap.isSelected());
+            assertEquals(initialWrap, ((TextArea) copy.getContent()).isWrapText());
+            text.setWrapText(initialWrap);
+            assertEquals(initialWrap, wrapItem.isSelected());
+            assertEquals(initialWrap, wrap.isSelected());
         });
     }
 
     @Test
-    public void consoleToolbarClearsOnlyItsOwnOutput() throws Exception {
+    public void consoleMenuAndToolbarClearOnlyTheirOwnOutput() throws Exception {
         runFx(() -> {
             DockingPaneApp app = new DockingPaneApp();
             Dockable console = app.createDockable("console").orElseThrow();
@@ -89,11 +103,16 @@ public class DockingPaneAppTest {
             clear.fire();
             assertEquals("", output.getText());
             assertEquals(original, otherOutput.getText());
+            output.setText("[INFO] More output");
+            assertTrue(!console.getMenuItems().isEmpty(), "Console should offer a clear action");
+            console.getMenuItems().get(0).fire();
+            assertEquals("", output.getText());
+            assertEquals(original, otherOutput.getText());
         });
     }
 
     @Test
-    public void navigatorToolbarExpandsAndCollapsesTheWholeTree() throws Exception {
+    public void navigatorMenuAndToolbarExpandAndCollapseTheWholeTree() throws Exception {
         runFx(() -> {
             Dockable navigator = new DockingPaneApp().createDockable("navigator").orElseThrow();
             TreeView<?> tree = (TreeView<?>) navigator.getContent();
@@ -107,6 +126,13 @@ public class DockingPaneAppTest {
             assertTrue(tree.getRoot().isExpanded());
             tree.getRoot().getChildren().forEach(item -> assertTrue(item.isExpanded()));
             collapse.fire();
+            assertTrue(!tree.getRoot().isExpanded());
+            tree.getRoot().getChildren().forEach(item -> assertTrue(!item.isExpanded()));
+            assertTrue(!navigator.getMenuItems().isEmpty(), "Navigator should offer tree actions");
+            navigator.getMenuItems().get(0).fire();
+            assertTrue(tree.getRoot().isExpanded());
+            tree.getRoot().getChildren().forEach(item -> assertTrue(item.isExpanded()));
+            navigator.getMenuItems().get(1).fire();
             assertTrue(!tree.getRoot().isExpanded());
             tree.getRoot().getChildren().forEach(item -> assertTrue(!item.isExpanded()));
         });
@@ -276,6 +302,8 @@ public class DockingPaneAppTest {
             DockingPane pane = context.createPane();
             Dockable drag = context.openDockable(pane, "drag", DockingPosition.CENTER).orElseThrow();
             Dockable drop = context.openDockable(pane, "drop", DockingPosition.CENTER).orElseThrow();
+            drag.getMenuItems().add(new MenuItem("Inspect rocket"));
+            drop.getMenuItems().add(new MenuItem("Inspect target"));
             StackPane root = new StackPane(pane);
             root.getStyleClass().add("docking-demo-app");
             root.setStyle("-color-success-emphasis: #123456; -color-danger-emphasis: #ab3456;"
@@ -295,6 +323,18 @@ public class DockingPaneAppTest {
                         ((FontIcon) drop.getGraphic()).getIconColor());
                 Region closeIcon = (Region) pane.lookup(".docking-tab.selected .docking-tab-close-button .icon");
                 assertEquals(Color.web("#abcdef"), closeIcon.getBackground().getFills().getFirst().getFill());
+                MenuButton menu = (MenuButton) pane.lookup(".docking-tab.selected .docking-tab-menu-button");
+                for (boolean showing : List.of(false, true)) {
+                    menu.pseudoClassStateChanged(PseudoClass.getPseudoClass("showing"), showing);
+                    root.applyCss();
+                    assertEquals(Color.web("#abcdef"), ((FontIcon) menu.getGraphic()).getIconColor());
+                    assertEquals(0, ((Region) menu.lookup(".arrow-button")).prefWidth(-1), 0);
+                    menu.getBackground().getFills().forEach(fill -> assertEquals(Color.TRANSPARENT, fill.getFill()));
+                    if (menu.getBorder() != null) {
+                        menu.getBorder().getStrokes().forEach(stroke ->
+                                assertEquals(Color.TRANSPARENT, stroke.getTopStroke()));
+                    }
+                }
                 Dockable selected = id.equals("drag") ? drag : drop;
                 FontIcon contentIcon = (FontIcon) selected.getContent().lookup(id.equals("drag")
                         ? ".docking-demo-drag-graphic" : ".docking-demo-target-graphic");

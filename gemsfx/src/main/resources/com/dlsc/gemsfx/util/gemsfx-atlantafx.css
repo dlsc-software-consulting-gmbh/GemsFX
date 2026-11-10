@@ -2924,7 +2924,8 @@
 }
 
 .docking-pane .docking-tab-close-button,
-.docking-pane .docking-tab-help-button {
+.docking-pane .docking-tab-help-button,
+.docking-pane .docking-tab-menu-button {
     -fx-background-color: transparent;
 }
 
@@ -2932,7 +2933,8 @@
     -fx-background-color: -color-fg-default;
 }
 
-.docking-pane .docking-tab-help-button .ikonli-font-icon {
+.docking-pane .docking-tab-help-button .ikonli-font-icon,
+.docking-pane .docking-tab-menu-button .ikonli-font-icon {
     -fx-icon-color: -color-fg-default;
 }
 
@@ -2940,12 +2942,14 @@
     -fx-background-color: -color-fg-emphasis;
 }
 
-.docking-pane .docking-tab.selected .docking-tab-help-button .ikonli-font-icon {
+.docking-pane .docking-tab.selected .docking-tab-help-button .ikonli-font-icon,
+.docking-pane .docking-tab.selected .docking-tab-menu-button .ikonli-font-icon {
     -fx-icon-color: -color-fg-emphasis;
 }
 
 .docking-pane .docking-tab-close-button:hover,
-.docking-pane .docking-tab-help-button:hover {
+.docking-pane .docking-tab-help-button:hover,
+.docking-pane .docking-tab-menu-button:hover {
     -fx-background-color: transparent;
 }
 

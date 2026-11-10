@@ -32,6 +32,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
@@ -462,6 +463,11 @@ public class DockingPaneApp extends GemApplication {
         HBox toolbar = new HBox(2, expand, collapse);
         toolbar.setAlignment(Pos.CENTER_LEFT);
         navigator.setToolbar(toolbar);
+        MenuItem expandItem = new MenuItem("Expand all");
+        expandItem.setOnAction(event -> setTreeExpanded(project, true));
+        MenuItem collapseItem = new MenuItem("Collapse all");
+        collapseItem.setOnAction(event -> setTreeExpanded(project, false));
+        navigator.getMenuItems().addAll(expandItem, collapseItem);
         return navigator;
     }
 
@@ -486,6 +492,9 @@ public class DockingPaneApp extends GemApplication {
         wrap.setSelected(text.isWrapText());
         wrap.selectedProperty().bindBidirectional(text.wrapTextProperty());
         editor.setToolbar(wrap);
+        CheckMenuItem wrapItem = new CheckMenuItem("Wrap text");
+        wrapItem.selectedProperty().bindBidirectional(text.wrapTextProperty());
+        editor.getMenuItems().add(wrapItem);
         return editor;
     }
 
@@ -523,6 +532,9 @@ public class DockingPaneApp extends GemApplication {
         content.setTop(toolbar);
         Dockable console = new Dockable(id, "Console", createIcon(MaterialDesign.MDI_CONSOLE), content);
         console.setToolbar(createTabToolbarButton(MaterialDesign.MDI_DELETE, "Clear output", output::clear));
+        MenuItem clearItem = new MenuItem("Clear output");
+        clearItem.setOnAction(event -> output.clear());
+        console.getMenuItems().add(clearItem);
         return console;
     }
 

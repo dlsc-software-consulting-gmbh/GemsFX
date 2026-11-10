@@ -42,8 +42,8 @@ import javafx.scene.transform.Transform;
 import javafx.stage.Window;
 
 /**
- * Skin of {@link DockingPane}. The tree recreates its nodes on every mutation, so the rendered scene graph is rebuilt
- * from the current {@link DockingLayoutNode} snapshot whenever it changes.
+ * Skin of {@link DockingPane}. Structural changes rebuild the rendered scene graph from the current
+ * {@link DockingLayoutNode} snapshot; selection-only changes update existing tab groups in place.
  */
 public class DockingPaneSkin extends SkinBase<DockingPane> {
 
@@ -68,7 +68,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private final Map<DockingPosition, StackPane> paneEdgeTargets = new EnumMap<>(DockingPosition.class);
     // Eagerly validate snapshots even when divider synchronization skips rebuilding.
     private final ChangeListener<DockingLayoutNode> layoutListener = (obs, oldLayout, newLayout) -> {
-        if (!syncingDivider) {
+        if (!syncingDivider && !updateSelection(oldLayout, newLayout)) {
             rebuild();
         }
     };
@@ -164,6 +164,40 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         for (DockingTabPane group : tabGroups) {
             group.pseudoClassStateChanged(FOCUS_HIGHLIGHTED, group == focusedGroup);
         }
+    }
+
+    private boolean updateSelection(DockingLayoutNode oldLayout, DockingLayoutNode newLayout) {
+        List<String> selectedIds = new ArrayList<>();
+        if (!collectSelectionOnlyChanges(oldLayout, newLayout, selectedIds)) {
+            return false;
+        }
+        for (int i = 0; i < tabGroups.size(); i++) {
+            tabGroups.get(i).updateSelection(selectedIds.get(i));
+        }
+        updateFocusBorders();
+        return true;
+    }
+
+    private static boolean collectSelectionOnlyChanges(DockingLayoutNode oldLayout, DockingLayoutNode newLayout,
+                                                       List<String> selectedIds) {
+        if (oldLayout instanceof DockingLayoutNode.Tabs && newLayout instanceof DockingLayoutNode.Tabs) {
+            DockingLayoutNode.Tabs oldTabs = (DockingLayoutNode.Tabs) oldLayout;
+            DockingLayoutNode.Tabs newTabs = (DockingLayoutNode.Tabs) newLayout;
+            if (!oldTabs.getDockableIds().equals(newTabs.getDockableIds())) {
+                return false;
+            }
+            selectedIds.add(newTabs.getSelectedId());
+            return true;
+        }
+        if (oldLayout instanceof DockingLayoutNode.Split && newLayout instanceof DockingLayoutNode.Split) {
+            DockingLayoutNode.Split oldSplit = (DockingLayoutNode.Split) oldLayout;
+            DockingLayoutNode.Split newSplit = (DockingLayoutNode.Split) newLayout;
+            return oldSplit.getOrientation() == newSplit.getOrientation()
+                    && oldSplit.getDividerPosition() == newSplit.getDividerPosition()
+                    && collectSelectionOnlyChanges(oldSplit.getFirst(), newSplit.getFirst(), selectedIds)
+                    && collectSelectionOnlyChanges(oldSplit.getSecond(), newSplit.getSecond(), selectedIds);
+        }
+        return oldLayout instanceof DockingLayoutNode.Empty && newLayout instanceof DockingLayoutNode.Empty;
     }
 
     private void rebuild() {

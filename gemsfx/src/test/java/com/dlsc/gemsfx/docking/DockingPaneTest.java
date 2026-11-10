@@ -13,7 +13,10 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -348,6 +351,70 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     @Test
+    public void menuButtonTracksItemsAndPrecedesHelpWithoutSelectingOrClosingItsDockable() {
+        runFx(() -> {
+            Dockable first = dockable("a");
+            first.setOnHelp(() -> {});
+            DockingContext context = context(first, dockable("b"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            layout(pane);
+            DockingTab header = (DockingTab) title(pane, "a");
+            MenuButton menu = (MenuButton) header.lookup(".docking-tab-menu-button");
+            assertFalse(menu.isVisible());
+            assertFalse(menu.isManaged());
+
+            AtomicInteger calls = new AtomicInteger();
+            MenuItem action = new MenuItem("Inspect");
+            action.setOnAction(event -> calls.incrementAndGet());
+            MenuItem other = new MenuItem("Other");
+            first.getMenuItems().addAll(action, other);
+            assertTrue(menu.isVisible());
+            assertTrue(menu.isManaged());
+            assertEquals(List.of(action, other), menu.getItems());
+            assertSame(header.lookup(".docking-tab-help-button"),
+                    header.getChildren().get(header.getChildren().indexOf(menu) + 1));
+            menu.getItems().get(0).fire();
+            mouse(menu, MouseEvent.MOUSE_CLICKED, true);
+            assertEquals(1, calls.get());
+            assertEquals("b", pane.getActiveDockable().getId());
+            assertEquals(2, context.getDockables().size());
+
+            first.getMenuItems().setAll(other);
+            assertEquals(List.of(other), menu.getItems());
+            first.getMenuItems().clear();
+            assertTrue(menu.getItems().isEmpty());
+            assertFalse(menu.isVisible());
+            assertFalse(menu.isManaged());
+        });
+    }
+
+    @Test
+    public void detachedMenuHeadersReleaseItemsAndStopObservingTheirList() {
+        runFx(() -> {
+            Dockable dockable = dockable("a");
+            MenuItem action = new MenuItem("Inspect");
+            dockable.getMenuItems().add(action);
+            DockingContext context = context(dockable);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+            MenuButton oldMenu = (MenuButton) title(pane, "a").lookup(".docking-tab-menu-button");
+            context.setTabFactory(candidate -> new Label(candidate.getTitle()));
+            assertTrue(oldMenu.getItems().isEmpty());
+            assertNull(action.getParentPopup());
+            dockable.getMenuItems().add(new MenuItem("New action"));
+            assertTrue(oldMenu.getItems().isEmpty());
+
+            context.setTabFactory(null);
+            pane.applyCss();
+            MenuButton restored = (MenuButton) title(pane, "a").lookup(".docking-tab-menu-button");
+            assertEquals(dockable.getMenuItems(), restored.getItems());
+        });
+    }
+
+    @Test
     public void helpButtonTracksCallbackChangesWithoutSelectingOrClosingItsDockable() {
         runFx(() -> {
             Dockable first = dockable("a");
@@ -394,12 +461,17 @@ public class DockingPaneTest extends FxTestBase {
                 ResourceBundleManager.setLocale(Locale.GERMAN);
                 Dockable dockable = dockable("a");
                 dockable.setOnHelp(() -> {});
+                dockable.getMenuItems().add(new MenuItem("Inspect"));
                 DockingTab tab = new DockingTab(context(dockable), dockable);
                 Button help = (Button) tab.lookup(".docking-tab-help-button");
+                MenuButton menu = (MenuButton) tab.lookup(".docking-tab-menu-button");
                 assertEquals("Hilfe", help.getTooltip().getText());
                 assertEquals("Hilfe zu Title a", help.getAccessibleText());
+                assertEquals("Weitere Aktionen", menu.getTooltip().getText());
+                assertEquals("Aktionen für Title a", menu.getAccessibleText());
                 dockable.setTitle("Editor");
                 assertEquals("Hilfe zu Editor", help.getAccessibleText());
+                assertEquals("Aktionen für Editor", menu.getAccessibleText());
             } finally {
                 ResourceBundleManager.setLocale(originalLocale);
             }
@@ -411,6 +483,7 @@ public class DockingPaneTest extends FxTestBase {
         runFx(() -> {
             Dockable dockable = dockable("a");
             dockable.setOnHelp(() -> {});
+            dockable.getMenuItems().add(new MenuItem("Inspect"));
             DockingContext context = context(dockable, dockable("b"));
             DockingPane pane = context.createPane();
             context.openDockable(pane, "a", DockingPosition.CENTER);
@@ -427,15 +500,20 @@ public class DockingPaneTest extends FxTestBase {
                     Node tab = title(pane, "a");
                     Button close = (Button) tab.lookup(".docking-tab-close-button");
                     Button help = (Button) tab.lookup(".docking-tab-help-button");
+                    MenuButton menu = (MenuButton) tab.lookup(".docking-tab-menu-button");
                     FontIcon icon = (FontIcon) help.getGraphic();
-                    for (String state : List.of("normal", "hover", "armed")) {
-                        for (Button button : List.of(close, help)) {
+                    FontIcon menuIcon = (FontIcon) menu.getGraphic();
+                    for (String state : List.of("normal", "hover", "armed", "showing")) {
+                        for (ButtonBase button : List.of(close, help, menu)) {
                             button.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), state.equals("hover"));
                             button.pseudoClassStateChanged(PseudoClass.getPseudoClass("armed"), state.equals("armed"));
+                            button.pseudoClassStateChanged(PseudoClass.getPseudoClass("showing"), state.equals("showing"));
                         }
                         scene.getRoot().applyCss();
                         assertEquals(12, icon.getIconSize());
-                        for (Button button : List.of(close, help)) {
+                        assertEquals(12, menuIcon.getIconSize());
+                        assertEquals(0, ((Region) menu.lookup(".arrow-button")).prefWidth(-1), 0);
+                        for (ButtonBase button : List.of(close, help, menu)) {
                             if (button.getBackground() != null) {
                                 button.getBackground().getFills().forEach(fill ->
                                         assertEquals(Color.TRANSPARENT, fill.getFill()));
@@ -444,6 +522,7 @@ public class DockingPaneTest extends FxTestBase {
                         if (themed) {
                             Color expected = selectedId.equals("a") ? Color.WHITE : Color.LIME;
                             assertEquals(expected, icon.getIconColor());
+                            assertEquals(expected, menuIcon.getIconColor());
                             Region closeIcon = (Region) close.getGraphic();
                             assertEquals(expected, closeIcon.getBackground().getFills().get(0).getFill());
                         }
@@ -472,9 +551,14 @@ public class DockingPaneTest extends FxTestBase {
             assertEquals("Renamed", header.getAccessibleText());
             mouse(header, MouseEvent.MOUSE_CLICKED, true);
             assertSame(first, pane.getActiveDockable());
+            assertSame(header, title(pane, "a"));
+            assertSame(pane.lookup(".docking-tab-content"), first.getContent().getParent());
             assertTrue(title(pane, "a").getStyleClass().contains("selected"));
             press(title(pane, "a"), KeyCode.RIGHT);
             assertEquals("b", pane.getActiveDockable().getId());
+            assertSame(header, title(pane, "a"));
+            assertFalse(header.getStyleClass().contains("selected"));
+            assertNull(first.getContent().getParent());
             press(title(pane, "a"), KeyCode.DELETE);
             assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) pane.getLayoutRoot()).getDockableIds());
         });
