@@ -1,10 +1,12 @@
 package com.dlsc.gemsfx.docking;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 
@@ -13,12 +15,14 @@ import java.util.Objects;
 /**
  * Represents a dockable component with an ID, a mutable display title and optional graphic, and a content node.
  */
-public final class Dockable {
+public class Dockable {
     
     private final String id;
     private final ReadOnlyStringWrapper title;
+    private final BooleanProperty titleEditable = new SimpleBooleanProperty(this, "titleEditable", true);
     private final ReadOnlyObjectWrapper<Node> graphic;
     private final Node content;
+    private final ObjectProperty<Node> toolbar = new SimpleObjectProperty<>(this, "toolbar");
     private final ObjectProperty<Runnable> onHelp = new SimpleObjectProperty<>(this, "onHelp");
     
     /**
@@ -77,6 +81,25 @@ public final class Dockable {
     public final void setTitle(String title) {
         this.title.set(validateTitle(title));
     }
+
+    /**
+     * Whether the user can edit the title by double-clicking the default {@link DockingTab}.
+     * Defaults to {@code true}. Setting this to {@code false} cancels an active title edit;
+     * programmatic changes through {@link #setTitle(String)} remain allowed.
+     *
+     * @return the title editing permission property
+     */
+    public final BooleanProperty titleEditableProperty() {
+        return titleEditable;
+    }
+
+    public final boolean isTitleEditable() {
+        return titleEditable.get();
+    }
+
+    public final void setTitleEditable(boolean titleEditable) {
+        this.titleEditable.set(titleEditable);
+    }
     
     /**
      * The optional graphic displayed in this dockable's tab, or {@code null} for no graphic.
@@ -94,6 +117,25 @@ public final class Dockable {
 
     public final void setGraphic(Node graphic) {
         this.graphic.set(graphic);
+    }
+
+    /**
+     * The optional toolbar displayed to the left of the help and close buttons in the default {@link DockingTab}.
+     * Defaults to {@code null}. Changes replace or remove the displayed toolbar immediately.
+     * The toolbar fades in with the buttons when the tab is hovered.
+     *
+     * @return the toolbar property
+     */
+    public final ObjectProperty<Node> toolbarProperty() {
+        return toolbar;
+    }
+
+    public final Node getToolbar() {
+        return toolbar.get();
+    }
+
+    public final void setToolbar(Node toolbar) {
+        this.toolbar.set(toolbar);
     }
 
     /**

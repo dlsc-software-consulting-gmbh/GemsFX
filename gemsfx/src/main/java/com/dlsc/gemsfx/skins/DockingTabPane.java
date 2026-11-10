@@ -106,7 +106,7 @@ final class DockingTabPane extends VBox {
 
         // Selecting on press rebuilds the titles and detaches the drag source before drag detection.
         title.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-            if (e.getButton() == MouseButton.PRIMARY && e.isStillSincePress()) {
+            if (!e.isConsumed() && e.getButton() == MouseButton.PRIMARY && e.isStillSincePress()) {
                 dockingPane.selectDockable(dockable.getId());
             }
         });
@@ -115,6 +115,9 @@ final class DockingTabPane extends VBox {
     }
 
     private void handleKey(Dockable dockable, KeyEvent event) {
+        if (event.isConsumed()) {
+            return;
+        }
         KeyCode code = event.getCode();
         int index = ids.indexOf(dockable.getId());
         if (code == KeyCode.ENTER || code == KeyCode.SPACE) {

@@ -127,10 +127,6 @@
     -fx-icon-color: -color-fg-emphasis;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected .docking-tab-close-button .icon {
-    -fx-background-color: -color-neutral-emphasis;
-}
-
 .docking-demo-app .docking-pane .docking-tab-content {
     -fx-background-color: -color-bg-default;
 }

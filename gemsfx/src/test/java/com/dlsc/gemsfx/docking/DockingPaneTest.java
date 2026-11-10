@@ -4,6 +4,8 @@ import com.dlsc.gemsfx.FxTestBase;
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Orientation;
@@ -13,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -33,6 +36,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.lang.reflect.Method;
 
 import static org.junit.Assert.*;
@@ -66,6 +71,20 @@ public class DockingPaneTest extends FxTestBase {
         Event.fireEvent(node, new MouseEvent(type, 5, 5, 105, 105, MouseButton.PRIMARY, 1,
                 false, false, false, false, type == MouseEvent.MOUSE_PRESSED, false, false,
                 false, false, stillSincePress, new PickResult(node, 5, 5)));
+    }
+
+    private static void doubleClick(Node node) {
+        Event.fireEvent(node, new MouseEvent(MouseEvent.MOUSE_CLICKED, 5, 5, 105, 105, MouseButton.PRIMARY, 2,
+                false, false, false, false, false, false, false,
+                false, false, true, new PickResult(node, 5, 5)));
+    }
+
+    private static TextField titleEditor(DockingPane pane) {
+        pane.applyCss();
+        pane.layout();
+        TextField editor = (TextField) pane.lookup(".docking-tab-title-editor");
+        assertNotNull("Double-clicking a tab should open its title editor", editor);
+        return editor;
     }
 
     private static List<Node> titles(DockingPane pane) {
@@ -114,6 +133,218 @@ public class DockingPaneTest extends FxTestBase {
                         + image.getPixelReader().getColor((int) image.getWidth() / 2, (int) image.getHeight() / 2),
                 maxX >= minX && maxY >= minY);
         return new Rectangle2D(minX, minY, maxX - minX + 1, maxY - minY + 1);
+    }
+
+    @Test
+    public void toolbarTracksInitialValueReplacementAndRemovalBeforeTabButtons() {
+        runFx(() -> {
+            Dockable dockable = dockable("a");
+            Button initial = new Button("Initial");
+            dockable.setToolbar(initial);
+            DockingTab tab = new DockingTab(context(dockable), dockable);
+            Node help = tab.lookup(".docking-tab-help-button");
+            assertNotNull(initial.getParent());
+            assertTrue(tab.getChildren().indexOf(initial.getParent()) < tab.getChildren().indexOf(help));
+
+            Button replacement = new Button("Replacement");
+            dockable.toolbarProperty().set(replacement);
+            assertNull(initial.getParent());
+            assertNotNull(replacement.getParent());
+            assertTrue(tab.getChildren().indexOf(replacement.getParent()) < tab.getChildren().indexOf(help));
+            dockable.setToolbar(null);
+            assertNull(replacement.getParent());
+            Node host = tab.lookup(".docking-tab-toolbar");
+            assertTrue(host == null || !host.isManaged());
+
+            dockable.setToolbar(initial);
+            assertNotNull(initial.getParent());
+            assertTrue(initial.getParent().isManaged());
+        });
+    }
+
+    @Test
+    public void toolbarFadesWithTabHover() throws InterruptedException {
+        class HoverableTab extends DockingTab {
+            HoverableTab(Dockable dockable) {
+                super(context(dockable), dockable);
+            }
+
+            void hover(boolean hovered) {
+                setHover(hovered);
+            }
+        }
+        CountDownLatch fadedIn = new CountDownLatch(1);
+        HoverableTab tab = invoke(() -> {
+            Dockable dockable = dockable("a");
+            Button toolbar = new Button("Action");
+            dockable.setToolbar(toolbar);
+            HoverableTab header = new HoverableTab(dockable);
+            Node host = toolbar.getParent();
+            assertNotNull(host);
+            assertEquals(0, host.getOpacity(), 0);
+            host.opacityProperty().addListener((obs, oldValue, newValue) -> {
+                if (newValue.doubleValue() == 1) {
+                    fadedIn.countDown();
+                }
+            });
+            header.hover(true);
+            return header;
+        });
+        assertTrue("Toolbar must fade in on hover", fadedIn.await(5, TimeUnit.SECONDS));
+        CountDownLatch fadedOut = new CountDownLatch(1);
+        runFx(() -> {
+            Node toolbar = tab.lookup(".docking-tab-toolbar");
+            assertEquals(1, toolbar.getOpacity(), 0);
+            toolbar.opacityProperty().addListener((obs, oldValue, newValue) -> {
+                if (newValue.doubleValue() == 0) {
+                    fadedOut.countDown();
+                }
+            });
+            tab.hover(false);
+        });
+        assertTrue("Toolbar must fade out when hover ends", fadedOut.await(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void titleEditingPermissionCanBeBoundAndDisablingItCancelsAnEdit() {
+        runFx(() -> {
+            Dockable dockable = dockable("a");
+            SimpleBooleanProperty allowed = new SimpleBooleanProperty(false);
+            dockable.titleEditableProperty().bind(allowed);
+            DockingContext context = context(dockable);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+
+            dockable.setTitle("Programmatic rename");
+            doubleClick(title(pane, "a"));
+            assertNull(pane.lookup(".docking-tab-title-editor"));
+            assertEquals("Programmatic rename", ((Label) title(pane, "a").lookup(".docking-tab-title")).getText());
+            allowed.set(true);
+            doubleClick(title(pane, "a"));
+            titleEditor(pane).setText("Not allowed to commit");
+            allowed.set(false);
+
+            assertEquals("Programmatic rename", dockable.getTitle());
+            assertNull(pane.lookup(".docking-tab-title-editor"));
+            allowed.set(true);
+            doubleClick(title(pane, "a"));
+            assertEquals("Programmatic rename", titleEditor(pane).getText());
+            press(titleEditor(pane), KeyCode.ESCAPE);
+        });
+    }
+
+    @Test
+    public void doubleClickEditsTitleAndEnterCommitsWithoutRebuildingTheTab() {
+        runFx(() -> {
+            Dockable dockable = dockable("a");
+            DockingContext context = context(dockable);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+            Node header = title(pane, "a");
+            Label label = (Label) header.lookup(".docking-tab-title");
+            doubleClick(label);
+            TextField editor = titleEditor(pane);
+            assertEquals("Title a", editor.getSelectedText());
+            editor.setText("Renamed");
+            assertEquals("Title a", dockable.getTitle());
+            press(editor, KeyCode.ENTER);
+
+            assertEquals("Renamed", dockable.getTitle());
+            assertEquals("Renamed", label.getText());
+            assertSame(header, title(pane, "a"));
+            assertSame(dockable.getContent(), pane.lookup(".docking-tab-content").lookup(".label"));
+            assertNull(pane.lookup(".docking-tab-title-editor"));
+        });
+    }
+
+    @Test
+    public void escapeAndBlankInputLeaveTheTitleUnchanged() {
+        runFx(() -> {
+            Dockable dockable = dockable("a");
+            DockingContext context = context(dockable);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+
+            doubleClick(title(pane, "a"));
+            TextField editor = titleEditor(pane);
+            editor.setText("Discarded");
+            press(editor, KeyCode.ESCAPE);
+            assertEquals("Title a", dockable.getTitle());
+            assertNull(pane.lookup(".docking-tab-title-editor"));
+
+            for (String blank : List.of("", " \t ")) {
+                doubleClick(title(pane, "a"));
+                titleEditor(pane).setText(blank);
+                press(titleEditor(pane), KeyCode.ENTER);
+                assertEquals("Title a", dockable.getTitle());
+                assertNull(pane.lookup(".docking-tab-title-editor"));
+            }
+        });
+    }
+
+    @Test
+    public void titleEditorDoesNotTriggerTabNavigationClosingOrDragging() {
+        runFx(() -> {
+            Dockable first = dockable("a");
+            Dockable second = dockable("b");
+            DockingContext context = context(first, second);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            layout(pane);
+            Node header = title(pane, "b");
+            doubleClick(header);
+            TextField editor = titleEditor(pane);
+            press(editor, KeyCode.LEFT);
+            assertEquals(0, editor.getCaretPosition());
+            assertEquals("", editor.getSelectedText());
+            press(editor, KeyCode.DELETE);
+            assertEquals("itle b", editor.getText());
+            press(editor, KeyCode.SPACE);
+            mouse(editor, MouseEvent.MOUSE_CLICKED, true);
+
+            assertSame(second, pane.getActiveDockable());
+            assertEquals(2, context.getDockables().size());
+            assertSame(editor, titleEditor(pane));
+            AtomicInteger drags = new AtomicInteger();
+            header.addEventHandler(MouseEvent.DRAG_DETECTED, event -> drags.incrementAndGet());
+            mouse(editor, MouseEvent.DRAG_DETECTED, false);
+            assertEquals(0, drags.get());
+        });
+    }
+
+    @Test
+    public void leavingTheTitleEditorCommitsWithoutStealingFocusBack() {
+        DockingPane pane = invoke(() -> {
+            Dockable dockable = dockable("a");
+            DockingContext context = context(dockable);
+            DockingPane result = context.createPane();
+            context.openDockable(result, "a", DockingPosition.CENTER);
+            layout(result);
+            Stage stage = (Stage) result.getScene().getWindow();
+            stage.show();
+            stage.requestFocus();
+            return result;
+        });
+        try {
+            waitForFxEvents();
+            runFx(() -> {
+                doubleClick(title(pane, "a"));
+                TextField editor = titleEditor(pane);
+                assertTrue(editor.isFocused());
+                editor.setText("Committed on blur");
+                pane.getActiveDockable().getContent().requestFocus();
+
+                assertEquals("Committed on blur", pane.getActiveDockable().getTitle());
+                assertNull(pane.lookup(".docking-tab-title-editor"));
+                assertSame(pane.getActiveDockable().getContent(), pane.getScene().getFocusOwner());
+            });
+        } finally {
+            runFx(() -> ((Stage) pane.getScene().getWindow()).close());
+        }
     }
 
     @Test
@@ -176,7 +407,7 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     @Test
-    public void helpIconUsesCssSizingAndThemeColorsForSelectedAndUnselectedTabs() {
+    public void actionButtonsAreIconOnlyAcrossThemesAndTabStates() {
         runFx(() -> {
             Dockable dockable = dockable("a");
             dockable.setOnHelp(() -> {});
@@ -187,16 +418,38 @@ public class DockingPaneTest extends FxTestBase {
             layout(pane);
             Scene scene = pane.getScene();
             scene.getStylesheets().add(getClass().getResource("docking-drag-theme.css").toExternalForm());
-            GemsFXAtlantaFX.applyTo(scene);
-            scene.getRoot().applyCss();
-            FontIcon icon = (FontIcon) ((Button) title(pane, "a").lookup(".docking-tab-help-button")).getGraphic();
-            assertEquals(12, icon.getIconSize());
-            assertEquals(Color.WHITE, icon.getIconColor());
-
-            pane.selectDockable("a");
-            scene.getRoot().applyCss();
-            FontIcon selectedIcon = (FontIcon) ((Button) title(pane, "a").lookup(".docking-tab-help-button")).getGraphic();
-            assertEquals(Color.web("#333333"), selectedIcon.getIconColor());
+            for (boolean themed : List.of(false, true)) {
+                if (themed) {
+                    GemsFXAtlantaFX.applyTo(scene);
+                }
+                for (String selectedId : List.of("b", "a")) {
+                    pane.selectDockable(selectedId);
+                    Node tab = title(pane, "a");
+                    Button close = (Button) tab.lookup(".docking-tab-close-button");
+                    Button help = (Button) tab.lookup(".docking-tab-help-button");
+                    FontIcon icon = (FontIcon) help.getGraphic();
+                    for (String state : List.of("normal", "hover", "armed")) {
+                        for (Button button : List.of(close, help)) {
+                            button.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), state.equals("hover"));
+                            button.pseudoClassStateChanged(PseudoClass.getPseudoClass("armed"), state.equals("armed"));
+                        }
+                        scene.getRoot().applyCss();
+                        assertEquals(12, icon.getIconSize());
+                        for (Button button : List.of(close, help)) {
+                            if (button.getBackground() != null) {
+                                button.getBackground().getFills().forEach(fill ->
+                                        assertEquals(Color.TRANSPARENT, fill.getFill()));
+                            }
+                        }
+                        if (themed) {
+                            Color expected = selectedId.equals("a") ? Color.WHITE : Color.LIME;
+                            assertEquals(expected, icon.getIconColor());
+                            Region closeIcon = (Region) close.getGraphic();
+                            assertEquals(expected, closeIcon.getBackground().getFills().get(0).getFill());
+                        }
+                    }
+                }
+            }
         });
     }
 

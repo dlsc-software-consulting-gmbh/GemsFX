@@ -369,20 +369,29 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     @Test
-    public void closeAndHelpButtonsFadeInWhileTheirTabHeadersAreHovered() throws InterruptedException {
+    public void closeAndHelpButtonsFadeWithTabAndContentAreaHover() throws InterruptedException {
         DockingPane pane = invoke(() -> {
             DockingContext context = new DockingContext(
                     id -> Optional.of(dockable(id)), floatingPane -> new Stage());
             DockingPane created = context.createPane();
             context.openDockable(created, "a", DockingPosition.CENTER).orElseThrow().setOnHelp(() -> {});
             context.openDockable(created, "b", DockingPosition.CENTER).orElseThrow().setOnHelp(() -> {});
+            context.openDockable(created, "c", DockingPosition.RIGHT).orElseThrow().setOnHelp(() -> {});
             return layout(created);
         });
 
-        for (String id : List.of("a", "b")) {
+        for (String target : List.of("a", "b", "content")) {
+            String id = target.equals("content") ? "b" : target;
+            Node hoverTarget = invoke(() -> target.equals("content")
+                    ? pane.getDockables().stream().filter(dockable -> dockable.getId().equals(id))
+                            .findFirst().orElseThrow().getContent().getParent()
+                    : title(pane, id));
             CountDownLatch fadedIn = new CountDownLatch(1);
+            CountDownLatch fadedOut = new CountDownLatch(1);
+            AtomicBoolean fadingOut = new AtomicBoolean();
             AtomicBoolean intermediateOpacity = new AtomicBoolean();
             AtomicBoolean intermediateHelpOpacity = new AtomicBoolean();
+            AtomicBoolean intermediateFadeOut = new AtomicBoolean();
             double width = invoke(() -> {
                 Node tab = title(pane, id);
                 Node close = tab.lookup(".docking-tab-close-button");
@@ -397,12 +406,18 @@ public class DockingContextWindowTest extends FxTestBase {
                 close.opacityProperty().addListener((obs, oldOpacity, newOpacity) -> {
                     if (newOpacity.doubleValue() > 0 && newOpacity.doubleValue() < 1) {
                         intermediateOpacity.set(true);
+                        if (fadingOut.get()) {
+                            intermediateFadeOut.set(true);
+                        }
                     }
                     if (newOpacity.doubleValue() == 1) {
                         fadedIn.countDown();
                     }
+                    if (newOpacity.doubleValue() == 0) {
+                        fadedOut.countDown();
+                    }
                 });
-                fireHover(tab, true);
+                fireHover(hoverTarget, true);
                 pane.applyCss();
                 assertEquals("Hover must start a fade, not instantly reveal the button", 0, close.getOpacity(), 0);
                 return tab.getBoundsInParent().getWidth();
@@ -418,9 +433,34 @@ public class DockingContextWindowTest extends FxTestBase {
                 assertEquals(1, close.getOpacity(), 0);
                 assertEquals(1, help.getOpacity(), 0);
                 assertEquals(width, tab.getBoundsInParent().getWidth(), 0);
+                for (String otherId : List.of("a", "b", "c")) {
+                    if (!otherId.equals(id)) {
+                        Node otherTab = title(pane, otherId);
+                        assertEquals(0, otherTab.lookup(".docking-tab-close-button").getOpacity(), 0);
+                        assertEquals(0, otherTab.lookup(".docking-tab-help-button").getOpacity(), 0);
+                    }
+                }
 
-                fireHover(tab, false);
+                if (target.equals("content")) {
+                    fireHover(tab, true);
+                    fireHover(hoverTarget, false);
+                    assertEquals(1, close.getOpacity(), 0);
+                    fireHover(hoverTarget, true);
+                    fireHover(tab, false);
+                    assertEquals(1, close.getOpacity(), 0);
+                }
+                fadingOut.set(true);
+                fireHover(hoverTarget, false);
                 pane.applyCss();
+                assertEquals("Leaving must fade the button out, not instantly hide it", 1, close.getOpacity(), 0);
+                assertEquals(1, help.getOpacity(), 0);
+            });
+            assertTrue("Close button did not finish fading out", fadedOut.await(5, TimeUnit.SECONDS));
+            runFx(() -> {
+                Node tab = title(pane, id);
+                Node close = tab.lookup(".docking-tab-close-button");
+                Node help = tab.lookup(".docking-tab-help-button");
+                assertTrue("The fade-out must include intermediate opacity values", intermediateFadeOut.get());
                 assertEquals(0, close.getOpacity(), 0);
                 assertEquals(0, help.getOpacity(), 0);
             });

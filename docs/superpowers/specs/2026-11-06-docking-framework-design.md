@@ -73,7 +73,9 @@ tabs in every pane belonging to the context, including floating panes.
 
 Applications can set `Dockable.onHelpProperty()` to a `Runnable` to provide
 help for an individual dockable. The default `DockingTab` then shows a help
-button immediately before Close, sharing its hover-only 300ms fade. A null
+button immediately before Close. Both buttons fade in and out over 150ms
+when the tab or its displayed content area is hovered; other dockables are
+unaffected. Hover changes during a fade reverse from the current opacity. A null
 callback hides the button without reserving layout space. Setting, replacing,
 or removing the callback updates existing tabs immediately; activating Help
 invokes the current callback on the JavaFX application thread without selecting

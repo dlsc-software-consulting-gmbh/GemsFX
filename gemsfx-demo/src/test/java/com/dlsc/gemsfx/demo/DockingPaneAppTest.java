@@ -15,8 +15,12 @@ import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -48,6 +52,64 @@ public class DockingPaneAppTest {
         Platform.startup(started::countDown);
         assertTrue(started.await(10, TimeUnit.SECONDS));
         Platform.setImplicitExit(false);
+    }
+
+    @Test
+    public void editorToolbarTogglesWrappingIndependentlyForEachView() throws Exception {
+        runFx(() -> {
+            DockingPaneApp app = new DockingPaneApp();
+            Dockable editor = app.createDockable("editor").orElseThrow();
+            Dockable copy = app.createSidebarDockable("editor");
+            TextArea text = (TextArea) editor.getContent();
+            CheckBox wrap = (CheckBox) editor.getToolbar();
+            assertNotNull(wrap);
+            assertEquals("Wrap text", wrap.getAccessibleText());
+            boolean initialWrap = text.isWrapText();
+            wrap.fire();
+            assertNotEquals(initialWrap, text.isWrapText());
+            assertEquals(initialWrap, ((TextArea) copy.getContent()).isWrapText());
+            wrap.fire();
+            assertEquals(initialWrap, text.isWrapText());
+        });
+    }
+
+    @Test
+    public void consoleToolbarClearsOnlyItsOwnOutput() throws Exception {
+        runFx(() -> {
+            DockingPaneApp app = new DockingPaneApp();
+            Dockable console = app.createDockable("console").orElseThrow();
+            Dockable copy = app.createSidebarDockable("console");
+            TextArea output = (TextArea) console.getContent().lookup(".text-area");
+            TextArea otherOutput = (TextArea) copy.getContent().lookup(".text-area");
+            String original = otherOutput.getText();
+            assertTrue(!output.getText().isEmpty());
+            Button clear = (Button) console.getToolbar();
+            assertNotNull(clear);
+            assertEquals("Clear output", clear.getAccessibleText());
+            clear.fire();
+            assertEquals("", output.getText());
+            assertEquals(original, otherOutput.getText());
+        });
+    }
+
+    @Test
+    public void navigatorToolbarExpandsAndCollapsesTheWholeTree() throws Exception {
+        runFx(() -> {
+            Dockable navigator = new DockingPaneApp().createDockable("navigator").orElseThrow();
+            TreeView<?> tree = (TreeView<?>) navigator.getContent();
+            HBox toolbar = (HBox) navigator.getToolbar();
+            assertNotNull(toolbar);
+            Button expand = (Button) toolbar.getChildren().get(0);
+            Button collapse = (Button) toolbar.getChildren().get(1);
+            assertEquals("Expand all", expand.getAccessibleText());
+            assertEquals("Collapse all", collapse.getAccessibleText());
+            expand.fire();
+            assertTrue(tree.getRoot().isExpanded());
+            tree.getRoot().getChildren().forEach(item -> assertTrue(item.isExpanded()));
+            collapse.fire();
+            assertTrue(!tree.getRoot().isExpanded());
+            tree.getRoot().getChildren().forEach(item -> assertTrue(!item.isExpanded()));
+        });
     }
 
     @Test
@@ -217,7 +279,7 @@ public class DockingPaneAppTest {
             StackPane root = new StackPane(pane);
             root.getStyleClass().add("docking-demo-app");
             root.setStyle("-color-success-emphasis: #123456; -color-danger-emphasis: #ab3456;"
-                    + " -color-fg-default: #654321; -color-fg-emphasis: #abcdef;");
+                    + " -color-fg-default: #654321; -color-fg-emphasis: #abcdef; -color-neutral-emphasis: #102030;");
             root.getStylesheets().add(DockingPaneApp.class.getResource("docking-pane-app-atlantafx.css").toExternalForm());
             Scene scene = new Scene(root, 800, 600);
             scene.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
@@ -231,6 +293,8 @@ public class DockingPaneAppTest {
                         ((FontIcon) drag.getGraphic()).getIconColor());
                 assertEquals(Color.web(id.equals("drop") ? "#abcdef" : "#654321"),
                         ((FontIcon) drop.getGraphic()).getIconColor());
+                Region closeIcon = (Region) pane.lookup(".docking-tab.selected .docking-tab-close-button .icon");
+                assertEquals(Color.web("#abcdef"), closeIcon.getBackground().getFills().getFirst().getFill());
                 Dockable selected = id.equals("drag") ? drag : drop;
                 FontIcon contentIcon = (FontIcon) selected.getContent().lookup(id.equals("drag")
                         ? ".docking-demo-drag-graphic" : ".docking-demo-target-graphic");

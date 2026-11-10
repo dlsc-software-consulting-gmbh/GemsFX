@@ -454,7 +454,20 @@ public class DockingPaneApp extends GemApplication {
         project.setExpanded(true);
         TreeView<String> tree = new TreeView<>(project);
         tree.setAccessibleText("Mission project files");
-        return new Dockable(id, "Navigator", createIcon(MaterialDesign.MDI_FOLDER), tree);
+        Dockable navigator = new Dockable(id, "Navigator", createIcon(MaterialDesign.MDI_FOLDER), tree);
+        Button expand = createTabToolbarButton(MaterialDesign.MDI_PLUS, "Expand all",
+                () -> setTreeExpanded(project, true));
+        Button collapse = createTabToolbarButton(MaterialDesign.MDI_MINUS, "Collapse all",
+                () -> setTreeExpanded(project, false));
+        HBox toolbar = new HBox(2, expand, collapse);
+        toolbar.setAlignment(Pos.CENTER_LEFT);
+        navigator.setToolbar(toolbar);
+        return navigator;
+    }
+
+    private void setTreeExpanded(TreeItem<?> item, boolean expanded) {
+        item.setExpanded(expanded);
+        item.getChildren().forEach(child -> setTreeExpanded(child, expanded));
     }
 
     private Dockable createEditorDockable(String id) {
@@ -465,6 +478,14 @@ public class DockingPaneApp extends GemApplication {
                         + "    }\n}\n");
         editor.getContent().getStyleClass().add("docking-demo-code");
         editor.getContent().setAccessibleText("MissionControl.java editor");
+        TextArea text = (TextArea) editor.getContent();
+        CheckBox wrap = new CheckBox("Wrap");
+        wrap.setFocusTraversable(false);
+        wrap.setAccessibleText("Wrap text");
+        wrap.setTooltip(new Tooltip("Wrap text"));
+        wrap.setSelected(text.isWrapText());
+        wrap.selectedProperty().bindBidirectional(text.wrapTextProperty());
+        editor.setToolbar(wrap);
         return editor;
     }
 
@@ -500,7 +521,19 @@ public class DockingPaneApp extends GemApplication {
         toolbar.setPadding(new Insets(8));
         BorderPane content = new BorderPane(output);
         content.setTop(toolbar);
-        return new Dockable(id, "Console", createIcon(MaterialDesign.MDI_CONSOLE), content);
+        Dockable console = new Dockable(id, "Console", createIcon(MaterialDesign.MDI_CONSOLE), content);
+        console.setToolbar(createTabToolbarButton(MaterialDesign.MDI_DELETE, "Clear output", output::clear));
+        return console;
+    }
+
+    private Button createTabToolbarButton(Ikon icon, String description, Runnable action) {
+        Button button = new Button("", createIcon(icon));
+        button.setPadding(new Insets(2));
+        button.setFocusTraversable(false);
+        button.setAccessibleText(description);
+        button.setTooltip(new Tooltip(description));
+        button.setOnAction(event -> action.run());
+        return button;
     }
 
     private Dockable createInspectorDockable(String id) {

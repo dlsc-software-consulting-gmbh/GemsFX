@@ -54,10 +54,19 @@
     -fx-font-weight: bold;
 }
 
+.docking-pane .docking-tab-title-editor {
+    -fx-padding: 0 3;
+    -fx-background-insets: 0;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-title-editor {
+    -fx-font-weight: bold;
+}
+
 .docking-pane .docking-tab-close-button,
 .docking-pane .docking-tab-help-button {
     -fx-background-color: transparent;
-    -fx-background-radius: 10;
+    -fx-background-radius: 0;
     -fx-padding: 4;
     -fx-min-width: 18;
     -fx-min-height: 18;
@@ -65,7 +74,7 @@
 
 .docking-pane .docking-tab-close-button:hover,
 .docking-pane .docking-tab-help-button:hover {
-    -fx-background-color: -fx-hover-base;
+    -fx-background-color: transparent;
 }
 
 .docking-pane .docking-tab-close-button .icon {
