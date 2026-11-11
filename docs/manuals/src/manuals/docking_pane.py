@@ -310,6 +310,12 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                     "that group's existing interval."
                 ),
                 Para(
+                    "Minimum and preferred sizes honor the selected content's bias throughout the split hierarchy. "
+                    "Horizontally biased content is measured at each group's allocated width; vertically biased "
+                    "content is measured at its allocated height. This also applies to an empty pane's placeholder. "
+                    "Switching tabs updates the propagated bias to match the newly selected content."
+                ),
+                Para(
                     "A normal drag onto an empty pane moves only the dragged dockable; Shift-drag moves its "
                     "whole tab group. Both show a full-pane preview and work over the placeholder itself or "
                     "any of its child nodes. The source and destination must belong to the same DockingContext."
