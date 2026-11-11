@@ -20,7 +20,7 @@ G = "docking-pane"
 
 MANUAL = Manual(
     control="DockingPane",
-    package="com.dlsc.gemsfx",
+    package="com.dlsc.gemsfx.docking",
     subtitle="A tab-and-split docking control with floating windows and layout snapshots",
     abstract=(
         "DockingPane provides IDE-style docking with draggable tabs, split layouts, "
@@ -44,9 +44,10 @@ MANUAL = Manual(
                 Section("Key features"),
                 Bullets(
                     [
-                        "Custom tab strip with title, optional graphic, and close button per dockable.",
-                        "Split layouts with horizontal/vertical panes and divider positions in [0, 1].",
+                        "Custom tab strip with title, optional graphic, toolbar, help, menu, and close controls.",
+                        "Multi-child horizontal/vertical splits with ordered divider positions in [0, 1].",
                         "Drag-and-drop within one pane and across panes in the same context.",
+                        "Shift-drag to move an entire tab group; drop onto an empty pane's placeholder to populate it.",
                         "Four outer-edge indicators for docking beside the entire pane layout.",
                         "Detaching tabs into app-created floating stages.",
                         "Context-wide snapshot and restore via <font face='Courier'>getLayout()</font> and <font face='Courier'>restoreLayout()</font>.",
@@ -60,7 +61,7 @@ MANUAL = Manual(
     <artifactId>gemsfx</artifactId>
     <version>4.7.0</version>
 </dependency>""",
-                    caption="DockingPane lives in module <font face='Courier'>com.dlsc.gemsfx</font>, package <font face='Courier'>com.dlsc.gemsfx</font>.",
+                    caption="DockingPane lives in module <font face='Courier'>com.dlsc.gemsfx</font>, package <font face='Courier'>com.dlsc.gemsfx.docking</font>.",
                 ),
             ],
         ),
@@ -131,7 +132,12 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                         [
                             "Split node",
                             "Layout node",
-                            "Two child nodes with orientation and divider position.",
+                            "An orientation, at least two ordered children, and one fewer normalized divider positions than children.",
+                        ],
+                        [
+                            "Empty-pane placeholder",
+                            "Node",
+                            "Application-replaceable content shown in an empty pane; accepts dockable drops from the same context.",
                         ],
                         [
                             "Floating pane",
@@ -173,6 +179,18 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                             "Moves one open dockable into a new floating pane and positions its stage.",
                         ),
                         Property(
+                            "canMoveTabGroup(...)",
+                            "boolean",
+                            "false if invalid",
+                            "Checks whether a tab group can move into another group, beside a pane, or into an empty pane.",
+                        ),
+                        Property(
+                            "moveTabGroup(...)",
+                            "boolean",
+                            "false if invalid",
+                            "Moves the entire source group while preserving tab order and selection.",
+                        ),
+                        Property(
                             "getLayout()",
                             "DockingLayout",
                             "snapshot",
@@ -205,7 +223,13 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                             "layoutRoot",
                             "ReadOnlyObjectProperty&lt;DockingLayoutNode&gt;",
                             "Empty",
-                            "Immutable snapshot of this pane tree, updated on structure and selection changes.",
+                            "Immutable snapshot of this pane tree, updated on structure, selection, and divider changes.",
+                        ),
+                        Property(
+                            "placeholder",
+                            "ObjectProperty&lt;Node&gt;",
+                            "DockingPanePlaceholder",
+                            "Content shown in an empty pane. Replace it with a custom node, or set null for a blank pane.",
                         ),
                         Property(
                             "selectDockable(id)",
@@ -214,10 +238,10 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                             "Activates a dockable by ID.",
                         ),
                         Property(
-                            "updateDividerPosition(path, position)",
+                            "updateDividerPositions(path, positions)",
                             "void",
                             "n/a",
-                            "Stores divider movement for snapshot fidelity.",
+                            "Atomically replaces a split's entire divider vector and publishes one layout snapshot.",
                         ),
                         Property(
                             "moveDockable(...)",
@@ -260,6 +284,8 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                         ["Drop on outer top/bottom indicator", "New group spans the full pane width above/below all remaining groups."],
                         ["Drop on outer left/right indicator", "New group spans the full pane height beside all remaining groups."],
                         ["Drop on another pane (same context)", "Cross-pane move; source pane may become empty."],
+                        ["Drop on an empty pane's placeholder", "Moves the dockable into the empty pane and selects it. Placeholder child nodes also accept drops."],
+                        ["Shift-drag a title", "Moves its entire tab group, preserving tab order and the group's selected tab."],
                         ["ESC during drag", "Cancels external floating; no detachment happens."],
                     ],
                     widths=[43, 57],
@@ -267,13 +293,30 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                 Para(
                     "For example, with two groups side by side, drag a tab onto the bottom outer-edge "
                     "indicator to place it below both groups. The preview spans the entire pane width. "
-                    "The source tab is removed first, empty branches collapse, and the remaining layout "
-                    "is wrapped in a new split. The same operation works when dragging from a floating pane "
+                    "The source tab is removed first and empty branches collapse. The new group is added "
+                    "to a matching-orientation split, or a new split is created when orientations differ. "
+                    "The same operation works when dragging from a floating pane "
                     "in the same context. Indicators disappear after dropping, leaving the pane, or canceling."
                 ),
                 Code(
                     'pane.moveDockableToPaneEdge("console", DockingPosition.BOTTOM);',
                     caption="Place the console below the pane's entire remaining layout.",
+                ),
+                Para(
+                    "Consecutive splits with the same orientation are flattened into one multi-child split. "
+                    "Moving a divider therefore resizes the two adjacent items rather than a nested same-axis "
+                    "subtree, subject to the items' minimum and maximum sizes. Opposite-orientation splits "
+                    "remain nested and resize as a unit. Inserting a group beside a dockable subdivides only "
+                    "that group's existing interval."
+                ),
+                Para(
+                    "A normal drag onto an empty pane moves only the dragged dockable; Shift-drag moves its "
+                    "whole tab group. Both show a full-pane preview and work over the placeholder itself or "
+                    "any of its child nodes. The source and destination must belong to the same DockingContext."
+                ),
+                Code(
+                    'pane.setPlaceholder(new DockingPanePlaceholder("Drop dockables here"));',
+                    caption="Customize the default illustrated placeholder's text, or supply any other Node.",
                 ),
                 Para(
                     "Keyboard interactions of the title controls: LEFT/RIGHT switches selected tab, "
@@ -313,6 +356,44 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                     "DockingContext intentionally keeps serialization/versioning outside the library. "
                     "Use <font face='Courier'>getLayout()</font> to capture a DTO graph, then serialize it in your own format."
                 ),
+                Section("Multi-child split snapshots"),
+                Para(
+                    "<font face='Courier'>DockingLayoutNode.Split</font> exposes "
+                    "<font face='Courier'>getOrientation()</font>, <font face='Courier'>getChildren()</font>, "
+                    "and <font face='Courier'>getDividerPositions()</font>. The child and divider lists are "
+                    "immutable defensive copies. For N children there must be exactly N - 1 divider positions, "
+                    "in nondecreasing order within [0, 1]. NaN and infinite values are rejected; equal positions "
+                    "and the endpoints 0 and 1 are valid and represent collapsed intervals."
+                ),
+                Code(
+                    """DockingLayoutNode.Split root = new DockingLayoutNode.Split(
+        Orientation.HORIZONTAL,
+        List.of(
+                new DockingLayoutNode.Tabs(List.of("editor"), "editor"),
+                new DockingLayoutNode.Tabs(List.of("console"), "console"),
+                new DockingLayoutNode.Tabs(List.of("inspector"), "inspector")),
+        List.of(0.35, 0.8));""",
+                    caption="Three groups occupying 35%, 45%, and 20% of a horizontal split.",
+                ),
+                Callout(
+                    "This is a breaking snapshot/API change. Split nodes use children and dividerPositions, "
+                    "not first, second, or dividerPosition. There are no legacy constructors, accessors, or "
+                    "automatic format adapters; update application-owned serializers accordingly.",
+                    kind="note",
+                ),
+                Section("Divider updates"),
+                Para(
+                    "<font face='Courier'>updateDividerPositions(path, positions)</font> validates the entire "
+                    "divider vector before changing the model and publishes one new snapshot per accepted update. "
+                    "Invalid vectors leave the previous layout unchanged. The path is a list of ordered child "
+                    "indices: an empty list addresses the root; <font face='Courier'>List.of(2)</font> addresses "
+                    "a split in the root's third child. Path indices are not limited to 0 and 1."
+                ),
+                Code(
+                    "pane.updateDividerPositions(List.of(), List.of(0.35, 0.8));",
+                    caption="Update both dividers of an existing three-child root split atomically.",
+                ),
+                Section("Capture and restore"),
                 Code(
                     """DockingLayout layout = context.getLayout();
 String json = mySerializer.write(layout); // application-owned
@@ -327,6 +408,18 @@ if (!result.getUnresolvedDockableIds().isEmpty()) {
                 Callout(
                     "Restore validates the layout shape and divider range, and requires exactly one primary pane (the pane layout with null stage bounds).",
                     kind="note",
+                ),
+                Para(
+                    "Restoration accepts same-orientation nesting and canonicalizes it into a flat split, "
+                    "transforming nested divider positions into their parent intervals. Opposite-orientation "
+                    "children remain nested. Captured layouts use the same canonical structure as the renderer, "
+                    "with one JavaFX SplitPane per split node."
+                ),
+                Para(
+                    "Unresolved dockables are reported and removed from the restored layout. Empty groups "
+                    "are removed and one-child splits collapse. A removed group's interval goes to its preceding "
+                    "sibling, or to the following sibling when the first group is removed; other boundaries stay "
+                    "unchanged. The same space-allocation rule applies when dockables are closed or moved away."
                 ),
             ],
         ),
@@ -343,6 +436,9 @@ if (!result.getUnresolvedDockableIds().isEmpty()) {
                         ["<font face='Courier'>.docking-pane</font>", "Control root background and border."],
                         ["<font face='Courier'>.docking-tab-strip</font>", "Tab strip container and spacing."],
                         ["<font face='Courier'>.docking-tab</font>", "Custom title tab shape and hover/selected visuals."],
+                        ["<font face='Courier'>.docking-tab-actions</font>", "Shared fading container for the toolbar, help, menu, and close controls."],
+                        ["<font face='Courier'>.docking-tab-help-button</font>", "Help action supplied by the dockable's onHelp callback."],
+                        ["<font face='Courier'>.docking-tab-menu-button</font>", "Menu populated from the dockable's menuItems list."],
                         ["<font face='Courier'>.docking-tab-close-button</font>", "Close affordance and icon."],
                         ["<font face='Courier'>.docking-split</font>", "SplitPane wrappers created for split layout nodes."],
                         ["<font face='Courier'>.docking-drop-leaf-preview</font>", "Outline of target leaf during drag."],
@@ -351,6 +447,25 @@ if (!result.getUnresolvedDockableIds().isEmpty()) {
                         ["<font face='Courier'>.pane-edge-left/right/top/bottom</font>", "Direction-specific style classes of the outer indicators."],
                     ],
                     widths=[46, 54],
+                ),
+                Para(
+                    "Toolbar, help, menu, and close controls share one hover fade. The actions container becomes "
+                    "unmanaged when its opacity reaches zero, releasing width for the title without changing tab "
+                    "height. Configure optional actions through <font face='Courier'>Dockable.setToolbar(...)</font>, "
+                    "<font face='Courier'>setOnHelp(...)</font>, and <font face='Courier'>getMenuItems()</font>."
+                ),
+                Para(
+                    "The default tab height is fixed by CSS at 2.5em, so it scales with the font size rather than "
+                    "toolbar content. Child controls are vertically centered, use their preferred widths, and are "
+                    "constrained to the available height. Override the preferred height to change all tabs consistently."
+                ),
+                Code(
+                    ".docking-pane .docking-tab {\n"
+                    "    -fx-pref-height: 2.75em;\n"
+                    "    -fx-min-height: -fx-pref-height;\n"
+                    "    -fx-max-height: -fx-pref-height;\n"
+                    "}",
+                    caption="Keep minimum and maximum heights tied to the font-scaled preferred height.",
                 ),
                 Code(
                     ".docking-pane .docking-tab.selected .docking-tab-title {\n"
