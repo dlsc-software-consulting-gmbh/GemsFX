@@ -162,7 +162,7 @@ Add the following dependency to your pom.xml:
 <dependency>
     <groupId>com.dlsc.gemsfx</groupId>
     <artifactId>gemsfx</artifactId>
-    <version>4.8.0</version>
+    <version>4.9.0</version>
 </dependency>
 ```
 
@@ -170,7 +170,7 @@ Add the following dependency to your pom.xml:
 Add the following dependency to your build.gradle:
 <span id="gradle-dependency"></span>
 ```groovy
-implementation 'com.dlsc.gemsfx:gemsfx:4.8.0'
+implementation 'com.dlsc.gemsfx:gemsfx:4.9.0'
 ```
 
 ## Internationalization (gemsfx module)
