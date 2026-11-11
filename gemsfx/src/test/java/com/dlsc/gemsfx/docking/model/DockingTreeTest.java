@@ -27,6 +27,81 @@ public class DockingTreeTest extends FxTestBase {
     }
 
     @Test
+    public void sameAxisInsertionAndRemovalPreserveOtherIntervals() {
+        DockingTree tree = treeWith("a");
+        tree.splitAt("a", dockable("b"), DockingPosition.RIGHT, 0.2);
+        tree.splitAt("b", dockable("c"), DockingPosition.RIGHT, 0.375);
+        tree.splitAt("c", dockable("d"), DockingPosition.RIGHT, 0.6);
+        tree.setDividerPositions(List.of(), List.of(0.2, 0.5, 0.8));
+        tree.splitAt("b", dockable("e"), DockingPosition.RIGHT, 0.5);
+        assertEquals(List.of("a", "b", "e", "c", "d"), tree.dockableIds());
+        assertEquals(List.of(0.2, 0.35, 0.5, 0.8),
+                ((DockingLayoutNode.Split) tree.snapshot()).getDividerPositions());
+        tree.remove("e");
+        assertEquals(List.of(0.2, 0.5, 0.8),
+                ((DockingLayoutNode.Split) tree.snapshot()).getDividerPositions());
+        tree.remove("b");
+        assertEquals(List.of("a", "c", "d"), tree.dockableIds());
+        assertEquals(List.of(0.5, 0.8),
+                ((DockingLayoutNode.Split) tree.snapshot()).getDividerPositions());
+        tree.remove("a");
+        assertEquals(List.of("c", "d"), tree.dockableIds());
+        assertEquals(List.of(0.8),
+                ((DockingLayoutNode.Split) tree.snapshot()).getDividerPositions());
+    }
+
+    @Test
+    public void dividerVectorsUpdateAtomicallyAndAddressAnyChild() {
+        DockingTree tree = treeWith("a");
+        tree.splitAt("a", dockable("b"), DockingPosition.RIGHT, 0.3);
+        tree.splitAt("b", dockable("c"), DockingPosition.RIGHT, 0.5);
+        tree.splitAt("c", dockable("d"), DockingPosition.BOTTOM, 0.4);
+        tree.setDividerPositions(List.of(2), List.of(0.7));
+        assertThrows(IllegalArgumentException.class,
+                () -> tree.setDividerPositions(List.of(), List.of(0.9, 0.1)));
+        assertArrayEquals(new double[]{0.3, 0.65},
+                ((DockingLayoutNode.Split) tree.snapshot()).getDividerPositions().stream()
+                        .mapToDouble(Double::doubleValue).toArray(), 1e-9);
+        DockingLayoutNode.Split root = (DockingLayoutNode.Split) tree.snapshot();
+        assertEquals(List.of(0.7), ((DockingLayoutNode.Split) root.getChildren().get(2)).getDividerPositions());
+    }
+
+    @Test
+    public void removalFlattensNewlyAdjacentMatchingOrientations() {
+        DockingTree tree = new DockingTree();
+        DockingLayoutNode.Tabs a = new DockingLayoutNode.Tabs(List.of("a"), "a");
+        DockingLayoutNode.Tabs b = new DockingLayoutNode.Tabs(List.of("b"), "b");
+        DockingLayoutNode.Tabs c = new DockingLayoutNode.Tabs(List.of("c"), "c");
+        DockingLayoutNode.Tabs d = new DockingLayoutNode.Tabs(List.of("d"), "d");
+        DockingLayoutNode.Tabs e = new DockingLayoutNode.Tabs(List.of("e"), "e");
+        tree.restore(new DockingLayoutNode.Split(Orientation.HORIZONTAL, List.of(a,
+                new DockingLayoutNode.Split(Orientation.VERTICAL, List.of(b,
+                        new DockingLayoutNode.Split(Orientation.HORIZONTAL, List.of(c, d), List.of(0.5))),
+                        List.of(0.4)), e), List.of(0.2, 0.8)));
+        tree.remove("b");
+        DockingLayoutNode.Split root = (DockingLayoutNode.Split) tree.snapshot();
+        assertEquals(List.of("a", "c", "d", "e"), tree.dockableIds());
+        assertEquals(4, root.getChildren().size());
+        assertEquals(List.of(0.2, 0.5, 0.8), root.getDividerPositions());
+    }
+
+    @Test
+    public void restoreFlattensCollapsedIntervalsAndRejectsDuplicateIdsAtomically() {
+        DockingTree tree = treeWith("original");
+        DockingLayoutNode.Tabs a = new DockingLayoutNode.Tabs(List.of("a"), "a");
+        DockingLayoutNode.Tabs b = new DockingLayoutNode.Tabs(List.of("b"), "b");
+        DockingLayoutNode.Tabs c = new DockingLayoutNode.Tabs(List.of("c"), "c");
+        assertThrows(IllegalArgumentException.class, () -> tree.restore(
+                new DockingLayoutNode.Split(Orientation.HORIZONTAL, List.of(a, a), List.of(0.5))));
+        assertEquals(List.of("original"), tree.dockableIds());
+        tree.restore(new DockingLayoutNode.Split(Orientation.HORIZONTAL, List.of(a,
+                new DockingLayoutNode.Split(Orientation.HORIZONTAL, List.of(b, c), List.of(0.5))), List.of(1.0)));
+        DockingLayoutNode.Split root = (DockingLayoutNode.Split) tree.snapshot();
+        assertEquals(3, root.getChildren().size());
+        assertEquals(List.of(1.0, 1.0), root.getDividerPositions());
+    }
+
+    @Test
     public void newTreeHasEmptyRoot() {
         DockingTree tree = new DockingTree();
         assertTrue(tree.dockableIds().isEmpty());
@@ -57,8 +132,8 @@ public class DockingTreeTest extends FxTestBase {
             tree.splitAt("a", dockable("n"), (DockingPosition) c[0], 0.3);
             DockingSplit split = (DockingSplit) tree.root();
             assertEquals(c[1], split.getOrientation());
-            assertEquals(0.3, split.getDividerPosition(), 0);
-            String firstId = ((DockingTabGroup) split.getFirst()).getDockableIds().get(0);
+            assertEquals(0.3, split.getDividerPositions().get(0), 0);
+            String firstId = ((DockingTabGroup) split.getChildren().get(0)).getDockableIds().get(0);
             assertEquals((boolean) c[2], firstId.equals("n"));
         }
     }
@@ -125,14 +200,21 @@ public class DockingTreeTest extends FxTestBase {
 
             DockingLayoutNode.Split outer = (DockingLayoutNode.Split) tree.snapshot();
             assertEquals(testCase[1], outer.getOrientation());
-            DockingLayoutNode moved = (boolean) testCase[2] ? outer.getFirst() : outer.getSecond();
-            DockingLayoutNode.Split remainder = (DockingLayoutNode.Split)
-                    ((boolean) testCase[2] ? outer.getSecond() : outer.getFirst());
+            boolean first = (boolean) testCase[2];
+            DockingLayoutNode moved = outer.getChildren().get(first ? 0 : outer.getChildren().size() - 1);
             assertEquals(List.of("tools"), ((DockingLayoutNode.Tabs) moved).getDockableIds());
-            assertEquals(Orientation.HORIZONTAL, remainder.getOrientation());
-            assertEquals(0.4, remainder.getDividerPosition(), 0);
-            assertEquals(List.of("left"), ((DockingLayoutNode.Tabs) remainder.getFirst()).getDockableIds());
-            assertEquals(List.of("right"), ((DockingLayoutNode.Tabs) remainder.getSecond()).getDockableIds());
+            if (outer.getOrientation() == Orientation.HORIZONTAL) {
+                assertEquals(3, outer.getChildren().size());
+                assertEquals(first ? List.of(0.5, 0.7) : List.of(0.2, 0.5), outer.getDividerPositions());
+                assertEquals(List.of("left"), ((DockingLayoutNode.Tabs) outer.getChildren().get(first ? 1 : 0)).getDockableIds());
+                assertEquals(List.of("right"), ((DockingLayoutNode.Tabs) outer.getChildren().get(first ? 2 : 1)).getDockableIds());
+            } else {
+                DockingLayoutNode.Split remainder = (DockingLayoutNode.Split) outer.getChildren().get(first ? 1 : 0);
+                assertEquals(Orientation.HORIZONTAL, remainder.getOrientation());
+                assertEquals(0.4, remainder.getDividerPositions().get(0), 0);
+                assertEquals(List.of("left"), ((DockingLayoutNode.Tabs) remainder.getChildren().get(0)).getDockableIds());
+                assertEquals(List.of("right"), ((DockingLayoutNode.Tabs) remainder.getChildren().get(1)).getDockableIds());
+            }
             assertEquals(3, tree.dockableIds().size());
         }
     }
@@ -146,8 +228,8 @@ public class DockingTreeTest extends FxTestBase {
 
         DockingLayoutNode.Split root = (DockingLayoutNode.Split) tree.snapshot();
         assertEquals(Orientation.VERTICAL, root.getOrientation());
-        assertEquals(List.of("right"), ((DockingLayoutNode.Tabs) root.getFirst()).getDockableIds());
-        assertEquals(List.of("left"), ((DockingLayoutNode.Tabs) root.getSecond()).getDockableIds());
+        assertEquals(List.of("right"), ((DockingLayoutNode.Tabs) root.getChildren().get(0)).getDockableIds());
+        assertEquals(List.of("left"), ((DockingLayoutNode.Tabs) root.getChildren().get(1)).getDockableIds());
     }
 
     @Test
@@ -186,7 +268,7 @@ public class DockingTreeTest extends FxTestBase {
         tree.splitAt("b", dockable("c"), DockingPosition.BOTTOM, 0.6);
         DockingLayoutNode.Split split = (DockingLayoutNode.Split) tree.snapshot();
         assertEquals(Orientation.HORIZONTAL, split.getOrientation());
-        DockingLayoutNode.Split inner = (DockingLayoutNode.Split) split.getSecond();
+        DockingLayoutNode.Split inner = (DockingLayoutNode.Split) split.getChildren().get(1);
         assertEquals(Orientation.VERTICAL, inner.getOrientation());
         assertEquals(List.of("a", "b", "c"), tree.dockableIds());
     }
@@ -197,12 +279,12 @@ public class DockingTreeTest extends FxTestBase {
         tree.splitAt("a", dockable("b"), DockingPosition.RIGHT, 0.5);
         tree.splitAt("b", dockable("c"), DockingPosition.BOTTOM, 0.5);
 
-        tree.setDividerPosition(List.of(1), 0.3);
-        tree.setDividerPosition(List.of(), 0.7);
+        tree.setDividerPositions(List.of(1), List.of(0.3));
+        tree.setDividerPositions(List.of(), List.of(0.7));
 
         DockingLayoutNode.Split root = (DockingLayoutNode.Split) tree.snapshot();
-        assertEquals(0.7, root.getDividerPosition(), 1e-9);
-        assertEquals(0.3, ((DockingLayoutNode.Split) root.getSecond()).getDividerPosition(), 1e-9);
+        assertEquals(0.7, root.getDividerPositions().get(0), 1e-9);
+        assertEquals(0.3, ((DockingLayoutNode.Split) root.getChildren().get(1)).getDividerPositions().get(0), 1e-9);
     }
 
     @Test
@@ -210,12 +292,12 @@ public class DockingTreeTest extends FxTestBase {
         DockingTree tree = treeWith("a");
         tree.splitAt("a", dockable("b"), DockingPosition.RIGHT, 0.5);
 
-        assertThrows(IllegalArgumentException.class, () -> tree.setDividerPosition(List.of(), 1.1));
-        assertThrows(IllegalArgumentException.class, () -> tree.setDividerPosition(List.of(), -0.1));
-        assertThrows(IllegalArgumentException.class, () -> tree.setDividerPosition(List.of(), Double.NaN));
-        assertThrows(IllegalArgumentException.class, () -> tree.setDividerPosition(List.of(), Double.POSITIVE_INFINITY));
-        assertThrows(IllegalArgumentException.class, () -> tree.setDividerPosition(List.of(0), 0.4));
-        assertEquals(0.5, ((DockingLayoutNode.Split) tree.snapshot()).getDividerPosition(), 1e-9);
+        assertThrows(IllegalArgumentException.class, () -> tree.setDividerPositions(List.of(), List.of(1.1)));
+        assertThrows(IllegalArgumentException.class, () -> tree.setDividerPositions(List.of(), List.of(-0.1)));
+        assertThrows(IllegalArgumentException.class, () -> tree.setDividerPositions(List.of(), List.of(Double.NaN)));
+        assertThrows(IllegalArgumentException.class, () -> tree.setDividerPositions(List.of(), List.of(Double.POSITIVE_INFINITY)));
+        assertThrows(IllegalArgumentException.class, () -> tree.setDividerPositions(List.of(0), List.of(0.4)));
+        assertEquals(0.5, ((DockingLayoutNode.Split) tree.snapshot()).getDividerPositions().get(0), 1e-9);
     }
 
     @Test
@@ -223,9 +305,9 @@ public class DockingTreeTest extends FxTestBase {
         DockingTree tree = treeWith("a");
         tree.splitAt("a", dockable("b"), DockingPosition.RIGHT, 0.5);
 
-        tree.setDividerPosition(List.of(), 0.0);
-        assertEquals(0.0, ((DockingLayoutNode.Split) tree.snapshot()).getDividerPosition(), 0);
-        tree.setDividerPosition(List.of(), 1.0);
-        assertEquals(1.0, ((DockingLayoutNode.Split) tree.snapshot()).getDividerPosition(), 0);
+        tree.setDividerPositions(List.of(), List.of(0.0));
+        assertEquals(0.0, ((DockingLayoutNode.Split) tree.snapshot()).getDividerPositions().get(0), 0);
+        tree.setDividerPositions(List.of(), List.of(1.0));
+        assertEquals(1.0, ((DockingLayoutNode.Split) tree.snapshot()).getDividerPositions().get(0), 0);
     }
 }

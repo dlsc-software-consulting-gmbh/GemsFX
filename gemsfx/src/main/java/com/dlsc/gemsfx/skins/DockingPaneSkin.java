@@ -192,10 +192,18 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         if (oldLayout instanceof DockingLayoutNode.Split && newLayout instanceof DockingLayoutNode.Split) {
             DockingLayoutNode.Split oldSplit = (DockingLayoutNode.Split) oldLayout;
             DockingLayoutNode.Split newSplit = (DockingLayoutNode.Split) newLayout;
-            return oldSplit.getOrientation() == newSplit.getOrientation()
-                    && oldSplit.getDividerPosition() == newSplit.getDividerPosition()
-                    && collectSelectionOnlyChanges(oldSplit.getFirst(), newSplit.getFirst(), selectedIds)
-                    && collectSelectionOnlyChanges(oldSplit.getSecond(), newSplit.getSecond(), selectedIds);
+            if (oldSplit.getOrientation() != newSplit.getOrientation()
+                    || !oldSplit.getDividerPositions().equals(newSplit.getDividerPositions())
+                    || oldSplit.getChildren().size() != newSplit.getChildren().size()) {
+                return false;
+            }
+            for (int i = 0; i < oldSplit.getChildren().size(); i++) {
+                if (!collectSelectionOnlyChanges(oldSplit.getChildren().get(i),
+                        newSplit.getChildren().get(i), selectedIds)) {
+                    return false;
+                }
+            }
+            return true;
         }
         return oldLayout instanceof DockingLayoutNode.Empty && newLayout instanceof DockingLayoutNode.Empty;
     }
@@ -293,12 +301,12 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             SplitPane splitPane = new SplitPane();
             splitPane.getStyleClass().add("docking-split");
             splitPane.setOrientation(split.getOrientation());
-            List<Double> positions = new ArrayList<>();
-            List<SplitRange> ranges = new ArrayList<>();
-            collectSplitItems(splitPane, split, path, 0, 1, positions, ranges);
-            splitPane.setDividerPositions(positions.stream().mapToDouble(Double::doubleValue).toArray());
+            for (int i = 0; i < split.getChildren().size(); i++) {
+                splitPane.getItems().add(render(split.getChildren().get(i), child(path, i)));
+            }
+            splitPane.setDividerPositions(split.getDividerPositions().stream().mapToDouble(Double::doubleValue).toArray());
             for (SplitPane.Divider divider : splitPane.getDividers()) {
-                divider.positionProperty().addListener((obs, old, value) -> syncDividers(splitPane, ranges));
+                divider.positionProperty().addListener((obs, old, value) -> syncDividers(splitPane, path));
             }
             return splitPane;
         }
@@ -315,68 +323,32 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return child;
     }
 
-    private void collectSplitItems(SplitPane pane, DockingLayoutNode node, List<Integer> path,
-                                   double start, double end, List<Double> positions, List<SplitRange> ranges) {
-        if (node instanceof DockingLayoutNode.Split
-                && ((DockingLayoutNode.Split) node).getOrientation() == pane.getOrientation()) {
-            DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-            int first = pane.getItems().size();
-            double boundary = start + (end - start) * split.getDividerPosition();
-            collectSplitItems(pane, split.getFirst(), child(path, 0), start, boundary, positions, ranges);
-            int middle = pane.getItems().size();
-            positions.add(boundary);
-            collectSplitItems(pane, split.getSecond(), child(path, 1), boundary, end, positions, ranges);
-            ranges.add(new SplitRange(path, first, middle, pane.getItems().size(), split.getDividerPosition()));
-        } else {
-            pane.getItems().add(render(node, path));
-        }
-    }
-
     // The model is updated while dragging; the visible split already shows the position, so it must not be rebuilt.
-    private void syncDividers(SplitPane pane, List<SplitRange> ranges) {
+    private void syncDividers(SplitPane pane, List<Integer> path) {
         if (syncingDivider) {
             return;
         }
-        double[] positions = pane.getDividerPositions();
-        double[] boundaries = new double[positions.length + 2];
-        boundaries[boundaries.length - 1] = 1;
-        for (int i = 0; i < positions.length; i++) {
-            if (!(positions[i] >= boundaries[i] && positions[i] <= 1)) {
+        List<Double> positions = new ArrayList<>();
+        double previous = 0;
+        for (double position : pane.getDividerPositions()) {
+            if (!(position >= previous && position <= 1)) {
                 return;
             }
-            boundaries[i + 1] = positions[i];
+            positions.add(position);
+            previous = position;
+        }
+        DockingLayoutNode node = getSkinnable().getLayoutRoot();
+        for (int index : path) {
+            node = ((DockingLayoutNode.Split) node).getChildren().get(index);
+        }
+        if (positions.equals(((DockingLayoutNode.Split) node).getDividerPositions())) {
+            return;
         }
         syncingDivider = true;
         try {
-            for (SplitRange range : ranges) {
-                double size = boundaries[range.end] - boundaries[range.start];
-                // A collapsed subtree has no measurable ratio; retain its last model proportion.
-                if (size > 0) {
-                    double position = (boundaries[range.middle] - boundaries[range.start]) / size;
-                    if (position != range.position) {
-                        getSkinnable().updateDividerPosition(range.path, position);
-                        range.position = position;
-                    }
-                }
-            }
+            getSkinnable().updateDividerPositions(path, positions);
         } finally {
             syncingDivider = false;
-        }
-    }
-
-    private static final class SplitRange {
-        private final List<Integer> path;
-        private final int start;
-        private final int middle;
-        private final int end;
-        private double position;
-
-        private SplitRange(List<Integer> path, int start, int middle, int end, double position) {
-            this.path = path;
-            this.start = start;
-            this.middle = middle;
-            this.end = end;
-            this.position = position;
         }
     }
 
@@ -532,8 +504,10 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         DockingPane pane = getSkinnable();
         boolean wholeGroup = isTabGroupDrag(event);
         showPaneEdgeTargets(draggedId, wholeGroup);
-        if (wholeGroup && pane.getLayoutRoot() instanceof DockingLayoutNode.Empty && isInsidePane(event)
-                && pane.getDockingContext().canMoveTabGroup(pane, draggedId, null, DockingPosition.CENTER)) {
+        if (pane.getLayoutRoot() instanceof DockingLayoutNode.Empty && isInsidePane(event)
+                && (wholeGroup
+                ? pane.getDockingContext().canMoveTabGroup(pane, draggedId, null, DockingPosition.CENTER)
+                : pane.canMoveDockableToPaneEdge(draggedId, DockingPosition.LEFT))) {
             showEmptyPanePreview();
             event.acceptTransferModes(TransferMode.MOVE);
             event.consume();
@@ -572,8 +546,10 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         showPaneEdgeTargets(draggedId, wholeGroup);
         DockingPosition paneEdge = resolvePaneEdgeTarget(event.getX(), event.getY());
         boolean moved;
-        if (wholeGroup && pane.getLayoutRoot() instanceof DockingLayoutNode.Empty && isInsidePane(event)) {
-            moved = pane.getDockingContext().moveTabGroup(pane, draggedId, null, DockingPosition.CENTER);
+        if (pane.getLayoutRoot() instanceof DockingLayoutNode.Empty && isInsidePane(event)) {
+            moved = wholeGroup
+                    ? pane.getDockingContext().moveTabGroup(pane, draggedId, null, DockingPosition.CENTER)
+                    : pane.moveDockableToPaneEdge(draggedId, DockingPosition.LEFT);
         } else if (paneEdge != null) {
             moved = wholeGroup ? pane.getDockingContext().moveTabGroup(pane, draggedId, null, paneEdge)
                     : pane.moveDockableToPaneEdge(draggedId, paneEdge);

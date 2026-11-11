@@ -91,35 +91,42 @@ public interface DockingLayoutNode {
     }
     
     /**
-     * Represents a split layout dividing two child nodes.
+     * A split with ordered children and normalized divider positions.
      */
     final class Split implements DockingLayoutNode {
         private final Orientation orientation;
-        private final double dividerPosition;
-        private final DockingLayoutNode first;
-        private final DockingLayoutNode second;
-        
+        private final List<DockingLayoutNode> children;
+        private final List<Double> dividerPositions;
+
         /**
-         * Constructs a Split layout node.
+         * Constructs an immutable split layout node.
          *
-         * @param orientation     the orientation of the split (HORIZONTAL or VERTICAL), must not be null
-         * @param dividerPosition the divider position (typically 0.0 to 1.0), must be a finite number
-         * @param first           the first child node, must not be null
-         * @param second          the second child node, must not be null
-         * @throws IllegalArgumentException if any parameter is null or dividerPosition is not finite
+         * @param orientation the non-null split orientation
+         * @param children at least two non-null children in layout order
+         * @param dividerPositions one fewer positions than children, finite and nondecreasing within [0, 1]
+         * @throws IllegalArgumentException if the child count or positions are invalid
+         * @throws NullPointerException if an argument or child is null
          */
-        public Split(Orientation orientation, double dividerPosition, DockingLayoutNode first, DockingLayoutNode second) {
+        public Split(Orientation orientation, List<DockingLayoutNode> children, List<Double> dividerPositions) {
             this.orientation = Objects.requireNonNull(orientation, "orientation must not be null");
-            
-            if (!Double.isFinite(dividerPosition)) {
-                throw new IllegalArgumentException("dividerPosition must be finite");
+            this.children = List.copyOf(Objects.requireNonNull(children, "children must not be null"));
+            if (children.size() < 2) {
+                throw new IllegalArgumentException("A split must contain at least two children");
             }
-            this.dividerPosition = dividerPosition;
-            
-            this.first = Objects.requireNonNull(first, "first must not be null");
-            this.second = Objects.requireNonNull(second, "second must not be null");
+            Objects.requireNonNull(dividerPositions, "dividerPositions must not be null");
+            if (dividerPositions.size() != children.size() - 1) {
+                throw new IllegalArgumentException("A split must have one fewer divider positions than children");
+            }
+            double previous = 0;
+            for (Double position : dividerPositions) {
+                if (position == null || !(position >= previous && position <= 1)) {
+                    throw new IllegalArgumentException("Divider positions must be finite, ordered, and within [0, 1]");
+                }
+                previous = position;
+            }
+            this.dividerPositions = List.copyOf(dividerPositions);
         }
-        
+
         /**
          * Returns the orientation of this split.
          *
@@ -128,32 +135,23 @@ public interface DockingLayoutNode {
         public Orientation getOrientation() {
             return orientation;
         }
-        
+
         /**
-         * Returns the divider position.
+         * Returns immutable normalized divider positions. Equal positions and endpoints allow collapsed areas.
          *
-         * @return the divider position
+         * @return the ordered divider positions
          */
-        public double getDividerPosition() {
-            return dividerPosition;
+        public List<Double> getDividerPositions() {
+            return dividerPositions;
         }
-        
+
         /**
-         * Returns the first child node.
+         * Returns the immutable child nodes in layout order.
          *
-         * @return the first node
+         * @return the ordered children
          */
-        public DockingLayoutNode getFirst() {
-            return first;
-        }
-        
-        /**
-         * Returns the second child node.
-         *
-         * @return the second node
-         */
-        public DockingLayoutNode getSecond() {
-            return second;
+        public List<DockingLayoutNode> getChildren() {
+            return children;
         }
     }
 }

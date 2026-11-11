@@ -42,6 +42,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -284,9 +285,10 @@ public class DockingPaneAppTest {
     public void layoutJsonIncludesSplitsSelectionsFloatingBoundsAndEmptyPanes() throws Exception {
         DockingLayout layout = new DockingLayout("main", List.of(
                 new DockingLayout.PaneLayout("main",
-                        new DockingLayoutNode.Split(Orientation.HORIZONTAL, 0.35,
+                        new DockingLayoutNode.Split(Orientation.HORIZONTAL, List.of(
                                 new DockingLayoutNode.Tabs(List.of("editor", "console"), "console"),
-                                new DockingLayoutNode.Tabs(List.of("preview"), "preview")), null),
+                                new DockingLayoutNode.Tabs(List.of("preview"), "preview"),
+                                new DockingLayoutNode.Tabs(List.of("logs"), "logs")), List.of(0.35, 0.8)), null),
                 new DockingLayout.PaneLayout("floating",
                         new DockingLayoutNode.Tabs(List.of("inspector"), "inspector"),
                         new DockingLayout.StageBounds(100, 200, 640, 480)),
@@ -300,10 +302,17 @@ public class DockingPaneAppTest {
         assertEquals(3, parsed.path("panes").size());
         JsonNode main = parsed.path("panes").get(0).path("root");
         assertEquals("HORIZONTAL", main.path("orientation").asText());
-        assertEquals(0.35, main.path("dividerPosition").asDouble());
-        assertEquals("console", main.path("first").path("selectedId").asText());
-        assertEquals(2, main.path("first").path("dockableIds").size());
-        assertEquals("preview", main.path("second").path("selectedId").asText());
+        assertEquals(2, main.path("dividerPositions").size());
+        assertEquals(0.35, main.path("dividerPositions").get(0).asDouble());
+        assertEquals(0.8, main.path("dividerPositions").get(1).asDouble());
+        assertEquals(3, main.path("children").size());
+        assertEquals("console", main.path("children").get(0).path("selectedId").asText());
+        assertEquals(2, main.path("children").get(0).path("dockableIds").size());
+        assertEquals("preview", main.path("children").get(1).path("selectedId").asText());
+        assertEquals("logs", main.path("children").get(2).path("selectedId").asText());
+        assertFalse(main.has("dividerPosition"));
+        assertFalse(main.has("first"));
+        assertFalse(main.has("second"));
         JsonNode floating = parsed.path("panes").get(1);
         assertEquals("inspector", floating.path("root").path("selectedId").asText());
         assertEquals(640, floating.path("stageBounds").path("width").asInt());

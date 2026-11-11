@@ -61,9 +61,11 @@ public class DockingContextRestoreTest extends FxTestBase {
         DockingLayoutNode.Split e = (DockingLayoutNode.Split) expected;
         DockingLayoutNode.Split a = (DockingLayoutNode.Split) actual;
         assertEquals(e.getOrientation(), a.getOrientation());
-        assertEquals(e.getDividerPosition(), a.getDividerPosition(), 1e-9);
-        assertLayoutNodeEquals(e.getFirst(), a.getFirst());
-        assertLayoutNodeEquals(e.getSecond(), a.getSecond());
+        assertEquals(e.getDividerPositions(), a.getDividerPositions());
+        assertEquals(e.getChildren().size(), a.getChildren().size());
+        for (int i = 0; i < e.getChildren().size(); i++) {
+            assertLayoutNodeEquals(e.getChildren().get(i), a.getChildren().get(i));
+        }
     }
 
     private static void assertStageBoundsEquals(DockingLayout.StageBounds expected, DockingLayout.StageBounds actual) {
@@ -105,11 +107,11 @@ public class DockingContextRestoreTest extends FxTestBase {
             source.openDockable(primary, "b", DockingPosition.CENTER);
             source.openDockable(primary, "c", DockingPosition.RIGHT);
             primary.selectDockable("a");
-            primary.updateDividerPosition(List.of(), 0.3);
+            primary.updateDividerPositions(List.of(), List.of(0.3));
 
             DockingPane floating = source.floatDockable("b", 111, 222);
             source.openDockable(floating, "d", DockingPosition.BOTTOM);
-            floating.updateDividerPosition(List.of(), 0.7);
+            floating.updateDividerPositions(List.of(), List.of(0.7));
             Stage floatingStage = sourceStages.get().get(0);
             floatingStage.setWidth(555);
             floatingStage.setHeight(333);
@@ -260,11 +262,10 @@ public class DockingContextRestoreTest extends FxTestBase {
                     new DockingLayout.PaneLayout("main",
                             new DockingLayoutNode.Split(
                                     Orientation.HORIZONTAL,
-                                    0.5,
-                                    new DockingLayoutNode.Tabs(
+                                    List.of(new DockingLayoutNode.Tabs(
                                             List.of("editor:main", "tool:removed"), "editor:main"),
                                     new DockingLayoutNode.Tabs(
-                                            List.of("tool:also-removed"), "tool:also-removed")),
+                                            List.of("tool:also-removed"), "tool:also-removed")), List.of(0.5)),
                             null)));
 
             DockingRestoreResult result = context.restoreLayout(layout);
@@ -274,6 +275,27 @@ public class DockingContextRestoreTest extends FxTestBase {
             DockingLayoutNode.Tabs tabs = (DockingLayoutNode.Tabs) restored.getPanes().get(0).getRoot();
             assertEquals(List.of("editor:main"), tabs.getDockableIds());
             return null;
+        });
+    }
+
+    @Test
+    public void unresolvedMiddleGroupsGiveTheirSpaceToThePreviousSibling() {
+        runFx(() -> {
+            DockingContext context = new DockingContext(id -> id.equals("missing")
+                    ? Optional.empty() : Optional.of(dockable(id)), pane -> new Stage());
+            DockingPane pane = context.createPane();
+            DockingLayoutNode.Split split = new DockingLayoutNode.Split(Orientation.HORIZONTAL, List.of(
+                    new DockingLayoutNode.Tabs(List.of("a"), "a"),
+                    new DockingLayoutNode.Tabs(List.of("missing"), "missing"),
+                    new DockingLayoutNode.Tabs(List.of("c"), "c"),
+                    new DockingLayoutNode.Tabs(List.of("d"), "d")), List.of(0.2, 0.5, 0.8));
+            DockingRestoreResult result = context.restoreLayout(new DockingLayout("main",
+                    List.of(new DockingLayout.PaneLayout("main", split, null))));
+            assertEquals(Set.of("missing"), result.getUnresolvedDockableIds());
+            DockingLayoutNode.Split restored = (DockingLayoutNode.Split) pane.getLayoutRoot();
+            assertEquals(3, restored.getChildren().size());
+            assertEquals(List.of(0.5, 0.8), restored.getDividerPositions());
+            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) restored.getChildren().get(0)).getDockableIds());
         });
     }
 
@@ -325,14 +347,13 @@ public class DockingContextRestoreTest extends FxTestBase {
             DockingPane pane = context.createPane();
             context.openDockable(pane, "existing", DockingPosition.CENTER);
             DockingLayout before = context.getLayout();
-            DockingLayout invalid = new DockingLayout("main", List.of(
+            assertThrows(IllegalArgumentException.class, () -> new DockingLayout("main", List.of(
                     new DockingLayout.PaneLayout("main",
-                            new DockingLayoutNode.Split(Orientation.HORIZONTAL, 1.1,
+                            new DockingLayoutNode.Split(Orientation.HORIZONTAL, List.of(
                                     new DockingLayoutNode.Tabs(List.of("left"), "left"),
-                                    new DockingLayoutNode.Tabs(List.of("right"), "right")),
-                            null)));
+                                    new DockingLayoutNode.Tabs(List.of("right"), "right")), List.of(1.1)),
+                            null))));
 
-            assertThrows(IllegalArgumentException.class, () -> context.restoreLayout(invalid));
             assertLayoutEquals(before, context.getLayout());
             return null;
         });

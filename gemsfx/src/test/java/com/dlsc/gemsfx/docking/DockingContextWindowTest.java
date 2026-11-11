@@ -80,8 +80,8 @@ public class DockingContextWindowTest extends FxTestBase {
             return ((DockingLayoutNode.Tabs) layout).getDockableIds();
         }
         DockingLayoutNode.Split split = (DockingLayoutNode.Split) layout;
-        List<String> ids = new ArrayList<>(allIds(split.getFirst()));
-        ids.addAll(allIds(split.getSecond()));
+        List<String> ids = new ArrayList<>();
+        split.getChildren().forEach(child -> ids.addAll(allIds(child)));
         return ids;
     }
 
@@ -203,6 +203,40 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     @Test
+    public void draggingOneTabOntoAPlaceholderChildMovesOnlyThatDockable() {
+        runFx(() -> {
+            Dockable a = dockable("a");
+            DockingContext context = new DockingContext(
+                    factoryFor(List.of(a, dockable("b")), new AtomicInteger()), pane -> new Stage());
+            DockingPane source = context.createPane();
+            context.openDockable(source, "a", DockingPosition.CENTER);
+            context.openDockable(source, "b", DockingPosition.CENTER);
+            renderWithEventSkin(source);
+            DockingPane target = context.createPane();
+            Label placeholderChild = new Label("Drop a dockable here");
+            placeholderChild.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            target.setPlaceholder(new StackPane(placeholderChild));
+            layout(target);
+            Node dragged = title(source, "a");
+            double x = target.getWidth() / 2;
+            double y = target.getHeight() / 2;
+
+            fireDragDetected(dragged);
+            fireDragEvent(placeholderChild, DragEvent.DRAG_OVER, dragged, x, y, 400, 300, null, placeholderChild);
+            assertTrue(target.lookup(".docking-drop-zone-preview").isVisible());
+            DragEvent drop = fireDragEvent(placeholderChild, DragEvent.DRAG_DROPPED, dragged,
+                    x, y, 400, 300, TransferMode.MOVE, placeholderChild);
+            fireDragEvent(dragged, DragEvent.DRAG_DONE, dragged, 5, 5, 400, 300, TransferMode.MOVE, dragged);
+
+            assertTrue(drop.isDropCompleted());
+            assertEquals(List.of("b"), ids(source));
+            assertEquals(List.of("a"), ids(target));
+            assertSame(a, target.getActiveDockable());
+            assertFalse(target.lookup(".docking-drop-zone-preview").isVisible());
+        });
+    }
+
+    @Test
     public void shiftDragIntoEmptyPaneShowsPreviewAndMovesTheGroup() {
         invoke(() -> {
             List<Dockable> all = List.of(dockable("a"), dockable("b"));
@@ -260,8 +294,8 @@ public class DockingContextWindowTest extends FxTestBase {
             fireDragEvent(dragged, DragEvent.DRAG_DONE, dragged, 5, 5, 400, 300, TransferMode.MOVE, dragged);
             assertTrue(drop.isDropCompleted());
             DockingLayoutNode.Split root = (DockingLayoutNode.Split) host.getLayoutRoot();
-            assertEquals(List.of("x"), ((DockingLayoutNode.Tabs) root.getFirst()).getDockableIds());
-            assertEquals(List.of("a", "b"), ((DockingLayoutNode.Tabs) root.getSecond()).getDockableIds());
+            assertEquals(List.of("x"), ((DockingLayoutNode.Tabs) root.getChildren().get(0)).getDockableIds());
+            assertEquals(List.of("a", "b"), ((DockingLayoutNode.Tabs) root.getChildren().get(1)).getDockableIds());
             assertEquals("b", host.getActiveDockable().getId());
 
             host.applyCss();
@@ -895,8 +929,8 @@ public class DockingContextWindowTest extends FxTestBase {
             return ((DockingLayoutNode.Tabs) node).getDockableIds();
         }
         DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-        List<String> ids = new ArrayList<>(ids(split.getFirst()));
-        ids.addAll(ids(split.getSecond()));
+        List<String> ids = new ArrayList<>();
+        split.getChildren().forEach(child -> ids.addAll(ids(child)));
         return ids;
     }
 
@@ -1234,8 +1268,8 @@ public class DockingContextWindowTest extends FxTestBase {
                 assertTrue(dropped.isDropCompleted());
                 DockingLayoutNode.Split split = (DockingLayoutNode.Split) host.getLayoutRoot();
                 assertEquals(testCase[2], split.getOrientation());
-                assertEquals(testCase[3], allIds(split.getFirst()));
-                assertEquals(testCase[4], allIds(split.getSecond()));
+                assertEquals(testCase[3], allIds(split.getChildren().get(0)));
+                assertEquals(testCase[4], allIds(split.getChildren().get(1)));
                 assertSame(b, host.getActiveDockable());
                 return null;
             });
@@ -1354,13 +1388,19 @@ public class DockingContextWindowTest extends FxTestBase {
                 assertTrue(dropped.isDropCompleted());
                 DockingLayoutNode.Split root = (DockingLayoutNode.Split) host.getLayoutRoot();
                 assertEquals(testCase[1], root.getOrientation());
-                DockingLayoutNode moved = (boolean) testCase[2] ? root.getFirst() : root.getSecond();
-                DockingLayoutNode.Split remainder = (DockingLayoutNode.Split)
-                        ((boolean) testCase[2] ? root.getSecond() : root.getFirst());
+                boolean first = (boolean) testCase[2];
+                DockingLayoutNode moved = root.getChildren().get(first ? 0 : root.getChildren().size() - 1);
                 assertEquals(List.of("c"), allIds(moved));
-                assertEquals(Orientation.HORIZONTAL, remainder.getOrientation());
-                assertEquals(List.of("a"), allIds(remainder.getFirst()));
-                assertEquals(List.of("b"), allIds(remainder.getSecond()));
+                if (root.getOrientation() == Orientation.HORIZONTAL) {
+                    assertEquals(3, root.getChildren().size());
+                    assertEquals(List.of("a"), allIds(root.getChildren().get(first ? 1 : 0)));
+                    assertEquals(List.of("b"), allIds(root.getChildren().get(first ? 2 : 1)));
+                } else {
+                    DockingLayoutNode.Split remainder = (DockingLayoutNode.Split) root.getChildren().get(first ? 1 : 0);
+                    assertEquals(Orientation.HORIZONTAL, remainder.getOrientation());
+                    assertEquals(List.of("a"), allIds(remainder.getChildren().get(0)));
+                    assertEquals(List.of("b"), allIds(remainder.getChildren().get(1)));
+                }
                 for (Node indicator : host.lookupAll(".docking-pane-edge-target")) {
                     assertFalse(indicator.isVisible());
                 }
@@ -1391,11 +1431,11 @@ public class DockingContextWindowTest extends FxTestBase {
             assertTrue(dropped.isDropCompleted());
             DockingLayoutNode.Split root = (DockingLayoutNode.Split) host.getLayoutRoot();
             assertEquals(Orientation.HORIZONTAL, root.getOrientation());
-            assertEquals(List.of("a"), allIds(root.getFirst()));
-            DockingLayoutNode.Split right = (DockingLayoutNode.Split) root.getSecond();
+            assertEquals(List.of("a"), allIds(root.getChildren().get(0)));
+            DockingLayoutNode.Split right = (DockingLayoutNode.Split) root.getChildren().get(1);
             assertEquals(Orientation.VERTICAL, right.getOrientation());
-            assertEquals(List.of("b"), allIds(right.getFirst()));
-            assertEquals(List.of("c"), allIds(right.getSecond()));
+            assertEquals(List.of("b"), allIds(right.getChildren().get(0)));
+            assertEquals(List.of("c"), allIds(right.getChildren().get(1)));
             return null;
         });
     }
@@ -1441,8 +1481,8 @@ public class DockingContextWindowTest extends FxTestBase {
                 assertTrue(floating.getLayoutRoot() instanceof DockingLayoutNode.Empty);
                 DockingLayoutNode.Split root = (DockingLayoutNode.Split) host.getLayoutRoot();
                 assertEquals(Orientation.VERTICAL, root.getOrientation());
-                assertEquals(List.of("a", "b"), allIds(root.getFirst()));
-                assertEquals(List.of("c"), allIds(root.getSecond()));
+                assertEquals(List.of("a", "b"), allIds(root.getChildren().get(0)));
+                assertEquals(List.of("c"), allIds(root.getChildren().get(1)));
                 assertEquals(3, context.getDockables().size());
                 return null;
             } finally {

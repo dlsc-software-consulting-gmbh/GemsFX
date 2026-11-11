@@ -7,7 +7,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.input.DragEvent;
 import javafx.stage.Stage;
@@ -603,8 +602,12 @@ public class DockingContext {
         }
         if (node instanceof DockingLayoutNode.Split) {
             DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-            DockingLayoutNode.Tabs first = findTabGroup(split.getFirst(), id);
-            return first != null ? first : findTabGroup(split.getSecond(), id);
+            for (DockingLayoutNode child : split.getChildren()) {
+                DockingLayoutNode.Tabs found = findTabGroup(child, id);
+                if (found != null) {
+                    return found;
+                }
+            }
         }
         return null;
     }
@@ -674,62 +677,7 @@ public class DockingContext {
     }
 
     private void buildPaneTree(DockingPane pane, DockingLayoutNode root, Map<String, Dockable> dockablesById) {
-        String seed = firstDockableId(root);
-        pane.insertDockable(requireDockable(seed, dockablesById), DockingPosition.CENTER);
-        expandNode(pane, root, seed, dockablesById);
-        applyDividerPositions(pane, root, List.of());
-    }
-
-    private void expandNode(DockingPane pane, DockingLayoutNode node, String seedId, Map<String, Dockable> dockablesById) {
-        if (node instanceof DockingLayoutNode.Tabs) {
-            DockingLayoutNode.Tabs tabs = (DockingLayoutNode.Tabs) node;
-            List<String> ids = tabs.getDockableIds();
-            for (int i = 1; i < ids.size(); i++) {
-                pane.insertDockableRelativeTo(seedId, requireDockable(ids.get(i), dockablesById), DockingPosition.CENTER);
-            }
-            pane.selectDockable(tabs.getSelectedId());
-            return;
-        }
-        DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-        String secondSeed = firstDockableId(split.getSecond());
-        DockingPosition edge = split.getOrientation() == Orientation.HORIZONTAL ? DockingPosition.RIGHT : DockingPosition.BOTTOM;
-        pane.insertDockableRelativeTo(seedId, requireDockable(secondSeed, dockablesById), edge);
-        expandNode(pane, split.getFirst(), seedId, dockablesById);
-        expandNode(pane, split.getSecond(), secondSeed, dockablesById);
-    }
-
-    private void applyDividerPositions(DockingPane pane, DockingLayoutNode node, List<Integer> path) {
-        if (!(node instanceof DockingLayoutNode.Split)) {
-            return;
-        }
-        DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-        pane.updateDividerPosition(path, split.getDividerPosition());
-
-        List<Integer> firstPath = new ArrayList<>(path);
-        firstPath.add(0);
-        applyDividerPositions(pane, split.getFirst(), firstPath);
-
-        List<Integer> secondPath = new ArrayList<>(path);
-        secondPath.add(1);
-        applyDividerPositions(pane, split.getSecond(), secondPath);
-    }
-
-    private String firstDockableId(DockingLayoutNode node) {
-        if (node instanceof DockingLayoutNode.Tabs) {
-            return ((DockingLayoutNode.Tabs) node).getDockableIds().get(0);
-        }
-        if (node instanceof DockingLayoutNode.Split) {
-            return firstDockableId(((DockingLayoutNode.Split) node).getFirst());
-        }
-        throw new IllegalArgumentException("Cannot build pane tree from empty layout node");
-    }
-
-    private Dockable requireDockable(String id, Map<String, Dockable> resolvedDockables) {
-        Dockable dockable = resolvedDockables.get(id);
-        if (dockable == null) {
-            throw new IllegalStateException("Resolved dockable missing for id: " + id);
-        }
-        return dockable;
+        pane.restoreLayout(root, dockablesById);
     }
 
     private DockingLayoutNode normalizeNode(DockingLayoutNode node,
@@ -756,19 +704,26 @@ public class DockingContext {
 
         DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
         DockingTree.validateSnapshotNode(split);
-        DockingLayoutNode first = normalizeNode(split.getFirst(), resolvedDockables, unresolvedDockables);
-        DockingLayoutNode second = normalizeNode(split.getSecond(), resolvedDockables, unresolvedDockables);
-
-        if (first instanceof DockingLayoutNode.Empty && second instanceof DockingLayoutNode.Empty) {
+        List<DockingLayoutNode> children = new ArrayList<>();
+        for (DockingLayoutNode child : split.getChildren()) {
+            children.add(normalizeNode(child, resolvedDockables, unresolvedDockables));
+        }
+        List<Double> positions = new ArrayList<>(split.getDividerPositions());
+        for (int i = children.size() - 1; i >= 0; i--) {
+            if (children.get(i) instanceof DockingLayoutNode.Empty) {
+                children.remove(i);
+                if (!positions.isEmpty()) {
+                    positions.remove(i == 0 ? 0 : i - 1);
+                }
+            }
+        }
+        if (children.isEmpty()) {
             return new DockingLayoutNode.Empty();
         }
-        if (first instanceof DockingLayoutNode.Empty) {
-            return second;
+        if (children.size() == 1) {
+            return children.get(0);
         }
-        if (second instanceof DockingLayoutNode.Empty) {
-            return first;
-        }
-        return new DockingLayoutNode.Split(split.getOrientation(), split.getDividerPosition(), first, second);
+        return new DockingLayoutNode.Split(split.getOrientation(), children, positions);
     }
 
     private Dockable resolveDockable(String id, Map<String, Dockable> resolvedDockables, Set<String> unresolvedDockables) {
@@ -843,8 +798,9 @@ public class DockingContext {
             return;
         }
         DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-        collectDockableIds(split.getFirst(), ids);
-        collectDockableIds(split.getSecond(), ids);
+        for (DockingLayoutNode child : split.getChildren()) {
+            collectDockableIds(child, ids);
+        }
     }
 
     private List<DockingPane> nonFloatingPanes() {

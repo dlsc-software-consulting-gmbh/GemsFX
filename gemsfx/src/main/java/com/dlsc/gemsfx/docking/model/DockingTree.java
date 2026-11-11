@@ -6,8 +6,10 @@ import com.dlsc.gemsfx.docking.DockingPosition;
 import javafx.geometry.Orientation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * The pane tree of a docking pane: exactly one root, which is either an (empty) tab group
@@ -261,9 +263,10 @@ public final class DockingTree {
         }
         Orientation orientation = edge == DockingPosition.LEFT || edge == DockingPosition.RIGHT
                 ? Orientation.HORIZONTAL : Orientation.VERTICAL;
-        root = edge == DockingPosition.LEFT || edge == DockingPosition.TOP
-                ? new DockingSplit(orientation, dividerPosition, created, root)
-                : new DockingSplit(orientation, dividerPosition, root, created);
+        root = normalizedSplit(orientation,
+                edge == DockingPosition.LEFT || edge == DockingPosition.TOP
+                        ? List.of(created, root) : List.of(root, created),
+                List.of(dividerPosition));
     }
 
     public boolean canInsertRelativeTo(String targetId, DockingPosition position) {
@@ -285,22 +288,55 @@ public final class DockingTree {
     }
 
     /**
-     * Sets the divider position of the split addressed by a path of child indices (0 = first, 1 = second)
-     * from the root; an empty path addresses the root.
+     * Atomically sets all divider positions of the split addressed by ordered child indices.
+     * An empty path addresses the root.
      */
-    public void setDividerPosition(List<Integer> path, double dividerPosition) {
-        requireDivider(dividerPosition);
+    public void setDividerPositions(List<Integer> path, List<Double> positions) {
         Node node = root;
-        for (int index : path) {
-            if (!(node instanceof DockingSplit) || (index != 0 && index != 1)) {
+        for (Integer index : Objects.requireNonNull(path, "path must not be null")) {
+            if (!(node instanceof DockingSplit) || index == null || index < 0
+                    || index >= ((DockingSplit) node).getChildren().size()) {
                 throw new IllegalArgumentException("Path does not address a split: " + path);
             }
-            node = index == 0 ? ((DockingSplit) node).getFirst() : ((DockingSplit) node).getSecond();
+            node = ((DockingSplit) node).getChildren().get(index);
         }
         if (!(node instanceof DockingSplit)) {
             throw new IllegalArgumentException("Path does not address a split: " + path);
         }
-        ((DockingSplit) node).setDividerPosition(dividerPosition);
+        ((DockingSplit) node).setDividerPositions(positions);
+    }
+
+    /**
+     * Replaces the tree from a snapshot, collapsing empty groups and flattening matching orientations.
+     * Invalid snapshots leave the current tree unchanged.
+     *
+     * @param snapshot the non-null layout snapshot
+     */
+    public void restore(DockingLayoutNode snapshot) {
+        root = restoreNode(Objects.requireNonNull(snapshot, "snapshot must not be null"), new HashSet<>());
+    }
+
+    private static Node restoreNode(DockingLayoutNode node, Set<String> ids) {
+        if (node instanceof DockingLayoutNode.Split) {
+            DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
+            List<Node> children = new ArrayList<>();
+            for (DockingLayoutNode child : split.getChildren()) {
+                children.add(restoreNode(child, ids));
+            }
+            return normalizedSplit(split.getOrientation(), children, split.getDividerPositions());
+        }
+        DockingTabGroup group = new DockingTabGroup();
+        if (node instanceof DockingLayoutNode.Tabs) {
+            DockingLayoutNode.Tabs tabs = (DockingLayoutNode.Tabs) node;
+            for (String id : tabs.getDockableIds()) {
+                if (!ids.add(id)) {
+                    throw new IllegalArgumentException("Duplicate dockable id: " + id);
+                }
+                group.add(id);
+            }
+            group.select(tabs.getSelectedId());
+        }
+        return group;
     }
 
     /**
@@ -351,17 +387,20 @@ public final class DockingTree {
         Objects.requireNonNull(node, "node must not be null");
         if (node instanceof DockingLayoutNode.Split) {
             DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-            requireDivider(split.getDividerPosition());
-            validateSnapshotNode(split.getFirst());
-            validateSnapshotNode(split.getSecond());
+            for (DockingLayoutNode child : split.getChildren()) {
+                validateSnapshotNode(child);
+            }
         }
     }
 
     private static DockingLayoutNode snapshot(Node node) {
         if (node instanceof DockingSplit) {
             DockingSplit split = (DockingSplit) node;
-            return new DockingLayoutNode.Split(split.getOrientation(), split.getDividerPosition(),
-                    snapshot(split.getFirst()), snapshot(split.getSecond()));
+            List<DockingLayoutNode> children = new ArrayList<>();
+            for (Node child : split.getChildren()) {
+                children.add(snapshot(child));
+            }
+            return new DockingLayoutNode.Split(split.getOrientation(), children, split.getDividerPositions());
         }
         DockingTabGroup group = (DockingTabGroup) node;
         if (group.isEmpty()) {
@@ -411,9 +450,8 @@ public final class DockingTree {
         boolean insertedFirst = edge == DockingPosition.LEFT || edge == DockingPosition.TOP;
         Orientation orientation = edge == DockingPosition.LEFT || edge == DockingPosition.RIGHT
                 ? Orientation.HORIZONTAL : Orientation.VERTICAL;
-        DockingSplit split = insertedFirst
-                ? new DockingSplit(orientation, dividerPosition, created, target)
-                : new DockingSplit(orientation, dividerPosition, target, created);
+        DockingSplit split = new DockingSplit(orientation,
+                insertedFirst ? List.of(created, target) : List.of(target, created), List.of(dividerPosition));
         root = replace(root, target, split);
     }
 
@@ -438,21 +476,28 @@ public final class DockingTree {
     private static DockingTabGroup find(Node node, String id) {
         if (node instanceof DockingSplit) {
             DockingSplit split = (DockingSplit) node;
-            DockingTabGroup found = find(split.getFirst(), id);
-            return found != null ? found : find(split.getSecond(), id);
+            for (Node child : split.getChildren()) {
+                DockingTabGroup found = find(child, id);
+                if (found != null) {
+                    return found;
+                }
+            }
+            return null;
         }
         DockingTabGroup group = (DockingTabGroup) node;
         return group.ids().contains(id) ? group : null;
     }
 
     private static DockingTabGroup firstGroup(Node node) {
-        return node instanceof DockingSplit ? firstGroup(((DockingSplit) node).getFirst()) : (DockingTabGroup) node;
+        return node instanceof DockingSplit
+                ? firstGroup(((DockingSplit) node).getChildren().get(0)) : (DockingTabGroup) node;
     }
 
     private static void collect(Node node, List<String> ids) {
         if (node instanceof DockingSplit) {
-            collect(((DockingSplit) node).getFirst(), ids);
-            collect(((DockingSplit) node).getSecond(), ids);
+            for (Node child : ((DockingSplit) node).getChildren()) {
+                collect(child, ids);
+            }
         } else {
             ids.addAll(((DockingTabGroup) node).ids());
         }
@@ -462,18 +507,21 @@ public final class DockingTree {
                                         double minX, double minY, double width, double height) {
         if (node instanceof DockingLayoutNode.Split) {
             DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-            if (split.getOrientation() == Orientation.HORIZONTAL) {
-                double firstWidth = width * split.getDividerPosition();
-                if (x <= minX + firstWidth) {
-                    return resolveLeaf(split.getFirst(), x, y, minX, minY, firstWidth, height);
+            double start = 0;
+            for (int i = 0; i < split.getChildren().size(); i++) {
+                double end = i < split.getDividerPositions().size() ? split.getDividerPositions().get(i) : 1;
+                if (split.getOrientation() == Orientation.HORIZONTAL) {
+                    if (x <= minX + width * end || i == split.getChildren().size() - 1) {
+                        return resolveLeaf(split.getChildren().get(i), x, y,
+                                minX + width * start, minY, width * (end - start), height);
+                    }
+                } else if (y <= minY + height * end || i == split.getChildren().size() - 1) {
+                    return resolveLeaf(split.getChildren().get(i), x, y,
+                            minX, minY + height * start, width, height * (end - start));
                 }
-                return resolveLeaf(split.getSecond(), x, y, minX + firstWidth, minY, width - firstWidth, height);
+                start = end;
             }
-            double firstHeight = height * split.getDividerPosition();
-            if (y <= minY + firstHeight) {
-                return resolveLeaf(split.getFirst(), x, y, minX, minY, width, firstHeight);
-            }
-            return resolveLeaf(split.getSecond(), x, y, minX, minY + firstHeight, width, height - firstHeight);
+            return null;
         }
         if (node instanceof DockingLayoutNode.Tabs) {
             DockingLayoutNode.Tabs tabs = (DockingLayoutNode.Tabs) node;
@@ -555,8 +603,11 @@ public final class DockingTree {
         }
         if (node instanceof DockingSplit) {
             DockingSplit s = (DockingSplit) node;
-            return new DockingSplit(s.getOrientation(), s.getDividerPosition(),
-                    replace(s.getFirst(), target, replacement), replace(s.getSecond(), target, replacement));
+            List<Node> children = new ArrayList<>();
+            for (Node child : s.getChildren()) {
+                children.add(replace(child, target, replacement));
+            }
+            return normalizedSplit(s.getOrientation(), children, s.getDividerPositions());
         }
         return node;
     }
@@ -564,20 +615,57 @@ public final class DockingTree {
     private static Node removeFrom(Node node, String id) {
         if (node instanceof DockingSplit) {
             DockingSplit s = (DockingSplit) node;
-            Node first = removeFrom(s.getFirst(), id);
-            Node second = removeFrom(s.getSecond(), id);
-            if (first == null) {
-                return second;
+            List<Node> children = new ArrayList<>();
+            for (Node child : s.getChildren()) {
+                children.add(removeFrom(child, id));
             }
-            if (second == null) {
-                return first;
-            }
-            return new DockingSplit(s.getOrientation(), s.getDividerPosition(), first, second);
+            return normalizedSplit(s.getOrientation(), children, s.getDividerPositions());
         }
         DockingTabGroup group = (DockingTabGroup) node;
         if (group.ids().contains(id)) {
             group.remove(id);
         }
         return group.isEmpty() ? null : group;
+    }
+
+    private static Node normalizedSplit(Orientation orientation, List<Node> nodes, List<Double> dividers) {
+        List<Node> children = new ArrayList<>(nodes);
+        List<Double> positions = new ArrayList<>(dividers);
+        for (int i = children.size() - 1; i >= 0; i--) {
+            Node child = children.get(i);
+            if (child == null || child instanceof DockingTabGroup && ((DockingTabGroup) child).isEmpty()) {
+                children.remove(i);
+                if (!positions.isEmpty()) {
+                    positions.remove(i == 0 ? 0 : i - 1);
+                }
+            }
+        }
+        if (children.isEmpty()) {
+            return new DockingTabGroup();
+        }
+        if (children.size() == 1) {
+            return children.get(0);
+        }
+        List<Node> flattened = new ArrayList<>();
+        List<Double> boundaries = new ArrayList<>();
+        double start = 0;
+        for (int i = 0; i < children.size(); i++) {
+            double end = i < positions.size() ? positions.get(i) : 1;
+            Node child = children.get(i);
+            if (child instanceof DockingSplit && ((DockingSplit) child).getOrientation() == orientation) {
+                DockingSplit split = (DockingSplit) child;
+                flattened.addAll(split.getChildren());
+                for (double position : split.getDividerPositions()) {
+                    boundaries.add(start + (end - start) * position);
+                }
+            } else {
+                flattened.add(child);
+            }
+            if (i < positions.size()) {
+                boundaries.add(end);
+            }
+            start = end;
+        }
+        return new DockingSplit(orientation, flattened, boundaries);
     }
 }

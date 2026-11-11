@@ -904,8 +904,8 @@ public class DockingPaneTest extends FxTestBase {
             context.openDockable(pane, "c", DockingPosition.BOTTOM);
             DockingLayoutNode.Split split = (DockingLayoutNode.Split) pane.getLayoutRoot();
             assertEquals(Orientation.VERTICAL, split.getOrientation());
-            assertEquals(List.of("a", "b"), ((DockingLayoutNode.Tabs) split.getFirst()).getDockableIds());
-            assertEquals(List.of("c"), ((DockingLayoutNode.Tabs) split.getSecond()).getDockableIds());
+            assertEquals(List.of("a", "b"), ((DockingLayoutNode.Tabs) split.getChildren().get(0)).getDockableIds());
+            assertEquals(List.of("c"), ((DockingLayoutNode.Tabs) split.getChildren().get(1)).getDockableIds());
             return null;
         });
     }
@@ -1348,9 +1348,30 @@ public class DockingPaneTest extends FxTestBase {
         });
 
         assertThrows(IllegalStateException.class, () -> pane.selectDockable("a"));
-        assertThrows(IllegalStateException.class, () -> pane.updateDividerPosition(List.of(), 0.7));
+        assertThrows(IllegalStateException.class, () -> pane.updateDividerPositions(List.of(), List.of(0.7)));
         assertThrows(IllegalStateException.class, () -> pane.canMoveDockableToPaneEdge("a", DockingPosition.BOTTOM));
         assertThrows(IllegalStateException.class, () -> pane.moveDockableToPaneEdge("a", DockingPosition.BOTTOM));
+    }
+
+    @Test
+    public void dividerVectorChangesPublishOneSnapshotAndRejectInvalidUpdatesAtomically() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"), dockable("c"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.RIGHT);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            AtomicInteger snapshots = new AtomicInteger();
+            pane.layoutRootProperty().addListener(obs -> snapshots.incrementAndGet());
+            DockingLayoutNode before = pane.getLayoutRoot();
+            assertThrows(IllegalArgumentException.class,
+                    () -> pane.updateDividerPositions(List.of(), List.of(0.8, 0.2)));
+            assertSame(before, pane.getLayoutRoot());
+            assertEquals(0, snapshots.get());
+            pane.updateDividerPositions(List.of(), List.of(0.3, 0.7));
+            assertEquals(1, snapshots.get());
+            assertEquals(List.of(0.3, 0.7), ((DockingLayoutNode.Split) pane.getLayoutRoot()).getDividerPositions());
+        });
     }
 
     @Test
@@ -1394,11 +1415,9 @@ public class DockingPaneTest extends FxTestBase {
                     }
                     positions = split.getDividerPositions();
                     DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
-                    assertEquals(positions[1], root.getDividerPosition(), 1e-9);
-                    assertEquals(positions[0] / positions[1],
-                            ((DockingLayoutNode.Split) root.getFirst()).getDividerPosition(), 1e-9);
-                    assertEquals((positions[2] - positions[1]) / (1 - positions[1]),
-                            ((DockingLayoutNode.Split) root.getSecond()).getDividerPosition(), 1e-9);
+                    assertEquals(4, root.getChildren().size());
+                    assertArrayEquals(positions, root.getDividerPositions().stream()
+                            .mapToDouble(Double::doubleValue).toArray(), 0);
                 }
                 pane.selectDockable("a");
                 assertSame(split, pane.lookup(".docking-split"));
@@ -1436,12 +1455,9 @@ public class DockingPaneTest extends FxTestBase {
             pane.layout();
             assertArrayEquals(positions, outer.getDividerPositions(), 0);
             DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
-            DockingLayoutNode.Split right = (DockingLayoutNode.Split) root.getSecond();
-            DockingLayoutNode.Split vertical = (DockingLayoutNode.Split) right.getSecond();
-            assertEquals(inner.getDividerPositions()[0], vertical.getDividerPosition(), 1e-9);
-            assertEquals((inner.getDividerPositions()[1] - inner.getDividerPositions()[0])
-                            / (1 - inner.getDividerPositions()[0]),
-                    ((DockingLayoutNode.Split) vertical.getSecond()).getDividerPosition(), 1e-9);
+            DockingLayoutNode.Split vertical = (DockingLayoutNode.Split) root.getChildren().get(2);
+            assertArrayEquals(inner.getDividerPositions(), vertical.getDividerPositions().stream()
+                    .mapToDouble(Double::doubleValue).toArray(), 0);
         });
     }
 
@@ -1459,8 +1475,8 @@ public class DockingPaneTest extends FxTestBase {
             for (double endpoint : new double[]{0, 1}) {
                 split.setDividerPositions(endpoint, endpoint);
                 DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
-                assertTrue(Double.isFinite(root.getDividerPosition()));
-                assertTrue(Double.isFinite(((DockingLayoutNode.Split) root.getSecond()).getDividerPosition()));
+                assertEquals(3, root.getChildren().size());
+                assertTrue(root.getDividerPositions().stream().allMatch(Double::isFinite));
                 assertNotNull(context.getLayout());
             }
         });
@@ -1484,14 +1500,14 @@ public class DockingPaneTest extends FxTestBase {
             inner.setDividerPositions(0.8);
 
             DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
-            assertEquals(0.3, root.getDividerPosition(), 1e-9);
-            assertEquals(0.8, ((DockingLayoutNode.Split) root.getSecond()).getDividerPosition(), 1e-9);
+            assertEquals(0.3, root.getDividerPositions().get(0), 1e-9);
+            assertEquals(0.8, ((DockingLayoutNode.Split) root.getChildren().get(1)).getDividerPositions().get(0), 1e-9);
             assertSame(outer, pane.lookup(".docking-split"));
             assertEquals(0.3, outer.getDividerPositions()[0], 1e-9);
 
             pane.selectDockable("a");
             root = (DockingLayoutNode.Split) pane.getLayoutRoot();
-            assertEquals(0.3, root.getDividerPosition(), 1e-9);
+            assertEquals(0.3, root.getDividerPositions().get(0), 1e-9);
             assertEquals(0.3, ((javafx.scene.control.SplitPane) pane.lookup(".docking-split"))
                     .getDividerPositions()[0], 1e-9);
             return null;
@@ -1510,13 +1526,13 @@ public class DockingPaneTest extends FxTestBase {
             javafx.scene.control.SplitPane split = (javafx.scene.control.SplitPane) pane.lookup(".docking-split");
             for (double endpoint : new double[]{0.0, 1.0}) {
                 split.setDividerPositions(endpoint);
-                assertEquals(endpoint, ((DockingLayoutNode.Split) pane.getLayoutRoot()).getDividerPosition(), 0);
+                assertEquals(endpoint, ((DockingLayoutNode.Split) pane.getLayoutRoot()).getDividerPositions().get(0), 0);
                 assertSame(split, pane.lookup(".docking-split"));
                 assertEquals(endpoint, split.getDividerPositions()[0], 0);
             }
 
             pane.selectDockable("a");
-            assertEquals(1.0, ((DockingLayoutNode.Split) pane.getLayoutRoot()).getDividerPosition(), 0);
+            assertEquals(1.0, ((DockingLayoutNode.Split) pane.getLayoutRoot()).getDividerPositions().get(0), 0);
             assertEquals(1.0, ((javafx.scene.control.SplitPane) pane.lookup(".docking-split"))
                     .getDividerPositions()[0], 0);
             return null;
@@ -1552,11 +1568,10 @@ public class DockingPaneTest extends FxTestBase {
             assertTrue(pane.moveDockable("a", 98, 50, 100, 100, "c"));
             DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
             assertEquals(Orientation.HORIZONTAL, root.getOrientation());
-            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) root.getFirst()).getDockableIds());
-            DockingLayoutNode.Split inner = (DockingLayoutNode.Split) root.getSecond();
-            assertEquals(Orientation.HORIZONTAL, inner.getOrientation());
-            assertEquals(List.of("c"), ((DockingLayoutNode.Tabs) inner.getFirst()).getDockableIds());
-            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) inner.getSecond()).getDockableIds());
+            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) root.getChildren().get(0)).getDockableIds());
+            assertEquals(3, root.getChildren().size());
+            assertEquals(List.of("c"), ((DockingLayoutNode.Tabs) root.getChildren().get(1)).getDockableIds());
+            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) root.getChildren().get(2)).getDockableIds());
             return null;
         });
     }
@@ -1573,8 +1588,8 @@ public class DockingPaneTest extends FxTestBase {
 
             DockingLayoutNode.Split split = (DockingLayoutNode.Split) pane.getLayoutRoot();
             assertEquals(Orientation.HORIZONTAL, split.getOrientation());
-            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) split.getFirst()).getDockableIds());
-            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) split.getSecond()).getDockableIds());
+            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) split.getChildren().get(0)).getDockableIds());
+            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) split.getChildren().get(1)).getDockableIds());
             return null;
         });
     }
@@ -1596,11 +1611,11 @@ public class DockingPaneTest extends FxTestBase {
 
             DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
             assertEquals(Orientation.VERTICAL, root.getOrientation());
-            DockingLayoutNode.Split top = (DockingLayoutNode.Split) root.getFirst();
+            DockingLayoutNode.Split top = (DockingLayoutNode.Split) root.getChildren().get(0);
             assertEquals(Orientation.HORIZONTAL, top.getOrientation());
-            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) top.getFirst()).getDockableIds());
-            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) top.getSecond()).getDockableIds());
-            assertEquals(List.of("c"), ((DockingLayoutNode.Tabs) root.getSecond()).getDockableIds());
+            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) top.getChildren().get(0)).getDockableIds());
+            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) top.getChildren().get(1)).getDockableIds());
+            assertEquals(List.of("c"), ((DockingLayoutNode.Tabs) root.getChildren().get(1)).getDockableIds());
             assertEquals("c", pane.getActiveDockable().getId());
             assertEquals(3, titles(pane).size());
             return null;
@@ -1618,17 +1633,17 @@ public class DockingPaneTest extends FxTestBase {
 
             assertTrue(pane.moveDockable("a", 70, 2, 100, 100, "c"));
             DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
-            DockingLayoutNode.Split topSplit = (DockingLayoutNode.Split) root.getSecond();
+            DockingLayoutNode.Split topSplit = (DockingLayoutNode.Split) root.getChildren().get(1);
             assertEquals(Orientation.VERTICAL, topSplit.getOrientation());
-            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) topSplit.getFirst()).getDockableIds());
-            assertEquals(List.of("c"), ((DockingLayoutNode.Tabs) topSplit.getSecond()).getDockableIds());
+            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) topSplit.getChildren().get(0)).getDockableIds());
+            assertEquals(List.of("c"), ((DockingLayoutNode.Tabs) topSplit.getChildren().get(1)).getDockableIds());
 
             assertTrue(pane.moveDockable("a", 70, 98, 100, 100, "c"));
             root = (DockingLayoutNode.Split) pane.getLayoutRoot();
-            DockingLayoutNode.Split bottomSplit = (DockingLayoutNode.Split) root.getSecond();
+            DockingLayoutNode.Split bottomSplit = (DockingLayoutNode.Split) root.getChildren().get(1);
             assertEquals(Orientation.VERTICAL, bottomSplit.getOrientation());
-            assertEquals(List.of("c"), ((DockingLayoutNode.Tabs) bottomSplit.getFirst()).getDockableIds());
-            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) bottomSplit.getSecond()).getDockableIds());
+            assertEquals(List.of("c"), ((DockingLayoutNode.Tabs) bottomSplit.getChildren().get(0)).getDockableIds());
+            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) bottomSplit.getChildren().get(1)).getDockableIds());
             return null;
         });
     }
@@ -1659,8 +1674,8 @@ public class DockingPaneTest extends FxTestBase {
             assertTrue(pane.moveDockable("a", 70, 2, 100, 100, "b"));
             DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
             assertEquals(Orientation.VERTICAL, root.getOrientation());
-            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) root.getFirst()).getDockableIds());
-            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) root.getSecond()).getDockableIds());
+            assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) root.getChildren().get(0)).getDockableIds());
+            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) root.getChildren().get(1)).getDockableIds());
             return null;
         });
     }
@@ -1679,7 +1694,7 @@ public class DockingPaneTest extends FxTestBase {
             assertFalse(pane.moveDockable("a", 50, 50, 0, 100, "b"));
             assertSame(beforeRejectedMove, pane.getLayoutRoot());
             assertEquals(List.of("a", "b"), ((DockingLayoutNode.Tabs) ((DockingLayoutNode.Split) pane.getLayoutRoot())
-                    .getFirst()).getDockableIds());
+                    .getChildren().get(0)).getDockableIds());
             return null;
         });
     }

@@ -248,47 +248,78 @@ public class DockingLayoutTest extends FxTestBase {
         DockingLayoutNode first = new DockingLayoutNode.Empty();
         DockingLayoutNode second = new DockingLayoutNode.Empty();
         DockingLayoutNode.Split split = new DockingLayoutNode.Split(
-                Orientation.HORIZONTAL, 0.5, first, second
+                Orientation.HORIZONTAL, List.of(first, second), List.of(0.5)
         );
 
         assertEquals(Orientation.HORIZONTAL, split.getOrientation());
-        assertEquals(0.5, split.getDividerPosition(), 0.01);
-        assertSame(first, split.getFirst());
-        assertSame(second, split.getSecond());
+        assertEquals(0.5, split.getDividerPositions().get(0), 0.01);
+        assertSame(first, split.getChildren().get(0));
+        assertSame(second, split.getChildren().get(1));
     }
 
     @Test
     public void dockingLayoutNodeSplitRejectsNullOrientation() {
         assertThrows(NullPointerException.class, () ->
-                new DockingLayoutNode.Split(null, 0.5, new DockingLayoutNode.Empty(), new DockingLayoutNode.Empty())
+                new DockingLayoutNode.Split(null,
+                        List.of(new DockingLayoutNode.Empty(), new DockingLayoutNode.Empty()), List.of(0.5))
         );
     }
 
     @Test
     public void dockingLayoutNodeSplitRejectsNullFirstNode() {
         assertThrows(NullPointerException.class, () ->
-                new DockingLayoutNode.Split(Orientation.VERTICAL, 0.5, null, new DockingLayoutNode.Empty())
+                new DockingLayoutNode.Split(Orientation.VERTICAL,
+                        Arrays.asList(null, new DockingLayoutNode.Empty()), List.of(0.5))
         );
     }
 
     @Test
     public void dockingLayoutNodeSplitRejectsNullSecondNode() {
         assertThrows(NullPointerException.class, () ->
-                new DockingLayoutNode.Split(Orientation.HORIZONTAL, 0.5, new DockingLayoutNode.Empty(), null)
+                new DockingLayoutNode.Split(Orientation.HORIZONTAL,
+                        Arrays.asList(new DockingLayoutNode.Empty(), null), List.of(0.5))
         );
     }
 
     @Test
     public void dockingLayoutNodeSplitRejectsNonFiniteDividerPosition() {
         assertThrows(IllegalArgumentException.class, () ->
-                new DockingLayoutNode.Split(Orientation.HORIZONTAL, Double.POSITIVE_INFINITY, 
-                        new DockingLayoutNode.Empty(), new DockingLayoutNode.Empty())
+                new DockingLayoutNode.Split(Orientation.HORIZONTAL,
+                        List.of(new DockingLayoutNode.Empty(), new DockingLayoutNode.Empty()),
+                        List.of(Double.POSITIVE_INFINITY))
         );
 
         assertThrows(IllegalArgumentException.class, () ->
-                new DockingLayoutNode.Split(Orientation.HORIZONTAL, Double.NaN, 
-                        new DockingLayoutNode.Empty(), new DockingLayoutNode.Empty())
+                new DockingLayoutNode.Split(Orientation.HORIZONTAL,
+                        List.of(new DockingLayoutNode.Empty(), new DockingLayoutNode.Empty()), List.of(Double.NaN))
         );
+    }
+
+    @Test
+    public void multiChildSplitValidatesAndDefensivelyCopiesItsCollections() {
+        List<DockingLayoutNode> children = new ArrayList<>(List.of(
+                new DockingLayoutNode.Empty(), new DockingLayoutNode.Empty(), new DockingLayoutNode.Empty()));
+        List<Double> positions = new ArrayList<>(List.of(0.25, 0.75));
+        DockingLayoutNode.Split split = new DockingLayoutNode.Split(Orientation.HORIZONTAL, children, positions);
+        children.clear();
+        positions.clear();
+        assertEquals(3, split.getChildren().size());
+        assertEquals(List.of(0.25, 0.75), split.getDividerPositions());
+        assertThrows(UnsupportedOperationException.class, () -> split.getChildren().clear());
+        assertThrows(UnsupportedOperationException.class, () -> split.getDividerPositions().clear());
+        for (List<Double> invalid : List.of(List.of(0.5), List.of(0.75, 0.25),
+                List.of(-0.1, 0.5), List.of(0.5, 1.1), List.of(Double.NaN, 0.5),
+                List.of(0.5, Double.POSITIVE_INFINITY))) {
+            assertThrows(IllegalArgumentException.class,
+                    () -> new DockingLayoutNode.Split(Orientation.VERTICAL, split.getChildren(), invalid));
+        }
+        assertThrows(IllegalArgumentException.class, () -> new DockingLayoutNode.Split(
+                Orientation.HORIZONTAL, List.of(new DockingLayoutNode.Empty()), List.of()));
+        DockingLayoutNode.Split collapsed = new DockingLayoutNode.Split(Orientation.VERTICAL,
+                List.of(new DockingLayoutNode.Empty(), new DockingLayoutNode.Empty(),
+                        new DockingLayoutNode.Empty(), new DockingLayoutNode.Empty()),
+                List.of(0.0, 0.0, 1.0));
+        assertEquals(List.of(0.0, 0.0, 1.0), collapsed.getDividerPositions());
     }
 
     @Test

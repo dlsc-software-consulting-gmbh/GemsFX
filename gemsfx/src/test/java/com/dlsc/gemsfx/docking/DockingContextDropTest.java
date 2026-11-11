@@ -72,18 +72,18 @@ public class DockingContextDropTest extends FxTestBase {
 
             context.dropDockable(pane, dropEvent(), "a", DockingPosition.CENTER);
             DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
-            assertEquals(List.of("a", "new-1"), ((DockingLayoutNode.Tabs) root.getFirst()).getDockableIds());
+            assertEquals(List.of("a", "new-1"), ((DockingLayoutNode.Tabs) root.getChildren().get(0)).getDockableIds());
             context.dropDockable(pane, dropEvent(), "b", DockingPosition.BOTTOM);
             root = (DockingLayoutNode.Split) pane.getLayoutRoot();
-            assertTrue(root.getSecond() instanceof DockingLayoutNode.Split);
+            assertTrue(root.getChildren().get(1) instanceof DockingLayoutNode.Split);
             context.dropDockable(pane, dropEvent(), null, DockingPosition.TOP);
             root = (DockingLayoutNode.Split) pane.getLayoutRoot();
-            assertEquals(List.of("new-3"), ((DockingLayoutNode.Tabs) root.getFirst()).getDockableIds());
-            DockingLayoutNode.Split previousLayout = (DockingLayoutNode.Split) root.getSecond();
-            assertEquals(List.of("a", "new-1"), ((DockingLayoutNode.Tabs) previousLayout.getFirst()).getDockableIds());
-            DockingLayoutNode.Split previousRightGroup = (DockingLayoutNode.Split) previousLayout.getSecond();
-            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) previousRightGroup.getFirst()).getDockableIds());
-            assertEquals(List.of("new-2"), ((DockingLayoutNode.Tabs) previousRightGroup.getSecond()).getDockableIds());
+            assertEquals(List.of("new-3"), ((DockingLayoutNode.Tabs) root.getChildren().get(0)).getDockableIds());
+            DockingLayoutNode.Split previousLayout = (DockingLayoutNode.Split) root.getChildren().get(1);
+            assertEquals(List.of("a", "new-1"), ((DockingLayoutNode.Tabs) previousLayout.getChildren().get(0)).getDockableIds());
+            DockingLayoutNode.Split previousRightGroup = (DockingLayoutNode.Split) previousLayout.getChildren().get(1);
+            assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) previousRightGroup.getChildren().get(0)).getDockableIds());
+            assertEquals(List.of("new-2"), ((DockingLayoutNode.Tabs) previousRightGroup.getChildren().get(1)).getDockableIds());
             assertEquals("new-3", pane.getActiveDockable().getId());
         });
     }
@@ -207,8 +207,8 @@ public class DockingContextDropTest extends FxTestBase {
 
             assertTrue(drop.isDropCompleted());
             DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
-            assertEquals(List.of("new-2"), ((DockingLayoutNode.Tabs) root.getSecond()).getDockableIds());
-            assertTrue(root.getFirst() instanceof DockingLayoutNode.Split);
+            assertEquals(List.of("new-2"), ((DockingLayoutNode.Tabs) root.getChildren().get(1)).getDockableIds());
+            assertTrue(root.getChildren().get(0) instanceof DockingLayoutNode.Split);
             assertEquals(2, creations.get());
             assertFalse(pane.lookup(".docking-drop-zone-preview").isVisible());
             assertFalse(pane.lookup(".docking-pane-edge-target.pane-edge-bottom").isVisible());

@@ -61,6 +61,30 @@ public class DockingDropTargetTest extends FxTestBase {
     }
 
     @Test
+    public void resolvesEveryMultiChildIntervalIncludingAfterACollapsedGroup() {
+        List<DockingLayoutNode> children = List.of(
+                new DockingLayoutNode.Tabs(List.of("a"), "a"),
+                new DockingLayoutNode.Tabs(List.of("collapsed"), "collapsed"),
+                new DockingLayoutNode.Tabs(List.of("b"), "b"),
+                new DockingLayoutNode.Tabs(List.of("c"), "c"));
+        double[] starts = {0, 40, 140};
+        double[] sizes = {40, 100, 60};
+        for (Orientation orientation : Orientation.values()) {
+            DockingLayoutNode.Split root = new DockingLayoutNode.Split(orientation, children, List.of(0.2, 0.2, 0.7));
+            for (int i = 0; i < starts.length; i++) {
+                boolean horizontal = orientation == Orientation.HORIZONTAL;
+                double point = starts[i] + sizes[i] / 2;
+                DockingTree.ResolvedDropTarget target = DockingTree.resolveDropTarget(root,
+                        horizontal ? point : 100, horizontal ? 100 : point, 200, 200, null);
+                assertEquals(List.of("a", "b", "c").get(i), target.getTargetId());
+                assertEquals(DockingPosition.CENTER, target.getPosition());
+                assertEquals(starts[i], horizontal ? target.getLeafX() : target.getLeafY(), 1e-9);
+                assertEquals(sizes[i], horizontal ? target.getLeafWidth() : target.getLeafHeight(), 1e-9);
+            }
+        }
+    }
+
+    @Test
     public void cancelledOrRejectedDropRetainsSourceDockable() {
         DockingTree tree = singleGroupTree();
         List<String> beforeIds = tree.dockableIds();
@@ -81,8 +105,8 @@ public class DockingDropTargetTest extends FxTestBase {
         assertTrue(topTree.tryMove("a", new DockingTree.DropTarget("b", DockingPosition.TOP), 0.5));
         DockingLayoutNode.Split topRoot = (DockingLayoutNode.Split) topTree.snapshot();
         assertEquals(Orientation.VERTICAL, topRoot.getOrientation());
-        assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) topRoot.getFirst()).getDockableIds());
-        assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) topRoot.getSecond()).getDockableIds());
+        assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) topRoot.getChildren().get(0)).getDockableIds());
+        assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) topRoot.getChildren().get(1)).getDockableIds());
 
         DockingTree bottomTree = new DockingTree();
         bottomTree.addToRoot(dockable("a"));
@@ -90,7 +114,7 @@ public class DockingDropTargetTest extends FxTestBase {
         assertTrue(bottomTree.tryMove("a", new DockingTree.DropTarget("b", DockingPosition.BOTTOM), 0.5));
         DockingLayoutNode.Split bottomRoot = (DockingLayoutNode.Split) bottomTree.snapshot();
         assertEquals(Orientation.VERTICAL, bottomRoot.getOrientation());
-        assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) bottomRoot.getFirst()).getDockableIds());
-        assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) bottomRoot.getSecond()).getDockableIds());
+        assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) bottomRoot.getChildren().get(0)).getDockableIds());
+        assertEquals(List.of("a"), ((DockingLayoutNode.Tabs) bottomRoot.getChildren().get(1)).getDockableIds());
     }
 }

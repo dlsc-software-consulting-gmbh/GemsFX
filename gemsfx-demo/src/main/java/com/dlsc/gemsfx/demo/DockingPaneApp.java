@@ -371,10 +371,9 @@ public class DockingPaneApp extends GemApplication {
         rootPane.selectDockable("editor");
         context.openDockable(rootPane, "drag", DockingPosition.RIGHT);
         context.openDockable(rootPane, "drop", DockingPosition.RIGHT);
-        rootPane.updateDividerPosition(List.of(), 0.38);
-        rootPane.updateDividerPosition(List.of(1), 0.62);
-        rootPane.updateDividerPosition(List.of(0), 0.5);
-        rootPane.updateDividerPosition(List.of(0, 1), 0.5);
+        rootPane.updateDividerPositions(List.of(), List.of(0.38));
+        rootPane.updateDividerPositions(List.of(1), List.of(0.62));
+        rootPane.updateDividerPositions(List.of(0), List.of(0.5, 0.75));
     }
 
     private Stage createFloatingStage(Stage owner, DockingPane pane) {

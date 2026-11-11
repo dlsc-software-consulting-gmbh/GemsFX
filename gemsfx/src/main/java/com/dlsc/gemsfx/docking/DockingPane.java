@@ -161,17 +161,34 @@ public class DockingPane extends Control {
     }
 
     /**
-     * Records a user-driven divider change so later layout snapshots keep the visible proportion. Observers of
-     * {@link #layoutRootProperty()} are notified with a new snapshot.
+     * Atomically records all divider positions of a split. Observers of {@link #layoutRootProperty()}
+     * are notified with one new snapshot after the entire vector has been validated.
      *
-     * @param path child indices (0 = first, 1 = second) leading from the layout root to the split
-     * @param position the new divider position within [0, 1]
-     * @throws IllegalArgumentException if the path does not address a split or the position is invalid
+     * @param path ordered child indices leading from the layout root to the split
+     * @param positions one fewer positions than children, finite and nondecreasing within [0, 1]
+     * @throws IllegalArgumentException if the path or positions are invalid
      */
-    public final void updateDividerPosition(List<Integer> path, double position) {
+    public final void updateDividerPositions(List<Integer> path, List<Double> positions) {
         DockingContext.requireFxThread();
-        tree.setDividerPosition(Objects.requireNonNull(path, "path must not be null"), position);
+        tree.setDividerPositions(Objects.requireNonNull(path, "path must not be null"), positions);
         layoutRoot.set(tree.snapshot());
+    }
+
+    final void restoreLayout(DockingLayoutNode root, Map<String, Dockable> resolvedDockables) {
+        tree.restore(root);
+        dockablesById.clear();
+        for (String id : tree.dockableIds()) {
+            dockablesById.put(id, Objects.requireNonNull(resolvedDockables.get(id), "Unresolved dockable: " + id));
+        }
+        DockingLayoutNode snapshot = tree.snapshot();
+        DockingLayoutNode last = snapshot;
+        while (last instanceof DockingLayoutNode.Split) {
+            List<DockingLayoutNode> children = ((DockingLayoutNode.Split) last).getChildren();
+            last = children.get(children.size() - 1);
+        }
+        activeDockable.set(last instanceof DockingLayoutNode.Tabs
+                ? dockablesById.get(((DockingLayoutNode.Tabs) last).getSelectedId()) : null);
+        layoutRoot.set(snapshot);
     }
 
     final boolean containsDockable(String id) {
@@ -351,8 +368,12 @@ public class DockingPane extends Control {
         }
         if (node instanceof DockingLayoutNode.Split) {
             DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-            String found = neighbourOf(split.getFirst(), id);
-            return found != null ? found : neighbourOf(split.getSecond(), id);
+            for (DockingLayoutNode child : split.getChildren()) {
+                String found = neighbourOf(child, id);
+                if (found != null) {
+                    return found;
+                }
+            }
         }
         return null;
     }

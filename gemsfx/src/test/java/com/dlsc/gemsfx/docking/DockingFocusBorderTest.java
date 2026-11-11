@@ -81,7 +81,7 @@ public class DockingFocusBorderTest extends FxTestBase {
             assertFalse(secondGroup.getPseudoClassStates().contains(HIGHLIGHTED));
             stage.setWindowFocused(true);
             assertTrue(secondGroup.getPseudoClassStates().contains(HIGHLIGHTED));
-            pane.updateDividerPosition(List.of(), 0.6);
+            pane.updateDividerPositions(List.of(), List.of(0.6));
             assertTrue(groupOf(secondInput).getPseudoClassStates().contains(HIGHLIGHTED));
             pane.setShowFocusBorder(false);
             assertFalse(groupOf(secondInput).getPseudoClassStates().contains(HIGHLIGHTED));

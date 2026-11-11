@@ -76,12 +76,17 @@ public class DockingContextTest extends FxTestBase {
                     assertTrue(context.moveTabGroup(pane, "a", paneEdge ? null : "x", edge));
 
                     DockingLayoutNode.Split split = (DockingLayoutNode.Split) pane.getLayoutRoot();
+                    boolean horizontal = edge == DockingPosition.LEFT || edge == DockingPosition.RIGHT;
                     if (!paneEdge) {
-                        assertEquals(List.of("y"), ((DockingLayoutNode.Tabs) split.getSecond()).getDockableIds());
-                        split = (DockingLayoutNode.Split) split.getFirst();
+                        assertEquals(List.of("y"), ((DockingLayoutNode.Tabs)
+                                split.getChildren().get(horizontal ? 1 : 2)).getDockableIds());
+                        if (horizontal) {
+                            split = (DockingLayoutNode.Split) split.getChildren().get(0);
+                        }
                     }
                     DockingLayoutNode moved = edge == DockingPosition.LEFT || edge == DockingPosition.TOP
-                            ? split.getFirst() : split.getSecond();
+                            ? split.getChildren().get(0)
+                            : split.getChildren().get(paneEdge ? split.getChildren().size() - 1 : 1);
                     assertTrue("The moved group must not become separate splits", moved instanceof DockingLayoutNode.Tabs);
                     assertEquals(List.of("a", "b"), ((DockingLayoutNode.Tabs) moved).getDockableIds());
                     assertEquals("b", ((DockingLayoutNode.Tabs) moved).getSelectedId());
