@@ -48,11 +48,15 @@ public class DockingTab extends HBox {
     private final Dockable dockable;
     private final Label label;
     private final HBox actions = new HBox();
-    private final ChangeListener<Boolean> titleEditableListener;
     private TextField titleEditor;
-    private final ChangeListener<Parent> contentParentListener;
     private final BooleanBinding dockableHovered;
-    private final ChangeListener<Node> toolbarListener;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final ChangeListener<Boolean> titleEditableListener; // this is a field to prevent garbage collection of the weak listener
+    @SuppressWarnings("FieldCanBeLocal")
+    private final ChangeListener<Parent> contentParentListener; // this is a field to prevent garbage collection of the weak listener
+    @SuppressWarnings("FieldCanBeLocal")
+    private final ChangeListener<Node> toolbarListener; // this is a field to prevent garbage collection of the weak listener
 
     /**
      * Creates a header whose close button requests closure through the given context.
