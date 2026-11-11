@@ -290,12 +290,16 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         }
         if (node instanceof DockingLayoutNode.Split) {
             DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-            SplitPane splitPane = new SplitPane(render(split.getFirst(), child(path, 0)),
-                    render(split.getSecond(), child(path, 1)));
+            SplitPane splitPane = new SplitPane();
             splitPane.getStyleClass().add("docking-split");
             splitPane.setOrientation(split.getOrientation());
-            splitPane.setDividerPositions(split.getDividerPosition());
-            splitPane.getDividers().get(0).positionProperty().addListener((obs, old, value) -> syncDivider(path, value.doubleValue()));
+            List<Double> positions = new ArrayList<>();
+            List<SplitRange> ranges = new ArrayList<>();
+            collectSplitItems(splitPane, split, path, 0, 1, positions, ranges);
+            splitPane.setDividerPositions(positions.stream().mapToDouble(Double::doubleValue).toArray());
+            for (SplitPane.Divider divider : splitPane.getDividers()) {
+                divider.positionProperty().addListener((obs, old, value) -> syncDividers(splitPane, ranges));
+            }
             return splitPane;
         }
         Node placeholder = getSkinnable().getPlaceholder();
@@ -311,16 +315,68 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return child;
     }
 
+    private void collectSplitItems(SplitPane pane, DockingLayoutNode node, List<Integer> path,
+                                   double start, double end, List<Double> positions, List<SplitRange> ranges) {
+        if (node instanceof DockingLayoutNode.Split
+                && ((DockingLayoutNode.Split) node).getOrientation() == pane.getOrientation()) {
+            DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
+            int first = pane.getItems().size();
+            double boundary = start + (end - start) * split.getDividerPosition();
+            collectSplitItems(pane, split.getFirst(), child(path, 0), start, boundary, positions, ranges);
+            int middle = pane.getItems().size();
+            positions.add(boundary);
+            collectSplitItems(pane, split.getSecond(), child(path, 1), boundary, end, positions, ranges);
+            ranges.add(new SplitRange(path, first, middle, pane.getItems().size(), split.getDividerPosition()));
+        } else {
+            pane.getItems().add(render(node, path));
+        }
+    }
+
     // The model is updated while dragging; the visible split already shows the position, so it must not be rebuilt.
-    private void syncDivider(List<Integer> path, double position) {
-        if (!(position >= 0 && position <= 1)) {
+    private void syncDividers(SplitPane pane, List<SplitRange> ranges) {
+        if (syncingDivider) {
             return;
+        }
+        double[] positions = pane.getDividerPositions();
+        double[] boundaries = new double[positions.length + 2];
+        boundaries[boundaries.length - 1] = 1;
+        for (int i = 0; i < positions.length; i++) {
+            if (!(positions[i] >= boundaries[i] && positions[i] <= 1)) {
+                return;
+            }
+            boundaries[i + 1] = positions[i];
         }
         syncingDivider = true;
         try {
-            getSkinnable().updateDividerPosition(path, position);
+            for (SplitRange range : ranges) {
+                double size = boundaries[range.end] - boundaries[range.start];
+                // A collapsed subtree has no measurable ratio; retain its last model proportion.
+                if (size > 0) {
+                    double position = (boundaries[range.middle] - boundaries[range.start]) / size;
+                    if (position != range.position) {
+                        getSkinnable().updateDividerPosition(range.path, position);
+                        range.position = position;
+                    }
+                }
+            }
         } finally {
             syncingDivider = false;
+        }
+    }
+
+    private static final class SplitRange {
+        private final List<Integer> path;
+        private final int start;
+        private final int middle;
+        private final int end;
+        private double position;
+
+        private SplitRange(List<Integer> path, int start, int middle, int end, double position) {
+            this.path = path;
+            this.start = start;
+            this.middle = middle;
+            this.end = end;
+            this.position = position;
         }
     }
 

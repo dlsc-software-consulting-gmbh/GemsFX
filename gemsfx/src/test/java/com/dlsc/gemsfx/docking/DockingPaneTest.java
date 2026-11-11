@@ -18,6 +18,7 @@ import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -1350,6 +1351,119 @@ public class DockingPaneTest extends FxTestBase {
         assertThrows(IllegalStateException.class, () -> pane.updateDividerPosition(List.of(), 0.7));
         assertThrows(IllegalStateException.class, () -> pane.canMoveDockableToPaneEdge("a", DockingPosition.BOTTOM));
         assertThrows(IllegalStateException.class, () -> pane.moveDockableToPaneEdge("a", DockingPosition.BOTTOM));
+    }
+
+    @Test
+    public void flattenedDividersResizeOnlyAdjacentItemsAndPreserveSavedProportions() {
+        runFx(() -> {
+            for (Orientation orientation : Orientation.values()) {
+                DockingPosition direction = orientation == Orientation.HORIZONTAL
+                        ? DockingPosition.RIGHT : DockingPosition.BOTTOM;
+                DockingContext context = context(dockable("a"), dockable("b"), dockable("c"), dockable("d"));
+                DockingPane pane = context.createPane();
+                context.openDockable(pane, "a", DockingPosition.CENTER);
+                context.openDockable(pane, "b", direction);
+                context.openDockable(pane, "c", direction);
+                pane.selectDockable("a");
+                context.openDockable(pane, "d", direction);
+                layout(pane);
+                SplitPane split = (SplitPane) pane.lookup(".docking-split");
+                assertEquals(4, split.getItems().size());
+                assertEquals(1, pane.lookupAll(".docking-split").size());
+                assertArrayEquals(new double[]{0.25, 0.5, 0.75}, split.getDividerPositions(), 0.002);
+
+                for (int divider = 0; divider < 3; divider++) {
+                    double[] sizes = split.getItems().stream().mapToDouble(item ->
+                            orientation == Orientation.HORIZONTAL
+                                    ? item.getLayoutBounds().getWidth() : item.getLayoutBounds().getHeight()).toArray();
+                    double[] positions = split.getDividerPositions();
+                    split.setDividerPosition(divider, positions[divider] + 0.04);
+                    pane.layout();
+                    assertSame(split, pane.lookup(".docking-split"));
+                    for (int item = 0; item < 4; item++) {
+                        double size = orientation == Orientation.HORIZONTAL
+                                ? split.getItems().get(item).getLayoutBounds().getWidth()
+                                : split.getItems().get(item).getLayoutBounds().getHeight();
+                        if (item == divider) {
+                            assertTrue("The preceding dockable must grow", size > sizes[item]);
+                        } else if (item == divider + 1) {
+                            assertTrue("The following dockable must shrink", size < sizes[item]);
+                        } else {
+                            assertEquals("Other dockables must retain their size", sizes[item], size, 1);
+                        }
+                    }
+                    positions = split.getDividerPositions();
+                    DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
+                    assertEquals(positions[1], root.getDividerPosition(), 1e-9);
+                    assertEquals(positions[0] / positions[1],
+                            ((DockingLayoutNode.Split) root.getFirst()).getDividerPosition(), 1e-9);
+                    assertEquals((positions[2] - positions[1]) / (1 - positions[1]),
+                            ((DockingLayoutNode.Split) root.getSecond()).getDividerPosition(), 1e-9);
+                }
+                pane.selectDockable("a");
+                assertSame(split, pane.lookup(".docking-split"));
+                double[] positions = split.getDividerPositions();
+                DockingContext restoredContext = context(dockable("a"), dockable("b"), dockable("c"), dockable("d"));
+                DockingPane restored = restoredContext.createPane();
+                restoredContext.restoreLayout(context.getLayout());
+                layout(restored);
+                SplitPane restoredSplit = (SplitPane) restored.lookup(".docking-split");
+                assertEquals(4, restoredSplit.getItems().size());
+                assertArrayEquals(positions, restoredSplit.getDividerPositions(), 0.002);
+            }
+        });
+    }
+
+    @Test
+    public void flatteningStopsAtOppositeOrientationSplits() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"), dockable("c"), dockable("d"), dockable("e"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.RIGHT);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            context.openDockable(pane, "d", DockingPosition.BOTTOM);
+            context.openDockable(pane, "e", DockingPosition.BOTTOM);
+            layout(pane);
+            SplitPane outer = (SplitPane) pane.lookup(".docking-split");
+            assertEquals(3, outer.getItems().size());
+            assertEquals(2, pane.lookupAll(".docking-split").size());
+            SplitPane inner = (SplitPane) outer.getItems().get(2);
+            assertEquals(Orientation.VERTICAL, inner.getOrientation());
+            assertEquals(3, inner.getItems().size());
+            double[] positions = outer.getDividerPositions();
+            inner.setDividerPosition(0, 0.7);
+            pane.layout();
+            assertArrayEquals(positions, outer.getDividerPositions(), 0);
+            DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
+            DockingLayoutNode.Split right = (DockingLayoutNode.Split) root.getSecond();
+            DockingLayoutNode.Split vertical = (DockingLayoutNode.Split) right.getSecond();
+            assertEquals(inner.getDividerPositions()[0], vertical.getDividerPosition(), 1e-9);
+            assertEquals((inner.getDividerPositions()[1] - inner.getDividerPositions()[0])
+                            / (1 - inner.getDividerPositions()[0]),
+                    ((DockingLayoutNode.Split) vertical.getSecond()).getDividerPosition(), 1e-9);
+        });
+    }
+
+    @Test
+    public void flattenedCollapsedRangesRetainFiniteModelRatios() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"), dockable("c"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.RIGHT);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            layout(pane);
+            SplitPane split = (SplitPane) pane.lookup(".docking-split");
+            assertEquals(2, split.getDividers().size());
+            for (double endpoint : new double[]{0, 1}) {
+                split.setDividerPositions(endpoint, endpoint);
+                DockingLayoutNode.Split root = (DockingLayoutNode.Split) pane.getLayoutRoot();
+                assertTrue(Double.isFinite(root.getDividerPosition()));
+                assertTrue(Double.isFinite(((DockingLayoutNode.Split) root.getSecond()).getDividerPosition()));
+                assertNotNull(context.getLayout());
+            }
+        });
     }
 
     @Test
