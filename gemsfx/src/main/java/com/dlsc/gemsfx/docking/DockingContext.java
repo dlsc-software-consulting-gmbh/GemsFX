@@ -680,6 +680,12 @@ public class DockingContext {
         pane.restoreLayout(root, dockablesById);
     }
 
+    /**
+     * Prepares a saved subtree for restore by removing dockables the factory cannot resolve and
+     * choosing a surviving selected tab when necessary. Empty split children are removed together
+     * with their preceding divider (the following divider for the first child), transferring their
+     * space to a neighbor. Splits with fewer than two surviving children are collapsed.
+     */
     private DockingLayoutNode normalizeNode(DockingLayoutNode node,
                                             Map<String, Dockable> resolvedDockables,
                                             Set<String> unresolvedDockables) {
@@ -726,6 +732,11 @@ public class DockingContext {
         return new DockingLayoutNode.Split(split.getOrientation(), children, positions);
     }
 
+    /**
+     * Resolves an ID through the factory, caching both successful and unsuccessful lookups for the
+     * current restore. Factory results must retain the requested ID so the saved layout and the
+     * context's ownership mappings refer to the same dockable.
+     */
     private Dockable resolveDockable(String id, Map<String, Dockable> resolvedDockables, Set<String> unresolvedDockables) {
         Dockable existing = resolvedDockables.get(id);
         if (existing != null) {
@@ -750,6 +761,11 @@ public class DockingContext {
         return dockable;
     }
 
+    /**
+     * Rejects invalid trees, context-wide duplicate dockable IDs, and inconsistent primary/floating
+     * pane metadata before restore invokes factories or changes the live workspace. Exactly the
+     * designated primary pane must omit stage bounds; every other pane represents a floating window.
+     */
     private void validateLayout(DockingLayout layout) {
         List<DockingLayout.PaneLayout> paneLayouts = layout.getPanes();
         if (paneLayouts.isEmpty()) {
@@ -813,6 +829,12 @@ public class DockingContext {
         return nonFloatingPanes;
     }
 
+    /**
+     * Chooses the existing primary pane to reuse so restore preserves its placement in the
+     * application's scene graph. A scene-attached non-floating pane takes precedence over detached
+     * panes; ambiguous candidates are rejected rather than silently replacing the wrong workspace.
+     * Returns {@code null} when no non-floating pane exists yet.
+     */
     private DockingPane resolveMountedPrimaryPaneForRestore() {
         List<DockingPane> nonFloating = nonFloatingPanes();
         if (nonFloating.isEmpty()) {
@@ -851,6 +873,11 @@ public class DockingContext {
         }
     }
 
+    /**
+     * Captures floating-window bounds even when the stage has not acquired usable dimensions yet.
+     * Missing or invalid dimensions fall back to the scene size, then to one, so the snapshot always
+     * satisfies the positive, finite size requirements of {@link DockingLayout.StageBounds}.
+     */
     private DockingLayout.StageBounds toStageBounds(Stage stage) {
         double width = stage.getWidth();
         double height = stage.getHeight();
@@ -914,6 +941,12 @@ public class DockingContext {
         }
     }
 
+    /**
+     * Removes an owned dockable from its pane and all context registries, closing an emptied floating
+     * window when appropriate. Identity checking prevents a stale instance from closing another
+     * dockable with the same ID. Window teardown passes {@code false} for {@code checkPolicy} after
+     * prechecking all tabs or when the window has already been hidden.
+     */
     private boolean closeDockableInternal(Dockable dockable, boolean checkPolicy) {
         String id = dockable.getId();
         if (dockablesById.get(id) != dockable) {
@@ -933,6 +966,11 @@ public class DockingContext {
         return true;
     }
 
+    /**
+     * Connects a floating pane to its stage and installs the close/hidden handlers that keep window
+     * lifetime and context ownership in sync. Host tracking follows the supplied source stage, falling
+     * back to the floating stage's owner when no source stage is available.
+     */
     private void registerFloatingStage(DockingPane pane, Stage floatingStage, Stage hostStage) {
         floatingStageByPane.put(pane, floatingStage);
         floatingPaneByStage.put(floatingStage, pane);
@@ -946,6 +984,11 @@ public class DockingContext {
         }
     }
 
+    /**
+     * Prechecks every tab's close policy before removing any dockable, so a veto leaves the whole
+     * window intact. After approval, policies are not evaluated again and automatic empty-window
+     * closure is suppressed to avoid reentering stage teardown while its dockables are being removed.
+     */
     private void handleFloatingStageCloseRequest(Stage stage, WindowEvent event) {
         DockingPane pane = floatingPaneByStage.get(stage);
         if (pane == null) {
@@ -980,6 +1023,11 @@ public class DockingContext {
         }
     }
 
+    /**
+     * Tracks floating windows by their logical host and installs one showing listener per host.
+     * Hiding the host closes its tracked windows, including windows not natively owned by that stage.
+     * The listener is retained for removal when the last tracked floating window is unregistered.
+     */
     private void registerHostStage(Stage hostStage, Stage floatingStage) {
         if (hostStage == null) {
             return;
@@ -1007,6 +1055,13 @@ public class DockingContext {
         }
     }
 
+    /**
+     * Tears down context state when a floating window is hidden or its close request is approved.
+     * Remaining dockables are removed without policy checks because the window is already hidden or
+     * approval has been obtained. Removing the stage mapping first makes repeated calls harmless;
+     * suppressing empty-window closure prevents recursive teardown. The host listener is released
+     * when its last tracked window is removed.
+     */
     private void unregisterFloatingStage(Stage stage) {
         DockingPane pane = floatingPaneByStage.remove(stage);
         if (pane == null) {

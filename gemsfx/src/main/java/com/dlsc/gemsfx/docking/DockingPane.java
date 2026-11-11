@@ -353,7 +353,11 @@ public class DockingPane extends Control {
         return List.copyOf(dockablesById.values());
     }
 
-    // The tab that stays selected when the given one is removed, or any remaining tab if it was alone in its group.
+    /**
+     * Finds a replacement active dockable before removal changes the tree. The preceding tab in the
+     * same group is preferred, or the following tab when removing the first tab. If the group would
+     * become empty, any remaining dockable elsewhere in the pane may take over.
+     */
     private String neighbourOf(DockingLayoutNode node, String id) {
         if (node instanceof DockingLayoutNode.Tabs) {
             List<String> ids = ((DockingLayoutNode.Tabs) node).getDockableIds();

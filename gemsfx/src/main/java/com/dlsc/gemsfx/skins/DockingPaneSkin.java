@@ -150,6 +150,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         updateFocusBorders();
     }
 
+    /**
+     * Highlights only the tab group containing the actual scene focus owner, and only while its
+     * window has focus. Walking the focus owner's ancestors includes focus within dockable content
+     * without confusing the active dockable with the group currently receiving keyboard input.
+     */
     private void updateFocusBorders() {
         DockingTabPane focusedGroup = null;
         if (getSkinnable().isShowFocusBorder() && focusScene != null
@@ -166,6 +171,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         }
     }
 
+    /**
+     * Applies selection-only snapshot changes to existing tab groups without rebuilding the scene
+     * graph. This avoids unnecessarily detaching content and disturbing focus when switching tabs.
+     * Returns {@code false} when structural or divider changes require a full rebuild instead.
+     */
     private boolean updateSelection(DockingLayoutNode oldLayout, DockingLayoutNode newLayout) {
         List<String> selectedIds = new ArrayList<>();
         if (!collectSelectionOnlyChanges(oldLayout, newLayout, selectedIds)) {
@@ -178,6 +188,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return true;
     }
 
+    /**
+     * Compares two snapshots while ignoring selected-tab IDs, collecting the new selections in the
+     * same depth-first order used to render tab groups. Collected IDs are usable only if the entire
+     * comparison succeeds; a mismatch may leave a partially populated list.
+     */
     private static boolean collectSelectionOnlyChanges(DockingLayoutNode oldLayout, DockingLayoutNode newLayout,
                                                        List<String> selectedIds) {
         if (oldLayout instanceof DockingLayoutNode.Tabs && newLayout instanceof DockingLayoutNode.Tabs) {
@@ -208,6 +223,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return oldLayout instanceof DockingLayoutNode.Empty && newLayout instanceof DockingLayoutNode.Empty;
     }
 
+    /**
+     * Recreates the rendered split/tab hierarchy after layout structure or tab presentation changes.
+     * Existing content and graphics are released before rendering so their nodes can be reused, and
+     * keyboard focus on a tab title is restored by dockable ID rather than by obsolete node identity.
+     */
     private void rebuild() {
         DockingPane pane = getSkinnable();
         String focusedId = focusedDockableId();
@@ -256,7 +276,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         }
     }
 
-    // Unskinned SplitPane items are not reachable through scene-graph lookup.
+    /**
+     * Releases content nodes and graphic bindings before rebuilding or disposing the skin. Explicit
+     * host/label lists are needed because items of an unskinned {@link SplitPane} are not reachable
+     * through scene-graph lookup, yet must still release their nodes before those nodes are reused.
+     */
     private void detachContents() {
         for (Label label : graphicLabels) {
             label.graphicProperty().unbind();
@@ -283,6 +307,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return null;
     }
 
+    /**
+     * Builds controls from a layout subtree while recording reusable content/graphic hosts for
+     * later cleanup. Each split retains its child-index path into the model so divider changes update
+     * the corresponding split rather than another split with the same orientation.
+     */
     private Node render(DockingLayoutNode node, List<Integer> path) {
         if (node instanceof DockingLayoutNode.Tabs) {
             DockingTabPane tabs = new DockingTabPane(getSkinnable(), (DockingLayoutNode.Tabs) node);
@@ -323,7 +352,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return child;
     }
 
-    // The model is updated while dragging; the visible split already shows the position, so it must not be rebuilt.
+    /**
+     * Publishes the split's complete, valid divider vector to the model as dividers move. Invalid
+     * intermediate vectors and unchanged positions are ignored. The synchronization guard prevents
+     * the resulting snapshot notification from rebuilding the split currently being dragged.
+     */
     private void syncDividers(SplitPane pane, List<Integer> path) {
         if (syncingDivider) {
             return;
@@ -370,6 +403,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         super.dispose();
     }
 
+    /**
+     * Connects tab titles to the drag lifecycle, capturing Shift at gesture start to distinguish
+     * whole-group moves from single-tab moves. The group marker is also kept on the source title
+     * until drag completion, allowing event handling to identify the gesture without a dragboard.
+     */
     private void installTitleDragHandlers(Node root) {
         for (Node title : root.lookupAll(".docking-tab")) {
             title.addEventHandler(MouseEvent.DRAG_DETECTED, event -> {
@@ -436,6 +474,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return snapshot(preview, 320, 240);
     }
 
+    /**
+     * Snapshots attached content in place, but temporarily mounts detached content so CSS and layout
+     * can provide meaningful dimensions. The temporary parent is removed and the original size and
+     * layout coordinates are restored even if snapshot creation fails.
+     */
     private Image snapshotDockableContent(Node content) {
         if (content.getParent() != null || content.getScene() != null) {
             return snapshot(content, 280, 180);
@@ -477,6 +520,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         scene.getStylesheets().addAll(getSkinnable().getStylesheets());
     }
 
+    /**
+     * Produces a transparent drag image that fits the requested limits without enlarging the node.
+     * Both the transform and viewport use the same scale, accounting for nonzero bounds origins
+     * while keeping the resulting image dimensions within the limits.
+     */
     private Image snapshot(Node node, double maxWidth, double maxHeight) {
         Bounds bounds = node.getBoundsInParent();
         double scale = Math.min(1, Math.min(maxWidth / Math.max(1, bounds.getWidth()),
@@ -490,6 +538,12 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return node.snapshot(parameters, null);
     }
 
+    /**
+     * Validates docking gestures and previews their destination without moving dockables. Empty
+     * panes and explicit pane-wide edge targets take precedence over individual group targets;
+     * single-tab and whole-group gestures use their respective context validation rules.
+     * Drags without a dockable ID are routed to the external dockable-creation path.
+     */
     private void handleDragOver(DragEvent event) {
         String draggedId = draggedDockableId(event);
         if (draggedId == null) {
@@ -533,6 +587,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         event.consume();
     }
 
+    /**
+     * Resolves the final destination and commits a single-tab or whole-group move, using the same
+     * target precedence as drag-over handling. Failed docking attempts are recorded so drag
+     * completion does not mistake a rejected in-pane drop for a request to create a floating window.
+     */
     private void handleDragDropped(DragEvent event) {
         String draggedId = draggedDockableId(event);
         if (draggedId == null) {
@@ -571,6 +630,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         hidePaneEdgeTargets();
     }
 
+    /**
+     * Previews a destination for an accepted external drag without invoking the dockable factory.
+     * The eventual drop may create content at a pane-wide edge, in an empty pane, or relative to a
+     * group; COPY and MOVE are both offered because the external source determines its semantics.
+     */
     private void handleExternalDragOver(DragEvent event) {
         DockingPane pane = getSkinnable();
         showPaneEdgeTargets(null);
@@ -592,6 +656,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         event.consume();
     }
 
+    /**
+     * Delegates dockable creation to the context only after resolving the external drop's final
+     * destination. Preview cleanup is unconditional, including when application-supplied drop
+     * callbacks fail, so stale indicators do not remain after the gesture ends.
+     */
     private void handleExternalDragDropped(DragEvent event) {
         DockingPane pane = getSkinnable();
         try {
@@ -802,6 +871,13 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return true;
     }
 
+    /**
+     * Distinguishes completed or rejected docking and Escape cancellation from outside drops that
+     * should float the dragged tab or group. A recorded scene drop outside the context's panes takes
+     * precedence over drag-done data; otherwise zero native drag-done coordinates fall back to the
+     * mouse position. Without a recorded outside drop, all panes in the context are checked before
+     * creating a floating window, and gesture state is cleared even if floating fails.
+     */
     private void completeDrag(String dockableId, TransferMode transferMode, double screenX, double screenY) {
         if (dockableId == null || !dockableId.equals(activeDragDockableId) || dragCancelledByEscape
                 || (outsideContextDropPosition == null && (transferMode != null || unsuccessfulDropObserved))) {
@@ -833,6 +909,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         }
     }
 
+    /**
+     * Checks screen coordinates against this context's panes across all JavaFX windows, not just
+     * the source pane. This prevents an unaccepted drop over another context pane from becoming a
+     * floating window. Non-finite coordinates are rejected rather than treated as an outside drop.
+     */
     private boolean isOutsideAllContextPanes(double screenX, double screenY) {
         if (!Double.isFinite(screenX) || !Double.isFinite(screenY)) {
             return false;
