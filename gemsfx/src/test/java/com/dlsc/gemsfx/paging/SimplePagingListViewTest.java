@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for {@link SimplePagingListView}, which wraps an observable list with transparent
- * paging via an internal {@link SimpleLoader}.
+ * paging via an model {@link SimpleLoader}.
  */
 public class SimplePagingListViewTest extends FxTestBase {
 

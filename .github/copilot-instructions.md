@@ -64,8 +64,10 @@ protected Skin<?> createDefaultSkin() {
 
 | Package                      | Purpose                                                         |
 |------------------------------|-----------------------------------------------------------------|
-| `com.dlsc.gemsfx`            | All public control classes                                      |
+| `com.dlsc.gemsfx`            | Core public control classes                                     |
 | `com.dlsc.gemsfx.skins`      | All skin implementations (also exported)                        |
+| `com.dlsc.gemsfx.docking`    | Public docking API and workspace controls                       |
+| `com.dlsc.gemsfx.docking.model` | Mutable docking layout model (not exported)                  |
 | `com.dlsc.gemsfx.binding`    | Reusable `ObjectBinding` subclasses for nested/aggregated lists |
 | `com.dlsc.gemsfx.daterange`  | Date range picker and view                                      |
 | `com.dlsc.gemsfx.infocenter` | Notification center pane and model classes                      |
@@ -77,8 +79,11 @@ protected Skin<?> createDefaultSkin() {
 
 ### Module
 
-The library is an **open** JPMS module (`open module com.dlsc.gemsfx`). All sub-packages listed above are explicitly
-`exports`-ed.
+The library is an **open** JPMS module (`open module com.dlsc.gemsfx`). Public API packages are explicitly
+`exports`-ed; `com.dlsc.gemsfx.docking.model` remains unexported.
+
+Docking skins stay in the shared `com.dlsc.gemsfx.skins` package. The docking control stylesheets live under
+`gemsfx/src/main/resources/com/dlsc/gemsfx/docking/`, alongside the matching control package.
 
 ### Demo Apps
 

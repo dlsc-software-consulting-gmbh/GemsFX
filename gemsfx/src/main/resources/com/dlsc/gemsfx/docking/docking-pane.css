@@ -1,0 +1,202 @@
+.docking-pane {
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+}
+
+.docking-pane .docking-tab-pane {
+    -fx-background-color: transparent;
+}
+
+.docking-pane:show-focus-border .docking-tab-pane {
+    -fx-border-color: transparent;
+    -fx-border-width: 1;
+}
+
+.docking-pane:show-focus-border .docking-tab-pane:focus-highlighted {
+    -fx-border-color: -fx-focus-color;
+}
+
+.docking-pane .docking-tab-strip {
+    -fx-spacing: 0;
+    -fx-padding: 0;
+    -fx-background-color: derive(-fx-base, -3%);
+}
+
+.docking-pane .docking-tab {
+    -fx-pref-height: 2.5em;
+    -fx-min-height: -fx-pref-height;
+    -fx-max-height: -fx-pref-height;
+    -fx-padding: 4 4 4 10;
+    -fx-spacing: 6;
+    -fx-background-color: derive(-fx-base, 8%);
+    -fx-background-radius: 0;
+    -fx-border-color: transparent -fx-box-border -fx-box-border transparent;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
+
+.docking-pane .docking-tab:focused {
+    -fx-border-color: -fx-focus-color;
+    -fx-border-radius: 0;
+    -fx-border-insets: 0;
+}
+
+.docking-pane .docking-tab:last-tab {
+    -fx-border-width: 1 0 1 1;
+}
+
+.docking-pane .docking-tab.selected {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.docking-pane .docking-tab-actions {
+    -fx-spacing: 6;
+}
+
+.docking-pane .docking-tab-title {
+    -fx-graphic-text-gap: 6;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-title {
+    -fx-font-weight: bold;
+}
+
+.docking-pane .docking-tab-title-editor {
+    -fx-padding: 0 3;
+    -fx-background-insets: 0;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-title-editor {
+    -fx-font-weight: bold;
+}
+
+.docking-pane .docking-tab-close-button,
+.docking-pane .docking-tab-help-button,
+.docking-pane .docking-tab-menu-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 4;
+    -fx-min-width: 18;
+    -fx-min-height: 18;
+}
+
+.docking-pane .docking-tab-close-button:hover,
+.docking-pane .docking-tab-help-button:hover,
+.docking-pane .docking-tab-menu-button:hover {
+    -fx-background-color: transparent;
+}
+
+.docking-pane .docking-tab-close-button .icon {
+    -fx-shape: "M1 0 L5 4 L9 0 L10 1 L6 5 L10 9 L9 10 L5 6 L1 10 L0 9 L4 5 L0 1 Z";
+    -fx-scale-shape: true;
+    -fx-min-width: 8;
+    -fx-min-height: 8;
+    -fx-pref-width: 8;
+    -fx-pref-height: 8;
+    -fx-max-width: 8;
+    -fx-max-height: 8;
+    -fx-background-color: -fx-text-base-color;
+}
+
+.docking-pane .docking-tab-help-button .ikonli-font-icon,
+.docking-pane .docking-tab-menu-button .ikonli-font-icon {
+    -fx-icon-size: 12;
+    -fx-icon-color: -fx-text-base-color;
+}
+
+.docking-pane .docking-tab-menu-button {
+    -fx-border-color: transparent;
+}
+
+.docking-pane .docking-tab-menu-button > .label,
+.docking-pane .docking-tab-menu-button > .arrow-button,
+.docking-pane .docking-tab-menu-button > .arrow-button > .arrow {
+    -fx-padding: 0;
+}
+
+.docking-pane .docking-tab .docking-tab-menu-button > .arrow-button > .arrow {
+    -fx-shape: null;
+    -fx-min-width: 0;
+}
+
+.docking-pane .docking-tab-content {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.docking-pane .docking-split {
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+
+.docking-pane .docking-drop-leaf-preview {
+    -fx-border-color: -fx-accent;
+    -fx-border-width: 1;
+    -fx-background-color: transparent;
+    -fx-opacity: 0.7;
+}
+
+.docking-pane .docking-drop-zone-preview {
+    -fx-opacity: 0.35;
+    -fx-background-color: -fx-accent;
+}
+
+.docking-pane .docking-drop-zone-preview.drop-zone-center {
+    -fx-opacity: 0.18;
+}
+
+.docking-pane .docking-pane-edge-target {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-radius: 5;
+    -fx-border-color: -fx-accent;
+    -fx-border-radius: 5;
+    -fx-border-width: 2;
+    -fx-padding: 7;
+}
+
+.docking-pane .docking-pane-edge-target:active {
+    -fx-background-color: -fx-accent;
+}
+
+.docking-pane .docking-pane-edge-target .icon {
+    -fx-background-color: -fx-accent;
+    -fx-pref-width: 20;
+    -fx-pref-height: 20;
+    -fx-max-width: 20;
+    -fx-max-height: 20;
+    -fx-scale-shape: true;
+}
+
+.docking-pane .docking-pane-edge-target:active .icon {
+    -fx-background-color: -fx-selection-bar-text;
+}
+
+.docking-pane .pane-edge-left .icon {
+    -fx-shape: "M0 0 H20 V20 H0 Z M7 2 V18 H18 V2 Z";
+}
+
+.docking-pane .pane-edge-right .icon {
+    -fx-shape: "M0 0 H20 V20 H0 Z M2 2 V18 H13 V2 Z";
+}
+
+.docking-pane .pane-edge-top .icon {
+    -fx-shape: "M0 0 H20 V20 H0 Z M2 7 V18 H18 V7 Z";
+}
+
+.docking-pane .pane-edge-bottom .icon {
+    -fx-shape: "M0 0 H20 V20 H0 Z M2 2 V13 H18 V2 Z";
+}
+
+.docking-pane.docking-drag-preview {
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 9;
+    -fx-spacing: 7;
+    -fx-alignment: top-center;
+}
+
+.docking-pane.docking-drag-preview .docking-drag-title {
+    -fx-padding: 0 2 3 2;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-base-color;
+}
+

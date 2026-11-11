@@ -13,6 +13,7 @@ import com.dlsc.gemsfx.demo.DateRangePickerApp;
 import com.dlsc.gemsfx.demo.DateRangeViewApp;
 import com.dlsc.gemsfx.demo.DayOfWeekPickerApp;
 import com.dlsc.gemsfx.demo.DialogPaneApp;
+import com.dlsc.gemsfx.demo.DockingPaneApp;
 import com.dlsc.gemsfx.demo.DrawerStackPaneApp;
 import com.dlsc.gemsfx.demo.DurationPickerApp;
 import com.dlsc.gemsfx.demo.EmailFieldApp;
@@ -131,6 +132,7 @@ public final class ShowcaseRegistry {
             entry(LISTS_AND_TABLES, "Strip View", "strip-view", StripViewApp.class),
 
             // --- Layout ---------------------------------------------------------
+            entry(LAYOUT, "Docking Pane", "docking-pane", DockingPaneApp.class),
             entry(LAYOUT, "Drawer Stack Pane", "drawer-stack-pane", DrawerStackPaneApp.class),
             entry(LAYOUT, "Hidden Sides Pane", "hidden-sides-pane", HiddenSidesPaneApp.class),
             entry(LAYOUT, "Loading Pane", "loading-pane", LoadingPaneApp.class),

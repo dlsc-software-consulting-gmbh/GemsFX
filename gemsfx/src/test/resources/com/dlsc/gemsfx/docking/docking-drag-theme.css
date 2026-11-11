@@ -1,0 +1,11 @@
+.root {
+    -color-bg-default: #123456;
+    -color-bg-subtle: #234567;
+    -color-border-default: #654321;
+    -color-border-muted: #654321;
+    -color-fg-default: lime;
+    -color-fg-emphasis: white;
+    -color-neutral-emphasis: #333333;
+    -color-neutral-muted: #555555;
+    -color-accent-emphasis: blue;
+}

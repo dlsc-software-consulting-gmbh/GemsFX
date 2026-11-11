@@ -1,0 +1,25 @@
+.docking-pane-placeholder {
+    -fx-alignment: center;
+    -fx-spacing: 16;
+}
+
+.docking-pane-placeholder .illustration {
+    -fx-shape: "M8 0 H172 Q180 0 180 8 V112 Q180 120 172 120 H8 Q0 120 0 112 V8 Q0 0 8 0 Z M8 3 Q3 3 3 8 V112 Q3 117 8 117 H172 Q177 117 177 112 V8 Q177 3 172 3 Z M3 22 H177 V25 H3 Z M54 25 H57 V117 H54 Z M57 83 H177 V86 H57 Z M12 11 H40 V14 H12 Z M49 11 H70 V14 H49 Z M12 36 H41 V39 H12 Z M12 47 H35 V50 H12 Z M12 58 H38 V61 H12 Z M67 36 H99 V39 H67 Z M67 96 H92 V99 H67 Z";
+    -fx-background-color: -fx-text-base-color;
+    -fx-opacity: 0.2;
+    -fx-scale-shape: true;
+    -fx-min-width: 180;
+    -fx-pref-width: 180;
+    -fx-max-width: 180;
+    -fx-min-height: 120;
+    -fx-pref-height: 120;
+    -fx-max-height: 120;
+}
+
+.docking-pane-placeholder .label {
+    -fx-text-fill: -fx-text-base-color;
+    -fx-opacity: 0.65;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+    -fx-max-width: 320;
+}

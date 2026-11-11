@@ -7,7 +7,7 @@ import javafx.collections.ObservableList;
 
 /**
  * A simple version of the paging list view that is completely based on a list of items, just like a normal
- * list view would be. The view uses an internal data loader that accesses the list to retrieve the items of the
+ * list view would be. The view uses an model data loader that accesses the list to retrieve the items of the
  * current page.
  *
  * @param <T> the type of items to show in the list view
@@ -51,7 +51,7 @@ public class SimplePagingListView<T> extends PagingListView<T> {
     }
 
     /**
-     * Stores the data structure to be used by the list view. The internal data loader will simply retrieve the page
+     * Stores the data structure to be used by the list view. The model data loader will simply retrieve the page
      * items from this list.
      *
      * @return the data model feeding the list view

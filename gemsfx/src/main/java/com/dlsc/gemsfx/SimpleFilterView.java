@@ -168,7 +168,7 @@ public class SimpleFilterView extends HBox {
      * This operation ensures that the filter view is in a clean state and ready for new inputs or selections.
      *
      * Note: During the execution of this method, a flag is set to avoid triggering unwanted actions
-     * due to internal state changes.
+     * due to model state changes.
      *
      * @see #setOnChange(Runnable)
      *
@@ -359,7 +359,7 @@ public class SimpleFilterView extends HBox {
     /**
      * Adds a new CheckBox with the specified text to the control.
      * The CheckBox is configured with listeners to manage its interaction
-     * with associated chip views and the internal state of the control.
+     * with associated chip views and the model state of the control.
      *
      * @param text the text to display alongside the created CheckBox
      * @return the created CheckBox instance

@@ -16,7 +16,7 @@ MANUAL = Manual(
     cover_caption='Generated cartoon overview of MultiColumnListView.',
     chapters=[
         Chapter("Introduction", [
-            Para("<b>MultiColumnListView</b> is a board-style control. Each <font face='Courier'>ListViewColumn</font> owns user items and internal <font face='Courier'>ColumnItem</font> wrappers so the control can insert From/To placeholders during drag and drop."),
+            Para("<b>MultiColumnListView</b> is a board-style control. Each <font face='Courier'>ListViewColumn</font> owns user items and model <font face='Courier'>ColumnItem</font> wrappers so the control can insert From/To placeholders during drag and drop."),
             Section("Key features"),
             Bullets([
                 'Columns contain a header node, item list and userObject.',
@@ -64,7 +64,7 @@ MANUAL = Manual(
                         Property('dropPossibleCallback', 'ObjectProperty&lt;Callback&lt;DropParameter&lt;T&gt;, Boolean&gt;&gt;', 'param -> true', 'Allows or rejects a drop target.'),
                         Property('draggedItem', 'ObjectProperty&lt;T&gt;', 'null', 'Currently dragged user object.'),
                         Property('draggedItems', 'ObservableList&lt;T&gt;', 'empty', 'Selected user objects involved in the drag.'),
-                        Property('fromPlaceholder / toPlaceholder', 'ColumnItem&lt;T&gt;', 'internal singletons', 'Marker wrappers inserted during drag operations.')
+                        Property('fromPlaceholder / toPlaceholder', 'ColumnItem&lt;T&gt;', 'model singletons', 'Marker wrappers inserted during drag operations.')
             ]),
             Section('Loading and placeholder'),
             PropertyTable([

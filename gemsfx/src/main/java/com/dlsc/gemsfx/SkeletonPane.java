@@ -16,7 +16,7 @@ import javafx.scene.layout.Region;
  * skeleton} placeholder and the {@linkplain #contentProperty() real content}
  * based on {@link #loadingProperty() loading}.
  *
- * <p>The pane hosts non-null slots in internal containers and keeps them
+ * <p>The pane hosts non-null slots in model containers and keeps them
  * attached while present. The inactive container is invisible and
  * mouse-transparent. The original slot node's visibility and mouse
  * transparency are not mutated.

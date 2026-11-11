@@ -27,9 +27,9 @@ MANUAL = Manual(
                 Figure(f"{G}/states.svg", 'Masked and plain-text display states.')
             ]),
         Chapter('Anatomy', [
-                Para("The control uses <font face='Courier'>CustomTextFieldSkin</font> semantics for left and right nodes, then the specialized skin rebinds the internal text node."),
+                Para("The control uses <font face='Courier'>CustomTextFieldSkin</font> semantics for left and right nodes, then the specialized skin rebinds the model text node."),
                 Figure(f"{G}/anatomy.svg", 'Parts of an EnhancedPasswordField.'),
-                Table(['Part', 'Node / property', 'Description'], [['Root', "<font face='Courier'>.enhanced-password-field</font>", 'PasswordField subclass with user agent stylesheet.'], ['Left slot', "<font face='Courier'>left</font>", 'Optional node supplied by the application.'], ['Text node', "internal <font face='Courier'>Text</font>", 'Shows repeated echo characters or plain text.'], ['Right slot', "<font face='Courier'>right</font>", 'Defaults to the clickable eye wrapper.']], widths=[24, 30, 46])
+                Table(['Part', 'Node / property', 'Description'], [['Root', "<font face='Courier'>.enhanced-password-field</font>", 'PasswordField subclass with user agent stylesheet.'], ['Left slot', "<font face='Courier'>left</font>", 'Optional node supplied by the application.'], ['Text node', "model <font face='Courier'>Text</font>", 'Shows repeated echo characters or plain text.'], ['Right slot', "<font face='Courier'>right</font>", 'Defaults to the clickable eye wrapper.']], widths=[24, 30, 46])
             ]),
         Chapter('Control API', [
                 PropertyTable([Property('left', 'ObjectProperty&lt;Node&gt;', 'null', 'Node shown on the left side of the field.'), Property('right', 'ObjectProperty&lt;Node&gt;', 'eye icon wrapper', 'Node shown on the right side. The default toggles password visibility.'), Property('showPassword', 'BooleanProperty', 'false', 'Shows plain text when true.'), Property('echoChar', 'ObjectProperty&lt;Character&gt;', '●', "Masking character. Styleable via <font face='Courier'>-fx-echo-char</font>."), Property('text', 'StringProperty', 'empty string', 'Inherited PasswordField content.')])

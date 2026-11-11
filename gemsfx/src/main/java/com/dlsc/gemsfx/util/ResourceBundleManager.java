@@ -70,6 +70,10 @@ public class ResourceBundleManager {
          */
         DIALOG_PANE("dialog-pane"),
         /**
+         * Bundle type for docking pane resources.
+         */
+        DOCKING_PANE("docking-pane"),
+        /**
          * Bundle type for drawer stack pane resources.
          */
         DRAWER_STACK_PANE("drawer-stack-pane"),

@@ -2456,6 +2456,14 @@
     -fx-background-color: -color-border-default, -color-bg-default;
 }
 
+.docking-pane.docking-drag-preview {
+    -fx-background-color: -color-border-default, -color-bg-default;
+}
+
+.docking-pane.docking-drag-preview .docking-drag-title {
+    -fx-text-fill: -color-fg-default;
+}
+
 .date-range-view > .range-view-container > .presets-box {
 }
 
@@ -2861,4 +2869,136 @@
 .skeleton {
     /* clearly visible on -color-bg-default and -color-bg-subtle in light and dark themes */
     -fx-base-color: -color-border-muted;
+}
+
+/* -----------------------------------------------------------------------
+ * DockingPane
+ */
+.docking-pane {
+}
+
+.docking-pane-placeholder .illustration {
+    -fx-background-color: -color-fg-muted;
+}
+
+.docking-pane-placeholder .label {
+    -fx-text-fill: -color-fg-muted;
+}
+
+.docking-pane .docking-tab-strip {
+    -fx-background-color: -color-neutral-emphasis;
+}
+
+.docking-pane .docking-tab {
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: transparent -color-border-muted -color-border-muted transparent;
+}
+
+.docking-pane .docking-tab-title {
+    -fx-text-fill: -color-fg-default;
+}
+
+.docking-pane .docking-tab-title .ikonli-font-icon {
+    -fx-icon-color: -color-fg-default;
+}
+
+.docking-pane .docking-tab.selected {
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: transparent -color-border-default transparent transparent;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-title {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-title .ikonli-font-icon {
+    -fx-icon-color: -color-fg-emphasis;
+}
+
+.docking-pane:show-focus-border .docking-tab-pane:focus-highlighted {
+    -fx-border-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-tab:focused {
+    -fx-border-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-tab-close-button,
+.docking-pane .docking-tab-help-button,
+.docking-pane .docking-tab-menu-button {
+    -fx-background-color: transparent;
+}
+
+.docking-pane .docking-tab-close-button .icon {
+    -fx-background-color: -color-fg-default;
+}
+
+.docking-pane .docking-tab-help-button .ikonli-font-icon,
+.docking-pane .docking-tab-menu-button .ikonli-font-icon {
+    -fx-icon-color: -color-fg-default;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-close-button .icon {
+    -fx-background-color: -color-fg-emphasis;
+}
+
+.docking-pane .docking-tab.selected .docking-tab-help-button .ikonli-font-icon,
+.docking-pane .docking-tab.selected .docking-tab-menu-button .ikonli-font-icon {
+    -fx-icon-color: -color-fg-emphasis;
+}
+
+.docking-pane .docking-tab-close-button:hover,
+.docking-pane .docking-tab-help-button:hover,
+.docking-pane .docking-tab-menu-button:hover {
+    -fx-background-color: transparent;
+}
+
+.docking-pane .docking-tab-content {
+    -fx-background-color: -color-bg-default;
+}
+
+.docking-pane .docking-split > .split-pane-divider,
+.docking-pane .docking-split > .split-pane-divider:hover,
+.docking-pane .docking-split > .split-pane-divider:pressed,
+.docking-pane .docking-split > .split-pane-divider:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-insets: 0;
+    -fx-border-width: 0;
+    -fx-padding: 3px;
+}
+
+.docking-pane .docking-split > .split-pane-divider > .horizontal-grabber,
+.docking-pane .docking-split > .split-pane-divider > .vertical-grabber,
+.docking-pane .docking-split > .split-pane-divider:pressed > .horizontal-grabber,
+.docking-pane .docking-split > .split-pane-divider:pressed > .vertical-grabber {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-opacity: 0;
+}
+
+.docking-pane .docking-drop-leaf-preview {
+    -fx-border-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-drop-zone-preview {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-pane-edge-target {
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-pane-edge-target:active {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-pane-edge-target .icon {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.docking-pane .docking-pane-edge-target:active .icon {
+    -fx-background-color: -color-fg-emphasis;
 }

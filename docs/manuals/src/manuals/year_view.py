@@ -67,7 +67,7 @@ view.valueProperty().addListener((obs, oldYear, newYear) -> {
         ]),
         Chapter("Behaviour", [
             Section("Paged ranges"),
-            Para("The first visible year is calculated from the selected year or the current year, the visible cell count, and an internal page offset. Clicking arrows increments or decrements the offset."),
+            Para("The first visible year is calculated from the selected year or the current year, the visible cell count, and an model page offset. Clicking arrows increments or decrements the offset."),
             Figure(f"{G}/behaviour.svg", "Interaction and value-flow behaviour."),
             Section("Range constraints"),
             Para("Year boxes bind their disabled state to earliestYear and latestYear. Clicking a disabled box is prevented by JavaFX disabled-node behavior."),

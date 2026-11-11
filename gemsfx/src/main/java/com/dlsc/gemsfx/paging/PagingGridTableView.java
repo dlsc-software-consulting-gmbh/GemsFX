@@ -31,9 +31,9 @@ public class PagingGridTableView<T> extends ItemPagingControlBase<T> {
      * necessary properties to manage paging and display of items.
      * The constructor sets up the following behavior:
      * - Adds a specific style class named "paging-grid-table-view" to the control.
-     * - Binds the columns of the internal {@code GridTableView} to the {@code columnsProperty} of this control.
-     * - Sets the items of the internal {@code GridTableView} to the items provided by the current page.
-     * - Configures the `minNumberOfRowsProperty` of the internal {@code GridTableView} to ensure the proper
+     * - Binds the columns of the model {@code GridTableView} to the {@code columnsProperty} of this control.
+     * - Sets the items of the model {@code GridTableView} to the items provided by the current page.
+     * - Configures the `minNumberOfRowsProperty` of the model {@code GridTableView} to ensure the proper
      *   number of rows are displayed, including empty rows if the last page should be filled.
      * - Registers a listener on the `minNumberOfRowsProperty` to trigger a refresh when the property changes.
      * Internally, this class uses the following additional methods and properties:

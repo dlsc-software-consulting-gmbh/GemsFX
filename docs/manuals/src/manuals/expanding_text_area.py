@@ -18,7 +18,7 @@ MANUAL = Manual(
         Chapter('Introduction', [
                 Para("<b>ExpandingTextArea</b> is a customized <font face='Courier'>TextArea</font> for form layouts where all text should stay visible. It does not introduce new public properties; instead it configures and observes the standard text-area skin."),
                 Section('Key features'),
-                Bullets(["Automatically calls <font face='Courier'>setWrapText(true)</font>.", "Forces the internal scroll pane horizontal and vertical scroll bars to <font face='Courier'>NEVER</font>.", "Binds <font face='Courier'>prefHeight</font> to the measured text node height plus insets.", 'Keeps the normal TextArea API for text, prompt text and selection.']),
+                Bullets(["Automatically calls <font face='Courier'>setWrapText(true)</font>.", "Forces the model scroll pane horizontal and vertical scroll bars to <font face='Courier'>NEVER</font>.", "Binds <font face='Courier'>prefHeight</font> to the measured text node height plus insets.", 'Keeps the normal TextArea API for text, prompt text and selection.']),
                 Section('Maven dependency'),
                 Code('<dependency>\n    <groupId>com.dlsc.gemsfx</groupId>\n    <artifactId>gemsfx</artifactId>\n    <version>4.4.1</version>\n</dependency>', caption='Maven coordinates for the GemsFX control library.')
             ]),
@@ -32,7 +32,7 @@ MANUAL = Manual(
             ]),
         Chapter('Control API', [
                 Para("The control adds no new JavaFX properties. Use the inherited <font face='Courier'>TextArea</font> API."),
-                PropertyTable([Property('text', 'StringProperty', 'empty string', 'Inherited text content.'), Property('promptText', 'StringProperty', 'empty string', 'Inherited prompt shown when text is empty.'), Property('wrapText', 'BooleanProperty', 'true', 'Set to true by the constructor.'), Property('prefHeight', 'DoubleProperty', 'bound after skin setup', 'Computed from the internal text node and insets.')])
+                PropertyTable([Property('text', 'StringProperty', 'empty string', 'Inherited text content.'), Property('promptText', 'StringProperty', 'empty string', 'Inherited prompt shown when text is empty.'), Property('wrapText', 'BooleanProperty', 'true', 'Set to true by the constructor.'), Property('prefHeight', 'DoubleProperty', 'bound after skin setup', 'Computed from the model text node and insets.')])
             ]),
         Chapter('Height computation', [
                 Figure(f"{G}/flow.svg", 'How text layout becomes preferred height.'),

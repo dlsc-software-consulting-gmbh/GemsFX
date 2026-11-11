@@ -28,6 +28,7 @@ open module com.dlsc.gemsfx {
 
     exports com.dlsc.gemsfx;
     exports com.dlsc.gemsfx.daterange;
+    exports com.dlsc.gemsfx.docking;
     exports com.dlsc.gemsfx.util;
     exports com.dlsc.gemsfx.skins;
     exports com.dlsc.gemsfx.binding;

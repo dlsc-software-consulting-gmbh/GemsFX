@@ -56,10 +56,10 @@ public class PagingListView<T> extends ItemPagingControlBase<T> {
      * and navigation of large datasets across multiple pages.
      * This constructor initializes the PagingListView by performing the following steps:
      * - Adds a custom style class ("paging-list-view") to the control.
-     * - Configures the internal ListView, including setting a custom style class ("inner-list-view"),
+     * - Configures the model ListView, including setting a custom style class ("inner-list-view"),
      *   enabling "multiple selection" mode, and establishing bindings for the cell factory and items
      *   displayed on the current page.
-     * - Binds the selection model of the PagingListView to the internal ListView for consistent
+     * - Binds the selection model of the PagingListView to the model ListView for consistent
      *   selection behavior.
      * - Sets a default cell factory to customize the rendering of items in the list.
      * - Listens to changes in the cell factory property and triggers a refresh when modifications occur.

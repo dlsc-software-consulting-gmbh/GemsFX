@@ -2,6 +2,7 @@ package com.dlsc.gemsfx;
 
 import com.dlsc.gemsfx.daterange.DateRangePicker;
 import com.dlsc.gemsfx.daterange.DateRangeView;
+import com.dlsc.gemsfx.docking.DockingContext;
 import com.dlsc.gemsfx.gridtable.GridTableView;
 import com.dlsc.gemsfx.infocenter.InfoCenterView;
 import com.dlsc.gemsfx.paging.PagingControls;
@@ -93,6 +94,7 @@ public class AccessibilityTest extends FxTestBase {
         map.put("SimpleFilterView", SimpleFilterView::new);
         map.put("ScreensView", ScreensView::new);
         map.put("Skeleton", Skeleton::new);
+        map.put("DockingPane", () -> new DockingContext(id -> java.util.Optional.empty(), pane -> null).createPane());
 
         return map;
     }
@@ -152,6 +154,7 @@ public class AccessibilityTest extends FxTestBase {
         map.put("SimpleFilterView", AccessibleRole.NODE);
         map.put("ScreensView", AccessibleRole.NODE);
         map.put("Skeleton", AccessibleRole.NODE);
+        map.put("DockingPane", AccessibleRole.NODE);
 
         return map;
     }
