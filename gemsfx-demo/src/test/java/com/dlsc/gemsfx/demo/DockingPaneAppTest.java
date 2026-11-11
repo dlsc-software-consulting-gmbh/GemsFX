@@ -10,6 +10,7 @@ import com.dlsc.gemsfx.docking.DockingPosition;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
@@ -28,6 +29,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.junit.jupiter.api.Test;
@@ -55,6 +57,67 @@ public class DockingPaneAppTest {
         Platform.startup(started::countDown);
         assertTrue(started.await(10, TimeUnit.SECONDS));
         Platform.setImplicitExit(false);
+    }
+
+    @Test
+    public void modenaStylesApplicationChromeAndFloatingViewContent() throws Exception {
+        runFx(() -> {
+            String previousTheme = System.getProperty("atlantafx");
+            String previousStylesheet = Application.getUserAgentStylesheet();
+            List<Window> previousWindows = List.copyOf(Window.getWindows());
+            System.clearProperty("atlantafx");
+            try {
+                Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+                Stage stage = new Stage();
+                new DockingPaneApp().start(stage);
+                Scene scene = stage.getScene();
+                var root = scene.getRoot();
+                root.applyCss();
+                root.layout();
+
+                Region menuIcon = (Region) root.lookup(".docking-demo-menu-icon");
+                assertTrue(menuIcon.getWidth() >= 16, "The application menu must have a visible icon");
+                assertNotNull(menuIcon.getBackground());
+                Label brand = (Label) root.lookup(".docking-demo-brand");
+                assertTrue(brand.getFont().getSize() >= 18, "The header needs its brand typography");
+                FontIcon rocket = (FontIcon) root.lookup(".docking-demo-drag-graphic");
+                assertTrue(rocket.getIconSize() >= 96, "The draggable rocket should be a large content graphic");
+                FontIcon target = (FontIcon) root.lookup(".docking-demo-target-graphic");
+                assertNotEquals(rocket.getIconColor(), target.getIconColor());
+
+                DockingPane pane = (DockingPane) root.lookup(".docking-pane");
+                Region selected = (Region) pane.lookup(".docking-tab.selected");
+                Region unselected = (Region) pane.lookupAll(".docking-tab").stream()
+                        .filter(tab -> !tab.getStyleClass().contains("selected")).findFirst().orElseThrow();
+                assertNotEquals(selected.getBackground().getFills().getFirst().getFill(),
+                        unselected.getBackground().getFills().getFirst().getFill());
+                Region group = (Region) pane.lookup(".docking-tab-pane");
+                assertNotNull(group.getBorder(), "Tab groups should have a visible boundary");
+
+                pane.selectDockable("drag");
+                root.lookupAll(".button").stream().filter(Button.class::isInstance).map(Button.class::cast)
+                        .filter(button -> button.getText().equals("Float Active")).findFirst().orElseThrow().fire();
+                Window floating = Window.getWindows().stream()
+                        .filter(window -> window != stage && !previousWindows.contains(window))
+                        .findFirst().orElseThrow();
+                var floatingRoot = floating.getScene().getRoot();
+                floatingRoot.applyCss();
+                floatingRoot.layout();
+                FontIcon floatingRocket = (FontIcon) floatingRoot.lookup(".docking-demo-drag-graphic");
+                assertTrue(floatingRocket.getIconSize() >= 96, "Floating windows must retain demo styling");
+                FontIcon tabIcon = (FontIcon) floatingRoot.lookup(".docking-tab-title .ikonli-font-icon");
+                assertTrue(tabIcon.getIconSize() < 32, "Content icon styling must not enlarge tab icons");
+            } finally {
+                List.copyOf(Window.getWindows()).stream()
+                        .filter(window -> !previousWindows.contains(window)).forEach(Window::hide);
+                Application.setUserAgentStylesheet(previousStylesheet);
+                if (previousTheme == null) {
+                    System.clearProperty("atlantafx");
+                } else {
+                    System.setProperty("atlantafx", previousTheme);
+                }
+            }
+        });
     }
 
     @Test

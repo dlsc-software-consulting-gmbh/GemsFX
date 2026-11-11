@@ -235,6 +235,9 @@ public class DockingPaneApp extends GemApplication {
             GemsFXAtlantaFX.applyTo(scene);
             scene.getStylesheets().add(Objects.requireNonNull(
                     DockingPaneApp.class.getResource("docking-pane-app-atlantafx.css")).toExternalForm());
+        } else {
+            scene.getStylesheets().add(Objects.requireNonNull(
+                    DockingPaneApp.class.getResource("docking-pane-app.css")).toExternalForm());
         }
     }
 

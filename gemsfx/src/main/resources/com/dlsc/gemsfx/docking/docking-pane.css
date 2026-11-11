@@ -23,6 +23,9 @@
 }
 
 .docking-pane .docking-tab {
+    -fx-pref-height: 2.5em;
+    -fx-min-height: -fx-pref-height;
+    -fx-max-height: -fx-pref-height;
     -fx-padding: 4 4 4 10;
     -fx-spacing: 6;
     -fx-background-color: derive(-fx-base, 8%);
@@ -44,6 +47,10 @@
 
 .docking-pane .docking-tab.selected {
     -fx-background-color: -fx-control-inner-background;
+}
+
+.docking-pane .docking-tab-actions {
+    -fx-spacing: 6;
 }
 
 .docking-pane .docking-tab-title {

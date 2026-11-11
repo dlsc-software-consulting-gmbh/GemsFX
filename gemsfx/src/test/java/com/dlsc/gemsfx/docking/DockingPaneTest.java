@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.event.EventType;
+import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
@@ -147,13 +148,15 @@ public class DockingPaneTest extends FxTestBase {
             DockingTab tab = new DockingTab(context(dockable), dockable);
             Node help = tab.lookup(".docking-tab-help-button");
             assertNotNull(initial.getParent());
-            assertTrue(tab.getChildren().indexOf(initial.getParent()) < tab.getChildren().indexOf(help));
+            assertTrue(help.getParent().getChildrenUnmodifiable().indexOf(initial.getParent())
+                    < help.getParent().getChildrenUnmodifiable().indexOf(help));
 
             Button replacement = new Button("Replacement");
             dockable.toolbarProperty().set(replacement);
             assertNull(initial.getParent());
             assertNotNull(replacement.getParent());
-            assertTrue(tab.getChildren().indexOf(replacement.getParent()) < tab.getChildren().indexOf(help));
+            assertTrue(help.getParent().getChildrenUnmodifiable().indexOf(replacement.getParent())
+                    < help.getParent().getChildrenUnmodifiable().indexOf(help));
             dockable.setToolbar(null);
             assertNull(replacement.getParent());
             Node host = tab.lookup(".docking-tab-toolbar");
@@ -166,7 +169,7 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     @Test
-    public void toolbarFadesWithTabHover() throws InterruptedException {
+    public void tabActionsFadeTogetherAndReleaseTitleSpaceWhenHidden() throws InterruptedException {
         class HoverableTab extends DockingTab {
             HoverableTab(Dockable dockable) {
                 super(context(dockable), dockable);
@@ -176,16 +179,27 @@ public class DockingPaneTest extends FxTestBase {
                 setHover(hovered);
             }
         }
+        double[] hiddenTitleWidth = new double[1];
         CountDownLatch fadedIn = new CountDownLatch(1);
         HoverableTab tab = invoke(() -> {
             Dockable dockable = dockable("a");
             Button toolbar = new Button("Action");
             dockable.setToolbar(toolbar);
+            dockable.setOnHelp(() -> {});
+            dockable.getMenuItems().add(new MenuItem("Inspect"));
             HoverableTab header = new HoverableTab(dockable);
-            Node host = toolbar.getParent();
-            assertNotNull(host);
-            assertEquals(0, host.getOpacity(), 0);
-            host.opacityProperty().addListener((obs, oldValue, newValue) -> {
+            new Scene(header, 500, 40);
+            header.applyCss();
+            header.resize(500, 40);
+            header.layout();
+            Node actions = header.lookup(".docking-tab-close-button").getParent();
+            assertEquals(0, actions.getOpacity(), 0);
+            assertFalse(actions.isManaged());
+            for (String selector : List.of(".docking-tab-toolbar", ".docking-tab-menu-button", ".docking-tab-help-button")) {
+                assertSame(actions, header.lookup(selector).getParent());
+            }
+            hiddenTitleWidth[0] = header.lookup(".docking-tab-title").getLayoutBounds().getWidth();
+            actions.opacityProperty().addListener((obs, oldValue, newValue) -> {
                 if (newValue.doubleValue() == 1) {
                     fadedIn.countDown();
                 }
@@ -193,19 +207,110 @@ public class DockingPaneTest extends FxTestBase {
             header.hover(true);
             return header;
         });
-        assertTrue("Toolbar must fade in on hover", fadedIn.await(5, TimeUnit.SECONDS));
+        assertTrue("Tab actions must fade in on hover", fadedIn.await(5, TimeUnit.SECONDS));
         CountDownLatch fadedOut = new CountDownLatch(1);
         runFx(() -> {
-            Node toolbar = tab.lookup(".docking-tab-toolbar");
-            assertEquals(1, toolbar.getOpacity(), 0);
-            toolbar.opacityProperty().addListener((obs, oldValue, newValue) -> {
+            Node actions = tab.lookup(".docking-tab-close-button").getParent();
+            assertEquals(1, actions.getOpacity(), 0);
+            assertTrue(actions.isManaged());
+            tab.layout();
+            assertTrue(tab.lookup(".docking-tab-title").getLayoutBounds().getWidth() < hiddenTitleWidth[0]);
+            actions.opacityProperty().addListener((obs, oldValue, newValue) -> {
                 if (newValue.doubleValue() == 0) {
                     fadedOut.countDown();
                 }
             });
             tab.hover(false);
         });
-        assertTrue("Toolbar must fade out when hover ends", fadedOut.await(5, TimeUnit.SECONDS));
+        assertTrue("Tab actions must fade out when hover ends", fadedOut.await(5, TimeUnit.SECONDS));
+        runFx(() -> {
+            Node actions = tab.lookup(".docking-tab-close-button").getParent();
+            assertFalse(actions.isManaged());
+            tab.layout();
+            assertEquals(hiddenTitleWidth[0], tab.lookup(".docking-tab-title").getLayoutBounds().getWidth(), 0);
+        });
+    }
+
+    @Test
+    public void tabHeightIsIndependentOfActionContentAndScalesWithFontSize() {
+        runFx(() -> {
+            Dockable dockable = dockable("a");
+            dockable.setOnHelp(() -> {});
+            dockable.getMenuItems().add(new MenuItem("Inspect"));
+            DockingContext context = context(dockable);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+            Region tab = (Region) title(pane, "a");
+            Node actions = tab.lookup(".docking-tab-actions");
+
+            tab.setStyle("-fx-font-size: 20px;");
+            pane.resize(220, 400);
+            pane.applyCss();
+            pane.layout();
+            for (double toolbarHeight : new double[]{0, 48, 72, 0}) {
+                if (toolbarHeight == 0) {
+                    dockable.setToolbar(null);
+                } else {
+                    Region toolbar = new Region();
+                    toolbar.setMinHeight(toolbarHeight);
+                    toolbar.setPrefHeight(toolbarHeight);
+                    toolbar.setPrefWidth(60);
+                    dockable.setToolbar(toolbar);
+                }
+                pane.applyCss();
+                pane.layout();
+                assertFalse(actions.isManaged());
+                double hiddenHeight = tab.getHeight();
+                double hiddenMinHeight = tab.minHeight(-1);
+                double hiddenPrefHeight = tab.prefHeight(-1);
+                assertEquals("Content must not determine the tab height", 50, hiddenHeight, 0);
+                assertEquals(50, hiddenMinHeight, 0);
+                assertEquals(50, tab.maxHeight(-1), 0);
+
+                actions.setOpacity(1);
+                pane.layout();
+                assertTrue(actions.isManaged());
+                assertEquals("Hover must not change the tab height", hiddenHeight, tab.getHeight(), 0);
+                assertEquals(hiddenMinHeight, tab.minHeight(-1), 0);
+                assertEquals(hiddenPrefHeight, tab.prefHeight(-1), 0);
+                Region label = (Region) tab.lookup(".docking-tab-title");
+                double availableHeight = tab.getHeight() - tab.getInsets().getTop() - tab.getInsets().getBottom();
+                for (String selector : List.of(".docking-tab-title", ".docking-tab-actions",
+                        ".docking-tab-toolbar", ".docking-tab-menu-button", ".docking-tab-help-button",
+                        ".docking-tab-close-button")) {
+                    Region child = (Region) tab.lookup(selector);
+                    if (child.isManaged()) {
+                        assertEquals(selector, availableHeight, child.getHeight(), 0);
+                        Bounds bounds = tab.sceneToLocal(child.localToScene(child.getLayoutBounds()));
+                        assertEquals(selector, tab.getInsets().getTop() + availableHeight / 2,
+                                (bounds.getMinY() + bounds.getMaxY()) / 2, 0);
+                        if (child != label) {
+                            assertEquals(selector, Math.max(child.minWidth(availableHeight),
+                                    child.prefWidth(availableHeight)), child.getWidth(), 0);
+                        }
+                    }
+                }
+                assertEquals(tab.getInsets().getTop(), label.getLayoutY(), 0);
+                if (dockable.getToolbar() != null) {
+                    Region toolbar = (Region) dockable.getToolbar();
+                    assertEquals(availableHeight, toolbar.getHeight(), 0);
+                    assertEquals(toolbar.prefWidth(availableHeight), toolbar.getWidth(), 0);
+                }
+
+                actions.setOpacity(0);
+                pane.layout();
+                assertEquals(hiddenHeight, tab.getHeight(), 0);
+            }
+            tab.setStyle("-fx-font-size: 16px;");
+            pane.applyCss();
+            pane.layout();
+            assertEquals(40, tab.getHeight(), 0);
+            tab.setStyle("-fx-font-size: 16px; -fx-pref-height: 3em;");
+            pane.applyCss();
+            pane.layout();
+            assertEquals("Applications can override the height through CSS", 48, tab.getHeight(), 0);
+        });
     }
 
     @Test
@@ -374,7 +479,7 @@ public class DockingPaneTest extends FxTestBase {
             assertTrue(menu.isManaged());
             assertEquals(List.of(action, other), menu.getItems());
             assertSame(header.lookup(".docking-tab-help-button"),
-                    header.getChildren().get(header.getChildren().indexOf(menu) + 1));
+                    menu.getParent().getChildrenUnmodifiable().get(menu.getParent().getChildrenUnmodifiable().indexOf(menu) + 1));
             menu.getItems().get(0).fire();
             mouse(menu, MouseEvent.MOUSE_CLICKED, true);
             assertEquals(1, calls.get());
@@ -432,7 +537,7 @@ public class DockingPaneTest extends FxTestBase {
             assertNotNull(help);
             assertTrue(help.isVisible());
             assertTrue(help.isManaged());
-            List<Node> children = ((DockingTab) header).getChildren();
+            List<Node> children = help.getParent().getChildrenUnmodifiable();
             assertSame(header.lookup(".docking-tab-close-button"), children.get(children.indexOf(help) + 1));
             help.fire();
             mouse(help, MouseEvent.MOUSE_CLICKED, true);
@@ -842,13 +947,15 @@ public class DockingPaneTest extends FxTestBase {
             Region strip = (Region) pane.lookup(".docking-tab-strip");
             Region header = (Region) title(pane, "a");
             Node close = header.lookup(".docking-tab-close-button");
+            close.getParent().setOpacity(1);
+            pane.layout();
 
             assertEquals(0, header.getLayoutX(), 0.01);
             assertEquals(0, header.getLayoutY(), 0.01);
             assertEquals(strip.getWidth(), header.getWidth(), 0.01);
             assertEquals(strip.getHeight(), header.getHeight(), 0.01);
             assertEquals(header.getWidth() - header.getInsets().getRight(),
-                    close.getBoundsInParent().getMaxX(), 1);
+                    header.sceneToLocal(close.localToScene(close.getBoundsInLocal())).getMaxX(), 1);
             return null;
         });
     }
@@ -867,6 +974,9 @@ public class DockingPaneTest extends FxTestBase {
                 context.openDockable(pane, id, DockingPosition.CENTER);
             }
             layout(pane);
+            for (Node header : titles(pane)) {
+                header.lookup(".docking-tab-close-button").getParent().setOpacity(1);
+            }
 
             for (double width : new double[]{800, 360}) {
                 pane.resize(width, 400);
@@ -881,14 +991,15 @@ public class DockingPaneTest extends FxTestBase {
                     assertEquals(0, header.getLayoutY(), 0.01);
                     assertEquals(strip.getHeight(), header.getHeight(), 0.01);
                     assertEquals(header.getWidth() - header.getInsets().getRight(),
-                            close.getBoundsInParent().getMaxX(), 1);
+                            header.sceneToLocal(close.localToScene(close.getBoundsInLocal())).getMaxX(), 1);
                 }
                 Label label = (Label) title(pane, "a").lookup(".docking-tab-title");
                 Text renderedTitle = (Text) label.lookup(".text");
                 assertTrue("Long titles must ellipsize instead of pushing other headers aside",
                         renderedTitle.getText().endsWith("..."));
                 Node close = title(pane, "a").lookup(".docking-tab-close-button");
-                assertTrue(label.getBoundsInParent().getMaxX() <= close.getBoundsInParent().getMinX());
+                assertTrue(label.getBoundsInParent().getMaxX()
+                        <= close.getParent().getBoundsInParent().getMinX());
             }
             return null;
         });

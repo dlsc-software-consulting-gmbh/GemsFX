@@ -10,7 +10,9 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -45,6 +47,7 @@ public class DockingTab extends HBox {
 
     private final Dockable dockable;
     private final Label label;
+    private final HBox actions = new HBox();
     private final ChangeListener<Boolean> titleEditableListener;
     private TextField titleEditor;
     private final ChangeListener<Parent> contentParentListener;
@@ -64,9 +67,27 @@ public class DockingTab extends HBox {
         setAlignment(Pos.CENTER_LEFT);
         AccessibilityUtil.setRole(this, AccessibleRole.TAB_ITEM);
 
+        label = createTitleLabel();
+        StackPane toolbar = createToolbar();
+        toolbarListener = (obs, oldToolbar, newToolbar) -> updateToolbar(toolbar, newToolbar);
+        dockable.toolbarProperty().addListener(new WeakChangeListener<>(toolbarListener));
+        updateToolbar(toolbar, dockable.getToolbar());
+
+        MenuButton menu = createMenuButton();
+        configureActions(toolbar, menu, createHelpButton(), createCloseButton(context));
+        getChildren().addAll(label, actions);
+
+        BooleanProperty contentHovered = new SimpleBooleanProperty(false);
+        contentParentListener = trackContentHover(contentHovered);
+        dockableHovered = hoverProperty().or(contentHovered).or(menu.showingProperty());
+        installActionsFade();
+        titleEditableListener = installTitleEditing();
+    }
+
+    private Label createTitleLabel() {
         Tooltip titleTooltip = new Tooltip();
         titleTooltip.textProperty().bind(dockable.titleProperty());
-        label = new Label() {
+        Label label = new Label() {
             @Override
             protected void layoutChildren() {
                 super.layoutChildren();
@@ -80,38 +101,26 @@ public class DockingTab extends HBox {
         label.setMnemonicParsing(false);
         label.setMinWidth(0);
         label.setMaxWidth(Double.MAX_VALUE);
+        fillAvailableHeight(label);
         HBox.setHgrow(label, Priority.ALWAYS);
+        return label;
+    }
 
-        MenuButton menu = new MenuButton();
+    private void configureActions(Node... controls) {
+        actions.getStyleClass().add("docking-tab-actions");
+        actions.setAlignment(Pos.CENTER_LEFT);
+        actions.setMinWidth(USE_PREF_SIZE);
+        fillAvailableHeight(actions);
+        actions.setOpacity(0);
+        actions.managedProperty().bind(actions.opacityProperty().greaterThan(0));
+        actions.getChildren().addAll(controls);
+    }
+
+    private Button createCloseButton(DockingContext context) {
         Button close = new Button();
         close.getStyleClass().add("docking-tab-close-button");
         close.setFocusTraversable(false);
-        close.setOpacity(0);
-        BooleanProperty contentHovered = new SimpleBooleanProperty(false);
-        contentParentListener = (obs, oldParent, parent) -> {
-            contentHovered.unbind();
-            if (parent == null) {
-                contentHovered.set(false);
-            } else {
-                contentHovered.bind(parent.hoverProperty());
-            }
-        };
-        dockable.getContent().parentProperty().addListener(new WeakChangeListener<>(contentParentListener));
-        contentParentListener.changed(dockable.getContent().parentProperty(), null, dockable.getContent().getParent());
-        dockableHovered = hoverProperty().or(contentHovered).or(menu.showingProperty());
-        FadeTransition fade = new FadeTransition(Duration.millis(150), close);
-        fade.setFromValue(0);
-        fade.setToValue(1);
-        dockableHovered.addListener((obs, wasHovered, isHovered) -> {
-            double opacity = close.getOpacity();
-            fade.stop();
-            fade.setFromValue(opacity);
-            fade.setToValue(isHovered ? 1 : 0);
-            fade.playFromStart();
-        });
-        if (dockableHovered.get()) {
-            fade.playFromStart();
-        }
+        fillAvailableHeight(close);
         Region icon = new Region();
         icon.getStyleClass().add("icon");
         close.setGraphic(icon);
@@ -121,14 +130,17 @@ public class DockingTab extends HBox {
                 () -> MessageFormat.format(closePattern, dockable.getTitle()), dockable.titleProperty()));
         close.setOnAction(event -> context.requestCloseDockable(dockable));
         close.addEventHandler(MouseEvent.MOUSE_CLICKED, MouseEvent::consume);
+        return close;
+    }
 
+    private Button createHelpButton() {
         Button help = new Button();
         help.getStyleClass().add("docking-tab-help-button");
         help.setFocusTraversable(false);
+        fillAvailableHeight(help);
         help.setGraphic(new FontIcon("bi-question-circle"));
         help.visibleProperty().bind(dockable.onHelpProperty().isNotNull());
         help.managedProperty().bind(help.visibleProperty());
-        help.opacityProperty().bind(close.opacityProperty());
         help.setTooltip(new Tooltip(ResourceBundleManager.getString(BundleType.DOCKING_PANE, "tooltip.help", "Help")));
         String helpPattern = ResourceBundleManager.getString(BundleType.DOCKING_PANE, "accessible.text.help", "Help for {0}");
         help.accessibleTextProperty().bind(Bindings.createStringBinding(
@@ -140,13 +152,17 @@ public class DockingTab extends HBox {
             }
         });
         help.addEventHandler(MouseEvent.MOUSE_CLICKED, MouseEvent::consume);
+        return help;
+    }
 
+    private MenuButton createMenuButton() {
+        MenuButton menu = new MenuButton();
         menu.getStyleClass().add("docking-tab-menu-button");
         menu.setFocusTraversable(false);
+        fillAvailableHeight(menu);
         menu.setGraphic(new FontIcon("bi-three-dots-vertical"));
         menu.visibleProperty().bind(Bindings.isNotEmpty(dockable.getMenuItems()));
         menu.managedProperty().bind(menu.visibleProperty());
-        menu.opacityProperty().bind(close.opacityProperty());
         menu.setTooltip(new Tooltip(ResourceBundleManager.getString(BundleType.DOCKING_PANE, "tooltip.more", "More actions")));
         String menuPattern = ResourceBundleManager.getString(BundleType.DOCKING_PANE, "accessible.text.more", "Actions for {0}");
         menu.accessibleTextProperty().bind(Bindings.createStringBinding(
@@ -167,25 +183,70 @@ public class DockingTab extends HBox {
                 Bindings.bindContent(menu.getItems(), dockable.getMenuItems());
             }
         });
+        return menu;
+    }
 
-        StackPane toolbar = new StackPane();
+    private StackPane createToolbar() {
+        StackPane toolbar = new StackPane() {
+            @Override
+            protected void layoutChildren() {
+                if (!getChildren().isEmpty()) {
+                    Node content = getChildren().get(0);
+                    double width = Math.max(0, getWidth() - snappedLeftInset() - snappedRightInset());
+                    double height = Math.max(0, getHeight() - snappedTopInset() - snappedBottomInset());
+                    // The tab, not the toolbar's size constraints, determines the available height.
+                    content.resize(width, height);
+                    positionInArea(content, snappedLeftInset(), snappedTopInset(), width, height,
+                            -1, HPos.CENTER, VPos.CENTER);
+                }
+            }
+        };
         toolbar.getStyleClass().add("docking-tab-toolbar");
         toolbar.setAlignment(Pos.CENTER_LEFT);
+        fillAvailableHeight(toolbar);
         toolbar.visibleProperty().bind(dockable.toolbarProperty().isNotNull());
         toolbar.managedProperty().bind(toolbar.visibleProperty());
-        toolbar.opacityProperty().bind(close.opacityProperty());
         toolbar.addEventHandler(MouseEvent.MOUSE_CLICKED, MouseEvent::consume);
-        toolbarListener = (obs, oldToolbar, newToolbar) -> updateToolbar(toolbar, newToolbar);
-        dockable.toolbarProperty().addListener(new WeakChangeListener<>(toolbarListener));
-        updateToolbar(toolbar, dockable.getToolbar());
-        getChildren().addAll(label, toolbar, menu, help, close);
+        return toolbar;
+    }
 
-        titleEditableListener = (obs, wasEditable, editable) -> {
+    private ChangeListener<Parent> trackContentHover(BooleanProperty contentHovered) {
+        ChangeListener<Parent> listener = (obs, oldParent, parent) -> {
+            contentHovered.unbind();
+            if (parent == null) {
+                contentHovered.set(false);
+            } else {
+                contentHovered.bind(parent.hoverProperty());
+            }
+        };
+        dockable.getContent().parentProperty().addListener(new WeakChangeListener<>(listener));
+        listener.changed(dockable.getContent().parentProperty(), null, dockable.getContent().getParent());
+        return listener;
+    }
+
+    private void installActionsFade() {
+        FadeTransition fade = new FadeTransition(Duration.millis(150), actions);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        dockableHovered.addListener((obs, wasHovered, isHovered) -> {
+            double opacity = actions.getOpacity();
+            fade.stop();
+            fade.setFromValue(opacity);
+            fade.setToValue(isHovered ? 1 : 0);
+            fade.playFromStart();
+        });
+        if (dockableHovered.get()) {
+            fade.playFromStart();
+        }
+    }
+
+    private ChangeListener<Boolean> installTitleEditing() {
+        ChangeListener<Boolean> listener = (obs, wasEditable, editable) -> {
             if (!editable) {
                 finishTitleEditing(false);
             }
         };
-        dockable.titleEditableProperty().addListener(new WeakChangeListener<>(titleEditableListener));
+        dockable.titleEditableProperty().addListener(new WeakChangeListener<>(listener));
         addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2
                     && event.isStillSincePress() && dockable.isTitleEditable()) {
@@ -198,6 +259,12 @@ public class DockingTab extends HBox {
                 event.consume();
             }
         });
+        return listener;
+    }
+
+    private void fillAvailableHeight(Region child) {
+        child.setMinHeight(0);
+        child.setMaxHeight(Double.MAX_VALUE);
     }
 
     private void startTitleEditing() {
@@ -209,10 +276,7 @@ public class DockingTab extends HBox {
         editor.accessibleTextProperty().bind(dockable.titleProperty());
         editor.setMinWidth(0);
         editor.setMaxWidth(Double.MAX_VALUE);
-        editor.setMinHeight(0);
-        if (label.getHeight() > 0) {
-            editor.setPrefHeight(label.getHeight());
-        }
+        fillAvailableHeight(editor);
         HBox.setHgrow(editor, Priority.ALWAYS);
         editor.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.ESCAPE) {
