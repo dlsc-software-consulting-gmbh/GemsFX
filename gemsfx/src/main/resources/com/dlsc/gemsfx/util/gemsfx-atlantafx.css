@@ -2907,16 +2907,16 @@
     -fx-border-color: transparent -color-border-default transparent transparent;
 }
 
+.docking-pane .docking-tab-pane:active .docking-tab:selected {
+    -fx-background-color: -color-accent-emphasis;
+}
+
 .docking-pane .docking-tab:selected .docking-tab-title {
     -fx-text-fill: -color-fg-emphasis;
 }
 
 .docking-pane .docking-tab:selected .docking-tab-title .ikonli-font-icon {
     -fx-icon-color: -color-fg-emphasis;
-}
-
-.docking-pane:show-focus-border .docking-tab-pane:focus-highlighted {
-    -fx-border-color: -color-accent-emphasis;
 }
 
 .docking-pane .docking-tab:focused {

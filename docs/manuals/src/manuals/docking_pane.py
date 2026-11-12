@@ -328,6 +328,11 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                     "Keyboard interactions of the title controls: LEFT/RIGHT switches selected tab, "
                     "ENTER or SPACE selects the focused title, DELETE or shortcut+W requests close."
                 ),
+                Para(
+                    "Focusing a dockable's content or title makes it active. If another dockable is "
+                    "activated while focus is in a dockable, focus moves into the newly active content "
+                    "or, if it has no focusable node, to its title. Focus outside the pane is unchanged."
+                ),
             ],
         ),
         Chapter(
@@ -441,6 +446,7 @@ if (!result.getUnresolvedDockableIds().isEmpty()) {
                     [
                         ["<font face='Courier'>.docking-pane</font>", "Control root background and border."],
                         ["<font face='Courier'>.docking-tab-strip</font>", "Tab strip container and spacing."],
+                        ["<font face='Courier'>.docking-tab-pane:active</font>", "Tab group containing the pane's active dockable."],
                         ["<font face='Courier'>.docking-tab</font>", "Custom title tab shape and hover/selected visuals."],
                         ["<font face='Courier'>.docking-tab:selected</font>", "The selected tab in each tab group."],
                         ["<font face='Courier'>.docking-tab-actions</font>", "Shared fading container for the toolbar, help, menu, and close controls."],

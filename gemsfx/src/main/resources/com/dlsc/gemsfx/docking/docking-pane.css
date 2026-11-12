@@ -7,15 +7,6 @@
     -fx-background-color: transparent;
 }
 
-.docking-pane:show-focus-border .docking-tab-pane {
-    -fx-border-color: transparent;
-    -fx-border-width: 1;
-}
-
-.docking-pane:show-focus-border .docking-tab-pane:focus-highlighted {
-    -fx-border-color: -fx-focus-color;
-}
-
 .docking-pane .docking-tab-strip {
     -fx-spacing: 0;
     -fx-padding: 0;
@@ -47,6 +38,24 @@
 
 .docking-pane .docking-tab:selected {
     -fx-background-color: -fx-control-inner-background;
+}
+
+.docking-pane .docking-tab-pane:active .docking-tab:selected {
+    -fx-background-color: -fx-accent;
+}
+
+.docking-pane .docking-tab-pane:active .docking-tab:selected .docking-tab-title {
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.docking-pane .docking-tab-pane:active .docking-tab:selected .docking-tab-title .ikonli-font-icon,
+.docking-pane .docking-tab-pane:active .docking-tab:selected .docking-tab-help-button .ikonli-font-icon,
+.docking-pane .docking-tab-pane:active .docking-tab:selected .docking-tab-menu-button .ikonli-font-icon {
+    -fx-icon-color: -fx-selection-bar-text;
+}
+
+.docking-pane .docking-tab-pane:active .docking-tab:selected .docking-tab-close-button .icon {
+    -fx-background-color: -fx-selection-bar-text;
 }
 
 .docking-pane .docking-tab-actions {

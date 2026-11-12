@@ -93,10 +93,6 @@
     -fx-border-insets: 0;
 }
 
-.docking-demo-app .docking-pane:show-focus-border .docking-tab-pane:focus-highlighted {
-    -fx-border-color: -color-accent-emphasis;
-}
-
 .docking-demo-app .docking-demo-map-footer {
     -fx-background-color: rgba(255, 255, 255, 0.65);
 }
@@ -109,6 +105,10 @@
 .docking-demo-app .docking-pane .docking-tab:selected {
     -fx-background-color: -color-neutral-emphasis;
     -fx-border-color: transparent -color-neutral-emphasis-plus -color-neutral-emphasis-plus transparent;
+}
+
+.docking-demo-app .docking-pane .docking-tab-pane:active .docking-tab:selected {
+    -fx-background-color: -color-accent-emphasis;
 }
 
 .docking-demo-app .docking-pane .docking-tab:focused {

@@ -16,8 +16,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -85,7 +83,6 @@ public class DockingPaneApp extends GemApplication {
     private static final List<String> SIDEBAR_VIEW_TYPES = List.of("navigator", "editor", "preview", "console", "inspector");
 
     private final Map<String, Function<String, Dockable>> templates = createTemplates();
-    private final BooleanProperty showFocusBorder = new SimpleBooleanProperty(this, "showFocusBorder", false);
     private DockingLayout savedLayout;
     private Label statusLabel;
     private Dockable dragDockable;
@@ -105,7 +102,6 @@ public class DockingPaneApp extends GemApplication {
                 createSidebarDockable((String) event.getDragboard().getContent(SIDEBAR_VIEW_FORMAT)));
 
         DockingPane rootPane = context.createPane();
-        rootPane.showFocusBorderProperty().bind(showFocusBorder);
         rootPane.setPadding(new Insets(4));
         openInitialLayout(context, rootPane);
 
@@ -313,11 +309,7 @@ public class DockingPaneApp extends GemApplication {
         Button dumpJson = new Button("Dump Layout JSON");
         dumpJson.setOnAction(event -> showLayoutJson(stage, context));
 
-        CheckBox focusBorder = new CheckBox("Focus Border");
-        focusBorder.selectedProperty().bindBidirectional(showFocusBorder);
-        focusBorder.setTooltip(new Tooltip("Highlight the tab group containing keyboard focus"));
-
-        HBox toolbar = new HBox(8, openSearch, openTasks, openView, floatActive, snapshot, restore, dumpJson, clearAll, focusBorder);
+        HBox toolbar = new HBox(8, openSearch, openTasks, openView, floatActive, snapshot, restore, dumpJson, clearAll);
         toolbar.getStyleClass().add("docking-demo-toolbar");
         toolbar.setAlignment(Pos.CENTER_LEFT);
         toolbar.setPadding(new Insets(8, 12, 8, 12));
@@ -377,7 +369,6 @@ public class DockingPaneApp extends GemApplication {
     }
 
     private Stage createFloatingStage(Stage owner, DockingPane pane) {
-        pane.showFocusBorderProperty().bind(showFocusBorder);
         Label hint = new Label("Drag between windows. Outer-edge indicators dock beside the entire layout; other edge drops split one group.");
         hint.setWrapText(true);
 

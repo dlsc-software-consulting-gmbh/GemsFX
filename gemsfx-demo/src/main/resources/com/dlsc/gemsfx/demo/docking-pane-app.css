@@ -113,10 +113,6 @@
     -fx-border-insets: 0;
 }
 
-.docking-demo-app .docking-pane:show-focus-border .docking-tab-pane:focus-highlighted {
-    -fx-border-color: -fx-focus-color;
-}
-
 .docking-demo-app .docking-pane .docking-tab-strip {
     -fx-background-color: derive(-fx-base, -6%);
 }
@@ -128,6 +124,10 @@
 
 .docking-demo-app .docking-pane .docking-tab:selected {
     -fx-background-color: derive(-fx-base, -65%);
+}
+
+.docking-demo-app .docking-pane .docking-tab-pane:active .docking-tab:selected {
+    -fx-background-color: -fx-accent;
 }
 
 .docking-demo-app .docking-pane .docking-tab:focused {

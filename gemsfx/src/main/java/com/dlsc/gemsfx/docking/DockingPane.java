@@ -4,13 +4,10 @@ import com.dlsc.gemsfx.docking.model.DockingTree;
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.css.PseudoClass;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
@@ -25,10 +22,9 @@ import java.util.Objects;
  * Control associated with exactly one {@link DockingContext}. It owns one pane tree and renders each dockable as a
  * title tab with a close affordance; only the selected tab's content is displayed.
  * Hold Shift when starting a tab drag to move its entire tab group, preserving tab order and selection.
+ * The tab group containing the active dockable has the {@code active} pseudo-class.
  */
 public class DockingPane extends Control {
-
-    private static final PseudoClass SHOW_FOCUS_BORDER = PseudoClass.getPseudoClass("show-focus-border");
 
     private final DockingContext dockingContext;
 
@@ -38,7 +34,6 @@ public class DockingPane extends Control {
     DockingPane(DockingContext dockingContext) {
         this.dockingContext = Objects.requireNonNull(dockingContext, "dockingContext must not be null");
         getStyleClass().add("docking-pane");
-        pseudoClassStateChanged(SHOW_FOCUS_BORDER, isShowFocusBorder());
         AccessibilityUtil.setRole(this, AccessibleRole.NODE, ResourceBundleManager.getString(
                 ResourceBundleManager.BundleType.DOCKING_PANE, "accessible.role-description", "Docking pane"));
         setPlaceholder(new DockingPanePlaceholder());
@@ -85,36 +80,14 @@ public class DockingPane extends Control {
         this.placeholder.set(placeholder);
     }
 
-    private final BooleanProperty showFocusBorder = new SimpleBooleanProperty(this, "showFocusBorder", true) {
-        @Override
-        protected void invalidated() {
-            pseudoClassStateChanged(SHOW_FOCUS_BORDER, get());
-        }
-    };
-
-    /**
-     * Whether to highlight the border of the tab group containing keyboard focus while its window is focused.
-     * Defaults to {@code false}. Enabling this reserves a border around all tab groups so that moving focus
-     * between groups does not shift their contents. It does not change tab selection or the active dockable.
-     *
-     * @return the show focus border property
-     */
-    public final BooleanProperty showFocusBorderProperty() {
-        return showFocusBorder;
-    }
-
-    public final boolean isShowFocusBorder() {
-        return showFocusBorder.get();
-    }
-
-    public final void setShowFocusBorder(boolean showFocusBorder) {
-        this.showFocusBorder.set(showFocusBorder);
-    }
-
     private final ReadOnlyObjectWrapper<Dockable> activeDockable = new ReadOnlyObjectWrapper<>(this, "activeDockable");
 
     /**
      * The currently active dockable of this pane, or {@code null}.
+     * Focusing a dockable's content or tab makes it active. If another dockable is activated
+     * while focus is in a different dockable in this pane, focus moves to the newly active
+     * dockable's content, or to its tab if the content has no focusable node. Focus outside
+     * this pane is left unchanged.
      *
      * @return the active dockable property
      */

@@ -335,17 +335,16 @@ public class DockingPaneAppTest {
     }
 
     @Test
-    public void focusBorderUsesAccentColorWithoutRecoloringOtherGroups() throws Exception {
+    public void activeGroupUsesAccentColorWhileOtherSelectedTabsStayNeutral() throws Exception {
         runFx(() -> {
             DockingPaneApp app = new DockingPaneApp();
             DockingContext context = new DockingContext(app::createDockable, pane -> null);
             DockingPane pane = context.createPane();
-            pane.setShowFocusBorder(true);
             context.openDockable(pane, "editor", DockingPosition.CENTER);
             context.openDockable(pane, "inspector", DockingPosition.RIGHT);
             StackPane root = new StackPane(pane);
             root.getStyleClass().add("docking-demo-app");
-            root.setStyle("-color-accent-emphasis: #12ab34; -color-neutral-emphasis-plus: #654321;");
+            root.setStyle("-color-accent-emphasis: #12ab34; -color-neutral-emphasis: #654321;");
             root.getStylesheets().add(DockingPaneApp.class.getResource("docking-pane-app-atlantafx.css").toExternalForm());
             Scene scene = new Scene(root, 800, 600);
             scene.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
@@ -353,16 +352,15 @@ public class DockingPaneAppTest {
             root.applyCss();
             root.layout();
 
-            var groups = pane.lookupAll(".docking-tab-pane");
-            assertEquals(2, groups.size());
-            var highlighted = groups.iterator().next();
-            highlighted.pseudoClassStateChanged(PseudoClass.getPseudoClass("focus-highlighted"), true);
-            root.applyCss();
-
-            for (var group : groups) {
-                assertEquals(Color.web(group == highlighted ? "#12ab34" : "#654321"),
-                        ((Region) group).getBorder().getStrokes().getFirst().getTopStroke());
-                assertEquals(1, ((Region) group).getBorder().getStrokes().getFirst().getWidths().getTop());
+            for (String id : List.of("editor", "inspector")) {
+                pane.selectDockable(id);
+                root.applyCss();
+                var active = (Region) pane.lookup(".docking-tab-pane:active .docking-tab:selected");
+                assertNotNull(active);
+                assertEquals(Color.web("#12ab34"), active.getBackground().getFills().getFirst().getFill());
+                var other = pane.lookupAll(".docking-tab:selected").stream()
+                        .filter(tab -> tab != active).map(Region.class::cast).findFirst().orElseThrow();
+                assertEquals(Color.web("#654321"), other.getBackground().getFills().getFirst().getFill());
             }
         });
     }

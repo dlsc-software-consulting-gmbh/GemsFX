@@ -50,7 +50,6 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private static final DataFormat DOCKABLE_ID_FORMAT = new DataFormat("application/x-gemsfx-dockable-id");
     private static final DataFormat TAB_GROUP_FORMAT = new DataFormat("application/x-gemsfx-dockable-tab-group");
     private static final PseudoClass ACTIVE = PseudoClass.getPseudoClass("active");
-    private static final PseudoClass FOCUS_HIGHLIGHTED = PseudoClass.getPseudoClass("focus-highlighted");
     private static final List<String> DROP_ZONE_STYLES = List.of(
             "drop-zone-center", "drop-zone-left", "drop-zone-right", "drop-zone-top", "drop-zone-bottom");
 
@@ -62,7 +61,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private final List<Label> graphicLabels = new ArrayList<>();
     private final List<DockingTabPane> tabGroups = new ArrayList<>();
     private Scene focusScene;
-    private Window focusWindow;
+    private boolean synchronizingFocus;
     private final Region dropLeafPreview = previewRegion("docking-drop-leaf-preview");
     private final Region dropZonePreview = previewRegion("docking-drop-zone-preview");
     private final Map<DockingPosition, StackPane> paneEdgeTargets = new EnumMap<>(DockingPosition.class);
@@ -119,55 +118,141 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         pane.addEventFilter(DragEvent.DRAG_DROPPED, dragDroppedHandler);
         pane.addEventFilter(DragEvent.DRAG_EXITED, dragExitedHandler);
         pane.addEventFilter(KeyEvent.KEY_PRESSED, keyPressedHandler);
-        registerChangeListener(pane.showFocusBorderProperty(), obs -> updateFocusBorders());
+        registerChangeListener(pane.activeDockableProperty(), obs -> {
+            updateActiveGroup();
+            focusActiveDockable();
+        });
         registerChangeListener(pane.getDockingContext().tabFactoryProperty(), obs -> rebuild());
         registerChangeListener(pane.sceneProperty(), obs -> observeFocusScene(pane.getScene()));
         observeFocusScene(pane.getScene());
         rebuild();
     }
 
+    /**
+     * Moves focus-owner observation to the pane's current scene, detaching from the old scene
+     * before synchronizing with the new one. Passing {@code null} stops observation.
+     *
+     * @param scene the scene to observe, or {@code null}
+     */
     private void observeFocusScene(Scene scene) {
         if (focusScene != null) {
             unregisterChangeListeners(focusScene.focusOwnerProperty());
-            unregisterChangeListeners(focusScene.windowProperty());
         }
         focusScene = scene;
         if (scene != null) {
-            registerChangeListener(scene.focusOwnerProperty(), obs -> updateFocusBorders());
-            registerChangeListener(scene.windowProperty(), obs -> observeFocusWindow(scene.getWindow()));
+            registerChangeListener(scene.focusOwnerProperty(), obs -> activateFocusedDockable());
+            activateFocusedDockable();
         }
-        observeFocusWindow(scene == null ? null : scene.getWindow());
-    }
-
-    private void observeFocusWindow(Window window) {
-        if (focusWindow != null) {
-            unregisterChangeListeners(focusWindow.focusedProperty());
-        }
-        focusWindow = window;
-        if (window != null) {
-            registerChangeListener(window.focusedProperty(), obs -> updateFocusBorders());
-        }
-        updateFocusBorders();
     }
 
     /**
-     * Highlights only the tab group containing the actual scene focus owner, and only while its
-     * window has focus. Walking the focus owner's ancestors includes focus within dockable content
-     * without confusing the active dockable with the group currently receiving keyboard input.
+     * Selects the dockable containing the scene's focus owner. The synchronization guard prevents
+     * the resulting active-dockable notification from moving focus a second time.
      */
-    private void updateFocusBorders() {
-        DockingTabPane focusedGroup = null;
-        if (getSkinnable().isShowFocusBorder() && focusScene != null
-                && focusWindow != null && focusWindow.isFocused()) {
-            for (Node node = focusScene.getFocusOwner(); node != null; node = node.getParent()) {
-                if (node instanceof DockingTabPane && tabGroups.contains(node)) {
-                    focusedGroup = (DockingTabPane) node;
-                    break;
+    private void activateFocusedDockable() {
+        if (synchronizingFocus || focusScene == null) {
+            return;
+        }
+        Dockable focused = dockableContaining(focusScene.getFocusOwner());
+        if (focused != null && focused != getSkinnable().getActiveDockable()) {
+            synchronizingFocus = true;
+            try {
+                getSkinnable().selectDockable(focused.getId());
+            } finally {
+                synchronizingFocus = false;
+            }
+        }
+    }
+
+    /**
+     * Walks the focus owner's ancestors to find a dockable's content or title in this pane.
+     * Matching the actual nodes also allows focus inside nested controls and custom tab titles.
+     *
+     * @param node the node to locate, or {@code null}
+     * @return the containing dockable, or {@code null} if none matches
+     */
+    private Dockable dockableContaining(Node node) {
+        DockingPane pane = getSkinnable();
+        for (Node ancestor = node; ancestor != null && ancestor != pane; ancestor = ancestor.getParent()) {
+            for (Dockable dockable : pane.getDockables()) {
+                if (ancestor == dockable.getContent()) {
+                    return dockable;
+                }
+                for (DockingTabPane group : tabGroups) {
+                    if (ancestor == group.titleOf(dockable.getId())) {
+                        return dockable;
+                    }
                 }
             }
         }
+        return null;
+    }
+
+    /**
+     * Moves focus to the newly active dockable only when it currently belongs to a different
+     * dockable in this pane. Content is preferred, with the tab title as a fallback. CSS is applied
+     * when a rebuild has not yet attached the new content, and the guard prevents focus changes
+     * from recursively changing the active dockable.
+     */
+    private void focusActiveDockable() {
+        if (synchronizingFocus || focusScene == null) {
+            return;
+        }
+        Dockable active = getSkinnable().getActiveDockable();
+        Dockable focused = dockableContaining(focusScene.getFocusOwner());
+        if (active == null || focused == null || focused == active) {
+            return;
+        }
+        synchronizingFocus = true;
+        try {
+            if (active.getContent().getScene() != focusScene) {
+                getSkinnable().applyCss();
+            }
+            if (!requestFocusIn(active.getContent())) {
+                for (DockingTabPane group : tabGroups) {
+                    Node title = group.titleOf(active.getId());
+                    if (title != null) {
+                        title.requestFocus();
+                        break;
+                    }
+                }
+            }
+        } finally {
+            synchronizingFocus = false;
+        }
+    }
+
+    /**
+     * Searches visible, enabled content depth-first for a focus-traversable node that accepts
+     * focus, skipping entire hidden or disabled subtrees.
+     *
+     * @param node the root of the content subtree
+     * @return {@code true} if a node in the subtree became the scene's focus owner
+     */
+    private boolean requestFocusIn(Node node) {
+        if (!node.isVisible() || node.isDisabled()) {
+            return false;
+        }
+        if (node.isFocusTraversable()) {
+            node.requestFocus();
+            if (focusScene.getFocusOwner() == node) {
+                return true;
+            }
+        }
+        if (node instanceof Parent) {
+            for (Node child : ((Parent) node).getChildrenUnmodifiable()) {
+                if (requestFocusIn(child)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void updateActiveGroup() {
+        Dockable dockable = getSkinnable().getActiveDockable();
         for (DockingTabPane group : tabGroups) {
-            group.pseudoClassStateChanged(FOCUS_HIGHLIGHTED, group == focusedGroup);
+            group.pseudoClassStateChanged(ACTIVE, dockable != null && group.containsDockable(dockable.getId()));
         }
     }
 
@@ -184,7 +269,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         for (int i = 0; i < tabGroups.size(); i++) {
             tabGroups.get(i).updateSelection(selectedIds.get(i));
         }
-        updateFocusBorders();
+        updateActiveGroup();
         return true;
     }
 
@@ -227,6 +312,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      * Recreates the rendered split/tab hierarchy after layout structure or tab presentation changes.
      * Existing content and graphics are released before rendering so their nodes can be reused, and
      * keyboard focus on a tab title is restored by dockable ID rather than by obsolete node identity.
+     * Applying CSS attaches newly created split contents before focus is requested.
      */
     private void rebuild() {
         DockingPane pane = getSkinnable();
@@ -239,13 +325,18 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         getChildren().setAll(host);
         clearDropPreview();
         if (focusedId != null) {
-            for (Node title : root.lookupAll(".docking-tab")) {
-                if (focusedId.equals(title.getProperties().get(DockingTabPane.DOCKABLE_ID_KEY))) {
+            if (pane.getSkin() == this) {
+                pane.applyCss();
+            }
+            for (DockingTabPane group : tabGroups) {
+                Node title = group.titleOf(focusedId);
+                if (title != null) {
                     title.requestFocus();
+                    break;
                 }
             }
         }
-        updateFocusBorders();
+        updateActiveGroup();
     }
 
     @Override
@@ -294,14 +385,24 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         contentHosts.clear();
     }
 
+    /**
+     * Finds the dockable ID of a focused title belonging to this pane. Titles are matched by node
+     * identity rather than ID alone so a nested docking pane cannot be mistaken for this pane.
+     *
+     * @return the focused title's dockable ID, or {@code null} if focus is not in one of its titles
+     */
     private String focusedDockableId() {
-        if (getSkinnable().getScene() == null) {
+        if (focusScene == null) {
             return null;
         }
-        for (Node node = getSkinnable().getScene().getFocusOwner(); node != null; node = node.getParent()) {
-            Object id = node.getProperties().get(DockingTabPane.DOCKABLE_ID_KEY);
-            if (id != null) {
-                return node.getStyleClass().contains("docking-tab") ? (String) id : null;
+        DockingPane pane = getSkinnable();
+        for (Node node = focusScene.getFocusOwner(); node != null && node != pane; node = node.getParent()) {
+            for (Dockable dockable : pane.getDockables()) {
+                for (DockingTabPane group : tabGroups) {
+                    if (node == group.titleOf(dockable.getId())) {
+                        return dockable.getId();
+                    }
+                }
             }
         }
         return null;
@@ -454,6 +555,14 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return dragboard.setContent(content);
     }
 
+    /**
+     * Builds a themed drag preview from the dockable's title and a scaled content snapshot.
+     * A separate scene allows CSS and layout to determine the preview's dimensions.
+     *
+     * @param dockableId the dockable to preview
+     * @return the resulting drag image
+     * @throws IllegalArgumentException if the dockable ID is unknown
+     */
     private Image createDockableDragView(String dockableId) {
         Dockable dockable = getSkinnable().getDockingContext().getDockables().stream()
                 .filter(item -> item.getId().equals(dockableId))
@@ -510,6 +619,12 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         }
     }
 
+    /**
+     * Copies the pane's user-agent stylesheet and the relevant scene, root, and pane stylesheets
+     * into a temporary snapshot scene so drag images reflect the current theme.
+     *
+     * @param scene the temporary snapshot scene
+     */
     private void configureSnapshotScene(Scene scene) {
         scene.getStylesheets().add(getSkinnable().getUserAgentStylesheet());
         Scene source = getSkinnable().getScene();
@@ -694,6 +809,13 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         showPaneEdgeTargets(draggedId, false);
     }
 
+    /**
+     * Shows pane-wide edge targets only for split layouts and permitted moves. A {@code null}
+     * dragged ID represents an external drag, whose dockable has not yet been created.
+     *
+     * @param draggedId the internal dockable ID, or {@code null} for an external drag
+     * @param wholeGroup whether the internal drag moves the entire tab group
+     */
     private void showPaneEdgeTargets(String draggedId, boolean wholeGroup) {
         DockingPane pane = getSkinnable();
         boolean splitLayout = pane.getLayoutRoot() instanceof DockingLayoutNode.Split;
@@ -752,6 +874,13 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return value instanceof String ? (String) value : null;
     }
 
+    /**
+     * Resolves an internal dockable ID from the dragboard, falling back to the gesture source when
+     * no ID is available on the dragboard.
+     *
+     * @param event the drag event
+     * @return the dragged dockable ID, or {@code null} for an unrecognized drag
+     */
     private static String draggedDockableId(DragEvent event) {
         Dragboard dragboard = event.getDragboard();
         if (dragboard != null && dragboard.hasContent(DOCKABLE_ID_FORMAT)) {
@@ -762,6 +891,13 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return gestureSource instanceof Node ? dockableId((Node) gestureSource) : null;
     }
 
+    /**
+     * Checks the whole-group marker on the dragboard or the source node. The source-node marker
+     * also identifies the gesture when a dragboard is unavailable.
+     *
+     * @param event the drag event
+     * @return {@code true} if the gesture moves the entire tab group
+     */
     private static boolean isTabGroupDrag(DragEvent event) {
         Dragboard dragboard = event.getDragboard();
         if (dragboard != null && Boolean.TRUE.equals(dragboard.getContent(TAB_GROUP_FORMAT))) {
@@ -852,6 +988,13 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return activeDragDockableId != null && activeDragDockableId.equals(draggedId);
     }
 
+    /**
+     * Checks whether a picked node belongs to any docking pane in the same context, including a
+     * pane nested within other scene-graph nodes.
+     *
+     * @param node the picked node, or {@code null}
+     * @return {@code true} if an ancestor is a pane belonging to this context
+     */
     private boolean isInsideContextPane(Node node) {
         DockingPane contextPane = getSkinnable();
         for (Node current = node; current != null; current = current.getParent()) {
@@ -939,6 +1082,14 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return panes;
     }
 
+    /**
+     * Recursively collects panes belonging to the given context, including panes nested inside
+     * other panes, for screen-coordinate checks across windows.
+     *
+     * @param node the root of the subtree to search
+     * @param context the context whose panes are wanted
+     * @param panes the destination list
+     */
     private static void collectContextPanes(Node node, com.dlsc.gemsfx.docking.DockingContext context, List<DockingPane> panes) {
         if (node instanceof DockingPane && ((DockingPane) node).getDockingContext() == context) {
             panes.add((DockingPane) node);

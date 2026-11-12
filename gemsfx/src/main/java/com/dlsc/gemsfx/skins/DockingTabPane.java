@@ -84,6 +84,19 @@ final class DockingTabPane extends VBox {
         }
     }
 
+    boolean containsDockable(String id) {
+        return ids.contains(id);
+    }
+
+    Node titleOf(String id) {
+        for (Node title : strip.getChildren()) {
+            if (id.equals(title.getProperties().get(DOCKABLE_ID_KEY))) {
+                return title;
+            }
+        }
+        return null;
+    }
+
     private static Dockable find(DockingPane pane, String id) {
         for (Dockable dockable : pane.getDockables()) {
             if (dockable.getId().equals(id)) {
