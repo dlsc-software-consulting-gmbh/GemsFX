@@ -29,7 +29,6 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -405,10 +404,8 @@ public class DockingPaneApp extends GemApplication {
         templates.put("console", this::createConsoleDockable);
         templates.put("navigator", this::createNavigatorDockable);
         templates.put("inspector", this::createInspectorDockable);
-        templates.put("search", id -> createTextDockable(id, "Search", MaterialDesign.MDI_MAGNIFY,
-                "Search results\n- DockingContext\n- DockingPane\n- DockingLayout"));
-        templates.put("tasks", id -> createListDockable(id, "Tasks", MaterialDesign.MDI_CHECKBOX_MARKED_OUTLINE,
-                "TODO: wire toolbar", "TODO: refresh preview", "DONE: snapshot layout"));
+        templates.put("search", id -> createTextDockable(id, "Search", MaterialDesign.MDI_MAGNIFY, "Search results\n- DockingContext\n- DockingPane\n- DockingLayout"));
+        templates.put("tasks", id -> createListDockable(id, "Tasks", MaterialDesign.MDI_CHECKBOX_MARKED_OUTLINE, "TODO: wire toolbar", "TODO: refresh preview", "DONE: snapshot layout"));
         templates.put("map", this::createMapDockable);
         templates.put("charts", this::createChartsDockable);
         templates.put("city", this::createCityDockable);
@@ -423,15 +420,13 @@ public class DockingPaneApp extends GemApplication {
             Dockable dockable = factory.apply(id);
             if (ThreadLocalRandom.current().nextBoolean()) {
                 dockable.setOnHelp(() -> {
-                    Alert help = new Alert(Alert.AlertType.INFORMATION);
-                    help.setTitle("Dockable Help");
-                    help.setHeaderText("Help for " + dockable.getTitle());
-                    help.setContentText("Drag the tab to rearrange this view, or use Close to remove it from the workspace.");
                     Scene scene = dockable.getScene();
-                    if (scene != null) {
-                        help.initOwner(scene.getWindow());
+                    DialogPane dialogs = scene == null ? null
+                            : (DialogPane) scene.getRoot().lookup("." + DIALOG_PANE_STYLE_CLASS);
+                    if (dialogs != null) {
+                        dialogs.showInformation("Help for " + dockable.getTitle(),
+                                "Drag the tab to rearrange this view, or use Close to remove it from the workspace.");
                     }
-                    help.show();
                 });
             }
             return dockable;

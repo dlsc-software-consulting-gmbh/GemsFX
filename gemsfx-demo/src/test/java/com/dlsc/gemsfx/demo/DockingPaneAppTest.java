@@ -20,7 +20,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -389,68 +388,69 @@ public class DockingPaneAppTest {
     public void demoMixesOptionalHelpCallbacksAndShowsHelpForTheCurrentTitle() throws Exception {
         runFx(() -> {
             DockingPaneApp app = new DockingPaneApp();
-            Dockable withHelp = null;
-            Dockable withoutHelp = null;
-            for (int i = 0; i < 128 && (withHelp == null || withoutHelp == null); i++) {
-                Dockable dockable = app.createDockable("search:" + i).orElseThrow();
-                if (dockable.getOnHelp() == null) {
-                    withoutHelp = dockable;
-                } else {
-                    withHelp = dockable;
-                }
-            }
-            assertNotNull(withHelp, "Some demo dockables should offer help");
-            assertNotNull(withoutHelp, "Some demo dockables should omit help");
-            withHelp.setTitle("Renamed Search");
-            List<Window> previousWindows = List.copyOf(Window.getWindows());
+            Stage stage = new Stage();
             try {
+                app.start(stage);
+                DockingPane pane = (DockingPane) stage.getScene().getRoot().lookup(".docking-pane");
+                DockingContext context = pane.getDockingContext();
+                Dockable withHelp = null;
+                Dockable withoutHelp = null;
+                for (int i = 0; i < 128 && (withHelp == null || withoutHelp == null); i++) {
+                    Dockable dockable = context.openDockable(pane, "search:" + i, DockingPosition.CENTER).orElseThrow();
+                    if (dockable.getOnHelp() == null) {
+                        withoutHelp = dockable;
+                    } else {
+                        withHelp = dockable;
+                    }
+                }
+                assertNotNull(withHelp, "Some demo dockables should offer help");
+                assertNotNull(withoutHelp, "Some demo dockables should omit help");
+                withHelp.setTitle("Renamed Search");
+                com.dlsc.gemsfx.DialogPane dialogs = dialogPane(stage);
+                List<Window> previousWindows = List.copyOf(Window.getWindows());
                 withHelp.getOnHelp().run();
-                Window helpWindow = Window.getWindows().stream()
-                        .filter(window -> !previousWindows.contains(window)).findFirst().orElseThrow();
-                DialogPane dialog = (DialogPane) helpWindow.getScene().getRoot().lookup(".dialog-pane");
-                assertEquals("Help for Renamed Search", dialog.getHeaderText());
-                assertTrue(dialog.getContentText().contains("Drag"));
+                assertEquals(1, dialogs.getDialogs().size());
+                com.dlsc.gemsfx.DialogPane.Dialog<?> dialog = dialogs.getDialogs().getFirst();
+                assertEquals("Help for Renamed Search", dialog.getTitle());
+                assertTrue(((Label) dialog.getContent()).getText().contains("Drag"));
+                assertEquals(previousWindows, List.copyOf(Window.getWindows()));
+                dialog.press(ButtonType.OK);
+                assertTrue(dialogs.getDialogs().isEmpty());
             } finally {
-                List.copyOf(Window.getWindows()).stream()
-                        .filter(window -> !previousWindows.contains(window)).forEach(Window::hide);
+                stage.hide();
             }
         });
     }
 
     @Test
-    public void helpForUnselectedDockableIsOwnedByItsHostWindow() throws Exception {
+    public void helpForUnselectedFloatingDockableUsesItsWindowOverlay() throws Exception {
         runFx(() -> {
             DockingPaneApp app = new DockingPaneApp();
-            Dockable withHelp = null;
-            for (int i = 0; i < 128 && withHelp == null; i++) {
-                Dockable candidate = app.createDockable("search:" + i).orElseThrow();
-                if (candidate.getOnHelp() != null) {
-                    withHelp = candidate;
-                }
-            }
-            assertNotNull(withHelp);
-            Dockable helpDockable = withHelp;
-            DockingContext context = new DockingContext(
-                    id -> Optional.of(id.equals(helpDockable.getId()) ? helpDockable : app.createDockable(id).orElseThrow()),
-                    pane -> new Stage());
-            DockingPane pane = context.createPane();
             Stage stage = new Stage();
-            List<Window> previousWindows = List.copyOf(Window.getWindows());
             try {
-                stage.setScene(new Scene(new StackPane(pane), 400, 300));
-                stage.show();
-                context.openDockable(pane, helpDockable.getId(), DockingPosition.CENTER);
-                context.openDockable(pane, "editor:other", DockingPosition.CENTER);
-                pane.applyCss();
+                app.start(stage);
+                DockingPane pane = (DockingPane) stage.getScene().getRoot().lookup(".docking-pane");
+                DockingContext context = pane.getDockingContext();
+                Dockable helpDockable = null;
+                for (int i = 0; i < 128 && helpDockable == null; i++) {
+                    Dockable candidate = context.openDockable(pane, "search:" + i, DockingPosition.CENTER).orElseThrow();
+                    if (candidate.getOnHelp() != null) {
+                        helpDockable = candidate;
+                    }
+                }
+                assertNotNull(helpDockable);
+                DockingPane floating = context.floatDockable(helpDockable.getId(), 100, 100);
+                Stage floatingStage = helpDockable.getStage();
+                context.openDockable(floating, "editor:other", DockingPosition.CENTER);
+                floating.applyCss();
                 assertNull(helpDockable.getContent().getScene());
-
+                com.dlsc.gemsfx.DialogPane floatingDialogs = dialogPane(floatingStage);
                 helpDockable.getOnHelp().run();
-                Stage help = (Stage) Window.getWindows().stream()
-                        .filter(window -> window != stage && !previousWindows.contains(window)).findFirst().orElseThrow();
-                assertSame(stage, help.getOwner());
+                assertEquals(1, floatingDialogs.getDialogs().size());
+                assertTrue(dialogPane(stage).getDialogs().isEmpty());
+                floatingDialogs.getDialogs().getFirst().press(ButtonType.OK);
             } finally {
-                List.copyOf(Window.getWindows()).stream()
-                        .filter(window -> !previousWindows.contains(window)).forEach(Window::hide);
+                stage.hide();
             }
         });
     }
