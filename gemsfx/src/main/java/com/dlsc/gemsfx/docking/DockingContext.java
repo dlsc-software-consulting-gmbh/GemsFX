@@ -15,6 +15,8 @@ import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -37,6 +40,7 @@ public class DockingContext {
     private final DockableFactory dockableFactory;
     private final DockingStageFactory stageFactory;
     private final Map<String, Dockable> dockablesById = new LinkedHashMap<>();
+    private final Set<Dockable> closeRequestsInProgress = Collections.newSetFromMap(new IdentityHashMap<>());
     private final Map<String, DockingPane> dockablePaneById = new LinkedHashMap<>();
     private final Set<DockingPane> panes = new LinkedHashSet<>();
     private final Map<DockingPane, String> paneIdByPane = new LinkedHashMap<>();
@@ -530,8 +534,8 @@ public class DockingContext {
     }
 
     /**
-     * Closes the dockable if its closeable property and the close policy permit it. A veto leaves
-     * the panes and this context unchanged. A successfully removed dockable is disposed.
+     * Closes the dockable if its closeable property, close policy, and close request callback permit
+     * it. A veto leaves the panes and this context unchanged. A successfully removed dockable is disposed.
      *
      * @param dockable the dockable to close
      * @return {@code true} only if the dockable was open and has been removed
@@ -562,7 +566,8 @@ public class DockingContext {
     }
 
     /**
-     * Evaluates the dockable's close permission and the context's close policy.
+     * Evaluates the dockable's close permission and the context's close policy without invoking
+     * the dockable's close request callback.
      *
      * @param dockable the dockable
      * @return {@code true} if the dockable may close
@@ -1040,6 +1045,15 @@ public class DockingContext {
         if (checkPolicy && !canCloseDockable(dockable)) {
             return false;
         }
+        if (dockablesById.get(id) != dockable) {
+            return false;
+        }
+        if (checkPolicy && !approveCloseRequest(dockable)) {
+            return false;
+        }
+        if (dockablesById.get(id) != dockable || (checkPolicy && !dockable.isCloseable())) {
+            return false;
+        }
         DockingPane pane = dockablePaneById.remove(id);
         if (pane == null) {
             return false;
@@ -1053,6 +1067,26 @@ public class DockingContext {
             closeFloatingStageIfEmpty(pane);
         }
         return true;
+    }
+
+    /**
+     * Invokes a dockable's close request callback at most once at a time, including when a modal
+     * confirmation dialog runs a nested JavaFX event loop.
+     */
+    private boolean approveCloseRequest(Dockable dockable) {
+        if (closeRequestsInProgress.contains(dockable)) {
+            return false;
+        }
+        BooleanSupplier callback = dockable.getOnCloseRequest();
+        if (callback == null) {
+            return true;
+        }
+        closeRequestsInProgress.add(dockable);
+        try {
+            return callback.getAsBoolean();
+        } finally {
+            closeRequestsInProgress.remove(dockable);
+        }
     }
 
     /**
@@ -1074,9 +1108,9 @@ public class DockingContext {
     }
 
     /**
-     * Prechecks every tab's close policy before removing any dockable, so a veto leaves the whole
-     * window intact. After approval, policies are not evaluated again and automatic empty-window
-     * closure is suppressed to avoid reentering stage teardown while its dockables are being removed.
+     * Prechecks every tab's close permission and request callback before removing any dockable, so a
+     * veto leaves the whole window intact. After approval, callbacks are not evaluated again and
+     * automatic empty-window closure is suppressed while its dockables are being removed.
      */
     private void handleFloatingStageCloseRequest(Stage stage, WindowEvent event) {
         DockingPane pane = floatingPaneByStage.get(stage);
@@ -1085,7 +1119,13 @@ public class DockingContext {
         }
         List<Dockable> paneDockables = new ArrayList<>(pane.getDockables());
         for (Dockable dockable : paneDockables) {
-            if (!canCloseDockable(dockable)) {
+            if (!canCloseDockable(dockable) || !matchesFloatingCloseTarget(stage, pane, paneDockables)) {
+                event.consume();
+                return;
+            }
+        }
+        for (Dockable dockable : paneDockables) {
+            if (!approveCloseRequest(dockable) || !matchesFloatingCloseTarget(stage, pane, paneDockables)) {
                 event.consume();
                 return;
             }
@@ -1100,6 +1140,22 @@ public class DockingContext {
             suppressEmptyFloatingClose = false;
         }
         unregisterFloatingStage(stage);
+    }
+
+    /**
+     * Rejects stale approvals if a callback changed the floating window's membership or ownership.
+     */
+    private boolean matchesFloatingCloseTarget(Stage stage, DockingPane pane, List<Dockable> dockables) {
+        if (floatingPaneByStage.get(stage) != pane || pane.getDockables().size() != dockables.size()) {
+            return false;
+        }
+        for (Dockable dockable : dockables) {
+            if (!dockable.isCloseable() || dockablesById.get(dockable.getId()) != dockable
+                    || dockablePaneById.get(dockable.getId()) != pane) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void closeFloatingStageIfEmpty(DockingPane pane) {

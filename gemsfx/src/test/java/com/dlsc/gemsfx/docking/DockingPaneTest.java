@@ -1804,6 +1804,27 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     @Test
+    public void closeButtonAndKeyboardRespectCloseRequestCallback() {
+        runFx(() -> {
+            AtomicInteger requests = new AtomicInteger();
+            Dockable dockable = dockable("a");
+            dockable.setOnCloseRequest(() -> {
+                requests.incrementAndGet();
+                return false;
+            });
+            DockingContext context = context(dockable);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+
+            ((Button) title(pane, "a").lookup(".docking-tab-close-button")).fire();
+            press(title(pane, "a"), KeyCode.DELETE);
+            assertSame(dockable, pane.getActiveDockable());
+            assertEquals(2, requests.get());
+        });
+    }
+
+    @Test
     public void skinDoesNotUseJavaFxTabPane() {
         invoke(() -> {
             DockingContext context = context(dockable("a"));

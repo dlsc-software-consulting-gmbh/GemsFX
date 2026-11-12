@@ -272,7 +272,23 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                             "true",
                             "Controls normal close requests and the default tab's close button visibility.",
                         ),
+                        Property(
+                            "onCloseRequest",
+                            "ObjectProperty&lt;BooleanSupplier&gt;",
+                            "null",
+                            "Optional callback that returns false to veto a close request.",
+                        ),
                     ]
+                ),
+                Para(
+                    "A close request first checks the dockable's closeable property and the context close "
+                    "policy, then invokes its onCloseRequest callback. Permission queries do not invoke "
+                    "the callback. A floating-window close requests approval from all dockables before "
+                    "removing any; a veto leaves the window open."
+                ),
+                Code(
+                    "dockable.setOnCloseRequest(() -> !hasUnsavedChanges() || confirmDiscardChanges());",
+                    caption="Ask for confirmation only when the dockable has unsaved changes.",
                 ),
                 Para(
                     "Override the protected <font face='Courier'>dispose()</font> method to release resources "

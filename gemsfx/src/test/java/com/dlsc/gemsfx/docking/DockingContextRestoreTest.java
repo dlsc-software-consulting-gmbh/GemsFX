@@ -160,6 +160,11 @@ public class DockingContextRestoreTest extends FxTestBase {
             };
             replaced.setCloseable(false);
             removed.setCloseable(false);
+            AtomicInteger requests = new AtomicInteger();
+            removed.setOnCloseRequest(() -> {
+                requests.incrementAndGet();
+                return false;
+            });
             Map<String, Dockable> factory = new HashMap<>(Map.of("a", retained, "b", replaced, "c", removed));
             DockingContext context = new DockingContext(id -> Optional.ofNullable(factory.get(id)), pane -> new Stage());
             DockingPane pane = context.createPane();
@@ -175,6 +180,7 @@ public class DockingContextRestoreTest extends FxTestBase {
             assertEquals(0, retainedDisposals.get());
             assertEquals(1, replacedDisposals.get());
             assertEquals(1, removedDisposals.get());
+            assertEquals(0, requests.get());
             assertEquals(List.of(retained, replacement), context.getDockables());
         });
     }

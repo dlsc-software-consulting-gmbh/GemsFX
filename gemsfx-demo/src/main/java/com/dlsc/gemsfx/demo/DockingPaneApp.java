@@ -487,6 +487,20 @@ public class DockingPaneApp extends GemApplication {
         wrap.setSelected(text.isWrapText());
         wrap.selectedProperty().bindBidirectional(text.wrapTextProperty());
         editor.setToolbar(wrap);
+        String initialText = text.getText();
+        editor.setOnCloseRequest(() -> {
+            if (initialText.equals(text.getText())) {
+                return true;
+            }
+            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
+                    "The editor has unsaved changes. Close it anyway?", ButtonType.OK, ButtonType.CANCEL);
+            confirmation.setTitle("Unsaved Changes");
+            confirmation.setHeaderText("Discard unsaved changes?");
+            if (wrap.getScene() != null && wrap.getScene().getWindow() != null) {
+                confirmation.initOwner(wrap.getScene().getWindow());
+            }
+            return confirmation.showAndWait().filter(ButtonType.OK::equals).isPresent();
+        });
         CheckMenuItem wrapItem = new CheckMenuItem("Wrap text");
         wrapItem.selectedProperty().bindBidirectional(text.wrapTextProperty());
         editor.getMenuItems().add(wrapItem);

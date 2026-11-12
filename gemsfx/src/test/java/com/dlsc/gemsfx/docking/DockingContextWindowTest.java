@@ -974,6 +974,100 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     @Test
+    public void floatingWindowCloseRequestsApprovalBeforeDisposingAnyDockable() {
+        runFx(() -> {
+            AtomicInteger disposals = new AtomicInteger();
+            AtomicInteger firstRequests = new AtomicInteger();
+            AtomicInteger secondRequests = new AtomicInteger();
+            AtomicBoolean approveSecond = new AtomicBoolean(false);
+            Dockable first = new Dockable("a", "A", new Label()) {
+                @Override
+                protected void dispose() {
+                    disposals.incrementAndGet();
+                }
+            };
+            Dockable second = new Dockable("b", "B", new Label()) {
+                @Override
+                protected void dispose() {
+                    disposals.incrementAndGet();
+                }
+            };
+            first.setOnCloseRequest(() -> {
+                firstRequests.incrementAndGet();
+                return true;
+            });
+            second.setOnCloseRequest(() -> {
+                secondRequests.incrementAndGet();
+                return approveSecond.get();
+            });
+            AtomicReference<Stage> stageRef = new AtomicReference<>();
+            DockingContext context = new DockingContext(factoryFor(List.of(first, second), new AtomicInteger()), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(new StackPane(pane), 200, 120));
+                stageRef.set(stage);
+                return stage;
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.CENTER);
+            DockingPane floating = context.floatDockable("a", 10, 10);
+            assertTrue(floating.moveDockable("b", "a", DockingPosition.CENTER));
+            Stage stage = stageRef.get();
+            stage.show();
+            try {
+                WindowEvent vetoed = new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST);
+                stage.fireEvent(vetoed);
+                assertTrue(vetoed.isConsumed());
+                assertEquals(List.of(first, second), floating.getDockables());
+                assertEquals(1, firstRequests.get());
+                assertEquals(1, secondRequests.get());
+                assertEquals(0, disposals.get());
+                approveSecond.set(true);
+                stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
+                assertTrue(context.getDockables().isEmpty());
+                assertEquals(2, firstRequests.get());
+                assertEquals(2, secondRequests.get());
+                assertEquals(2, disposals.get());
+            } finally {
+                stage.close();
+            }
+        });
+    }
+
+    @Test
+    public void floatingCloseIsVetoedIfCallbackChangesItsDockables() {
+        runFx(() -> {
+            Dockable first = dockable("a");
+            Dockable added = dockable("b");
+            AtomicReference<Stage> stageRef = new AtomicReference<>();
+            DockingContext context = new DockingContext(factoryFor(List.of(first, added), new AtomicInteger()), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(new StackPane(pane), 200, 120));
+                stageRef.set(stage);
+                return stage;
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            DockingPane floating = context.floatDockable("a", 10, 10);
+            first.setOnCloseRequest(() -> {
+                context.openDockable(floating, "b", DockingPosition.CENTER);
+                return true;
+            });
+            Stage stage = stageRef.get();
+            stage.show();
+            try {
+                WindowEvent event = new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST);
+                stage.fireEvent(event);
+                assertTrue(event.isConsumed());
+                assertEquals(List.of(first, added), context.getDockables());
+                assertEquals(List.of(first, added), floating.getDockables());
+            } finally {
+                stage.close();
+            }
+        });
+    }
+
+    @Test
     public void nonCloseableDockableVetoesFloatingWindowClose() {
         runFx(() -> {
             AtomicInteger disposals = new AtomicInteger();
@@ -1016,6 +1110,7 @@ public class DockingContextWindowTest extends FxTestBase {
     public void hidingFloatingStageDisposesItsDockableOnce() {
         runFx(() -> {
             AtomicInteger disposals = new AtomicInteger();
+            AtomicInteger requests = new AtomicInteger();
             Dockable dockable = new Dockable("a", "A", new Label()) {
                 @Override
                 protected void dispose() {
@@ -1023,6 +1118,10 @@ public class DockingContextWindowTest extends FxTestBase {
                 }
             };
             dockable.setCloseable(false);
+            dockable.setOnCloseRequest(() -> {
+                requests.incrementAndGet();
+                return false;
+            });
             AtomicReference<Stage> stageRef = new AtomicReference<>();
             DockingContext context = new DockingContext(id -> Optional.of(dockable), pane -> {
                 Stage stage = new Stage();
@@ -1039,6 +1138,7 @@ public class DockingContextWindowTest extends FxTestBase {
 
             assertTrue(context.getDockables().isEmpty());
             assertEquals(1, disposals.get());
+            assertEquals(0, requests.get());
             stage.close();
             assertEquals(1, disposals.get());
         });

@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.control.MenuItem;
 
 import java.util.Objects;
+import java.util.function.BooleanSupplier;
 
 /**
  * Represents a dockable component with an ID, a mutable display title and optional graphic, and a content node.
@@ -24,6 +25,7 @@ public class Dockable {
     private final ReadOnlyStringWrapper title;
     private final BooleanProperty titleEditable = new SimpleBooleanProperty(this, "titleEditable", true);
     private final BooleanProperty closeable = new SimpleBooleanProperty(this, "closeable", true);
+    private final ObjectProperty<BooleanSupplier> onCloseRequest = new SimpleObjectProperty<>(this, "onCloseRequest");
     private final ReadOnlyObjectWrapper<Node> graphic;
     private final Node content;
     private final ObjectProperty<Node> toolbar = new SimpleObjectProperty<>(this, "toolbar");
@@ -123,6 +125,26 @@ public class Dockable {
 
     public final void setCloseable(boolean closeable) {
         this.closeable.set(closeable);
+    }
+
+    /**
+     * The optional callback invoked on a normal close request after close permissions are checked.
+     * Return {@code false} to veto the request or {@code true} to allow it. A {@code null} callback
+     * allows the request. The callback runs on the JavaFX application thread and is not invoked
+     * by permission queries, layout restore, or teardown of an already hidden window.
+     *
+     * @return the close request callback property
+     */
+    public final ObjectProperty<BooleanSupplier> onCloseRequestProperty() {
+        return onCloseRequest;
+    }
+
+    public final BooleanSupplier getOnCloseRequest() {
+        return onCloseRequest.get();
+    }
+
+    public final void setOnCloseRequest(BooleanSupplier onCloseRequest) {
+        this.onCloseRequest.set(onCloseRequest);
     }
     
     /**

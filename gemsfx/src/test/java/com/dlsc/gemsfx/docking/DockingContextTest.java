@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -364,6 +365,93 @@ public class DockingContextTest extends FxTestBase {
             assertSame(editor, pane.getActiveDockable());
             assertSame(before, pane.getLayoutRoot());
             return null;
+        });
+    }
+
+    @Test
+    public void closeRequestCallbackCanVetoWithoutAffectingPermissionQueries() {
+        runFx(() -> {
+            AtomicInteger disposals = new AtomicInteger();
+            AtomicInteger requests = new AtomicInteger();
+            AtomicBoolean approve = new AtomicBoolean(false);
+            Dockable dockable = new Dockable("a", "A", new Label()) {
+                @Override
+                protected void dispose() {
+                    disposals.incrementAndGet();
+                }
+            };
+            dockable.setOnCloseRequest(() -> {
+                requests.incrementAndGet();
+                return approve.get();
+            });
+            DockingContext context = new DockingContext(factoryFor(dockable, new AtomicInteger()), STAGE_FACTORY);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+
+            assertTrue(context.canCloseDockable(dockable));
+            assertEquals(0, requests.get());
+            assertFalse(context.requestCloseDockable(dockable));
+            assertSame(dockable, pane.getActiveDockable());
+            assertEquals(1, requests.get());
+            assertEquals(0, disposals.get());
+            dockable.setCloseable(false);
+            assertFalse(context.requestCloseDockable(dockable));
+            assertEquals(1, requests.get());
+            dockable.setCloseable(true);
+            context.setCanCloseDockable(d -> false);
+            assertFalse(context.requestCloseDockable(dockable));
+            assertEquals(1, requests.get());
+            context.setCanCloseDockable(d -> true);
+            approve.set(true);
+            assertTrue(context.requestCloseDockable(dockable));
+            assertEquals(2, requests.get());
+            assertEquals(1, disposals.get());
+            assertFalse(context.requestCloseDockable(dockable));
+            assertEquals(2, requests.get());
+        });
+    }
+
+    @Test
+    public void reentrantCloseRequestDoesNotInvokeCallbackOrDisposeTwice() {
+        runFx(() -> {
+            AtomicInteger requests = new AtomicInteger();
+            AtomicInteger disposals = new AtomicInteger();
+            Dockable dockable = new Dockable("a", "A", new Label()) {
+                @Override
+                protected void dispose() {
+                    disposals.incrementAndGet();
+                }
+            };
+            DockingContext context = new DockingContext(factoryFor(dockable, new AtomicInteger()), STAGE_FACTORY);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            dockable.setOnCloseRequest(() -> {
+                if (requests.incrementAndGet() == 1) {
+                    assertFalse(context.requestCloseDockable(dockable));
+                }
+                return true;
+            });
+
+            assertTrue(context.requestCloseDockable(dockable));
+            assertEquals(1, requests.get());
+            assertEquals(1, disposals.get());
+        });
+    }
+
+    @Test
+    public void closeRequestRespectsCloseabilityChangedByCallback() {
+        runFx(() -> {
+            Dockable dockable = new Dockable("a", "A", new Label());
+            DockingContext context = new DockingContext(factoryFor(dockable, new AtomicInteger()), STAGE_FACTORY);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            dockable.setOnCloseRequest(() -> {
+                dockable.setCloseable(false);
+                return true;
+            });
+
+            assertFalse(context.requestCloseDockable(dockable));
+            assertSame(dockable, pane.getActiveDockable());
         });
     }
 

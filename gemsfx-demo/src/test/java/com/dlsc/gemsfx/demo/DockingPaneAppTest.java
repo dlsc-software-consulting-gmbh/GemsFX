@@ -18,6 +18,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
@@ -152,6 +153,48 @@ public class DockingPaneAppTest {
             assertEquals(initialWrap, wrapItem.isSelected());
             assertEquals(initialWrap, wrap.isSelected());
         });
+    }
+
+    @Test
+    public void editorVetoesCloseUntilUnsavedChangesAreConfirmed() throws Exception {
+        runFx(() -> {
+            DockingPaneApp app = new DockingPaneApp();
+            DockingContext context = new DockingContext(app::createDockable, pane -> new Stage());
+            DockingPane pane = context.createPane();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(new StackPane(pane), 600, 400));
+            stage.show();
+            try {
+                Dockable unchanged = context.openDockable(pane, "editor", DockingPosition.CENTER).orElseThrow();
+                assertNotNull(unchanged.getOnCloseRequest());
+                assertTrue(context.requestCloseDockable(unchanged));
+
+                Dockable editor = context.openDockable(pane, "editor", DockingPosition.CENTER).orElseThrow();
+                TextArea text = (TextArea) editor.getContent();
+                text.appendText("// Unsaved edit");
+                Dockable console = context.openDockable(pane, "console", DockingPosition.CENTER).orElseThrow();
+                pane.applyCss();
+                assertNull(text.getScene(), "The editor is an unselected tab");
+                Platform.runLater(() -> answerConfirmation(stage, ButtonType.CANCEL));
+                assertFalse(context.requestCloseDockable(editor));
+                assertTrue(context.getDockables().contains(editor));
+                assertTrue(text.getText().contains("// Unsaved edit"));
+
+                Platform.runLater(() -> answerConfirmation(stage, ButtonType.OK));
+                assertTrue(context.requestCloseDockable(editor));
+                assertEquals(List.of(console), context.getDockables());
+            } finally {
+                stage.close();
+            }
+        });
+    }
+
+    private static void answerConfirmation(Stage owner, ButtonType answer) {
+        Window dialog = Window.getWindows().stream()
+                .filter(window -> window instanceof Stage && ((Stage) window).getOwner() == owner)
+                .filter(Window::isShowing).findFirst().orElseThrow();
+        DialogPane pane = (DialogPane) dialog.getScene().getRoot().lookup(".dialog-pane");
+        ((Button) pane.lookupButton(answer)).fire();
     }
 
     @Test
