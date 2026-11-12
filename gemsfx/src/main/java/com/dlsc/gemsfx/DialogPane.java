@@ -109,6 +109,11 @@ import com.dlsc.gemsfx.util.ResourceBundleManager;
  * <pre>
  *     dialogPane.showConfirmation("Confirm", "Really delete?").onClose(buttonType -> { ... });
  * </pre>
+ * Alternatively, when called from a JavaFX event handler or {@link Platform#runLater(Runnable)},
+ * {@link Dialog#showAndWait()} returns the selected button synchronously:
+ * <pre>
+ *     ButtonType answer = dialogPane.showConfirmation("Confirm", "Really delete?").showAndWait();
+ * </pre>
  * The pane supports factories for creating the header and the footer. This allows application developers
  * to completely replace those elements of the dialogs. Default factories are already registered and will
  * be used if not replaced.
@@ -344,6 +349,10 @@ public class DialogPane extends StackPane {
     /**
      * Makes the given dialog visible in the pane. A dialog can define a delay duration which will
      * be used to delay the appearance of the dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @see Dialog#delayProperty()
      * @param dialog the dialog to show
@@ -353,14 +362,20 @@ public class DialogPane extends StackPane {
         if (dialog.getDialogPane() != this) {
             throw new IllegalArgumentException("the given dialog does not belong to this dialog pane");
         }
+        dialog.cancelled = false;
+        long sequence = ++dialog.showSequence;
         Duration delay = dialog.getDelay();
         if (delay != null) {
+            dialog.showPending = true;
             Thread thread = new Thread(() -> {
                 try {
                     Thread.sleep((long) delay.toMillis());
                     Platform.runLater(() -> {
-                        if (!dialog.cancelled) {
-                            dialogs.add(dialog);
+                        if (dialog.showSequence == sequence) {
+                            dialog.showPending = false;
+                            if (!dialog.cancelled) {
+                                dialogs.add(dialog);
+                            }
                         }
                     });
                 } catch (InterruptedException e) {
@@ -370,6 +385,7 @@ public class DialogPane extends StackPane {
             thread.setDaemon(true);
             thread.start();
         } else {
+            dialog.showPending = false;
             dialogs.add(dialog);
         }
     }
@@ -380,6 +396,14 @@ public class DialogPane extends StackPane {
      * @param dialog the dialog to hide
      */
     public void hideDialog(Dialog<?> dialog) {
+        if (dialog != null && dialog.getDialogPane() == this && dialog.showPending) {
+            dialog.showPending = false;
+            dialog.cancelled = true;
+            dialog.showSequence++;
+            if (!dialog.closingWithButton) {
+                dialog.finishWait(null);
+            }
+        }
         dialogs.remove(dialog);
     }
 
@@ -414,6 +438,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows an error message dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title   the title for the dialog
      * @param message the main error message
@@ -425,6 +453,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows an error message dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title     the title for the dialog
      * @param message   the main error message
@@ -439,6 +471,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows an error message dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title     the title for the dialog
      * @param exception an exception that will be used to provide the main message additional details
@@ -450,6 +486,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows an error message dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title   the title for the dialog
      * @param message the main error message
@@ -462,6 +502,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows an error message dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title   the title for the dialog
      * @param message the main error message
@@ -536,6 +580,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows a warning dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title   the text shown in the header of the dialog
      * @param message the warning message
@@ -547,6 +595,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows a warning dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title   the text shown in the header of the dialog
      * @param message the warning message
@@ -559,6 +611,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows a confirmation dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title   the text shown in the header of the dialog
      * @param message the main message, usually a question
@@ -570,6 +626,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows a confirmation dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title       the text shown in the header of the dialog
      * @param message     the main message, usually a question
@@ -582,6 +642,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows an information dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title   the text shown in the header of the dialog
      * @param message the main message, usually a question
@@ -593,6 +657,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows an information dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title   the text shown in the header of the dialog
      * @param message the main message, usually a question
@@ -605,6 +673,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows a text input dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title the text shown in the header of the dialog
      * @param text  the initial text to show
@@ -616,6 +688,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows a text input dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title     the text shown in the header of the dialog
      * @param text      the initial text to show
@@ -628,6 +704,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows a text input dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title     the text shown in the header of the dialog
      * @param message   the main message, usually a question
@@ -641,6 +721,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows a text input dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title     the text shown in the header of the dialog
      * @param message   the main message, usually a question
@@ -655,6 +739,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows a text input dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param title     the text shown in the header of the dialog
      * @param message   the main message, usually a question
@@ -727,6 +815,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Shows an arbitrary node in a dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param type  the type of dialog (info, warning, error, ....)
      * @param title the text shown in the title section / header of the dialog
@@ -740,6 +832,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Shows an arbitrary node in a dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param type     the type of dialog (info, warning, error, ....)
      * @param title    the text shown in the title section / header of the dialog
@@ -754,6 +850,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Shows an arbitrary node in a dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param type    the type of dialog (info, warning, error, ....)
      * @param title   the text shown in the title section / header of the dialog
@@ -768,6 +868,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Shows an arbitrary node in a dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param type     the type of dialog (info, warning, error, ....)
      * @param title    the text shown in the title section / header of the dialog
@@ -783,6 +887,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Shows an arbitrary node in a dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param type             the type of dialog (info, warning, error, ....)
      * @param title            the text shown in the title section / header of the dialog
@@ -799,6 +907,10 @@ public class DialogPane extends StackPane {
 
     /**
      * Shows an arbitrary node in a dialog.
+     * <p>
+     * This method returns immediately. To handle the user's response, register
+     * {@link Dialog#onClose(Consumer)} on the returned dialog, or call
+     * {@link Dialog#showAndWait()} to wait while JavaFX continues processing events.
      *
      * @param type             the type of dialog (info, warning, error, ....)
      * @param title            the text shown in the title section / header of the dialog
@@ -832,6 +944,12 @@ public class DialogPane extends StackPane {
 
     /**
      * Creates and shows a dialog that shows a busy indicator / busy animation.
+     * <p>
+     * This method returns immediately. The dialog has no buttons and must be closed
+     * programmatically. Register {@link Dialog#onClose(Consumer)} to handle a committed
+     * close, or call {@link Dialog#showAndWait()} to wait for closure while JavaFX
+     * continues processing events. Removing the dialog without committing it does not
+     * invoke the close handler.
      *
      * @return the created dialog
      */
@@ -1154,6 +1272,13 @@ public class DialogPane extends StackPane {
         private final Type type;
 
         private final DialogPane pane;
+        private boolean showPending;
+        private long showSequence;
+        private boolean closingWithButton;
+        private Object waitKey;
+        private boolean waitRunning;
+        private boolean waitFinished;
+        private ButtonType waitResult;
 
         /**
          * Creates a new dialog with the specified dialog pane and type.
@@ -1553,9 +1678,115 @@ public class DialogPane extends StackPane {
 
         /**
          * Shows this dialog in its owning {@link DialogPane}.
+         * <p>
+         * This method returns immediately. Register {@link #onClose(Consumer)} to handle
+         * the user's response, or call {@link #showAndWait()} to wait while JavaFX
+         * continues processing events.
          */
         public void show() {
             pane.showDialog(this);
+        }
+
+        /**
+         * Shows this dialog if necessary and waits for it to close, while continuing to process
+         * JavaFX events. The result is the button used to close the dialog, or {@code null} if
+         * it was removed without a button or its window was hidden or detached.
+         * The dialog's value, if any, remains available through {@link #getValue()}.
+         * <p>
+         * This method must run on the JavaFX application thread from an input handler or a
+         * {@link Platform#runLater(Runnable)} callback, not during animation or layout. The
+         * dialog pane must be attached to a showing window. The nested event loop allows other
+         * application events to run while the caller is waiting.
+         *
+         * @return the button used to close the dialog, or {@code null}
+         * @throws IllegalStateException if the dialog is already waiting, the pane is not in a
+         * showing window, or JavaFX cannot start a nested event loop in the current context
+         */
+        public ButtonType showAndWait() {
+            if (!Platform.isFxApplicationThread()) {
+                throw new IllegalStateException("showAndWait must be called on the JavaFX application thread");
+            }
+            if (waitKey != null) {
+                throw new IllegalStateException("this dialog is already waiting");
+            }
+            Scene scene = pane.getScene();
+            Window window = scene == null ? null : scene.getWindow();
+            if (window == null || !window.isShowing()) {
+                throw new IllegalStateException("the dialog pane must belong to a showing window");
+            }
+
+            waitKey = new Object();
+            waitFinished = false;
+            waitResult = null;
+            boolean alreadyShowing = pane.getDialogs().contains(this) || showPending;
+            ListChangeListener<Dialog<?>> removed = change -> {
+                while (change.next()) {
+                    if (!closingWithButton && change.getRemoved().contains(this)
+                            && !pane.getDialogs().contains(this)) {
+                        finishWait(null);
+                    }
+                }
+            };
+            Runnable hostLost = () -> {
+                cancelled = true;
+                pane.hideDialog(this);
+                finishWait(null);
+            };
+            ChangeListener<Scene> sceneChanged = (obs, oldScene, newScene) -> {
+                if (newScene != scene) {
+                    hostLost.run();
+                }
+            };
+            ChangeListener<Window> windowChanged = (obs, oldWindow, newWindow) -> {
+                if (newWindow != window) {
+                    hostLost.run();
+                }
+            };
+            ChangeListener<Boolean> windowHidden = (obs, wasShowing, isShowing) -> {
+                if (!isShowing) {
+                    hostLost.run();
+                }
+            };
+            pane.dialogsProperty().addListener(removed);
+            pane.sceneProperty().addListener(sceneChanged);
+            scene.windowProperty().addListener(windowChanged);
+            window.showingProperty().addListener(windowHidden);
+            boolean completed = false;
+            try {
+                if (!alreadyShowing) {
+                    show();
+                }
+                if (!waitFinished) {
+                    waitRunning = true;
+                    try {
+                        Platform.enterNestedEventLoop(waitKey);
+                    } finally {
+                        waitRunning = false;
+                    }
+                }
+                completed = true;
+                return waitResult;
+            } finally {
+                pane.dialogsProperty().removeListener(removed);
+                pane.sceneProperty().removeListener(sceneChanged);
+                scene.windowProperty().removeListener(windowChanged);
+                window.showingProperty().removeListener(windowHidden);
+                waitKey = null;
+                if (!completed && !alreadyShowing) {
+                    cancelled = true;
+                    pane.hideDialog(this);
+                }
+            }
+        }
+
+        private void finishWait(ButtonType button) {
+            if (waitKey != null && !waitFinished) {
+                waitFinished = true;
+                waitResult = button;
+                if (waitRunning) {
+                    Platform.exitNestedEventLoop(waitKey, null);
+                }
+            }
         }
 
         private boolean cancelled = false;
@@ -1565,9 +1796,7 @@ public class DialogPane extends StackPane {
          */
         public void cancel() {
             cancelled = true;
-            pane.hideDialog(this);
-            setValue(null);
-            commit(ButtonType.CANCEL);
+            close(ButtonType.CANCEL, true);
         }
 
         /**
@@ -1699,8 +1928,21 @@ public class DialogPane extends StackPane {
          * @param buttonType the type of button pressed
          */
         public void press(ButtonType buttonType) {
-            pane.hideDialog(this);
-            commit(buttonType);
+            close(buttonType, false);
+        }
+
+        private void close(ButtonType buttonType, boolean clearValue) {
+            closingWithButton = true;
+            try {
+                pane.hideDialog(this);
+                if (clearValue) {
+                    setValue(null);
+                }
+                commit(buttonType);
+            } finally {
+                closingWithButton = false;
+                finishWait(buttonType);
+            }
         }
 
         private void commit(ButtonType buttonType) {
@@ -2311,8 +2553,7 @@ public class DialogPane extends StackPane {
                                 }
                             }
 
-                            dialog.getDialogPane().hideDialog(dialog);
-                            dialog.commit(buttonType);
+                            dialog.close(buttonType, false);
                         }
                     });
 
