@@ -80,10 +80,11 @@ public class NotificationGroup<T, S extends Notification<T>> implements Comparab
         this.name.set(name);
     }
 
-    private final IntegerProperty sortOrder = new SimpleIntegerProperty(this, "sortOrder");
+    private int sortOrderValue = 0;
+    private IntegerProperty sortOrder;
 
     public final Integer getSortOrder() {
-        return sortOrder.get();
+        return sortOrder == null ? sortOrderValue : sortOrder.get();
     }
 
     /**
@@ -93,11 +94,18 @@ public class NotificationGroup<T, S extends Notification<T>> implements Comparab
      * @return the sort order
      */
     public final IntegerProperty sortOrderProperty() {
+        if (sortOrder == null) {
+            sortOrder = new SimpleIntegerProperty(this, "sortOrder", sortOrderValue);
+        }
         return sortOrder;
     }
 
     public final void setSortOrder(Integer sortOrder) {
-        this.sortOrder.set(sortOrder);
+        if (this.sortOrder == null) {
+            sortOrderValue = sortOrder;
+        } else {
+            this.sortOrder.set(sortOrder);
+        }
     }
 
     private final ObservableList<S> notifications = FXCollections.observableArrayList();
@@ -184,10 +192,11 @@ public class NotificationGroup<T, S extends Notification<T>> implements Comparab
         this.pinned.set(pinned);
     }
 
-    private final ObjectProperty<Callback<S, NotificationView<T, S>>> viewFactory = new SimpleObjectProperty<>(this, "viewFactory");
+    private Callback<S, NotificationView<T, S>> viewFactoryValue = null;
+    private ObjectProperty<Callback<S, NotificationView<T, S>>> viewFactory;
 
     public final Callback<S, NotificationView<T, S>> getViewFactory() {
-        return viewFactory.get();
+        return viewFactory == null ? viewFactoryValue : viewFactory.get();
     }
 
     /**
@@ -197,11 +206,19 @@ public class NotificationGroup<T, S extends Notification<T>> implements Comparab
      * @return the view factory callback
      */
     public final ObjectProperty<Callback<S, NotificationView<T, S>>> viewFactoryProperty() {
+        if (viewFactory == null) {
+            viewFactory = new SimpleObjectProperty<>(this, "viewFactory", viewFactoryValue);
+            viewFactoryValue = null;
+        }
         return viewFactory;
     }
 
     public final void setViewFactory(Callback<S, NotificationView<T, S>> viewFactory) {
-        this.viewFactory.set(viewFactory);
+        if (this.viewFactory == null) {
+            viewFactoryValue = viewFactory;
+        } else {
+            this.viewFactory.set(viewFactory);
+        }
     }
 
     private final IntegerProperty maximumNumberOfNotifications = new SimpleIntegerProperty(this, "maximumNumberOfNotifications", 10);
@@ -252,8 +269,8 @@ public class NotificationGroup<T, S extends Notification<T>> implements Comparab
     @Override
     public int compareTo(NotificationGroup o) {
         // if the app uses sort order then use that
-        if (sortOrder.getValue() != null) {
-            return sortOrder.getValue().compareTo(o.getSortOrder());
+        if (getSortOrder() != null) {
+            return getSortOrder().compareTo(o.getSortOrder());
         }
 
         // fallback: sorting is based on the group name

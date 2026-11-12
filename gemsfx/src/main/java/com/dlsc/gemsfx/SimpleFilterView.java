@@ -208,10 +208,11 @@ public class SimpleFilterView extends HBox {
         }
     }
 
-    private final ObjectProperty<Runnable> onChange = new SimpleObjectProperty<>(this, "onChange");
+    private Runnable onChangeValue = null;
+    private ObjectProperty<Runnable> onChange;
 
     public final Runnable getOnChange() {
-        return onChange.get();
+        return onChange == null ? onChangeValue : onChange.get();
     }
 
     /**
@@ -220,11 +221,19 @@ public class SimpleFilterView extends HBox {
      * @return the runnable to executed upon change
      */
     public final ObjectProperty<Runnable> onChangeProperty() {
+        if (onChange == null) {
+            onChange = new SimpleObjectProperty<>(this, "onChange", onChangeValue);
+            onChangeValue = null;
+        }
         return onChange;
     }
 
     public final void setOnChange(Runnable onChange) {
-        this.onChange.set(onChange);
+        if (this.onChange == null) {
+            onChangeValue = onChange;
+        } else {
+            this.onChange.set(onChange);
+        }
     }
 
     /**

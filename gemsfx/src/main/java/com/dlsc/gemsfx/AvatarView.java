@@ -161,10 +161,11 @@ public class AvatarView extends Control {
 
     // number of styles
 
-    private final IntegerProperty numberOfStyles = new SimpleIntegerProperty(this, "numberOfStyles", 5);
+    private int numberOfStylesValue = 5;
+    private IntegerProperty numberOfStyles;
 
     public final int getNumberOfStyles() {
-        return numberOfStyles.get();
+        return numberOfStyles == null ? numberOfStylesValue : numberOfStyles.get();
     }
 
     /**
@@ -178,11 +179,18 @@ public class AvatarView extends Control {
      * @return the number of supported styles
      */
     public final IntegerProperty numberOfStylesProperty() {
+        if (numberOfStyles == null) {
+            numberOfStyles = new SimpleIntegerProperty(this, "numberOfStyles", numberOfStylesValue);
+        }
         return numberOfStyles;
     }
 
     public final void setNumberOfStyles(int numberOfStyles) {
-        this.numberOfStyles.set(numberOfStyles);
+        if (this.numberOfStyles == null) {
+            numberOfStylesValue = numberOfStyles;
+        } else {
+            this.numberOfStyles.set(numberOfStyles);
+        }
     }
 
     // user name initials

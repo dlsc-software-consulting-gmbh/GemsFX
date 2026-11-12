@@ -245,10 +245,11 @@ public class DialogPane extends StackPane {
 
     // header factory
 
-    private final ObjectProperty<Callback<Dialog<?>, Node>> headerFactory = new SimpleObjectProperty<>(this, "headerFactory");
+    private Callback<Dialog<?>, Node> headerFactoryValue = null;
+    private ObjectProperty<Callback<Dialog<?>, Node>> headerFactory;
 
     public final Callback<Dialog<?>, Node> getHeaderFactory() {
-        return headerFactory.get();
+        return headerFactory == null ? headerFactoryValue : headerFactory.get();
     }
 
     /**
@@ -261,19 +262,28 @@ public class DialogPane extends StackPane {
      * @see #footerFactoryProperty()
      */
     public final ObjectProperty<Callback<Dialog<?>, Node>> headerFactoryProperty() {
+        if (headerFactory == null) {
+            headerFactory = new SimpleObjectProperty<>(this, "headerFactory", headerFactoryValue);
+            headerFactoryValue = null;
+        }
         return headerFactory;
     }
 
     public final void setHeaderFactory(Callback<Dialog<?>, Node> headerFactory) {
-        this.headerFactory.set(headerFactory);
+        if (this.headerFactory == null) {
+            headerFactoryValue = headerFactory;
+        } else {
+            this.headerFactory.set(headerFactory);
+        }
     }
 
     // footer factory
 
-    private final ObjectProperty<Callback<Dialog<?>, Node>> footerFactory = new SimpleObjectProperty<>(this, "footerFactory");
+    private Callback<Dialog<?>, Node> footerFactoryValue = null;
+    private ObjectProperty<Callback<Dialog<?>, Node>> footerFactory;
 
     public final Callback<Dialog<?>, Node> getFooterFactory() {
-        return footerFactory.get();
+        return footerFactory == null ? footerFactoryValue : footerFactory.get();
     }
 
     /**
@@ -286,11 +296,19 @@ public class DialogPane extends StackPane {
      * @see #headerFactoryProperty()
      */
     public final ObjectProperty<Callback<Dialog<?>, Node>> footerFactoryProperty() {
+        if (footerFactory == null) {
+            footerFactory = new SimpleObjectProperty<>(this, "footerFactory", footerFactoryValue);
+            footerFactoryValue = null;
+        }
         return footerFactory;
     }
 
     public final void setFooterFactory(Callback<Dialog<?>, Node> footerFactory) {
-        this.footerFactory.set(footerFactory);
+        if (this.footerFactory == null) {
+            footerFactoryValue = footerFactory;
+        } else {
+            this.footerFactory.set(footerFactory);
+        }
     }
 
     // dialogs
@@ -515,10 +533,11 @@ public class DialogPane extends StackPane {
         return dialog;
     }
 
-    private final StringProperty sendButtonText = new SimpleStringProperty(this, "sendButtonText", ResourceBundleManager.getString(ResourceBundleManager.BundleType.DIALOG_PANE, "button.send", "Send"));
+    private String sendButtonTextValue = ResourceBundleManager.getString(ResourceBundleManager.BundleType.DIALOG_PANE, "button.send", "Send");
+    private StringProperty sendButtonText;
 
     public final String getSendButtonText() {
-        return sendButtonText.get();
+        return sendButtonText == null ? sendButtonTextValue : sendButtonText.get();
     }
 
     /**
@@ -527,11 +546,19 @@ public class DialogPane extends StackPane {
      * @return the send button text property
      */
     public final StringProperty sendButtonTextProperty() {
+        if (sendButtonText == null) {
+            sendButtonText = new SimpleStringProperty(this, "sendButtonText", sendButtonTextValue);
+            sendButtonTextValue = null;
+        }
         return sendButtonText;
     }
 
     public final void setSendButtonText(String sendButtonText) {
-        this.sendButtonText.set(sendButtonText);
+        if (this.sendButtonText == null) {
+            sendButtonTextValue = sendButtonText;
+        } else {
+            this.sendButtonText.set(sendButtonText);
+        }
     }
 
     /**
@@ -858,10 +885,11 @@ public class DialogPane extends StackPane {
 
     // label factory
 
-    private final ObjectProperty<Supplier<Label>> labelSupplier = new SimpleObjectProperty<>(this, "labelSupplier", Label::new);
+    private Supplier<Label> labelSupplierValue = Label::new;
+    private ObjectProperty<Supplier<Label>> labelSupplier;
 
     public final Supplier<Label> getLabelSupplier() {
-        return labelSupplier.get();
+        return labelSupplier == null ? labelSupplierValue : labelSupplier.get();
     }
 
     /**
@@ -874,16 +902,25 @@ public class DialogPane extends StackPane {
      * @see #showConfirmation(String, String)
      */
     public final ObjectProperty<Supplier<Label>> labelSupplierProperty() {
+        if (labelSupplier == null) {
+            labelSupplier = new SimpleObjectProperty<>(this, "labelSupplier", labelSupplierValue);
+            labelSupplierValue = null;
+        }
         return labelSupplier;
     }
 
     public final void setLabelSupplier(Supplier<Label> labelSupplier) {
-        this.labelSupplier.set(labelSupplier);
+        if (this.labelSupplier == null) {
+            labelSupplierValue = labelSupplier;
+        } else {
+            this.labelSupplier.set(labelSupplier);
+        }
     }
 
     // animate
 
-    private final BooleanProperty animateDialogs = new SimpleBooleanProperty(this, "animateDialogs", true);
+    private boolean animateDialogsValue = true;
+    private BooleanProperty animateDialogs;
 
     /**
      * Determines if the dialogs will be animated when they appear. Animation is currently a simple fly-in /
@@ -892,15 +929,22 @@ public class DialogPane extends StackPane {
      * @return true if the dialog will be animated when appearing / disappearing
      */
     public final BooleanProperty animateDialogsProperty() {
+        if (animateDialogs == null) {
+            animateDialogs = new SimpleBooleanProperty(this, "animateDialogs", animateDialogsValue);
+        }
         return animateDialogs;
     }
 
     public final boolean isAnimateDialogs() {
-        return animateDialogs.get();
+        return animateDialogs == null ? animateDialogsValue : animateDialogs.get();
     }
 
     public final void setAnimateDialogs(boolean animate) {
-        animateDialogs.set(animate);
+        if (this.animateDialogs == null) {
+            animateDialogsValue = animate;
+        } else {
+            this.animateDialogs.set(animate);
+        }
     }
 
     // fade-in / fade-out
@@ -997,10 +1041,11 @@ public class DialogPane extends StackPane {
         }
     }
 
-    private final DoubleProperty maximizedPadding = new SimpleDoubleProperty(this, "dialogPadding", 20);
+    private double maximizedPaddingValue = 20;
+    private DoubleProperty maximizedPadding;
 
     public final double getMaximizedPadding() {
-        return maximizedPadding.get();
+        return maximizedPadding == null ? maximizedPaddingValue : maximizedPadding.get();
     }
 
     /**
@@ -1010,11 +1055,18 @@ public class DialogPane extends StackPane {
      * @return the padding around a maximized dialog
      */
     public final DoubleProperty maximizedPaddingProperty() {
+        if (maximizedPadding == null) {
+            maximizedPadding = new SimpleDoubleProperty(this, "dialogPadding", maximizedPaddingValue);
+        }
         return maximizedPadding;
     }
 
     public final void setMaximizedPadding(double maximizedPadding) {
-        this.maximizedPadding.set(maximizedPadding);
+        if (this.maximizedPadding == null) {
+            maximizedPaddingValue = maximizedPadding;
+        } else {
+            this.maximizedPadding.set(maximizedPadding);
+        }
     }
 
     @Override
@@ -1233,10 +1285,11 @@ public class DialogPane extends StackPane {
 
         // id
 
-        private final StringProperty id = new SimpleStringProperty(this, "id");
+        private String idValue = null;
+        private StringProperty id;
 
         public final String getId() {
-            return id.get();
+            return id == null ? idValue : id.get();
         }
 
         /**
@@ -1245,11 +1298,19 @@ public class DialogPane extends StackPane {
          * @return the id of the dialog, e.g. "preferences.dialog"
          */
         public final StringProperty idProperty() {
+            if (id == null) {
+                id = new SimpleStringProperty(this, "id", idValue);
+                idValue = null;
+            }
             return id;
         }
 
         public final void setId(String id) {
-            this.id.set(id);
+            if (this.id == null) {
+                idValue = id;
+            } else {
+                this.id.set(id);
+            }
         }
 
         // preferences
@@ -1415,10 +1476,11 @@ public class DialogPane extends StackPane {
 
         // required
 
-        private final BooleanProperty required = new SimpleBooleanProperty(this, "required", false);
+        private boolean requiredValue = false;
+        private BooleanProperty required;
 
         public final boolean isRequired() {
-            return required.get();
+            return required == null ? requiredValue : required.get();
         }
 
         /**
@@ -1429,11 +1491,18 @@ public class DialogPane extends StackPane {
          * @return true if the dialog requires input
          */
         public final BooleanProperty requiredProperty() {
+            if (required == null) {
+                required = new SimpleBooleanProperty(this, "required", requiredValue);
+            }
             return required;
         }
 
         public final void setRequired(boolean required) {
-            this.required.set(required);
+            if (this.required == null) {
+                requiredValue = required;
+            } else {
+                this.required.set(required);
+            }
         }
 
         // show close button
@@ -1461,10 +1530,11 @@ public class DialogPane extends StackPane {
 
         // delay
 
-        private final ObjectProperty<Duration> delay = new SimpleObjectProperty<>(this, "delay");
+        private Duration delayValue = null;
+        private ObjectProperty<Duration> delay;
 
         public final Duration getDelay() {
-            return delay.get();
+            return delay == null ? delayValue : delay.get();
         }
 
         /**
@@ -1476,19 +1546,28 @@ public class DialogPane extends StackPane {
          * @return the delay before the dialog becomes visible, default is null.
          */
         public final ObjectProperty<Duration> delayProperty() {
+            if (delay == null) {
+                delay = new SimpleObjectProperty<>(this, "delay", delayValue);
+                delayValue = null;
+            }
             return delay;
         }
 
         public final void setDelay(Duration delay) {
-            this.delay.set(delay);
+            if (this.delay == null) {
+                delayValue = delay;
+            } else {
+                this.delay.set(delay);
+            }
         }
 
         // padding
 
-        private final BooleanProperty usingPadding = new SimpleBooleanProperty(this, "usingPadding", true);
+        private boolean usingPaddingValue = true;
+        private BooleanProperty usingPadding;
 
         public final boolean isUsingPadding() {
-            return usingPadding.get();
+            return usingPadding == null ? usingPaddingValue : usingPadding.get();
         }
 
         /**
@@ -1499,19 +1578,27 @@ public class DialogPane extends StackPane {
          * @see #setContent
          */
         public final BooleanProperty usingPaddingProperty() {
+            if (usingPadding == null) {
+                usingPadding = new SimpleBooleanProperty(this, "usingPadding", usingPaddingValue);
+            }
             return usingPadding;
         }
 
         public final void setUsingPadding(boolean usingPadding) {
-            this.usingPadding.set(usingPadding);
+            if (this.usingPadding == null) {
+                usingPaddingValue = usingPadding;
+            } else {
+                this.usingPadding.set(usingPadding);
+            }
         }
 
         // alignment
 
-        private final ObjectProperty<Pos> contentAlignment = new SimpleObjectProperty<>(this, "contentAlignment", Pos.CENTER_LEFT);
+        private Pos contentAlignmentValue = Pos.CENTER_LEFT;
+        private ObjectProperty<Pos> contentAlignment;
 
         public final Pos getContentAlignment() {
-            return contentAlignment.get();
+            return contentAlignment == null ? contentAlignmentValue : contentAlignment.get();
         }
 
         /**
@@ -1521,11 +1608,19 @@ public class DialogPane extends StackPane {
          * @return the position of the content
          */
         public final ObjectProperty<Pos> contentAlignmentProperty() {
+            if (contentAlignment == null) {
+                contentAlignment = new SimpleObjectProperty<>(this, "contentAlignment", contentAlignmentValue);
+                contentAlignmentValue = null;
+            }
             return contentAlignment;
         }
 
         public final void setContentAlignment(Pos contentAlignment) {
-            this.contentAlignment.set(contentAlignment);
+            if (this.contentAlignment == null) {
+                contentAlignmentValue = contentAlignment;
+            } else {
+                this.contentAlignment.set(contentAlignment);
+            }
         }
 
         // value
@@ -1749,10 +1844,11 @@ public class DialogPane extends StackPane {
 
         // same width buttons
 
-        private final BooleanProperty sameWidthButtons = new SimpleBooleanProperty(true);
+        private boolean sameWidthButtonsValue = true;
+        private BooleanProperty sameWidthButtons;
 
         public final boolean isSameWidthButtons() {
-            return sameWidthButtons.get();
+            return sameWidthButtons == null ? sameWidthButtonsValue : sameWidthButtons.get();
         }
 
         /**
@@ -1762,16 +1858,24 @@ public class DialogPane extends StackPane {
          * @return true if all buttons should have the same width
          */
         public final BooleanProperty sameWidthButtonsProperty() {
+            if (sameWidthButtons == null) {
+                sameWidthButtons = new SimpleBooleanProperty(sameWidthButtonsValue);
+            }
             return sameWidthButtons;
         }
 
         public final void setSameWidthButtons(boolean sameWidthButtons) {
-            this.sameWidthButtons.set(sameWidthButtons);
+            if (this.sameWidthButtons == null) {
+                sameWidthButtonsValue = sameWidthButtons;
+            } else {
+                this.sameWidthButtons.set(sameWidthButtons);
+            }
         }
 
         // maximize
 
-        private final BooleanProperty maximize = new SimpleBooleanProperty();
+        private boolean maximizeValue = false;
+        private BooleanProperty maximize;
 
         /**
          * If maximized the dialog will try to use as much width and height inside
@@ -1780,15 +1884,22 @@ public class DialogPane extends StackPane {
          * @return true if the dialog will try to maximize itself
          */
         public final BooleanProperty maximizeProperty() {
+            if (maximize == null) {
+                maximize = new SimpleBooleanProperty(maximizeValue);
+            }
             return maximize;
         }
 
         public final void setMaximize(boolean max) {
-            maximize.set(max);
+            if (this.maximize == null) {
+                maximizeValue = max;
+            } else {
+                this.maximize.set(max);
+            }
         }
 
         public final boolean isMaximize() {
-            return maximize.get();
+            return maximize == null ? maximizeValue : maximize.get();
         }
 
         // content

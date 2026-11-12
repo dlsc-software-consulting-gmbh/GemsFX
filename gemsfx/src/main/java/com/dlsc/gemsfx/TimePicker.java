@@ -680,10 +680,11 @@ public class TimePicker extends CustomComboBox<LocalTime> {
         this.rollover.set(rollover);
     }
 
-    private final ObjectProperty<Consumer<TimePicker>> onShowPopup = new SimpleObjectProperty<>(this, "onShowPopup");
+    private Consumer<TimePicker> onShowPopupValue = null;
+    private ObjectProperty<Consumer<TimePicker>> onShowPopup;
 
     public final Consumer<TimePicker> getOnShowPopup() {
-        return onShowPopup.get();
+        return onShowPopup == null ? onShowPopupValue : onShowPopup.get();
     }
 
     /**
@@ -693,11 +694,19 @@ public class TimePicker extends CustomComboBox<LocalTime> {
      * @return the "on show popup" consumer
      */
     public final ObjectProperty<Consumer<TimePicker>> onShowPopupProperty() {
+        if (onShowPopup == null) {
+            onShowPopup = new SimpleObjectProperty<>(this, "onShowPopup", onShowPopupValue);
+            onShowPopupValue = null;
+        }
         return onShowPopup;
     }
 
     public final void setOnShowPopup(Consumer<TimePicker> onShowPopup) {
-        this.onShowPopup.set(onShowPopup);
+        if (this.onShowPopup == null) {
+            onShowPopupValue = onShowPopup;
+        } else {
+            this.onShowPopup.set(onShowPopup);
+        }
     }
 
     private final ObjectProperty<Format> format = new StyleableObjectProperty<>(Format.HOURS_MINUTES) {

@@ -554,7 +554,8 @@ public class PopOver extends PopupControl {
 
     // detach support
 
-    private final BooleanProperty detachable = new SimpleBooleanProperty(this, "detachable");
+    private boolean detachableValue = false;
+    private BooleanProperty detachable;
 
     /**
      * Determines if the popover is detachable at all.
@@ -562,15 +563,22 @@ public class PopOver extends PopupControl {
      * @return the detachable property
      */
     public final BooleanProperty detachableProperty() {
+        if (detachable == null) {
+            detachable = new SimpleBooleanProperty(this, "detachable", detachableValue);
+        }
         return detachable;
     }
 
     public final void setDetachable(boolean detachable) {
-        detachableProperty().set(detachable);
+        if (this.detachable == null) {
+            detachableValue = detachable;
+        } else {
+            this.detachable.set(detachable);
+        }
     }
 
     public final boolean isDetachable() {
-        return detachableProperty().get();
+        return detachable == null ? detachableValue : detachable.get();
     }
 
     private final BooleanProperty detached = new SimpleBooleanProperty(this, "detached", false);
@@ -951,7 +959,8 @@ public class PopOver extends PopupControl {
         BOTTOM_RIGHT;
     }
 
-    private final ObjectProperty<Duration> fadeInDuration = new SimpleObjectProperty<>(this, "fadeInDuration", DEFAULT_FADE_DURATION);
+    private Duration fadeInDurationValue = DEFAULT_FADE_DURATION;
+    private ObjectProperty<Duration> fadeInDuration;
 
     /**
      * Stores the fade-in duration. This should be set before calling PopOver.show(…).
@@ -959,10 +968,15 @@ public class PopOver extends PopupControl {
      * @return the fade-in duration property
      */
     public final ObjectProperty<Duration> fadeInDurationProperty() {
+        if (fadeInDuration == null) {
+            fadeInDuration = new SimpleObjectProperty<>(this, "fadeInDuration", fadeInDurationValue);
+            fadeInDurationValue = null;
+        }
         return fadeInDuration;
     }
 
-    private final ObjectProperty<Duration> fadeOutDuration = new SimpleObjectProperty<>(this, "fadeOutDuration", DEFAULT_FADE_DURATION);
+    private Duration fadeOutDurationValue = DEFAULT_FADE_DURATION;
+    private ObjectProperty<Duration> fadeOutDuration;
 
     /**
      * Stores the fade-out duration.
@@ -970,23 +984,35 @@ public class PopOver extends PopupControl {
      * @return the fade-out duration property
      */
     public final ObjectProperty<Duration> fadeOutDurationProperty() {
+        if (fadeOutDuration == null) {
+            fadeOutDuration = new SimpleObjectProperty<>(this, "fadeOutDuration", fadeOutDurationValue);
+            fadeOutDurationValue = null;
+        }
         return fadeOutDuration;
     }
 
     public final Duration getFadeInDuration() {
-        return fadeInDurationProperty().get();
+        return fadeInDuration == null ? fadeInDurationValue : fadeInDuration.get();
     }
 
     public final void setFadeInDuration(Duration duration) {
-        fadeInDurationProperty().setValue(duration);
+        if (this.fadeInDuration == null) {
+            fadeInDurationValue = duration;
+        } else {
+            this.fadeInDuration.set(duration);
+        }
     }
 
     public final Duration getFadeOutDuration() {
-        return fadeOutDurationProperty().get();
+        return fadeOutDuration == null ? fadeOutDurationValue : fadeOutDuration.get();
     }
 
     public final void setFadeOutDuration(Duration duration) {
-        fadeOutDurationProperty().setValue(duration);
+        if (this.fadeOutDuration == null) {
+            fadeOutDurationValue = duration;
+        } else {
+            this.fadeOutDuration.set(duration);
+        }
     }
 
     private final SimpleBooleanProperty animated = new SimpleBooleanProperty(this, "animated", true);

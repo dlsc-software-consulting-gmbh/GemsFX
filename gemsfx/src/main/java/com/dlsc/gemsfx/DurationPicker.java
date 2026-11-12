@@ -288,10 +288,11 @@ public class DurationPicker extends CustomComboBox<Duration> {
 
     // popup
 
-    private final ObjectProperty<Consumer<DurationPicker>> onShowPopup = new SimpleObjectProperty<>(this, "onShowPopup");
+    private Consumer<DurationPicker> onShowPopupValue = null;
+    private ObjectProperty<Consumer<DurationPicker>> onShowPopup;
 
     public final Consumer<DurationPicker> getOnShowPopup() {
-        return onShowPopup.get();
+        return onShowPopup == null ? onShowPopupValue : onShowPopup.get();
     }
 
     /**
@@ -301,11 +302,19 @@ public class DurationPicker extends CustomComboBox<Duration> {
      * @return the "on show popup" consumer
      */
     public final ObjectProperty<Consumer<DurationPicker>> onShowPopupProperty() {
+        if (onShowPopup == null) {
+            onShowPopup = new SimpleObjectProperty<>(this, "onShowPopup", onShowPopupValue);
+            onShowPopupValue = null;
+        }
         return onShowPopup;
     }
 
     public final void setOnShowPopup(Consumer<DurationPicker> onShowPopup) {
-        this.onShowPopup.set(onShowPopup);
+        if (this.onShowPopup == null) {
+            onShowPopupValue = onShowPopup;
+        } else {
+            this.onShowPopup.set(onShowPopup);
+        }
     }
 
     // popup trigger button

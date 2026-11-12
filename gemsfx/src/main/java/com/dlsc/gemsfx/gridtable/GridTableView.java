@@ -304,10 +304,11 @@ public class GridTableView<S> extends Control {
         this.commitLoadStatusDelay.set(commitLoadStatusDelay);
     }
 
-    private final ObjectProperty<Callback<S, ContextMenu>> onContextMenuForItemRequested = new SimpleObjectProperty<>(this, "onContextMenuForItemRequested");
+    private Callback<S, ContextMenu> onContextMenuForItemRequestedValue = null;
+    private ObjectProperty<Callback<S, ContextMenu>> onContextMenuForItemRequested;
 
     public final Callback<S, ContextMenu> getOnContextMenuForItemRequested() {
-        return onContextMenuForItemRequested.get();
+        return onContextMenuForItemRequested == null ? onContextMenuForItemRequestedValue : onContextMenuForItemRequested.get();
     }
 
     /**
@@ -316,11 +317,19 @@ public class GridTableView<S> extends Control {
      * @return the callback for creating a context menu for a given item / row.
      */
     public final ObjectProperty<Callback<S, ContextMenu>> onContextMenuForItemRequestedProperty() {
+        if (onContextMenuForItemRequested == null) {
+            onContextMenuForItemRequested = new SimpleObjectProperty<>(this, "onContextMenuForItemRequested", onContextMenuForItemRequestedValue);
+            onContextMenuForItemRequestedValue = null;
+        }
         return onContextMenuForItemRequested;
     }
 
     public final void setOnContextMenuForItemRequested(Callback<S, ContextMenu> onContextMenuForItemRequested) {
-        this.onContextMenuForItemRequested.set(onContextMenuForItemRequested);
+        if (this.onContextMenuForItemRequested == null) {
+            onContextMenuForItemRequestedValue = onContextMenuForItemRequested;
+        } else {
+            this.onContextMenuForItemRequested.set(onContextMenuForItemRequested);
+        }
     }
 
     /**

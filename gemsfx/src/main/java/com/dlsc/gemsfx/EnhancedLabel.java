@@ -196,10 +196,11 @@ public class EnhancedLabel extends Label {
         this.copyMenuItemText.set(copyMenuItemText);
     }
 
-    private final ObjectProperty<Supplier<String>> copyContentSupplier = new SimpleObjectProperty<>(this, "copyContentProvider", this::getText);
+    private Supplier<String> copyContentSupplierValue = this::getText;
+    private ObjectProperty<Supplier<String>> copyContentSupplier;
 
     public final Supplier<String> getCopyContentSupplier() {
-        return copyContentSupplier.get();
+        return copyContentSupplier == null ? copyContentSupplierValue : copyContentSupplier.get();
     }
 
     /**
@@ -212,10 +213,18 @@ public class EnhancedLabel extends Label {
      * @return the supplier for the clipboard content when the user copies the label
      */
     public final ObjectProperty<Supplier<String>> copyContentSupplierProperty() {
+        if (copyContentSupplier == null) {
+            copyContentSupplier = new SimpleObjectProperty<>(this, "copyContentProvider", copyContentSupplierValue);
+            copyContentSupplierValue = null;
+        }
         return copyContentSupplier;
     }
 
     public final void setCopyContentSupplier(Supplier<String> copyContentSupplier) {
-        this.copyContentSupplier.set(copyContentSupplier);
+        if (this.copyContentSupplier == null) {
+            copyContentSupplierValue = copyContentSupplier;
+        } else {
+            this.copyContentSupplier.set(copyContentSupplier);
+        }
     }
 }

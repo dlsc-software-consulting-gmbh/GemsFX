@@ -220,10 +220,11 @@ public class MultiColumnListView<T> extends Control {
         }
     }
 
-    private final ObjectProperty<Callback<DropParameter<T>, Boolean>> dropPossibleCallback = new SimpleObjectProperty<>(this, "dropPossibleCallback", param -> true);
+    private Callback<DropParameter<T>, Boolean> dropPossibleCallbackValue = param -> true;
+    private ObjectProperty<Callback<DropParameter<T>, Boolean>> dropPossibleCallback;
 
     public final Callback<DropParameter<T>, Boolean> getDropPossibleCallback() {
-        return dropPossibleCallback.get();
+        return dropPossibleCallback == null ? dropPossibleCallbackValue : dropPossibleCallback.get();
     }
 
     /**
@@ -232,17 +233,26 @@ public class MultiColumnListView<T> extends Control {
      * @return the drop validation callback property
      */
     public final ObjectProperty<Callback<DropParameter<T>, Boolean>> dropPossibleCallbackProperty() {
+        if (dropPossibleCallback == null) {
+            dropPossibleCallback = new SimpleObjectProperty<>(this, "dropPossibleCallback", dropPossibleCallbackValue);
+            dropPossibleCallbackValue = null;
+        }
         return dropPossibleCallback;
     }
 
     public final void setDropPossibleCallback(Callback<DropParameter<T>, Boolean> dropPossibleCallback) {
-        this.dropPossibleCallback.set(dropPossibleCallback);
+        if (this.dropPossibleCallback == null) {
+            dropPossibleCallbackValue = dropPossibleCallback;
+        } else {
+            this.dropPossibleCallback.set(dropPossibleCallback);
+        }
     }
 
-    private final ObjectProperty<Callback<T, Boolean>> dragPossibleCallback = new SimpleObjectProperty<>(this, "draggableCallback", item -> true);
+    private Callback<T, Boolean> dragPossibleCallbackValue = item -> true;
+    private ObjectProperty<Callback<T, Boolean>> dragPossibleCallback;
 
     public Callback<T, Boolean> getDragPossibleCallback() {
-        return dragPossibleCallback.get();
+        return dragPossibleCallback == null ? dragPossibleCallbackValue : dragPossibleCallback.get();
     }
 
     /**
@@ -251,11 +261,19 @@ public class MultiColumnListView<T> extends Control {
      * @return the drag validation callback property
      */
     public ObjectProperty<Callback<T, Boolean>> dragPossibleCallbackProperty() {
+        if (dragPossibleCallback == null) {
+            dragPossibleCallback = new SimpleObjectProperty<>(this, "draggableCallback", dragPossibleCallbackValue);
+            dragPossibleCallbackValue = null;
+        }
         return dragPossibleCallback;
     }
 
     public void setDragPossibleCallback(Callback<T, Boolean> dragPossibleCallback) {
-        this.dragPossibleCallback.set(dragPossibleCallback);
+        if (this.dragPossibleCallback == null) {
+            dragPossibleCallbackValue = dragPossibleCallback;
+        } else {
+            this.dragPossibleCallback.set(dragPossibleCallback);
+        }
     }
 
     private final ObjectProperty<ProgressIndicator> progressIndicator = new SimpleObjectProperty<>(this, "progressIndicator", new CircleProgressIndicator());

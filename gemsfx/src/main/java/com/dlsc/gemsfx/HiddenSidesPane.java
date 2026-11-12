@@ -186,7 +186,8 @@ public class HiddenSidesPane extends Pane {
         return bias;
     }
 
-    private final DoubleProperty triggerDistance = new SimpleDoubleProperty(this, "triggerDistance", 16); 
+    private double triggerDistanceValue = 16;
+    private DoubleProperty triggerDistance;
 
     /**
      * The property that stores the distance to the pane's edges that will
@@ -198,15 +199,22 @@ public class HiddenSidesPane extends Pane {
      * @return the trigger distance property
      */
     public final DoubleProperty triggerDistanceProperty() {
+        if (triggerDistance == null) {
+            triggerDistance = new SimpleDoubleProperty(this, "triggerDistance", triggerDistanceValue);
+        }
         return triggerDistance;
     }
 
     public final double getTriggerDistance() {
-        return triggerDistance.get();
+        return triggerDistance == null ? triggerDistanceValue : triggerDistance.get();
     }
 
     public final void setTriggerDistance(double distance) {
-        triggerDistance.set(distance);
+        if (this.triggerDistance == null) {
+            triggerDistanceValue = distance;
+        } else {
+            this.triggerDistance.set(distance);
+        }
     }
 
     // Content node support.
@@ -343,7 +351,8 @@ public class HiddenSidesPane extends Pane {
 
     // slide in animation delay
 
-    private final ObjectProperty<Duration> animationDelay = new SimpleObjectProperty<>(this, "animationDelay", Duration.millis(300)); 
+    private Duration animationDelayValue = Duration.millis(300);
+    private ObjectProperty<Duration> animationDelay;
 
     /**
      * Returns the animation delay property. The value of this property
@@ -353,20 +362,29 @@ public class HiddenSidesPane extends Pane {
      * @return animation delay property
      */
     public final ObjectProperty<Duration> animationDelayProperty() {
+        if (animationDelay == null) {
+            animationDelay = new SimpleObjectProperty<>(this, "animationDelay", animationDelayValue);
+            animationDelayValue = null;
+        }
         return animationDelay;
     }
 
     public final Duration getAnimationDelay() {
-        return animationDelay.get();
+        return animationDelay == null ? animationDelayValue : animationDelay.get();
     }
 
     public final void setAnimationDelay(Duration duration) {
-        animationDelay.set(duration);
+        if (this.animationDelay == null) {
+            animationDelayValue = duration;
+        } else {
+            this.animationDelay.set(duration);
+        }
     }
 
     // slide in / slide out duration
 
-    private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(this, "animationDuration", Duration.millis(200)); 
+    private Duration animationDurationValue = Duration.millis(200);
+    private ObjectProperty<Duration> animationDuration;
 
     /**
      * Returns the animation duration property. The value of this property
@@ -375,15 +393,23 @@ public class HiddenSidesPane extends Pane {
      * @return animation delay property
      */
     public final ObjectProperty<Duration> animationDurationProperty() {
+        if (animationDuration == null) {
+            animationDuration = new SimpleObjectProperty<>(this, "animationDuration", animationDurationValue);
+            animationDurationValue = null;
+        }
         return animationDuration;
     }
 
     public final Duration getAnimationDuration() {
-        return animationDuration.get();
+        return animationDuration == null ? animationDurationValue : animationDuration.get();
     }
 
     public final void setAnimationDuration(Duration duration) {
-        animationDuration.set(duration);
+        if (this.animationDuration == null) {
+            animationDurationValue = duration;
+        } else {
+            this.animationDuration.set(duration);
+        }
     }
 
     @Override

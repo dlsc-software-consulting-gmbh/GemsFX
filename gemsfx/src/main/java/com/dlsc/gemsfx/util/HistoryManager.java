@@ -146,7 +146,8 @@ public abstract class HistoryManager<T> {
         maxHistorySizeProperty().set(maxHistorySize);
     }
 
-    private final ObjectProperty<Predicate<T>> filter = new SimpleObjectProperty<>(this, "filter", it -> true);
+    private Predicate<T> filterValue = it -> true;
+    private ObjectProperty<Predicate<T>> filter;
 
     /**
      * Returns the property object for the filter used when adding items to the history.
@@ -155,15 +156,23 @@ public abstract class HistoryManager<T> {
      * @return the property object for the filter
      */
     public final ObjectProperty<Predicate<T>> filterProperty() {
+        if (filter == null) {
+            filter = new SimpleObjectProperty<>(this, "filter", filterValue);
+            filterValue = null;
+        }
         return filter;
     }
 
     public final Predicate<T> getFilter() {
-        return filter.get();
+        return filter == null ? filterValue : filter.get();
     }
 
     public final void setFilter(Predicate<T> filter) {
-        this.filter.set(filter);
+        if (this.filter == null) {
+            filterValue = filter;
+        } else {
+            this.filter.set(filter);
+        }
     }
 
     /**

@@ -170,10 +170,11 @@ public class ThreeItemsPane extends Pane {
         this.item3.set(item3);
     }
 
-    private final DoubleProperty spacing = new SimpleDoubleProperty(this, "spacing", 0);
+    private double spacingValue = 0;
+    private DoubleProperty spacing;
 
     public final double getSpacing() {
-        return spacing.get();
+        return spacing == null ? spacingValue : spacing.get();
     }
 
     /**
@@ -182,11 +183,18 @@ public class ThreeItemsPane extends Pane {
      * @return the spacing property
      */
     public final DoubleProperty spacingProperty() {
+        if (spacing == null) {
+            spacing = new SimpleDoubleProperty(this, "spacing", spacingValue);
+        }
         return spacing;
     }
 
     public final void setSpacing(double spacing) {
-        this.spacing.set(spacing);
+        if (this.spacing == null) {
+            spacingValue = spacing;
+        } else {
+            this.spacing.set(spacing);
+        }
     }
 
     @Override

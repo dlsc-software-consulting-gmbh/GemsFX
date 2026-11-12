@@ -229,10 +229,11 @@ public class ScreensView extends Control {
         this.showWindows.set(showWindows);
     }
 
-    private final ObjectProperty<Callback<Screen, Image>> wallpaperProvider = new SimpleObjectProperty<>(this, "wallpaperProvider");
+    private Callback<Screen, Image> wallpaperProviderValue = null;
+    private ObjectProperty<Callback<Screen, Image>> wallpaperProvider;
 
     public final Callback<Screen, Image> getWallpaperProvider() {
-        return wallpaperProvider.get();
+        return wallpaperProvider == null ? wallpaperProviderValue : wallpaperProvider.get();
     }
 
     /**
@@ -242,17 +243,26 @@ public class ScreensView extends Control {
      * @return a callback for determining which wallpaper to use for which screen
      */
     public final ObjectProperty<Callback<Screen, Image>> wallpaperProviderProperty() {
+        if (wallpaperProvider == null) {
+            wallpaperProvider = new SimpleObjectProperty<>(this, "wallpaperProvider", wallpaperProviderValue);
+            wallpaperProviderValue = null;
+        }
         return wallpaperProvider;
     }
 
     public final void setWallpaperProvider(Callback<Screen, Image> wallpaperProvider) {
-        this.wallpaperProvider.set(wallpaperProvider);
+        if (this.wallpaperProvider == null) {
+            wallpaperProviderValue = wallpaperProvider;
+        } else {
+            this.wallpaperProvider.set(wallpaperProvider);
+        }
     }
 
-    private final BooleanProperty enableWindowDragging = new SimpleBooleanProperty(this, "enableWindowDragging", true);
+    private boolean enableWindowDraggingValue = true;
+    private BooleanProperty enableWindowDragging;
 
     public final boolean isEnableWindowDragging() {
-        return enableWindowDragging.get();
+        return enableWindowDragging == null ? enableWindowDraggingValue : enableWindowDragging.get();
     }
 
     /**
@@ -262,10 +272,17 @@ public class ScreensView extends Control {
      * @return true if the user can modify the window positions
      */
     public final BooleanProperty enableWindowDraggingProperty() {
+        if (enableWindowDragging == null) {
+            enableWindowDragging = new SimpleBooleanProperty(this, "enableWindowDragging", enableWindowDraggingValue);
+        }
         return enableWindowDragging;
     }
 
     public final void setEnableWindowDragging(boolean enableWindowDragging) {
-        this.enableWindowDragging.set(enableWindowDragging);
+        if (this.enableWindowDragging == null) {
+            enableWindowDraggingValue = enableWindowDragging;
+        } else {
+            this.enableWindowDragging.set(enableWindowDragging);
+        }
     }
 }
