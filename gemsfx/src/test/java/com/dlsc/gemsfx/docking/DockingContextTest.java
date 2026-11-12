@@ -323,6 +323,32 @@ public class DockingContextTest extends FxTestBase {
     }
 
     @Test
+    public void movingDoesNotDisposeButProgrammaticCloseDoes() {
+        runFx(() -> {
+            AtomicInteger disposals = new AtomicInteger();
+            Dockable dockable = new Dockable("a", "A", new Label()) {
+                @Override
+                protected void dispose() {
+                    disposals.incrementAndGet();
+                }
+            };
+            DockingContext context = new DockingContext(factoryFor(dockable, new AtomicInteger()), STAGE_FACTORY);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.floatDockable("a", 10, 10);
+            assertEquals(0, disposals.get());
+            context.setCanCloseDockable(d -> false);
+            assertFalse(context.requestCloseDockable(dockable));
+            assertEquals(0, disposals.get());
+            context.setCanCloseDockable(d -> true);
+            assertTrue(context.requestCloseDockable(dockable));
+            assertEquals(1, disposals.get());
+            assertFalse(context.requestCloseDockable(dockable));
+            assertEquals(1, disposals.get());
+        });
+    }
+
+    @Test
     public void requestCloseVetoLeavesEverythingUnchanged() {
         invoke(() -> {
             Dockable editor = new Dockable("editor:main", "Editor", new Label());

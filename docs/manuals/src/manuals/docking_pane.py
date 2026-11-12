@@ -206,7 +206,7 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                             "canCloseDockable policy",
                             "Predicate&lt;Dockable&gt;",
                             "always true",
-                            "Veto hook used by close buttons, keyboard close, and floating stage close.",
+                            "Additional veto hook used by close buttons, keyboard close, and floating stage close.",
                         ),
                     ]
                 ),
@@ -262,6 +262,24 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                             "Moves a dockable to an outer LEFT, RIGHT, TOP, or BOTTOM edge, spanning all existing groups.",
                         ),
                     ]
+                ),
+                Section("Dockable"),
+                PropertyTable(
+                    [
+                        Property(
+                            "closeable",
+                            "BooleanProperty",
+                            "true",
+                            "Controls normal close requests and the default tab's close button visibility.",
+                        ),
+                    ]
+                ),
+                Para(
+                    "Override the protected <font face='Courier'>dispose()</font> method to release resources "
+                    "when a dockable is removed from its context. Moving a dockable between panes does not "
+                    "dispose it. Layout restore replaces the current layout regardless of close permissions "
+                    "and disposes removed or replaced instances, but not reused instances. Hiding an already "
+                    "open floating window also removes and disposes its dockables."
                 ),
             ],
         ),

@@ -974,6 +974,77 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     @Test
+    public void nonCloseableDockableVetoesFloatingWindowClose() {
+        runFx(() -> {
+            AtomicInteger disposals = new AtomicInteger();
+            Dockable dockable = new Dockable("a", "A", new Label()) {
+                @Override
+                protected void dispose() {
+                    disposals.incrementAndGet();
+                }
+            };
+            dockable.setCloseable(false);
+            AtomicReference<Stage> stageRef = new AtomicReference<>();
+            DockingContext context = new DockingContext(id -> Optional.of(dockable), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(new StackPane(pane), 200, 120));
+                stageRef.set(stage);
+                return stage;
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.floatDockable("a", 10, 10);
+            Stage stage = stageRef.get();
+            stage.show();
+            try {
+                WindowEvent vetoed = new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST);
+                stage.fireEvent(vetoed);
+                assertTrue(vetoed.isConsumed());
+                assertEquals(List.of(dockable), context.getDockables());
+                assertEquals(0, disposals.get());
+                dockable.setCloseable(true);
+                stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
+                assertTrue(context.getDockables().isEmpty());
+                assertEquals(1, disposals.get());
+            } finally {
+                stage.close();
+            }
+        });
+    }
+
+    @Test
+    public void hidingFloatingStageDisposesItsDockableOnce() {
+        runFx(() -> {
+            AtomicInteger disposals = new AtomicInteger();
+            Dockable dockable = new Dockable("a", "A", new Label()) {
+                @Override
+                protected void dispose() {
+                    disposals.incrementAndGet();
+                }
+            };
+            dockable.setCloseable(false);
+            AtomicReference<Stage> stageRef = new AtomicReference<>();
+            DockingContext context = new DockingContext(id -> Optional.of(dockable), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(new StackPane(pane), 200, 120));
+                stageRef.set(stage);
+                return stage;
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.floatDockable("a", 10, 10);
+            Stage stage = stageRef.get();
+            stage.show();
+            stage.hide();
+
+            assertTrue(context.getDockables().isEmpty());
+            assertEquals(1, disposals.get());
+            stage.close();
+            assertEquals(1, disposals.get());
+        });
+    }
+
+    @Test
     public void escapeCanceledDragDoesNotCreateFloatingPane() {
         invoke(() -> {
             Dockable a = dockable("a");

@@ -135,6 +135,51 @@ public class DockingContextRestoreTest extends FxTestBase {
     }
 
     @Test
+    public void restoreDisposesRemovedAndReplacedInstancesButNotReusedOnes() {
+        runFx(() -> {
+            AtomicInteger retainedDisposals = new AtomicInteger();
+            AtomicInteger replacedDisposals = new AtomicInteger();
+            AtomicInteger removedDisposals = new AtomicInteger();
+            Dockable retained = new Dockable("a", "A", new Label()) {
+                @Override
+                protected void dispose() {
+                    retainedDisposals.incrementAndGet();
+                }
+            };
+            Dockable replaced = new Dockable("b", "B", new Label()) {
+                @Override
+                protected void dispose() {
+                    replacedDisposals.incrementAndGet();
+                }
+            };
+            Dockable removed = new Dockable("c", "C", new Label()) {
+                @Override
+                protected void dispose() {
+                    removedDisposals.incrementAndGet();
+                }
+            };
+            replaced.setCloseable(false);
+            removed.setCloseable(false);
+            Map<String, Dockable> factory = new HashMap<>(Map.of("a", retained, "b", replaced, "c", removed));
+            DockingContext context = new DockingContext(id -> Optional.ofNullable(factory.get(id)), pane -> new Stage());
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.CENTER);
+            Dockable replacement = dockable("b");
+            factory.put("b", replacement);
+
+            context.restoreLayout(new DockingLayout("main", List.of(new DockingLayout.PaneLayout(
+                    "main", new DockingLayoutNode.Tabs(List.of("a", "b"), "a"), null))));
+
+            assertEquals(0, retainedDisposals.get());
+            assertEquals(1, replacedDisposals.get());
+            assertEquals(1, removedDisposals.get());
+            assertEquals(List.of(retained, replacement), context.getDockables());
+        });
+    }
+
+    @Test
     public void repeatedRestoreRendersFreshContentInMountedSplitAndTabbedGroups() {
         invoke(() -> {
             Map<String, Dockable> created = new HashMap<>();

@@ -125,6 +125,8 @@ public class DockingTab extends HBox {
         Button close = new Button();
         close.getStyleClass().add("docking-tab-close-button");
         close.setFocusTraversable(false);
+        close.visibleProperty().bind(dockable.closeableProperty());
+        close.managedProperty().bind(close.visibleProperty());
         fillAvailableHeight(close);
         Region icon = new Region();
         icon.getStyleClass().add("icon");

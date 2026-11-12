@@ -404,6 +404,8 @@ public class DockingContext {
 
     /**
      * Restores a complete context-wide docking layout.
+     * Restore replaces the current layout regardless of close permissions and disposes dockable
+     * instances that are not reused in the restored layout.
      *
      * @param layout the layout to restore
      * @return restore result containing unresolved dockable IDs
@@ -466,6 +468,7 @@ public class DockingContext {
             throw ex;
         }
 
+        List<Dockable> oldDockables = new ArrayList<>(dockables);
         List<Stage> oldFloatingStages = new ArrayList<>(floatingPaneByStage.keySet());
         for (Map.Entry<Stage, ChangeListener<Boolean>> entry : new ArrayList<>(hostListeners.entrySet())) {
             entry.getKey().showingProperty().removeListener(entry.getValue());
@@ -517,12 +520,18 @@ public class DockingContext {
         for (Stage stage : oldFloatingStages) {
             stage.close();
         }
+        for (Dockable dockable : oldDockables) {
+            if (dockablesById.get(dockable.getId()) != dockable) {
+                dockable.dispose();
+            }
+        }
 
         return new DockingRestoreResult(new ArrayList<>(unresolvedDockables));
     }
 
     /**
-     * Closes the dockable if the close policy permits it. A veto leaves the panes and this context unchanged.
+     * Closes the dockable if its closeable property and the close policy permit it. A veto leaves
+     * the panes and this context unchanged. A successfully removed dockable is disposed.
      *
      * @param dockable the dockable to close
      * @return {@code true} only if the dockable was open and has been removed
@@ -553,13 +562,14 @@ public class DockingContext {
     }
 
     /**
-     * Evaluates the close policy.
+     * Evaluates the dockable's close permission and the context's close policy.
      *
      * @param dockable the dockable
      * @return {@code true} if the dockable may close
      */
     public final boolean canCloseDockable(Dockable dockable) {
-        return canCloseDockable.test(Objects.requireNonNull(dockable, "dockable must not be null"));
+        Objects.requireNonNull(dockable, "dockable must not be null");
+        return dockable.isCloseable() && canCloseDockable.test(dockable);
     }
 
     /**
@@ -1037,7 +1047,11 @@ public class DockingContext {
         pane.removeDockable(dockable);
         dockablesById.remove(id);
         dockables.remove(dockable);
-        closeFloatingStageIfEmpty(pane);
+        try {
+            dockable.dispose();
+        } finally {
+            closeFloatingStageIfEmpty(pane);
+        }
         return true;
     }
 

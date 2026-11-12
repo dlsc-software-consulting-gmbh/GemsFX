@@ -23,6 +23,7 @@ public class Dockable {
     private final String id;
     private final ReadOnlyStringWrapper title;
     private final BooleanProperty titleEditable = new SimpleBooleanProperty(this, "titleEditable", true);
+    private final BooleanProperty closeable = new SimpleBooleanProperty(this, "closeable", true);
     private final ReadOnlyObjectWrapper<Node> graphic;
     private final Node content;
     private final ObjectProperty<Node> toolbar = new SimpleObjectProperty<>(this, "toolbar");
@@ -104,6 +105,25 @@ public class Dockable {
     public final void setTitleEditable(boolean titleEditable) {
         this.titleEditable.set(titleEditable);
     }
+
+    /**
+     * Whether this dockable can be closed through normal close requests. Defaults to {@code true}.
+     * The default tab hides its close button when this property is {@code false}. Layout restore and
+     * teardown of an already hidden window can still remove the dockable.
+     *
+     * @return the close permission property
+     */
+    public final BooleanProperty closeableProperty() {
+        return closeable;
+    }
+
+    public final boolean isCloseable() {
+        return closeable.get();
+    }
+
+    public final void setCloseable(boolean closeable) {
+        this.closeable.set(closeable);
+    }
     
     /**
      * The optional graphic displayed in this dockable's tab, or {@code null} for no graphic.
@@ -181,6 +201,14 @@ public class Dockable {
      */
     public Node getContent() {
         return content;
+    }
+
+    /**
+     * Releases resources after this dockable is removed from its docking context. Subclasses may
+     * override this method; it is not called when the dockable merely moves between panes. If the
+     * same instance is reopened, it can be disposed again when subsequently removed.
+     */
+    protected void dispose() {
     }
 
     private static String validateTitle(String title) {

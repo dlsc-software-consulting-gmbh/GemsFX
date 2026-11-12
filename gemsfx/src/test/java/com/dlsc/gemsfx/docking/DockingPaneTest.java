@@ -1756,6 +1756,54 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     @Test
+    public void closeablePropertyControlsCloseButtonAndCloseRequests() {
+        runFx(() -> {
+            Dockable dockable = dockable("a");
+            DockingContext context = context(dockable);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+            Button close = (Button) title(pane, "a").lookup(".docking-tab-close-button");
+            assertTrue(dockable.isCloseable());
+            assertTrue(close.isVisible());
+            SimpleBooleanProperty closeable = new SimpleBooleanProperty(true);
+            dockable.closeableProperty().bind(closeable);
+            closeable.set(false);
+            assertFalse(close.isVisible());
+            assertFalse(close.isManaged());
+            assertFalse(context.canCloseDockable(dockable));
+            assertFalse(context.requestCloseDockable(dockable));
+            press(title(pane, "a"), KeyCode.DELETE);
+            assertSame(dockable, pane.getActiveDockable());
+            closeable.set(true);
+            assertTrue(close.isVisible());
+            assertTrue(close.isManaged());
+            close.fire();
+            assertTrue(context.getDockables().isEmpty());
+        });
+    }
+
+    @Test
+    public void clickingCloseDisposesDockable() {
+        runFx(() -> {
+            AtomicInteger disposals = new AtomicInteger();
+            Dockable dockable = new Dockable("a", "A", new Label()) {
+                @Override
+                protected void dispose() {
+                    disposals.incrementAndGet();
+                }
+            };
+            DockingContext context = context(dockable);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+            ((Button) title(pane, "a").lookup(".docking-tab-close-button")).fire();
+            assertTrue(context.getDockables().isEmpty());
+            assertEquals(1, disposals.get());
+        });
+    }
+
+    @Test
     public void skinDoesNotUseJavaFxTabPane() {
         invoke(() -> {
             DockingContext context = context(dockable("a"));
