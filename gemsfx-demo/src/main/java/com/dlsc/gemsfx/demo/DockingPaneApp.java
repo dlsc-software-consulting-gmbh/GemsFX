@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import atlantafx.base.theme.NordDark;
 import atlantafx.base.theme.NordLight;
+import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.docking.Dockable;
 import com.dlsc.gemsfx.docking.DockableFactory;
 import com.dlsc.gemsfx.docking.DockingContext;
@@ -15,10 +16,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.AreaChart;
@@ -82,6 +85,7 @@ public class DockingPaneApp extends GemApplication {
     private static final DataFormat TITLE_SWAP_FORMAT = new DataFormat("com.dlsc.gemsfx.demo.dockable-title-swap");
     private static final DataFormat SIDEBAR_VIEW_FORMAT = new DataFormat("com.dlsc.gemsfx.demo.sidebar-view");
     private static final List<String> SIDEBAR_VIEW_TYPES = List.of("navigator", "editor", "preview", "console", "inspector");
+    private static final String DIALOG_PANE_STYLE_CLASS = "docking-demo-dialog-pane";
 
     private final Map<String, Function<String, Dockable>> templates = createTemplates();
     private DockingLayout savedLayout;
@@ -114,7 +118,7 @@ public class DockingPaneApp extends GemApplication {
         BorderPane.setMargin(rootPane, new Insets(0, 0, 0, 4));
         root.setBottom(createStatusBar(rootPane));
 
-        Scene scene = new Scene(root, 1280, 800);
+        Scene scene = new Scene(createWindowRoot(root), 1280, 800);
         applyAppStyles(scene);
         stage.setTitle("DockingPane Demo");
         stage.setScene(scene);
@@ -381,11 +385,17 @@ public class DockingPaneApp extends GemApplication {
         Stage floating = new Stage();
         floating.initOwner(owner);
         floating.setTitle("DockingPane Floating Stage");
-        Scene scene = new Scene(wrapper, 420, 280);
+        Scene scene = new Scene(createWindowRoot(wrapper), 420, 280);
         applyAppStyles(scene);
         floating.setScene(scene);
         floating.show();
         return floating;
+    }
+
+    private StackPane createWindowRoot(Node content) {
+        DialogPane dialogPane = new DialogPane();
+        dialogPane.getStyleClass().add(DIALOG_PANE_STYLE_CLASS);
+        return new StackPane(content, dialogPane);
     }
 
     private Map<String, Function<String, Dockable>> createTemplates() {
@@ -417,7 +427,7 @@ public class DockingPaneApp extends GemApplication {
                     help.setTitle("Dockable Help");
                     help.setHeaderText("Help for " + dockable.getTitle());
                     help.setContentText("Drag the tab to rearrange this view, or use Close to remove it from the workspace.");
-                    Scene scene = dockable.getContent().getScene();
+                    Scene scene = dockable.getScene();
                     if (scene != null) {
                         help.initOwner(scene.getWindow());
                     }
@@ -492,14 +502,14 @@ public class DockingPaneApp extends GemApplication {
             if (initialText.equals(text.getText())) {
                 return true;
             }
-            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
-                    "The editor has unsaved changes. Close it anyway?", ButtonType.OK, ButtonType.CANCEL);
-            confirmation.setTitle("Unsaved Changes");
-            confirmation.setHeaderText("Discard unsaved changes?");
-            if (wrap.getScene() != null && wrap.getScene().getWindow() != null) {
-                confirmation.initOwner(wrap.getScene().getWindow());
+
+            DialogPane dialogPane = (DialogPane) editor.getScene().getRoot().lookup("." + DIALOG_PANE_STYLE_CLASS);
+            if (dialogPane != null) {
+                DialogPane.Dialog<ButtonType> dialog = dialogPane.showConfirmation("Discard unsaved changes?", "The editor has unsaved changes. Close it anyway?", List.of(ButtonType.OK, ButtonType.CANCEL));
+                return ButtonType.OK.equals(dialog.showAndWait());
             }
-            return confirmation.showAndWait().filter(ButtonType.OK::equals).isPresent();
+
+            return false;
         });
         CheckMenuItem wrapItem = new CheckMenuItem("Wrap text");
         wrapItem.selectedProperty().bindBidirectional(text.wrapTextProperty());

@@ -56,6 +56,7 @@ public class DockingContextDropTest extends FxTestBase {
             assertEquals(List.of(created), context.getDockables());
             assertEquals(List.of(created), pane.getDockables());
             assertSame(created, pane.getActiveDockable());
+            assertSame(pane, created.getDockingPane());
         });
     }
 

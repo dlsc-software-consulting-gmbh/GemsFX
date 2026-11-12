@@ -11,7 +11,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
@@ -28,6 +31,7 @@ public class Dockable {
     private final ObjectProperty<BooleanSupplier> onCloseRequest = new SimpleObjectProperty<>(this, "onCloseRequest");
     private final ReadOnlyObjectWrapper<Node> graphic;
     private final Node content;
+    private DockingContext dockingContext;
     private final ObjectProperty<Node> toolbar = new SimpleObjectProperty<>(this, "toolbar");
     private final ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
     private final ObjectProperty<Runnable> onHelp = new SimpleObjectProperty<>(this, "onHelp");
@@ -70,6 +74,40 @@ public class Dockable {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * Returns the pane currently hosting this dockable, even when its content is not selected.
+     *
+     * @return the hosting pane, or {@code null} if this dockable is not open
+     */
+    public DockingPane getDockingPane() {
+        return dockingContext == null ? null : dockingContext.findDockingPane(this);
+    }
+
+    /**
+     * Returns the scene containing the hosting pane.
+     *
+     * @return the hosting scene, or {@code null} if there is no hosting pane or scene
+     */
+    public Scene getScene() {
+        DockingPane pane = getDockingPane();
+        return pane == null ? null : pane.getScene();
+    }
+
+    /**
+     * Returns the stage containing the hosting pane.
+     *
+     * @return the hosting stage, or {@code null} if there is no scene or its window is not a stage
+     */
+    public Stage getStage() {
+        Scene scene = getScene();
+        Window window = scene == null ? null : scene.getWindow();
+        return window instanceof Stage ? (Stage) window : null;
+    }
+
+    void setDockingContext(DockingContext context) {
+        dockingContext = context;
     }
     
     /**

@@ -69,6 +69,12 @@ public class DockingContext {
         this.stageFactory = Objects.requireNonNull(stageFactory, "stageFactory must not be null");
     }
 
+    DockingPane findDockingPane(Dockable dockable) {
+        String id = dockable.getId();
+        DockingPane pane = dockablePaneById.get(id);
+        return dockablesById.get(id) == dockable && pane != null && pane.containsDockable(id) ? pane : null;
+    }
+
     /**
      * Returns the factory used to resolve dockables by ID.
      *
@@ -219,6 +225,7 @@ public class DockingContext {
         }
         dockablesById.put(id, dockable);
         dockablePaneById.put(id, pane);
+        dockable.setDockingContext(this);
         dockables.add(dockable);
         try {
             if (targetId != null) {
@@ -231,6 +238,7 @@ public class DockingContext {
         } catch (RuntimeException | Error ex) {
             dockablesById.remove(id);
             dockablePaneById.remove(id);
+            dockable.setDockingContext(null);
             dockables.remove(dockable);
             LOG.fine(() -> "External drop of dockable '" + id + "' failed while inserting: " + ex);
             throw ex;
@@ -294,12 +302,14 @@ public class DockingContext {
 
         dockablesById.put(id, dockable);
         dockablePaneById.put(id, pane);
+        dockable.setDockingContext(this);
         dockables.add(dockable);
         try {
             pane.insertDockable(dockable, position);
         } catch (RuntimeException | Error ex) {
             dockablesById.remove(id);
             dockablePaneById.remove(id);
+            dockable.setDockingContext(null);
             dockables.remove(dockable);
             LOG.fine(() -> "Opening dockable '" + id + "' failed while inserting: " + ex);
             throw ex;
@@ -343,8 +353,8 @@ public class DockingContext {
         }
 
         sourcePane.removeDockable(dockable);
-        floatingPane.insertDockable(dockable, DockingPosition.CENTER);
         dockablePaneById.put(id, floatingPane);
+        floatingPane.insertDockable(dockable, DockingPosition.CENTER);
         registerFloatingStage(floatingPane, stage, hostingStage(sourcePane));
         stage.setX(screenX);
         stage.setY(screenY);
@@ -480,6 +490,9 @@ public class DockingContext {
 
         dockablesById.clear();
         dockablePaneById.clear();
+        for (Dockable dockable : oldDockables) {
+            dockable.setDockingContext(null);
+        }
         dockables.clear();
         panes.clear();
         paneIdByPane.clear();
@@ -493,13 +506,19 @@ public class DockingContext {
 
         DockingPane restoredPrimaryPane = mountedPrimaryPane == null ? new DockingPane(this) : mountedPrimaryPane;
         clearPane(restoredPrimaryPane);
+        Set<String> primaryIds = new LinkedHashSet<>();
+        collectDockableIds(normalizedPrimaryRoot, primaryIds);
+        for (String id : primaryIds) {
+            Dockable dockable = resolvedDockables.get(id);
+            dockablesById.put(id, dockable);
+            dockablePaneById.put(id, restoredPrimaryPane);
+            dockable.setDockingContext(this);
+        }
         if (!(normalizedPrimaryRoot instanceof DockingLayoutNode.Empty)) {
             buildPaneTree(restoredPrimaryPane, normalizedPrimaryRoot, resolvedDockables);
         }
         attachPane(restoredPrimaryPane, primaryLayout.getPaneId());
         for (Dockable dockable : restoredPrimaryPane.getDockables()) {
-            dockablesById.put(dockable.getId(), dockable);
-            dockablePaneById.put(dockable.getId(), restoredPrimaryPane);
             dockables.add(dockable);
         }
 
@@ -511,6 +530,7 @@ public class DockingContext {
             for (Dockable dockable : plan.pane.getDockables()) {
                 dockablesById.put(dockable.getId(), dockable);
                 dockablePaneById.put(dockable.getId(), plan.pane);
+                dockable.setDockingContext(this);
                 dockables.add(dockable);
             }
             if (plan.stage != null) {
@@ -719,8 +739,8 @@ public class DockingContext {
         if (dockable == null) {
             return false;
         }
-        targetPane.insertDockableRelativeTo(targetId, dockable, position);
         dockablePaneById.put(draggedId, targetPane);
+        targetPane.insertDockableRelativeTo(targetId, dockable, position);
         closeFloatingStageIfEmpty(sourcePane);
         return true;
     }
@@ -760,8 +780,8 @@ public class DockingContext {
             return targetPane.moveInsideToPaneEdge(id, edge);
         }
         Dockable dockable = sourcePane.removeDockableById(id);
-        targetPane.insertDockableAtPaneEdge(dockable, edge);
         dockablePaneById.put(id, targetPane);
+        targetPane.insertDockableAtPaneEdge(dockable, edge);
         closeFloatingStageIfEmpty(sourcePane);
         return true;
     }
@@ -1058,6 +1078,7 @@ public class DockingContext {
         if (pane == null) {
             return false;
         }
+        dockable.setDockingContext(null);
         pane.removeDockable(dockable);
         dockablesById.remove(id);
         dockables.remove(dockable);

@@ -149,12 +149,14 @@ public class DockingContextRestoreTest extends FxTestBase {
             Dockable replaced = new Dockable("b", "B", new Label()) {
                 @Override
                 protected void dispose() {
+                    assertNull(getDockingPane());
                     replacedDisposals.incrementAndGet();
                 }
             };
             Dockable removed = new Dockable("c", "C", new Label()) {
                 @Override
                 protected void dispose() {
+                    assertNull(getDockingPane());
                     removedDisposals.incrementAndGet();
                 }
             };
@@ -173,6 +175,13 @@ public class DockingContextRestoreTest extends FxTestBase {
             context.openDockable(pane, "c", DockingPosition.CENTER);
             Dockable replacement = dockable("b");
             factory.put("b", replacement);
+            AtomicReference<DockingPane> hostDuringRestore = new AtomicReference<>();
+            pane.layoutRootProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue instanceof DockingLayoutNode.Tabs
+                        && ((DockingLayoutNode.Tabs) newValue).getDockableIds().equals(List.of("a", "b"))) {
+                    hostDuringRestore.set(retained.getDockingPane());
+                }
+            });
 
             context.restoreLayout(new DockingLayout("main", List.of(new DockingLayout.PaneLayout(
                     "main", new DockingLayoutNode.Tabs(List.of("a", "b"), "a"), null))));
@@ -182,6 +191,64 @@ public class DockingContextRestoreTest extends FxTestBase {
             assertEquals(1, removedDisposals.get());
             assertEquals(0, requests.get());
             assertEquals(List.of(retained, replacement), context.getDockables());
+            assertSame(pane, hostDuringRestore.get());
+            assertSame(pane, retained.getDockingPane());
+            assertSame(pane, replacement.getDockingPane());
+            assertNull(replaced.getDockingPane());
+            assertNull(removed.getDockingPane());
+        });
+    }
+
+    @Test
+    public void failedRestoreKeepsExistingHostDuringPreflight() {
+        runFx(() -> {
+            Dockable dockable = dockable("a");
+            AtomicReference<DockingPane> seenDuringPreflight = new AtomicReference<>();
+            DockingContext context = new DockingContext(id -> Optional.of(dockable), pane -> {
+                seenDuringPreflight.set(dockable.getDockingPane());
+                throw new IllegalStateException("stage failure");
+            });
+            DockingPane primary = context.createPane();
+            context.openDockable(primary, "a", DockingPosition.CENTER);
+            DockingLayout layout = new DockingLayout("main", List.of(
+                    new DockingLayout.PaneLayout("main", new DockingLayoutNode.Empty(), null),
+                    new DockingLayout.PaneLayout("floating",
+                            new DockingLayoutNode.Tabs(List.of("a"), "a"),
+                            new DockingLayout.StageBounds(10, 20, 200, 100))));
+
+            assertThrows(IllegalStateException.class, () -> context.restoreLayout(layout));
+            assertSame(primary, seenDuringPreflight.get());
+            assertSame(primary, dockable.getDockingPane());
+        });
+    }
+
+    @Test
+    public void restoredFloatingDockableUsesReplacementWindow() {
+        runFx(() -> {
+            Dockable dockable = dockable("a");
+            List<Stage> stages = new ArrayList<>();
+            AtomicReference<DockingPane> hostWhenShown = new AtomicReference<>();
+            DockingContext context = new DockingContext(id -> Optional.of(dockable), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(new StackPane(pane)));
+                stage.setOnShown(event -> hostWhenShown.set(dockable.getDockingPane()));
+                stages.add(stage);
+                return stage;
+            });
+            DockingPane primary = context.createPane();
+            context.openDockable(primary, "a", DockingPosition.CENTER);
+            DockingPane originalFloating = context.floatDockable("a", 10, 20);
+            DockingLayout layout = context.getLayout();
+            try {
+                context.restoreLayout(layout);
+                Stage restoredStage = stages.get(1);
+                assertNotSame(originalFloating, dockable.getDockingPane());
+                assertSame(dockable.getDockingPane(), hostWhenShown.get());
+                assertSame(restoredStage.getScene(), dockable.getScene());
+                assertSame(restoredStage, dockable.getStage());
+            } finally {
+                stages.forEach(Stage::close);
+            }
         });
     }
 

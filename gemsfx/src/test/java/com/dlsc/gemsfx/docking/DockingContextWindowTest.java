@@ -25,6 +25,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.robot.Robot;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -48,6 +49,104 @@ public class DockingContextWindowTest extends FxTestBase {
 
     private static Dockable dockable(String id) {
         return new Dockable(id, "Title " + id, new Label("Content " + id));
+    }
+
+    @Test
+    public void dockableLocatesItsHostWhenUnselectedMovedAndClosed() {
+        runFx(() -> {
+            Dockable editor = dockable("editor");
+            DockingContext context = new DockingContext(
+                    id -> Optional.of(id.equals("editor") ? editor : dockable(id)), pane -> {
+                        Stage stage = new Stage();
+                        stage.setScene(new Scene(new StackPane(pane), 400, 300));
+                        stage.show();
+                        return stage;
+                    });
+            DockingPane pane = context.createPane();
+            Stage stage = new Stage();
+            try {
+                assertNull(editor.getDockingPane());
+                assertNull(editor.getScene());
+                assertNull(editor.getStage());
+                context.openDockable(pane, "editor", DockingPosition.CENTER);
+                assertSame(pane, editor.getDockingPane());
+                assertNull(editor.getScene());
+
+                stage.setScene(new Scene(new StackPane(pane), 600, 400));
+                stage.show();
+                context.openDockable(pane, "other", DockingPosition.CENTER);
+                pane.applyCss();
+                assertNull(editor.getContent().getScene());
+                assertSame(pane, editor.getDockingPane());
+                assertSame(stage.getScene(), editor.getScene());
+                assertSame(stage, editor.getStage());
+
+                DockingPane floating = context.floatDockable("editor", 100, 100);
+                Stage floatingStage = (Stage) floating.getScene().getWindow();
+                assertSame(floating, editor.getDockingPane());
+                assertSame(floatingStage.getScene(), editor.getScene());
+                assertSame(floatingStage, editor.getStage());
+
+                assertTrue(context.requestCloseDockable(editor));
+                assertNull(editor.getDockingPane());
+                assertNull(editor.getScene());
+                assertNull(editor.getStage());
+            } finally {
+                stage.hide();
+            }
+        });
+    }
+
+    @Test
+    public void dockableLocatesSceneWithoutAStage() {
+        runFx(() -> {
+            Dockable dockable = dockable("popup");
+            DockingContext context = new DockingContext(id -> Optional.of(dockable), pane -> new Stage());
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "popup", DockingPosition.CENTER);
+            Popup popup = new Popup();
+            Stage owner = new Stage();
+            try {
+                Scene scene = new Scene(new StackPane(pane));
+                assertSame(scene, dockable.getScene());
+                assertNull(dockable.getStage());
+                scene.setRoot(new StackPane());
+                owner.setScene(new Scene(new StackPane(), 200, 200));
+                owner.show();
+                popup.getContent().add(pane);
+                popup.show(owner);
+                assertSame(pane, dockable.getDockingPane());
+                assertSame(popup.getScene(), dockable.getScene());
+                assertNull(dockable.getStage());
+            } finally {
+                popup.hide();
+                owner.close();
+            }
+        });
+    }
+
+    @Test
+    public void destinationLayoutListenersSeeTheNewHost() {
+        runFx(() -> {
+            Dockable moving = dockable("moving");
+            DockingContext context = new DockingContext(
+                    id -> Optional.of(id.equals("moving") ? moving : dockable(id)), pane -> new Stage());
+            DockingPane source = context.createPane();
+            DockingPane destination = context.createPane();
+            context.openDockable(source, "moving", DockingPosition.CENTER);
+            context.openDockable(destination, "target", DockingPosition.CENTER);
+            AtomicReference<DockingPane> observed = new AtomicReference<>();
+            AtomicBoolean sourceWasCleared = new AtomicBoolean();
+            source.layoutRootProperty().addListener((observable, oldValue, newValue) ->
+                    sourceWasCleared.set(moving.getDockingPane() == null));
+            destination.layoutRootProperty().addListener((observable, oldValue, newValue) ->
+                    observed.set(moving.getDockingPane()));
+
+            assertTrue(context.moveDockable(destination, "moving", "target", DockingPosition.CENTER));
+            assertTrue(sourceWasCleared.get());
+            assertSame(destination, observed.get());
+            assertSame(destination, moving.getDockingPane());
+        });
     }
 
     private static DockableFactory factoryFor(List<Dockable> dockables, AtomicInteger calls) {
