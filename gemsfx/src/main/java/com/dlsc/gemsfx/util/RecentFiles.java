@@ -136,8 +136,8 @@ public class RecentFiles {
 
     // -- onOpenFile ----------------------------------------------------------
 
-    private final ObjectProperty<Consumer<File>> onOpenFile =
-            new SimpleObjectProperty<>(this, "onOpenFile");
+    private Consumer<File> onOpenFileValue = null;
+    private ObjectProperty<Consumer<File>> onOpenFile;
 
     /**
      * The callback invoked when the user clicks a recent file entry in the menu.
@@ -145,15 +145,23 @@ public class RecentFiles {
      * @return the property holding the open-file callback
      */
     public final ObjectProperty<Consumer<File>> onOpenFileProperty() {
+        if (onOpenFile == null) {
+            onOpenFile = new SimpleObjectProperty<>(this, "onOpenFile", onOpenFileValue);
+            onOpenFileValue = null;
+        }
         return onOpenFile;
     }
 
     public final Consumer<File> getOnOpenFile() {
-        return onOpenFile.get();
+        return onOpenFile == null ? onOpenFileValue : onOpenFile.get();
     }
 
     public final void setOnOpenFile(Consumer<File> callback) {
-        onOpenFile.set(callback);
+        if (this.onOpenFile == null) {
+            onOpenFileValue = callback;
+        } else {
+            this.onOpenFile.set(callback);
+        }
     }
 
     // -- maxFiles ------------------------------------------------------------

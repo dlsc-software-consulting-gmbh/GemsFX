@@ -167,7 +167,8 @@ public class StripView<T> extends Control {
 
     // Autoscrolling.
 
-    private final BooleanProperty autoScrolling = new SimpleBooleanProperty(this, "autoScrolling", true);
+    private boolean autoScrollingValue = true;
+    private BooleanProperty autoScrolling;
 
     /**
      * Determines whether the view will automatically scroll to a newly selected item.
@@ -175,15 +176,22 @@ public class StripView<T> extends Control {
      * @return true if the control uses automatic scrolling when an item becomes selected
      */
     public final BooleanProperty autoScrollingProperty() {
+        if (autoScrolling == null) {
+            autoScrolling = new SimpleBooleanProperty(this, "autoScrolling", autoScrollingValue);
+        }
         return autoScrolling;
     }
 
     public final boolean isAutoScrolling() {
-        return autoScrolling.get();
+        return autoScrolling == null ? autoScrollingValue : autoScrolling.get();
     }
 
     public final void setAutoScrolling(boolean autoScrolling) {
-        this.autoScrolling.set(autoScrolling);
+        if (this.autoScrolling == null) {
+            autoScrollingValue = autoScrolling;
+        } else {
+            this.autoScrolling.set(autoScrolling);
+        }
     }
 
     // Animation support.
@@ -295,10 +303,11 @@ public class StripView<T> extends Control {
 
     // cell factory support
 
-    private final ObjectProperty<Callback<StripView<T>, StripCell<T>>> cellFactory = new SimpleObjectProperty<>(this, "cellFactory");
+    private Callback<StripView<T>, StripCell<T>> cellFactoryValue = null;
+    private ObjectProperty<Callback<StripView<T>, StripCell<T>>> cellFactory;
 
     public final Callback<StripView<T>, StripCell<T>> getCellFactory() {
-        return cellFactory.get();
+        return cellFactory == null ? cellFactoryValue : cellFactory.get();
     }
 
     /**
@@ -307,11 +316,19 @@ public class StripView<T> extends Control {
      * @return the cell factory
      */
     public final ObjectProperty<Callback<StripView<T>, StripCell<T>>> cellFactoryProperty() {
+        if (cellFactory == null) {
+            cellFactory = new SimpleObjectProperty<>(this, "cellFactory", cellFactoryValue);
+            cellFactoryValue = null;
+        }
         return cellFactory;
     }
 
     public final void setCellFactory(Callback<StripView<T>, StripCell<T>> cellFactory) {
-        this.cellFactory.set(cellFactory);
+        if (this.cellFactory == null) {
+            cellFactoryValue = cellFactory;
+        } else {
+            this.cellFactory.set(cellFactory);
+        }
     }
 
     /**

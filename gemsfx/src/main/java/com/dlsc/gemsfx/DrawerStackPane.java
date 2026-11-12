@@ -265,10 +265,11 @@ public class DrawerStackPane extends StackPane {
 
     // auto hide support
 
-    private final BooleanProperty autoHide = new SimpleBooleanProperty(this, "autoHide", true);
+    private boolean autoHideValue = true;
+    private BooleanProperty autoHide;
 
     public final boolean isAutoHide() {
-        return autoHide.get();
+        return autoHide == null ? autoHideValue : autoHide.get();
     }
 
     /**
@@ -277,14 +278,22 @@ public class DrawerStackPane extends StackPane {
      * @return true if the drawer hides when user clicks on background
      */
     public final BooleanProperty autoHideProperty() {
+        if (autoHide == null) {
+            autoHide = new SimpleBooleanProperty(this, "autoHide", autoHideValue);
+        }
         return autoHide;
     }
 
     public final void setAutoHide(boolean autoHide) {
-        this.autoHide.set(autoHide);
+        if (this.autoHide == null) {
+            autoHideValue = autoHide;
+        } else {
+            this.autoHide.set(autoHide);
+        }
     }
 
-    private final StringProperty preferencesKey = new SimpleStringProperty(this, "preferencesKey", "drawer.stackpane");
+    private String preferencesKeyValue = "drawer.stackpane";
+    private StringProperty preferencesKey;
 
     /**
      * Stores the key used to store the drawer height via the preferences store.
@@ -292,6 +301,10 @@ public class DrawerStackPane extends StackPane {
      * @return the preferences key property
      */
     public final StringProperty preferencesKeyProperty() {
+        if (preferencesKey == null) {
+            preferencesKey = new SimpleStringProperty(this, "preferencesKey", preferencesKeyValue);
+            preferencesKeyValue = null;
+        }
         return preferencesKey;
     }
 
@@ -302,7 +315,11 @@ public class DrawerStackPane extends StackPane {
      * @param key the preferences key
      */
     public final void setPreferencesKey(String key) {
-        preferencesKey.set(key);
+        if (this.preferencesKey == null) {
+            preferencesKeyValue = key;
+        } else {
+            this.preferencesKey.set(key);
+        }
     }
 
     /**
@@ -312,7 +329,7 @@ public class DrawerStackPane extends StackPane {
      * @return the preferences key
      */
     public final String getPreferencesKey() {
-        return preferencesKey.get();
+        return preferencesKey == null ? preferencesKeyValue : preferencesKey.get();
     }
 
     // max drawer height support
@@ -504,10 +521,11 @@ public class DrawerStackPane extends StackPane {
         }
     }
 
-    private final ObjectProperty<Runnable> onCloseRequest = new SimpleObjectProperty<>(this, "onCloseRequest", () -> setShowDrawer(false));
+    private Runnable onCloseRequestValue = () -> setShowDrawer(false);
+    private ObjectProperty<Runnable> onCloseRequest;
 
     public final Runnable getOnCloseRequest() {
-        return onCloseRequest.get();
+        return onCloseRequest == null ? onCloseRequestValue : onCloseRequest.get();
     }
 
     /**
@@ -517,17 +535,26 @@ public class DrawerStackPane extends StackPane {
      * @return the callback for closing the drawer
      */
     public final ObjectProperty<Runnable> onCloseRequestProperty() {
+        if (onCloseRequest == null) {
+            onCloseRequest = new SimpleObjectProperty<>(this, "onCloseRequest", onCloseRequestValue);
+            onCloseRequestValue = null;
+        }
         return onCloseRequest;
     }
 
     public final void setOnCloseRequest(Runnable onCloseRequest) {
-        this.onCloseRequest.set(onCloseRequest);
+        if (this.onCloseRequest == null) {
+            onCloseRequestValue = onCloseRequest;
+        } else {
+            this.onCloseRequest.set(onCloseRequest);
+        }
     }
 
-    private final ObjectProperty<Runnable> onDrawerClose = new SimpleObjectProperty<>(this, "onDrawerClose");
+    private Runnable onDrawerCloseValue = null;
+    private ObjectProperty<Runnable> onDrawerClose;
 
     public final Runnable getOnDrawerClose() {
-        return onDrawerClose.get();
+        return onDrawerClose == null ? onDrawerCloseValue : onDrawerClose.get();
     }
 
     /**
@@ -536,11 +563,19 @@ public class DrawerStackPane extends StackPane {
      * @return a callback that will be invoked when the drawer gets closed
      */
     public final ObjectProperty<Runnable> onDrawerCloseProperty() {
+        if (onDrawerClose == null) {
+            onDrawerClose = new SimpleObjectProperty<>(this, "onDrawerClose", onDrawerCloseValue);
+            onDrawerCloseValue = null;
+        }
         return onDrawerClose;
     }
 
     public final void setOnDrawerClose(Runnable onDrawerClose) {
-        this.onDrawerClose.set(onDrawerClose);
+        if (this.onDrawerClose == null) {
+            onDrawerCloseValue = onDrawerClose;
+        } else {
+            this.onDrawerClose.set(onDrawerClose);
+        }
     }
 
     // show drawer title support

@@ -438,10 +438,11 @@ public class SearchField<T> extends Control {
         }
     }
 
-    private final ObjectProperty<Consumer<T>> onCommit = new SimpleObjectProperty<>(this, "onCommit");
+    private Consumer<T> onCommitValue = null;
+    private ObjectProperty<Consumer<T>> onCommit;
 
     public final Consumer<T> getOnCommit() {
-        return onCommit.get();
+        return onCommit == null ? onCommitValue : onCommit.get();
     }
 
     /**
@@ -454,11 +455,19 @@ public class SearchField<T> extends Control {
      * @return the commit handler
      */
     public final ObjectProperty<Consumer<T>> onCommitProperty() {
+        if (onCommit == null) {
+            onCommit = new SimpleObjectProperty<>(this, "onCommit", onCommitValue);
+            onCommitValue = null;
+        }
         return onCommit;
     }
 
     public void setOnCommit(Consumer<T> onCommit) {
-        this.onCommit.set(onCommit);
+        if (this.onCommit == null) {
+            onCommitValue = onCommit;
+        } else {
+            this.onCommit.set(onCommit);
+        }
     }
 
     private class SearchEventHandlerProperty extends SimpleObjectProperty<EventHandler<SearchEvent>> {
@@ -846,10 +855,11 @@ public class SearchField<T> extends Control {
         this.comparator.set(comparator);
     }
 
-    private final ObjectProperty<Callback<String, T>> newItemProducer = new SimpleObjectProperty<>(this, "newItemProducer");
+    private Callback<String, T> newItemProducerValue = null;
+    private ObjectProperty<Callback<String, T>> newItemProducer;
 
     public final Callback<String, T> getNewItemProducer() {
-        return newItemProducer.get();
+        return newItemProducer == null ? newItemProducerValue : newItemProducer.get();
     }
 
     /**
@@ -859,11 +869,19 @@ public class SearchField<T> extends Control {
      * @return the callback for producing a new object of the field supported object type
      */
     public final ObjectProperty<Callback<String, T>> newItemProducerProperty() {
+        if (newItemProducer == null) {
+            newItemProducer = new SimpleObjectProperty<>(this, "newItemProducer", newItemProducerValue);
+            newItemProducerValue = null;
+        }
         return newItemProducer;
     }
 
     public final void setNewItemProducer(Callback<String, T> newItemProducer) {
-        this.newItemProducer.set(newItemProducer);
+        if (this.newItemProducer == null) {
+            newItemProducerValue = newItemProducer;
+        } else {
+            this.newItemProducer.set(newItemProducer);
+        }
     }
 
     private final StyleableDoubleProperty autoCompletionGap = new StyleableDoubleProperty(1) {

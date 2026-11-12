@@ -99,10 +99,11 @@ public class GridTableCell<S, T> extends Cell<T> {
         }
     }
 
-    private final ObjectProperty<S> rowItem = new SimpleObjectProperty<>(this, "rowItem");
+    private S rowItemValue = null;
+    private ObjectProperty<S> rowItem;
 
     public final S getRowItem() {
-        return rowItem.get();
+        return rowItem == null ? rowItemValue : rowItem.get();
     }
 
     /**
@@ -111,11 +112,19 @@ public class GridTableCell<S, T> extends Cell<T> {
      * @return the row item property
      */
     public final ObjectProperty<S> rowItemProperty() {
+        if (rowItem == null) {
+            rowItem = new SimpleObjectProperty<>(this, "rowItem", rowItemValue);
+            rowItemValue = null;
+        }
         return rowItem;
     }
 
     public final void setRowItem(S rowItem) {
-        this.rowItem.set(rowItem);
+        if (this.rowItem == null) {
+            rowItemValue = rowItem;
+        } else {
+            this.rowItem.set(rowItem);
+        }
     }
 
     private final IntegerProperty index = new SimpleIntegerProperty(this, "index");
@@ -137,10 +146,11 @@ public class GridTableCell<S, T> extends Cell<T> {
         this.index.set(index);
     }
 
-    private final ObjectProperty<GridTableColumn<S, T>> column = new SimpleObjectProperty<>(this, "column");
+    private GridTableColumn<S, T> columnValue = null;
+    private ObjectProperty<GridTableColumn<S, T>> column;
 
     public final GridTableColumn getColumn() {
-        return column.get();
+        return column == null ? columnValue : column.get();
     }
 
     /**
@@ -149,11 +159,19 @@ public class GridTableCell<S, T> extends Cell<T> {
      * @return the column property
      */
     public final ObjectProperty<GridTableColumn<S, T>> columnProperty() {
+        if (column == null) {
+            column = new SimpleObjectProperty<>(this, "column", columnValue);
+            columnValue = null;
+        }
         return column;
     }
 
     final void setColumn(GridTableColumn column) {
-        this.column.set(column);
+        if (this.column == null) {
+            columnValue = column;
+        } else {
+            this.column.set(column);
+        }
     }
 
 

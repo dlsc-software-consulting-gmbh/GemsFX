@@ -128,10 +128,11 @@ public class TextView extends Control {
     }
 
 
-    private final BooleanProperty disableTextSelectionByMouseClicks = new SimpleBooleanProperty(this, "disableTextSelectionByMouseClicks", false);
+    private boolean disableTextSelectionByMouseClicksValue = false;
+    private BooleanProperty disableTextSelectionByMouseClicks;
 
     public final boolean isDisableTextSelectionByMouseClicks() {
-        return disableTextSelectionByMouseClicks.get();
+        return disableTextSelectionByMouseClicks == null ? disableTextSelectionByMouseClicksValue : disableTextSelectionByMouseClicks.get();
     }
 
     /**
@@ -141,11 +142,18 @@ public class TextView extends Control {
      * @return the "disable selection by mouse clicks" property
      */
     public final BooleanProperty disableTextSelectionByMouseClicksProperty() {
+        if (disableTextSelectionByMouseClicks == null) {
+            disableTextSelectionByMouseClicks = new SimpleBooleanProperty(this, "disableTextSelectionByMouseClicks", disableTextSelectionByMouseClicksValue);
+        }
         return disableTextSelectionByMouseClicks;
     }
 
     public final void setDisableTextSelectionByMouseClicks(boolean disableTextSelectionByMouseClicks) {
-        this.disableTextSelectionByMouseClicks.set(disableTextSelectionByMouseClicks);
+        if (this.disableTextSelectionByMouseClicks == null) {
+            disableTextSelectionByMouseClicksValue = disableTextSelectionByMouseClicks;
+        } else {
+            this.disableTextSelectionByMouseClicks.set(disableTextSelectionByMouseClicks);
+        }
     }
 
     /**
