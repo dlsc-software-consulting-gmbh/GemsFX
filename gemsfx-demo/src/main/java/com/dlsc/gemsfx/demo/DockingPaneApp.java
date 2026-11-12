@@ -43,6 +43,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -478,7 +479,8 @@ public class DockingPaneApp extends GemApplication {
         editor.getContent().getStyleClass().add("docking-demo-code");
         editor.getContent().setAccessibleText("MissionControl.java editor");
         TextArea text = (TextArea) editor.getContent();
-        CheckBox wrap = new CheckBox("Wrap");
+        ToggleButton wrap = new ToggleButton("", createIcon(MaterialDesign.MDI_WRAP));
+        wrap.getStyleClass().add("docking-demo-tab-action");
         wrap.setFocusTraversable(false);
         wrap.setAccessibleText("Wrap text");
         wrap.setTooltip(new Tooltip("Wrap text"));
@@ -533,7 +535,7 @@ public class DockingPaneApp extends GemApplication {
 
     private Button createTabToolbarButton(Ikon icon, String description, Runnable action) {
         Button button = new Button("", createIcon(icon));
-        button.setPadding(new Insets(2));
+        button.getStyleClass().add("docking-demo-tab-action");
         button.setFocusTraversable(false);
         button.setAccessibleText(description);
         button.setTooltip(new Tooltip(description));

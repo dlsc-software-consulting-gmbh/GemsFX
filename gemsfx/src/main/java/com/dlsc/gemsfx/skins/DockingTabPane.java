@@ -49,6 +49,9 @@ final class DockingTabPane extends VBox {
 
         strip.getStyleClass().add("docking-tab-strip");
         contentArea.getStyleClass().add("docking-tab-content");
+        contentArea.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> activateSelectedDockable());
+        addEventFilter(MouseEvent.MOUSE_RELEASED, this::activateFromHeaderOrBackground);
+        addEventFilter(MouseEvent.MOUSE_CLICKED, this::activateFromHeaderOrBackground);
         VBox.setVgrow(contentArea, Priority.ALWAYS);
 
         for (String id : ids) {
@@ -66,6 +69,29 @@ final class DockingTabPane extends VBox {
             strip.getChildren().get(strip.getChildren().size() - 1).pseudoClassStateChanged(LAST_TAB, true);
         }
         getChildren().addAll(strip, contentArea);
+    }
+
+    /**
+     * Activates on a completed click before header controls handle the release. Unselected titles
+     * retain their own selection and drag behavior, and content clicks are handled on press.
+     */
+    private void activateFromHeaderOrBackground(MouseEvent event) {
+        if (!event.isStillSincePress() || !(event.getTarget() instanceof Node)) {
+            return;
+        }
+        for (Node node = (Node) event.getTarget(); node != null && node != this; node = node.getParent()) {
+            if (node == contentArea || (node.getParent() == strip && node != titleOf(selectedId))) {
+                return;
+            }
+        }
+        activateSelectedDockable();
+    }
+
+    private void activateSelectedDockable() {
+        Dockable active = dockingPane.getActiveDockable();
+        if (active == null || !selectedId.equals(active.getId())) {
+            dockingPane.selectDockable(selectedId);
+        }
     }
 
     void updateSelection(String id) {

@@ -17,13 +17,14 @@ import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -43,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -129,7 +131,7 @@ public class DockingPaneAppTest {
             Dockable editor = app.createDockable("editor").orElseThrow();
             Dockable copy = app.createSidebarDockable("editor");
             TextArea text = (TextArea) editor.getContent();
-            CheckBox wrap = (CheckBox) editor.getToolbar();
+            ToggleButton wrap = assertInstanceOf(ToggleButton.class, editor.getToolbar());
             assertNotNull(wrap);
             assertEquals("Wrap text", wrap.getAccessibleText());
             assertTrue(!editor.getMenuItems().isEmpty(), "Editor should offer a wrapping action");
@@ -200,6 +202,55 @@ public class DockingPaneAppTest {
             navigator.getMenuItems().get(1).fire();
             assertTrue(!tree.getRoot().isExpanded());
             tree.getRoot().getChildren().forEach(item -> assertTrue(!item.isExpanded()));
+        });
+    }
+
+    @Test
+    public void dockableToolbarActionsMatchHeaderIconsInBothThemes() throws Exception {
+        runFx(() -> {
+            for (boolean atlanta : List.of(false, true)) {
+                DockingPaneApp app = new DockingPaneApp();
+                DockingContext context = new DockingContext(app::createDockable, pane -> new Stage());
+                DockingPane pane = context.createPane();
+                for (String id : List.of("navigator", "editor", "console")) {
+                    context.openDockable(pane, id, DockingPosition.CENTER).orElseThrow().setOnHelp(() -> {});
+                }
+                StackPane root = new StackPane(pane);
+                root.getStyleClass().add("docking-demo-app");
+                String stylesheet = atlanta ? "docking-pane-app-atlantafx.css" : "docking-pane-app.css";
+                root.getStylesheets().add(DockingPaneApp.class.getResource(stylesheet).toExternalForm());
+                Scene scene = new Scene(root, 800, 600);
+                if (atlanta) {
+                    scene.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
+                    GemsFXAtlantaFX.applyTo(scene);
+                } else {
+                    scene.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+                }
+
+                for (String id : List.of("navigator", "editor", "console")) {
+                    pane.selectDockable(id);
+                    root.applyCss();
+                    root.layout();
+                    Dockable dockable = pane.getActiveDockable();
+                    List<ButtonBase> actions = dockable.getToolbar() instanceof HBox
+                            ? ((HBox) dockable.getToolbar()).getChildren().stream().map(ButtonBase.class::cast).toList()
+                            : List.of((ButtonBase) dockable.getToolbar());
+                    FontIcon helpIcon = (FontIcon) ((Button) pane.lookup(".docking-tab:selected .docking-tab-help-button")).getGraphic();
+                    for (ButtonBase action : actions) {
+                        assertTrue(action.getText() == null || action.getText().isEmpty());
+                        FontIcon icon = assertInstanceOf(FontIcon.class, action.getGraphic());
+                        assertEquals(12, icon.getIconSize());
+                        assertEquals(helpIcon.getIconColor(), icon.getIconColor());
+                        for (String state : List.of("hover", "pressed", "selected")) {
+                            action.pseudoClassStateChanged(PseudoClass.getPseudoClass(state), true);
+                            root.applyCss();
+                            assertTrue(action.getBackground() == null || action.getBackground().getFills().stream()
+                                    .allMatch(fill -> Color.TRANSPARENT.equals(fill.getFill())));
+                            action.pseudoClassStateChanged(PseudoClass.getPseudoClass(state), false);
+                        }
+                    }
+                }
+            }
         });
     }
 

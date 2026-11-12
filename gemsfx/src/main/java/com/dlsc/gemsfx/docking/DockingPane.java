@@ -84,7 +84,7 @@ public class DockingPane extends Control {
 
     /**
      * The currently active dockable of this pane, or {@code null}.
-     * Focusing a dockable's content or tab makes it active. If another dockable is activated
+     * Clicking or focusing a dockable's content or tab makes it active. If another dockable is activated
      * while focus is in a different dockable in this pane, focus moves to the newly active
      * dockable's content, or to its tab if the content has no focusable node. Focus outside
      * this pane is left unchanged.

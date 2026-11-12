@@ -43,6 +43,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.lang.reflect.Method;
 
 import static org.junit.Assert.*;
@@ -669,6 +670,118 @@ public class DockingPaneTest extends FxTestBase {
         } finally {
             runFx(() -> ((Stage) pane.getScene().getWindow()).close());
         }
+    }
+
+    @Test
+    public void clickingNonFocusableContentActivatesDockableAndMovesFocus() {
+        DockingPane pane = invoke(() -> {
+            Label clicked = new Label("Non-focusable content");
+            clicked.setId("clicked-content");
+            DockingContext context = context(
+                    new Dockable("a", "A", new StackPane(clicked)),
+                    new Dockable("b", "B", new TextField()));
+            DockingPane result = context.createPane();
+            context.openDockable(result, "a", DockingPosition.CENTER);
+            context.openDockable(result, "b", DockingPosition.RIGHT);
+            layout(result);
+            Stage stage = (Stage) result.getScene().getWindow();
+            stage.show();
+            stage.requestFocus();
+            return result;
+        });
+        try {
+            waitForFxEvents();
+            runFx(() -> {
+                Node second = pane.getActiveDockable().getContent();
+                second.requestFocus();
+                assertSame(second, pane.getScene().getFocusOwner());
+                Node content = pane.lookup("#clicked-content");
+                AtomicInteger presses = new AtomicInteger();
+                content.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> presses.incrementAndGet());
+
+                mouse(content, MouseEvent.MOUSE_PRESSED, true);
+
+                assertEquals("a", pane.getActiveDockable().getId());
+                assertSame(title(pane, "a"), pane.getScene().getFocusOwner());
+                assertEquals(1, presses.get());
+            });
+        } finally {
+            runFx(() -> ((Stage) pane.getScene().getWindow()).close());
+        }
+    }
+
+    @Test
+    public void clickingEmptyContentAreaActivatesItsSelectedDockable() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.RIGHT);
+            layout(pane);
+            Node group = title(pane, "a").getParent().getParent();
+            Node contentArea = group.lookup(".docking-tab-content");
+
+            mouse(contentArea, MouseEvent.MOUSE_PRESSED, true);
+
+            assertEquals("a", pane.getActiveDockable().getId());
+        });
+    }
+
+    @Test
+    public void clickingSelectedHeaderActionActivatesItsDockableWithoutConsumingTheClick() {
+        runFx(() -> {
+            Dockable first = dockable("a");
+            first.setOnHelp(() -> {});
+            DockingContext context = context(first, dockable("b"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.RIGHT);
+            layout(pane);
+            Node help = title(pane, "a").lookup(".docking-tab-help-button");
+            AtomicInteger clicks = new AtomicInteger();
+            help.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> clicks.incrementAndGet());
+
+            mouse(help, MouseEvent.MOUSE_CLICKED, true);
+
+            assertEquals("a", pane.getActiveDockable().getId());
+            assertEquals(1, clicks.get());
+        });
+    }
+
+    @Test
+    public void selectedHeaderActionObservesItsDockableAsActive() {
+        runFx(() -> {
+            Dockable first = dockable("a");
+            DockingContext context = context(first, dockable("b"));
+            DockingPane pane = context.createPane();
+            AtomicReference<Dockable> activeDuringHelp = new AtomicReference<>();
+            first.setOnHelp(() -> activeDuringHelp.set(pane.getActiveDockable()));
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.RIGHT);
+            layout(pane);
+            Node help = title(pane, "a").lookup(".docking-tab-help-button");
+
+            mouse(help, MouseEvent.MOUSE_PRESSED, true);
+            mouse(help, MouseEvent.MOUSE_RELEASED, true);
+
+            assertSame(first, activeDuringHelp.get());
+        });
+    }
+
+    @Test
+    public void clickingTabGroupBackgroundActivatesItsSelectedDockable() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.RIGHT);
+            layout(pane);
+            Node group = title(pane, "a").getParent().getParent();
+
+            mouse(group, MouseEvent.MOUSE_CLICKED, true);
+
+            assertEquals("a", pane.getActiveDockable().getId());
+        });
     }
 
     @Test

@@ -329,7 +329,7 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                     "ENTER or SPACE selects the focused title, DELETE or shortcut+W requests close."
                 ),
                 Para(
-                    "Focusing a dockable's content or title makes it active. If another dockable is "
+                    "Clicking or focusing a dockable's content or title makes it active. If another dockable is "
                     "activated while focus is in a dockable, focus moves into the newly active content "
                     "or, if it has no focusable node, to its title. Focus outside the pane is unchanged."
                 ),
