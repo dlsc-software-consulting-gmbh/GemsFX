@@ -105,7 +105,6 @@ public class DockingTab extends HBox {
         label.getStyleClass().add("docking-tab-title");
         label.setMnemonicParsing(false);
         label.setMinWidth(0);
-        label.setMaxWidth(Double.MAX_VALUE);
         fillAvailableHeight(label);
         HBox.setHgrow(label, Priority.ALWAYS);
         return label;
