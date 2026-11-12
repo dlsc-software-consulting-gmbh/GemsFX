@@ -95,7 +95,7 @@ public class DockingContext {
      * a fresh, unparented, non-null node on every invocation. Changing the factory refreshes existing
      * tabs in all panes of this context, including floating panes.
      * <p>
-     * The workspace applies the {@code docking-tab} and {@code selected} style classes, accessibility,
+     * The workspace applies the {@code docking-tab} style class, the {@code selected} pseudo-class, accessibility,
      * keyboard actions, and docking drag handlers to the returned node. A custom header supplies its own
      * close button, if desired, invoking {@link #requestCloseDockable(Dockable)}.
      *

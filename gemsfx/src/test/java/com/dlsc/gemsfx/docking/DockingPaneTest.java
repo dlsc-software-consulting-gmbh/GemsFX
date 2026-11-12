@@ -639,6 +639,38 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     @Test
+    public void tabSelectionUsesPseudoClassForDefaultAndCustomHeaders() {
+        runFx(() -> {
+            PseudoClass selected = PseudoClass.getPseudoClass("selected");
+            for (boolean custom : List.of(false, true)) {
+                DockingContext context = context(dockable("a"), dockable("b"));
+                if (custom) {
+                    context.setTabFactory(dockable -> new Label(dockable.getTitle()));
+                }
+                DockingPane pane = context.createPane();
+                context.openDockable(pane, "a", DockingPosition.CENTER);
+                context.openDockable(pane, "b", DockingPosition.CENTER);
+                layout(pane);
+
+                Node first = title(pane, "a");
+                Node second = title(pane, "b");
+                assertFalse(first.getPseudoClassStates().contains(selected));
+                assertTrue(second.getPseudoClassStates().contains(selected));
+                assertFalse(first.getStyleClass().contains("selected"));
+                assertFalse(second.getStyleClass().contains("selected"));
+
+                pane.selectDockable("a");
+                assertSame(first, title(pane, "a"));
+                assertSame(second, title(pane, "b"));
+                assertTrue(first.getPseudoClassStates().contains(selected));
+                assertFalse(second.getPseudoClassStates().contains(selected));
+                assertFalse(first.getStyleClass().contains("selected"));
+                assertFalse(second.getStyleClass().contains("selected"));
+            }
+        });
+    }
+
+    @Test
     public void customTabHeadersKeepSelectionKeyboardActionsAndAccessibility() {
         runFx(() -> {
             Dockable first = dockable("a");
@@ -659,11 +691,11 @@ public class DockingPaneTest extends FxTestBase {
             assertSame(first, pane.getActiveDockable());
             assertSame(header, title(pane, "a"));
             assertSame(pane.lookup(".docking-tab-content"), first.getContent().getParent());
-            assertTrue(title(pane, "a").getStyleClass().contains("selected"));
+            assertTrue(title(pane, "a").getPseudoClassStates().contains(PseudoClass.getPseudoClass("selected")));
             press(title(pane, "a"), KeyCode.RIGHT);
             assertEquals("b", pane.getActiveDockable().getId());
             assertSame(header, title(pane, "a"));
-            assertFalse(header.getStyleClass().contains("selected"));
+            assertFalse(header.getPseudoClassStates().contains(PseudoClass.getPseudoClass("selected")));
             assertNull(first.getContent().getParent());
             press(title(pane, "a"), KeyCode.DELETE);
             assertEquals(List.of("b"), ((DockingLayoutNode.Tabs) pane.getLayoutRoot()).getDockableIds());

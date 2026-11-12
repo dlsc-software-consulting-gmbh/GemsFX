@@ -2902,16 +2902,16 @@
     -fx-icon-color: -color-fg-default;
 }
 
-.docking-pane .docking-tab.selected {
+.docking-pane .docking-tab:selected {
     -fx-background-color: -color-bg-default;
     -fx-border-color: transparent -color-border-default transparent transparent;
 }
 
-.docking-pane .docking-tab.selected .docking-tab-title {
+.docking-pane .docking-tab:selected .docking-tab-title {
     -fx-text-fill: -color-fg-emphasis;
 }
 
-.docking-pane .docking-tab.selected .docking-tab-title .ikonli-font-icon {
+.docking-pane .docking-tab:selected .docking-tab-title .ikonli-font-icon {
     -fx-icon-color: -color-fg-emphasis;
 }
 
@@ -2938,12 +2938,12 @@
     -fx-icon-color: -color-fg-default;
 }
 
-.docking-pane .docking-tab.selected .docking-tab-close-button .icon {
+.docking-pane .docking-tab:selected .docking-tab-close-button .icon {
     -fx-background-color: -color-fg-emphasis;
 }
 
-.docking-pane .docking-tab.selected .docking-tab-help-button .ikonli-font-icon,
-.docking-pane .docking-tab.selected .docking-tab-menu-button .ikonli-font-icon {
+.docking-pane .docking-tab:selected .docking-tab-help-button .ikonli-font-icon,
+.docking-pane .docking-tab:selected .docking-tab-menu-button .ikonli-font-icon {
     -fx-icon-color: -color-fg-emphasis;
 }
 

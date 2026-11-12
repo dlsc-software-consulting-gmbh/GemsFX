@@ -87,9 +87,10 @@ public class DockingPaneAppTest {
                 assertNotEquals(rocket.getIconColor(), target.getIconColor());
 
                 DockingPane pane = (DockingPane) root.lookup(".docking-pane");
-                Region selected = (Region) pane.lookup(".docking-tab.selected");
+                Region selected = (Region) pane.lookup(".docking-tab:selected");
                 Region unselected = (Region) pane.lookupAll(".docking-tab").stream()
-                        .filter(tab -> !tab.getStyleClass().contains("selected")).findFirst().orElseThrow();
+                        .filter(tab -> !tab.getPseudoClassStates().contains(PseudoClass.getPseudoClass("selected")))
+                        .findFirst().orElseThrow();
                 assertNotEquals(selected.getBackground().getFills().getFirst().getFill(),
                         unselected.getBackground().getFills().getFirst().getFill());
                 Region group = (Region) pane.lookup(".docking-tab-pane");
@@ -393,9 +394,9 @@ public class DockingPaneAppTest {
                         ((FontIcon) drag.getGraphic()).getIconColor());
                 assertEquals(Color.web(id.equals("drop") ? "#abcdef" : "#654321"),
                         ((FontIcon) drop.getGraphic()).getIconColor());
-                Region closeIcon = (Region) pane.lookup(".docking-tab.selected .docking-tab-close-button .icon");
+                Region closeIcon = (Region) pane.lookup(".docking-tab:selected .docking-tab-close-button .icon");
                 assertEquals(Color.web("#abcdef"), closeIcon.getBackground().getFills().getFirst().getFill());
-                MenuButton menu = (MenuButton) pane.lookup(".docking-tab.selected .docking-tab-menu-button");
+                MenuButton menu = (MenuButton) pane.lookup(".docking-tab:selected .docking-tab-menu-button");
                 for (boolean showing : List.of(false, true)) {
                     menu.pseudoClassStateChanged(PseudoClass.getPseudoClass("showing"), showing);
                     root.applyCss();

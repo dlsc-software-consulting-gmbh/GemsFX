@@ -126,7 +126,7 @@
     -fx-border-color: transparent -fx-box-border -fx-box-border transparent;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected {
+.docking-demo-app .docking-pane .docking-tab:selected {
     -fx-background-color: derive(-fx-base, -65%);
 }
 
@@ -138,17 +138,17 @@
     -fx-icon-color: -fx-text-base-color;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected .docking-tab-title {
+.docking-demo-app .docking-pane .docking-tab:selected .docking-tab-title {
     -fx-text-fill: -fx-light-text-color;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected .docking-tab-title .ikonli-font-icon,
-.docking-demo-app .docking-pane .docking-tab.selected .docking-tab-help-button .ikonli-font-icon,
-.docking-demo-app .docking-pane .docking-tab.selected .docking-tab-menu-button .ikonli-font-icon {
+.docking-demo-app .docking-pane .docking-tab:selected .docking-tab-title .ikonli-font-icon,
+.docking-demo-app .docking-pane .docking-tab:selected .docking-tab-help-button .ikonli-font-icon,
+.docking-demo-app .docking-pane .docking-tab:selected .docking-tab-menu-button .ikonli-font-icon {
     -fx-icon-color: -fx-light-text-color;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected .docking-tab-close-button .icon {
+.docking-demo-app .docking-pane .docking-tab:selected .docking-tab-close-button .icon {
     -fx-background-color: -fx-light-text-color;
 }
 
@@ -169,7 +169,7 @@
     -fx-border-color: transparent transparent -fx-text-base-color transparent;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected .docking-demo-tab-action:selected {
+.docking-demo-app .docking-pane .docking-tab:selected .docking-demo-tab-action:selected {
     -fx-border-color: transparent transparent -fx-light-text-color transparent;
 }
 
@@ -178,7 +178,7 @@
     -fx-icon-color: -fx-text-base-color;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected .docking-demo-tab-action .ikonli-font-icon {
+.docking-demo-app .docking-pane .docking-tab:selected .docking-demo-tab-action .ikonli-font-icon {
     -fx-icon-color: -fx-light-text-color;
 }
 

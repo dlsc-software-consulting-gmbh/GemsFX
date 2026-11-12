@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.docking;
 import com.dlsc.gemsfx.FxTestBase;
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import javafx.animation.PauseTransition;
+import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Bounds;
@@ -484,7 +485,7 @@ public class DockingContextWindowTest extends FxTestBase {
                     assertSame("Selection must retain the hovered tab header", tab, title(pane, id));
                     assertSame(otherGroupTitle, title(pane, "c"));
                     assertEquals(id, pane.getActiveDockable().getId());
-                    assertTrue(tab.getStyleClass().contains("selected"));
+                    assertTrue(tab.getPseudoClassStates().contains(PseudoClass.getPseudoClass("selected")));
                     assertEquals(1, actions.getOpacity(), 0);
                     assertSame(tab.getParent().getParent(),
                             pane.getActiveDockable().getContent().getParent().getParent());

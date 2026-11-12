@@ -38,7 +38,8 @@ import java.util.Objects;
 /**
  * Default docking tab header, displaying a dockable's title, graphic, optional toolbar, actions menu and help button,
  * and close button.
- * Selection, keyboard navigation, and docking drag-and-drop are installed by the workspace.
+ * Selection, keyboard navigation, and docking drag-and-drop are installed by the workspace. Selected headers
+ * have the {@code selected} pseudo-class.
  * Applications can create or subclass this header in a {@link DockingContext#tabFactoryProperty() tab factory}.
  * Double-clicking edits the title when {@link Dockable#titleEditableProperty()} permits it.
  * Enter or focus loss commits a nonblank title; Escape cancels the edit.

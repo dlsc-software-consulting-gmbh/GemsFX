@@ -45,7 +45,7 @@
     -fx-border-width: 1 0 1 1;
 }
 
-.docking-pane .docking-tab.selected {
+.docking-pane .docking-tab:selected {
     -fx-background-color: -fx-control-inner-background;
 }
 
@@ -57,7 +57,7 @@
     -fx-graphic-text-gap: 6;
 }
 
-.docking-pane .docking-tab.selected .docking-tab-title {
+.docking-pane .docking-tab:selected .docking-tab-title {
     -fx-font-weight: bold;
 }
 
@@ -66,7 +66,7 @@
     -fx-background-insets: 0;
 }
 
-.docking-pane .docking-tab.selected .docking-tab-title-editor {
+.docking-pane .docking-tab:selected .docking-tab-title-editor {
     -fx-font-weight: bold;
 }
 

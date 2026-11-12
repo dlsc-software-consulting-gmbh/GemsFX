@@ -442,6 +442,7 @@ if (!result.getUnresolvedDockableIds().isEmpty()) {
                         ["<font face='Courier'>.docking-pane</font>", "Control root background and border."],
                         ["<font face='Courier'>.docking-tab-strip</font>", "Tab strip container and spacing."],
                         ["<font face='Courier'>.docking-tab</font>", "Custom title tab shape and hover/selected visuals."],
+                        ["<font face='Courier'>.docking-tab:selected</font>", "The selected tab in each tab group."],
                         ["<font face='Courier'>.docking-tab-actions</font>", "Shared fading container for the toolbar, help, menu, and close controls."],
                         ["<font face='Courier'>.docking-tab-help-button</font>", "Help action supplied by the dockable's onHelp callback."],
                         ["<font face='Courier'>.docking-tab-menu-button</font>", "Menu populated from the dockable's menuItems list."],
@@ -474,7 +475,7 @@ if (!result.getUnresolvedDockableIds().isEmpty()) {
                     caption="Keep minimum and maximum heights tied to the font-scaled preferred height.",
                 ),
                 Code(
-                    ".docking-pane .docking-tab.selected .docking-tab-title {\n"
+                    ".docking-pane .docking-tab:selected .docking-tab-title {\n"
                     "    -fx-font-weight: bold;\n"
                     "}\n"
                     ".docking-pane .docking-drop-zone-preview {\n"

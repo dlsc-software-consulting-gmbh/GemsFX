@@ -32,6 +32,7 @@ final class DockingTabPane extends VBox {
 
     static final String DOCKABLE_ID_KEY = "docking.dockable-id";
     private static final PseudoClass LAST_TAB = PseudoClass.getPseudoClass("last-tab");
+    private static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
     private static final Object TITLE_ACCESSIBLE_TEXT_BINDING_KEY = new Object();
 
     private final DockingPane dockingPane;
@@ -73,10 +74,7 @@ final class DockingTabPane extends VBox {
         }
         selectedId = id;
         for (Node title : strip.getChildren()) {
-            title.getStyleClass().remove("selected");
-            if (id.equals(title.getProperties().get(DOCKABLE_ID_KEY))) {
-                title.getStyleClass().add("selected");
-            }
+            title.pseudoClassStateChanged(SELECTED, id.equals(title.getProperties().get(DOCKABLE_ID_KEY)));
         }
         Dockable dockable = find(dockingPane, id);
         if (dockable == null) {
@@ -106,11 +104,7 @@ final class DockingTabPane extends VBox {
         if (!title.getStyleClass().contains("docking-tab")) {
             title.getStyleClass().add("docking-tab");
         }
-        if (selected) {
-            title.getStyleClass().add("selected");
-        } else {
-            title.getStyleClass().remove("selected");
-        }
+        title.pseudoClassStateChanged(SELECTED, selected);
         if (title instanceof Region) {
             Region region = (Region) title;
             region.setMinWidth(0);

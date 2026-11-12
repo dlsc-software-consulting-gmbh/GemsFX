@@ -106,7 +106,7 @@
     -fx-border-color: transparent -color-neutral-emphasis-plus -color-neutral-emphasis-plus transparent;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected {
+.docking-demo-app .docking-pane .docking-tab:selected {
     -fx-background-color: -color-neutral-emphasis;
     -fx-border-color: transparent -color-neutral-emphasis-plus -color-neutral-emphasis-plus transparent;
 }
@@ -115,7 +115,7 @@
     -fx-border-color: -color-accent-emphasis -color-neutral-emphasis-plus -color-neutral-emphasis-plus -color-accent-emphasis;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected .docking-tab-title {
+.docking-demo-app .docking-pane .docking-tab:selected .docking-tab-title {
     -fx-text-fill: -color-fg-emphasis;
 }
 
@@ -123,7 +123,7 @@
     -fx-icon-color: -color-fg-default;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected .docking-tab-title .ikonli-font-icon {
+.docking-demo-app .docking-pane .docking-tab:selected .docking-tab-title .ikonli-font-icon {
     -fx-icon-color: -color-fg-emphasis;
 }
 
@@ -144,7 +144,7 @@
     -fx-border-color: transparent transparent -color-fg-default transparent;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected .docking-demo-tab-action:selected {
+.docking-demo-app .docking-pane .docking-tab:selected .docking-demo-tab-action:selected {
     -fx-border-color: transparent transparent -color-fg-emphasis transparent;
 }
 
@@ -153,7 +153,7 @@
     -fx-icon-color: -color-fg-default;
 }
 
-.docking-demo-app .docking-pane .docking-tab.selected .docking-demo-tab-action .ikonli-font-icon {
+.docking-demo-app .docking-pane .docking-tab:selected .docking-demo-tab-action .ikonli-font-icon {
     -fx-icon-color: -color-fg-emphasis;
 }
 
