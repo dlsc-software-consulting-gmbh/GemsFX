@@ -2,18 +2,89 @@ package com.dlsc.gemsfx.docking;
 
 import com.dlsc.gemsfx.FxTestBase;
 
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.PickResult;
+import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
 public class DockingContextTest extends FxTestBase {
+
+    @Test
+    public void dockingDecisionLogsExplainAcceptedAndRejectedMoves() {
+        Logger logger = Logger.getLogger(DockingContext.class.getName());
+        Level previousLevel = logger.getLevel();
+        List<String> messages = new ArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                messages.add(record.getMessage());
+            }
+
+            @Override
+            public void flush() {
+            }
+
+            @Override
+            public void close() {
+            }
+        };
+        logger.setLevel(Level.FINE);
+        handler.setLevel(Level.FINE);
+        logger.addHandler(handler);
+        try {
+            runFx(() -> {
+                DockingContext context = new DockingContext(
+                        id -> Optional.of(new Dockable(id, id, new Label(id))), STAGE_FACTORY);
+                DockingPane pane = context.createPane();
+                context.openDockable(pane, "a", DockingPosition.CENTER);
+                context.openDockable(pane, "b", DockingPosition.CENTER);
+
+                assertFalse(context.canMoveDockable(pane, "missing", "a", DockingPosition.LEFT));
+                assertFalse(context.canMoveTabGroup(pane, "a", "b", DockingPosition.CENTER));
+                assertTrue(context.canMoveDockable(pane, "a", "b", DockingPosition.LEFT));
+                assertFalse(context.canMoveDockableToPaneEdge(pane, "a", DockingPosition.CENTER));
+
+                DragEvent event = new DragEvent(DragEvent.DRAG_DROPPED, null, 100, 100, 100, 100,
+                        TransferMode.COPY, new Group(), null, new PickResult(null, 100, 100));
+                assertFalse(context.canAcceptDockableDrop(event));
+                assertTrue(context.dropDockable(pane, event, "absent", DockingPosition.LEFT).isEmpty());
+                context.setDockableDropFactory(candidate -> null);
+                context.setDockableDropPredicate(candidate -> false);
+                assertTrue(context.dropDockable(pane, event, "b", DockingPosition.CENTER).isEmpty());
+                context.setDockableDropPredicate(candidate -> true);
+                assertTrue(context.dropDockable(pane, event, "b", DockingPosition.CENTER).isEmpty());
+                context.setDockableDropFactory(candidate -> new Dockable("dropped", "Dropped", new Label()));
+                assertTrue(context.dropDockable(pane, event, "b", DockingPosition.CENTER).isPresent());
+            });
+            assertTrue(messages.toString(), messages.stream().anyMatch(m -> m.contains("missing") && m.contains("not open")));
+            assertTrue(messages.toString(), messages.stream().anyMatch(m -> m.contains("a") && m.contains("b") && m.contains("same tab group")));
+            assertTrue(messages.toString(), messages.stream().anyMatch(m -> m.contains("a") && m.contains("b") && m.contains("LEFT") && m.contains("allowed")));
+            assertTrue(messages.toString(), messages.stream().anyMatch(m -> m.contains("pane edge") && m.contains("CENTER") && m.contains("position must be a pane edge")));
+            assertTrue(messages.toString(), messages.stream().anyMatch(m -> m.contains("external drag") && m.contains("no drop factory")));
+            assertTrue(messages.toString(), messages.stream().anyMatch(m -> m.contains("absent") && m.contains("not present")));
+            assertTrue(messages.toString(), messages.stream().anyMatch(m -> m.contains("predicate rejected")));
+            assertTrue(messages.toString(), messages.stream().anyMatch(m -> m.contains("factory declined")));
+            assertTrue(messages.toString(), messages.stream().anyMatch(m -> m.contains("dropped") && m.contains("created and inserted")));
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(previousLevel);
+        }
+    }
 
     private static final DockingStageFactory STAGE_FACTORY = pane -> {
         Stage stage = new Stage();

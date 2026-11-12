@@ -23,12 +23,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 /**
  * Owns the factories and the pane membership of a docking setup and enforces dockable ID uniqueness across all of its
  * panes. All model changes must happen on the JavaFX application thread.
+ * Docking decisions are logged at {@link java.util.logging.Level#FINE FINE} level using this class's logger.
  */
 public class DockingContext {
+
+    private static final Logger LOG = Logger.getLogger(DockingContext.class.getName());
 
     private final DockableFactory dockableFactory;
     private final DockingStageFactory stageFactory;
@@ -155,7 +159,12 @@ public class DockingContext {
      */
     public final boolean canAcceptDockableDrop(DragEvent event) {
         Objects.requireNonNull(event, "event must not be null");
-        return dockableDropFactory != null && dockableDropPredicate.test(event);
+        if (dockableDropFactory == null) {
+            return logDecision("external drag", null, null, null, null, false, "no drop factory is configured");
+        }
+        boolean accepted = dockableDropPredicate.test(event);
+        return logDecision("external drag", null, null, null, null, accepted,
+                accepted ? "drop predicate accepted the event" : "drop predicate rejected the event");
     }
 
     /**
@@ -173,20 +182,35 @@ public class DockingContext {
                                                 String targetId, DockingPosition position) {
         requireFxThread();
         Objects.requireNonNull(event, "event must not be null");
-        if (pane == null || pane.getDockingContext() != this || !paneIdByPane.containsKey(pane)
-                || position == null
-                || (targetId != null && !pane.canInsertRelativeTo(targetId, position))
-                || (targetId == null && position == DockingPosition.CENTER
-                    && !(pane.getLayoutRoot() instanceof DockingLayoutNode.Empty))
-                || !canAcceptDockableDrop(event)) {
+        if (pane == null || pane.getDockingContext() != this || !paneIdByPane.containsKey(pane)) {
+            logDecision("external drop", pane, null, targetId, position, false, "destination pane is missing or not attached to this context");
+            return Optional.empty();
+        }
+        if (position == null) {
+            logDecision("external drop", pane, null, targetId, position, false, "docking position is missing");
+            return Optional.empty();
+        }
+        if (targetId != null && !pane.canInsertRelativeTo(targetId, position)) {
+            logDecision("external drop", pane, null, targetId, position, false, "target dockable is not present in the destination pane");
+            return Optional.empty();
+        }
+        if (targetId == null && position == DockingPosition.CENTER
+                && !(pane.getLayoutRoot() instanceof DockingLayoutNode.Empty)) {
+            logDecision("external drop", pane, null, null, position, false, "center drop without a target requires an empty pane");
+            return Optional.empty();
+        }
+        if (!canAcceptDockableDrop(event)) {
+            logDecision("external drop", pane, null, targetId, position, false, "external drag was rejected; see preceding decision");
             return Optional.empty();
         }
         Dockable dockable = dockableDropFactory.call(event);
         if (dockable == null) {
+            logDecision("external drop", pane, null, targetId, position, false, "drop factory declined to create a dockable");
             return Optional.empty();
         }
         String id = dockable.getId();
         if (dockablesById.containsKey(id)) {
+            logDecision("external drop", pane, id, targetId, position, false, "dockable ID is already open");
             throw new IllegalStateException("Drop factory returned an already-open dockable ID: " + id);
         }
         dockablesById.put(id, dockable);
@@ -204,8 +228,10 @@ public class DockingContext {
             dockablesById.remove(id);
             dockablePaneById.remove(id);
             dockables.remove(dockable);
+            LOG.fine(() -> "External drop of dockable '" + id + "' failed while inserting: " + ex);
             throw ex;
         }
+        logDecision("external drop", pane, id, targetId, position, true, "dockable was created and inserted");
         return Optional.of(dockable);
     }
 
@@ -245,17 +271,20 @@ public class DockingContext {
         Dockable existing = dockablesById.get(id);
         if (existing != null) {
             dockablePaneById.get(id).selectDockable(id);
+            logDecision("open", dockablePaneById.get(id), id, null, position, true, "dockable was already open and has been selected");
             return Optional.of(existing);
         }
 
         Optional<Dockable> created = Objects.requireNonNull(dockableFactory.create(id),
                 "dockableFactory must not return null");
         if (created.isEmpty()) {
+            logDecision("open", pane, id, null, position, false, "dockable factory could not resolve the ID");
             return Optional.empty();
         }
 
         Dockable dockable = created.get();
         if (!id.equals(dockable.getId())) {
+            logDecision("open", pane, id, null, position, false, "dockable factory returned a different ID: " + dockable.getId());
             throw new IllegalStateException("Factory returned dockable '" + dockable.getId() + "' for requested ID '" + id + "'");
         }
 
@@ -268,8 +297,10 @@ public class DockingContext {
             dockablesById.remove(id);
             dockablePaneById.remove(id);
             dockables.remove(dockable);
+            LOG.fine(() -> "Opening dockable '" + id + "' failed while inserting: " + ex);
             throw ex;
         }
+        logDecision("open", pane, id, null, position, true, "dockable was created and inserted");
         return Optional.of(dockable);
     }
 
@@ -545,20 +576,34 @@ public class DockingContext {
     public final boolean canMoveTabGroup(DockingPane targetPane, String id, String targetId, DockingPosition position) {
         requireFxThread();
         DockingPane source = dockablePaneById.get(id);
-        if (source == null || targetPane == null || targetPane.getDockingContext() != this
-                || !paneIdByPane.containsKey(targetPane) || position == null) {
-            return false;
+        if (source == null) {
+            return logDecision("tab group", targetPane, id, targetId, position, false, "source dockable is not open");
+        }
+        if (targetPane == null || targetPane.getDockingContext() != this || !paneIdByPane.containsKey(targetPane)) {
+            return logDecision("tab group", targetPane, id, targetId, position, false, "destination pane is missing or not attached to this context");
+        }
+        if (position == null) {
+            return logDecision("tab group", targetPane, id, targetId, null, false, "docking position is missing");
         }
         DockingLayoutNode.Tabs group = findTabGroup(source.getLayoutRoot(), id);
         if (targetId == null) {
             if (targetPane.getLayoutRoot() instanceof DockingLayoutNode.Empty) {
-                return true;
+                return logDecision("tab group", targetPane, id, null, position, true, "destination pane is empty");
             }
-            return position != DockingPosition.CENTER
-                    && (source != targetPane || group.getDockableIds().size() < source.getDockables().size());
+            if (position == DockingPosition.CENTER) {
+                return logDecision("tab group", targetPane, id, null, position, false, "center drop without a target requires an empty pane");
+            }
+            if (source == targetPane && group.getDockableIds().size() >= source.getDockables().size()) {
+                return logDecision("tab group", targetPane, id, null, position, false, "the group already occupies the entire pane");
+            }
+            return logDecision("tab group", targetPane, id, null, position, true, "group can move to the pane edge");
         }
-        return !group.getDockableIds().contains(targetId)
-                && canMoveDockable(targetPane, group.getDockableIds().get(0), targetId, position);
+        if (group.getDockableIds().contains(targetId)) {
+            return logDecision("tab group", targetPane, id, targetId, position, false, "target is in the same tab group");
+        }
+        boolean allowed = canMoveDockable(targetPane, group.getDockableIds().get(0), targetId, position);
+        return logDecision("tab group", targetPane, id, targetId, position, allowed,
+                allowed ? "group can move relative to the target" : "target cannot accept the group; see preceding decision");
     }
 
     /**
@@ -615,19 +660,34 @@ public class DockingContext {
     final boolean canMoveDockable(DockingPane targetPane, String draggedId, String targetId, DockingPosition position) {
         requireFxThread();
         if (targetPane == null || targetPane.getDockingContext() != this) {
-            return false;
+            return logDecision("dockable", targetPane, draggedId, targetId, position, false, "destination pane is missing or belongs to another context");
         }
         DockingPane sourcePane = dockablePaneById.get(draggedId);
         if (sourcePane == null) {
-            return false;
+            return logDecision("dockable", targetPane, draggedId, targetId, position, false, "source dockable is not open");
         }
+        boolean allowed;
         if (sourcePane == targetPane) {
-            return targetPane.canMoveInside(draggedId, targetId, position);
+            allowed = targetPane.canMoveInside(draggedId, targetId, position);
+        } else {
+            allowed = draggedId != null
+                    && targetId != null
+                    && !draggedId.equals(targetId)
+                    && targetPane.canInsertRelativeTo(targetId, position);
         }
-        return draggedId != null
-                && targetId != null
-                && !draggedId.equals(targetId)
-                && targetPane.canInsertRelativeTo(targetId, position);
+        String reason;
+        if (allowed) {
+            reason = sourcePane == targetPane ? "valid move within the pane" : "target pane can accept the dockable";
+        } else if (position == null) {
+            reason = "docking position is missing";
+        } else if (targetId == null) {
+            reason = "target dockable ID is missing";
+        } else if (draggedId.equals(targetId)) {
+            reason = "a dockable cannot be docked relative to itself";
+        } else {
+            reason = "target dockable is not present in the destination pane";
+        }
+        return logDecision("dockable", targetPane, draggedId, targetId, position, allowed, reason);
     }
 
     final boolean moveDockable(DockingPane targetPane, String draggedId, String targetId, DockingPosition position) {
@@ -652,13 +712,28 @@ public class DockingContext {
 
     final boolean canMoveDockableToPaneEdge(DockingPane targetPane, String id, DockingPosition edge) {
         requireFxThread();
-        if (targetPane == null || targetPane.getDockingContext() != this || !paneIdByPane.containsKey(targetPane)
-                || edge == null || edge == DockingPosition.CENTER) {
-            return false;
+        if (targetPane == null || targetPane.getDockingContext() != this || !paneIdByPane.containsKey(targetPane)) {
+            return logDecision("pane edge", targetPane, id, null, edge, false, "destination pane is missing or not attached to this context");
+        }
+        if (edge == null || edge == DockingPosition.CENTER) {
+            return logDecision("pane edge", targetPane, id, null, edge, false, "position must be a pane edge");
         }
         DockingPane sourcePane = dockablePaneById.get(id);
-        return sourcePane != null
-                && (sourcePane != targetPane || targetPane.canMoveInsideToPaneEdge(id, edge));
+        if (sourcePane == null) {
+            return logDecision("pane edge", targetPane, id, null, edge, false, "source dockable is not open");
+        }
+        boolean allowed = sourcePane != targetPane || targetPane.canMoveInsideToPaneEdge(id, edge);
+        return logDecision("pane edge", targetPane, id, null, edge, allowed,
+                allowed ? "dockable can move to the pane edge" : "a lone dockable cannot move to its own pane edge");
+    }
+
+    private boolean logDecision(String operation, DockingPane pane, String id, String targetId,
+                                DockingPosition position, boolean allowed, String reason) {
+        LOG.fine(() -> "Docking " + operation + " " + (allowed ? "allowed" : "rejected")
+                + " [dockable=" + id + ", sourcePane=" + paneIdByPane.get(dockablePaneById.get(id))
+                + ", pane=" + (pane == null ? null : paneIdByPane.getOrDefault(pane, "<unattached>"))
+                + ", target=" + targetId + ", position=" + position + "]: " + reason);
+        return allowed;
     }
 
     final boolean moveDockableToPaneEdge(DockingPane targetPane, String id, DockingPosition edge) {
