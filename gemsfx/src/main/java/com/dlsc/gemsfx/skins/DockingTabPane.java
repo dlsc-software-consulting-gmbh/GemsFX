@@ -10,6 +10,8 @@ import javafx.beans.binding.StringBinding;
 import javafx.css.PseudoClass;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
+import javafx.scene.control.ButtonBase;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -48,6 +50,7 @@ final class DockingTabPane extends VBox {
         getStyleClass().add("docking-tab-pane");
 
         strip.getStyleClass().add("docking-tab-strip");
+        strip.addEventFilter(MouseEvent.MOUSE_CLICKED, this::toggleMaximized);
         contentArea.getStyleClass().add("docking-tab-content");
         contentArea.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> activateSelectedDockable());
         addEventFilter(MouseEvent.MOUSE_RELEASED, this::activateFromHeaderOrBackground);
@@ -69,6 +72,26 @@ final class DockingTabPane extends VBox {
             strip.getChildren().get(strip.getChildren().size() - 1).pseudoClassStateChanged(LAST_TAB, true);
         }
         getChildren().addAll(strip, contentArea);
+    }
+
+    private void toggleMaximized(MouseEvent event) {
+        if (event.getButton() != MouseButton.PRIMARY || event.getClickCount() != 2
+                || !event.isShiftDown() || !event.isStillSincePress() || !(event.getTarget() instanceof Node)) {
+            return;
+        }
+        String id = selectedId;
+        for (Node node = (Node) event.getTarget(); node != null && node != strip; node = node.getParent()) {
+            if (node instanceof ButtonBase || node instanceof TextInputControl) {
+                return;
+            }
+            if (node.getParent() == strip) {
+                id = (String) node.getProperties().get(DOCKABLE_ID_KEY);
+            }
+        }
+        Dockable maximized = dockingPane.getMaximizedDockable();
+        dockingPane.setMaximizedDockable(maximized != null && containsDockable(maximized.getId())
+                ? null : find(dockingPane, id));
+        event.consume();
     }
 
     /**

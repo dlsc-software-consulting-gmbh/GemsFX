@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.docking;
 
 import com.dlsc.gemsfx.FxTestBase;
+import com.dlsc.gemsfx.GlassPane;
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
@@ -83,6 +84,176 @@ public class DockingPaneTest extends FxTestBase {
         Event.fireEvent(node, new MouseEvent(MouseEvent.MOUSE_CLICKED, 5, 5, 105, 105, MouseButton.PRIMARY, 2,
                 false, false, false, false, false, false, false,
                 false, false, true, new PickResult(node, 5, 5)));
+    }
+
+    private static void shiftDoubleClick(Node node) {
+        Event.fireEvent(node, new MouseEvent(MouseEvent.MOUSE_CLICKED, 5, 5, 105, 105, MouseButton.PRIMARY, 2,
+                true, false, false, false, false, false, false,
+                false, false, true, new PickResult(node, 5, 5)));
+    }
+
+    @Test
+    public void shiftDoubleClickTogglesPaddedTabGroupOverlayWithoutEditingTitle() {
+        runFx(() -> {
+            Dockable a = dockable("a");
+            Dockable b = dockable("b");
+            Dockable c = dockable("c");
+            DockingContext context = context(a, b, c);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            Scene scene = new Scene(new StackPane(pane), 800, 600);
+            scene.getRoot().applyCss();
+            scene.getRoot().layout();
+
+            shiftDoubleClick(title(pane, "a"));
+            scene.getRoot().applyCss();
+            scene.getRoot().layout();
+            Node overlay = pane.lookup(".docking-maximized-overlay");
+            assertNotNull("Shift-double-click should maximize the tab group", overlay);
+            GlassPane glass = (GlassPane) pane.lookup(".glass-pane");
+            assertNotNull("A glass pane should cover the background", glass);
+            assertTrue(glass.isVisible());
+            assertTrue(glass.getOpacity() > 0 && glass.getOpacity() < 1);
+            assertTrue(((StackPane) overlay.getParent()).getChildren().indexOf(glass)
+                    < ((StackPane) overlay.getParent()).getChildren().indexOf(overlay));
+            assertNull(pane.lookup(".docking-tab-title-editor"));
+            assertSame(a, pane.getActiveDockable());
+            assertNotNull(title(pane, "b"));
+            Bounds bounds = title(pane, "a").getParent().getParent().localToScene(
+                    title(pane, "a").getParent().getParent().getBoundsInLocal());
+            Bounds paneBounds = pane.localToScene(pane.getBoundsInLocal());
+            assertTrue(bounds.getMinX() > paneBounds.getMinX());
+            assertTrue(bounds.getMinY() > paneBounds.getMinY());
+            assertTrue(bounds.getMaxX() < paneBounds.getMaxX());
+            assertTrue(bounds.getMaxY() < paneBounds.getMaxY());
+            DockingLayoutNode layout = pane.getLayoutRoot();
+
+            shiftDoubleClick(title(pane, "a"));
+            assertNull(pane.lookup(".docking-maximized-overlay"));
+            assertNull(pane.lookup(".glass-pane"));
+            assertSame(layout, pane.getLayoutRoot());
+        });
+    }
+
+    @Test
+    public void programmaticMaximizeFollowsTabSelectionAndClearsOnClose() {
+        runFx(() -> {
+            Dockable a = dockable("a");
+            Dockable b = dockable("b");
+            Dockable c = dockable("c");
+            DockingContext context = context(a, b, c);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            Scene scene = new Scene(new StackPane(pane), 800, 600);
+            scene.getRoot().applyCss();
+            scene.getRoot().layout();
+            pane.setMaximizedDockable(a);
+            assertSame(a, pane.getMaximizedDockable());
+            assertSame(a, pane.getActiveDockable());
+            assertTrue(pane.lookup(".docking-split").isDisabled());
+            assertFalse(title(pane, "a").isDisabled());
+            pane.selectDockable("b");
+            assertSame(b, pane.getMaximizedDockable());
+            assertTrue(context.requestCloseDockable(b));
+            assertSame(a, pane.getMaximizedDockable());
+            assertNotNull(pane.lookup(".docking-maximized-overlay"));
+            assertTrue(context.requestCloseDockable(a));
+            assertNull(pane.getMaximizedDockable());
+            assertNull(pane.lookup(".docking-maximized-overlay"));
+        });
+    }
+
+    @Test
+    public void maximizationDoesNotChangeDividerPositionsOrSurviveLayoutRestore() {
+        runFx(() -> {
+            Dockable a = dockable("a");
+            Dockable b = dockable("b");
+            DockingContext context = context(a, b);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.RIGHT);
+            Scene scene = new Scene(new StackPane(pane), 800, 600);
+            scene.getRoot().applyCss();
+            scene.getRoot().layout();
+            pane.updateDividerPositions(List.of(), List.of(0.3));
+            DockingLayout layout = context.getLayout();
+            pane.setMaximizedDockable(a);
+            scene.getRoot().applyCss();
+            scene.getRoot().layout();
+            assertEquals(List.of(0.3), ((DockingLayoutNode.Split) pane.getLayoutRoot()).getDividerPositions());
+            context.restoreLayout(layout);
+            assertNull(pane.getMaximizedDockable());
+            assertNull(pane.lookup(".docking-maximized-overlay"));
+            assertEquals(List.of(0.3), ((DockingLayoutNode.Split) pane.getLayoutRoot()).getDividerPositions());
+        });
+    }
+
+    @Test
+    public void maximizedGroupTracksNewTabsAndRestoresWhenAnotherGroupIsSelected() {
+        runFx(() -> {
+            Dockable a = dockable("a");
+            Dockable b = dockable("b");
+            Dockable c = dockable("c");
+            DockingContext context = context(a, b, c);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            new Scene(new StackPane(pane), 800, 600).getRoot().applyCss();
+            pane.setMaximizedDockable(a);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            assertSame(b, pane.getActiveDockable());
+            assertSame(b, pane.getMaximizedDockable());
+            assertNotNull(pane.lookup(".docking-maximized-overlay"));
+            pane.selectDockable("c");
+            assertNull(pane.getMaximizedDockable());
+            assertNull(pane.lookup(".docking-maximized-overlay"));
+        });
+    }
+
+    @Test
+    public void maximizingAndRestoringKeepsFocusInContent() {
+        DockingPane pane = invoke(() -> {
+            Dockable dockable = new Dockable("a", "A", new TextField());
+            DockingContext context = context(dockable, dockable("b"));
+            DockingPane result = context.createPane();
+            context.openDockable(result, "a", DockingPosition.CENTER);
+            context.openDockable(result, "b", DockingPosition.RIGHT);
+            result.selectDockable("a");
+            Stage stage = new Stage();
+            stage.setScene(new Scene(new StackPane(result), 500, 400));
+            stage.show();
+            stage.requestFocus();
+            return result;
+        });
+        try {
+            waitForFxEvents();
+            runFx(() -> {
+                Dockable dockable = pane.getActiveDockable();
+                Node content = dockable.getContent();
+                content.requestFocus();
+                assertSame(content, pane.getScene().getFocusOwner());
+                pane.setMaximizedDockable(dockable);
+            });
+            waitForFxEvents();
+            runFx(() -> {
+                Node content = pane.getActiveDockable().getContent();
+                assertSame(content, pane.getScene().getFocusOwner());
+                assertTrue(content.isFocused());
+                pane.setMaximizedDockable(null);
+            });
+            waitForFxEvents();
+            runFx(() -> {
+                Node content = pane.getActiveDockable().getContent();
+                assertSame(content, pane.getScene().getFocusOwner());
+                assertTrue(content.isFocused());
+            });
+        } finally {
+            runFx(() -> ((Stage) pane.getScene().getWindow()).close());
+        }
     }
 
     private static TextField titleEditor(DockingPane pane) {

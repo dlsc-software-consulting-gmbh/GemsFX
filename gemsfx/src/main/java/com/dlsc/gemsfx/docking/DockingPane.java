@@ -22,6 +22,7 @@ import java.util.Objects;
  * Control associated with exactly one {@link DockingContext}. It owns one pane tree and renders each dockable as a
  * title tab with a close affordance; only the selected tab's content is displayed.
  * Hold Shift when starting a tab drag to move its entire tab group, preserving tab order and selection.
+ * Shift-double-click a tab or its strip to maximize or restore its group within this pane.
  * The tab group containing the active dockable has the {@code active} pseudo-class.
  */
 public class DockingPane extends Control {
@@ -31,12 +32,26 @@ public class DockingPane extends Control {
     private final DockingTree tree = new DockingTree();
     private final Map<String, Dockable> dockablesById = new HashMap<>();
 
-    DockingPane(DockingContext dockingContext) {
+    /**
+     * Creates a pane belonging to the supplied context. Applications should create panes via the context's
+     * pane factory and {@link DockingContext#createPane()}.
+     *
+     * @param dockingContext the owning context
+     */
+    protected DockingPane(DockingContext dockingContext) {
         this.dockingContext = Objects.requireNonNull(dockingContext, "dockingContext must not be null");
         getStyleClass().add("docking-pane");
         AccessibilityUtil.setRole(this, AccessibleRole.NODE, ResourceBundleManager.getString(
                 ResourceBundleManager.BundleType.DOCKING_PANE, "accessible.role-description", "Docking pane"));
         setPlaceholder(new DockingPanePlaceholder());
+        activeDockable.addListener((observable, previous, current) -> {
+            Dockable maximized = getMaximizedDockable();
+            if (maximized != null) {
+                DockingLayoutNode.Tabs group = findGroup(getLayoutRoot(), maximized.getId());
+                maximizedDockable.set(current != null && group != null && group.getDockableIds().contains(current.getId())
+                        ? current : null);
+            }
+        });
     }
 
     @Override
@@ -99,6 +114,36 @@ public class DockingPane extends Control {
         return activeDockable.get();
     }
 
+    private final ReadOnlyObjectWrapper<Dockable> maximizedDockable =
+            new ReadOnlyObjectWrapper<>(this, "maximizedDockable");
+
+    /**
+     * The selected dockable in the maximized tab group, or {@code null} when no group is maximized.
+     * Maximization is temporary and is not included in layout snapshots. Use
+     * {@link #setMaximizedDockable(Dockable)} to maximize a dockable belonging to this pane,
+     * or pass {@code null} to restore the normal layout.
+     *
+     * @return the maximized dockable property
+     */
+    public final ReadOnlyObjectProperty<Dockable> maximizedDockableProperty() {
+        return maximizedDockable.getReadOnlyProperty();
+    }
+
+    public final Dockable getMaximizedDockable() {
+        return maximizedDockable.get();
+    }
+
+    public final void setMaximizedDockable(Dockable dockable) {
+        DockingContext.requireFxThread();
+        if (dockable != null && dockablesById.get(dockable.getId()) != dockable) {
+            throw new IllegalArgumentException("Dockable does not belong to this pane");
+        }
+        if (dockable != null && getActiveDockable() != dockable) {
+            selectDockable(dockable.getId());
+        }
+        maximizedDockable.set(dockable);
+    }
+
     private final ReadOnlyObjectWrapper<DockingLayoutNode> layoutRoot =
             new ReadOnlyObjectWrapper<>(this, "layoutRoot", new DockingLayoutNode.Empty());
 
@@ -131,6 +176,22 @@ public class DockingPane extends Control {
         tree.select(id);
         layoutRoot.set(tree.snapshot());
         activeDockable.set(dockable);
+    }
+
+    private DockingLayoutNode.Tabs findGroup(DockingLayoutNode node, String id) {
+        if (node instanceof DockingLayoutNode.Tabs) {
+            DockingLayoutNode.Tabs tabs = (DockingLayoutNode.Tabs) node;
+            return tabs.getDockableIds().contains(id) ? tabs : null;
+        }
+        if (node instanceof DockingLayoutNode.Split) {
+            for (DockingLayoutNode child : ((DockingLayoutNode.Split) node).getChildren()) {
+                DockingLayoutNode.Tabs found = findGroup(child, id);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -181,6 +242,13 @@ public class DockingPane extends Control {
     }
 
     final void removeDockable(Dockable dockable) {
+        if (getMaximizedDockable() == dockable) {
+            DockingLayoutNode.Tabs group = findGroup(getLayoutRoot(), dockable.getId());
+            List<String> ids = group.getDockableIds();
+            int index = ids.indexOf(dockable.getId());
+            maximizedDockable.set(ids.size() == 1 ? null
+                    : dockablesById.get(ids.get(index == 0 ? 1 : index - 1)));
+        }
         String id = dockable.getId();
         String neighbour = neighbourOf(getLayoutRoot(), id);
         tree.remove(id);

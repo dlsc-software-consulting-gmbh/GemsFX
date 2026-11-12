@@ -93,6 +93,30 @@ public class DockingContext {
         return stageFactory;
     }
 
+    private final ObjectProperty<Callback<DockingContext, DockingPane>> paneFactory =
+            new SimpleObjectProperty<>(this, "paneFactory", DockingPane::new);
+
+    /**
+     * Factory used to create panes for this context, including floating and restored panes.
+     * The default creates a {@link DockingPane}. Each invocation must return a fresh, unparented,
+     * non-null pane belonging to the supplied context. The factory itself must not be {@code null}.
+     * It is invoked on the JavaFX application thread. Changes apply only to subsequently created panes.
+     * A primary pane already in use is retained when restoring a layout.
+     *
+     * @return the pane factory property
+     */
+    public final ObjectProperty<Callback<DockingContext, DockingPane>> paneFactoryProperty() {
+        return paneFactory;
+    }
+
+    public final Callback<DockingContext, DockingPane> getPaneFactory() {
+        return paneFactory.get();
+    }
+
+    public final void setPaneFactory(Callback<DockingContext, DockingPane> factory) {
+        paneFactory.set(factory);
+    }
+
     private final ObjectProperty<Callback<Dockable, Node>> tabFactory = new SimpleObjectProperty<>(
             this, "tabFactory", dockable -> new DockingTab(this, dockable));
 
@@ -437,6 +461,8 @@ public class DockingContext {
         DockingPane mountedPrimaryPane = resolveMountedPrimaryPaneForRestore();
         DockingLayout.PaneLayout primaryLayout = findPrimaryLayout(layout);
         DockingLayoutNode normalizedPrimaryRoot = null;
+        Set<DockingPane> replacementPanes = Collections.newSetFromMap(new IdentityHashMap<>());
+        DockingPane restoredPrimaryPane;
 
         try {
             for (DockingLayout.PaneLayout paneLayout : layout.getPanes()) {
@@ -455,7 +481,10 @@ public class DockingContext {
                     continue;
                 }
 
-                DockingPane replacementPane = new DockingPane(this);
+                DockingPane replacementPane = createFactoryPane();
+                if (!replacementPanes.add(replacementPane)) {
+                    throw new IllegalArgumentException("paneFactory must return a fresh pane");
+                }
                 if (!(normalized instanceof DockingLayoutNode.Empty)) {
                     buildPaneTree(replacementPane, normalized, resolvedDockables);
                 }
@@ -474,6 +503,10 @@ public class DockingContext {
                     replacementStage.setHeight(stageBounds.getHeight());
                 }
                 plans.add(PanePlan.floating(paneLayout.getPaneId(), replacementPane, replacementStage));
+            }
+            restoredPrimaryPane = mountedPrimaryPane == null ? createFactoryPane() : mountedPrimaryPane;
+            if (mountedPrimaryPane == null && !replacementPanes.add(restoredPrimaryPane)) {
+                throw new IllegalArgumentException("paneFactory must return a fresh pane");
             }
         } catch (RuntimeException | Error ex) {
             for (Stage stage : replacementStages) {
@@ -504,7 +537,6 @@ public class DockingContext {
         hostListeners.clear();
         nextPaneNumber = 1;
 
-        DockingPane restoredPrimaryPane = mountedPrimaryPane == null ? new DockingPane(this) : mountedPrimaryPane;
         clearPane(restoredPrimaryPane);
         Set<String> primaryIds = new LinkedHashSet<>();
         collectDockableIds(normalizedPrimaryRoot, primaryIds);
@@ -1007,8 +1039,18 @@ public class DockingContext {
     }
 
     private DockingPane createPaneWithId(String paneId) {
-        DockingPane pane = new DockingPane(this);
+        DockingPane pane = createFactoryPane();
         attachPane(pane, paneId);
+        return pane;
+    }
+
+    private DockingPane createFactoryPane() {
+        Callback<DockingContext, DockingPane> factory = Objects.requireNonNull(getPaneFactory(),
+                "paneFactory must not be null");
+        DockingPane pane = Objects.requireNonNull(factory.call(this), "paneFactory must not return null");
+        if (pane.getDockingContext() != this || panes.contains(pane) || pane.getParent() != null || pane.getScene() != null) {
+            throw new IllegalArgumentException("paneFactory must return a fresh, unparented pane belonging to this context");
+        }
         return pane;
     }
 

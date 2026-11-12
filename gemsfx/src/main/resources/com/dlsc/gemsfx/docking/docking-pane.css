@@ -7,6 +7,10 @@
     -fx-background-color: transparent;
 }
 
+.docking-pane .docking-maximized-overlay {
+    -fx-padding: 20;
+}
+
 .docking-pane .docking-tab-strip {
     -fx-spacing: 0;
     -fx-padding: 0;

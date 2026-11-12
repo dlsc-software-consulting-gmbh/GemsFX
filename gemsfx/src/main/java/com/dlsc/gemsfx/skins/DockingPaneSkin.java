@@ -1,5 +1,6 @@
 package com.dlsc.gemsfx.skins;
 
+import com.dlsc.gemsfx.GlassPane;
 import com.dlsc.gemsfx.docking.Dockable;
 import com.dlsc.gemsfx.docking.DockingLayoutNode;
 import com.dlsc.gemsfx.docking.DockingPane;
@@ -60,6 +61,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private final List<StackPane> contentHosts = new ArrayList<>();
     private final List<Label> graphicLabels = new ArrayList<>();
     private final List<DockingTabPane> tabGroups = new ArrayList<>();
+    private DockingTabPane maximizedGroup;
     private Scene focusScene;
     private boolean synchronizingFocus;
     private final Region dropLeafPreview = previewRegion("docking-drop-leaf-preview");
@@ -73,6 +75,13 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     };
     private final ChangeListener<Node> placeholderListener = (obs, oldPlaceholder, newPlaceholder) -> {
         if (getSkinnable().getLayoutRoot() instanceof DockingLayoutNode.Empty) {
+            rebuild();
+        }
+    };
+    private final ChangeListener<Dockable> maximizedListener = (obs, previous, current) -> {
+        if (previous == null || current == null || maximizedGroup == null
+                || !maximizedGroup.containsDockable(previous.getId())
+                || !maximizedGroup.containsDockable(current.getId())) {
             rebuild();
         }
     };
@@ -123,6 +132,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             focusActiveDockable();
         });
         registerChangeListener(pane.getDockingContext().tabFactoryProperty(), obs -> rebuild());
+        pane.maximizedDockableProperty().addListener(maximizedListener);
         registerChangeListener(pane.sceneProperty(), obs -> observeFocusScene(pane.getScene()));
         observeFocusScene(pane.getScene());
         rebuild();
@@ -319,8 +329,18 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         String focusedId = focusedDockableId();
         detachContents();
         emptyPane.getChildren().clear();
+        maximizedGroup = null;
         Node root = render(pane.getLayoutRoot(), new ArrayList<>());
-        host.getChildren().setAll(root, dropLeafPreview, dropZonePreview);
+        root.setDisable(maximizedGroup != null);
+        host.getChildren().setAll(root);
+        if (maximizedGroup != null) {
+            GlassPane glass = new GlassPane();
+            glass.setHide(false);
+            StackPane overlay = new StackPane(maximizedGroup);
+            overlay.getStyleClass().add("docking-maximized-overlay");
+            host.getChildren().addAll(glass, overlay);
+        }
+        host.getChildren().addAll(dropLeafPreview, dropZonePreview);
         host.getChildren().addAll(paneEdgeTargets.values());
         getChildren().setAll(host);
         clearDropPreview();
@@ -424,6 +444,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
                 }
             }
             installTitleDragHandlers(tabs);
+            Dockable maximized = getSkinnable().getMaximizedDockable();
+            if (maximized != null && tabs.containsDockable(maximized.getId())) {
+                maximizedGroup = tabs;
+                return new Region();
+            }
             return tabs;
         }
         if (node instanceof DockingLayoutNode.Split) {
@@ -499,6 +524,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         pane.removeEventFilter(KeyEvent.KEY_PRESSED, keyPressedHandler);
         getSkinnable().layoutRootProperty().removeListener(layoutListener);
         pane.placeholderProperty().removeListener(placeholderListener);
+        pane.maximizedDockableProperty().removeListener(maximizedListener);
         detachContents();
         emptyPane.getChildren().clear();
         super.dispose();
