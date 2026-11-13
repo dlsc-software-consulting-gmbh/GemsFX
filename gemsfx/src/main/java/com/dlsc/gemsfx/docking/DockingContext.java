@@ -279,7 +279,8 @@ public class DockingContext {
      * It receives the owning pane and an immutable snapshot of the group's dockables in tab order.
      * The returned node is wrapped in a stack pane styled as an unselected tab. The factory or
      * its result may be {@code null}; otherwise each invocation must return a fresh, unparented node.
-     * The default creates a {@link DockingTabPaneHeader} for closing, floating, and maximizing the group.
+     * The default creates a {@link DockingTabPaneHeader} for closing, floating internally or in a window,
+     * docking internally floating groups back into their pane, and maximizing docked groups.
      * <p>
      * The factory is invoked on the JavaFX application thread when groups are rebuilt, including
      * when their membership changes. Changing it refreshes existing groups in all panes.

@@ -13,7 +13,6 @@ import com.dlsc.gemsfx.docking.DockingPane;
 import com.dlsc.gemsfx.docking.DockingPosition;
 import com.dlsc.gemsfx.docking.DockingRestoreResult;
 import com.dlsc.gemsfx.docking.DockingStageFactory;
-import com.dlsc.gemsfx.docking.DockingTabPaneHeader;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +24,6 @@ import javafx.collections.ListChangeListener;
 import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
@@ -48,7 +46,6 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -127,7 +124,6 @@ public class DockingPaneApp extends GemApplication {
 
         DockingPane rootPane = context.createPane();
         rootPane.setPadding(new Insets(4));
-        context.setTabPaneHeaderFactory((pane, dockables) -> createGroupHeader(pane, dockables, rootPane));
         openInitialLayout(context, rootPane);
 
         BorderPane root = new BorderPane();
@@ -145,47 +141,6 @@ public class DockingPaneApp extends GemApplication {
         stage.show();
 
         status("Drag sidebar icons into the workspace to create views, or move the rocket between its panels. Drag tabs to rearrange views.");
-    }
-
-    private Node createGroupHeader(DockingPane pane, List<Dockable> dockables, DockingPane rootPane) {
-        DockingContext context = pane.getDockingContext();
-        DockingTabPaneHeader header = new DockingTabPaneHeader(pane, dockables);
-        boolean internallyFloating = pane.isDockableFloating(dockables.get(0).getId());
-        MenuItem dockGroup = new MenuItem(internallyFloating ? "Dock Group" : "Dock Group to Main Pane");
-        dockGroup.setOnAction(event -> {
-            DockingPane targetPane = internallyFloating ? pane : rootPane;
-            if (context.moveTabGroup(targetPane, dockables.get(0).getId(), null, DockingPosition.LEFT)) {
-                status(internallyFloating ? "Docked the group at its pane's left edge."
-                        : "Docked the group at the main pane's left edge.");
-            }
-        });
-        if (internallyFloating) {
-            header.getItems().removeIf(item -> item.getStyleClass().contains("docking-group-maximize"));
-            header.getItems().stream()
-                    .filter(item -> item.getStyleClass().contains("docking-group-float"))
-                    .forEach(item -> item.setText("Move Group to New Window"));
-            header.getItems().addAll(new SeparatorMenuItem(), dockGroup);
-            return header;
-        }
-
-        MenuItem floatTab = new MenuItem("Float Tab Internally");
-        floatTab.setOnAction(event -> dockables.stream()
-                .filter(context.getSelectionModel()::isSelected)
-                .findFirst()
-                .ifPresent(dockable -> {
-                    context.floatDockableInternally(dockable.getId(), new Rectangle2D(40, 40, 400, 280));
-                    status("Drag the floating header to move; drag its edges to resize. Use the group menu to dock again.");
-                }));
-        MenuItem floatGroup = new MenuItem("Float Group Internally");
-        floatGroup.setOnAction(event -> {
-            context.floatTabGroupInternally(dockables.get(0).getId(), new Rectangle2D(40, 40, 400, 280));
-            status("Floating the tab group inside its pane. Its nearest-edge gaps are retained when resizing.");
-        });
-        header.getItems().addAll(new SeparatorMenuItem(), floatTab, floatGroup);
-        if (pane != rootPane) {
-            header.getItems().add(dockGroup);
-        }
-        return header;
     }
 
     HBox createStatusBar(DockingPane pane) {

@@ -1555,6 +1555,83 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     @Test
+    public void defaultGroupMenuFloatsItsSelectedTabInternallyWhenAnotherGroupIsActive() {
+        runFx(() -> {
+            Dockable a = dockable("a");
+            Dockable b = dockable("b");
+            Dockable c = dockable("c");
+            DockingContext context = context(a, b, c);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            context.setFloatingEnabled(false);
+            layout(pane);
+
+            groupMenuItem(pane, "a", "docking-tab-float-internally").fire();
+
+            assertEquals(List.of("b"), pane.getFloatingGroups().get(0).getTabs().getDockableIds());
+            assertFalse(pane.isDockableFloating("a"));
+            assertFalse(pane.isDockableFloating("c"));
+            assertSame(pane, b.getDockingPane());
+        });
+    }
+
+    @Test
+    public void defaultGroupMenuFloatsAndRedocksInternallyInItsOwnPane() {
+        runFx(() -> {
+            for (boolean externalWindow : new boolean[]{false, true}) {
+                Dockable a = dockable("a");
+                Dockable b = dockable("b");
+                Dockable c = dockable("c");
+                DockingContext context = context(a, b, c);
+                DockingPane main = context.createPane();
+                context.openDockable(main, "a", DockingPosition.CENTER);
+                context.openDockable(main, "b", DockingPosition.CENTER);
+                context.openDockable(main, "c", DockingPosition.RIGHT);
+                DockingPane pane = externalWindow ? context.floatTabGroup("a", 100, 100) : main;
+                Stage stage = externalWindow ? (Stage) pane.getScene().getWindow() : null;
+                try {
+                    if (externalWindow) {
+                        pane.getScene().getRoot().applyCss();
+                        pane.getScene().getRoot().layout();
+                    } else {
+                        layout(pane);
+                    }
+                    groupMenuItem(pane, "a", "docking-group-float-internally").fire();
+                    pane.applyCss();
+                    pane.layout();
+                    assertEquals(List.of("a", "b"), pane.getFloatingGroups().get(0).getTabs().getDockableIds());
+                    assertEquals("b", pane.getFloatingGroups().get(0).getTabs().getSelectedId());
+                    MenuButton floatingMenu = (MenuButton) pane.lookup(".docking-floating-frame")
+                            .lookup(".docking-tab-pane-menu-button");
+                    assertTrue(floatingMenu.getItems().stream()
+                            .anyMatch(item -> item.getStyleClass().contains("docking-group-float")));
+                    assertFalse(floatingMenu.getItems().stream().anyMatch(item ->
+                            item.getStyleClass().contains("docking-group-maximize")
+                                    || item.getStyleClass().contains("docking-tab-float-internally")
+                                    || item.getStyleClass().contains("docking-group-float-internally")));
+
+                    groupMenuItem(pane, "a", "docking-group-dock").fire();
+                    pane.applyCss();
+                    pane.layout();
+                    assertTrue(pane.getFloatingGroups().isEmpty());
+                    assertSame(pane, a.getDockingPane());
+                    assertSame(pane, b.getDockingPane());
+                    assertSame(main, c.getDockingPane());
+                    assertTrue(context.getSelectionModel().isSelected(b));
+                    assertTrue(groupMenuItem(pane, "a", "docking-group-float-internally").isVisible());
+                    assertTrue(groupMenuItem(pane, "a", "docking-group-maximize").isVisible());
+                } finally {
+                    if (stage != null) {
+                        stage.close();
+                    }
+                }
+            }
+        });
+    }
+
+    @Test
     public void defaultGroupMenuMaximizesAndRestoresTheSelectedGroup() {
         runFx(() -> {
             Dockable a = dockable("a");

@@ -156,11 +156,11 @@ public class DockingPaneAppTest {
                 MenuButton menu = root.lookupAll(".docking-tab-pane-menu-button").stream()
                         .map(MenuButton.class::cast)
                         .filter(button -> button.getItems().stream()
-                                .anyMatch(item -> "Float Group Internally".equals(item.getText())))
+                                .anyMatch(item -> item.getStyleClass().contains("docking-group-float-internally")))
                         .findFirst().orElseThrow();
                 assertFalse(menu.getItems().stream()
-                        .anyMatch(item -> "Dock Group".equals(item.getText())));
-                menu.getItems().stream().filter(item -> "Float Group Internally".equals(item.getText()))
+                        .anyMatch(item -> item.getStyleClass().contains("docking-group-dock")));
+                menu.getItems().stream().filter(item -> item.getStyleClass().contains("docking-group-float-internally"))
                         .findFirst().orElseThrow().fire();
                 assertEquals(1, pane.getFloatingGroups().size());
                 String floatingId = pane.getFloatingGroups().get(0).getTabs().getDockableIds().get(0);
@@ -169,14 +169,14 @@ public class DockingPaneAppTest {
                 MenuButton floatingMenu = (MenuButton) pane.lookup(".docking-floating-frame")
                         .lookup(".docking-tab-pane-menu-button");
                 assertFalse(floatingMenu.getItems().stream()
-                        .anyMatch(item -> "Float Tab Internally".equals(item.getText())
-                                || "Float Group Internally".equals(item.getText())
+                        .anyMatch(item -> item.getStyleClass().contains("docking-tab-float-internally")
+                                || item.getStyleClass().contains("docking-group-float-internally")
                                 || item.getStyleClass().contains("docking-group-maximize")));
                 assertTrue(floatingMenu.getItems().stream()
-                        .anyMatch(item -> "Move Group to New Window".equals(item.getText())));
+                        .anyMatch(item -> item.getStyleClass().contains("docking-group-float")));
                 assertTrue(floatingMenu.getItems().stream()
                         .anyMatch(item -> item.getStyleClass().contains("docking-group-close-all")));
-                floatingMenu.getItems().stream().filter(item -> "Dock Group".equals(item.getText()))
+                floatingMenu.getItems().stream().filter(item -> item.getStyleClass().contains("docking-group-dock"))
                         .findFirst().orElseThrow().fire();
                 assertTrue(pane.getFloatingGroups().isEmpty());
                 root.applyCss();
@@ -186,18 +186,18 @@ public class DockingPaneAppTest {
                         .findFirst().orElseThrow();
                 MenuButton redockedMenu = (MenuButton) redockedTab.getParent().lookup(".docking-tab-pane-menu-button");
                 assertTrue(redockedMenu.getItems().stream()
-                        .anyMatch(item -> "Float Group Internally".equals(item.getText())));
+                        .anyMatch(item -> item.getStyleClass().contains("docking-group-float-internally")));
                 assertTrue(redockedMenu.getItems().stream()
                         .anyMatch(item -> item.getStyleClass().contains("docking-group-maximize") && item.isVisible()));
                 assertFalse(redockedMenu.getItems().stream()
-                        .anyMatch(item -> "Dock Group".equals(item.getText())));
+                        .anyMatch(item -> item.getStyleClass().contains("docking-group-dock")));
 
                 DockingPane windowPane = pane.getDockingContext().floatTabGroup(
                         floatingId, stage.getX() + 40, stage.getY() + 40);
                 windowPane.getScene().getRoot().applyCss();
                 windowPane.getScene().getRoot().layout();
                 MenuButton windowMenu = (MenuButton) windowPane.lookup(".docking-tab-pane-menu-button");
-                windowMenu.getItems().stream().filter(item -> "Float Group Internally".equals(item.getText()))
+                windowMenu.getItems().stream().filter(item -> item.getStyleClass().contains("docking-group-float-internally"))
                         .findFirst().orElseThrow().fire();
                 assertTrue(windowPane.isDockableFloating(floatingId));
                 List<Dockable> windowDockables = List.copyOf(windowPane.getDockables());
@@ -205,7 +205,7 @@ public class DockingPaneAppTest {
                 windowPane.getScene().getRoot().layout();
                 MenuButton windowFloatingMenu = (MenuButton) windowPane.lookup(".docking-floating-frame")
                         .lookup(".docking-tab-pane-menu-button");
-                windowFloatingMenu.getItems().stream().filter(item -> "Dock Group".equals(item.getText()))
+                windowFloatingMenu.getItems().stream().filter(item -> item.getStyleClass().contains("docking-group-dock"))
                         .findFirst().orElseThrow().fire();
                 assertTrue(windowPane.getFloatingGroups().isEmpty());
                 for (Dockable dockable : windowDockables) {
@@ -215,10 +215,9 @@ public class DockingPaneAppTest {
                 windowPane.getScene().getRoot().applyCss();
                 windowPane.getScene().getRoot().layout();
                 windowMenu = (MenuButton) windowPane.lookup(".docking-tab-pane-menu-button");
-                windowMenu.getItems().stream().filter(item -> "Dock Group to Main Pane".equals(item.getText()))
-                        .findFirst().orElseThrow().fire();
-                assertSame(pane, pane.getDockables().stream()
-                        .filter(dockable -> floatingId.equals(dockable.getId())).findFirst().orElseThrow().getDockingPane());
+                assertFalse(windowMenu.getItems().stream()
+                        .anyMatch(item -> item.getStyleClass().contains("docking-group-dock")
+                                || "Dock Group to Main Pane".equals(item.getText())));
             } finally {
                 stage.hide();
             }
@@ -244,7 +243,7 @@ public class DockingPaneAppTest {
                             .filter(tab -> "editor".equals(tab.getProperties().get("docking.dockable-id")))
                             .findFirst().orElseThrow();
                     MenuButton menu = (MenuButton) editorTab.getParent().lookup(".docking-tab-pane-menu-button");
-                    menu.getItems().stream().filter(item -> "Float Tab Internally".equals(item.getText()))
+                    menu.getItems().stream().filter(item -> item.getStyleClass().contains("docking-tab-float-internally"))
                             .findFirst().orElseThrow().fire();
 
                     assertEquals(1, pane.getFloatingGroups().size());

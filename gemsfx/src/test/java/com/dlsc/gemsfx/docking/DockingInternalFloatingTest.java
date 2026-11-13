@@ -150,9 +150,8 @@ public class DockingInternalFloatingTest extends FxTestBase {
             assertNotNull("Activating a floating frame must not restore the maximized background",
                     pane.getMaximizedDockable());
             MenuButton menu = (MenuButton) frame.lookup(".docking-tab-pane-menu-button");
-            assertFalse(menu.getItems().stream()
-                    .filter(item -> item.getStyleClass().contains("docking-group-maximize"))
-                    .findFirst().orElseThrow().isVisible());
+            assertFalse(menu.getItems().stream().anyMatch(item ->
+                    item.getStyleClass().contains("docking-group-maximize") && item.isVisible()));
             root.resize(100, 80);
             root.layout();
             assertEquals(100, frame.getWidth(), 0.01);
