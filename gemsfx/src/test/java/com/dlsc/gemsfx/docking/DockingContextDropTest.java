@@ -175,6 +175,37 @@ public class DockingContextDropTest extends FxTestBase {
     }
 
     @Test
+    public void maximizedPaneRejectsExternalDockingWithoutBlockingContentDragEvents() {
+        runFx(() -> {
+            DockingContext context = context();
+            DockingPane pane = context.createPane();
+            Dockable existing = context.openDockable(pane, "existing", DockingPosition.CENTER).orElseThrow();
+            layout(pane);
+            AtomicInteger creations = new AtomicInteger();
+            AtomicInteger contentEvents = new AtomicInteger();
+            context.setDockableDropPredicate(event -> true);
+            context.setDockableDropFactory(event -> dockable("new-" + creations.incrementAndGet()));
+            existing.getContent().addEventHandler(DragEvent.ANY, event -> contentEvents.incrementAndGet());
+            pane.setMaximizedDockable(existing);
+            pane.applyCss();
+            pane.layout();
+
+            fireDrag(pane, existing.getContent(), new Group(), false);
+            assertFalse(pane.lookup(".docking-drop-zone-preview").isVisible());
+            assertFalse(fireDrag(pane, existing.getContent(), new Group(), true).isDropCompleted());
+            assertTrue(context.dropDockable(pane, dropEvent(), "existing", DockingPosition.RIGHT).isEmpty());
+            assertEquals(0, creations.get());
+            assertEquals(2, contentEvents.get());
+            assertEquals(List.of(existing), pane.getDockables());
+            assertSame(existing, pane.getMaximizedDockable());
+
+            pane.setMaximizedDockable(null);
+            assertTrue(context.dropDockable(pane, dropEvent(), "existing", DockingPosition.RIGHT).isPresent());
+            assertEquals(1, creations.get());
+        });
+    }
+
+    @Test
     public void unrelatedContentDragsRemainAvailableWhenDropFactoryIsConfigured() {
         runFx(() -> {
             DockingContext context = context();

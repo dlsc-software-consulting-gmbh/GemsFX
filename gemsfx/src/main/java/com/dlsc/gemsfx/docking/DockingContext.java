@@ -377,6 +377,10 @@ public class DockingContext {
             logDecision("external drop", pane, null, targetId, position, false, "destination pane is missing or not attached to this context");
             return Optional.empty();
         }
+        if (pane.getMaximizedDockable() != null) {
+            logDecision("external drop", pane, null, targetId, position, false, "destination pane has a maximized group");
+            return Optional.empty();
+        }
         if (position == null) {
             logDecision("external drop", pane, null, targetId, position, false, "docking position is missing");
             return Optional.empty();
@@ -515,7 +519,7 @@ public class DockingContext {
      * @param id      the dockable ID
      * @param screenX target screen x coordinate
      * @param screenY target screen y coordinate
-     * @return the floating pane
+     * @return the floating pane, or {@code null} if the source pane has a maximized group
      */
     public DockingPane floatDockable(String id, double screenX, double screenY) {
         return withSelectionUpdates(() -> floatDockableInternal(id, screenX, screenY));
@@ -528,6 +532,9 @@ public class DockingContext {
         DockingPane sourcePane = dockablePaneById.get(id);
         if (dockable == null || sourcePane == null) {
             throw new IllegalArgumentException("Unknown dockable id: " + id);
+        }
+        if (sourcePane.getMaximizedDockable() != null) {
+            return null;
         }
 
         DockingPane floatingPane = createPaneWithId(allocatePaneId());
@@ -564,7 +571,7 @@ public class DockingContext {
      * @param id a dockable in the group to float
      * @param screenX target screen x coordinate
      * @param screenY target screen y coordinate
-     * @return the floating pane
+     * @return the floating pane, or {@code null} if the source pane has a maximized group
      * @throws IllegalArgumentException if the dockable is not open in this context
      */
     public final DockingPane floatTabGroup(String id, double screenX, double screenY) {
@@ -574,16 +581,22 @@ public class DockingContext {
         if (source == null) {
             throw new IllegalArgumentException("Unknown dockable id: " + id);
         }
+        if (source.getMaximizedDockable() != null) {
+            return null;
+        }
         DockingLayoutNode.Tabs group = source.tabGroupSnapshot(id);
         DockingTabGroup sourceGroup = source.groupOf(id);
         DockingPane floating = floatDockable(group.getDockableIds().get(0), screenX, screenY);
-        moveRemainingTabs(source, sourceGroup, floating, group);
+        if (floating != null) {
+            moveRemainingTabs(source, sourceGroup, floating, group);
+        }
         return floating;
     }
 
     /**
      * Moves one open dockable into an internal floating frame in its current pane.
      * Does not create a window and is independent of {@link #floatingEnabledProperty()}.
+     * Does nothing while the pane has a maximized group.
      *
      * @param id the open dockable ID
      * @param bounds requested bounds relative to the pane's content area
@@ -595,7 +608,7 @@ public class DockingContext {
 
     /**
      * Moves an open dockable's entire tab group into an internal floating frame,
-     * preserving tab order and selection.
+     * preserving tab order and selection. Does nothing while the pane has a maximized group.
      *
      * @param id any open dockable in the group
      * @param bounds requested bounds relative to the pane's content area
@@ -611,6 +624,9 @@ public class DockingContext {
             DockingPane pane = dockablePaneById.get(Objects.requireNonNull(id, "id must not be null"));
             if (pane == null) {
                 throw new IllegalArgumentException("Unknown dockable id: " + id);
+            }
+            if (pane.getMaximizedDockable() != null) {
+                return null;
             }
             DockingLayoutNode.Tabs source = pane.tabGroupSnapshot(id);
             List<String> movedIds = wholeGroup ? source.getDockableIds() : List.of(id);
@@ -871,7 +887,7 @@ public class DockingContext {
     /**
      * Tests whether a dockable's entire tab group can move to the given target.
      * A {@code null} target ID addresses a pane-wide edge, or an empty pane for a center drop.
-     * Drops back onto the source group are rejected.
+     * Drops back onto the source group are rejected, as are moves involving a pane with a maximized group.
      *
      * @param targetPane the destination pane in this context
      * @param id a dockable in the source group
@@ -887,6 +903,9 @@ public class DockingContext {
         }
         if (targetPane == null || targetPane.getDockingContext() != this || !paneIdByPane.containsKey(targetPane)) {
             return logDecision("tab group", targetPane, id, targetId, position, false, "destination pane is missing or not attached to this context");
+        }
+        if (source.getMaximizedDockable() != null || targetPane.getMaximizedDockable() != null) {
+            return logDecision("tab group", targetPane, id, targetId, position, false, "source or destination pane has a maximized group");
         }
         if (position == null) {
             return logDecision("tab group", targetPane, id, targetId, null, false, "docking position is missing");
@@ -980,6 +999,9 @@ public class DockingContext {
         if (sourcePane == null) {
             return logDecision("dockable", targetPane, draggedId, targetId, position, false, "source dockable is not open");
         }
+        if (sourcePane.getMaximizedDockable() != null || targetPane.getMaximizedDockable() != null) {
+            return logDecision("dockable", targetPane, draggedId, targetId, position, false, "source or destination pane has a maximized group");
+        }
         boolean allowed;
         if (sourcePane == targetPane) {
             allowed = targetPane.canMoveInside(draggedId, targetId, position);
@@ -1048,6 +1070,9 @@ public class DockingContext {
         DockingPane sourcePane = dockablePaneById.get(id);
         if (sourcePane == null) {
             return logDecision("pane edge", targetPane, id, null, edge, false, "source dockable is not open");
+        }
+        if (sourcePane.getMaximizedDockable() != null || targetPane.getMaximizedDockable() != null) {
+            return logDecision("pane edge", targetPane, id, null, edge, false, "source or destination pane has a maximized group");
         }
         boolean allowed = sourcePane != targetPane || targetPane.canMoveInsideToPaneEdge(id, edge);
         return logDecision("pane edge", targetPane, id, null, edge, allowed,

@@ -246,6 +246,9 @@ public class DockingPane extends Control {
      * Maximization is temporary and is not included in layout snapshots. Use
      * {@link #setMaximizedDockable(Dockable)} to maximize a dockable belonging to this pane,
      * or pass {@code null} to restore the normal layout.
+     * While a group is maximized, docking moves into, out of, or within this pane,
+     * external docking drops, and internal or window floating are rejected.
+     * Tab selection, closing, and restoring the normal layout remain available.
      *
      * @return the maximized dockable property
      */
