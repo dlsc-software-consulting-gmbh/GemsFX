@@ -122,6 +122,10 @@
     -fx-border-color: transparent -fx-box-border -fx-box-border transparent;
 }
 
+.docking-demo-app .docking-pane .docking-tab-pane-actions {
+    -fx-border-color: transparent transparent -fx-box-border -fx-box-border;
+}
+
 .docking-demo-app .docking-pane .docking-tab:selected {
     -fx-background-color: derive(-fx-base, -65%);
 }

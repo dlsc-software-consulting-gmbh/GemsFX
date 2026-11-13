@@ -23,8 +23,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 
 /**
  * Renders one tab group: a strip of factory-created headers above the content of the selected dockable only.
@@ -41,6 +43,7 @@ final class DockingTabPane extends VBox {
     private final List<String> ids;
     private final HBox strip = new HBox();
     private final StackPane contentArea = new StackPane();
+    private StackPane headerAccessory;
     private String selectedId;
 
     DockingTabPane(DockingPane dockingPane, DockingLayoutNode.Tabs tabs) {
@@ -57,11 +60,13 @@ final class DockingTabPane extends VBox {
         addEventFilter(MouseEvent.MOUSE_CLICKED, this::activateFromHeaderOrBackground);
         VBox.setVgrow(contentArea, Priority.ALWAYS);
 
+        List<Dockable> dockables = new ArrayList<>();
         for (String id : ids) {
             Dockable dockable = find(dockingPane, id);
             if (dockable == null) {
                 continue;
             }
+            dockables.add(dockable);
             boolean selected = id.equals(selectedId);
             strip.getChildren().add(createTitle(dockable, selected));
             if (selected) {
@@ -70,6 +75,16 @@ final class DockingTabPane extends VBox {
         }
         if (!strip.getChildren().isEmpty()) {
             strip.getChildren().get(strip.getChildren().size() - 1).pseudoClassStateChanged(LAST_TAB, true);
+        }
+        BiFunction<DockingPane, List<Dockable>, Node> factory = dockingPane.getDockingContext().getTabPaneHeaderFactory();
+        Node accessory = factory == null ? null : factory.apply(dockingPane, List.copyOf(dockables));
+        if (accessory != null) {
+            if (accessory.getParent() != null) {
+                throw new IllegalArgumentException("tabPaneHeaderFactory must return a fresh, unparented node");
+            }
+            headerAccessory = new StackPane(accessory);
+            headerAccessory.getStyleClass().addAll("docking-tab", "docking-tab-pane-actions");
+            strip.getChildren().add(headerAccessory);
         }
         getChildren().addAll(strip, contentArea);
     }
@@ -81,6 +96,9 @@ final class DockingTabPane extends VBox {
         }
         String id = selectedId;
         for (Node node = (Node) event.getTarget(); node != null && node != strip; node = node.getParent()) {
+            if (node == headerAccessory) {
+                return;
+            }
             if (node instanceof ButtonBase || node instanceof TextInputControl) {
                 return;
             }

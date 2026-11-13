@@ -30,6 +30,12 @@
     -fx-cursor: hand;
 }
 
+.docking-pane .docking-tab-pane-actions {
+    -fx-padding: 4;
+    -fx-border-color: transparent transparent -fx-box-border -fx-box-border;
+    -fx-border-width: 1 0 1 1;
+}
+
 .docking-pane .docking-tab:focused {
     -fx-border-color: -fx-focus-color;
     -fx-border-radius: 0;
@@ -85,7 +91,8 @@
 
 .docking-pane .docking-tab-close-button,
 .docking-pane .docking-tab-help-button,
-.docking-pane .docking-tab-menu-button {
+.docking-pane .docking-tab-menu-button,
+.docking-pane .docking-tab-pane-menu-button {
     -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-padding: 4;
@@ -95,7 +102,8 @@
 
 .docking-pane .docking-tab-close-button:hover,
 .docking-pane .docking-tab-help-button:hover,
-.docking-pane .docking-tab-menu-button:hover {
+.docking-pane .docking-tab-menu-button:hover,
+.docking-pane .docking-tab-pane-menu-button:hover {
     -fx-background-color: transparent;
 }
 
@@ -112,22 +120,28 @@
 }
 
 .docking-pane .docking-tab-help-button .ikonli-font-icon,
-.docking-pane .docking-tab-menu-button .ikonli-font-icon {
+.docking-pane .docking-tab-menu-button .ikonli-font-icon,
+.docking-pane .docking-tab-pane-menu-button .ikonli-font-icon {
     -fx-icon-size: 12;
     -fx-icon-color: -fx-text-base-color;
 }
 
-.docking-pane .docking-tab-menu-button {
+.docking-pane .docking-tab-menu-button,
+.docking-pane .docking-tab-pane-menu-button {
     -fx-border-color: transparent;
 }
 
 .docking-pane .docking-tab-menu-button > .label,
 .docking-pane .docking-tab-menu-button > .arrow-button,
-.docking-pane .docking-tab-menu-button > .arrow-button > .arrow {
+.docking-pane .docking-tab-menu-button > .arrow-button > .arrow,
+.docking-pane .docking-tab-pane-menu-button > .label,
+.docking-pane .docking-tab-pane-menu-button > .arrow-button,
+.docking-pane .docking-tab-pane-menu-button > .arrow-button > .arrow {
     -fx-padding: 0;
 }
 
-.docking-pane .docking-tab .docking-tab-menu-button > .arrow-button > .arrow {
+.docking-pane .docking-tab .docking-tab-menu-button > .arrow-button > .arrow,
+.docking-pane .docking-tab-pane-menu-button > .arrow-button > .arrow {
     -fx-shape: null;
     -fx-min-width: 0;
 }

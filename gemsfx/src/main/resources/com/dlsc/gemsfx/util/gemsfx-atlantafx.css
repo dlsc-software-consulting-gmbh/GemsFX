@@ -2894,6 +2894,10 @@
     -fx-border-color: transparent -color-border-muted -color-border-muted transparent;
 }
 
+.docking-pane .docking-tab-pane-actions {
+    -fx-border-color: transparent transparent -color-border-muted -color-border-muted;
+}
+
 .docking-pane .docking-tab-title {
     -fx-text-fill: -color-fg-default;
 }

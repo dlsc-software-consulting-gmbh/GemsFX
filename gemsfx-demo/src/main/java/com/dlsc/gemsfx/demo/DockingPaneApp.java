@@ -295,7 +295,7 @@ public class DockingPaneApp extends GemApplication {
             status("Floated dockable '" + active.getId() + "' into an app-created stage.");
         });
 
-        CheckBox allowDragToFloat = new CheckBox("Allow Drag to Float");
+        ToggleButton allowDragToFloat = new ToggleButton("Allow Drag to Float");
         allowDragToFloat.selectedProperty().bindBidirectional(context.floatingEnabledProperty());
         allowDragToFloat.setTooltip(new Tooltip("Allow tabs or groups to be dragged into new windows"));
 
@@ -334,8 +334,15 @@ public class DockingPaneApp extends GemApplication {
         Button eventsAndSelections = new Button("Events & Selections");
         eventsAndSelections.setOnAction(event -> inspector.show(eventsAndSelections.getScene().getWindow()));
 
+        var defaultHeaderFactory = context.getTabPaneHeaderFactory();
+        ToggleButton groupMenu = new ToggleButton("Show Group Menu");
+        groupMenu.setSelected(defaultHeaderFactory != null);
+        groupMenu.setTooltip(new Tooltip("Show or hide tab group actions"));
+        groupMenu.selectedProperty().addListener((obs, oldValue, selected) ->
+                context.setTabPaneHeaderFactory(selected ? defaultHeaderFactory : null));
+
         HBox toolbar = new HBox(8, openSearch, openTasks, openView, floatActive,
-                snapshot, restore, dumpJson, clearAll, eventsAndSelections, allowDragToFloat);
+                snapshot, restore, dumpJson, clearAll, eventsAndSelections, allowDragToFloat, groupMenu);
         toolbar.getStyleClass().add("docking-demo-toolbar");
         toolbar.setAlignment(Pos.CENTER_LEFT);
         toolbar.setPadding(new Insets(8, 12, 8, 12));

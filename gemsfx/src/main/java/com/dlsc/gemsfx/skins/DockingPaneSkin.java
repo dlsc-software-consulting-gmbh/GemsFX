@@ -132,6 +132,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             focusActiveDockable();
         });
         registerChangeListener(pane.getDockingContext().tabFactoryProperty(), obs -> rebuild());
+        registerChangeListener(pane.getDockingContext().tabPaneHeaderFactoryProperty(), obs -> rebuild());
         pane.maximizedDockableProperty().addListener(maximizedListener);
         registerChangeListener(pane.sceneProperty(), obs -> observeFocusScene(pane.getScene()));
         observeFocusScene(pane.getScene());
@@ -555,6 +556,9 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      */
     private void installTitleDragHandlers(Node root) {
         for (Node title : root.lookupAll(".docking-tab")) {
+            if (dockableId(title) == null) {
+                continue;
+            }
             title.addEventHandler(MouseEvent.DRAG_DETECTED, event -> {
                 String id = dockableId(title);
                 if (id == null) {

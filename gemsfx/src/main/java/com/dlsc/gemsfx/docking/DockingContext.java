@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -197,8 +198,9 @@ public class DockingContext {
 
     /**
      * Controls whether dragging a dockable or tab group outside all panes creates a floating
-     * window. When disabled, the drop leaves the layout unchanged. The default is {@code true}.
-     * This setting does not restrict explicit floating operations or layout restoration.
+     * window. When disabled, the drop leaves the layout unchanged and the default tab group menu
+     * hides its float action. The default is {@code true}. This setting does not restrict explicit
+     * programmatic floating operations or layout restoration.
      *
      * @return the floating-enabled property
      */
@@ -266,6 +268,33 @@ public class DockingContext {
 
     public final void setTabFactory(Callback<Dockable, Node> factory) {
         tabFactory.set(factory);
+    }
+
+    private final ObjectProperty<BiFunction<DockingPane, List<Dockable>, Node>> tabPaneHeaderFactory =
+            new SimpleObjectProperty<>(this, "tabPaneHeaderFactory", DockingTabPaneHeader::new);
+
+    /**
+     * Factory for an optional node at the right edge of each tab group's header strip.
+     * It receives the owning pane and an immutable snapshot of the group's dockables in tab order.
+     * The returned node is wrapped in a stack pane styled as an unselected tab. The factory or
+     * its result may be {@code null}; otherwise each invocation must return a fresh, unparented node.
+     * The default creates a {@link DockingTabPaneHeader} for closing, floating, and maximizing the group.
+     * <p>
+     * The factory is invoked on the JavaFX application thread when groups are rebuilt, including
+     * when their membership changes. Changing it refreshes existing groups in all panes.
+     *
+     * @return the tab pane header factory property
+     */
+    public final ObjectProperty<BiFunction<DockingPane, List<Dockable>, Node>> tabPaneHeaderFactoryProperty() {
+        return tabPaneHeaderFactory;
+    }
+
+    public final BiFunction<DockingPane, List<Dockable>, Node> getTabPaneHeaderFactory() {
+        return tabPaneHeaderFactory.get();
+    }
+
+    public final void setTabPaneHeaderFactory(BiFunction<DockingPane, List<Dockable>, Node> factory) {
+        tabPaneHeaderFactory.set(factory);
     }
 
     /**

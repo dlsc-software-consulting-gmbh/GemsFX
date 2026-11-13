@@ -101,7 +101,7 @@ public class DockingPaneAppTest {
     }
 
     @Test
-    public void floatingCheckboxControlsDragFloating() throws Exception {
+    public void floatingToggleControlsDragFloating() throws Exception {
         runFx(() -> {
             Stage stage = new Stage();
             try {
@@ -109,10 +109,10 @@ public class DockingPaneAppTest {
                 var root = stage.getScene().getRoot();
                 DockingPane pane = (DockingPane) root.lookup(".docking-pane");
                 DockingContext context = pane.getDockingContext();
-                CheckBox floating = root.lookupAll(".check-box").stream()
-                        .filter(CheckBox.class::isInstance).map(CheckBox.class::cast)
+                ToggleButton floating = root.lookupAll(".toggle-button").stream()
+                        .filter(ToggleButton.class::isInstance).map(ToggleButton.class::cast)
                         .filter(box -> "Allow Drag to Float".equals(box.getText())).findFirst().orElse(null);
-                assertNotNull(floating, "The demo must provide a drag-to-float checkbox");
+                assertNotNull(floating, "The demo must provide a drag-to-float toggle button");
                 assertTrue(floating.isSelected());
                 assertTrue(context.isFloatingEnabled());
 
@@ -128,12 +128,48 @@ public class DockingPaneAppTest {
                 root.applyCss();
                 root.layout();
                 assertTrue(floating.localToScene(floating.getBoundsInLocal()).getMaxX() <= stage.getScene().getWidth(),
-                        "The checkbox must be visible at the demo's default window size");
+                        "The toggle button must be visible at the demo's default window size");
                 Button inspector = root.lookupAll(".button").stream()
                         .filter(Button.class::isInstance).map(Button.class::cast)
                         .filter(button -> "Events & Selections".equals(button.getText())).findFirst().orElseThrow();
                 assertTrue(inspector.localToScene(inspector.getBoundsInLocal()).getMaxX() <= stage.getScene().getWidth(),
                         "Existing toolbar buttons must remain visible");
+            } finally {
+                stage.hide();
+            }
+        });
+    }
+
+    @Test
+    public void groupMenuToggleDisablesAndRestoresTheDefaultFactory() throws Exception {
+        runFx(() -> {
+            Stage stage = new Stage();
+            try {
+                new DockingPaneApp().start(stage);
+                Parent root = stage.getScene().getRoot();
+                DockingPane pane = (DockingPane) root.lookup(".docking-pane");
+                DockingContext context = pane.getDockingContext();
+                var factory = context.getTabPaneHeaderFactory();
+                ToggleButton toggle = root.lookupAll(".toggle-button").stream()
+                        .filter(ToggleButton.class::isInstance).map(ToggleButton.class::cast)
+                        .filter(button -> "Show Group Menu".equals(button.getText())).findFirst().orElse(null);
+                assertNotNull(toggle);
+                assertTrue(toggle.isSelected());
+                assertNotNull(factory);
+                assertNotNull(pane.lookup(".docking-tab-pane-menu-button"));
+                assertTrue(toggle.localToScene(toggle.getBoundsInLocal()).getMaxX() <= stage.getScene().getWidth(),
+                        "The group menu toggle must be visible at the demo's default window size");
+
+                toggle.fire();
+                assertNull(context.getTabPaneHeaderFactory());
+                root.applyCss();
+                root.layout();
+                assertNull(pane.lookup(".docking-tab-pane-menu-button"));
+                toggle.fire();
+                assertSame(factory, context.getTabPaneHeaderFactory());
+                root.applyCss();
+                root.layout();
+                assertNotNull(pane.lookup(".docking-tab-pane-menu-button"));
             } finally {
                 stage.hide();
             }
@@ -504,6 +540,7 @@ public class DockingPaneAppTest {
                 }
                 StackPane root = new StackPane(pane);
                 root.getStyleClass().add("docking-demo-app");
+                root.setStyle("-fx-box-border: #123456; -color-neutral-emphasis-plus: #123456;");
                 String stylesheet = atlanta ? "docking-pane-app-atlantafx.css" : "docking-pane-app.css";
                 root.getStylesheets().add(DockingPaneApp.class.getResource(stylesheet).toExternalForm());
                 Scene scene = new Scene(root, 800, 600);
@@ -513,6 +550,15 @@ public class DockingPaneAppTest {
                 } else {
                     scene.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
                 }
+                root.applyCss();
+                root.layout();
+                StackPane groupActions = (StackPane) pane.lookup(".docking-tab-pane-actions");
+                var border = groupActions.getBorder().getStrokes().get(0);
+                assertNotEquals(Color.TRANSPARENT, border.getLeftStroke());
+                assertEquals(Color.TRANSPARENT, border.getRightStroke());
+                assertTrue(border.getWidths().getLeft() > 0);
+                assertEquals(0, border.getWidths().getRight());
+                assertEquals(groupActions.getPadding().getLeft(), groupActions.getPadding().getRight());
 
                 for (String id : List.of("navigator", "editor", "console")) {
                     pane.selectDockable(id);

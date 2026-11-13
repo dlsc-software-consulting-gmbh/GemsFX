@@ -320,7 +320,13 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     private static List<Node> titles(DockingPane pane) {
-        return new ArrayList<>(pane.lookupAll(".docking-tab"));
+        List<Node> titles = new ArrayList<>();
+        for (Node node : pane.lookupAll(".docking-tab")) {
+            if (node.getProperties().containsKey("docking.dockable-id")) {
+                titles.add(node);
+            }
+        }
+        return titles;
     }
 
     private static Node title(DockingPane pane, String id) {
@@ -1456,6 +1462,257 @@ public class DockingPaneTest extends FxTestBase {
         });
     }
 
+    private static MenuItem groupMenuItem(DockingPane pane, String dockableId, String styleClass) {
+        MenuButton menu = (MenuButton) title(pane, dockableId).getParent().lookup(".docking-tab-pane-menu-button");
+        assertNotNull("Each tab group must have a default actions menu", menu);
+        assertTrue(menu instanceof DockingTabPaneHeader);
+        assertNotNull("The menu needs an accessible label", menu.getAccessibleText());
+        assertTrue("The menu must have a down-arrow icon", menu.getGraphic() instanceof FontIcon);
+        return menu.getItems().stream().filter(item -> item.getStyleClass().contains(styleClass))
+                .findFirst().orElseThrow(AssertionError::new);
+    }
+
+    @Test
+    public void defaultGroupHeaderSupportsAdditionalActionsInCustomFactory() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"));
+            context.setTabPaneHeaderFactory((pane, dockables) -> {
+                DockingTabPaneHeader header = new DockingTabPaneHeader(pane, dockables);
+                header.getItems().add(new MenuItem("Additional action"));
+                return header;
+            });
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+
+            DockingTabPaneHeader header = (DockingTabPaneHeader) pane.lookup(".docking-tab-pane-menu-button");
+            assertNotNull(header);
+            assertTrue(header.getItems().stream().anyMatch(item -> "Additional action".equals(item.getText())));
+            groupMenuItem(pane, "a", "docking-group-maximize").fire();
+            assertNotNull(pane.getMaximizedDockable());
+        });
+    }
+
+    @Test
+    public void defaultGroupMenuClosesOnlyPermittedDockablesInItsGroup() {
+        runFx(() -> {
+            Dockable a = dockable("a");
+            Dockable b = dockable("b");
+            Dockable c = dockable("c");
+            Dockable d = dockable("d");
+            b.setCloseable(false);
+            d.setOnCloseRequest(() -> false);
+            DockingContext context = context(a, b, c, d);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "d", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            layout(pane);
+
+            groupMenuItem(pane, "a", "docking-group-close-all").fire();
+            assertNull(a.getDockingPane());
+            assertSame(pane, b.getDockingPane());
+            assertSame(pane, c.getDockingPane());
+            assertSame(pane, d.getDockingPane());
+        });
+    }
+
+    @Test
+    public void defaultGroupMenuFloatsTheGroupOnlyWhenFloatingIsEnabled() {
+        runFx(() -> {
+            Dockable a = dockable("a");
+            Dockable b = dockable("b");
+            Dockable c = dockable("c");
+            DockingContext context = context(a, b, c);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            pane.selectDockable("a");
+            layout(pane);
+            MenuItem floatItem = groupMenuItem(pane, "a", "docking-group-float");
+            context.setFloatingEnabled(false);
+            assertFalse(floatItem.isVisible());
+            floatItem.fire();
+            assertSame(pane, a.getDockingPane());
+            context.setFloatingEnabled(true);
+            assertTrue(floatItem.isVisible());
+            floatItem.fire();
+
+            DockingPane floating = a.getDockingPane();
+            try {
+                assertNotSame(pane, floating);
+                assertSame(floating, b.getDockingPane());
+                assertSame(pane, c.getDockingPane());
+                DockingLayoutNode.Tabs group = (DockingLayoutNode.Tabs) floating.getLayoutRoot();
+                assertEquals(List.of("a", "b"), group.getDockableIds());
+                assertEquals("a", group.getSelectedId());
+            } finally {
+                ((Stage) floating.getScene().getWindow()).close();
+            }
+        });
+    }
+
+    @Test
+    public void defaultGroupMenuMaximizesAndRestoresTheSelectedGroup() {
+        runFx(() -> {
+            Dockable a = dockable("a");
+            Dockable b = dockable("b");
+            Dockable c = dockable("c");
+            DockingContext context = context(a, b, c);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            layout(pane);
+
+            MenuItem maximize = groupMenuItem(pane, "a", "docking-group-maximize");
+            String maximizeText = maximize.getText();
+            maximize.fire();
+            assertSame(b, pane.getMaximizedDockable());
+            assertNotNull(pane.lookup(".docking-maximized-overlay"));
+            MenuItem restore = groupMenuItem(pane, "a", "docking-group-maximize");
+            assertNotEquals(maximizeText, restore.getText());
+            restore.fire();
+            assertNull(pane.getMaximizedDockable());
+            assertNull(pane.lookup(".docking-maximized-overlay"));
+        });
+    }
+
+    @Test
+    public void headerFactoryCreatesStyledActionsForEachTabGroup() {
+        runFx(() -> {
+            Dockable a = dockable("a");
+            Dockable b = dockable("b");
+            Dockable c = dockable("c");
+            DockingContext context = context(a, b, c);
+            DockingPane pane = context.createPane();
+            List<List<Dockable>> groups = new ArrayList<>();
+            context.setTabPaneHeaderFactory((owner, dockables) -> {
+                assertSame(pane, owner);
+                groups.add(dockables);
+                Label action = new Label("Actions");
+                action.setId("actions-" + dockables.get(0).getId());
+                return action;
+            });
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            layout(pane);
+
+            assertTrue(groups.contains(List.of(a, b)));
+            assertTrue(groups.contains(List.of(c)));
+            assertThrows(UnsupportedOperationException.class, () -> groups.get(0).add(c));
+            List<Dockable> originalGroup = groups.stream()
+                    .filter(group -> group.equals(List.of(a, b))).findFirst().orElseThrow();
+            Label action = (Label) pane.lookup("#actions-a");
+            assertNotNull(action);
+            StackPane wrapper = (StackPane) action.getParent();
+            assertTrue(wrapper.getStyleClass().contains("docking-tab"));
+            assertFalse(wrapper.getPseudoClassStates().contains(PseudoClass.getPseudoClass("selected")));
+            Region tab = (Region) title(pane, "a");
+            assertEquals(tab.getBackground(), wrapper.getBackground());
+            assertEquals(tab.getBorder().getStrokes().get(0).getBottomStroke(),
+                    wrapper.getBorder().getStrokes().get(0).getBottomStroke());
+            assertEquals(tab.getPadding().getTop(), wrapper.getPadding().getTop(), 0.01);
+            assertEquals(tab.getPadding().getBottom(), wrapper.getPadding().getBottom(), 0.01);
+            Node strip = wrapper.getParent();
+            assertEquals(strip.localToScene(strip.getBoundsInLocal()).getMaxX(),
+                    wrapper.localToScene(wrapper.getBoundsInLocal()).getMaxX(), 1);
+            shiftDoubleClick(action);
+            assertNull(pane.getMaximizedDockable());
+            pane.selectDockable("a");
+            assertFalse(wrapper.getPseudoClassStates().contains(PseudoClass.getPseudoClass("selected")));
+            assertSame(a, pane.getActiveDockable());
+            assertTrue(context.requestCloseDockable(b));
+            assertTrue(groups.contains(List.of(a)));
+            assertEquals(List.of(a, b), originalGroup);
+        });
+    }
+
+    @Test
+    public void headerAccessoryIsCenteredWithBorderOnItsLeftInBothThemes() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            layout(pane);
+            Scene scene = pane.getScene();
+            scene.getRoot().setStyle("-fx-box-border: #123456; -color-border-muted: #123456;");
+
+            for (boolean atlanta : List.of(false, true)) {
+                if (atlanta) {
+                    GemsFXAtlantaFX.applyTo(scene);
+                }
+                scene.getRoot().applyCss();
+                scene.getRoot().layout();
+                StackPane wrapper = (StackPane) pane.lookup(".docking-tab-pane-actions");
+                MenuButton menu = (MenuButton) wrapper.getChildren().get(0);
+                Bounds wrapperBounds = wrapper.localToScene(wrapper.getBoundsInLocal());
+                Node icon = menu.getGraphic();
+                Bounds iconBounds = icon.localToScene(icon.getBoundsInLocal());
+                assertEquals(wrapper.getPadding().getLeft(), wrapper.getPadding().getRight(), 0.01);
+                assertEquals((wrapperBounds.getMinX() + wrapperBounds.getMaxX()) / 2,
+                        (iconBounds.getMinX() + iconBounds.getMaxX()) / 2, 1);
+                var border = wrapper.getBorder().getStrokes().get(0);
+                assertTrue(border.getWidths().getLeft() > 0);
+                assertEquals(0, border.getWidths().getRight(), 0.01);
+                assertNotEquals(Color.TRANSPARENT, border.getLeftStroke());
+                assertEquals(Color.TRANSPARENT, border.getRightStroke());
+            }
+        });
+    }
+
+    @Test
+    public void changingHeaderFactoryRefreshesExistingPanesAndHandlesNull() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"));
+            DockingPane main = context.createPane();
+            context.openDockable(main, "a", DockingPosition.CENTER);
+            context.openDockable(main, "b", DockingPosition.CENTER);
+            layout(main);
+            DockingPane floating = context.floatDockable("b", 100, 100);
+            Stage stage = (Stage) floating.getScene().getWindow();
+            try {
+                floating.applyCss();
+                context.setTabPaneHeaderFactory((pane, dockables) -> {
+                    Label action = new Label(dockables.get(0).getId());
+                    action.getStyleClass().add("group-actions");
+                    return action;
+                });
+                assertNotNull(main.lookup(".group-actions"));
+                assertNotNull(floating.lookup(".group-actions"));
+                context.setTabPaneHeaderFactory((pane, dockables) -> null);
+                assertNull(main.lookup(".group-actions"));
+                assertNull(floating.lookup(".group-actions"));
+                context.setTabPaneHeaderFactory(null);
+                assertNotNull(title(main, "a"));
+                assertNotNull(title(floating, "b"));
+            } finally {
+                stage.close();
+            }
+        });
+    }
+
+    @Test
+    public void disposedSkinStopsObservingHeaderFactoryChanges() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+            pane.setSkin(null);
+            AtomicInteger calls = new AtomicInteger();
+            context.setTabPaneHeaderFactory((owner, dockables) -> {
+                calls.incrementAndGet();
+                return new Label("Actions");
+            });
+            assertEquals(0, calls.get());
+        });
+    }
+
     @Test
     public void disposedSkinStopsObservingTabFactoryChanges() {
         runFx(() -> {
@@ -1691,7 +1948,7 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     @Test
-    public void singleDockableTitleFillsTheHeaderAndKeepsItsCloseButtonAtTheRight() {
+    public void singleDockableTitleFillsAvailableHeaderAndKeepsItsCloseButtonAtTheRight() {
         invoke(() -> {
             DockingContext context = context(dockable("a"));
             DockingPane pane = context.createPane();
@@ -1705,7 +1962,8 @@ public class DockingPaneTest extends FxTestBase {
 
             assertEquals(0, header.getLayoutX(), 0.01);
             assertEquals(0, header.getLayoutY(), 0.01);
-            assertEquals(strip.getWidth(), header.getWidth(), 0.01);
+            Region actions = (Region) pane.lookup(".docking-tab-pane-actions");
+            assertEquals(strip.getWidth() - actions.getWidth(), header.getWidth(), 0.01);
             assertEquals(strip.getHeight(), header.getHeight(), 0.01);
             assertEquals(header.getWidth() - header.getInsets().getRight(),
                     header.sceneToLocal(close.localToScene(close.getBoundsInLocal())).getMaxX(), 1);
@@ -1735,12 +1993,14 @@ public class DockingPaneTest extends FxTestBase {
                 pane.resize(width, 400);
                 pane.layout();
                 Region strip = (Region) pane.lookup(".docking-tab-strip");
+                Region actions = (Region) pane.lookup(".docking-tab-pane-actions");
+                double tabsWidth = strip.getWidth() - actions.getWidth();
                 int index = 0;
                 for (String id : List.of("a", "b", "c")) {
                     Region header = (Region) title(pane, id);
                     Node close = header.lookup(".docking-tab-close-button");
-                    assertEquals(strip.getWidth() / 3, header.getWidth(), 1);
-                    assertEquals(index++ * strip.getWidth() / 3, header.getLayoutX(), 1);
+                    assertEquals(tabsWidth / 3, header.getWidth(), 1);
+                    assertEquals(index++ * tabsWidth / 3, header.getLayoutX(), 1);
                     assertEquals(0, header.getLayoutY(), 0.01);
                     assertEquals(strip.getHeight(), header.getHeight(), 0.01);
                     assertEquals(header.getWidth() - header.getInsets().getRight(),

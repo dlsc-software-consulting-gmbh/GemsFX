@@ -281,7 +281,8 @@ public class DockingContextRestoreTest extends FxTestBase {
                     primary.layout();
 
                     assertLayoutEquals(snapshot, context.getLayout());
-                    assertEquals(3, primary.lookupAll(".docking-tab").size());
+                    assertEquals(3, primary.lookupAll(".docking-tab").stream()
+                            .filter(node -> node.getProperties().containsKey("docking.dockable-id")).count());
                     assertNotSame(previous, created.get("a"));
                     assertSame(host.getScene(), created.get("a").getContent().getScene());
                     assertSame(host.getScene(), created.get("c").getContent().getScene());

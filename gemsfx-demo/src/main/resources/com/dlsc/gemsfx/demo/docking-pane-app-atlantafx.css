@@ -102,6 +102,10 @@
     -fx-border-color: transparent -color-neutral-emphasis-plus -color-neutral-emphasis-plus transparent;
 }
 
+.docking-demo-app .docking-pane .docking-tab-pane-actions {
+    -fx-border-color: transparent transparent -color-neutral-emphasis-plus -color-neutral-emphasis-plus;
+}
+
 .docking-demo-app .docking-pane .docking-tab:selected {
     -fx-background-color: -color-neutral-emphasis;
     -fx-border-color: transparent -color-neutral-emphasis-plus -color-neutral-emphasis-plus transparent;
