@@ -14,7 +14,9 @@ import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.geometry.Rectangle2D;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +29,9 @@ import java.util.Objects;
  * Hold Shift when starting a tab drag to move its entire tab group, preserving tab order and selection.
  * Shift-double-click a tab or its strip to maximize or restore its group within this pane.
  * The tab group containing the active dockable has the {@code active} pseudo-class.
+ * Internal floating groups are displayed above this pane's regular layout, including a maximized
+ * group. Drag their headers to move them and their borders or corners to resize them. Entering or
+ * leaving internal floating mode is controlled through the context's API.
  */
 public class DockingPane extends Control {
 
@@ -34,6 +39,122 @@ public class DockingPane extends Control {
 
     private final DockingTree tree = new DockingTree();
     private final Map<String, Dockable> dockablesById = new HashMap<>();
+    private final List<FloatingState> floatingStates = new ArrayList<>();
+    private final ReadOnlyObjectWrapper<List<DockingFloatingGroup>> floatingGroups =
+            new ReadOnlyObjectWrapper<>(this, "floatingGroups", List.of());
+
+    /**
+     * Immutable snapshots of the internal floating groups, ordered back to front.
+     * Includes tab order, selection and persistent edge-relative geometry.
+     *
+     * @return the floating groups property
+     */
+    public final ReadOnlyObjectProperty<List<DockingFloatingGroup>> floatingGroupsProperty() {
+        return floatingGroups.getReadOnlyProperty();
+    }
+
+    public final List<DockingFloatingGroup> getFloatingGroups() {
+        return floatingGroups.get();
+    }
+
+    /**
+     * Tests whether a dockable belongs to an internal floating group in this pane.
+     * This does not indicate whether the pane itself is hosted in a floating window.
+     *
+     * @param id the dockable ID
+     * @return {@code true} if internally floating in this pane, or {@code false} if docked or not present
+     */
+    public final boolean isDockableFloating(String id) {
+        return floatingState(id) != null;
+    }
+
+    /**
+     * Updates an internal floating group's bounds and captures its nearest horizontal and
+     * vertical edges. Coordinates are relative to this pane's content area, excluding padding.
+     *
+     * @param id any dockable in the floating group
+     * @param bounds the requested bounds, with finite coordinates and positive dimensions
+     * @throws IllegalArgumentException if the dockable is not internally floating in this pane
+     */
+    public final void updateFloatingGroupBounds(String id, Rectangle2D bounds) {
+        DockingContext.requireFxThread();
+        FloatingState state = floatingState(id);
+        if (state == null) {
+            throw new IllegalArgumentException("Dockable is not internally floating in this pane: " + id);
+        }
+        state.layout = floatingLayout((DockingLayoutNode.Tabs) state.tree.snapshot(), bounds);
+        publishFloatingGroups();
+    }
+
+    private DockingFloatingGroup floatingLayout(DockingLayoutNode.Tabs tabs, Rectangle2D bounds) {
+        return DockingFloatingGroup.atBounds(tabs, bounds,
+                Math.max(0, getWidth() - getInsets().getLeft() - getInsets().getRight()),
+                Math.max(0, getHeight() - getInsets().getTop() - getInsets().getBottom()));
+    }
+
+    final void floatInternally(String id, Rectangle2D bounds, boolean wholeGroup) {
+        DockingLayoutNode.Tabs source = tabGroupSnapshot(id);
+        DockingLayoutNode.Tabs tabs = wholeGroup ? source : new DockingLayoutNode.Tabs(List.of(id), id);
+        DockingFloatingGroup layout = floatingLayout(tabs, bounds);
+        FloatingState existing = floatingState(id);
+        if (existing != null && existing.tree.dockableIds().size() == tabs.getDockableIds().size()) {
+            existing.layout = layout;
+            selectDockable(tabs.getSelectedId());
+            publishFloatingGroups();
+            return;
+        }
+        List<Dockable> moving = new ArrayList<>();
+        for (String tabId : tabs.getDockableIds()) {
+            moving.add(dockablesById.get(tabId));
+        }
+        for (Dockable dockable : moving) {
+            removeDockable(dockable);
+        }
+        FloatingState state = new FloatingState(layout);
+        floatingStates.add(state);
+        for (Dockable dockable : moving) {
+            dockablesById.put(dockable.getId(), dockable);
+        }
+        publishFloatingGroups();
+        activeDockable.set(dockablesById.get(tabs.getSelectedId()));
+    }
+
+    private FloatingState floatingState(String id) {
+        for (FloatingState state : floatingStates) {
+            if (state.tree.dockableIds().contains(id)) {
+                return state;
+            }
+        }
+        return null;
+    }
+
+    private DockingTree treeFor(String id) {
+        FloatingState state = floatingState(id);
+        return state == null ? tree : state.tree;
+    }
+
+    final DockingLayoutNode.Tabs tabGroupSnapshot(String id) {
+        return findGroup(treeFor(id).snapshot(), id);
+    }
+
+    private void publishFloatingGroups() {
+        List<DockingFloatingGroup> snapshots = new ArrayList<>();
+        for (FloatingState state : floatingStates) {
+            state.layout = state.layout.withTabs((DockingLayoutNode.Tabs) state.tree.snapshot());
+            snapshots.add(state.layout);
+        }
+        floatingGroups.set(List.copyOf(snapshots));
+    }
+
+    private static final class FloatingState {
+        private final DockingTree tree = new DockingTree();
+        private DockingFloatingGroup layout;
+
+        private FloatingState(DockingFloatingGroup layout) {
+            this.layout = layout;
+            tree.restore(layout.getTabs());
+        }
+    }
 
     /**
      * Creates a pane belonging to the supplied context. Applications should create panes via the context's
@@ -49,7 +170,7 @@ public class DockingPane extends Control {
         setPlaceholder(new DockingPanePlaceholder());
         activeDockable.addListener((observable, previous, current) -> {
             Dockable maximized = getMaximizedDockable();
-            if (maximized != null) {
+            if (maximized != null && (current == null || floatingState(current.getId()) == null)) {
                 DockingLayoutNode.Tabs group = findGroup(getLayoutRoot(), maximized.getId());
                 maximizedDockable.set(current != null && group != null && group.getDockableIds().contains(current.getId())
                         ? current : null);
@@ -141,6 +262,9 @@ public class DockingPane extends Control {
         if (dockable != null && dockablesById.get(dockable.getId()) != dockable) {
             throw new IllegalArgumentException("Dockable does not belong to this pane");
         }
+        if (dockable != null && floatingState(dockable.getId()) != null) {
+            throw new IllegalArgumentException("Internal floating groups cannot be maximized");
+        }
         if (dockable != null && getActiveDockable() != dockable) {
             selectDockable(dockable.getId());
         }
@@ -151,8 +275,9 @@ public class DockingPane extends Control {
             new ReadOnlyObjectWrapper<>(this, "layoutRoot", new DockingLayoutNode.Empty());
 
     /**
-     * An immutable snapshot of this pane's current layout. A new snapshot is published on every structural or
-     * selection change, so observers must not rely on node identity.
+     * An immutable snapshot of this pane's regular split/tab layout, excluding
+     * {@link #floatingGroupsProperty() internal floating groups}. A new snapshot is published on
+     * every structural or selection change to that layout, so observers must not rely on node identity.
      *
      * @return the layout root property
      */
@@ -183,14 +308,25 @@ public class DockingPane extends Control {
         if (dockable == null) {
             throw new IllegalArgumentException("Unknown dockable id: " + id);
         }
-        tree.select(id);
-        layoutRoot.set(tree.snapshot());
+        DockingTree selectedTree = treeFor(id);
+        selectedTree.select(id);
+        if (selectedTree == tree) {
+            layoutRoot.set(tree.snapshot());
+        } else {
+            FloatingState state = floatingState(id);
+            floatingStates.remove(state);
+            floatingStates.add(state);
+            publishFloatingGroups();
+        }
         activeDockable.set(dockable);
     }
 
     final Map<DockingTabGroup, Dockable> selectedGroups() {
         Map<DockingTabGroup, Dockable> result = new LinkedHashMap<>();
         collectSelectedGroups(tree.root(), result);
+        for (FloatingState state : floatingStates) {
+            collectSelectedGroups(state.tree.root(), result);
+        }
         return result;
     }
 
@@ -247,9 +383,22 @@ public class DockingPane extends Control {
     }
 
     final void restoreLayout(DockingLayoutNode root, Map<String, Dockable> resolvedDockables) {
+        restoreLayout(root, List.of(), resolvedDockables);
+    }
+
+    final void restoreLayout(DockingLayoutNode root, List<DockingFloatingGroup> floating,
+                             Map<String, Dockable> resolvedDockables) {
         tree.restore(root);
+        floatingStates.clear();
+        for (DockingFloatingGroup group : floating) {
+            floatingStates.add(new FloatingState(group));
+        }
         dockablesById.clear();
-        for (String id : tree.dockableIds()) {
+        List<String> allIds = new ArrayList<>(tree.dockableIds());
+        for (FloatingState state : floatingStates) {
+            allIds.addAll(state.tree.dockableIds());
+        }
+        for (String id : allIds) {
             dockablesById.put(id, Objects.requireNonNull(resolvedDockables.get(id), "Unresolved dockable: " + id));
         }
         DockingLayoutNode snapshot = tree.snapshot();
@@ -261,6 +410,10 @@ public class DockingPane extends Control {
         activeDockable.set(last instanceof DockingLayoutNode.Tabs
                 ? dockablesById.get(((DockingLayoutNode.Tabs) last).getSelectedId()) : null);
         layoutRoot.set(snapshot);
+        publishFloatingGroups();
+        if (!floating.isEmpty()) {
+            activeDockable.set(dockablesById.get(floating.get(floating.size() - 1).getTabs().getSelectedId()));
+        }
     }
 
     final boolean containsDockable(String id) {
@@ -269,13 +422,20 @@ public class DockingPane extends Control {
 
     final void insertDockable(Dockable dockable, DockingPosition position) {
         Dockable active = getActiveDockable();
+        DockingTree targetTree = tree;
         if (active == null) {
             tree.addToRoot(dockable);
+        } else if (floatingState(active.getId()) != null && position != DockingPosition.CENTER) {
+            tree.insertAtPaneEdge(dockable, position, 0.5);
         } else {
-            tree.splitAt(active.getId(), dockable, position, 0.5);
+            targetTree = treeFor(active.getId());
+            targetTree.splitAt(active.getId(), dockable, position, 0.5);
         }
         dockablesById.put(dockable.getId(), dockable);
-        layoutRoot.set(tree.snapshot());
+        if (targetTree == tree) {
+            layoutRoot.set(tree.snapshot());
+        }
+        publishFloatingGroups();
         activeDockable.set(dockable);
     }
 
@@ -288,15 +448,24 @@ public class DockingPane extends Control {
                     : dockablesById.get(ids.get(index == 0 ? 1 : index - 1)));
         }
         String id = dockable.getId();
-        String neighbour = neighbourOf(getLayoutRoot(), id);
-        tree.remove(id);
+        DockingTree sourceTree = treeFor(id);
+        String neighbour = neighbourOf(sourceTree.snapshot(), id);
+        sourceTree.remove(id);
+        floatingStates.removeIf(state -> state.tree.dockableIds().isEmpty());
         dockablesById.remove(id);
-        layoutRoot.set(tree.snapshot());
+        if (sourceTree == tree) {
+            layoutRoot.set(tree.snapshot());
+        }
+        publishFloatingGroups();
         if (dockable == getActiveDockable()) {
             activeDockable.set(neighbour == null ? null : dockablesById.get(neighbour));
             if (neighbour != null) {
-                tree.select(neighbour);
-                layoutRoot.set(tree.snapshot());
+                DockingTree selectedTree = treeFor(neighbour);
+                selectedTree.select(neighbour);
+                if (selectedTree == tree) {
+                    layoutRoot.set(tree.snapshot());
+                }
+                publishFloatingGroups();
             }
         }
     }
@@ -365,33 +534,56 @@ public class DockingPane extends Control {
     }
 
     final boolean canMoveInside(String draggedId, String targetId, DockingPosition position) {
-        return draggedId != null
+        if (!(draggedId != null
                 && targetId != null
                 && position != null
                 && dockablesById.containsKey(draggedId)
-                && tree.canMove(draggedId, new DockingTree.DropTarget(targetId, position));
+                && !draggedId.equals(targetId)
+                && canInsertRelativeTo(targetId, position))) {
+            return false;
+        }
+        DockingTree sourceTree = treeFor(draggedId);
+        DockingTree targetTree = treeFor(targetId);
+        return sourceTree != targetTree || sourceTree.canMove(draggedId, new DockingTree.DropTarget(targetId, position));
     }
 
     final boolean canInsertRelativeTo(String targetId, DockingPosition position) {
-        return tree.canInsertRelativeTo(targetId, position);
+        return containsDockable(targetId) && (floatingState(targetId) == null || position == DockingPosition.CENTER)
+                && treeFor(targetId).canInsertRelativeTo(targetId, position);
     }
 
     final boolean moveInside(String draggedId, String targetId, DockingPosition position) {
-        if (!canMoveInside(draggedId, targetId, position)
-                || !tree.tryMove(draggedId, new DockingTree.DropTarget(targetId, position), 0.5)) {
+        if (!canMoveInside(draggedId, targetId, position)) {
+            return false;
+        }
+        DockingTree sourceTree = treeFor(draggedId);
+        if (sourceTree != treeFor(targetId)) {
+            Dockable dockable = removeDockableById(draggedId);
+            insertDockableRelativeTo(targetId, dockable, position);
+            return true;
+        }
+        if (!sourceTree.tryMove(draggedId, new DockingTree.DropTarget(targetId, position), 0.5)) {
             return false;
         }
         Dockable dockable = dockablesById.get(draggedId);
-        layoutRoot.set(tree.snapshot());
+        if (sourceTree == tree) {
+            layoutRoot.set(tree.snapshot());
+        }
+        publishFloatingGroups();
         activeDockable.set(dockable);
         return true;
     }
 
     final boolean canMoveInsideToPaneEdge(String id, DockingPosition edge) {
-        return tree.canMoveToPaneEdge(id, edge);
+        return floatingState(id) != null || tree.canMoveToPaneEdge(id, edge);
     }
 
     final boolean moveInsideToPaneEdge(String id, DockingPosition edge) {
+        if (floatingState(id) != null) {
+            Dockable dockable = removeDockableById(id);
+            insertDockableAtPaneEdge(dockable, edge);
+            return true;
+        }
         if (!tree.moveToPaneEdge(id, edge, 0.5)) {
             return false;
         }
@@ -410,9 +602,13 @@ public class DockingPane extends Control {
     }
 
     final void insertDockableRelativeTo(String targetId, Dockable dockable, DockingPosition position) {
-        tree.insertRelativeTo(targetId, dockable, position, 0.5);
+        DockingTree targetTree = treeFor(targetId);
+        targetTree.insertRelativeTo(targetId, dockable, position, 0.5);
         dockablesById.put(dockable.getId(), dockable);
-        layoutRoot.set(tree.snapshot());
+        if (targetTree == tree) {
+            layoutRoot.set(tree.snapshot());
+        }
+        publishFloatingGroups();
         activeDockable.set(dockable);
     }
 
@@ -462,7 +658,7 @@ public class DockingPane extends Control {
     }
 
     private String remainingOutside(String id) {
-        for (String other : tree.dockableIds()) {
+        for (String other : dockablesById.keySet()) {
             if (!other.equals(id)) {
                 return other;
             }

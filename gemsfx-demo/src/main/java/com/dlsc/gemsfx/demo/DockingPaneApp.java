@@ -13,6 +13,7 @@ import com.dlsc.gemsfx.docking.DockingPane;
 import com.dlsc.gemsfx.docking.DockingPosition;
 import com.dlsc.gemsfx.docking.DockingRestoreResult;
 import com.dlsc.gemsfx.docking.DockingStageFactory;
+import com.dlsc.gemsfx.docking.DockingTabPaneHeader;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +25,7 @@ import javafx.collections.ListChangeListener;
 import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
@@ -46,6 +48,7 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -68,6 +71,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -121,6 +127,7 @@ public class DockingPaneApp extends GemApplication {
 
         DockingPane rootPane = context.createPane();
         rootPane.setPadding(new Insets(4));
+        context.setTabPaneHeaderFactory((pane, dockables) -> createGroupHeader(pane, dockables, rootPane));
         openInitialLayout(context, rootPane);
 
         BorderPane root = new BorderPane();
@@ -138,6 +145,47 @@ public class DockingPaneApp extends GemApplication {
         stage.show();
 
         status("Drag sidebar icons into the workspace to create views, or move the rocket between its panels. Drag tabs to rearrange views.");
+    }
+
+    private Node createGroupHeader(DockingPane pane, List<Dockable> dockables, DockingPane rootPane) {
+        DockingContext context = pane.getDockingContext();
+        DockingTabPaneHeader header = new DockingTabPaneHeader(pane, dockables);
+        boolean internallyFloating = pane.isDockableFloating(dockables.get(0).getId());
+        MenuItem dockGroup = new MenuItem(internallyFloating ? "Dock Group" : "Dock Group to Main Pane");
+        dockGroup.setOnAction(event -> {
+            DockingPane targetPane = internallyFloating ? pane : rootPane;
+            if (context.moveTabGroup(targetPane, dockables.get(0).getId(), null, DockingPosition.LEFT)) {
+                status(internallyFloating ? "Docked the group at its pane's left edge."
+                        : "Docked the group at the main pane's left edge.");
+            }
+        });
+        if (internallyFloating) {
+            header.getItems().removeIf(item -> item.getStyleClass().contains("docking-group-maximize"));
+            header.getItems().stream()
+                    .filter(item -> item.getStyleClass().contains("docking-group-float"))
+                    .forEach(item -> item.setText("Move Group to New Window"));
+            header.getItems().addAll(new SeparatorMenuItem(), dockGroup);
+            return header;
+        }
+
+        MenuItem floatTab = new MenuItem("Float Tab Internally");
+        floatTab.setOnAction(event -> dockables.stream()
+                .filter(context.getSelectionModel()::isSelected)
+                .findFirst()
+                .ifPresent(dockable -> {
+                    context.floatDockableInternally(dockable.getId(), new Rectangle2D(40, 40, 400, 280));
+                    status("Drag the floating header to move; drag its edges to resize. Use the group menu to dock again.");
+                }));
+        MenuItem floatGroup = new MenuItem("Float Group Internally");
+        floatGroup.setOnAction(event -> {
+            context.floatTabGroupInternally(dockables.get(0).getId(), new Rectangle2D(40, 40, 400, 280));
+            status("Floating the tab group inside its pane. Its nearest-edge gaps are retained when resizing.");
+        });
+        header.getItems().addAll(new SeparatorMenuItem(), floatTab, floatGroup);
+        if (pane != rootPane) {
+            header.getItems().add(dockGroup);
+        }
+        return header;
     }
 
     HBox createStatusBar(DockingPane pane) {
@@ -269,11 +317,12 @@ public class DockingPaneApp extends GemApplication {
         });
 
         MenuButton openView = new MenuButton("Open View");
-        for (String id : List.of("map", "charts", "city", "drag", "drop")) {
+        for (String id : List.of("map", "charts", "city", "video", "drag", "drop")) {
             MenuItem item = new MenuItem(switch (id) {
                 case "map" -> "Map";
                 case "charts" -> "Financial Charts";
                 case "city" -> "City";
+                case "video" -> "Video";
                 case "drag" -> "Rocket Source";
                 default -> "Rocket Target";
             });
@@ -444,6 +493,7 @@ public class DockingPaneApp extends GemApplication {
         context.openDockable(rootPane, "navigator", DockingPosition.CENTER);
         context.openDockable(rootPane, "inspector", DockingPosition.CENTER);
         context.openDockable(rootPane, "city", DockingPosition.CENTER);
+        context.openDockable(rootPane, "video", DockingPosition.CENTER);
         rootPane.selectDockable("editor");
         context.openDockable(rootPane, "drag", DockingPosition.RIGHT);
         context.openDockable(rootPane, "drop", DockingPosition.RIGHT);
@@ -489,6 +539,7 @@ public class DockingPaneApp extends GemApplication {
         templates.put("map", this::createMapDockable);
         templates.put("charts", this::createChartsDockable);
         templates.put("city", this::createCityDockable);
+        templates.put("video", this::createVideoDockable);
         templates.put("drag", this::createDragDockable);
         templates.put("drop", this::createDropDockable);
         return templates;
@@ -802,6 +853,48 @@ public class DockingPaneApp extends GemApplication {
         content.setMinSize(0, 0);
         StackPane.setAlignment(footer, Pos.BOTTOM_CENTER);
         return new Dockable(id, "Map", createIcon(MaterialDesign.MDI_MAP), content);
+    }
+
+    private Dockable createVideoDockable(String id) {
+        Media media = new Media(Objects.requireNonNull(
+                DockingPaneApp.class.getResource("docking-video.mp4")).toExternalForm());
+        MediaPlayer player = new MediaPlayer(media);
+        player.setCycleCount(MediaPlayer.INDEFINITE);
+        MediaView view = new MediaView(player);
+        view.setPreserveRatio(true);
+
+        StackPane videoPane = new StackPane(view);
+        videoPane.setMinSize(0, 0);
+        videoPane.setStyle("-fx-background-color: black;");
+        view.fitWidthProperty().bind(videoPane.widthProperty());
+        view.fitHeightProperty().bind(videoPane.heightProperty());
+
+        Button playPause = new Button();
+        playPause.textProperty().bind(Bindings.when(player.statusProperty().isEqualTo(MediaPlayer.Status.PLAYING))
+                .then("Pause").otherwise("Play"));
+        playPause.setOnAction(event -> {
+            if (player.getStatus() == MediaPlayer.Status.PLAYING) {
+                player.pause();
+            } else {
+                player.play();
+            }
+        });
+
+        Label error = new Label();
+        error.setWrapText(true);
+        player.setOnError(() -> error.setText("Unable to play video: " + player.getError().getMessage()));
+        HBox controls = new HBox(8, playPause, error);
+        controls.setAlignment(Pos.CENTER_LEFT);
+        controls.setPadding(new Insets(8));
+        BorderPane content = new BorderPane(videoPane);
+        content.setBottom(controls);
+
+        return new Dockable(id, "Video", createIcon(MaterialDesign.MDI_VIDEO), content) {
+            @Override
+            protected void dispose() {
+                player.dispose();
+            }
+        };
     }
 
     private Dockable createChartsDockable(String id) {

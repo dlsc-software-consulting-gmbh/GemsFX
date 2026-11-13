@@ -11,6 +11,14 @@
     -fx-padding: 20;
 }
 
+.docking-pane .docking-floating-frame {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-border-color: -fx-box-border;
+    -fx-border-width: 1;
+    -fx-padding: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 12, 0.1, 0, 3);
+}
+
 .docking-pane .docking-tab-strip {
     -fx-spacing: 0;
     -fx-padding: 0;

@@ -922,6 +922,75 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     @Test
+    public void movingExternalGroupToNewWindowPreservesTabsAndOriginalHostLifetime() {
+        runFx(() -> {
+            for (int tabCount : List.of(1, 2)) {
+                AtomicInteger disposed = new AtomicInteger();
+                List<Dockable> all = new ArrayList<>();
+                for (String id : tabCount == 1 ? List.of("a") : List.of("a", "b")) {
+                    all.add(new Dockable(id, id, new Label(id)) {
+                        @Override
+                        protected void dispose() {
+                            disposed.incrementAndGet();
+                        }
+                    });
+                }
+                all.add(dockable("remaining"));
+                Stage host = new Stage();
+                List<Stage> floatingStages = new ArrayList<>();
+                DockingContext context = new DockingContext(factoryFor(all, new AtomicInteger()), pane -> {
+                    Stage floating = new Stage();
+                    floating.initOwner(host);
+                    floating.setScene(new Scene(new StackPane(pane), 400, 300));
+                    floatingStages.add(floating);
+                    floating.show();
+                    return floating;
+                });
+                try {
+                    DockingPane primary = context.createPane();
+                    host.setScene(new Scene(primary, 600, 400));
+                    host.show();
+                    for (int i = 0; i < tabCount; i++) {
+                        context.openDockable(primary, all.get(i).getId(), DockingPosition.CENTER);
+                    }
+                    context.openDockable(primary, "remaining", DockingPosition.RIGHT);
+                    String selectedId = all.get(tabCount - 1).getId();
+                    primary.selectDockable(selectedId);
+                    DockingPane external = context.floatTabGroup("a", 80, 90);
+
+                    for (int move = 0; move < 2; move++) {
+                        Stage previous = (Stage) external.getScene().getWindow();
+                        previous.getScene().getRoot().applyCss();
+                        previous.getScene().getRoot().layout();
+                        MenuButton menu = (MenuButton) external.lookup(".docking-tab-pane-menu-button");
+                        menu.getItems().stream()
+                                .filter(item -> item.getStyleClass().contains("docking-group-float"))
+                                .findFirst().orElseThrow().fire();
+
+                        Stage replacement = floatingStages.get(floatingStages.size() - 1);
+                        assertFalse(previous.isShowing());
+                        assertTrue("Closing the emptied source must not close the replacement", replacement.isShowing());
+                        external = all.get(0).getDockingPane();
+                        assertNotNull(external);
+                        assertSame(replacement, external.getScene().getWindow());
+                        assertEquals(tabCount == 1 ? List.of("a") : List.of("a", "b"), ids(external));
+                        assertEquals(selectedId, external.getActiveDockable().getId());
+                        assertEquals(tabCount + 1, context.getDockables().size());
+                        assertEquals(0, disposed.get());
+                    }
+
+                    host.close();
+                    assertFalse(floatingStages.get(floatingStages.size() - 1).isShowing());
+                    assertEquals(List.of(all.get(tabCount)), context.getDockables());
+                } finally {
+                    floatingStages.forEach(Stage::close);
+                    host.close();
+                }
+            }
+        });
+    }
+
+    @Test
     public void closingFloatingStageRemovesListenerFromItsRegisteredHost() {
         invoke(() -> {
             Dockable a = dockable("a");
