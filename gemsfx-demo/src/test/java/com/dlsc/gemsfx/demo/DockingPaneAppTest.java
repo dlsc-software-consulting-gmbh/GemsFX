@@ -15,14 +15,17 @@ import javafx.application.Platform;
 import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeView;
@@ -37,6 +40,9 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -62,6 +68,102 @@ public class DockingPaneAppTest {
         Platform.startup(started::countDown);
         assertTrue(started.await(10, TimeUnit.SECONDS));
         Platform.setImplicitExit(false);
+    }
+
+    @Test
+    public void dockingEventsArePrintedToStandardOutput() throws Exception {
+        runFx(() -> {
+            PrintStream previousOut = System.out;
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            Stage stage = new Stage();
+            try (PrintStream captured = new PrintStream(output, true, StandardCharsets.UTF_8)) {
+                System.setOut(captured);
+                new DockingPaneApp().start(stage);
+                DockingPane pane = (DockingPane) stage.getScene().getRoot().lookup(".docking-pane");
+                DockingContext context = pane.getDockingContext();
+                Dockable dockable = context.openDockable(pane, "editor:logging", DockingPosition.CENTER).orElseThrow();
+                assertTrue(pane.moveDockable(dockable.getId(), "navigator", DockingPosition.LEFT));
+                assertTrue(context.requestCloseDockable(dockable));
+
+                String text = output.toString(StandardCharsets.UTF_8);
+                assertTrue(text.lines().anyMatch(line -> line.contains("DOCKABLE_OPENED") && line.contains("editor:logging")), text);
+                assertTrue(text.lines().anyMatch(line -> line.contains("DOCKABLE_MOVED") && line.contains("editor:logging")), text);
+                assertTrue(text.lines().anyMatch(line -> line.contains("DOCKABLE_CLOSED") && line.contains("editor:logging")), text);
+                assertTrue(text.lines().anyMatch(line -> line.contains("Docking selection:") && line.contains("editor:logging")));
+            } finally {
+                System.setOut(previousOut);
+                stage.hide();
+            }
+        });
+    }
+
+    @Test
+    public void inspectorShowsEventHistoryAndLiveSelectionAcrossWindows() throws Exception {
+        runFx(() -> {
+            Stage stage = new Stage();
+            try {
+                new DockingPaneApp().start(stage);
+                var root = stage.getScene().getRoot();
+                Button inspectorButton = root.lookupAll(".button").stream()
+                        .filter(Button.class::isInstance).map(Button.class::cast)
+                        .filter(button -> "Events & Selections".equals(button.getText())).findFirst().orElse(null);
+                assertNotNull(inspectorButton, "The demo must provide the combined inspector button");
+                assertTrue(root.lookupAll(".button").stream()
+                        .filter(Button.class::isInstance).map(Button.class::cast)
+                        .noneMatch(button -> "Events".equals(button.getText()) || "Selection".equals(button.getText())));
+
+                DockingPane pane = (DockingPane) root.lookup(".docking-pane");
+                DockingContext context = pane.getDockingContext();
+                inspectorButton.fire();
+                Stage inspector = (Stage) Window.getWindows().stream()
+                        .filter(window -> window instanceof Stage candidate && candidate.getOwner() == stage)
+                        .findFirst().orElseThrow();
+                TabPane tabs = assertInstanceOf(TabPane.class, inspector.getScene().getRoot());
+                assertEquals("Events", tabs.getSelectionModel().getSelectedItem().getText());
+                Parent eventsTab = assertInstanceOf(Parent.class, tabs.getTabs().get(0).getContent());
+                TextArea events = assertInstanceOf(TextArea.class, eventsTab.lookup(".text-area"));
+                assertTrue(events.isWrapText(), "Event text must wrap");
+                assertFalse(events.isEditable());
+                assertTrue(events.getText().lines().anyMatch(line -> line.contains("DOCKABLE_OPENED")
+                        && line.contains("editor")), "Initial events must be retained");
+                Button clear = eventsTab.lookupAll(".button").stream()
+                        .filter(Button.class::isInstance).map(Button.class::cast)
+                        .filter(button -> "Clear".equals(button.getText())).findFirst().orElse(null);
+                assertNotNull(clear, "The Events tab must provide a Clear button");
+                clear.fire();
+                assertEquals("", events.getText());
+
+                Dockable opened = context.openDockable(pane, "editor:inspector-test", DockingPosition.CENTER).orElseThrow();
+                assertTrue(events.getText().lines().anyMatch(line -> line.contains("DOCKABLE_OPENED")
+                        && line.contains(opened.getId())));
+                DockingPane floating = context.floatDockable(opened.getId(), 100, 100);
+                assertNotNull(floating);
+                assertTrue(events.getText().lines().anyMatch(line -> line.contains("DOCKABLE_MOVED")
+                        && line.contains(opened.getId())));
+                tabs.getSelectionModel().select(1);
+                assertEquals("Selection", tabs.getSelectionModel().getSelectedItem().getText());
+                ListView<?> selection = assertInstanceOf(ListView.class, tabs.getTabs().get(1).getContent());
+                assertTrue(selection.getItems().contains(opened), "Floating selections must be visible");
+                assertTrue(selection.getItems().size() > 1, "Selections in other groups must remain visible");
+                pane.selectDockable("map");
+                assertTrue(selection.getItems().stream().anyMatch(item -> ((Dockable) item).getId().equals("map")));
+                assertFalse(selection.getItems().stream().anyMatch(item -> ((Dockable) item).getId().equals("editor")));
+                assertTrue(selection.getItems().contains(opened), "Selecting in one pane must preserve floating selections");
+
+                inspector.hide();
+                assertTrue(context.requestCloseDockable(opened));
+                inspectorButton.fire();
+                assertTrue(inspector.isShowing(), "The same inspector must reopen");
+                assertEquals("Selection", tabs.getSelectionModel().getSelectedItem().getText());
+                assertFalse(selection.getItems().contains(opened));
+                assertEquals(1, events.getText().lines().filter(line -> line.contains("DOCKABLE_CLOSED")
+                        && line.contains(opened.getId())).count());
+                assertFalse(events.getText().lines().anyMatch(line -> line.contains("DOCKABLE_OPENED dockable=editor ")),
+                        "Cleared events must not return after reopening");
+            } finally {
+                stage.hide();
+            }
+        });
     }
 
     @Test

@@ -23,7 +23,7 @@ import java.util.function.BooleanSupplier;
  * Represents a dockable component with an ID, a mutable display title and optional graphic, and a content node.
  */
 public class Dockable {
-    
+
     private final String id;
     private final ReadOnlyStringWrapper title;
     private final BooleanProperty titleEditable = new SimpleBooleanProperty(this, "titleEditable", true);
@@ -277,5 +277,15 @@ public class Dockable {
             throw new IllegalArgumentException("title must not be blank");
         }
         return title;
+    }
+
+    private boolean closing;
+
+    final boolean isClosing() {
+        return closing;
+    }
+
+    final void setClosing(boolean closing) {
+        this.closing = closing;
     }
 }

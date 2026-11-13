@@ -1,12 +1,16 @@
 package com.dlsc.gemsfx.docking;
 
 import com.dlsc.gemsfx.docking.model.DockingTree;
+import com.dlsc.gemsfx.docking.model.DockingTabGroup;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.input.DragEvent;
 import javafx.stage.Stage;
@@ -26,6 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 /**
@@ -57,6 +62,9 @@ public class DockingContext {
     private Predicate<DragEvent> dockableDropPredicate = event -> false;
     private Callback<DragEvent, Dockable> dockableDropFactory;
     private boolean suppressEmptyFloatingClose;
+    private final Map<EventType<?>, List<EventHandler<?>>> eventHandlers = new LinkedHashMap<>();
+    private final DockingSelectionModel selectionModel = new DockingSelectionModel(this);
+    private int restoreDepth;
 
     /**
      * Creates a context. The stage factory is only stored for later floating-window support.
@@ -67,6 +75,96 @@ public class DockingContext {
     public DockingContext(DockableFactory dockableFactory, DockingStageFactory stageFactory) {
         this.dockableFactory = Objects.requireNonNull(dockableFactory, "dockableFactory must not be null");
         this.stageFactory = Objects.requireNonNull(stageFactory, "stageFactory must not be null");
+    }
+
+    final <T> T withSelectionUpdates(Supplier<T> operation) {
+        requireFxThread();
+        if (restoreDepth > 0) {
+            return operation.get();
+        }
+        try {
+            return operation.get();
+        } finally {
+            updateSelectionModel();
+        }
+    }
+
+    private void updateSelectionModel() {
+        List<Dockable> selected = new ArrayList<>();
+        for (DockingPane pane : panes) {
+            selected.addAll(pane.selectedGroups().values());
+        }
+        selectionModel.update(selected);
+    }
+
+    /**
+     * Returns the selection model spanning all panes in this context.
+     *
+     * @return the docking selection model
+     */
+    public final DockingSelectionModel getSelectionModel() {
+        return selectionModel;
+    }
+
+    /**
+     * Registers a handler for a docking event type and its subtypes. Handlers are called
+     * synchronously on the JavaFX application thread. They may perform nested docking operations;
+     * handler exceptions are logged and do not interrupt other handlers or required cleanup.
+     * Layout restoration does not emit docking events.
+     *
+     * @param eventType the event type
+     * @param handler the handler
+     * @param <E> the event class
+     * @throws IllegalStateException if called off the JavaFX application thread
+     */
+    public final <E extends Event> void addEventHandler(EventType<E> eventType, EventHandler<? super E> handler) {
+        requireFxThread();
+        eventHandlers.computeIfAbsent(Objects.requireNonNull(eventType), ignored -> new ArrayList<>())
+                .add(Objects.requireNonNull(handler));
+    }
+
+    /**
+     * Removes a previously registered event handler.
+     *
+     * @param eventType the event type
+     * @param handler the handler
+     * @param <E> the event class
+     * @throws IllegalStateException if called off the JavaFX application thread
+     */
+    public final <E extends Event> void removeEventHandler(EventType<E> eventType, EventHandler<? super E> handler) {
+        requireFxThread();
+        List<EventHandler<?>> handlers = eventHandlers.get(Objects.requireNonNull(eventType));
+        if (handlers != null) {
+            handlers.remove(Objects.requireNonNull(handler));
+            if (handlers.isEmpty()) {
+                eventHandlers.remove(eventType);
+            }
+        }
+    }
+
+    private void fireDockingEvent(Event event) {
+        if (restoreDepth > 0) {
+            return;
+        }
+        updateSelectionModel();
+        dispatchDockingEvent(event);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void dispatchDockingEvent(Event event) {
+        for (EventType<?> type = event.getEventType(); type != null; type = type.getSuperType()) {
+            List<EventHandler<?>> handlers = eventHandlers.get(type);
+            if (handlers == null) {
+                continue;
+            }
+            for (EventHandler<?> handler : new ArrayList<>(handlers)) {
+                try {
+                    ((EventHandler<Event>) handler).handle(event);
+                } catch (Exception ex) {
+                    LOG.log(java.util.logging.Level.WARNING, "Docking event handler failed", ex);
+                }
+            }
+        }
     }
 
     DockingPane findDockingPane(Dockable dockable) {
@@ -214,6 +312,11 @@ public class DockingContext {
      */
     public final Optional<Dockable> dropDockable(DockingPane pane, DragEvent event,
                                                 String targetId, DockingPosition position) {
+        return withSelectionUpdates(() -> dropDockableInternal(pane, event, targetId, position));
+    }
+
+    private Optional<Dockable> dropDockableInternal(DockingPane pane, DragEvent event,
+                                                   String targetId, DockingPosition position) {
         requireFxThread();
         Objects.requireNonNull(event, "event must not be null");
         if (pane == null || pane.getDockingContext() != this || !paneIdByPane.containsKey(pane)) {
@@ -242,6 +345,7 @@ public class DockingContext {
             logDecision("external drop", pane, null, targetId, position, false, "drop factory declined to create a dockable");
             return Optional.empty();
         }
+        ensureNotClosing(dockable);
         String id = dockable.getId();
         if (dockablesById.containsKey(id)) {
             logDecision("external drop", pane, id, targetId, position, false, "dockable ID is already open");
@@ -267,6 +371,7 @@ public class DockingContext {
             LOG.fine(() -> "External drop of dockable '" + id + "' failed while inserting: " + ex);
             throw ex;
         }
+        fireDockingEvent(new DockingEvent(this, DockingEvent.OPENED, dockable, null, pane));
         logDecision("external drop", pane, id, targetId, position, true, "dockable was created and inserted");
         return Optional.of(dockable);
     }
@@ -290,9 +395,14 @@ public class DockingContext {
      * @param position the requested position
      * @return the opened or activated dockable, or empty if the factory cannot resolve the ID
      * @throws IllegalArgumentException if the pane belongs to another context
-     * @throws IllegalStateException    if called off the FX thread or the factory returns a dockable with another ID
+     * @throws IllegalStateException if called off the FX thread, the factory returns a dockable with another ID,
+     *                               or the returned instance is currently being closed
      */
     public Optional<Dockable> openDockable(DockingPane pane, String id, DockingPosition position) {
+        return withSelectionUpdates(() -> openDockableInternal(pane, id, position));
+    }
+
+    private Optional<Dockable> openDockableInternal(DockingPane pane, String id, DockingPosition position) {
         requireFxThread();
         Objects.requireNonNull(pane, "pane must not be null");
         Objects.requireNonNull(id, "id must not be null");
@@ -319,6 +429,7 @@ public class DockingContext {
         }
 
         Dockable dockable = created.get();
+        ensureNotClosing(dockable);
         if (!id.equals(dockable.getId())) {
             logDecision("open", pane, id, null, position, false, "dockable factory returned a different ID: " + dockable.getId());
             throw new IllegalStateException("Factory returned dockable '" + dockable.getId() + "' for requested ID '" + id + "'");
@@ -338,6 +449,7 @@ public class DockingContext {
             LOG.fine(() -> "Opening dockable '" + id + "' failed while inserting: " + ex);
             throw ex;
         }
+        fireDockingEvent(new DockingEvent(this, DockingEvent.OPENED, dockable, null, pane));
         logDecision("open", pane, id, null, position, true, "dockable was created and inserted");
         return Optional.of(dockable);
     }
@@ -352,6 +464,10 @@ public class DockingContext {
      * @return the floating pane
      */
     public DockingPane floatDockable(String id, double screenX, double screenY) {
+        return withSelectionUpdates(() -> floatDockableInternal(id, screenX, screenY));
+    }
+
+    private DockingPane floatDockableInternal(String id, double screenX, double screenY) {
         requireFxThread();
         Objects.requireNonNull(id, "id must not be null");
         Dockable dockable = dockablesById.get(id);
@@ -383,6 +499,7 @@ public class DockingContext {
         stage.setX(screenX);
         stage.setY(screenY);
         closeFloatingStageIfEmpty(sourcePane);
+        fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, floatingPane));
         return floatingPane;
     }
 
@@ -404,8 +521,9 @@ public class DockingContext {
             throw new IllegalArgumentException("Unknown dockable id: " + id);
         }
         DockingLayoutNode.Tabs group = findTabGroup(source.getLayoutRoot(), id);
+        DockingTabGroup sourceGroup = source.groupOf(id);
         DockingPane floating = floatDockable(group.getDockableIds().get(0), screenX, screenY);
-        moveRemainingTabs(floating, group);
+        moveRemainingTabs(source, sourceGroup, floating, group);
         return floating;
     }
 
@@ -449,6 +567,18 @@ public class DockingContext {
      * @return restore result containing unresolved dockable IDs
      */
     public DockingRestoreResult restoreLayout(DockingLayout layout) {
+        restoreDepth++;
+        try {
+            return restoreLayoutInternal(layout);
+        } finally {
+            restoreDepth--;
+            if (restoreDepth == 0) {
+                updateSelectionModel();
+            }
+        }
+    }
+
+    private DockingRestoreResult restoreLayoutInternal(DockingLayout layout) {
         requireFxThread();
         Objects.requireNonNull(layout, "layout must not be null");
 
@@ -689,22 +819,47 @@ public class DockingContext {
         }
         DockingLayoutNode.Tabs group = findTabGroup(dockablePaneById.get(id).getLayoutRoot(), id);
         String first = group.getDockableIds().get(0);
+        DockingPane source = dockablePaneById.get(id);
+        DockingTabGroup sourceGroup = source.groupOf(id);
+        boolean moved;
         if (targetId == null) {
-            moveDockableToPaneEdge(targetPane, first,
+            moved = moveDockableToPaneEdge(targetPane, first,
                     position == DockingPosition.CENTER ? DockingPosition.LEFT : position);
         } else {
-            moveDockable(targetPane, first, targetId, position);
+            moved = moveDockable(targetPane, first, targetId, position);
         }
-        moveRemainingTabs(targetPane, group);
-        return true;
+        return moved && moveRemainingTabs(source, sourceGroup, targetPane, group);
     }
 
-    private void moveRemainingTabs(DockingPane targetPane, DockingLayoutNode.Tabs group) {
+    private boolean moveRemainingTabs(DockingPane sourcePane, DockingTabGroup sourceGroup,
+                                      DockingPane targetPane, DockingLayoutNode.Tabs group) {
         List<String> ids = group.getDockableIds();
+        DockingTabGroup targetGroup = targetPane.groupOf(ids.get(0));
+        if (targetGroup == null || dockablePaneById.get(ids.get(0)) != targetPane) {
+            return false;
+        }
         for (int i = 1; i < ids.size(); i++) {
-            moveDockable(targetPane, ids.get(i), ids.get(0), DockingPosition.CENTER);
+            for (int j = 0; j < i; j++) {
+                if (dockablePaneById.get(ids.get(j)) != targetPane || targetPane.groupOf(ids.get(j)) != targetGroup) {
+                    return false;
+                }
+            }
+            for (int j = i; j < ids.size(); j++) {
+                if (dockablePaneById.get(ids.get(j)) != sourcePane || sourcePane.groupOf(ids.get(j)) != sourceGroup) {
+                    return false;
+                }
+            }
+            if (!moveDockable(targetPane, ids.get(i), ids.get(0), DockingPosition.CENTER)) {
+                return false;
+            }
+        }
+        for (String id : ids) {
+            if (dockablePaneById.get(id) != targetPane || targetPane.groupOf(id) != targetGroup) {
+                return false;
+            }
         }
         targetPane.selectDockable(group.getSelectedId());
+        return true;
     }
 
     private static DockingLayoutNode.Tabs findTabGroup(DockingLayoutNode node, String id) {
@@ -758,6 +913,10 @@ public class DockingContext {
     }
 
     final boolean moveDockable(DockingPane targetPane, String draggedId, String targetId, DockingPosition position) {
+        return withSelectionUpdates(() -> moveDockableInternal(targetPane, draggedId, targetId, position));
+    }
+
+    private boolean moveDockableInternal(DockingPane targetPane, String draggedId, String targetId, DockingPosition position) {
         requireFxThread();
         if (!canMoveDockable(targetPane, draggedId, targetId, position)) {
             return false;
@@ -765,7 +924,15 @@ public class DockingContext {
 
         DockingPane sourcePane = dockablePaneById.get(draggedId);
         if (sourcePane == targetPane) {
-            return targetPane.moveInside(draggedId, targetId, position);
+            Dockable dockable = dockablesById.get(draggedId);
+            DockingLayoutNode.Tabs before = findTabGroup(targetPane.getLayoutRoot(), draggedId);
+            boolean sameGroup = position == DockingPosition.CENTER && before.getDockableIds().contains(targetId);
+            boolean moved = targetPane.moveInside(draggedId, targetId, position);
+            if (moved && (!sameGroup || !before.getDockableIds().equals(
+                    findTabGroup(targetPane.getLayoutRoot(), draggedId).getDockableIds()))) {
+                fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, targetPane));
+            }
+            return moved;
         }
         Dockable dockable = sourcePane.removeDockableById(draggedId);
         if (dockable == null) {
@@ -774,6 +941,7 @@ public class DockingContext {
         dockablePaneById.put(draggedId, targetPane);
         targetPane.insertDockableRelativeTo(targetId, dockable, position);
         closeFloatingStageIfEmpty(sourcePane);
+        fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, targetPane));
         return true;
     }
 
@@ -804,17 +972,27 @@ public class DockingContext {
     }
 
     final boolean moveDockableToPaneEdge(DockingPane targetPane, String id, DockingPosition edge) {
+        return withSelectionUpdates(() -> moveDockableToPaneEdgeInternal(targetPane, id, edge));
+    }
+
+    private boolean moveDockableToPaneEdgeInternal(DockingPane targetPane, String id, DockingPosition edge) {
         if (!canMoveDockableToPaneEdge(targetPane, id, edge)) {
             return false;
         }
         DockingPane sourcePane = dockablePaneById.get(id);
         if (sourcePane == targetPane) {
-            return targetPane.moveInsideToPaneEdge(id, edge);
+            Dockable dockable = dockablesById.get(id);
+            boolean moved = targetPane.moveInsideToPaneEdge(id, edge);
+            if (moved) {
+                fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, targetPane));
+            }
+            return moved;
         }
         Dockable dockable = sourcePane.removeDockableById(id);
         dockablePaneById.put(id, targetPane);
         targetPane.insertDockableAtPaneEdge(dockable, edge);
         closeFloatingStageIfEmpty(sourcePane);
+        fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, targetPane));
         return true;
     }
 
@@ -896,6 +1074,7 @@ public class DockingContext {
         }
 
         Dockable dockable = created.get();
+        ensureNotClosing(dockable);
         if (!id.equals(dockable.getId())) {
             throw new IllegalStateException("Factory returned dockable '" + dockable.getId() + "' for requested ID '" + id + "'");
         }
@@ -1100,6 +1279,10 @@ public class DockingContext {
      * prechecking all tabs or when the window has already been hidden.
      */
     private boolean closeDockableInternal(Dockable dockable, boolean checkPolicy) {
+        return withSelectionUpdates(() -> closeDockableImpl(dockable, checkPolicy));
+    }
+
+    private boolean closeDockableImpl(Dockable dockable, boolean checkPolicy) {
         String id = dockable.getId();
         if (dockablesById.get(id) != dockable) {
             return false;
@@ -1120,16 +1303,31 @@ public class DockingContext {
         if (pane == null) {
             return false;
         }
-        dockable.setDockingContext(null);
-        pane.removeDockable(dockable);
-        dockablesById.remove(id);
-        dockables.remove(dockable);
+        dockable.setClosing(true);
         try {
-            dockable.dispose();
+            dockable.setDockingContext(null);
+            pane.removeDockable(dockable);
+            dockablesById.remove(id);
+            dockables.remove(dockable);
+            try {
+                fireDockingEvent(new DockingEvent(this, DockingEvent.CLOSED, dockable, pane, null));
+            } finally {
+                dockable.dispose();
+            }
         } finally {
-            closeFloatingStageIfEmpty(pane);
+            try {
+                closeFloatingStageIfEmpty(pane);
+            } finally {
+                dockable.setClosing(false);
+            }
         }
         return true;
+    }
+
+    private static void ensureNotClosing(Dockable dockable) {
+        if (dockable.isClosing()) {
+            throw new IllegalStateException("Cannot reopen a dockable while it is closing");
+        }
     }
 
     /**

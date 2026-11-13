@@ -1,6 +1,8 @@
 package com.dlsc.gemsfx.docking;
 
 import com.dlsc.gemsfx.docking.model.DockingTree;
+import com.dlsc.gemsfx.docking.model.DockingSplit;
+import com.dlsc.gemsfx.docking.model.DockingTabGroup;
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
@@ -14,6 +16,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -168,6 +171,13 @@ public class DockingPane extends Control {
      * @throws IllegalArgumentException if the dockable is not part of this pane
      */
     public final void selectDockable(String id) {
+        dockingContext.withSelectionUpdates(() -> {
+            selectDockableInternal(id);
+            return null;
+        });
+    }
+
+    private void selectDockableInternal(String id) {
         DockingContext.requireFxThread();
         Dockable dockable = dockablesById.get(Objects.requireNonNull(id, "id must not be null"));
         if (dockable == null) {
@@ -176,6 +186,34 @@ public class DockingPane extends Control {
         tree.select(id);
         layoutRoot.set(tree.snapshot());
         activeDockable.set(dockable);
+    }
+
+    final Map<DockingTabGroup, Dockable> selectedGroups() {
+        Map<DockingTabGroup, Dockable> result = new LinkedHashMap<>();
+        collectSelectedGroups(tree.root(), result);
+        return result;
+    }
+
+    final DockingTabGroup groupOf(String id) {
+        for (DockingTabGroup group : selectedGroups().keySet()) {
+            if (group.getDockableIds().contains(id)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    private void collectSelectedGroups(DockingTree.Node node, Map<DockingTabGroup, Dockable> result) {
+        if (node instanceof DockingTabGroup) {
+            DockingTabGroup group = (DockingTabGroup) node;
+            if (group.getSelectedId() != null) {
+                result.put(group, dockablesById.get(group.getSelectedId()));
+            }
+        } else {
+            for (DockingTree.Node child : ((DockingSplit) node).getChildren()) {
+                collectSelectedGroups(child, result);
+            }
+        }
     }
 
     private DockingLayoutNode.Tabs findGroup(DockingLayoutNode node, String id) {
