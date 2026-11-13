@@ -91,6 +91,10 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         }
     };
     private final ChangeListener<Dockable> maximizedListener = (obs, previous, current) -> {
+        if (current != null) {
+            clearDropPreview();
+            hidePaneEdgeTargets();
+        }
         if (previous == null || current == null || maximizedGroup == null
                 || !maximizedGroup.containsDockable(previous.getId())
                 || !maximizedGroup.containsDockable(current.getId())) {
@@ -627,7 +631,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             }
             title.addEventHandler(MouseEvent.DRAG_DETECTED, event -> {
                 String id = dockableId(title);
-                if (id == null) {
+                if (id == null || getSkinnable().getMaximizedDockable() != null) {
                     return;
                 }
                 dragWholeGroup = event.isShiftDown();
@@ -775,6 +779,15 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      */
     private void handleDragOver(DragEvent event) {
         String draggedId = draggedDockableId(event);
+        DockingPane pane = getSkinnable();
+        if (pane.getMaximizedDockable() != null) {
+            clearDropPreview();
+            hidePaneEdgeTargets();
+            if (draggedId != null) {
+                event.consume();
+            }
+            return;
+        }
         if (draggedId == null) {
             if (getSkinnable().getDockingContext().canAcceptDockableDrop(event)) {
                 handleExternalDragOver(event);
@@ -784,7 +797,6 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             }
             return;
         }
-        DockingPane pane = getSkinnable();
         if (isOverFloatingFrame(event)) {
             clearDropPreview();
             hidePaneEdgeTargets();
@@ -829,13 +841,23 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      */
     private void handleDragDropped(DragEvent event) {
         String draggedId = draggedDockableId(event);
+        DockingPane pane = getSkinnable();
+        if (pane.getMaximizedDockable() != null) {
+            if (draggedId != null) {
+                recordUnsuccessfulDrop(draggedId);
+                event.setDropCompleted(false);
+                event.consume();
+            }
+            clearDropPreview();
+            hidePaneEdgeTargets();
+            return;
+        }
         if (draggedId == null) {
             if (getSkinnable().getDockingContext().canAcceptDockableDrop(event)) {
                 handleExternalDragDropped(event);
             }
             return;
         }
-        DockingPane pane = getSkinnable();
         if (isOverFloatingFrame(event)) {
             recordUnsuccessfulDrop(draggedId);
             event.setDropCompleted(false);
@@ -1116,6 +1138,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
 
     private void handleSceneDragOver(DragEvent event) {
         if (!getSkinnable().getDockingContext().isFloatingEnabled()
+                || getSkinnable().getMaximizedDockable() != null
                 || !isActiveDockableDrag(event) || isInsideContextPane(intersectedNode(event))) {
             return;
         }
@@ -1125,6 +1148,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
 
     private void handleSceneDragDropped(DragEvent event) {
         if (!getSkinnable().getDockingContext().isFloatingEnabled()
+                || getSkinnable().getMaximizedDockable() != null
                 || !isActiveDockableDrag(event) || isInsideContextPane(intersectedNode(event))) {
             return;
         }
@@ -1174,6 +1198,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      */
     private void completeDrag(String dockableId, TransferMode transferMode, double screenX, double screenY) {
         if (!getSkinnable().getDockingContext().isFloatingEnabled()
+                || getSkinnable().getMaximizedDockable() != null
                 || dockableId == null || !dockableId.equals(activeDragDockableId) || dragCancelledByEscape
                 || (outsideContextDropPosition == null && (transferMode != null || unsuccessfulDropObserved))) {
             finishDrag();

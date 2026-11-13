@@ -239,14 +239,104 @@ public class DockingContextWindowTest extends FxTestBase {
 
     private static final class EventTestDockingPaneSkin extends DockingPaneSkin {
 
+        private int dragStarts;
+
         private EventTestDockingPaneSkin(DockingPane pane) {
             super(pane);
         }
 
         @Override
         protected boolean startDockableDrag(Node title, String dockableId) {
+            dragStarts++;
             return true;
         }
+    }
+
+    @Test
+    public void maximizedPaneDoesNotStartNativeTabOrGroupDockingDrags() {
+        runFx(() -> {
+            DockingContext context = new DockingContext(id -> Optional.of(dockable(id)), pane -> new Stage());
+            DockingPane pane = context.createPane();
+            Dockable a = context.openDockable(pane, "a", DockingPosition.CENTER).orElseThrow();
+            context.openDockable(pane, "b", DockingPosition.RIGHT);
+            renderWithEventSkin(pane);
+            EventTestDockingPaneSkin skin = (EventTestDockingPaneSkin) pane.getSkin();
+            pane.setMaximizedDockable(a);
+            pane.applyCss();
+            pane.layout();
+            fireDragDetected(title(pane, "a"));
+            fireDragDetected(title(pane, "a"), true);
+            assertEquals(0, skin.dragStarts);
+            assertTrue(pane.lookupAll(".docking-pane-edge-target").stream().noneMatch(Node::isVisible));
+
+            pane.setMaximizedDockable(null);
+            pane.applyCss();
+            pane.layout();
+            Node dragged = title(pane, "a");
+            fireDragDetected(dragged);
+            assertEquals(1, skin.dragStarts);
+            fireDragEvent(dragged, DragEvent.DRAG_DONE, dragged, 5, 5, 400, 300, TransferMode.MOVE, dragged);
+        });
+    }
+
+    @Test
+    public void maximizingDuringADragClearsPreviewsAndRejectsSourceAndTargetMoves() {
+        runFx(() -> {
+            for (boolean wholeGroup : new boolean[]{false, true}) {
+                DockingContext context = new DockingContext(id -> Optional.of(dockable(id)), pane -> {
+                    throw new AssertionError("A rejected drag must not create a floating window");
+                });
+                DockingPane source = context.createPane();
+                Dockable a = context.openDockable(source, "a", DockingPosition.CENTER).orElseThrow();
+                context.openDockable(source, "b", DockingPosition.CENTER);
+                renderWithEventSkin(source);
+                DockingPane target = context.createPane();
+                Dockable x = context.openDockable(target, "x", DockingPosition.CENTER).orElseThrow();
+                context.openDockable(target, "y", DockingPosition.RIGHT);
+                renderWithEventSkin(target);
+                Node dragged = title(source, "a");
+                fireDragDetected(dragged, wholeGroup);
+                fireDragEvent(target, DragEvent.DRAG_OVER, dragged,
+                        target.getWidth() / 2, target.getHeight() / 2, 400, 300, TransferMode.MOVE, title(target, "x"));
+                assertTrue(target.lookup(".docking-drop-zone-preview").isVisible());
+
+                target.setMaximizedDockable(x);
+                assertFalse(target.lookup(".docking-drop-zone-preview").isVisible());
+                assertTrue(target.lookupAll(".docking-pane-edge-target").stream().noneMatch(Node::isVisible));
+                target.applyCss();
+                target.layout();
+                fireDragEvent(target, DragEvent.DRAG_OVER, dragged,
+                        target.getWidth() / 2, target.getHeight() / 2, 400, 300, TransferMode.MOVE, title(target, "x"));
+                assertFalse(target.lookup(".docking-drop-zone-preview").isVisible());
+                assertFalse(fireDragEvent(target, DragEvent.DRAG_DROPPED, dragged,
+                        target.getWidth() / 2, target.getHeight() / 2, 400, 300, TransferMode.MOVE,
+                        title(target, "x")).isDropCompleted());
+
+                target.setMaximizedDockable(null);
+                target.applyCss();
+                target.layout();
+                source.setMaximizedDockable(a);
+                fireDragEvent(target, DragEvent.DRAG_OVER, dragged,
+                        target.getWidth() / 2, target.getHeight() / 2, 400, 300, TransferMode.MOVE, title(target, "x"));
+                assertFalse(target.lookup(".docking-drop-zone-preview").isVisible());
+                assertFalse(fireDragEvent(target, DragEvent.DRAG_DROPPED, dragged,
+                        target.getWidth() / 2, target.getHeight() / 2, 400, 300, TransferMode.MOVE,
+                        title(target, "x")).isDropCompleted());
+                fireDragEvent(dragged, DragEvent.DRAG_DONE, dragged, 5, 5, 900, 900, null, dragged);
+                assertSame(source, a.getDockingPane());
+
+                source.setMaximizedDockable(null);
+                source.applyCss();
+                source.layout();
+                dragged = title(source, "a");
+                fireDragDetected(dragged, wholeGroup);
+                assertTrue(fireDragEvent(target, DragEvent.DRAG_DROPPED, dragged,
+                        target.getWidth() / 2, target.getHeight() / 2, 400, 300, TransferMode.MOVE,
+                        title(target, "x")).isDropCompleted());
+                fireDragEvent(dragged, DragEvent.DRAG_DONE, dragged, 5, 5, 400, 300, TransferMode.MOVE, dragged);
+                assertSame(target, a.getDockingPane());
+            }
+        });
     }
 
     @Test

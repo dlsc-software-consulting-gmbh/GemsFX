@@ -60,6 +60,7 @@ public class DockingTabPaneHeader extends MenuButton {
                 bundle, "menu.float-group", "Move Group to New Window"));
         floatGroup.getStyleClass().add("docking-group-float");
         floatGroup.visibleProperty().bind(context.floatingEnabledProperty());
+        floatGroup.disableProperty().bind(pane.maximizedDockableProperty().isNotNull());
         floatGroup.setOnAction(event -> {
             String id = groupDockables.get(0).getId();
             if (context.isFloatingEnabled() && pane.groupOf(id) != null) {
@@ -72,6 +73,7 @@ public class DockingTabPaneHeader extends MenuButton {
         if (pane.isDockableFloating(groupDockables.get(0).getId())) {
             MenuItem dockGroup = new MenuItem(ResourceBundleManager.getString(bundle, "menu.dock-group", "Dock Group"));
             dockGroup.getStyleClass().add("docking-group-dock");
+            dockGroup.disableProperty().bind(pane.maximizedDockableProperty().isNotNull());
             dockGroup.setOnAction(event -> {
                 String id = groupDockables.get(0).getId();
                 if (pane.isDockableFloating(id)) {
@@ -101,6 +103,7 @@ public class DockingTabPaneHeader extends MenuButton {
         MenuItem floatTabInternally = new MenuItem(ResourceBundleManager.getString(
                 bundle, "menu.float-tab-internally", "Float Tab Internally"));
         floatTabInternally.getStyleClass().add("docking-tab-float-internally");
+        floatTabInternally.disableProperty().bind(pane.maximizedDockableProperty().isNotNull());
         floatTabInternally.setOnAction(event -> {
             DockingTabGroup group = pane.groupOf(groupDockables.get(0).getId());
             if (group != null) {
@@ -111,6 +114,7 @@ public class DockingTabPaneHeader extends MenuButton {
         MenuItem floatGroupInternally = new MenuItem(ResourceBundleManager.getString(
                 bundle, "menu.float-group-internally", "Float Group Internally"));
         floatGroupInternally.getStyleClass().add("docking-group-float-internally");
+        floatGroupInternally.disableProperty().bind(pane.maximizedDockableProperty().isNotNull());
         floatGroupInternally.setOnAction(event -> {
             String id = groupDockables.get(0).getId();
             if (pane.groupOf(id) != null) {

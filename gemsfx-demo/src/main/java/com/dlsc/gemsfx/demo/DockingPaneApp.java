@@ -289,6 +289,7 @@ public class DockingPaneApp extends GemApplication {
         }
 
         Button floatActive = new Button("Float Active");
+        floatActive.disableProperty().bind(rootPane.maximizedDockableProperty().isNotNull());
         floatActive.setOnAction(evt -> {
             Dockable active = rootPane.getActiveDockable();
             if (active == null) {

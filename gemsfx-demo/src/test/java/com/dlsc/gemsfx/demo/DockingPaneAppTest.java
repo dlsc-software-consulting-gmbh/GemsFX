@@ -258,6 +258,30 @@ public class DockingPaneAppTest {
     }
 
     @Test
+    public void floatActiveIsDisabledWhileAGroupIsMaximized() throws Exception {
+        runFx(() -> {
+            Stage stage = new Stage();
+            try {
+                new DockingPaneApp().start(stage);
+                Parent root = stage.getScene().getRoot();
+                DockingPane pane = (DockingPane) root.lookup(".docking-pane");
+                Button floatActive = root.lookupAll(".button").stream()
+                        .filter(Button.class::isInstance).map(Button.class::cast)
+                        .filter(button -> "Float Active".equals(button.getText())).findFirst().orElseThrow();
+                assertFalse(floatActive.isDisabled());
+                pane.setMaximizedDockable(pane.getActiveDockable());
+                assertTrue(floatActive.isDisabled());
+                floatActive.fire();
+                assertNotNull(pane.getMaximizedDockable());
+                pane.setMaximizedDockable(null);
+                assertFalse(floatActive.isDisabled());
+            } finally {
+                stage.hide();
+            }
+        });
+    }
+
+    @Test
     public void groupMenuToggleDisablesAndRestoresTheDefaultFactory() throws Exception {
         runFx(() -> {
             Stage stage = new Stage();

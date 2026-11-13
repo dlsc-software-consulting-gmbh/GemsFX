@@ -169,6 +169,122 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     @Test
+    public void maximizedPaneRejectsDockingMovesIntoOutOfAndWithinIt() {
+        runFx(() -> {
+            DockingContext context = new DockingContext(id -> Optional.of(dockable(id)), pane -> new Stage());
+            DockingPane pane = context.createPane();
+            Dockable a = context.openDockable(pane, "a", DockingPosition.CENTER).orElseThrow();
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            DockingPane other = context.createPane();
+            context.openDockable(other, "x", DockingPosition.CENTER);
+            DockingPane third = context.createPane();
+            context.openDockable(third, "y", DockingPosition.CENTER);
+            pane.setMaximizedDockable(a);
+            DockingLayoutNode before = pane.getLayoutRoot();
+            DockingLayoutNode otherBefore = other.getLayoutRoot();
+
+            assertFalse(pane.canMoveDockable("a", "c", DockingPosition.CENTER));
+            assertFalse(pane.moveDockable("a", "c", DockingPosition.CENTER));
+            assertFalse(other.canMoveDockable("c", "x", DockingPosition.CENTER));
+            assertFalse(other.moveDockable("c", "x", DockingPosition.CENTER));
+            assertFalse(pane.canMoveDockable("x", "a", DockingPosition.CENTER));
+            assertFalse(pane.moveDockable("x", "a", DockingPosition.CENTER));
+            assertFalse(other.canMoveDockableToPaneEdge("a", DockingPosition.LEFT));
+            assertFalse(other.moveDockableToPaneEdge("a", DockingPosition.LEFT));
+            assertFalse(pane.canMoveDockableToPaneEdge("x", DockingPosition.LEFT));
+            assertFalse(pane.moveDockableToPaneEdge("x", DockingPosition.LEFT));
+            assertFalse(context.canMoveTabGroup(other, "a", null, DockingPosition.LEFT));
+            assertFalse(context.moveTabGroup(other, "a", null, DockingPosition.LEFT));
+            assertFalse(context.canMoveTabGroup(pane, "x", null, DockingPosition.LEFT));
+            assertFalse(context.moveTabGroup(pane, "x", null, DockingPosition.LEFT));
+            assertSame(before, pane.getLayoutRoot());
+            assertSame(otherBefore, other.getLayoutRoot());
+            assertSame(a, pane.getMaximizedDockable());
+            assertTrue(third.moveDockable("x", "y", DockingPosition.CENTER));
+
+            pane.setMaximizedDockable(null);
+            assertTrue(pane.moveDockable("x", "a", DockingPosition.CENTER));
+        });
+    }
+
+    @Test
+    public void maximizedPaneRejectsInternalAndWindowFloatingWithoutCreatingStages() {
+        runFx(() -> {
+            AtomicInteger stages = new AtomicInteger();
+            DockingContext context = new DockingContext(id -> Optional.of(dockable(id)), pane -> {
+                stages.incrementAndGet();
+                Stage stage = new Stage();
+                stage.setScene(new Scene(pane));
+                return stage;
+            });
+            DockingPane pane = context.createPane();
+            Dockable a = context.openDockable(pane, "a", DockingPosition.CENTER).orElseThrow();
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            pane.setMaximizedDockable(a);
+            DockingLayoutNode before = pane.getLayoutRoot();
+            for (String id : List.of("a", "c")) {
+                assertNull(context.floatDockable(id, 100, 100));
+                assertNull(context.floatTabGroup(id, 100, 100));
+                context.floatDockableInternally(id, new Rectangle2D(40, 40, 400, 280));
+                context.floatTabGroupInternally(id, new Rectangle2D(40, 40, 400, 280));
+            }
+            assertEquals(0, stages.get());
+            assertTrue(pane.getFloatingGroups().isEmpty());
+            assertSame(before, pane.getLayoutRoot());
+            assertSame(a, pane.getMaximizedDockable());
+
+            pane.setMaximizedDockable(null);
+            context.floatTabGroupInternally("a", new Rectangle2D(40, 40, 400, 280));
+            assertTrue(pane.isDockableFloating("a"));
+            DockingPane floating = context.floatTabGroup("a", 100, 100);
+            try {
+                assertNotNull(floating);
+                assertEquals(1, stages.get());
+            } finally {
+                ((Stage) floating.getScene().getWindow()).close();
+            }
+        });
+    }
+
+    @Test
+    public void maximizedPaneDisablesDockingMenuActionsButKeepsSelectionCloseAndRestore() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"), dockable("f"));
+            DockingPane pane = context.createPane();
+            Dockable a = context.openDockable(pane, "a", DockingPosition.CENTER).orElseThrow();
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "f", DockingPosition.RIGHT);
+            context.floatDockableInternally("f", new Rectangle2D(40, 40, 400, 280));
+            layout(pane);
+            pane.setMaximizedDockable(a);
+            pane.applyCss();
+            pane.layout();
+            for (String action : List.of("docking-group-float", "docking-tab-float-internally",
+                    "docking-group-float-internally")) {
+                assertTrue(groupMenuItem(pane, "a", action).isDisable());
+            }
+            MenuItem dock = groupMenuItem(pane, "f", "docking-group-dock");
+            assertTrue(dock.isDisable());
+            dock.fire();
+            assertTrue(pane.isDockableFloating("f"));
+            assertFalse(groupMenuItem(pane, "a", "docking-group-close-all").isDisable());
+            assertFalse(groupMenuItem(pane, "a", "docking-group-maximize").isDisable());
+            pane.selectDockable("b");
+            assertEquals("b", pane.getMaximizedDockable().getId());
+            assertTrue(groupMenuItem(pane, "b", "docking-group-float").isDisable());
+
+            groupMenuItem(pane, "b", "docking-group-maximize").fire();
+            assertNull(pane.getMaximizedDockable());
+            assertFalse(groupMenuItem(pane, "a", "docking-group-float").isDisable());
+            assertFalse(groupMenuItem(pane, "a", "docking-tab-float-internally").isDisable());
+            assertFalse(groupMenuItem(pane, "a", "docking-group-float-internally").isDisable());
+            assertFalse(groupMenuItem(pane, "f", "docking-group-dock").isDisable());
+        });
+    }
+
+    @Test
     public void maximizationDoesNotChangeDividerPositionsOrSurviveLayoutRestore() {
         runFx(() -> {
             Dockable a = dockable("a");
