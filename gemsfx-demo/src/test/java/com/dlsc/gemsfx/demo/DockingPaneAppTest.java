@@ -36,8 +36,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -55,7 +53,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -291,107 +288,24 @@ public class DockingPaneAppTest {
     }
 
     @Test
-    public void videoDockableCanBeOpenedAndClosed() throws Exception {
+    public void videoDockableIsNotAvailableInTheDemo() throws Exception {
         runFx(() -> {
             DockingPaneApp app = new DockingPaneApp();
-            DockingContext context = new DockingContext(app::createDockable, pane -> null);
-            DockingPane pane = context.createPane();
-            Dockable video = context.openDockable(pane, "video", DockingPosition.CENTER).orElseThrow();
-            assertEquals("Video", video.getTitle());
-            DockingLayout layout = context.getLayout();
-            assertTrue(context.requestCloseDockable(video));
-            DockingContext restored = new DockingContext(app::createDockable, floating -> null);
-            assertTrue(restored.restoreLayout(layout).getUnresolvedDockableIds().isEmpty());
-            Dockable restoredVideo = restored.getDockables().stream()
-                    .filter(item -> "video".equals(item.getId())).findFirst().orElseThrow();
-            assertTrue(restored.requestCloseDockable(restoredVideo));
-        });
-    }
-
-    @Test
-    public void videoIsInitiallyAvailableAndCanBeReopenedFromMenu() throws Exception {
-        runFx(() -> {
+            assertTrue(app.createDockable("video").isEmpty());
             Stage stage = new Stage();
             try {
-                new DockingPaneApp().start(stage);
+                app.start(stage);
                 Parent root = stage.getScene().getRoot();
                 DockingPane pane = (DockingPane) root.lookup(".docking-pane");
-                DockingContext context = pane.getDockingContext();
-                Dockable video = context.getDockables().stream()
-                        .filter(item -> "video".equals(item.getId())).findFirst().orElseThrow();
-                assertTrue(context.requestCloseDockable(video));
+                assertTrue(pane.getDockables().stream().noneMatch(dockable -> "video".equals(dockable.getId())));
                 MenuButton openView = root.lookupAll(".menu-button").stream()
                         .filter(MenuButton.class::isInstance).map(MenuButton.class::cast)
                         .filter(menu -> "Open View".equals(menu.getText())).findFirst().orElseThrow();
-                openView.getItems().stream().filter(item -> "Video".equals(item.getText()))
-                        .findFirst().orElseThrow().fire();
-                Dockable reopened = context.getDockables().stream()
-                        .filter(item -> "video".equals(item.getId())).findFirst().orElseThrow();
-                assertNotSame(video, reopened);
-                assertTrue(context.requestCloseDockable(reopened));
+                assertFalse(openView.getItems().stream().anyMatch(item -> "Video".equals(item.getText())));
             } finally {
                 stage.hide();
             }
         });
-    }
-
-    @Test
-    public void bundledVideoPlaysPausesAndReleasesItsPlayer() throws Exception {
-        CompletableFuture<Void> ready = new CompletableFuture<>();
-        CompletableFuture<Void> playing = new CompletableFuture<>();
-        CompletableFuture<Void> paused = new CompletableFuture<>();
-        AtomicReference<MediaPlayer> playerRef = new AtomicReference<>();
-        AtomicReference<Button> buttonRef = new AtomicReference<>();
-        AtomicReference<DockingContext> contextRef = new AtomicReference<>();
-        AtomicReference<Dockable> dockableRef = new AtomicReference<>();
-        try {
-            runFx(() -> {
-                DockingPaneApp app = new DockingPaneApp();
-                DockingContext context = new DockingContext(app::createDockable, pane -> null);
-                DockingPane pane = context.createPane();
-                Dockable dockable = context.openDockable(pane, "video", DockingPosition.CENTER).orElseThrow();
-                contextRef.set(context);
-                dockableRef.set(dockable);
-                BorderPane content = assertInstanceOf(BorderPane.class, dockable.getContent());
-                StackPane videoPane = assertInstanceOf(StackPane.class, content.getCenter());
-                MediaView view = assertInstanceOf(MediaView.class, videoPane.getChildren().get(0));
-                MediaPlayer player = view.getMediaPlayer();
-                playerRef.set(player);
-                Button button = assertInstanceOf(Button.class,
-                        assertInstanceOf(HBox.class, content.getBottom()).getChildren().get(0));
-                buttonRef.set(button);
-                player.setOnReady(() -> ready.complete(null));
-                player.setOnPlaying(() -> playing.complete(null));
-                player.setOnPaused(() -> paused.complete(null));
-                player.setOnError(() -> ready.completeExceptionally(player.getError()));
-                new Scene(content, 640, 360);
-                content.applyCss();
-                content.layout();
-                assertTrue(videoPane.getWidth() > 0);
-                assertTrue(videoPane.getHeight() > 0);
-                assertEquals(videoPane.getWidth(), view.getFitWidth(), 0.1);
-                assertEquals(videoPane.getHeight(), view.getFitHeight(), 0.1);
-            });
-            ready.get(10, TimeUnit.SECONDS);
-            runFx(() -> {
-                assertTrue(playerRef.get().getMedia().getWidth() > 0);
-                buttonRef.get().fire();
-            });
-            playing.get(10, TimeUnit.SECONDS);
-            runFx(() -> {
-                assertEquals("Pause", buttonRef.get().getText());
-                buttonRef.get().fire();
-            });
-            paused.get(10, TimeUnit.SECONDS);
-            runFx(() -> assertEquals("Play", buttonRef.get().getText()));
-        } finally {
-            if (contextRef.get() != null && dockableRef.get() != null) {
-                runFx(() -> {
-                    assertTrue(contextRef.get().requestCloseDockable(dockableRef.get()));
-                    assertEquals(MediaPlayer.Status.DISPOSED, playerRef.get().getStatus());
-                });
-            }
-        }
     }
 
     @Test

@@ -68,9 +68,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -272,12 +269,11 @@ public class DockingPaneApp extends GemApplication {
         });
 
         MenuButton openView = new MenuButton("Open View");
-        for (String id : List.of("map", "charts", "city", "video", "drag", "drop")) {
+        for (String id : List.of("map", "charts", "city", "drag", "drop")) {
             MenuItem item = new MenuItem(switch (id) {
                 case "map" -> "Map";
                 case "charts" -> "Financial Charts";
                 case "city" -> "City";
-                case "video" -> "Video";
                 case "drag" -> "Rocket Source";
                 default -> "Rocket Target";
             });
@@ -449,7 +445,6 @@ public class DockingPaneApp extends GemApplication {
         context.openDockable(rootPane, "navigator", DockingPosition.CENTER);
         context.openDockable(rootPane, "inspector", DockingPosition.CENTER);
         context.openDockable(rootPane, "city", DockingPosition.CENTER);
-        context.openDockable(rootPane, "video", DockingPosition.CENTER);
         rootPane.selectDockable("editor");
         context.openDockable(rootPane, "drag", DockingPosition.RIGHT);
         context.openDockable(rootPane, "drop", DockingPosition.RIGHT);
@@ -495,7 +490,6 @@ public class DockingPaneApp extends GemApplication {
         templates.put("map", this::createMapDockable);
         templates.put("charts", this::createChartsDockable);
         templates.put("city", this::createCityDockable);
-        templates.put("video", this::createVideoDockable);
         templates.put("drag", this::createDragDockable);
         templates.put("drop", this::createDropDockable);
         return templates;
@@ -809,48 +803,6 @@ public class DockingPaneApp extends GemApplication {
         content.setMinSize(0, 0);
         StackPane.setAlignment(footer, Pos.BOTTOM_CENTER);
         return new Dockable(id, "Map", createIcon(MaterialDesign.MDI_MAP), content);
-    }
-
-    private Dockable createVideoDockable(String id) {
-        Media media = new Media(Objects.requireNonNull(
-                DockingPaneApp.class.getResource("docking-video.mp4")).toExternalForm());
-        MediaPlayer player = new MediaPlayer(media);
-        player.setCycleCount(MediaPlayer.INDEFINITE);
-        MediaView view = new MediaView(player);
-        view.setPreserveRatio(true);
-
-        StackPane videoPane = new StackPane(view);
-        videoPane.setMinSize(0, 0);
-        videoPane.setStyle("-fx-background-color: black;");
-        view.fitWidthProperty().bind(videoPane.widthProperty());
-        view.fitHeightProperty().bind(videoPane.heightProperty());
-
-        Button playPause = new Button();
-        playPause.textProperty().bind(Bindings.when(player.statusProperty().isEqualTo(MediaPlayer.Status.PLAYING))
-                .then("Pause").otherwise("Play"));
-        playPause.setOnAction(event -> {
-            if (player.getStatus() == MediaPlayer.Status.PLAYING) {
-                player.pause();
-            } else {
-                player.play();
-            }
-        });
-
-        Label error = new Label();
-        error.setWrapText(true);
-        player.setOnError(() -> error.setText("Unable to play video: " + player.getError().getMessage()));
-        HBox controls = new HBox(8, playPause, error);
-        controls.setAlignment(Pos.CENTER_LEFT);
-        controls.setPadding(new Insets(8));
-        BorderPane content = new BorderPane(videoPane);
-        content.setBottom(controls);
-
-        return new Dockable(id, "Video", createIcon(MaterialDesign.MDI_VIDEO), content) {
-            @Override
-            protected void dispose() {
-                player.dispose();
-            }
-        };
     }
 
     private Dockable createChartsDockable(String id) {

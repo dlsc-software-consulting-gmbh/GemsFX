@@ -1,7 +1,6 @@
 open module com.dlsc.gemsfx.demo {
     requires javafx.swing;
     requires javafx.web;
-    requires javafx.media;
     requires java.logging;
     requires java.prefs;
 
