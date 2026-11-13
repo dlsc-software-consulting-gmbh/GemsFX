@@ -32,9 +32,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -52,6 +55,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -141,6 +145,120 @@ public class DockingPaneAppTest {
     }
 
     @Test
+    public void applicationGroupMenuCanFloatInternallyAndRedock() throws Exception {
+        runFx(() -> {
+            Stage stage = new Stage();
+            try {
+                new DockingPaneApp().start(stage);
+                var root = stage.getScene().getRoot();
+                DockingPane pane = (DockingPane) root.lookup(".docking-pane");
+                pane.selectDockable("editor");
+                MenuButton menu = root.lookupAll(".docking-tab-pane-menu-button").stream()
+                        .map(MenuButton.class::cast)
+                        .filter(button -> button.getItems().stream()
+                                .anyMatch(item -> "Float Group Internally".equals(item.getText())))
+                        .findFirst().orElseThrow();
+                assertFalse(menu.getItems().stream()
+                        .anyMatch(item -> "Dock Group".equals(item.getText())));
+                menu.getItems().stream().filter(item -> "Float Group Internally".equals(item.getText()))
+                        .findFirst().orElseThrow().fire();
+                assertEquals(1, pane.getFloatingGroups().size());
+                String floatingId = pane.getFloatingGroups().get(0).getTabs().getDockableIds().get(0);
+                root.applyCss();
+                root.layout();
+                MenuButton floatingMenu = (MenuButton) pane.lookup(".docking-floating-frame")
+                        .lookup(".docking-tab-pane-menu-button");
+                assertFalse(floatingMenu.getItems().stream()
+                        .anyMatch(item -> "Float Tab Internally".equals(item.getText())
+                                || "Float Group Internally".equals(item.getText())
+                                || item.getStyleClass().contains("docking-group-maximize")));
+                assertTrue(floatingMenu.getItems().stream()
+                        .anyMatch(item -> "Move Group to New Window".equals(item.getText())));
+                assertTrue(floatingMenu.getItems().stream()
+                        .anyMatch(item -> item.getStyleClass().contains("docking-group-close-all")));
+                floatingMenu.getItems().stream().filter(item -> "Dock Group".equals(item.getText()))
+                        .findFirst().orElseThrow().fire();
+                assertTrue(pane.getFloatingGroups().isEmpty());
+                root.applyCss();
+                root.layout();
+                var redockedTab = pane.lookupAll(".docking-tab").stream()
+                        .filter(tab -> floatingId.equals(tab.getProperties().get("docking.dockable-id")))
+                        .findFirst().orElseThrow();
+                MenuButton redockedMenu = (MenuButton) redockedTab.getParent().lookup(".docking-tab-pane-menu-button");
+                assertTrue(redockedMenu.getItems().stream()
+                        .anyMatch(item -> "Float Group Internally".equals(item.getText())));
+                assertTrue(redockedMenu.getItems().stream()
+                        .anyMatch(item -> item.getStyleClass().contains("docking-group-maximize") && item.isVisible()));
+                assertFalse(redockedMenu.getItems().stream()
+                        .anyMatch(item -> "Dock Group".equals(item.getText())));
+
+                DockingPane windowPane = pane.getDockingContext().floatTabGroup(
+                        floatingId, stage.getX() + 40, stage.getY() + 40);
+                windowPane.getScene().getRoot().applyCss();
+                windowPane.getScene().getRoot().layout();
+                MenuButton windowMenu = (MenuButton) windowPane.lookup(".docking-tab-pane-menu-button");
+                windowMenu.getItems().stream().filter(item -> "Float Group Internally".equals(item.getText()))
+                        .findFirst().orElseThrow().fire();
+                assertTrue(windowPane.isDockableFloating(floatingId));
+                List<Dockable> windowDockables = List.copyOf(windowPane.getDockables());
+                windowPane.getScene().getRoot().applyCss();
+                windowPane.getScene().getRoot().layout();
+                MenuButton windowFloatingMenu = (MenuButton) windowPane.lookup(".docking-floating-frame")
+                        .lookup(".docking-tab-pane-menu-button");
+                windowFloatingMenu.getItems().stream().filter(item -> "Dock Group".equals(item.getText()))
+                        .findFirst().orElseThrow().fire();
+                assertTrue(windowPane.getFloatingGroups().isEmpty());
+                for (Dockable dockable : windowDockables) {
+                    assertSame(windowPane, dockable.getDockingPane());
+                }
+                assertTrue(windowPane.getScene().getWindow().isShowing());
+                windowPane.getScene().getRoot().applyCss();
+                windowPane.getScene().getRoot().layout();
+                windowMenu = (MenuButton) windowPane.lookup(".docking-tab-pane-menu-button");
+                windowMenu.getItems().stream().filter(item -> "Dock Group to Main Pane".equals(item.getText()))
+                        .findFirst().orElseThrow().fire();
+                assertSame(pane, pane.getDockables().stream()
+                        .filter(dockable -> floatingId.equals(dockable.getId())).findFirst().orElseThrow().getDockingPane());
+            } finally {
+                stage.hide();
+            }
+        });
+    }
+
+    @Test
+    public void floatTabInternallyUsesGroupSelectionEvenWhenAnotherGroupIsActive() throws Exception {
+        runFx(() -> {
+            for (boolean activateOtherGroup : new boolean[]{false, true}) {
+                Stage stage = new Stage();
+                try {
+                    new DockingPaneApp().start(stage);
+                    Parent root = stage.getScene().getRoot();
+                    DockingPane pane = (DockingPane) root.lookup(".docking-pane");
+                    pane.selectDockable("map");
+                    if (activateOtherGroup) {
+                        pane.selectDockable("preview");
+                    }
+                    root.applyCss();
+                    root.layout();
+                    var editorTab = pane.lookupAll(".docking-tab").stream()
+                            .filter(tab -> "editor".equals(tab.getProperties().get("docking.dockable-id")))
+                            .findFirst().orElseThrow();
+                    MenuButton menu = (MenuButton) editorTab.getParent().lookup(".docking-tab-pane-menu-button");
+                    menu.getItems().stream().filter(item -> "Float Tab Internally".equals(item.getText()))
+                            .findFirst().orElseThrow().fire();
+
+                    assertEquals(1, pane.getFloatingGroups().size());
+                    assertEquals(List.of("map"), pane.getFloatingGroups().get(0).getTabs().getDockableIds());
+                    assertFalse(pane.isDockableFloating("editor"));
+                    assertFalse(pane.isDockableFloating("preview"));
+                } finally {
+                    stage.hide();
+                }
+            }
+        });
+    }
+
+    @Test
     public void groupMenuToggleDisablesAndRestoresTheDefaultFactory() throws Exception {
         runFx(() -> {
             Stage stage = new Stage();
@@ -174,6 +292,110 @@ public class DockingPaneAppTest {
                 stage.hide();
             }
         });
+    }
+
+    @Test
+    public void videoDockableCanBeOpenedAndClosed() throws Exception {
+        runFx(() -> {
+            DockingPaneApp app = new DockingPaneApp();
+            DockingContext context = new DockingContext(app::createDockable, pane -> null);
+            DockingPane pane = context.createPane();
+            Dockable video = context.openDockable(pane, "video", DockingPosition.CENTER).orElseThrow();
+            assertEquals("Video", video.getTitle());
+            DockingLayout layout = context.getLayout();
+            assertTrue(context.requestCloseDockable(video));
+            DockingContext restored = new DockingContext(app::createDockable, floating -> null);
+            assertTrue(restored.restoreLayout(layout).getUnresolvedDockableIds().isEmpty());
+            Dockable restoredVideo = restored.getDockables().stream()
+                    .filter(item -> "video".equals(item.getId())).findFirst().orElseThrow();
+            assertTrue(restored.requestCloseDockable(restoredVideo));
+        });
+    }
+
+    @Test
+    public void videoIsInitiallyAvailableAndCanBeReopenedFromMenu() throws Exception {
+        runFx(() -> {
+            Stage stage = new Stage();
+            try {
+                new DockingPaneApp().start(stage);
+                Parent root = stage.getScene().getRoot();
+                DockingPane pane = (DockingPane) root.lookup(".docking-pane");
+                DockingContext context = pane.getDockingContext();
+                Dockable video = context.getDockables().stream()
+                        .filter(item -> "video".equals(item.getId())).findFirst().orElseThrow();
+                assertTrue(context.requestCloseDockable(video));
+                MenuButton openView = root.lookupAll(".menu-button").stream()
+                        .filter(MenuButton.class::isInstance).map(MenuButton.class::cast)
+                        .filter(menu -> "Open View".equals(menu.getText())).findFirst().orElseThrow();
+                openView.getItems().stream().filter(item -> "Video".equals(item.getText()))
+                        .findFirst().orElseThrow().fire();
+                Dockable reopened = context.getDockables().stream()
+                        .filter(item -> "video".equals(item.getId())).findFirst().orElseThrow();
+                assertNotSame(video, reopened);
+                assertTrue(context.requestCloseDockable(reopened));
+            } finally {
+                stage.hide();
+            }
+        });
+    }
+
+    @Test
+    public void bundledVideoPlaysPausesAndReleasesItsPlayer() throws Exception {
+        CompletableFuture<Void> ready = new CompletableFuture<>();
+        CompletableFuture<Void> playing = new CompletableFuture<>();
+        CompletableFuture<Void> paused = new CompletableFuture<>();
+        AtomicReference<MediaPlayer> playerRef = new AtomicReference<>();
+        AtomicReference<Button> buttonRef = new AtomicReference<>();
+        AtomicReference<DockingContext> contextRef = new AtomicReference<>();
+        AtomicReference<Dockable> dockableRef = new AtomicReference<>();
+        try {
+            runFx(() -> {
+                DockingPaneApp app = new DockingPaneApp();
+                DockingContext context = new DockingContext(app::createDockable, pane -> null);
+                DockingPane pane = context.createPane();
+                Dockable dockable = context.openDockable(pane, "video", DockingPosition.CENTER).orElseThrow();
+                contextRef.set(context);
+                dockableRef.set(dockable);
+                BorderPane content = assertInstanceOf(BorderPane.class, dockable.getContent());
+                StackPane videoPane = assertInstanceOf(StackPane.class, content.getCenter());
+                MediaView view = assertInstanceOf(MediaView.class, videoPane.getChildren().get(0));
+                MediaPlayer player = view.getMediaPlayer();
+                playerRef.set(player);
+                Button button = assertInstanceOf(Button.class,
+                        assertInstanceOf(HBox.class, content.getBottom()).getChildren().get(0));
+                buttonRef.set(button);
+                player.setOnReady(() -> ready.complete(null));
+                player.setOnPlaying(() -> playing.complete(null));
+                player.setOnPaused(() -> paused.complete(null));
+                player.setOnError(() -> ready.completeExceptionally(player.getError()));
+                new Scene(content, 640, 360);
+                content.applyCss();
+                content.layout();
+                assertTrue(videoPane.getWidth() > 0);
+                assertTrue(videoPane.getHeight() > 0);
+                assertEquals(videoPane.getWidth(), view.getFitWidth(), 0.1);
+                assertEquals(videoPane.getHeight(), view.getFitHeight(), 0.1);
+            });
+            ready.get(10, TimeUnit.SECONDS);
+            runFx(() -> {
+                assertTrue(playerRef.get().getMedia().getWidth() > 0);
+                buttonRef.get().fire();
+            });
+            playing.get(10, TimeUnit.SECONDS);
+            runFx(() -> {
+                assertEquals("Pause", buttonRef.get().getText());
+                buttonRef.get().fire();
+            });
+            paused.get(10, TimeUnit.SECONDS);
+            runFx(() -> assertEquals("Play", buttonRef.get().getText()));
+        } finally {
+            if (contextRef.get() != null && dockableRef.get() != null) {
+                runFx(() -> {
+                    assertTrue(contextRef.get().requestCloseDockable(dockableRef.get()));
+                    assertEquals(MediaPlayer.Status.DISPOSED, playerRef.get().getStatus());
+                });
+            }
+        }
     }
 
     @Test

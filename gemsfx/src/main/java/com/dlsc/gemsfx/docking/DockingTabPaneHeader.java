@@ -68,6 +68,10 @@ public class DockingTabPaneHeader extends MenuButton {
         String restoreText = ResourceBundleManager.getString(bundle, "menu.restore-group", "Restore Group");
         MenuItem maximize = new MenuItem();
         maximize.getStyleClass().add("docking-group-maximize");
+        maximize.visibleProperty().bind(Bindings.createBooleanBinding(
+                () -> pane.getFloatingGroups().stream().noneMatch(
+                        group -> group.getTabs().getDockableIds().contains(groupDockables.get(0).getId())),
+                pane.floatingGroupsProperty()));
         maximize.textProperty().bind(Bindings.createStringBinding(
                 () -> pane.getMaximizedDockable() != null && groupDockables.contains(pane.getMaximizedDockable())
                         ? restoreText : maximizeText,

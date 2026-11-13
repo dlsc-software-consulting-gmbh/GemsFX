@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.skins;
 
 import com.dlsc.gemsfx.GlassPane;
 import com.dlsc.gemsfx.docking.Dockable;
+import com.dlsc.gemsfx.docking.DockingFloatingGroup;
 import com.dlsc.gemsfx.docking.DockingLayoutNode;
 import com.dlsc.gemsfx.docking.DockingPane;
 import com.dlsc.gemsfx.docking.DockingPosition;
@@ -34,6 +35,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -57,6 +60,15 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private boolean syncingDivider;
     private DockingTree.ResolvedDropTarget previewTarget;
     private final StackPane host = new StackPane();
+    private final List<DockingFloatingFrame> floatingFrames = new ArrayList<>();
+    private final Pane floatingLayer = new Pane() {
+        @Override
+        protected void layoutChildren() {
+            for (DockingFloatingFrame frame : floatingFrames) {
+                frame.layoutIn(getWidth(), getHeight());
+            }
+        }
+    };
     private final StackPane emptyPane = new StackPane();
     private final List<StackPane> contentHosts = new ArrayList<>();
     private final List<Label> graphicLabels = new ArrayList<>();
@@ -110,6 +122,13 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     public DockingPaneSkin(DockingPane pane) {
         super(pane);
         emptyPane.getStyleClass().add("docking-empty");
+        floatingLayer.getStyleClass().add("docking-floating-layer");
+        floatingLayer.setPickOnBounds(false);
+        floatingLayer.setMinSize(0, 0);
+        Rectangle floatingClip = new Rectangle();
+        floatingClip.widthProperty().bind(floatingLayer.widthProperty());
+        floatingClip.heightProperty().bind(floatingLayer.heightProperty());
+        floatingLayer.setClip(floatingClip);
         for (DockingPosition edge : List.of(DockingPosition.LEFT, DockingPosition.RIGHT,
                 DockingPosition.TOP, DockingPosition.BOTTOM)) {
             Region icon = new Region();
@@ -133,6 +152,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         });
         registerChangeListener(pane.getDockingContext().tabFactoryProperty(), obs -> rebuild());
         registerChangeListener(pane.getDockingContext().tabPaneHeaderFactoryProperty(), obs -> rebuild());
+        registerChangeListener(pane.floatingGroupsProperty(), obs -> updateFloatingGroups());
         pane.maximizedDockableProperty().addListener(maximizedListener);
         registerChangeListener(pane.sceneProperty(), obs -> observeFocusScene(pane.getScene()));
         observeFocusScene(pane.getScene());
@@ -277,7 +297,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         if (!collectSelectionOnlyChanges(oldLayout, newLayout, selectedIds)) {
             return false;
         }
-        for (int i = 0; i < tabGroups.size(); i++) {
+        for (int i = 0; i < selectedIds.size(); i++) {
             tabGroups.get(i).updateSelection(selectedIds.get(i));
         }
         updateActiveGroup();
@@ -355,6 +375,15 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             overlay.getStyleClass().add("docking-maximized-overlay");
             host.getChildren().addAll(glass, overlay);
         }
+        floatingFrames.clear();
+        floatingLayer.getChildren().clear();
+        for (DockingFloatingGroup group : pane.getFloatingGroups()) {
+            DockingTabPane tabs = createTabs(group.getTabs(), false);
+            DockingFloatingFrame frame = new DockingFloatingFrame(pane, tabs, group);
+            floatingFrames.add(frame);
+            floatingLayer.getChildren().add(frame);
+        }
+        host.getChildren().add(floatingLayer);
         host.getChildren().addAll(dropLeafPreview, dropZonePreview);
         host.getChildren().addAll(paneEdgeTargets.values());
         getChildren().setAll(host);
@@ -375,6 +404,36 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
                 && (focusScene.getFocusOwner() == focusedContent || focusScene.getFocusOwner() == null)) {
             focusedContent.requestFocus();
         }
+        updateActiveGroup();
+    }
+
+    private void updateFloatingGroups() {
+        List<DockingFloatingFrame> ordered = new ArrayList<>();
+        for (DockingFloatingGroup group : getSkinnable().getFloatingGroups()) {
+            DockingFloatingFrame existing = null;
+            for (DockingFloatingFrame frame : floatingFrames) {
+                if (frame.getGroup().getTabs().getDockableIds().equals(group.getTabs().getDockableIds())) {
+                    existing = frame;
+                    break;
+                }
+            }
+            if (existing == null) {
+                rebuild();
+                return;
+            }
+            existing.update(group);
+            ordered.add(existing);
+        }
+        if (ordered.size() != floatingFrames.size()) {
+            rebuild();
+            return;
+        }
+        floatingFrames.clear();
+        floatingFrames.addAll(ordered);
+        if (!floatingLayer.getChildren().equals(ordered)) {
+            floatingLayer.getChildren().setAll(ordered);
+        }
+        floatingLayer.requestLayout();
         updateActiveGroup();
     }
 
@@ -454,15 +513,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      */
     private Node render(DockingLayoutNode node, List<Integer> path) {
         if (node instanceof DockingLayoutNode.Tabs) {
-            DockingTabPane tabs = new DockingTabPane(getSkinnable(), (DockingLayoutNode.Tabs) node);
-            tabGroups.add(tabs);
-            contentHosts.add((StackPane) tabs.lookup(".docking-tab-content"));
-            for (Node label : tabs.lookupAll(".docking-tab-title")) {
-                if (label instanceof Label) {
-                    graphicLabels.add((Label) label);
-                }
-            }
-            installTitleDragHandlers(tabs);
+            DockingTabPane tabs = createTabs((DockingLayoutNode.Tabs) node, true);
             Dockable maximized = getSkinnable().getMaximizedDockable();
             if (maximized != null && tabs.containsDockable(maximized.getId())) {
                 maximizedGroup = tabs;
@@ -489,6 +540,21 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             emptyPane.getChildren().setAll(placeholder);
         }
         return emptyPane;
+    }
+
+    private DockingTabPane createTabs(DockingLayoutNode.Tabs node, boolean draggable) {
+        DockingTabPane tabs = new DockingTabPane(getSkinnable(), node);
+        tabGroups.add(tabs);
+        contentHosts.add((StackPane) tabs.lookup(".docking-tab-content"));
+        for (Node label : tabs.lookupAll(".docking-tab-title")) {
+            if (label instanceof Label) {
+                graphicLabels.add((Label) label);
+            }
+        }
+        if (draggable) {
+            installTitleDragHandlers(tabs);
+        }
+        return tabs;
     }
 
     private static List<Integer> child(List<Integer> path, int index) {
@@ -719,6 +785,12 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             return;
         }
         DockingPane pane = getSkinnable();
+        if (isOverFloatingFrame(event)) {
+            clearDropPreview();
+            hidePaneEdgeTargets();
+            event.consume();
+            return;
+        }
         boolean wholeGroup = isTabGroupDrag(event);
         showPaneEdgeTargets(draggedId, wholeGroup);
         if (pane.getLayoutRoot() instanceof DockingLayoutNode.Empty && isInsidePane(event)
@@ -764,6 +836,14 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             return;
         }
         DockingPane pane = getSkinnable();
+        if (isOverFloatingFrame(event)) {
+            recordUnsuccessfulDrop(draggedId);
+            event.setDropCompleted(false);
+            event.consume();
+            clearDropPreview();
+            hidePaneEdgeTargets();
+            return;
+        }
         boolean wholeGroup = isTabGroupDrag(event);
         showPaneEdgeTargets(draggedId, wholeGroup);
         DockingPosition paneEdge = resolvePaneEdgeTarget(event.getX(), event.getY());
@@ -800,6 +880,12 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      */
     private void handleExternalDragOver(DragEvent event) {
         DockingPane pane = getSkinnable();
+        if (isOverFloatingFrame(event)) {
+            clearDropPreview();
+            hidePaneEdgeTargets();
+            event.consume();
+            return;
+        }
         showPaneEdgeTargets(null);
         DockingPosition paneEdge = resolvePaneEdgeTarget(event.getX(), event.getY());
         if (paneEdge != null) {
@@ -827,6 +913,10 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     private void handleExternalDragDropped(DragEvent event) {
         DockingPane pane = getSkinnable();
         try {
+            if (isOverFloatingFrame(event)) {
+                event.setDropCompleted(false);
+                return;
+            }
             showPaneEdgeTargets(null);
             DockingPosition paneEdge = resolvePaneEdgeTarget(event.getX(), event.getY());
             boolean dropped;
@@ -845,6 +935,17 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             clearDropPreview();
             hidePaneEdgeTargets();
         }
+    }
+
+    private boolean isOverFloatingFrame(DragEvent event) {
+        Point2D point = floatingLayer.sceneToLocal(
+                getSkinnable().localToScene(event.getX(), event.getY()));
+        for (DockingFloatingFrame frame : floatingFrames) {
+            if (frame.getBoundsInParent().contains(point)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isInsidePane(DragEvent event) {

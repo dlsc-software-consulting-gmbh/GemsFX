@@ -70,6 +70,7 @@ public final class DockingLayout {
         private final String paneId;
         private final DockingLayoutNode root;
         private final StageBounds stageBounds;
+        private final List<DockingFloatingGroup> floatingGroups;
         
         /**
          * Constructs a PaneLayout.
@@ -80,12 +81,34 @@ public final class DockingLayout {
          * @throws IllegalArgumentException if paneId is null/blank or root is null
          */
         public PaneLayout(String paneId, DockingLayoutNode root, StageBounds stageBounds) {
+            this(paneId, root, stageBounds, List.of());
+        }
+
+        /**
+         * Constructs a pane layout including internal floating groups, ordered back to front.
+         *
+         * @param paneId the pane ID
+         * @param root the regular split/tab layout
+         * @param stageBounds window bounds, or null for the primary pane
+         * @param floatingGroups internal floating groups in stacking order
+         */
+        public PaneLayout(String paneId, DockingLayoutNode root, StageBounds stageBounds,
+                          List<DockingFloatingGroup> floatingGroups) {
             this.paneId = Objects.requireNonNull(paneId, "paneId must not be null");
             if (paneId.isBlank()) {
                 throw new IllegalArgumentException("paneId must not be blank");
             }
             this.root = Objects.requireNonNull(root, "root must not be null");
             this.stageBounds = stageBounds;
+            this.floatingGroups = List.copyOf(floatingGroups);
+        }
+
+        /**
+         * Returns the internal floating groups in back-to-front stacking order.
+         * @return an immutable list of groups
+         */
+        public List<DockingFloatingGroup> getFloatingGroups() {
+            return floatingGroups;
         }
         
         /**

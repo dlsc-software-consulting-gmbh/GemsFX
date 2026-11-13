@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.input.DragEvent;
 import javafx.stage.Stage;
@@ -411,7 +412,7 @@ public class DockingContext {
             if (targetId != null) {
                 pane.insertDockableRelativeTo(targetId, dockable, position);
             } else if (position == DockingPosition.CENTER) {
-                pane.insertDockable(dockable, position);
+                pane.insertDockableAtPaneEdge(dockable, DockingPosition.LEFT);
             } else {
                 pane.insertDockableAtPaneEdge(dockable, position);
             }
@@ -572,11 +573,57 @@ public class DockingContext {
         if (source == null) {
             throw new IllegalArgumentException("Unknown dockable id: " + id);
         }
-        DockingLayoutNode.Tabs group = findTabGroup(source.getLayoutRoot(), id);
+        DockingLayoutNode.Tabs group = source.tabGroupSnapshot(id);
         DockingTabGroup sourceGroup = source.groupOf(id);
         DockingPane floating = floatDockable(group.getDockableIds().get(0), screenX, screenY);
         moveRemainingTabs(source, sourceGroup, floating, group);
         return floating;
+    }
+
+    /**
+     * Moves one open dockable into an internal floating frame in its current pane.
+     * Does not create a window and is independent of {@link #floatingEnabledProperty()}.
+     *
+     * @param id the open dockable ID
+     * @param bounds requested bounds relative to the pane's content area
+     * @throws IllegalArgumentException if the ID or geometry is invalid
+     */
+    public final void floatDockableInternally(String id, Rectangle2D bounds) {
+        floatInternally(id, bounds, false);
+    }
+
+    /**
+     * Moves an open dockable's entire tab group into an internal floating frame,
+     * preserving tab order and selection.
+     *
+     * @param id any open dockable in the group
+     * @param bounds requested bounds relative to the pane's content area
+     * @throws IllegalArgumentException if the ID or geometry is invalid
+     */
+    public final void floatTabGroupInternally(String id, Rectangle2D bounds) {
+        floatInternally(id, bounds, true);
+    }
+
+    private void floatInternally(String id, Rectangle2D bounds, boolean wholeGroup) {
+        withSelectionUpdates(() -> {
+            requireFxThread();
+            DockingPane pane = dockablePaneById.get(Objects.requireNonNull(id, "id must not be null"));
+            if (pane == null) {
+                throw new IllegalArgumentException("Unknown dockable id: " + id);
+            }
+            DockingLayoutNode.Tabs source = pane.tabGroupSnapshot(id);
+            List<String> movedIds = wholeGroup ? source.getDockableIds() : List.of(id);
+            pane.floatInternally(id, bounds, wholeGroup);
+            DockingTabGroup floatedGroup = pane.groupOf(movedIds.get(0));
+            for (String movedId : movedIds) {
+                Dockable moved = dockablesById.get(movedId);
+                if (moved != null && dockablePaneById.get(movedId) == pane
+                        && pane.groupOf(movedId) == floatedGroup) {
+                    fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, moved, pane, pane));
+                }
+            }
+            return null;
+        });
     }
 
     /**
@@ -605,7 +652,7 @@ public class DockingContext {
             }
             Stage floatingStage = floatingStageByPane.get(pane);
             DockingLayout.StageBounds bounds = floatingStage == null ? null : toStageBounds(floatingStage);
-            paneLayouts.add(new DockingLayout.PaneLayout(paneId, pane.getLayoutRoot(), bounds));
+            paneLayouts.add(new DockingLayout.PaneLayout(paneId, pane.getLayoutRoot(), bounds, pane.getFloatingGroups()));
         }
         return new DockingLayout(Objects.requireNonNull(paneIdByPane.get(primaryPane)), paneLayouts);
     }
@@ -643,13 +690,22 @@ public class DockingContext {
         DockingPane mountedPrimaryPane = resolveMountedPrimaryPaneForRestore();
         DockingLayout.PaneLayout primaryLayout = findPrimaryLayout(layout);
         DockingLayoutNode normalizedPrimaryRoot = null;
+        Map<String, List<DockingFloatingGroup>> normalizedFloating = new LinkedHashMap<>();
         Set<DockingPane> replacementPanes = Collections.newSetFromMap(new IdentityHashMap<>());
         DockingPane restoredPrimaryPane;
 
         try {
             for (DockingLayout.PaneLayout paneLayout : layout.getPanes()) {
                 DockingLayoutNode normalized = normalizeNode(paneLayout.getRoot(), resolvedDockables, unresolvedDockables);
-                boolean empty = normalized instanceof DockingLayoutNode.Empty;
+                List<DockingFloatingGroup> floating = new ArrayList<>();
+                for (DockingFloatingGroup group : paneLayout.getFloatingGroups()) {
+                    DockingLayoutNode tabs = normalizeNode(group.getTabs(), resolvedDockables, unresolvedDockables);
+                    if (tabs instanceof DockingLayoutNode.Tabs) {
+                        floating.add(group.withTabs((DockingLayoutNode.Tabs) tabs));
+                    }
+                }
+                normalizedFloating.put(paneLayout.getPaneId(), floating);
+                boolean empty = normalized instanceof DockingLayoutNode.Empty && floating.isEmpty();
                 if (empty && paneLayout.getStageBounds() != null) {
                     continue;
                 }
@@ -667,9 +723,7 @@ public class DockingContext {
                 if (!replacementPanes.add(replacementPane)) {
                     throw new IllegalArgumentException("paneFactory must return a fresh pane");
                 }
-                if (!(normalized instanceof DockingLayoutNode.Empty)) {
-                    buildPaneTree(replacementPane, normalized, resolvedDockables);
-                }
+                replacementPane.restoreLayout(normalized, floating, resolvedDockables);
                 Stage replacementStage = null;
                 DockingLayout.StageBounds stageBounds = paneLayout.getStageBounds();
                 if (stageBounds != null) {
@@ -722,15 +776,17 @@ public class DockingContext {
         clearPane(restoredPrimaryPane);
         Set<String> primaryIds = new LinkedHashSet<>();
         collectDockableIds(normalizedPrimaryRoot, primaryIds);
+        for (DockingFloatingGroup group : normalizedFloating.get(primaryLayout.getPaneId())) {
+            collectDockableIds(group.getTabs(), primaryIds);
+        }
         for (String id : primaryIds) {
             Dockable dockable = resolvedDockables.get(id);
             dockablesById.put(id, dockable);
             dockablePaneById.put(id, restoredPrimaryPane);
             dockable.setDockingContext(this);
         }
-        if (!(normalizedPrimaryRoot instanceof DockingLayoutNode.Empty)) {
-            buildPaneTree(restoredPrimaryPane, normalizedPrimaryRoot, resolvedDockables);
-        }
+        restoredPrimaryPane.restoreLayout(normalizedPrimaryRoot,
+                normalizedFloating.get(primaryLayout.getPaneId()), resolvedDockables);
         attachPane(restoredPrimaryPane, primaryLayout.getPaneId());
         for (Dockable dockable : restoredPrimaryPane.getDockables()) {
             dockables.add(dockable);
@@ -834,7 +890,7 @@ public class DockingContext {
         if (position == null) {
             return logDecision("tab group", targetPane, id, targetId, null, false, "docking position is missing");
         }
-        DockingLayoutNode.Tabs group = findTabGroup(source.getLayoutRoot(), id);
+        DockingLayoutNode.Tabs group = source.tabGroupSnapshot(id);
         if (targetId == null) {
             if (targetPane.getLayoutRoot() instanceof DockingLayoutNode.Empty) {
                 return logDecision("tab group", targetPane, id, null, position, true, "destination pane is empty");
@@ -869,7 +925,7 @@ public class DockingContext {
         if (!canMoveTabGroup(targetPane, id, targetId, position)) {
             return false;
         }
-        DockingLayoutNode.Tabs group = findTabGroup(dockablePaneById.get(id).getLayoutRoot(), id);
+        DockingLayoutNode.Tabs group = dockablePaneById.get(id).tabGroupSnapshot(id);
         String first = group.getDockableIds().get(0);
         DockingPane source = dockablePaneById.get(id);
         DockingTabGroup sourceGroup = source.groupOf(id);
@@ -912,23 +968,6 @@ public class DockingContext {
         }
         targetPane.selectDockable(group.getSelectedId());
         return true;
-    }
-
-    private static DockingLayoutNode.Tabs findTabGroup(DockingLayoutNode node, String id) {
-        if (node instanceof DockingLayoutNode.Tabs) {
-            DockingLayoutNode.Tabs tabs = (DockingLayoutNode.Tabs) node;
-            return tabs.getDockableIds().contains(id) ? tabs : null;
-        }
-        if (node instanceof DockingLayoutNode.Split) {
-            DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-            for (DockingLayoutNode child : split.getChildren()) {
-                DockingLayoutNode.Tabs found = findTabGroup(child, id);
-                if (found != null) {
-                    return found;
-                }
-            }
-        }
-        return null;
     }
 
     final boolean canMoveDockable(DockingPane targetPane, String draggedId, String targetId, DockingPosition position) {
@@ -977,11 +1016,11 @@ public class DockingContext {
         DockingPane sourcePane = dockablePaneById.get(draggedId);
         if (sourcePane == targetPane) {
             Dockable dockable = dockablesById.get(draggedId);
-            DockingLayoutNode.Tabs before = findTabGroup(targetPane.getLayoutRoot(), draggedId);
+            DockingLayoutNode.Tabs before = targetPane.tabGroupSnapshot(draggedId);
             boolean sameGroup = position == DockingPosition.CENTER && before.getDockableIds().contains(targetId);
             boolean moved = targetPane.moveInside(draggedId, targetId, position);
             if (moved && (!sameGroup || !before.getDockableIds().equals(
-                    findTabGroup(targetPane.getLayoutRoot(), draggedId).getDockableIds()))) {
+                    targetPane.tabGroupSnapshot(draggedId).getDockableIds()))) {
                 fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, targetPane));
             }
             return moved;
@@ -1046,10 +1085,6 @@ public class DockingContext {
         closeFloatingStageIfEmpty(sourcePane);
         fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, targetPane));
         return true;
-    }
-
-    private void buildPaneTree(DockingPane pane, DockingLayoutNode root, Map<String, Dockable> dockablesById) {
-        pane.restoreLayout(root, dockablesById);
     }
 
     /**
@@ -1152,6 +1187,10 @@ public class DockingContext {
             DockingLayoutNode root = paneLayout.getRoot();
             DockingTree.validateSnapshotNode(root);
             collectDockableIds(root, dockableIds);
+            for (DockingFloatingGroup group : paneLayout.getFloatingGroups()) {
+                DockingTree.validateSnapshotNode(group.getTabs());
+                collectDockableIds(group.getTabs(), dockableIds);
+            }
 
             boolean primary = paneLayout.getPaneId().equals(layout.getPrimaryPaneId());
             boolean hasBounds = paneLayout.getStageBounds() != null;
@@ -1404,8 +1443,8 @@ public class DockingContext {
 
     /**
      * Connects a floating pane to its stage and installs the close/hidden handlers that keep window
-     * lifetime and context ownership in sync. Host tracking follows the supplied source stage, falling
-     * back to the floating stage's owner when no source stage is available.
+     * lifetime and context ownership in sync. A floating source passes on its logical host so closing
+     * an emptied source window cannot close its replacement. Without a source, the stage's owner is used.
      */
     private void registerFloatingStage(DockingPane pane, Stage floatingStage, Stage hostStage) {
         floatingStageByPane.put(pane, floatingStage);
@@ -1414,6 +1453,9 @@ public class DockingContext {
                 event -> handleFloatingStageCloseRequest(floatingStage, event));
         floatingStage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> unregisterFloatingStage(floatingStage));
         Stage registeredHost = hostStage == null ? ownerOf(floatingStage) : hostStage;
+        if (floatingPaneByStage.containsKey(registeredHost)) {
+            registeredHost = hostStageByFloatingStage.get(registeredHost);
+        }
         if (registeredHost != null) {
             hostStageByFloatingStage.put(floatingStage, registeredHost);
             registerHostStage(registeredHost, floatingStage);

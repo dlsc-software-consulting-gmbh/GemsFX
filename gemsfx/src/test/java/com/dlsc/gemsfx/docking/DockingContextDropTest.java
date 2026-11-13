@@ -61,6 +61,22 @@ public class DockingContextDropTest extends FxTestBase {
     }
 
     @Test
+    public void droppingIntoEmptyRegularLayoutDoesNotJoinActiveInternalFloatingGroup() {
+        runFx(() -> {
+            DockingContext context = context();
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.floatDockableInternally("a", new javafx.geometry.Rectangle2D(25, 30, 300, 180));
+            context.setDockableDropPredicate(event -> true);
+            context.setDockableDropFactory(event -> dockable("new"));
+            assertTrue(context.dropDockable(pane, dropEvent(), null, DockingPosition.CENTER).isPresent());
+            assertTrue(pane.getLayoutRoot() instanceof DockingLayoutNode.Tabs);
+            assertEquals(List.of("new"), ((DockingLayoutNode.Tabs) pane.getLayoutRoot()).getDockableIds());
+            assertEquals(List.of("a"), pane.getFloatingGroups().get(0).getTabs().getDockableIds());
+        });
+    }
+
+    @Test
     public void droppedDockablesCanJoinOrSplitTheHoveredGroupAndSpanThePane() {
         runFx(() -> {
             DockingContext context = context();

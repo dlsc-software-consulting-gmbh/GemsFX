@@ -94,6 +94,10 @@ final class DockingTabPane extends VBox {
                 || !event.isShiftDown() || !event.isStillSincePress() || !(event.getTarget() instanceof Node)) {
             return;
         }
+        if (dockingPane.getFloatingGroups().stream()
+                .anyMatch(group -> group.getTabs().getDockableIds().contains(selectedId))) {
+            return;
+        }
         String id = selectedId;
         for (Node node = (Node) event.getTarget(); node != null && node != strip; node = node.getParent()) {
             if (node == headerAccessory) {
