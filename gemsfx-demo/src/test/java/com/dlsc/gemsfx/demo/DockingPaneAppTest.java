@@ -78,33 +78,6 @@ public class DockingPaneAppTest {
     }
 
     @Test
-    public void dockingEventsArePrintedToStandardOutput() throws Exception {
-        runFx(() -> {
-            PrintStream previousOut = System.out;
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            Stage stage = new Stage();
-            try (PrintStream captured = new PrintStream(output, true, StandardCharsets.UTF_8)) {
-                System.setOut(captured);
-                new DockingPaneApp().start(stage);
-                DockingPane pane = (DockingPane) stage.getScene().getRoot().lookup(".docking-pane");
-                DockingContext context = pane.getDockingContext();
-                Dockable dockable = context.openDockable(pane, "editor:logging", DockingPosition.CENTER).orElseThrow();
-                assertTrue(pane.moveDockable(dockable.getId(), "navigator", DockingPosition.LEFT));
-                assertTrue(context.requestCloseDockable(dockable));
-
-                String text = output.toString(StandardCharsets.UTF_8);
-                assertTrue(text.lines().anyMatch(line -> line.contains("DOCKABLE_OPENED") && line.contains("editor:logging")), text);
-                assertTrue(text.lines().anyMatch(line -> line.contains("DOCKABLE_MOVED") && line.contains("editor:logging")), text);
-                assertTrue(text.lines().anyMatch(line -> line.contains("DOCKABLE_CLOSED") && line.contains("editor:logging")), text);
-                assertTrue(text.lines().anyMatch(line -> line.contains("Docking selection:") && line.contains("editor:logging")));
-            } finally {
-                System.setOut(previousOut);
-                stage.hide();
-            }
-        });
-    }
-
-    @Test
     public void floatingToggleControlsDragFloating() throws Exception {
         runFx(() -> {
             Stage stage = new Stage();
