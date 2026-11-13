@@ -6,6 +6,7 @@ import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.docking.Dockable;
 import com.dlsc.gemsfx.docking.DockableFactory;
 import com.dlsc.gemsfx.docking.DockingContext;
+import com.dlsc.gemsfx.docking.DockingEvent;
 import com.dlsc.gemsfx.docking.DockingLayout;
 import com.dlsc.gemsfx.docking.DockingPane;
 import com.dlsc.gemsfx.docking.DockingPosition;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ListChangeListener;
 import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -37,12 +39,15 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -66,6 +71,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -99,6 +105,14 @@ public class DockingPaneApp extends GemApplication {
         DockableFactory dockableFactory = this::createDockable;
         DockingStageFactory stageFactory = pane -> createFloatingStage(stage, pane);
         DockingContext context = new DockingContext(dockableFactory, stageFactory);
+        DockingInspector inspector = new DockingInspector(context);
+        context.addEventHandler(DockingEvent.ANY, event -> {
+            String message = String.format("Docking event: %s dockable=%s oldPane=%s newPane=%s",
+                    event.getEventType().getName(), event.getDockable().getId(),
+                    event.getOldPane(), event.getNewPane());
+            System.out.println(message);
+            inspector.events.appendText(message + "\n");
+        });
         context.setDockableDropPredicate(event -> event.getDragboard() != null
                 && event.getDragboard().hasContent(SIDEBAR_VIEW_FORMAT)
                 && SIDEBAR_VIEW_TYPES.contains(event.getDragboard().getContent(SIDEBAR_VIEW_FORMAT)));
@@ -111,7 +125,7 @@ public class DockingPaneApp extends GemApplication {
 
         BorderPane root = new BorderPane();
         root.getStyleClass().add("docking-demo-app");
-        root.setTop(new VBox(createApplicationHeader(), createToolbar(stage, context, rootPane)));
+        root.setTop(new VBox(createApplicationHeader(), createToolbar(stage, context, rootPane, inspector)));
         root.setLeft(createNavigationRail());
         root.setCenter(rootPane);
         BorderPane.setMargin(rootPane, new Insets(0, 0, 0, 4));
@@ -241,7 +255,7 @@ public class DockingPaneApp extends GemApplication {
         }
     }
 
-    private HBox createToolbar(Stage stage, DockingContext context, DockingPane rootPane) {
+    private HBox createToolbar(Stage stage, DockingContext context, DockingPane rootPane, DockingInspector inspector) {
         Button openSearch = new Button("Open Search");
         openSearch.setOnAction(evt -> {
             context.openDockable(rootPane, "search", DockingPosition.CENTER);
@@ -313,11 +327,65 @@ public class DockingPaneApp extends GemApplication {
         Button dumpJson = new Button("Dump Layout JSON");
         dumpJson.setOnAction(event -> showLayoutJson(stage, context));
 
-        HBox toolbar = new HBox(8, openSearch, openTasks, openView, floatActive, snapshot, restore, dumpJson, clearAll);
+        Button eventsAndSelections = new Button("Events & Selections");
+        eventsAndSelections.setOnAction(event -> inspector.show(eventsAndSelections.getScene().getWindow()));
+
+        HBox toolbar = new HBox(8, openSearch, openTasks, openView, floatActive, snapshot, restore, dumpJson, clearAll, eventsAndSelections);
         toolbar.getStyleClass().add("docking-demo-toolbar");
         toolbar.setAlignment(Pos.CENTER_LEFT);
         toolbar.setPadding(new Insets(8, 12, 8, 12));
         return toolbar;
+    }
+
+    private class DockingInspector {
+        private final DockingContext context;
+        private final TextArea events = new TextArea();
+        private Stage stage;
+
+        private DockingInspector(DockingContext context) {
+            this.context = context;
+            events.setEditable(false);
+            events.setWrapText(true);
+            events.setPromptText("No docking events yet");
+        }
+
+        private void show(Window owner) {
+            if (stage == null) {
+                Button clear = new Button("Clear");
+                clear.setOnAction(event -> events.clear());
+                VBox eventsTab = new VBox(8, events, clear);
+                eventsTab.setPadding(new Insets(8));
+                VBox.setVgrow(events, Priority.ALWAYS);
+                ListView<Dockable> selectionList = new ListView<>(context.getSelectionModel().getSelectedItems());
+                selectionList.setPlaceholder(new Label("No dockables selected"));
+                selectionList.setCellFactory(view -> new ListCell<>() {
+                    @Override
+                    protected void updateItem(Dockable dockable, boolean empty) {
+                        super.updateItem(dockable, empty);
+                        textProperty().unbind();
+                        if (empty || dockable == null) {
+                            setText(null);
+                        } else {
+                            textProperty().bind(Bindings.createStringBinding(
+                                    () -> dockable.getTitle() + " (" + dockable.getId() + ")",
+                                    dockable.titleProperty()));
+                        }
+                    }
+                });
+
+                TabPane tabs = new TabPane(new Tab("Events", eventsTab), new Tab("Selection", selectionList));
+                tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+                Scene scene = new Scene(tabs, 700, 400);
+                scene.setUserAgentStylesheet(owner.getScene().getUserAgentStylesheet());
+                applyAppStyles(scene);
+                stage = new Stage();
+                stage.initOwner(owner);
+                stage.setTitle("Docking Events and Selection");
+                stage.setScene(scene);
+            }
+            stage.show();
+            stage.toFront();
+        }
     }
 
     private void showLayoutJson(Stage owner, DockingContext context) {
