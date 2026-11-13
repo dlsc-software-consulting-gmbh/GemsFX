@@ -3,7 +3,9 @@ package com.dlsc.gemsfx.docking;
 import com.dlsc.gemsfx.docking.model.DockingTree;
 import com.dlsc.gemsfx.docking.model.DockingTabGroup;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -189,6 +191,27 @@ public class DockingContext {
      */
     public final DockingStageFactory getStageFactory() {
         return stageFactory;
+    }
+
+    private final BooleanProperty floatingEnabled = new SimpleBooleanProperty(this, "floatingEnabled", true);
+
+    /**
+     * Controls whether dragging a dockable or tab group outside all panes creates a floating
+     * window. When disabled, the drop leaves the layout unchanged. The default is {@code true}.
+     * This setting does not restrict explicit floating operations or layout restoration.
+     *
+     * @return the floating-enabled property
+     */
+    public final BooleanProperty floatingEnabledProperty() {
+        return floatingEnabled;
+    }
+
+    public final boolean isFloatingEnabled() {
+        return floatingEnabled.get();
+    }
+
+    public final void setFloatingEnabled(boolean enabled) {
+        floatingEnabled.set(enabled);
     }
 
     private final ObjectProperty<Callback<DockingContext, DockingPane>> paneFactory =

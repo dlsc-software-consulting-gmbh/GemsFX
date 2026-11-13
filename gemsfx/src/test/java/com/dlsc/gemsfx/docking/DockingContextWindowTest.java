@@ -1350,6 +1350,105 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     @Test
+    public void disabledFloatingRejectsOutsideDropsButAllowsInPaneDragging() {
+        invoke(() -> {
+            AtomicInteger stageFactoryCalls = new AtomicInteger();
+            AtomicReference<DockingPane> floatingPane = new AtomicReference<>();
+            DockingContext context = new DockingContext(factoryFor(List.of(dockable("a"), dockable("b")),
+                    new AtomicInteger()), pane -> {
+                stageFactoryCalls.incrementAndGet();
+                floatingPane.set(pane);
+                Stage stage = new Stage();
+                stage.setScene(new Scene(pane, 200, 120));
+                return stage;
+            });
+            assertTrue("Floating must remain enabled by default", context.isFloatingEnabled());
+            context.setFloatingEnabled(false);
+
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.CENTER);
+            host.setSkin(new EventTestDockingPaneSkin(host));
+            StackPane outside = new StackPane();
+            layout(new HBox(host, outside));
+            AtomicInteger outsideDrops = new AtomicInteger();
+            AtomicInteger outsideDragOvers = new AtomicInteger();
+            outside.addEventHandler(DragEvent.DRAG_DROPPED, event -> outsideDrops.incrementAndGet());
+            outside.addEventHandler(DragEvent.DRAG_OVER, event -> outsideDragOvers.incrementAndGet());
+
+            for (boolean wholeGroup : new boolean[]{false, true}) {
+                Node source = title(host, "a");
+                fireDragDetected(source, wholeGroup);
+                fireDragEvent(outside, DragEvent.DRAG_OVER, source,
+                        5, 5, 777, 888, null, outside);
+                fireDragEvent(outside, DragEvent.DRAG_DROPPED, source,
+                        5, 5, 777, 888, TransferMode.MOVE, outside);
+                fireDragEvent(source, DragEvent.DRAG_DONE, source, 5, 5, 777, 888, null, source);
+                assertEquals(List.of("a", "b"), ids(host));
+                assertEquals(0, stageFactoryCalls.get());
+                for (Node indicator : host.lookupAll(".docking-pane-edge-target")) {
+                    assertFalse(indicator.isVisible());
+                }
+            }
+            assertEquals("Outside drag-over events must remain available to other handlers", 2, outsideDragOvers.get());
+            assertEquals("Outside drops must remain available to other handlers", 2, outsideDrops.get());
+
+            Node source = title(host, "a");
+            Node target = title(host, "b");
+            fireDragDetected(source);
+            DragEvent dropped = fireDragEvent(host, DragEvent.DRAG_DROPPED, source,
+                    host.getWidth() / 2, host.getHeight() / 2, 200, 200, TransferMode.MOVE, target);
+            fireDragEvent(source, DragEvent.DRAG_DONE, source, 5, 5, 200, 200, TransferMode.MOVE, source);
+            assertTrue(dropped.isDropCompleted());
+            assertEquals(List.of("b", "a"), ids(host));
+            assertEquals(0, stageFactoryCalls.get());
+
+            context.setFloatingEnabled(true);
+            source = title(host, "a");
+            fireDragDetected(source);
+            fireDragEvent(source, DragEvent.DRAG_DONE, source, 5, 5, 777, 888, null, source);
+            assertEquals(1, stageFactoryCalls.get());
+            assertEquals(List.of("a"), ids(floatingPane.get()));
+            return null;
+        });
+    }
+
+    @Test
+    public void disablingFloatingDuringDragCancelsPendingOutsideDrop() {
+        invoke(() -> {
+            AtomicInteger stageFactoryCalls = new AtomicInteger();
+            DockingContext context = new DockingContext(factoryFor(List.of(dockable("a"), dockable("b")),
+                    new AtomicInteger()), pane -> {
+                stageFactoryCalls.incrementAndGet();
+                Stage stage = new Stage();
+                stage.setScene(new Scene(pane, 200, 120));
+                return stage;
+            });
+            DockingPane host = context.createPane();
+            context.openDockable(host, "a", DockingPosition.CENTER);
+            context.openDockable(host, "b", DockingPosition.CENTER);
+            host.setSkin(new EventTestDockingPaneSkin(host));
+            StackPane outside = new StackPane();
+            layout(new HBox(host, outside));
+            Node source = title(host, "a");
+
+            fireDragDetected(source);
+            DragEvent drop = fireDragEvent(outside, DragEvent.DRAG_DROPPED, source,
+                    5, 5, 777, 888, TransferMode.MOVE, outside);
+            assertTrue(drop.isDropCompleted());
+            context.setFloatingEnabled(false);
+            fireDragEvent(source, DragEvent.DRAG_DONE, source, 0, 0, 0, 0, TransferMode.MOVE, source);
+            assertEquals(0, stageFactoryCalls.get());
+            assertEquals(List.of("a", "b"), ids(host));
+
+            DockingPane floating = context.floatDockable("a", 100, 100);
+            assertEquals(1, stageFactoryCalls.get());
+            assertEquals(List.of("a"), ids(floating));
+            return null;
+        });
+    }
+
+    @Test
     public void nativeDragDoneWithZeroCoordinatesFloatsAtThePointerPosition() {
         Assume.assumeTrue("Keep pointer movement inside the headless test toolkit",
                 "Monocle".equals(System.getProperty("glass.platform")));

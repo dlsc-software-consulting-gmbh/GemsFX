@@ -1010,7 +1010,8 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     }
 
     private void handleSceneDragOver(DragEvent event) {
-        if (!isActiveDockableDrag(event) || isInsideContextPane(intersectedNode(event))) {
+        if (!getSkinnable().getDockingContext().isFloatingEnabled()
+                || !isActiveDockableDrag(event) || isInsideContextPane(intersectedNode(event))) {
             return;
         }
         event.acceptTransferModes(TransferMode.MOVE);
@@ -1018,7 +1019,8 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     }
 
     private void handleSceneDragDropped(DragEvent event) {
-        if (!isActiveDockableDrag(event) || isInsideContextPane(intersectedNode(event))) {
+        if (!getSkinnable().getDockingContext().isFloatingEnabled()
+                || !isActiveDockableDrag(event) || isInsideContextPane(intersectedNode(event))) {
             return;
         }
         if (handleExternalDrop(activeDragDockableId, event.getScreenX(), event.getScreenY())) {
@@ -1066,7 +1068,8 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      * creating a floating window, and gesture state is cleared even if floating fails.
      */
     private void completeDrag(String dockableId, TransferMode transferMode, double screenX, double screenY) {
-        if (dockableId == null || !dockableId.equals(activeDragDockableId) || dragCancelledByEscape
+        if (!getSkinnable().getDockingContext().isFloatingEnabled()
+                || dockableId == null || !dockableId.equals(activeDragDockableId) || dragCancelledByEscape
                 || (outsideContextDropPosition == null && (transferMode != null || unsuccessfulDropObserved))) {
             finishDrag();
             return;

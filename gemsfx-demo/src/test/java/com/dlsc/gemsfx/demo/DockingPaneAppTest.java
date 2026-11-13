@@ -1,6 +1,7 @@
 package com.dlsc.gemsfx.demo;
 
 import atlantafx.base.theme.NordLight;
+import com.dlsc.gemsfx.BeforeAfterView;
 import com.dlsc.gemsfx.docking.Dockable;
 import com.dlsc.gemsfx.docking.DockingContext;
 import com.dlsc.gemsfx.docking.DockingLayout;
@@ -20,6 +21,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -29,6 +31,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -94,6 +97,78 @@ public class DockingPaneAppTest {
                 System.setOut(previousOut);
                 stage.hide();
             }
+        });
+    }
+
+    @Test
+    public void floatingCheckboxControlsDragFloating() throws Exception {
+        runFx(() -> {
+            Stage stage = new Stage();
+            try {
+                new DockingPaneApp().start(stage);
+                var root = stage.getScene().getRoot();
+                DockingPane pane = (DockingPane) root.lookup(".docking-pane");
+                DockingContext context = pane.getDockingContext();
+                CheckBox floating = root.lookupAll(".check-box").stream()
+                        .filter(CheckBox.class::isInstance).map(CheckBox.class::cast)
+                        .filter(box -> "Allow Drag to Float".equals(box.getText())).findFirst().orElse(null);
+                assertNotNull(floating, "The demo must provide a drag-to-float checkbox");
+                assertTrue(floating.isSelected());
+                assertTrue(context.isFloatingEnabled());
+
+                floating.fire();
+                assertFalse(context.isFloatingEnabled());
+                context.setFloatingEnabled(true);
+                assertTrue(floating.isSelected());
+                context.setFloatingEnabled(false);
+                assertFalse(floating.isSelected());
+                floating.fire();
+                assertTrue(context.isFloatingEnabled());
+
+                root.applyCss();
+                root.layout();
+                assertTrue(floating.localToScene(floating.getBoundsInLocal()).getMaxX() <= stage.getScene().getWidth(),
+                        "The checkbox must be visible at the demo's default window size");
+                Button inspector = root.lookupAll(".button").stream()
+                        .filter(Button.class::isInstance).map(Button.class::cast)
+                        .filter(button -> "Events & Selections".equals(button.getText())).findFirst().orElseThrow();
+                assertTrue(inspector.localToScene(inspector.getBoundsInLocal()).getMaxX() <= stage.getScene().getWidth(),
+                        "Existing toolbar buttons must remain visible");
+            } finally {
+                stage.hide();
+            }
+        });
+    }
+
+    @Test
+    public void cityDockableShowsResizableBerlinBeforeAfterImages() throws Exception {
+        runFx(() -> {
+            Dockable city = new DockingPaneApp().createDockable("city").orElseThrow();
+            BeforeAfterView comparison = assertInstanceOf(BeforeAfterView.class, city.getContent());
+            ImageView before = assertInstanceOf(ImageView.class, comparison.getBefore());
+            ImageView after = assertInstanceOf(ImageView.class, comparison.getAfter());
+            assertTrue(before.getImage().getUrl().endsWith("/berlin/before1.png"));
+            assertTrue(after.getImage().getUrl().endsWith("/berlin/after1.png"));
+            assertFalse(before.getImage().isError());
+            assertFalse(after.getImage().isError());
+
+            StackPane root = new StackPane(comparison);
+            new Scene(root, 360, 200);
+            root.applyCss();
+            root.layout();
+            assertEquals(360, comparison.getWidth(), 0.1);
+            assertEquals(comparison.getWidth(), before.getFitWidth(), 0.1);
+            assertEquals(comparison.getHeight(), before.getFitHeight(), 0.1);
+            assertEquals(before.getFitWidth(), after.getFitWidth(), 0.1);
+            assertEquals(before.getFitHeight(), after.getFitHeight(), 0.1);
+            assertTrue(before.isPreserveRatio());
+            assertTrue(after.isPreserveRatio());
+
+            root.resize(200, 350);
+            root.layout();
+            assertEquals(200, comparison.getWidth(), 0.1);
+            assertEquals(comparison.getWidth(), before.getFitWidth(), 0.1);
+            assertEquals(comparison.getHeight(), after.getFitHeight(), 0.1);
         });
     }
 

@@ -2,6 +2,7 @@ package com.dlsc.gemsfx.demo;
 
 import atlantafx.base.theme.NordDark;
 import atlantafx.base.theme.NordLight;
+import com.dlsc.gemsfx.BeforeAfterView;
 import com.dlsc.gemsfx.DialogPane;
 import com.dlsc.gemsfx.docking.Dockable;
 import com.dlsc.gemsfx.docking.DockableFactory;
@@ -68,7 +69,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -295,6 +295,10 @@ public class DockingPaneApp extends GemApplication {
             status("Floated dockable '" + active.getId() + "' into an app-created stage.");
         });
 
+        CheckBox allowDragToFloat = new CheckBox("Allow Drag to Float");
+        allowDragToFloat.selectedProperty().bindBidirectional(context.floatingEnabledProperty());
+        allowDragToFloat.setTooltip(new Tooltip("Allow tabs or groups to be dragged into new windows"));
+
         Button snapshot = new Button("Snapshot Layout");
         snapshot.setOnAction(evt -> {
             savedLayout = context.getLayout();
@@ -330,7 +334,8 @@ public class DockingPaneApp extends GemApplication {
         Button eventsAndSelections = new Button("Events & Selections");
         eventsAndSelections.setOnAction(event -> inspector.show(eventsAndSelections.getScene().getWindow()));
 
-        HBox toolbar = new HBox(8, openSearch, openTasks, openView, floatActive, snapshot, restore, dumpJson, clearAll, eventsAndSelections);
+        HBox toolbar = new HBox(8, openSearch, openTasks, openView, floatActive,
+                snapshot, restore, dumpJson, clearAll, eventsAndSelections, allowDragToFloat);
         toolbar.getStyleClass().add("docking-demo-toolbar");
         toolbar.setAlignment(Pos.CENTER_LEFT);
         toolbar.setPadding(new Insets(8, 12, 8, 12));
@@ -835,25 +840,21 @@ public class DockingPaneApp extends GemApplication {
     }
 
     private Dockable createCityDockable(String id) {
-        Image image = new Image(Objects.requireNonNull(
+        Image before = new Image(Objects.requireNonNull(
+                DockingPaneApp.class.getResource("berlin/before1.png")).toExternalForm());
+        Image after = new Image(Objects.requireNonNull(
                 DockingPaneApp.class.getResource("berlin/after1.png")).toExternalForm());
-        ImageView city = new ImageView(image);
-        city.setPreserveRatio(true);
-        city.setSmooth(true);
-        city.setAccessibleText("Photograph of Berlin");
-        StackPane imagePane = new StackPane(city);
-        imagePane.setMinSize(0, 0);
-        Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(imagePane.widthProperty());
-        clip.heightProperty().bind(imagePane.heightProperty());
-        imagePane.setClip(clip);
-
-        var scale = Bindings.createDoubleBinding(
-                () -> Math.max(imagePane.getWidth() / image.getWidth(), imagePane.getHeight() / image.getHeight()),
-                imagePane.widthProperty(), imagePane.heightProperty());
-        city.fitWidthProperty().bind(scale.multiply(image.getWidth()));
-        city.fitHeightProperty().bind(scale.multiply(image.getHeight()));
-        return new Dockable(id, "City", createIcon(MaterialDesign.MDI_IMAGE), imagePane);
+        BeforeAfterView city = new BeforeAfterView(before, after);
+        city.setMinSize(0, 0);
+        city.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        city.setAccessibleText("Before and after photographs of Berlin");
+        for (Node node : List.of(city.getBefore(), city.getAfter())) {
+            ImageView imageView = (ImageView) node;
+            imageView.setPreserveRatio(true);
+            imageView.fitWidthProperty().bind(city.widthProperty());
+            imageView.fitHeightProperty().bind(city.heightProperty());
+        }
+        return new Dockable(id, "City", createIcon(MaterialDesign.MDI_IMAGE), city);
     }
 
     private Dockable createTextDockable(String id, String title, Ikon icon, String content) {
