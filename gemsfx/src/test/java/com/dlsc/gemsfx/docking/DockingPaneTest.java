@@ -5,6 +5,7 @@ import com.dlsc.gemsfx.GlassPane;
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
+import javafx.animation.AnimationTimer;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
@@ -215,9 +216,10 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     @Test
-    public void maximizingAndRestoringKeepsFocusInContent() {
+    public void maximizingAndRestoringKeepsFocusInContent() throws InterruptedException {
+        TextField input = invoke(TextField::new);
         DockingPane pane = invoke(() -> {
-            Dockable dockable = new Dockable("a", "A", new TextField());
+            Dockable dockable = new Dockable("a", "A", new StackPane(input));
             DockingContext context = context(dockable, dockable("b"));
             DockingPane result = context.createPane();
             context.openDockable(result, "a", DockingPosition.CENTER);
@@ -233,27 +235,80 @@ public class DockingPaneTest extends FxTestBase {
             waitForFxEvents();
             runFx(() -> {
                 Dockable dockable = pane.getActiveDockable();
-                Node content = dockable.getContent();
-                content.requestFocus();
-                assertSame(content, pane.getScene().getFocusOwner());
+                input.requestFocus();
+                assertSame(input, pane.getScene().getFocusOwner());
                 pane.setMaximizedDockable(dockable);
             });
-            waitForFxEvents();
+            waitForPulses();
             runFx(() -> {
-                Node content = pane.getActiveDockable().getContent();
-                assertSame(content, pane.getScene().getFocusOwner());
-                assertTrue(content.isFocused());
+                assertSame(input, pane.getScene().getFocusOwner());
+                assertTrue(input.isFocused());
                 pane.setMaximizedDockable(null);
             });
-            waitForFxEvents();
+            waitForPulses();
             runFx(() -> {
-                Node content = pane.getActiveDockable().getContent();
-                assertSame(content, pane.getScene().getFocusOwner());
-                assertTrue(content.isFocused());
+                assertSame(input, pane.getScene().getFocusOwner());
+                assertTrue(input.isFocused());
             });
         } finally {
             runFx(() -> ((Stage) pane.getScene().getWindow()).close());
         }
+    }
+
+    @Test
+    public void restoringDoesNotStealFocusChangedDuringRebuild() throws InterruptedException {
+        TextField input = invoke(TextField::new);
+        Button outside = invoke(Button::new);
+        DockingPane pane = invoke(() -> {
+            Dockable dockable = new Dockable("a", "A", input);
+            DockingContext context = context(dockable, dockable("b"));
+            DockingPane result = context.createPane();
+            context.openDockable(result, "a", DockingPosition.CENTER);
+            context.openDockable(result, "b", DockingPosition.RIGHT);
+            result.selectDockable("a");
+            Stage stage = new Stage();
+            stage.setScene(new Scene(new StackPane(result, outside), 500, 400));
+            stage.show();
+            stage.requestFocus();
+            return result;
+        });
+        try {
+            waitForFxEvents();
+            runFx(() -> {
+                input.requestFocus();
+                pane.setMaximizedDockable(pane.getActiveDockable());
+            });
+            waitForPulses();
+            runFx(() -> {
+                assertSame(input, pane.getScene().getFocusOwner());
+                input.sceneProperty().addListener((obs, previous, current) -> {
+                    if (current == null) {
+                        outside.requestFocus();
+                    }
+                });
+                pane.setMaximizedDockable(null);
+            });
+            waitForPulses();
+            runFx(() -> assertSame(outside, pane.getScene().getFocusOwner()));
+        } finally {
+            runFx(() -> ((Stage) pane.getScene().getWindow()).close());
+        }
+    }
+
+    private static void waitForPulses() throws InterruptedException {
+        CountDownLatch pulses = new CountDownLatch(1);
+        runFx(() -> new AnimationTimer() {
+            private int count;
+
+            @Override
+            public void handle(long now) {
+                if (++count == 2) {
+                    stop();
+                    pulses.countDown();
+                }
+            }
+        }.start());
+        assertTrue("Timed out waiting for JavaFX pulses", pulses.await(10, TimeUnit.SECONDS));
     }
 
     private static TextField titleEditor(DockingPane pane) {

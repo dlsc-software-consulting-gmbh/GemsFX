@@ -321,12 +321,26 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     /**
      * Recreates the rendered split/tab hierarchy after layout structure or tab presentation changes.
      * Existing content and graphics are released before rendering so their nodes can be reused, and
-     * keyboard focus on a tab title is restored by dockable ID rather than by obsolete node identity.
+     * keyboard focus on a tab title is restored by dockable ID rather than by obsolete node identity,
+     * while focus inside dockable content is restored to the original node when it remains available.
      * Applying CSS attaches newly created split contents before focus is requested.
      */
     private void rebuild() {
         DockingPane pane = getSkinnable();
         String focusedId = focusedDockableId();
+        Node focusedContent = null;
+        if (focusedId == null && focusScene != null) {
+            Node focusOwner = focusScene.getFocusOwner();
+            Dockable dockable = dockableContaining(focusOwner);
+            if (dockable != null) {
+                for (Node node = focusOwner; node != null && node != pane; node = node.getParent()) {
+                    if (node == dockable.getContent()) {
+                        focusedContent = focusOwner;
+                        break;
+                    }
+                }
+            }
+        }
         detachContents();
         emptyPane.getChildren().clear();
         maximizedGroup = null;
@@ -344,10 +358,10 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         host.getChildren().addAll(paneEdgeTargets.values());
         getChildren().setAll(host);
         clearDropPreview();
+        if ((focusedId != null || focusedContent != null) && pane.getSkin() == this) {
+            pane.applyCss();
+        }
         if (focusedId != null) {
-            if (pane.getSkin() == this) {
-                pane.applyCss();
-            }
             for (DockingTabPane group : tabGroups) {
                 Node title = group.titleOf(focusedId);
                 if (title != null) {
@@ -355,6 +369,10 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
                     break;
                 }
             }
+        } else if (focusedContent != null && focusScene != null && focusedContent.getScene() == focusScene
+                && !focusedContent.isDisabled()
+                && (focusScene.getFocusOwner() == focusedContent || focusScene.getFocusOwner() == null)) {
+            focusedContent.requestFocus();
         }
         updateActiveGroup();
     }
