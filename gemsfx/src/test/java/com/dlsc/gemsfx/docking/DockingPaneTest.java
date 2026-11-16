@@ -1464,7 +1464,8 @@ public class DockingPaneTest extends FxTestBase {
                 layout(pane);
                 Scene scene = pane.getScene();
                 scene.getRoot().setStyle("-fx-accent: #12ab34; -fx-control-inner-background: #654321;"
-                        + " -color-accent-emphasis: #12ab34; -color-bg-default: #654321;");
+                        + " -color-accent-emphasis: #12ab34; -color-bg-default: #654321;"
+                        + " -color-neutral-emphasis: #654321; -color-neutral-emphasis-plus: #123456;");
                 if (atlanta) {
                     GemsFXAtlantaFX.applyTo(scene);
                 }
@@ -1833,7 +1834,8 @@ public class DockingPaneTest extends FxTestBase {
             context.openDockable(pane, "b", DockingPosition.CENTER);
             layout(pane);
             Scene scene = pane.getScene();
-            scene.getRoot().setStyle("-fx-box-border: #123456; -color-border-muted: #123456;");
+            scene.getRoot().setStyle("-fx-box-border: #123456; -color-border-muted: #123456;"
+                    + " -color-neutral-emphasis-plus: #123456;");
 
             for (boolean atlanta : List.of(false, true)) {
                 if (atlanta) {
@@ -1939,6 +1941,37 @@ public class DockingPaneTest extends FxTestBase {
             reused.openDockable(reusedPane, "a", DockingPosition.CENTER);
             reused.openDockable(reusedPane, "b", DockingPosition.CENTER);
             assertThrows(IllegalArgumentException.class, () -> new DockingPaneSkin(reusedPane));
+        });
+    }
+
+    @Test
+    public void atlantaCompanionStylesDockingGroupsWithoutDemoStylesheet() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"), dockable("c"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            context.openDockable(pane, "c", DockingPosition.RIGHT);
+            layout(pane);
+            Scene scene = pane.getScene();
+            scene.getRoot().setStyle("-color-neutral-emphasis-plus: #123456;"
+                    + " -color-neutral-emphasis: #654321; -color-bg-default: #eeeeee;"
+                    + " -color-bg-subtle: #dddddd; -color-accent-emphasis: #cc1122;"
+                    + " -color-border-muted: #abcdef; -color-border-default: #fedcba;"
+                    + " -color-fg-default: #111111; -color-fg-emphasis: #ffffff;");
+            GemsFXAtlantaFX.applyTo(scene);
+            scene.getRoot().applyCss();
+            scene.getRoot().layout();
+
+            Region unselected = (Region) title(pane, "a");
+            Region inactiveSelected = (Region) title(pane, "b");
+            Region activeSelected = (Region) title(pane, "c");
+            Region group = (Region) inactiveSelected.getParent().getParent();
+            assertNotNull("The AtlantaFX companion must style the tab group border", group.getBorder());
+            assertEquals(Color.web("#123456"), group.getBorder().getStrokes().get(0).getTopStroke());
+            assertEquals(Color.web("#123456"), unselected.getBorder().getStrokes().get(0).getRightStroke());
+            assertEquals(Color.web("#654321"), inactiveSelected.getBackground().getFills().get(0).getFill());
+            assertEquals(Color.web("#cc1122"), activeSelected.getBackground().getFills().get(0).getFill());
         });
     }
 

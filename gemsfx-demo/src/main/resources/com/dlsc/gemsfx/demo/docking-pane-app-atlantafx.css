@@ -87,54 +87,14 @@
     -fx-text-fill: -color-fg-muted;
 }
 
-.docking-demo-app .docking-pane .docking-tab-pane {
-    -fx-border-color: -color-neutral-emphasis-plus;
-    -fx-border-width: 1px;
-    -fx-border-insets: 0;
-}
-
 .docking-demo-app .docking-demo-map-footer {
     -fx-background-color: rgba(255, 255, 255, 0.65);
 }
 
-.docking-demo-app .docking-pane .docking-tab {
-    -fx-background-color: -color-bg-subtle;
-    -fx-border-color: transparent -color-neutral-emphasis-plus -color-neutral-emphasis-plus transparent;
-}
-
-.docking-demo-app .docking-pane .docking-tab-pane-actions {
-    -fx-border-color: transparent transparent -color-neutral-emphasis-plus -color-neutral-emphasis-plus;
-}
-
-.docking-demo-app .docking-pane .docking-tab:selected {
-    -fx-background-color: -color-neutral-emphasis;
-    -fx-border-color: transparent -color-neutral-emphasis-plus -color-neutral-emphasis-plus transparent;
-}
-
-.docking-demo-app .docking-pane .docking-tab-pane:active .docking-tab:selected {
-    -fx-background-color: -color-accent-emphasis;
-}
-
-.docking-demo-app .docking-pane .docking-tab:focused {
-    -fx-border-color: -color-accent-emphasis -color-neutral-emphasis-plus -color-neutral-emphasis-plus -color-accent-emphasis;
-}
-
-.docking-demo-app .docking-pane .docking-tab:selected .docking-tab-title {
-    -fx-text-fill: -color-fg-emphasis;
-}
-
-.docking-demo-app .docking-pane .docking-tab-title .ikonli-font-icon {
-    -fx-icon-color: -color-fg-default;
-}
-
-.docking-demo-app .docking-pane .docking-tab:selected .docking-tab-title .ikonli-font-icon {
-    -fx-icon-color: -color-fg-emphasis;
-}
-
-.docking-demo-app .docking-pane .docking-tab-toolbar .docking-demo-tab-action,
-.docking-demo-app .docking-pane .docking-tab-toolbar .docking-demo-tab-action:hover,
-.docking-demo-app .docking-pane .docking-tab-toolbar .docking-demo-tab-action:pressed,
-.docking-demo-app .docking-pane .docking-tab-toolbar .docking-demo-tab-action:selected {
+.docking-demo-app .docking-tab-toolbar .docking-demo-tab-action,
+.docking-demo-app .docking-tab-toolbar .docking-demo-tab-action:hover,
+.docking-demo-app .docking-tab-toolbar .docking-demo-tab-action:pressed,
+.docking-demo-app .docking-tab-toolbar .docking-demo-tab-action:selected {
     -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-padding: 4px;
@@ -144,25 +104,21 @@
     -fx-border-width: 0 0 1px 0;
 }
 
-.docking-demo-app .docking-pane .docking-tab-toolbar .docking-demo-tab-action:selected {
+.docking-demo-app .docking-tab-toolbar .docking-demo-tab-action:selected {
     -fx-border-color: transparent transparent -color-fg-default transparent;
 }
 
-.docking-demo-app .docking-pane .docking-tab:selected .docking-demo-tab-action:selected {
+.docking-demo-app .docking-tab:selected .docking-demo-tab-action:selected {
     -fx-border-color: transparent transparent -color-fg-emphasis transparent;
 }
 
-.docking-demo-app .docking-pane .docking-tab-toolbar .docking-demo-tab-action .ikonli-font-icon {
+.docking-demo-app .docking-tab-toolbar .docking-demo-tab-action .ikonli-font-icon {
     -fx-icon-size: 12px;
     -fx-icon-color: -color-fg-default;
 }
 
-.docking-demo-app .docking-pane .docking-tab:selected .docking-demo-tab-action .ikonli-font-icon {
+.docking-demo-app .docking-tab:selected .docking-demo-tab-action .ikonli-font-icon {
     -fx-icon-color: -color-fg-emphasis;
-}
-
-.docking-demo-app .docking-pane .docking-tab-content {
-    -fx-background-color: -color-bg-default;
 }
 
 .docking-demo-app .docking-demo-drag-graphic,
