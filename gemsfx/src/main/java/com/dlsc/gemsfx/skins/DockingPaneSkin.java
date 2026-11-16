@@ -963,7 +963,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         Point2D point = floatingLayer.sceneToLocal(
                 getSkinnable().localToScene(event.getX(), event.getY()));
         for (DockingFloatingFrame frame : floatingFrames) {
-            if (frame.getBoundsInParent().contains(point)) {
+            if (frame.getLayoutBounds().contains(frame.parentToLocal(point))) {
                 return true;
             }
         }
