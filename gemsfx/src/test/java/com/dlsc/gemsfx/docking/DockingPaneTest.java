@@ -24,11 +24,13 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -51,6 +53,20 @@ import java.lang.reflect.Method;
 import static org.junit.Assert.*;
 
 public class DockingPaneTest extends FxTestBase {
+
+    private static class EventTestDockingPaneSkin extends DockingPaneSkin {
+        private int dragStarts;
+
+        private EventTestDockingPaneSkin(DockingPane pane) {
+            super(pane);
+        }
+
+        @Override
+        protected boolean startDockableDrag(Node title, String dockableId) {
+            dragStarts++;
+            return true;
+        }
+    }
 
     private static DockingContext context(Dockable... dockables) {
         return new DockingContext(id -> {
@@ -79,6 +95,19 @@ public class DockingPaneTest extends FxTestBase {
         Event.fireEvent(node, new MouseEvent(type, 5, 5, 105, 105, MouseButton.PRIMARY, 1,
                 false, false, false, false, type == MouseEvent.MOUSE_PRESSED, false, false,
                 false, false, stillSincePress, new PickResult(node, 5, 5)));
+    }
+
+    private static void fireDragDetected(Node node, boolean shiftDown) {
+        Event.fireEvent(node, new MouseEvent(MouseEvent.DRAG_DETECTED, 5, 5, 105, 105, MouseButton.PRIMARY, 1,
+                shiftDown, false, false, false, true, false, false, false, false, true,
+                new PickResult(node, 5, 5)));
+    }
+
+    private static DragEvent fireDragEvent(Node target, EventType<DragEvent> type, Node source, double x, double y) {
+        DragEvent event = new DragEvent(source, target, type, null, x, y, 400, 300, TransferMode.MOVE,
+                source, target, new PickResult(target, x, y));
+        Event.fireEvent(target, event);
+        return event;
     }
 
     private static void doubleClick(Node node) {
@@ -281,6 +310,26 @@ public class DockingPaneTest extends FxTestBase {
             assertFalse(groupMenuItem(pane, "a", "docking-tab-float-internally").isDisable());
             assertFalse(groupMenuItem(pane, "a", "docking-group-float-internally").isDisable());
             assertFalse(groupMenuItem(pane, "f", "docking-group-dock").isDisable());
+        });
+    }
+
+    @Test
+    public void dockGroupMenuActionTracksDockingEnabled() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.floatDockableInternally("a", new Rectangle2D(25, 30, 300, 180));
+            layout(pane);
+            MenuItem dockGroup = groupMenuItem(pane, "a", "docking-group-dock");
+
+            assertFalse(dockGroup.isDisable());
+            context.setDockingEnabled(false);
+            assertTrue(dockGroup.isDisable());
+            dockGroup.fire();
+            assertTrue(pane.isDockableFloating("a"));
+            context.setDockingEnabled(true);
+            assertFalse(dockGroup.isDisable());
         });
     }
 
@@ -771,6 +820,55 @@ public class DockingPaneTest extends FxTestBase {
             header.addEventHandler(MouseEvent.DRAG_DETECTED, event -> drags.incrementAndGet());
             mouse(editor, MouseEvent.DRAG_DETECTED, false);
             assertEquals(0, drags.get());
+        });
+    }
+
+    @Test
+    public void disabledDockingContextDoesNotStartTabOrGroupDrags() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("b"));
+            DockingPane pane = context.createPane();
+            Dockable a = context.openDockable(pane, "a", DockingPosition.CENTER).orElseThrow();
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            pane.setSkin(new EventTestDockingPaneSkin(pane));
+            layout(pane);
+            context.setDockingEnabled(false);
+
+            Node title = title(pane, "a");
+            fireDragDetected(title, false);
+            fireDragDetected(title, true);
+
+            EventTestDockingPaneSkin skin = (EventTestDockingPaneSkin) pane.getSkin();
+            assertEquals(0, skin.dragStarts);
+            assertTrue(pane.lookupAll(".docking-pane-edge-target").stream().noneMatch(Node::isVisible));
+            assertSame(pane, a.getDockingPane());
+        });
+    }
+
+    @Test
+    public void disablingDockingDuringADragRejectsTheDrop() {
+        runFx(() -> {
+            DockingContext context = context(dockable("a"), dockable("x"));
+            DockingPane source = context.createPane();
+            Dockable a = context.openDockable(source, "a", DockingPosition.CENTER).orElseThrow();
+            source.setSkin(new EventTestDockingPaneSkin(source));
+            layout(source);
+            DockingPane target = context.createPane();
+            context.openDockable(target, "x", DockingPosition.CENTER);
+            target.setSkin(new EventTestDockingPaneSkin(target));
+            layout(target);
+
+            Node dragged = title(source, "a");
+            fireDragDetected(dragged, false);
+            context.setDockingEnabled(false);
+            fireDragEvent(target, DragEvent.DRAG_OVER, dragged, target.getWidth() / 2, target.getHeight() / 2);
+
+            assertFalse(target.lookup(".docking-drop-zone-preview").isVisible());
+            DragEvent dropped = fireDragEvent(target, DragEvent.DRAG_DROPPED, dragged,
+                    target.getWidth() / 2, target.getHeight() / 2);
+            assertFalse(dropped.isDropCompleted());
+            assertSame(source, a.getDockingPane());
+            fireDragEvent(dragged, DragEvent.DRAG_DONE, dragged, 5, 5);
         });
     }
 

@@ -195,6 +195,26 @@ public class DockingContext {
         return stageFactory;
     }
 
+    private final BooleanProperty dockingEnabled = new SimpleBooleanProperty(this, "dockingEnabled", true);
+
+    /**
+     * Controls whether users can rearrange existing dockables through docking gestures and built-in docking actions.
+     * Disabling this property does not restrict programmatic move operations.
+     *
+     * @return the docking-enabled property
+     */
+    public final BooleanProperty dockingEnabledProperty() {
+        return dockingEnabled;
+    }
+
+    public final boolean isDockingEnabled() {
+        return dockingEnabled.get();
+    }
+
+    public final void setDockingEnabled(boolean enabled) {
+        dockingEnabled.set(enabled);
+    }
+
     private final BooleanProperty floatingEnabled = new SimpleBooleanProperty(this, "floatingEnabled", true);
 
     /**
