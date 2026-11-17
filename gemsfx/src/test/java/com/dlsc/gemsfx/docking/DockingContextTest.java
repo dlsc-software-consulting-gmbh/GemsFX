@@ -101,6 +101,31 @@ public class DockingContextTest extends FxTestBase {
     }
 
     @Test
+    public void disablingDockingInteractionsDoesNotDisableProgrammaticMoves() {
+        invoke(() -> {
+            DockingContext context = new DockingContext(
+                    id -> Optional.of(new Dockable(id, id, new Label(id))), STAGE_FACTORY);
+            DockingPane source = context.createPane();
+            context.openDockable(source, "a", DockingPosition.CENTER);
+            context.openDockable(source, "b", DockingPosition.CENTER);
+            context.openDockable(source, "c", DockingPosition.RIGHT);
+            DockingPane target = context.createPane();
+            context.openDockable(target, "x", DockingPosition.CENTER);
+            DockingPane groupTarget = context.createPane();
+
+            assertTrue(context.isDockingEnabled());
+            context.setDockingEnabled(false);
+            assertFalse(context.isDockingEnabled());
+
+            assertTrue(context.canMoveDockable(target, "a", "x", DockingPosition.CENTER));
+            assertTrue(target.moveDockable("a", "x", DockingPosition.CENTER));
+            assertTrue(source.moveDockableToPaneEdge("b", DockingPosition.LEFT));
+            assertTrue(context.moveTabGroup(groupTarget, "c", null, DockingPosition.CENTER));
+            return null;
+        });
+    }
+
+    @Test
     public void movingTabGroupMergesInOrderAndPreservesItsSelection() {
         invoke(() -> {
             DockingContext context = new DockingContext(

@@ -632,7 +632,8 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             }
             title.addEventHandler(MouseEvent.DRAG_DETECTED, event -> {
                 String id = dockableId(title);
-                if (id == null || getSkinnable().getMaximizedDockable() != null) {
+                if (id == null || !getSkinnable().getDockingContext().isDockingEnabled()
+                        || getSkinnable().getMaximizedDockable() != null) {
                     return;
                 }
                 dragWholeGroup = event.isShiftDown();
@@ -798,6 +799,12 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             }
             return;
         }
+        if (!pane.getDockingContext().isDockingEnabled()) {
+            clearDropPreview();
+            hidePaneEdgeTargets();
+            event.consume();
+            return;
+        }
         if (isOverFloatingFrame(event)) {
             clearDropPreview();
             hidePaneEdgeTargets();
@@ -857,6 +864,14 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             if (getSkinnable().getDockingContext().canAcceptDockableDrop(event)) {
                 handleExternalDragDropped(event);
             }
+            return;
+        }
+        if (!pane.getDockingContext().isDockingEnabled()) {
+            recordUnsuccessfulDrop(draggedId);
+            event.setDropCompleted(false);
+            event.consume();
+            clearDropPreview();
+            hidePaneEdgeTargets();
             return;
         }
         if (isOverFloatingFrame(event)) {
