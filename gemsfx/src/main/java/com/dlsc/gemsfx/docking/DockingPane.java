@@ -3,6 +3,7 @@ package com.dlsc.gemsfx.docking;
 import com.dlsc.gemsfx.docking.model.DockingTree;
 import com.dlsc.gemsfx.docking.model.DockingSplit;
 import com.dlsc.gemsfx.docking.model.DockingTabGroup;
+import com.dlsc.gemsfx.docking.model.DockingSizing;
 import com.dlsc.gemsfx.skins.DockingPaneSkin;
 import com.dlsc.gemsfx.util.AccessibilityUtil;
 import com.dlsc.gemsfx.util.ResourceBundleManager;
@@ -39,6 +40,7 @@ public class DockingPane extends Control {
 
     private final DockingTree tree = new DockingTree();
     private final Map<String, Dockable> dockablesById = new HashMap<>();
+    private final Map<String, PendingDockingSize> pendingDockingSizes = new LinkedHashMap<>();
     private final List<FloatingState> floatingStates = new ArrayList<>();
     private final ReadOnlyObjectWrapper<List<DockingFloatingGroup>> floatingGroups =
             new ReadOnlyObjectWrapper<>(this, "floatingGroups", List.of());
@@ -168,6 +170,8 @@ public class DockingPane extends Control {
         AccessibilityUtil.setRole(this, AccessibleRole.NODE, ResourceBundleManager.getString(
                 ResourceBundleManager.BundleType.DOCKING_PANE, "accessible.role-description", "Docking pane"));
         setPlaceholder(new DockingPanePlaceholder());
+        widthProperty().addListener(observable -> applyPendingDockingSizes());
+        heightProperty().addListener(observable -> applyPendingDockingSizes());
         activeDockable.addListener((observable, previous, current) -> {
             Dockable maximized = getMaximizedDockable();
             if (maximized != null && (current == null || floatingState(current.getId()) == null)) {
@@ -392,6 +396,7 @@ public class DockingPane extends Control {
     final void restoreLayout(DockingLayoutNode root, List<DockingFloatingGroup> floating,
                              Map<String, Dockable> resolvedDockables) {
         tree.restore(root);
+        pendingDockingSizes.clear();
         floatingStates.clear();
         for (DockingFloatingGroup group : floating) {
             floatingStates.add(new FloatingState(group));
@@ -426,16 +431,19 @@ public class DockingPane extends Control {
     final void insertDockable(Dockable dockable, DockingPosition position) {
         Dockable active = getActiveDockable();
         DockingTree targetTree = tree;
+        String targetId = null;
         if (active == null) {
             tree.addToRoot(dockable);
         } else if (floatingState(active.getId()) != null && position != DockingPosition.CENTER) {
             tree.insertAtPaneEdge(dockable, position, 0.5);
         } else {
             targetTree = treeFor(active.getId());
+            targetId = active.getId();
             targetTree.splitAt(active.getId(), dockable, position, 0.5);
         }
         dockablesById.put(dockable.getId(), dockable);
         if (targetTree == tree) {
+            applyDockingSize(dockable.getId(), targetId, position, dockable.getPreferredDockingSize());
             layoutRoot.set(tree.snapshot());
         }
         publishFloatingGroups();
@@ -451,6 +459,7 @@ public class DockingPane extends Control {
                     : dockablesById.get(ids.get(index == 0 ? 1 : index - 1)));
         }
         String id = dockable.getId();
+        pendingDockingSizes.remove(id);
         DockingTree sourceTree = treeFor(id);
         String neighbour = neighbourOf(sourceTree.snapshot(), id);
         sourceTree.remove(id);
@@ -555,14 +564,14 @@ public class DockingPane extends Control {
                 && treeFor(targetId).canInsertRelativeTo(targetId, position);
     }
 
-    final boolean moveInside(String draggedId, String targetId, DockingPosition position) {
+    final boolean moveInside(String draggedId, String targetId, DockingPosition position, DockingSize size) {
         if (!canMoveInside(draggedId, targetId, position)) {
             return false;
         }
         DockingTree sourceTree = treeFor(draggedId);
         if (sourceTree != treeFor(targetId)) {
             Dockable dockable = removeDockableById(draggedId);
-            insertDockableRelativeTo(targetId, dockable, position);
+            insertDockableRelativeTo(targetId, dockable, position, size);
             return true;
         }
         if (!sourceTree.tryMove(draggedId, new DockingTree.DropTarget(targetId, position), 0.5)) {
@@ -570,6 +579,7 @@ public class DockingPane extends Control {
         }
         Dockable dockable = dockablesById.get(draggedId);
         if (sourceTree == tree) {
+            applyDockingSize(draggedId, targetId, position, size);
             layoutRoot.set(tree.snapshot());
         }
         publishFloatingGroups();
@@ -581,15 +591,16 @@ public class DockingPane extends Control {
         return floatingState(id) != null || tree.canMoveToPaneEdge(id, edge);
     }
 
-    final boolean moveInsideToPaneEdge(String id, DockingPosition edge) {
+    final boolean moveInsideToPaneEdge(String id, DockingPosition edge, DockingSize size) {
         if (floatingState(id) != null) {
             Dockable dockable = removeDockableById(id);
-            insertDockableAtPaneEdge(dockable, edge);
+            insertDockableAtPaneEdge(dockable, edge, size);
             return true;
         }
         if (!tree.moveToPaneEdge(id, edge, 0.5)) {
             return false;
         }
+        applyDockingSize(id, null, edge, size);
         layoutRoot.set(tree.snapshot());
         activeDockable.set(dockablesById.get(id));
         return true;
@@ -605,10 +616,15 @@ public class DockingPane extends Control {
     }
 
     final void insertDockableRelativeTo(String targetId, Dockable dockable, DockingPosition position) {
+        insertDockableRelativeTo(targetId, dockable, position, dockable.getPreferredDockingSize());
+    }
+
+    final void insertDockableRelativeTo(String targetId, Dockable dockable, DockingPosition position, DockingSize size) {
         DockingTree targetTree = treeFor(targetId);
         targetTree.insertRelativeTo(targetId, dockable, position, 0.5);
         dockablesById.put(dockable.getId(), dockable);
         if (targetTree == tree) {
+            applyDockingSize(dockable.getId(), targetId, position, size);
             layoutRoot.set(tree.snapshot());
         }
         publishFloatingGroups();
@@ -616,10 +632,62 @@ public class DockingPane extends Control {
     }
 
     final void insertDockableAtPaneEdge(Dockable dockable, DockingPosition edge) {
+        insertDockableAtPaneEdge(dockable, edge, dockable.getPreferredDockingSize());
+    }
+
+    final void insertDockableAtPaneEdge(Dockable dockable, DockingPosition edge, DockingSize size) {
         tree.insertAtPaneEdge(dockable, edge, 0.5);
         dockablesById.put(dockable.getId(), dockable);
+        applyDockingSize(dockable.getId(), null, edge, size);
         layoutRoot.set(tree.snapshot());
         activeDockable.set(dockable);
+    }
+
+    final void resizeDockedGroup(String id, String targetId, DockingPosition position, DockingSize size) {
+        if (size == null || position == DockingPosition.CENTER) {
+            return;
+        }
+        applyDockingSize(id, targetId, position, size);
+        layoutRoot.set(tree.snapshot());
+    }
+
+    private void applyDockingSize(String id, String targetId, DockingPosition position, DockingSize size) {
+        pendingDockingSizes.remove(id);
+        if (!DockingSizing.apply(tree, id, targetId, position, size, getWidth(), getHeight())) {
+            pendingDockingSizes.put(id, new PendingDockingSize(targetId, position, size));
+        }
+    }
+
+    private void applyPendingDockingSizes() {
+        if (pendingDockingSizes.isEmpty()) {
+            return;
+        }
+        boolean changed = false;
+        var iterator = pendingDockingSizes.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, PendingDockingSize> entry = iterator.next();
+            PendingDockingSize pending = entry.getValue();
+            if (DockingSizing.apply(tree, entry.getKey(), pending.targetId, pending.position,
+                    pending.size, getWidth(), getHeight())) {
+                iterator.remove();
+                changed = true;
+            }
+        }
+        if (changed) {
+            layoutRoot.set(tree.snapshot());
+        }
+    }
+
+    private static final class PendingDockingSize {
+        private final String targetId;
+        private final DockingPosition position;
+        private final DockingSize size;
+
+        private PendingDockingSize(String targetId, DockingPosition position, DockingSize size) {
+            this.targetId = targetId;
+            this.position = position;
+            this.size = size;
+        }
     }
 
     /**

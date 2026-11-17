@@ -3028,7 +3028,8 @@ public class DockingPaneTest extends FxTestBase {
                 throw new AssertionError(ex);
             }
 
-            invokeSkinPrivate(skin, "showDropPreview", new Class<?>[]{resolved.getClass()}, resolved);
+            invokeSkinPrivate(skin, "showDropPreview",
+                    new Class<?>[]{resolved.getClass(), String.class, boolean.class}, resolved, "c", false);
             Node zonePreview = pane.lookup(".docking-drop-zone-preview");
             assertNotNull(zonePreview);
             assertTrue(zonePreview.isVisible());
