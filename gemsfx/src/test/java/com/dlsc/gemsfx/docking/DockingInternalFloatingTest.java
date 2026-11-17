@@ -4,16 +4,21 @@ import com.dlsc.gemsfx.FxTestBase;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Point2D;
 import javafx.event.Event;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuButton;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import org.junit.Test;
 
@@ -163,6 +168,94 @@ public class DockingInternalFloatingTest extends FxTestBase {
             assertEquals(300, frame.getWidth(), 0.01);
             assertThrows(IllegalArgumentException.class, () -> pane.setMaximizedDockable(
                     pane.getDockables().stream().filter(d -> d.getId().equals("a")).findFirst().orElseThrow()));
+        });
+    }
+
+    @Test
+    public void floatingFrameRendersItsShadowOutsideFrameBounds() {
+        runFx(() -> {
+            DockingContext context = context();
+            DockingPane pane = pane(context);
+            StackPane root = new StackPane(pane);
+            new Scene(root, 1000, 600);
+            root.applyCss();
+            root.layout();
+            context.floatDockableInternally("a", new Rectangle2D(200, 150, 300, 180));
+            root.applyCss();
+            root.layout();
+            Region frame = (Region) pane.lookup(".docking-floating-frame");
+            assertNotNull(frame.getEffect());
+            WritableImage withShadow = root.snapshot(null, null);
+            frame.setEffect(null);
+            WritableImage withoutShadow = root.snapshot(null, null);
+            boolean shadowVisible = false;
+            for (int x = 188; x < 200; x++) {
+                for (int y = 180; y < 300; y++) {
+                    if (withShadow.getPixelReader().getArgb(x, y) != withoutShadow.getPixelReader().getArgb(x, y)) {
+                        shadowVisible = true;
+                    }
+                }
+            }
+            assertTrue("The shadow must be visible outside the floating frame", shadowVisible);
+        });
+    }
+
+    @Test
+    public void floatingFrameShadowIsClippedAtPaneBoundary() {
+        runFx(() -> {
+            DockingContext context = context();
+            DockingPane pane = pane(context);
+            pane.setMaxSize(500, 400);
+            StackPane root = new StackPane(pane);
+            root.setStyle("-fx-background-color: white;");
+            new Scene(root, 700, 600);
+            root.applyCss();
+            root.layout();
+            context.floatDockableInternally("a", new Rectangle2D(0, 100, 300, 180));
+            root.applyCss();
+            root.layout();
+            Region frame = (Region) pane.lookup(".docking-floating-frame");
+            WritableImage withShadow = root.snapshot(null, null);
+            frame.setEffect(null);
+            WritableImage withoutShadow = root.snapshot(null, null);
+            boolean insideShadowVisible = false;
+            for (int y = 220; y < 300; y++) {
+                for (int x = 88; x < 100; x++) {
+                    assertEquals("The shadow must not escape the pane",
+                            withoutShadow.getPixelReader().getArgb(x, y), withShadow.getPixelReader().getArgb(x, y));
+                }
+                for (int x = 400; x < 412; x++) {
+                    insideShadowVisible |= withShadow.getPixelReader().getArgb(x, y)
+                            != withoutShadow.getPixelReader().getArgb(x, y);
+                }
+            }
+            assertTrue("The shadow must be visible inside the pane", insideShadowVisible);
+        });
+    }
+
+    @Test
+    public void floatingFrameClipsOversizedContent() {
+        runFx(() -> {
+            DockingContext context = new DockingContext(id -> Optional.of(new Dockable(id, id,
+                    id.equals("a") ? new Pane(new Rectangle(800, 500, Color.RED)) : new Region())), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(pane));
+                return stage;
+            });
+            DockingPane pane = pane(context);
+            StackPane root = new StackPane(pane);
+            new Scene(root, 1000, 600);
+            root.applyCss();
+            root.layout();
+            context.floatDockableInternally("a", new Rectangle2D(200, 150, 300, 180));
+            root.applyCss();
+            root.layout();
+            Region frame = (Region) pane.lookup(".docking-floating-frame");
+            frame.setEffect(null);
+            WritableImage image = root.snapshot(null, null);
+            assertEquals(Color.RED, image.getPixelReader().getColor(250, 250));
+            assertNotEquals("Oversized content must not escape the frame", Color.RED,
+                    image.getPixelReader().getColor(510, 250));
         });
     }
 
@@ -337,6 +430,33 @@ public class DockingInternalFloatingTest extends FxTestBase {
             Event.fireEvent(frame, drop);
             assertFalse(drop.isDropCompleted());
             assertTrue(pane.getLayoutRoot() instanceof DockingLayoutNode.Split);
+        });
+    }
+
+    @Test
+    public void droppingOnShadowCanDockIntoTheUnderlyingGroup() {
+        runFx(() -> {
+            DockingContext context = context();
+            DockingPane pane = pane(context);
+            StackPane root = new StackPane(pane);
+            new Scene(root, 1000, 600);
+            root.applyCss();
+            root.layout();
+            context.floatDockableInternally("a", new Rectangle2D(200, 150, 300, 180));
+            root.applyCss();
+            root.layout();
+            context.setDockableDropPredicate(event -> true);
+            context.setDockableDropFactory(event -> new Dockable("new", "new", new Region()));
+            Node content = context.getDockables().stream().filter(d -> d.getId().equals("b"))
+                    .findFirst().orElseThrow().getContent();
+            Point2D point = content.sceneToLocal(199, 250);
+            Group source = new Group();
+            DragEvent drop = new DragEvent(source, content, DragEvent.DRAG_DROPPED, null,
+                    199, 250, 199, 250, TransferMode.COPY, source, content,
+                    new PickResult(content, point.getX(), point.getY()));
+            Event.fireEvent(content, drop);
+            assertTrue("The shadow must not block docking", drop.isDropCompleted());
+            assertEquals("new", pane.getActiveDockable().getId());
         });
     }
 }
