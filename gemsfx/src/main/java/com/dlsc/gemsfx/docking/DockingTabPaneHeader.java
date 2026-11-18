@@ -73,10 +73,11 @@ public class DockingTabPaneHeader extends MenuButton {
         if (pane.isDockableFloating(groupDockables.get(0).getId())) {
             MenuItem dockGroup = new MenuItem(ResourceBundleManager.getString(bundle, "menu.dock-group", "Dock Group"));
             dockGroup.getStyleClass().add("docking-group-dock");
-            dockGroup.disableProperty().bind(pane.maximizedDockableProperty().isNotNull());
+            dockGroup.disableProperty().bind(context.dockingEnabledProperty().not()
+                    .or(pane.maximizedDockableProperty().isNotNull()));
             dockGroup.setOnAction(event -> {
                 String id = groupDockables.get(0).getId();
-                if (pane.isDockableFloating(id)) {
+                if (context.isDockingEnabled() && pane.isDockableFloating(id)) {
                     context.moveTabGroup(pane, id, null, DockingPosition.LEFT);
                 }
             });

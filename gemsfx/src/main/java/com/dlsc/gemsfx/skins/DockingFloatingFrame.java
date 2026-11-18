@@ -36,9 +36,9 @@ final class DockingFloatingFrame extends StackPane {
         setMinSize(0, 0);
         tabs.setMinSize(0, 0);
         Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(widthProperty());
-        clip.heightProperty().bind(heightProperty());
-        setClip(clip);
+        clip.widthProperty().bind(tabs.widthProperty());
+        clip.heightProperty().bind(tabs.heightProperty());
+        tabs.setClip(clip);
         addEventFilter(MouseEvent.MOUSE_PRESSED, this::pressed);
         addEventFilter(MouseEvent.MOUSE_DRAGGED, this::dragged);
         addEventFilter(MouseEvent.MOUSE_RELEASED, this::released);

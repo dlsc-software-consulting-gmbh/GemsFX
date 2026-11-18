@@ -12,6 +12,7 @@ import com.dlsc.gemsfx.docking.DockingLayout;
 import com.dlsc.gemsfx.docking.DockingPane;
 import com.dlsc.gemsfx.docking.DockingPosition;
 import com.dlsc.gemsfx.docking.DockingRestoreResult;
+import com.dlsc.gemsfx.docking.DockingSize;
 import com.dlsc.gemsfx.docking.DockingStageFactory;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -499,6 +500,13 @@ public class DockingPaneApp extends GemApplication {
         String templateId = id.split(":", 2)[0];
         return Optional.ofNullable(templates.get(templateId)).map(factory -> {
             Dockable dockable = factory.apply(id);
+            dockable.setPreferredDockingSize(switch (templateId) {
+                case "navigator" -> DockingSize.pixels(260);
+                case "inspector" -> DockingSize.pixels(300);
+                case "map" -> DockingSize.weight(0.4);
+                case "console" -> DockingSize.weight(0.25);
+                default -> null;
+            });
             if (ThreadLocalRandom.current().nextBoolean()) {
                 dockable.setOnHelp(() -> {
                     Scene scene = dockable.getScene();

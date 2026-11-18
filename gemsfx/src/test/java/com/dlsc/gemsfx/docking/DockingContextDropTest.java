@@ -61,6 +61,24 @@ public class DockingContextDropTest extends FxTestBase {
     }
 
     @Test
+    public void externalContentDropIsUnaffectedByDockingToggle() {
+        runFx(() -> {
+            DockingContext context = context();
+            DockingPane pane = context.createPane();
+            context.setDockingEnabled(false);
+            DragEvent event = dropEvent();
+            Dockable created = dockable("new");
+            context.setDockableDropPredicate(candidate -> candidate == event);
+            context.setDockableDropFactory(candidate -> created);
+
+            assertTrue(context.canAcceptDockableDrop(event));
+            assertEquals(Optional.of(created),
+                    context.dropDockable(pane, event, null, DockingPosition.CENTER));
+            assertSame(pane, created.getDockingPane());
+        });
+    }
+
+    @Test
     public void droppingIntoEmptyRegularLayoutDoesNotJoinActiveInternalFloatingGroup() {
         runFx(() -> {
             DockingContext context = context();

@@ -7,6 +7,7 @@ import com.dlsc.gemsfx.docking.DockingLayoutNode;
 import com.dlsc.gemsfx.docking.DockingPane;
 import com.dlsc.gemsfx.docking.DockingPosition;
 import com.dlsc.gemsfx.docking.model.DockingTree;
+import com.dlsc.gemsfx.docking.model.DockingSizing;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -631,7 +632,8 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             }
             title.addEventHandler(MouseEvent.DRAG_DETECTED, event -> {
                 String id = dockableId(title);
-                if (id == null || getSkinnable().getMaximizedDockable() != null) {
+                if (id == null || !getSkinnable().getDockingContext().isDockingEnabled()
+                        || getSkinnable().getMaximizedDockable() != null) {
                     return;
                 }
                 dragWholeGroup = event.isShiftDown();
@@ -797,6 +799,12 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             }
             return;
         }
+        if (!pane.getDockingContext().isDockingEnabled()) {
+            clearDropPreview();
+            hidePaneEdgeTargets();
+            event.consume();
+            return;
+        }
         if (isOverFloatingFrame(event)) {
             clearDropPreview();
             hidePaneEdgeTargets();
@@ -816,7 +824,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         }
         DockingPosition paneEdge = resolvePaneEdgeTarget(event.getX(), event.getY());
         if (paneEdge != null) {
-            showPaneEdgePreview(paneEdge);
+            showPaneEdgePreview(paneEdge, draggedId, wholeGroup);
             event.acceptTransferModes(TransferMode.MOVE);
             event.consume();
             return;
@@ -829,7 +837,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             event.consume();
             return;
         }
-        showDropPreview(target);
+        showDropPreview(target, draggedId, wholeGroup);
         event.acceptTransferModes(TransferMode.MOVE);
         event.consume();
     }
@@ -856,6 +864,14 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
             if (getSkinnable().getDockingContext().canAcceptDockableDrop(event)) {
                 handleExternalDragDropped(event);
             }
+            return;
+        }
+        if (!pane.getDockingContext().isDockingEnabled()) {
+            recordUnsuccessfulDrop(draggedId);
+            event.setDropCompleted(false);
+            event.consume();
+            clearDropPreview();
+            hidePaneEdgeTargets();
             return;
         }
         if (isOverFloatingFrame(event)) {
@@ -911,7 +927,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         showPaneEdgeTargets(null);
         DockingPosition paneEdge = resolvePaneEdgeTarget(event.getX(), event.getY());
         if (paneEdge != null) {
-            showPaneEdgePreview(paneEdge);
+            showPaneEdgePreview(paneEdge, null, false);
         } else if (pane.getLayoutRoot() instanceof DockingLayoutNode.Empty && isInsidePane(event)) {
             showEmptyPanePreview();
         } else {
@@ -921,7 +937,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
                 event.consume();
                 return;
             }
-            showDropPreview(target);
+            showDropPreview(target, null, false);
         }
         event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
         event.consume();
@@ -963,7 +979,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         Point2D point = floatingLayer.sceneToLocal(
                 getSkinnable().localToScene(event.getX(), event.getY()));
         for (DockingFloatingFrame frame : floatingFrames) {
-            if (frame.getBoundsInParent().contains(point)) {
+            if (frame.getLayoutBounds().contains(frame.parentToLocal(point))) {
                 return true;
             }
         }
@@ -1016,7 +1032,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         return null;
     }
 
-    private void showPaneEdgePreview(DockingPosition edge) {
+    private void showPaneEdgePreview(DockingPosition edge, String draggedId, boolean wholeGroup) {
         clearDropPreview();
         double width = host.getWidth();
         double height = host.getHeight();
@@ -1029,6 +1045,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         dropLeafPreview.setVisible(true);
         dropZonePreview.getStyleClass().add(previewStyle(edge));
         dropZonePreview.resizeRelocate(x, y, zoneWidth, zoneHeight);
+        showPreferredPreview(draggedId, wholeGroup, null, edge);
         dropZonePreview.setVisible(true);
         paneEdgeTargets.get(edge).pseudoClassStateChanged(ACTIVE, true);
     }
@@ -1293,7 +1310,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         hidePaneEdgeTargets();
     }
 
-    private void showDropPreview(DockingTree.ResolvedDropTarget target) {
+    private void showDropPreview(DockingTree.ResolvedDropTarget target, String draggedId, boolean wholeGroup) {
         if (target.equals(previewTarget)) {
             return;
         }
@@ -1302,8 +1319,55 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         dropLeafPreview.setVisible(true);
         dropZonePreview.getStyleClass().add(previewStyle(target.getPosition()));
         dropZonePreview.resizeRelocate(target.getZoneX(), target.getZoneY(), target.getZoneWidth(), target.getZoneHeight());
+        showPreferredPreview(draggedId, wholeGroup, target.getTargetId(), target.getPosition());
         dropZonePreview.setVisible(true);
         previewTarget = target;
+    }
+
+    private void showPreferredPreview(String draggedId, boolean wholeGroup, String targetId, DockingPosition position) {
+        if (draggedId == null || position == DockingPosition.CENTER) {
+            return;
+        }
+        DockingPane pane = getSkinnable();
+        Dockable dockable = pane.getDockingContext().getDockables().stream()
+                .filter(item -> item.getId().equals(draggedId)).findFirst().orElse(null);
+        if (dockable == null) {
+            return;
+        }
+        List<String> sourceIds = List.of(draggedId);
+        if (wholeGroup) {
+            DockingPane source = dockable.getDockingPane();
+            DockingLayoutNode.Tabs group = findGroup(source.getLayoutRoot(), draggedId);
+            if (group == null) {
+                group = source.getFloatingGroups().stream().map(DockingFloatingGroup::getTabs)
+                        .filter(tabs -> tabs.getDockableIds().contains(draggedId)).findFirst().orElseThrow();
+            }
+            sourceIds = group.getDockableIds();
+            String selectedId = group.getSelectedId();
+            dockable = pane.getDockingContext().getDockables().stream()
+                    .filter(item -> item.getId().equals(selectedId)).findFirst().orElseThrow();
+        }
+        if (dockable.getPreferredDockingSize() != null) {
+            Rectangle2D bounds = DockingSizing.preview(pane.getLayoutRoot(), sourceIds, dockable,
+                    targetId, position, pane.getWidth(), pane.getHeight());
+            dropZonePreview.resizeRelocate(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+        }
+    }
+
+    private static DockingLayoutNode.Tabs findGroup(DockingLayoutNode node, String id) {
+        if (node instanceof DockingLayoutNode.Tabs) {
+            DockingLayoutNode.Tabs tabs = (DockingLayoutNode.Tabs) node;
+            return tabs.getDockableIds().contains(id) ? tabs : null;
+        }
+        if (node instanceof DockingLayoutNode.Split) {
+            for (DockingLayoutNode child : ((DockingLayoutNode.Split) node).getChildren()) {
+                DockingLayoutNode.Tabs found = findGroup(child, id);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     private void clearDropPreview() {

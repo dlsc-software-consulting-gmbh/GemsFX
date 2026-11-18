@@ -25,7 +25,7 @@ MANUAL = Manual(
     abstract=(
         "DockingPane provides IDE-style docking with draggable tabs, split layouts, "
         "optional floating windows, and complete context snapshots through DockingContext. "
-        "This manual covers structure, interaction, stage hosting, persistence hooks, "
+        "This manual covers structure, interaction, preferred docking sizes, stage hosting, persistence hooks, "
         "styling, accessibility, and a practical application recipe."
     ),
     cover_svg=f"{G}/cover.svg",
@@ -49,6 +49,7 @@ MANUAL = Manual(
                         "Drag-and-drop within one pane and across panes in the same context.",
                         "Shift-drag to move an entire tab group; drop onto an empty pane's placeholder to populate it.",
                         "Four outer-edge indicators for docking beside the entire pane layout.",
+                        "Per-dockable preferred side sizes, expressed as pane-relative weights or logical pixels.",
                         "Detaching tabs into app-created floating stages.",
                         "Context-wide snapshot and restore via <font face='Courier'>getLayout()</font> and <font face='Courier'>restoreLayout()</font>.",
                         "Close policy hook via <font face='Courier'>setCanCloseDockable(...)</font>.",
@@ -78,7 +79,9 @@ MANUAL = Manual(
         return Optional.of(new Dockable("editor", "Editor", new TextArea()));
     }
     if ("inspector".equals(id)) {
-        return Optional.of(new Dockable("inspector", "Inspector", new ListView<>()));
+        Dockable inspector = new Dockable(id, "Inspector", new ListView<>());
+        inspector.setPreferredDockingSize(DockingSize.pixels(300));
+        return Optional.of(inspector);
     }
     return Optional.empty();
 };
@@ -95,7 +98,7 @@ DockingContext context = new DockingContext(dockableFactory, stageFactory);
 DockingPane pane = context.createPane();
 context.openDockable(pane, "editor", DockingPosition.CENTER);
 context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
-                    caption="Minimal setup with an ID-based DockableFactory and a shared DockingStageFactory.",
+                    caption="Minimal setup with an ID-based factory, an initial 300-pixel Inspector width, and a shared stage factory.",
                 ),
                 Figure(
                     f"{G}/interactions.svg",
@@ -267,6 +270,12 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                 PropertyTable(
                     [
                         Property(
+                            "preferredDockingSize",
+                            "ObjectProperty&lt;DockingSize&gt;",
+                            "null",
+                            "Preferred initial width for LEFT/RIGHT splits or height for TOP/BOTTOM splits. Use DockingSize.weight(...) or DockingSize.pixels(...).",
+                        ),
+                        Property(
                             "closeable",
                             "BooleanProperty",
                             "true",
@@ -370,6 +379,88 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
             ],
         ),
         Chapter(
+            "Preferred docking size",
+            [
+                Para(
+                    "Set <font face='Courier'>Dockable.preferredDockingSize</font> in your dockable factory "
+                    "to control the space assigned when a dockable opens or moves into a new side split. "
+                    "The same preference applies to programmatic opening and moving, drag-and-drop within "
+                    "or between panes, and dockables created by an external-drop factory."
+                ),
+                Table(
+                    ["Size", "Meaning"],
+                    [
+                        [
+                            "DockingSize.weight(value)",
+                            "A finite value in [0, 1], relative to the entire destination DockingPane. "
+                            "0 requests no space; 1 requests the entire pane dimension.",
+                        ],
+                        [
+                            "DockingSize.pixels(value)",
+                            "A finite, nonnegative initial size in JavaFX logical pixels.",
+                        ],
+                        [
+                            "null (default)",
+                            "Keeps the existing equal-split allocation.",
+                        ],
+                    ],
+                    widths=[39, 61],
+                ),
+                Code(
+                    """navigator.setPreferredDockingSize(DockingSize.pixels(260));
+inspector.setPreferredDockingSize(DockingSize.pixels(300));
+map.setPreferredDockingSize(DockingSize.weight(0.4));
+console.setPreferredDockingSize(DockingSize.weight(0.25));""",
+                    caption="Examples used by DockingPaneApp; sidebar-created copies inherit their template's preference.",
+                ),
+                Para(
+                    "LEFT and RIGHT use the pane's width; TOP and BOTTOM use its height. For example, "
+                    "a weight of 0.25 requests 250 logical pixels in a 1000-pixel-wide pane, even when "
+                    "the targeted group occupies only part of that pane. A local split can use only "
+                    "the target group's existing interval; it does not take space from unrelated groups. "
+                    "Pane-edge docking instead allocates space beside the whole layout and scales the "
+                    "remaining groups proportionally."
+                ),
+                Callout(
+                    "This is a preferred allocation, not a way to bypass layout constraints. Requests are "
+                    "clamped to the available space and remain subject to the selected content's minimum "
+                    "sizes. Weights 0 and 1 therefore do not guarantee that a group becomes invisible or "
+                    "fills the pane. Divider thickness can also affect the rendered size.",
+                    kind="note",
+                ),
+                Section("Opening at a pane edge"),
+                Para(
+                    "A side passed to <font face='Courier'>openDockable(...)</font> normally splits beside "
+                    "the active tab group, not beside the entire pane. To force a pane-edge placement, "
+                    "open the dockable and call <font face='Courier'>moveDockableToPaneEdge(...)</font>. "
+                    "Set the preference in the factory before opening, as in the Getting started example."
+                ),
+                Code(
+                    """context.openDockable(pane, "inspector", DockingPosition.CENTER)
+        .ifPresent(dockable -> pane.moveDockableToPaneEdge(
+                dockable.getId(), DockingPosition.RIGHT));""",
+                    caption="Place the Inspector beside the entire remaining layout, using its preferred size.",
+                ),
+                Para(
+                    "Opening an already-open ID only activates that dockable; it does not move or resize it. "
+                    "A lone dockable already occupying the regular layout cannot be moved to its own "
+                    "pane edge. Docking moves are disabled while a group in the source or destination "
+                    "pane is maximized."
+                ),
+                Section("Timing, groups, and previews"),
+                Bullets(
+                    [
+                        "The preference is used when creating a side split. Changing it does not resize an already docked group.",
+                        "CENTER/tab insertion ignores the preference. A dockable entering an empty pane occupies the pane.",
+                        "Pixel requests made before the pane is measured are applied once the relevant dimension is known. They are initial allocations, not fixed pixel constraints during later resizing.",
+                        "Moving a whole tab group uses its selected tab's preference, not the first tab's preference.",
+                        "Internal drag previews honor the preference. For external drags, set it on the dockable returned by dockableDropFactory; the preceding preview remains generic because the factory is called only on the actual drop.",
+                        "Layout snapshots save the resulting divider positions, not the preferred size setting. Restore uses the saved layout rather than reapplying the preference.",
+                    ]
+                ),
+            ],
+        ),
+        Chapter(
             "Floating stages",
             [
                 Figure(
@@ -437,6 +528,13 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                 Code(
                     "pane.updateDividerPositions(List.of(), List.of(0.35, 0.8));",
                     caption="Update both dividers of an existing three-child root split atomically.",
+                ),
+                Para(
+                    "Preferred docking sizes are converted into divider positions during placement. "
+                    "These resulting positions are included in the snapshot; "
+                    "<font face='Courier'>preferredDockingSize</font> itself is not serialized. Restore "
+                    "preserves saved divider positions and does not reapply factory preferences. Configure "
+                    "preferences in your factories for subsequent side-docking operations."
                 ),
                 Section("Capture and restore"),
                 Code(
@@ -558,6 +656,7 @@ if (!result.getUnresolvedDockableIds().isEmpty()) {
                     [
                         "Define a stable ID catalog for all dockables your app can create.",
                         "Implement <font face='Courier'>DockableFactory</font> that maps IDs to new Dockable instances.",
+                        "Set <font face='Courier'>preferredDockingSize</font> on selected dockables in the factory to demonstrate pane-relative weights or initial pixel sizes.",
                         "Implement one shared <font face='Courier'>DockingStageFactory</font> that wraps supplied panes in app-specific stage chrome.",
                         "Create one DockingContext, one primary DockingPane, and open the initial dockables.",
                         "Persist <font face='Courier'>DockingLayout</font> snapshots using your own serializer and restore on startup.",
@@ -584,7 +683,7 @@ context.restoreLayout(snapshot);""",
                 Bullets(
                     [
                         "Demo application: <font face='Courier'>com.dlsc.gemsfx.demo.DockingPaneApp</font> (run: <font face='Courier'>mvn javafx:run -f gemsfx-demo/pom.xml -Dmain.class=com.dlsc.gemsfx.demo.DockingPaneApp</font>).",
-                        "Related APIs: <font face='Courier'>DockingContext</font>, <font face='Courier'>DockingLayout</font>, <font face='Courier'>DockingLayoutNode</font>, <font face='Courier'>DockingRestoreResult</font>.",
+                        "Related APIs: <font face='Courier'>DockingContext</font>, <font face='Courier'>DockingSize</font>, <font face='Courier'>DockingLayout</font>, <font face='Courier'>DockingLayoutNode</font>, <font face='Courier'>DockingRestoreResult</font>.",
                         "API documentation: https://dlsc-software-consulting-gmbh.github.io/GemsFX/api/",
                     ]
                 )

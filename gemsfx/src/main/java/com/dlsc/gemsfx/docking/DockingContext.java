@@ -195,6 +195,26 @@ public class DockingContext {
         return stageFactory;
     }
 
+    private final BooleanProperty dockingEnabled = new SimpleBooleanProperty(this, "dockingEnabled", true);
+
+    /**
+     * Controls whether users can rearrange existing dockables through docking gestures and built-in docking actions.
+     * Disabling this property does not restrict programmatic move operations.
+     *
+     * @return the docking-enabled property
+     */
+    public final BooleanProperty dockingEnabledProperty() {
+        return dockingEnabled;
+    }
+
+    public final boolean isDockingEnabled() {
+        return dockingEnabled.get();
+    }
+
+    public final void setDockingEnabled(boolean enabled) {
+        dockingEnabled.set(enabled);
+    }
+
     private final BooleanProperty floatingEnabled = new SimpleBooleanProperty(this, "floatingEnabled", true);
 
     /**
@@ -934,6 +954,7 @@ public class DockingContext {
     /**
      * Moves a dockable's entire tab group, preserving its order and selected tab.
      * Center drops append the tabs to the target group; edge drops create one new group.
+     * The selected tab's preferred docking size is used for the new group.
      *
      * @param targetPane the destination pane in this context
      * @param id a dockable in the source group
@@ -949,14 +970,19 @@ public class DockingContext {
         String first = group.getDockableIds().get(0);
         DockingPane source = dockablePaneById.get(id);
         DockingTabGroup sourceGroup = source.groupOf(id);
+        DockingSize size = preferredDockingSize(group.getSelectedId());
         boolean moved;
         if (targetId == null) {
-            moved = moveDockableToPaneEdge(targetPane, first,
-                    position == DockingPosition.CENTER ? DockingPosition.LEFT : position);
+            moved = withSelectionUpdates(() -> moveDockableToPaneEdgeInternal(targetPane, first,
+                    position == DockingPosition.CENTER ? DockingPosition.LEFT : position, size));
         } else {
-            moved = moveDockable(targetPane, first, targetId, position);
+            moved = withSelectionUpdates(() -> moveDockableInternal(targetPane, first, targetId, position, size));
         }
-        return moved && moveRemainingTabs(source, sourceGroup, targetPane, group);
+        if (!moved || !moveRemainingTabs(source, sourceGroup, targetPane, group)) {
+            return false;
+        }
+        targetPane.resizeDockedGroup(first, targetId, position, size);
+        return true;
     }
 
     private boolean moveRemainingTabs(DockingPane sourcePane, DockingTabGroup sourceGroup,
@@ -1027,10 +1053,18 @@ public class DockingContext {
     }
 
     final boolean moveDockable(DockingPane targetPane, String draggedId, String targetId, DockingPosition position) {
-        return withSelectionUpdates(() -> moveDockableInternal(targetPane, draggedId, targetId, position));
+        return withSelectionUpdates(() -> moveDockableInternal(targetPane, draggedId, targetId, position,
+                preferredDockingSize(draggedId)));
     }
 
-    private boolean moveDockableInternal(DockingPane targetPane, String draggedId, String targetId, DockingPosition position) {
+    private DockingSize preferredDockingSize(String id) {
+        requireFxThread();
+        Dockable dockable = dockablesById.get(id);
+        return dockable == null ? null : dockable.getPreferredDockingSize();
+    }
+
+    private boolean moveDockableInternal(DockingPane targetPane, String draggedId, String targetId,
+                                         DockingPosition position, DockingSize size) {
         requireFxThread();
         if (!canMoveDockable(targetPane, draggedId, targetId, position)) {
             return false;
@@ -1041,7 +1075,7 @@ public class DockingContext {
             Dockable dockable = dockablesById.get(draggedId);
             DockingLayoutNode.Tabs before = targetPane.tabGroupSnapshot(draggedId);
             boolean sameGroup = position == DockingPosition.CENTER && before.getDockableIds().contains(targetId);
-            boolean moved = targetPane.moveInside(draggedId, targetId, position);
+            boolean moved = targetPane.moveInside(draggedId, targetId, position, size);
             if (moved && (!sameGroup || !before.getDockableIds().equals(
                     targetPane.tabGroupSnapshot(draggedId).getDockableIds()))) {
                 fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, targetPane));
@@ -1053,7 +1087,7 @@ public class DockingContext {
             return false;
         }
         dockablePaneById.put(draggedId, targetPane);
-        targetPane.insertDockableRelativeTo(targetId, dockable, position);
+        targetPane.insertDockableRelativeTo(targetId, dockable, position, size);
         closeFloatingStageIfEmpty(sourcePane);
         fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, targetPane));
         return true;
@@ -1089,17 +1123,17 @@ public class DockingContext {
     }
 
     final boolean moveDockableToPaneEdge(DockingPane targetPane, String id, DockingPosition edge) {
-        return withSelectionUpdates(() -> moveDockableToPaneEdgeInternal(targetPane, id, edge));
+        return withSelectionUpdates(() -> moveDockableToPaneEdgeInternal(targetPane, id, edge, preferredDockingSize(id)));
     }
 
-    private boolean moveDockableToPaneEdgeInternal(DockingPane targetPane, String id, DockingPosition edge) {
+    private boolean moveDockableToPaneEdgeInternal(DockingPane targetPane, String id, DockingPosition edge, DockingSize size) {
         if (!canMoveDockableToPaneEdge(targetPane, id, edge)) {
             return false;
         }
         DockingPane sourcePane = dockablePaneById.get(id);
         if (sourcePane == targetPane) {
             Dockable dockable = dockablesById.get(id);
-            boolean moved = targetPane.moveInsideToPaneEdge(id, edge);
+            boolean moved = targetPane.moveInsideToPaneEdge(id, edge, size);
             if (moved) {
                 fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, targetPane));
             }
@@ -1107,7 +1141,7 @@ public class DockingContext {
         }
         Dockable dockable = sourcePane.removeDockableById(id);
         dockablePaneById.put(id, targetPane);
-        targetPane.insertDockableAtPaneEdge(dockable, edge);
+        targetPane.insertDockableAtPaneEdge(dockable, edge, size);
         closeFloatingStageIfEmpty(sourcePane);
         fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, targetPane));
         return true;

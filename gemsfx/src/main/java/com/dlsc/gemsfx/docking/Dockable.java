@@ -31,6 +31,8 @@ public class Dockable {
     private final ObjectProperty<BooleanSupplier> onCloseRequest = new SimpleObjectProperty<>(this, "onCloseRequest");
     private final ReadOnlyObjectWrapper<Node> graphic;
     private final Node content;
+    private final ObjectProperty<DockingSize> preferredDockingSize =
+            new SimpleObjectProperty<>(this, "preferredDockingSize");
     private DockingContext dockingContext;
     private final ObjectProperty<Node> toolbar = new SimpleObjectProperty<>(this, "toolbar");
     private final ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
@@ -163,6 +165,32 @@ public class Dockable {
 
     public final void setCloseable(boolean closeable) {
         this.closeable.set(closeable);
+    }
+
+    /**
+     * The preferred size when this dockable opens or moves into a new side split, including drops.
+     * Left/right docking uses width; top/bottom docking uses height. Weights are relative to the
+     * entire destination pane. Requests are constrained by available space and the content's
+     * minimum sizes. A {@code null} value keeps the default equal split. Center/tab insertion and
+     * layout restore ignore this preference; changing it does not resize an already docked group.
+     * Pixel sizes are applied once the pane is measured, not maintained during later resizes.
+     * The resulting divider positions, rather than this preference, are saved in the layout.
+     * Moving a whole tab group uses its selected tab's preference. For external drags, the size
+     * becomes known only when the drop factory creates the dockable; the preceding preview uses
+     * the default size.
+     *
+     * @return the preferred docking size property
+     */
+    public final ObjectProperty<DockingSize> preferredDockingSizeProperty() {
+        return preferredDockingSize;
+    }
+
+    public final DockingSize getPreferredDockingSize() {
+        return preferredDockingSize.get();
+    }
+
+    public final void setPreferredDockingSize(DockingSize size) {
+        preferredDockingSize.set(size);
     }
 
     /**
