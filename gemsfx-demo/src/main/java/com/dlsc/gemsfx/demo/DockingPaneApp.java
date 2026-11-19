@@ -15,6 +15,7 @@ import com.dlsc.gemsfx.docking.DockingRestoreResult;
 import com.dlsc.gemsfx.docking.DockingSize;
 import com.dlsc.gemsfx.docking.DockingStageFactory;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
+import com.dlsc.pdfviewfx.PDFView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -77,6 +78,9 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -270,11 +274,12 @@ public class DockingPaneApp extends GemApplication {
         });
 
         MenuButton openView = new MenuButton("Open View");
-        for (String id : List.of("map", "charts", "city", "drag", "drop")) {
+        for (String id : List.of("map", "charts", "city", "pdf", "drag", "drop")) {
             MenuItem item = new MenuItem(switch (id) {
                 case "map" -> "Map";
                 case "charts" -> "Financial Charts";
                 case "city" -> "City";
+                case "pdf" -> "Tesla Manual";
                 case "drag" -> "Rocket Source";
                 default -> "Rocket Target";
             });
@@ -439,6 +444,7 @@ public class DockingPaneApp extends GemApplication {
 
     private void openInitialLayout(DockingContext context, DockingPane rootPane) {
         context.openDockable(rootPane, "editor", DockingPosition.CENTER);
+        context.openDockable(rootPane, "pdf", DockingPosition.CENTER);
         context.openDockable(rootPane, "map", DockingPosition.CENTER);
         context.openDockable(rootPane, "preview", DockingPosition.BOTTOM);
         context.openDockable(rootPane, "charts", DockingPosition.CENTER);
@@ -490,6 +496,7 @@ public class DockingPaneApp extends GemApplication {
         templates.put("map", this::createMapDockable);
         templates.put("charts", this::createChartsDockable);
         templates.put("city", this::createCityDockable);
+        templates.put("pdf", this::createPdfDockable);
         templates.put("drag", this::createDragDockable);
         templates.put("drop", this::createDropDockable);
         return templates;
@@ -526,6 +533,26 @@ public class DockingPaneApp extends GemApplication {
             return null;
         }
         return createDockable(templateId + ":" + UUID.randomUUID()).orElse(null);
+    }
+
+    private Dockable createPdfDockable(String id) {
+        PDFView pdfView = new PDFView();
+        if (Boolean.getBoolean("atlantafx")) {
+            pdfView.getStylesheets().add(Objects.requireNonNull(
+                    DockingPaneApp.class.getResource("pdf-view-atlanta.css")).toExternalForm());
+        }
+        try (InputStream stream = Objects.requireNonNull(
+                DockingPaneApp.class.getResourceAsStream("tesla-manual.pdf"))) {
+            pdfView.load(stream);
+        } catch (IOException ex) {
+            throw new UncheckedIOException("Could not load the Tesla manual", ex);
+        }
+        return new Dockable(id, "Tesla Manual", createIcon(MaterialDesign.MDI_FILE_PDF), pdfView) {
+            @Override
+            protected void dispose() {
+                pdfView.unload();
+            }
+        };
     }
 
     private Dockable createNavigatorDockable(String id) {

@@ -15,6 +15,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Label;
@@ -34,6 +35,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.junit.Test;
@@ -53,6 +55,41 @@ import java.lang.reflect.Method;
 import static org.junit.Assert.*;
 
 public class DockingPaneTest extends FxTestBase {
+
+    @Test
+    public void overflowingContentIsClippedToItsContainerAfterResizing() {
+        runFx(() -> {
+            Rectangle overflow = new Rectangle(-100, -100, 2000, 2000);
+            overflow.setFill(Color.MAGENTA);
+            overflow.setManaged(false);
+            StackPane content = new StackPane(overflow);
+            Rectangle applicationClip = new Rectangle(-100, -100, 2000, 2000);
+            content.setClip(applicationClip);
+            DockingContext context = context(new Dockable("a", "A", content));
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            layout(pane);
+            Region container = (Region) pane.lookup(".docking-tab-content");
+            container.setManaged(false);
+
+            for (double width : new double[]{300, 150, 450}) {
+                container.resize(width, 120);
+                container.layout();
+                SnapshotParameters parameters = new SnapshotParameters();
+                parameters.setFill(Color.TRANSPARENT);
+                parameters.setViewport(new Rectangle2D(
+                        container.getLayoutX() - 20, container.getLayoutY() - 20, width + 40, 160));
+
+                Rectangle2D visibleContent = coloredBounds(container.snapshot(parameters, null), Color.MAGENTA);
+
+                assertEquals(20, visibleContent.getMinX(), 0);
+                assertEquals(20, visibleContent.getMinY(), 0);
+                assertEquals(width, visibleContent.getWidth(), 0);
+                assertEquals(120, visibleContent.getHeight(), 0);
+                assertSame(applicationClip, content.getClip());
+            }
+        });
+    }
 
     private static class EventTestDockingPaneSkin extends DockingPaneSkin {
         private int dragStarts;

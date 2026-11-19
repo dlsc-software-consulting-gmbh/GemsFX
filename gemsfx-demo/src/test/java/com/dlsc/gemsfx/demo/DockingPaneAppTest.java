@@ -9,6 +9,7 @@ import com.dlsc.gemsfx.docking.DockingLayoutNode;
 import com.dlsc.gemsfx.docking.DockingPane;
 import com.dlsc.gemsfx.docking.DockingPosition;
 import com.dlsc.gemsfx.util.GemsFXAtlantaFX;
+import com.dlsc.pdfviewfx.PDFView;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
@@ -65,6 +66,45 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DockingPaneAppTest {
+
+    @Test
+    public void teslaManualStartsBesideEditorAndCanBeClosedAndReopened() throws Exception {
+        runFx(() -> {
+            Stage stage = new Stage();
+            try {
+                new DockingPaneApp().start(stage);
+                DockingPane pane = (DockingPane) stage.getScene().getRoot().lookup(".docking-pane");
+                DockingContext context = pane.getDockingContext();
+                Dockable manual = context.getDockables().stream()
+                        .filter(dockable -> dockable.getId().equals("pdf")).findFirst().orElseThrow();
+                PDFView view = assertInstanceOf(PDFView.class, manual.getContent());
+                assertNotNull(view.getDocument());
+                assertTrue(view.getDocument().getNumberOfPages() > 0);
+                pane.selectDockable("pdf");
+                assertTrue(context.getSelectionModel().isSelected(manual));
+                pane.selectDockable("editor");
+                assertFalse(context.getSelectionModel().isSelected(manual),
+                        "The manual must share the Editor's tab group");
+
+                assertTrue(context.requestCloseDockable(manual));
+                assertNull(view.getDocument(), "Closing the dockable must release its PDF document");
+
+                MenuButton openView = stage.getScene().getRoot().lookupAll(".menu-button").stream()
+                        .filter(MenuButton.class::isInstance).map(MenuButton.class::cast)
+                        .filter(menu -> "Open View".equals(menu.getText())).findFirst().orElseThrow();
+                openView.getItems().stream().filter(item -> "Tesla Manual".equals(item.getText()))
+                        .findFirst().orElseThrow().fire();
+
+                Dockable reopened = pane.getActiveDockable();
+                assertEquals("pdf", reopened.getId());
+                assertNotSame(manual, reopened);
+                assertNotNull(assertInstanceOf(PDFView.class, reopened.getContent()).getDocument());
+                assertTrue(context.requestCloseDockable(reopened));
+            } finally {
+                stage.hide();
+            }
+        });
+    }
 
     @BeforeAll
     static void startToolkit() throws InterruptedException {
