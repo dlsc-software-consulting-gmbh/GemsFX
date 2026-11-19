@@ -13,9 +13,11 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.input.DragEvent;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
@@ -41,6 +43,13 @@ import java.util.logging.Logger;
  * Owns the factories and the pane membership of a docking setup and enforces dockable ID uniqueness across all of its
  * panes. All model changes must happen on the JavaFX application thread.
  * Docking decisions are logged at {@link java.util.logging.Level#FINE FINE} level using this class's logger.
+ * <p>
+ * Floating windows are tied to the stage hosting the pane they were floated from. When that host
+ * stage is hidden, its floating windows are closed and their dockables are removed and disposed
+ * <em>without</em> consulting close permissions, because the host is already gone at that point.
+ * Applications whose dockables can veto closing, e.g. because of unsaved changes, should call
+ * {@link #requestCloseAll()} from the host stage's close request handler and consume the event
+ * when it returns {@code false}.
  */
 public class DockingContext {
 
@@ -579,6 +588,7 @@ public class DockingContext {
         registerFloatingStage(floatingPane, stage, hostingStage(sourcePane));
         stage.setX(screenX);
         stage.setY(screenY);
+        stage.show();
         closeFloatingStageIfEmpty(sourcePane);
         fireDockingEvent(new DockingEvent(this, DockingEvent.MOVED, dockable, sourcePane, floatingPane));
         return floatingPane;
@@ -770,8 +780,9 @@ public class DockingContext {
                     if (!hosts(replacementStage, replacementPane)) {
                         throw new IllegalStateException("stageFactory must return a stage hosting the supplied pane");
                     }
-                    replacementStage.setX(stageBounds.getX());
-                    replacementStage.setY(stageBounds.getY());
+                    Point2D position = visiblePosition(stageBounds);
+                    replacementStage.setX(position.getX());
+                    replacementStage.setY(position.getY());
                     replacementStage.setWidth(stageBounds.getWidth());
                     replacementStage.setHeight(stageBounds.getHeight());
                 }
@@ -872,6 +883,54 @@ public class DockingContext {
         requireFxThread();
         Objects.requireNonNull(dockable, "dockable must not be null");
         return closeDockableInternal(dockable, true);
+    }
+
+    /**
+     * Closes every open dockable of this context, docked and floating, if all of them permit it.
+     * Each dockable's closeable property, the close policy, and its close request callback are
+     * consulted first; a single veto leaves the context unchanged. Approved dockables are removed
+     * and disposed, and emptied floating windows are closed.
+     * <p>
+     * Call this from the close request handler of the host stage and consume the event when it
+     * returns {@code false}; see the class documentation.
+     *
+     * @return {@code true} if all dockables have been closed, {@code false} if one of them vetoed
+     * @throws IllegalStateException if called off the FX thread
+     */
+    public final boolean requestCloseAll() {
+        requireFxThread();
+        List<Dockable> open = new ArrayList<>(dockables);
+        for (Dockable dockable : open) {
+            if (!canCloseDockable(dockable)) {
+                return false;
+            }
+        }
+        for (Dockable dockable : open) {
+            if (!approveCloseRequest(dockable) || !matchesCloseAllTarget(open)) {
+                return false;
+            }
+        }
+        return withSelectionUpdates(() -> {
+            for (Dockable dockable : open) {
+                closeDockableInternal(dockable, false);
+            }
+            return true;
+        });
+    }
+
+    /**
+     * Rejects stale approvals if a callback opened, closed, or locked a dockable.
+     */
+    private boolean matchesCloseAllTarget(List<Dockable> open) {
+        if (!dockables.equals(open)) {
+            return false;
+        }
+        for (Dockable dockable : open) {
+            if (!dockable.isCloseable()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -1652,6 +1711,32 @@ public class DockingContext {
                 }
             }
         }
+    }
+
+    /**
+     * Returns the saved window position, or a position on the primary screen if the window's title
+     * area would not be reachable on any current screen, e.g. after a monitor was disconnected.
+     */
+    private static Point2D visiblePosition(DockingLayout.StageBounds bounds) {
+        double x = bounds.getX();
+        double y = bounds.getY();
+        double width = bounds.getWidth();
+        double titleHeight = Math.min(bounds.getHeight(), 32);
+        for (Screen screen : Screen.getScreens()) {
+            Rectangle2D visual = screen.getVisualBounds();
+            double visibleWidth = Math.min(x + width, visual.getMaxX()) - Math.max(x, visual.getMinX());
+            double visibleHeight = Math.min(y + titleHeight, visual.getMaxY()) - Math.max(y, visual.getMinY());
+            if (visibleWidth >= Math.min(width, 64) && visibleHeight >= titleHeight / 2) {
+                return new Point2D(x, y);
+            }
+        }
+        if (Screen.getScreens().isEmpty()) {
+            return new Point2D(x, y);
+        }
+        Rectangle2D visual = Screen.getPrimary().getVisualBounds();
+        return new Point2D(
+                Math.max(visual.getMinX(), Math.min(x, visual.getMaxX() - width)),
+                Math.max(visual.getMinY(), Math.min(y, visual.getMaxY() - bounds.getHeight())));
     }
 
     private static Stage hostingStage(DockingPane pane) {

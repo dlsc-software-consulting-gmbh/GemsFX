@@ -469,7 +469,6 @@ public class DockingPaneApp extends GemApplication {
         Scene scene = new Scene(createWindowRoot(wrapper), 420, 280);
         applyAppStyles(scene);
         floating.setScene(scene);
-        floating.show();
         return floating;
     }
 

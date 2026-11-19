@@ -1295,7 +1295,73 @@ public class DockingPaneTest extends FxTestBase {
     }
 
     @Test
-    public void activationKeepsExternalFocusAndFallsBackToTheTabHeader() {
+    public void closingTheFocusedLoneTabMovesFocusIntoTheNewlyActiveDockable() {
+        DockingPane pane = invoke(() -> {
+            DockingContext context = context(
+                    new Dockable("a", "A", new StackPane(new TextField())),
+                    new Dockable("b", "B", new StackPane(new TextField())));
+            DockingPane result = context.createPane();
+            context.openDockable(result, "a", DockingPosition.CENTER);
+            context.openDockable(result, "b", DockingPosition.RIGHT);
+            layout(result);
+            Stage stage = (Stage) result.getScene().getWindow();
+            stage.show();
+            stage.requestFocus();
+            return result;
+        });
+        try {
+            waitForFxEvents();
+            runFx(() -> {
+                Dockable closing = pane.getDockables().get(1);
+                TextField remaining = (TextField) ((StackPane) pane.getDockables().get(0).getContent()).getChildren().get(0);
+                ((StackPane) closing.getContent()).getChildren().get(0).requestFocus();
+                assertEquals("b", pane.getActiveDockable().getId());
+
+                assertTrue(pane.getDockingContext().requestCloseDockable(closing));
+
+                assertEquals("a", pane.getActiveDockable().getId());
+                assertSame(remaining, pane.getScene().getFocusOwner());
+            });
+        } finally {
+            runFx(() -> ((Stage) pane.getScene().getWindow()).close());
+        }
+    }
+
+    @Test
+    public void closingTheFocusedTabMovesFocusIntoItsNeighbourTab() {
+        DockingPane pane = invoke(() -> {
+            DockingContext context = context(
+                    new Dockable("a", "A", new StackPane(new TextField())),
+                    new Dockable("b", "B", new StackPane(new TextField())));
+            DockingPane result = context.createPane();
+            context.openDockable(result, "a", DockingPosition.CENTER);
+            context.openDockable(result, "b", DockingPosition.CENTER);
+            layout(result);
+            Stage stage = (Stage) result.getScene().getWindow();
+            stage.show();
+            stage.requestFocus();
+            return result;
+        });
+        try {
+            waitForFxEvents();
+            runFx(() -> {
+                Dockable closing = pane.getDockables().get(1);
+                TextField remaining = (TextField) ((StackPane) pane.getDockables().get(0).getContent()).getChildren().get(0);
+                ((StackPane) closing.getContent()).getChildren().get(0).requestFocus();
+                assertEquals("b", pane.getActiveDockable().getId());
+
+                assertTrue(pane.getDockingContext().requestCloseDockable(closing));
+
+                assertEquals("a", pane.getActiveDockable().getId());
+                assertSame(remaining, pane.getScene().getFocusOwner());
+            });
+        } finally {
+            runFx(() -> ((Stage) pane.getScene().getWindow()).close());
+        }
+    }
+
+    @Test
+    public void activationTakesFocusFromOutsideThePaneAndFallsBackToTheTabHeader() {
         DockingPane pane = invoke(() -> {
             DockingContext context = context(
                     new Dockable("a", "A", new TextField()),
@@ -1319,10 +1385,9 @@ public class DockingPaneTest extends FxTestBase {
                 outside.requestFocus();
                 assertSame(outside, pane.getScene().getFocusOwner());
                 pane.selectDockable("a");
-                assertSame(outside, pane.getScene().getFocusOwner());
-
-                pane.getActiveDockable().getContent().requestFocus();
                 assertSame(pane.getActiveDockable().getContent(), pane.getScene().getFocusOwner());
+
+                outside.requestFocus();
                 pane.selectDockable("b");
                 assertEquals("b", pane.getActiveDockable().getId());
                 assertSame(title(pane, "b"), pane.getScene().getFocusOwner());
@@ -1488,7 +1553,8 @@ public class DockingPaneTest extends FxTestBase {
             DockingPane result = context.floatTabGroup("a", 0, 0);
             result.moveDockable("b", "a", DockingPosition.RIGHT);
             Stage stage = (Stage) result.getScene().getWindow();
-            stage.show();
+            result.applyCss();
+            result.layout();
             stage.requestFocus();
             return result;
         });

@@ -538,6 +538,35 @@ public class DockingPaneAppTest {
     }
 
     @Test
+    public void closingTheRocketDockablesFocusesTheEditorTextArea() throws Exception {
+        Stage[] stages = new Stage[1];
+        try {
+            runFx(() -> {
+                stages[0] = new Stage();
+                new DockingPaneApp().start(stages[0]);
+                stages[0].requestFocus();
+            });
+            runFx(() -> {
+            });
+            runFx(() -> {
+                Stage stage = stages[0];
+                DockingPane pane = (DockingPane) stage.getScene().getRoot().lookup(".docking-pane");
+                DockingContext context = pane.getDockingContext();
+                for (String id : List.of("drop", "drag")) {
+                    Dockable rocket = context.getDockables().stream()
+                            .filter(dockable -> dockable.getId().equals(id)).findFirst().orElseThrow();
+                    assertTrue(context.requestCloseDockable(rocket));
+                }
+                Dockable editor = pane.getActiveDockable();
+                assertEquals("editor", editor.getId());
+                assertSame(editor.getContent(), stage.getScene().getFocusOwner());
+            });
+        } finally {
+            runFx(() -> stages[0].hide());
+        }
+    }
+
+    @Test
     public void floatingWindowCloseUsesItsOwnEditorConfirmation() throws Exception {
         runFx(() -> {
             Stage main = new Stage();
