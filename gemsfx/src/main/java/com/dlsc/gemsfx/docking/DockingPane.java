@@ -227,10 +227,9 @@ public class DockingPane extends Control {
 
     /**
      * The currently active dockable of this pane, or {@code null}.
-     * Clicking or focusing a dockable's content or tab makes it active. If another dockable is activated
-     * while focus is in a different dockable in this pane, focus moves to the newly active
-     * dockable's content, or to its tab if the content has no focusable node. Focus outside
-     * this pane is left unchanged.
+     * Clicking or focusing a dockable's content or tab makes it active. When a dockable becomes
+     * active, focus moves to the first focusable node of its content, or to its tab if the content
+     * has no focusable node, even if the focus was outside this pane.
      *
      * @return the active dockable property
      */
@@ -702,38 +701,59 @@ public class DockingPane extends Control {
     /**
      * Finds a replacement active dockable before removal changes the tree. The preceding tab in the
      * same group is preferred, or the following tab when removing the first tab. If the group would
-     * become empty, any remaining dockable elsewhere in the pane may take over.
+     * become empty, the selected tab of the nearest remaining group takes over, so no other group
+     * changes its selection.
      */
-    private String neighbourOf(DockingLayoutNode node, String id) {
-        if (node instanceof DockingLayoutNode.Tabs) {
-            List<String> ids = ((DockingLayoutNode.Tabs) node).getDockableIds();
+    private String neighbourOf(DockingLayoutNode root, String id) {
+        List<DockingLayoutNode.Tabs> groups = new ArrayList<>();
+        collectGroups(root, groups);
+        for (int i = 0; i < groups.size(); i++) {
+            List<String> ids = groups.get(i).getDockableIds();
             int index = ids.indexOf(id);
             if (index < 0) {
-                return null;
+                continue;
             }
-            if (ids.size() == 1) {
-                return remainingOutside(id);
+            if (ids.size() > 1) {
+                return ids.get(index == 0 ? 1 : index - 1);
             }
-            return ids.get(index == 0 ? 1 : index - 1);
-        }
-        if (node instanceof DockingLayoutNode.Split) {
-            DockingLayoutNode.Split split = (DockingLayoutNode.Split) node;
-            for (DockingLayoutNode child : split.getChildren()) {
-                String found = neighbourOf(child, id);
-                if (found != null) {
-                    return found;
-                }
+            if (groups.size() > 1) {
+                return selectedOf(groups.get(i == 0 ? 1 : i - 1));
             }
+            return selectedInOtherTree(id);
         }
         return null;
     }
 
-    private String remainingOutside(String id) {
-        for (String other : dockablesById.keySet()) {
-            if (!other.equals(id)) {
-                return other;
+    private static void collectGroups(DockingLayoutNode node, List<DockingLayoutNode.Tabs> groups) {
+        if (node instanceof DockingLayoutNode.Tabs) {
+            groups.add((DockingLayoutNode.Tabs) node);
+        } else if (node instanceof DockingLayoutNode.Split) {
+            for (DockingLayoutNode child : ((DockingLayoutNode.Split) node).getChildren()) {
+                collectGroups(child, groups);
             }
         }
-        return null;
+    }
+
+    private static String selectedOf(DockingLayoutNode.Tabs group) {
+        String selected = group.getSelectedId();
+        return selected != null ? selected : group.getDockableIds().get(0);
+    }
+
+    /**
+     * Picks the selected tab of the docked layout's first group, or of the topmost internal floating
+     * group, skipping the tree that holds the given dockable.
+     */
+    private String selectedInOtherTree(String id) {
+        DockingTree sourceTree = treeFor(id);
+        List<DockingLayoutNode.Tabs> groups = new ArrayList<>();
+        if (sourceTree != tree) {
+            collectGroups(tree.snapshot(), groups);
+        }
+        for (int i = floatingStates.size() - 1; i >= 0 && groups.isEmpty(); i--) {
+            if (floatingStates.get(i).tree != sourceTree) {
+                collectGroups(floatingStates.get(i).tree.snapshot(), groups);
+            }
+        }
+        return groups.isEmpty() ? null : selectedOf(groups.get(0));
     }
 }

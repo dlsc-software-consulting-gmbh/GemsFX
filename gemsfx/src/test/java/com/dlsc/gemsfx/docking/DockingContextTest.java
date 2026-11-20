@@ -87,6 +87,64 @@ public class DockingContextTest extends FxTestBase {
         }
     }
 
+    @Test
+    public void closingALoneActiveTabKeepsTheSelectionOfOtherGroups() {
+        runFx(() -> {
+            DockingContext context = new DockingContext(
+                    id -> Optional.of(new Dockable(id, id, new Label(id))), STAGE_FACTORY);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "b1", DockingPosition.CENTER);
+            context.openDockable(pane, "b2", DockingPosition.CENTER);
+            context.openDockable(pane, "b3", DockingPosition.CENTER);
+            pane.selectDockable("b1");
+            Dockable lone = context.openDockable(pane, "a", DockingPosition.LEFT).orElseThrow();
+            assertSame(lone, pane.getActiveDockable());
+
+            assertTrue(context.requestCloseDockable(lone));
+
+            DockingLayoutNode.Tabs group = (DockingLayoutNode.Tabs) pane.getLayoutRoot();
+            assertEquals("b1", group.getSelectedId());
+            assertEquals("b1", pane.getActiveDockable().getId());
+        });
+    }
+
+    @Test
+    public void requestCloseAllLeavesEverythingOpenWhenOneDockableVetoes() {
+        runFx(() -> {
+            List<String> disposed = new ArrayList<>();
+            DockingContext context = new DockingContext(id -> Optional.of(new Dockable(id, id, new Label(id)) {
+                @Override
+                protected void dispose() {
+                    disposed.add(getId());
+                }
+            }), STAGE_FACTORY);
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            Dockable unsaved = context.openDockable(pane, "b", DockingPosition.CENTER).orElseThrow();
+            DockingPane floating = context.floatDockable("b", 100, 100);
+            Stage floatingStage = (Stage) floating.getScene().getWindow();
+            try {
+                unsaved.setOnCloseRequest(() -> false);
+
+                assertFalse(context.requestCloseAll());
+
+                assertEquals(2, context.getDockables().size());
+                assertTrue(disposed.isEmpty());
+                assertSame(floating, unsaved.getDockingPane());
+
+                unsaved.setOnCloseRequest(() -> true);
+
+                assertTrue(context.requestCloseAll());
+
+                assertTrue(context.getDockables().isEmpty());
+                assertEquals(List.of("a", "b"), disposed);
+                assertFalse(floatingStage.isShowing());
+            } finally {
+                floatingStage.close();
+            }
+        });
+    }
+
     private static final DockingStageFactory STAGE_FACTORY = pane -> {
         Stage stage = new Stage();
         stage.setScene(new Scene(pane));

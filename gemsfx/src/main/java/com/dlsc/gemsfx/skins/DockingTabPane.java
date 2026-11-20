@@ -21,6 +21,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Callback;
 
 import java.util.ArrayList;
@@ -55,6 +56,10 @@ final class DockingTabPane extends VBox {
         strip.getStyleClass().add("docking-tab-strip");
         strip.addEventFilter(MouseEvent.MOUSE_CLICKED, this::toggleMaximized);
         contentArea.getStyleClass().add("docking-tab-content");
+        Rectangle contentClip = new Rectangle();
+        contentClip.widthProperty().bind(contentArea.widthProperty());
+        contentClip.heightProperty().bind(contentArea.heightProperty());
+        contentArea.setClip(contentClip);
         contentArea.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> activateSelectedDockable());
         addEventFilter(MouseEvent.MOUSE_RELEASED, this::activateFromHeaderOrBackground);
         addEventFilter(MouseEvent.MOUSE_CLICKED, this::activateFromHeaderOrBackground);

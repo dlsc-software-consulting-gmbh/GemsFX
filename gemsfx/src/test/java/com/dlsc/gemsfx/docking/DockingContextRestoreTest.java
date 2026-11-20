@@ -3,9 +3,11 @@ package com.dlsc.gemsfx.docking;
 import com.dlsc.gemsfx.FxTestBase;
 
 import javafx.geometry.Orientation;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.junit.Test;
 
@@ -298,6 +300,42 @@ public class DockingContextRestoreTest extends FxTestBase {
                 host.close();
             }
             return null;
+        });
+    }
+
+    @Test
+    public void restoreMovesOffScreenFloatingWindowsOntoAScreen() {
+        runFx(() -> {
+            Map<String, Dockable> dockables = new HashMap<>();
+            dockables.put("a", dockable("a"));
+            dockables.put("b", dockable("b"));
+            AtomicReference<List<Stage>> stages = new AtomicReference<>(new ArrayList<>());
+            DockingContext context = context(dockables, new AtomicInteger(), stages);
+            DockingPane primary = context.createPane();
+            context.openDockable(primary, "a", DockingPosition.CENTER);
+            context.openDockable(primary, "b", DockingPosition.CENTER);
+            try {
+                context.floatDockable("b", 100, 100);
+                DockingLayout saved = context.getLayout();
+                List<DockingLayout.PaneLayout> panes = new ArrayList<>();
+                for (DockingLayout.PaneLayout pane : saved.getPanes()) {
+                    panes.add(pane.getStageBounds() == null ? pane : new DockingLayout.PaneLayout(pane.getPaneId(),
+                            pane.getRoot(), new DockingLayout.StageBounds(-50000, 90000, 300, 200)));
+                }
+
+                context.restoreLayout(new DockingLayout(saved.getPrimaryPaneId(), panes));
+
+                Stage restored = stages.get().get(stages.get().size() - 1);
+                Rectangle2D screen = Screen.getPrimary().getVisualBounds();
+                assertTrue("restored window must be on screen but is at " + restored.getX() + ", " + restored.getY(),
+                        screen.contains(restored.getX(), restored.getY(), restored.getWidth(), restored.getHeight()));
+                assertEquals(300, restored.getWidth(), 0.0);
+                assertEquals(200, restored.getHeight(), 0.0);
+            } finally {
+                for (Stage stage : stages.get()) {
+                    stage.close();
+                }
+            }
         });
     }
 

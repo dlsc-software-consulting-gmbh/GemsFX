@@ -90,7 +90,6 @@ DockingStageFactory stageFactory = pane -> {
     Stage stage = new Stage();
     stage.setTitle("Floating Dock");
     stage.setScene(new Scene(new BorderPane(pane), 420, 280));
-    stage.show();
     return stage;
 };
 
@@ -372,9 +371,9 @@ context.openDockable(pane, "inspector", DockingPosition.RIGHT);""",
                     "ENTER or SPACE selects the focused title, DELETE or shortcut+W requests close."
                 ),
                 Para(
-                    "Clicking or focusing a dockable's content or title makes it active. If another dockable is "
-                    "activated while focus is in a dockable, focus moves into the newly active content "
-                    "or, if it has no focusable node, to its title. Focus outside the pane is unchanged."
+                    "Clicking or focusing a dockable's content or title makes it active. When a dockable becomes "
+                    "active, focus moves to the first focusable node of its content or, if it has none, "
+                    "to its title, even if the focus was outside the pane."
                 ),
             ],
         ),
@@ -470,11 +469,16 @@ console.setPreferredDockingSize(DockingSize.weight(0.25));""",
                 Para(
                     "When a drag ends outside all context panes, or when the app calls "
                     "<font face='Courier'>floatDockable(...)</font>, the context creates a fresh pane and asks "
-                    "the stage factory to host it. The factory must return a stage that already contains the supplied pane."
+                    "the stage factory to host it. The factory must return a stage that already contains the supplied pane. "
+                    "It should not show the stage; the context positions and shows it."
                 ),
                 Bullets(
                     [
-                        "Floating stages are tracked per host stage and close automatically when the host closes.",
+                        "Floating stages are tracked per host stage and close automatically when the host closes. "
+                        "Their dockables are then disposed without asking for permission.",
+                        "Call <font face='Courier'>context.requestCloseAll()</font> from the host stage's close request "
+                        "handler and consume the event if it returns false, so that dockables can veto the shutdown.",
+                        "A restored floating window whose saved position is no longer on any screen is moved onto the primary screen.",
                         "If the last dockable leaves a floating pane, its stage is closed automatically.",
                         "Close-veto policy is respected before a floating stage closes.",
                     ]

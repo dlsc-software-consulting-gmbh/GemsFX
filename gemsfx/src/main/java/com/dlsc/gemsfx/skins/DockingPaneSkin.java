@@ -225,8 +225,8 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
     }
 
     /**
-     * Moves focus to the newly active dockable only when it currently belongs to a different
-     * dockable in this pane. Content is preferred, with the tab title as a fallback. CSS is applied
+     * Moves focus to the newly active dockable unless it already holds the focus. The first
+     * focusable node of its content is preferred, with the tab title as a fallback. CSS is applied
      * when a rebuild has not yet attached the new content, and the guard prevents focus changes
      * from recursively changing the active dockable.
      */
@@ -236,7 +236,7 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         }
         Dockable active = getSkinnable().getActiveDockable();
         Dockable focused = dockableContaining(focusScene.getFocusOwner());
-        if (active == null || focused == null || focused == active) {
+        if (active == null || focused == active) {
             return;
         }
         synchronizingFocus = true;
@@ -780,6 +780,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      * Drags without a dockable ID are routed to the external dockable-creation path.
      */
     private void handleDragOver(DragEvent event) {
+        if (isForeignDockingDrag(event)) {
+            clearDropPreview();
+            hidePaneEdgeTargets();
+            return;
+        }
         String draggedId = draggedDockableId(event);
         DockingPane pane = getSkinnable();
         if (pane.getMaximizedDockable() != null) {
@@ -848,6 +853,11 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
      * completion does not mistake a rejected in-pane drop for a request to create a floating window.
      */
     private void handleDragDropped(DragEvent event) {
+        if (isForeignDockingDrag(event)) {
+            clearDropPreview();
+            hidePaneEdgeTargets();
+            return;
+        }
         String draggedId = draggedDockableId(event);
         DockingPane pane = getSkinnable();
         if (pane.getMaximizedDockable() != null) {
@@ -1077,6 +1087,30 @@ public class DockingPaneSkin extends SkinBase<DockingPane> {
         }
         Object gestureSource = event.getGestureSource();
         return gestureSource instanceof Node ? dockableId((Node) gestureSource) : null;
+    }
+
+    /**
+     * Detects docking drags that belong to another docking context. A dockable ID only identifies
+     * a dockable within its own context, so such a drag must never be resolved against this pane's
+     * context. A docking drag without a gesture source was started by another application.
+     *
+     * @param event the drag event
+     * @return {@code true} if the event carries a dockable of a different context
+     */
+    private boolean isForeignDockingDrag(DragEvent event) {
+        if (draggedDockableId(event) == null) {
+            return false;
+        }
+        Object gestureSource = event.getGestureSource();
+        if (!(gestureSource instanceof Node)) {
+            return true;
+        }
+        for (Node node = (Node) gestureSource; node != null; node = node.getParent()) {
+            if (node instanceof DockingPane) {
+                return ((DockingPane) node).getDockingContext() != getSkinnable().getDockingContext();
+            }
+        }
+        return false;
     }
 
     /**

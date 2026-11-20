@@ -366,6 +366,58 @@ public class DockingContextWindowTest extends FxTestBase {
     }
 
     @Test
+    public void dragFromAnotherContextDoesNotMoveALocalDockableWithTheSameId() {
+        runFx(() -> {
+            DockingContext sourceContext = new DockingContext(
+                    id -> Optional.of(dockable(id)), pane -> new Stage());
+            DockingPane source = sourceContext.createPane();
+            sourceContext.openDockable(source, "console", DockingPosition.CENTER);
+            renderWithEventSkin(source);
+            DockingContext targetContext = new DockingContext(
+                    id -> Optional.of(dockable(id)), pane -> new Stage());
+            DockingPane target = targetContext.createPane();
+            targetContext.openDockable(target, "editor", DockingPosition.CENTER);
+            targetContext.openDockable(target, "console", DockingPosition.CENTER);
+            layout(target);
+            Node dragged = title(source, "console");
+
+            DragEvent drop = fireDragEvent(target, DragEvent.DRAG_DROPPED, dragged,
+                    target.getWidth() - 10, target.getHeight() / 2, 400, 300, TransferMode.MOVE, target);
+
+            assertFalse(drop.isDropCompleted());
+            assertEquals(List.of("editor", "console"), ids(target));
+            assertEquals(List.of("console"), ids(source));
+        });
+    }
+
+    @Test
+    public void floatingADockableShowsTheStageWhenTheFactoryDoesNot() {
+        runFx(() -> {
+            DockingContext context = new DockingContext(id -> Optional.of(dockable(id)), pane -> {
+                Stage stage = new Stage();
+                stage.setScene(new Scene(new StackPane(pane), 400, 300));
+                return stage;
+            });
+            DockingPane pane = context.createPane();
+            context.openDockable(pane, "a", DockingPosition.CENTER);
+            context.openDockable(pane, "b", DockingPosition.CENTER);
+            Stage floatingStage = null;
+            try {
+                DockingPane floating = context.floatDockable("b", 100, 100);
+                floatingStage = (Stage) floating.getScene().getWindow();
+
+                assertTrue(floatingStage.isShowing());
+                assertEquals(100, floatingStage.getX(), 0.0);
+                assertEquals(100, floatingStage.getY(), 0.0);
+            } finally {
+                if (floatingStage != null) {
+                    floatingStage.close();
+                }
+            }
+        });
+    }
+
+    @Test
     public void shiftDragMergesTheWholeGroupIntoAnotherPane() {
         invoke(() -> {
             List<Dockable> all = List.of(dockable("a"), dockable("b"), dockable("x"));
@@ -1703,8 +1755,9 @@ public class DockingContextWindowTest extends FxTestBase {
                 assertSame(scene, sourceTitle.getScene());
 
                 fireDragDetected(sourceTitle);
+                double dropX = id.equals("c") ? 777 : 1177;
                 fireDragEvent(sourceTitle, DragEvent.DRAG_DONE, sourceTitle,
-                        5, 5, 777, 888, null, sourceTitle);
+                        5, 5, dropX, 888, null, sourceTitle);
 
                 assertNotNull("Dragging a title inside a split must create a floating pane", floatingPaneRef.get());
                 assertEquals(List.of(id), ids(floatingPaneRef.get()));
